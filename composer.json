@@ -1,0 +1,33 @@
+{
+    "name": "zenstruck/foundry",
+    "description": "TODO",
+    "homepage": "https://github.com/zenstruck/foundry",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["fixture", "factory", "test"],
+    "authors": [
+        {
+            "name": "Kevin Bond",
+            "email": "kevinbond@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": { "Zenstruck\\Foundry\\": "src/" },
+        "files": ["src/functions.php"]
+    },
+    "autoload-dev": {
+        "psr-4": { "Zenstruck\\Foundry\\Tests\\": "tests/" }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    }
+}
