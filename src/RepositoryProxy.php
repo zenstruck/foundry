@@ -110,6 +110,21 @@ final class RepositoryProxy implements ObjectRepository
     }
 
     /**
+     * Remove all rows.
+     */
+    public function truncate(): void
+    {
+        if (!$this->repository instanceof EntityRepository) {
+            throw new \RuntimeException('This operation is only available when using doctrine/orm');
+        }
+
+        PersistenceManager::objectManagerFor($this->getClassName())
+            ->createQuery("DELETE {$this->getClassName()}")
+            ->execute()
+        ;
+    }
+
+    /**
      * @param object|array|mixed $criteria
      *
      * @return Proxy|object|null
