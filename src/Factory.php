@@ -23,6 +23,9 @@ class Factory
     private array $attributeSet = [];
 
     /** @var callable[] */
+    private array $beforeInstantiate = [];
+
+    /** @var callable[] */
     private array $afterInstantiate = [];
 
     /** @var callable[] */
@@ -90,6 +93,17 @@ class Factory
     {
         $cloned = clone $this;
         $cloned->attributeSet[] = $attributes;
+
+        return $cloned;
+    }
+
+    /**
+     * @param callable $callback (array $attributes): array
+     */
+    final public function beforeInstantiate(callable $callback): self
+    {
+        $cloned = clone $this;
+        $cloned->beforeInstantiate[] = $callback;
 
         return $cloned;
     }
@@ -168,6 +182,14 @@ class Factory
 
         // normalize each attribute set and collapse
         $attributes = \array_merge(...\array_map([$this, 'normalizeAttributes'], $attributeSet));
+
+        foreach ($this->beforeInstantiate as $callback) {
+            $attributes = $callback($attributes);
+
+            if (!\is_array($attributes)) {
+                throw new \LogicException('Before Instantiate event callback must return an array.');
+            }
+        }
 
         // filter each attribute to convert proxies and factories to objects
         $attributes = \array_map(fn ($value) => self::filterNormalizedProperty($value, $persisting), $attributes);
