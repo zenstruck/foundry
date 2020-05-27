@@ -87,6 +87,21 @@ abstract class CustomFactory extends Factory
     }
 
     /**
+     * Try and find existing object for the given $attributes. If not found,
+     * instantiate and persist.
+     *
+     * @return Proxy|object
+     */
+    final public static function findOrCreate(array $attributes): object
+    {
+        if ($found = self::repository(true)->find($attributes)) {
+            return $found;
+        }
+
+        return self::create($attributes);
+    }
+
+    /**
      * @return RepositoryProxy|ObjectRepository
      */
     final public static function repository(bool $proxy = true): ObjectRepository
