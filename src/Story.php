@@ -19,6 +19,11 @@ abstract class Story
         return $this->get($method);
     }
 
+    public static function __callStatic($name, $arguments)
+    {
+        return static::load()->get($name);
+    }
+
     final public static function load(): self
     {
         if (StoryManager::has(static::class)) {
