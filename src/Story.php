@@ -46,7 +46,7 @@ abstract class Story
         return $this;
     }
 
-    final public function get(string $name): object
+    final public function get(string $name): Proxy
     {
         if (!\array_key_exists($name, $this->objects)) {
             throw new \InvalidArgumentException('explain that object was not registered'); // todo
