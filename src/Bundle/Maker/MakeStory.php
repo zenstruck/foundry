@@ -1,6 +1,6 @@
 <?php
 
-namespace Zenstruck\Foundry\Maker;
+namespace Zenstruck\Foundry\Bundle\Maker;
 
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;

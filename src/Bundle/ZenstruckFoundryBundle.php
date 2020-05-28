@@ -1,6 +1,6 @@
 <?php
 
-namespace Zenstruck\Foundry;
+namespace Zenstruck\Foundry\Bundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

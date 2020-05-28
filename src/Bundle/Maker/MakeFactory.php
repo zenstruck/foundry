@@ -1,6 +1,6 @@
 <?php
 
-namespace Zenstruck\Foundry\Maker;
+namespace Zenstruck\Foundry\Bundle\Maker;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;

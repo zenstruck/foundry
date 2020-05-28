@@ -5,12 +5,12 @@
         https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="Zenstruck\Foundry\Maker\MakeFactory">
+        <service id="Zenstruck\Foundry\Bundle\Maker\MakeFactory">
             <argument type="service" id="Doctrine\Persistence\ManagerRegistry" />
             <tag name="maker.command" />
         </service>
 
-        <service id="Zenstruck\Foundry\Maker\MakeStory">
+        <service id="Zenstruck\Foundry\Bundle\Maker\MakeStory">
             <tag name="maker.command" />
         </service>
     </services>

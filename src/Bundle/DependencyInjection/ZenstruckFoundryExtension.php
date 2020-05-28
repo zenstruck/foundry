@@ -1,6 +1,6 @@
 <?php
 
-namespace Zenstruck\Foundry\DependencyInjection;
+namespace Zenstruck\Foundry\Bundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
