@@ -28,8 +28,7 @@ final class PersistenceManager
             $objectOrClass = \get_class($objectOrClass);
         }
 
-        $objectManager = self::objectManagerFor($objectOrClass);
-        $repository = $objectManager->getRepository($objectOrClass);
+        $repository = self::managerRegistry()->getRepository($objectOrClass);
 
         return $proxy ? new RepositoryProxy($repository) : $repository;
     }
@@ -65,16 +64,21 @@ final class PersistenceManager
      */
     public static function objectManagerFor($objectOrClass): ObjectManager
     {
-        if (null === self::$managerRegistry) {
-            throw new \RuntimeException('ManagerRegistry not registered...'); // todo improve
-        }
-
         $class = \is_string($objectOrClass) ? $objectOrClass : \get_class($objectOrClass);
 
-        if (!$objectManager = self::$managerRegistry->getManagerForClass($class)) {
+        if (!$objectManager = self::managerRegistry()->getManagerForClass($class)) {
             throw new \RuntimeException(\sprintf('No object manager registered for "%s".', $class));
         }
 
         return $objectManager;
+    }
+
+    private static function managerRegistry(): ManagerRegistry
+    {
+        if (null === self::$managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry not registered...'); // todo improve
+        }
+
+        return self::$managerRegistry;
     }
 }

@@ -28,7 +28,7 @@ function persist(string $class, $attributes = [], ?bool $proxy = null): object
  *
  * @return Proxy[]|object[]
  */
-function persist_many(int $number, string $class, $attributes = [], ?bool $proxy = null): object
+function persist_many(int $number, string $class, $attributes = [], ?bool $proxy = null): array
 {
     return factory($class)->persistMany($number, $attributes, $proxy);
 }
@@ -44,7 +44,7 @@ function instantiate(string $class, $attributes = []): object
 /**
  * @see Factory::instantiateMany()
  */
-function instantiate_many(int $number, string $class, $attributes = []): object
+function instantiate_many(int $number, string $class, $attributes = []): array
 {
     return factory($class)->instantiateMany($number, $attributes);
 }
@@ -54,7 +54,7 @@ function instantiate_many(int $number, string $class, $attributes = []): object
  *
  * @return RepositoryProxy|ObjectRepository
  */
-function repository(string $objectOrClass, bool $proxy = true): ObjectRepository
+function repository($objectOrClass, bool $proxy = true): ObjectRepository
 {
     return PersistenceManager::repositoryFor($objectOrClass, $proxy);
 }
