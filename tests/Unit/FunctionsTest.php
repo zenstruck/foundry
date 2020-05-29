@@ -6,18 +6,18 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
+use Zenstruck\Foundry\PersistenceManager;
+use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\RepositoryProxy;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
+use Zenstruck\Foundry\Tests\ResetGlobalState;
 use function Zenstruck\Foundry\faker;
 use function Zenstruck\Foundry\instantiate;
 use function Zenstruck\Foundry\instantiate_many;
 use function Zenstruck\Foundry\persist;
 use function Zenstruck\Foundry\persist_many;
-use Zenstruck\Foundry\PersistenceManager;
-use Zenstruck\Foundry\Proxy;
 use function Zenstruck\Foundry\repository;
-use Zenstruck\Foundry\RepositoryProxy;
-use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
-use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
-use Zenstruck\Foundry\Tests\ResetGlobalState;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

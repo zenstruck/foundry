@@ -16,7 +16,9 @@ return PhpCsFixer\Config::create()
         'multiline_whitespace_before_semicolons' => ['strategy' => 'new_line_for_chained_calls'],
         'multiline_comment_opening_closing' => true,
         'array_syntax' => ['syntax' => 'short'],
-        'ordered_imports' => true,
+        'ordered_imports' => [
+            'imports_order' => ['const', 'class', 'function'],
+        ],
         'ordered_class_elements' => true,
         'native_function_invocation' => true,
         'explicit_indirect_variable' => true,
