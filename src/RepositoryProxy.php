@@ -119,7 +119,7 @@ final class RepositoryProxy implements ObjectRepository
         }
 
         PersistenceManager::objectManagerFor($this->getClassName())
-            ->createQuery("DELETE {$this->getClassName()}")
+            ->createQuery("DELETE {$this->getClassName()} e")
             ->execute()
         ;
     }
