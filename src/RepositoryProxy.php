@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Foundry;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\Assert;
@@ -114,14 +115,13 @@ final class RepositoryProxy implements ObjectRepository
      */
     public function truncate(): void
     {
-        if (!$this->repository instanceof EntityRepository) {
+        $om = PersistenceManager::objectManagerFor($this->getClassName());
+
+        if (!$om instanceof EntityManagerInterface) {
             throw new \RuntimeException('This operation is only available when using doctrine/orm');
         }
 
-        PersistenceManager::objectManagerFor($this->getClassName())
-            ->createQuery("DELETE {$this->getClassName()} e")
-            ->execute()
-        ;
+        $om->createQuery("DELETE {$this->getClassName()} e")->execute();
     }
 
     /**
