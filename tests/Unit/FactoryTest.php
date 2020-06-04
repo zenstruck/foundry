@@ -11,14 +11,14 @@ use Zenstruck\Foundry\PersistenceManager;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
-use Zenstruck\Foundry\Tests\ResetGlobalState;
+use Zenstruck\Foundry\Tests\ResetGlobals;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class FactoryTest extends TestCase
 {
-    use ResetGlobalState;
+    use ResetGlobals;
 
     /**
      * @test

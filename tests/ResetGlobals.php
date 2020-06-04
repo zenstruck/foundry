@@ -10,12 +10,12 @@ use Zenstruck\Foundry\StoryManager;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-trait ResetGlobalState
+trait ResetGlobals
 {
     /**
      * @before
      */
-    public static function resetGlobalState()
+    public static function resetGlobals()
     {
         $reset = static function($class, $property, $value) {
             $property = (new \ReflectionClass($class))->getProperty($property);

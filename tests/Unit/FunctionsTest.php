@@ -11,7 +11,7 @@ use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\RepositoryProxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
-use Zenstruck\Foundry\Tests\ResetGlobalState;
+use Zenstruck\Foundry\Tests\ResetGlobals;
 use function Zenstruck\Foundry\faker;
 use function Zenstruck\Foundry\instantiate;
 use function Zenstruck\Foundry\instantiate_many;
@@ -24,7 +24,7 @@ use function Zenstruck\Foundry\repository;
  */
 final class FunctionsTest extends TestCase
 {
-    use ResetGlobalState;
+    use ResetGlobals;
 
     /**
      * @test

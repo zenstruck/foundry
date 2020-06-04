@@ -5,14 +5,14 @@ namespace Zenstruck\Foundry\Tests\Unit;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
-use Zenstruck\Foundry\Tests\ResetGlobalState;
+use Zenstruck\Foundry\Tests\ResetGlobals;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class ProxyTest extends TestCase
 {
-    use ResetGlobalState;
+    use ResetGlobals;
 
     protected function setUp(): void
     {
