@@ -192,7 +192,7 @@ final class RepositoryProxy implements ObjectRepository
     private static function normalizeCriteria(array $criteria): array
     {
         return \array_map(
-            function ($value) {
+            function($value) {
                 return $value instanceof Proxy ? $value->object() : $value;
             },
             $criteria

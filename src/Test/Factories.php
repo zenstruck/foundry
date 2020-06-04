@@ -24,7 +24,7 @@ trait Factories
             throw new \RuntimeException(\sprintf('The "%s" trait can only be used on TestCases that extend "%s".', __TRAIT__, KernelTestCase::class));
         }
 
-        PersistenceManager::register(new LazyManagerRegistry(static function () {
+        PersistenceManager::register(new LazyManagerRegistry(static function() {
             if (!static::$booted) {
                 static::bootKernel();
             }

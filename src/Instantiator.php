@@ -194,7 +194,7 @@ final class Instantiator
      */
     private static function camel(string $string): string
     {
-        return \str_replace(' ', '', \preg_replace_callback('/\b./u', static function ($m) use (&$i) {
+        return \str_replace(' ', '', \preg_replace_callback('/\b./u', static function($m) use (&$i) {
             return 1 === ++$i ? ('İ' === $m[0] ? 'i̇' : \mb_strtolower($m[0], 'UTF-8')) : \mb_convert_case($m[0], MB_CASE_TITLE, 'UTF-8');
         }, \preg_replace('/[^\pL0-9]++/u', ' ', $string)));
     }
@@ -211,7 +211,7 @@ final class Instantiator
         /**
          * @see https://github.com/symfony/symfony/blob/a73523b065221b6b93cd45bf1cc7c59e7eb2dcdf/src/Symfony/Component/String/AbstractUnicodeString.php#L369
          */
-        $string = \preg_replace_callback('/\b./u', static function (array $m): string {
+        $string = \preg_replace_callback('/\b./u', static function(array $m): string {
             return \mb_convert_case($m[0], MB_CASE_TITLE, 'UTF-8');
         }, $string, 1);
 

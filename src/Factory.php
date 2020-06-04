@@ -55,7 +55,7 @@ class Factory
      */
     final public function instantiateMany(int $number, $attributes = []): array
     {
-        return \array_map(fn () => $this->instantiate($attributes), \array_fill(0, $number, null));
+        return \array_map(fn() => $this->instantiate($attributes), \array_fill(0, $number, null));
     }
 
     /**
@@ -83,7 +83,7 @@ class Factory
      */
     final public function persistMany(int $number, $attributes = [], ?bool $proxy = null): array
     {
-        return \array_map(fn () => $this->persist($attributes, $proxy), \array_fill(0, $number, null));
+        return \array_map(fn() => $this->persist($attributes, $proxy), \array_fill(0, $number, null));
     }
 
     /**
@@ -192,7 +192,7 @@ class Factory
         }
 
         // filter each attribute to convert proxies and factories to objects
-        $attributes = \array_map(fn ($value) => self::filterNormalizedProperty($value, $persisting), $attributes);
+        $attributes = \array_map(fn($value) => self::filterNormalizedProperty($value, $persisting), $attributes);
 
         // instantiate the object with the users instantiator or if not set, the default instantiator
         $object = ($this->instantiator ?? self::defaultInstantiator())($attributes, $this->class);

@@ -26,7 +26,7 @@ final class FactoryTest extends TestCase
     public function can_instantiate_object(): void
     {
         $attributeArray = ['title' => 'title', 'body' => 'body'];
-        $attributeCallback = fn (Faker\Generator $faker) => ['title' => 'title', 'body' => 'body'];
+        $attributeCallback = fn(Faker\Generator $faker) => ['title' => 'title', 'body' => 'body'];
 
         $this->assertSame('title', (new Factory(Post::class, $attributeArray))->instantiate()->getTitle());
         $this->assertSame('title', (new Factory(Post::class))->instantiate($attributeArray)->getTitle());
@@ -42,7 +42,7 @@ final class FactoryTest extends TestCase
     public function can_instantiate_many_objects(): void
     {
         $attributeArray = ['title' => 'title', 'body' => 'body'];
-        $attributeCallback = fn (Faker\Generator $faker) => ['title' => 'title', 'body' => 'body'];
+        $attributeCallback = fn(Faker\Generator $faker) => ['title' => 'title', 'body' => 'body'];
 
         $objects = (new Factory(Post::class, $attributeArray))->instantiateMany(3);
 
@@ -94,7 +94,7 @@ final class FactoryTest extends TestCase
     {
         $attributeArray = ['title' => 'original title', 'body' => 'original body'];
 
-        $object = (new Factory(Post::class))->instantiator(function (array $attributes, string $class) use ($attributeArray) {
+        $object = (new Factory(Post::class))->instantiator(function(array $attributes, string $class) use ($attributeArray) {
             $this->assertSame(Post::class, $class);
             $this->assertSame($attributes, $attributeArray);
 
@@ -113,12 +113,12 @@ final class FactoryTest extends TestCase
         $attributeArray = ['title' => 'original title', 'body' => 'original body'];
 
         $object = (new Factory(Post::class))
-            ->beforeInstantiate(function (array $attributes) {
+            ->beforeInstantiate(function(array $attributes) {
                 $attributes['title'] = 'title';
 
                 return $attributes;
             })
-            ->beforeInstantiate(function (array $attributes) {
+            ->beforeInstantiate(function(array $attributes) {
                 $attributes['body'] = 'body';
 
                 return $attributes;
@@ -138,7 +138,7 @@ final class FactoryTest extends TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Before Instantiate event callback must return an array.');
 
-        (new Factory(Post::class))->beforeInstantiate(function () {})->instantiate();
+        (new Factory(Post::class))->beforeInstantiate(function() {})->instantiate();
     }
 
     /**
@@ -149,12 +149,12 @@ final class FactoryTest extends TestCase
         $attributesArray = ['title' => 'title', 'body' => 'body'];
 
         $object = (new Factory(Post::class))
-            ->afterInstantiate(function (Post $post, array $attributes) use ($attributesArray) {
+            ->afterInstantiate(function(Post $post, array $attributes) use ($attributesArray) {
                 $this->assertSame($attributesArray, $attributes);
 
                 $post->increaseViewCount();
             })
-            ->afterInstantiate(function (Post $post, array $attributes) use ($attributesArray) {
+            ->afterInstantiate(function(Post $post, array $attributes) use ($attributesArray) {
                 $this->assertSame($attributesArray, $attributes);
 
                 $post->increaseViewCount();
@@ -182,7 +182,7 @@ final class FactoryTest extends TestCase
      */
     public function can_register_default_instantiator(): void
     {
-        Factory::registerDefaultInstantiator(function () {
+        Factory::registerDefaultInstantiator(function() {
             return new Post('different title', 'different body');
         });
 
@@ -229,10 +229,10 @@ final class FactoryTest extends TestCase
         $objectId = \spl_object_id($factory);
 
         $this->assertNotSame(\spl_object_id($factory->withAttributes([])), $objectId);
-        $this->assertNotSame(\spl_object_id($factory->instantiator(function () {})), $objectId);
-        $this->assertNotSame(\spl_object_id($factory->beforeInstantiate(function () {})), $objectId);
-        $this->assertNotSame(\spl_object_id($factory->afterInstantiate(function () {})), $objectId);
-        $this->assertNotSame(\spl_object_id($factory->afterPersist(function () {})), $objectId);
+        $this->assertNotSame(\spl_object_id($factory->instantiator(function() {})), $objectId);
+        $this->assertNotSame(\spl_object_id($factory->beforeInstantiate(function() {})), $objectId);
+        $this->assertNotSame(\spl_object_id($factory->afterInstantiate(function() {})), $objectId);
+        $this->assertNotSame(\spl_object_id($factory->afterPersist(function() {})), $objectId);
     }
 
     /**
@@ -369,12 +369,12 @@ final class FactoryTest extends TestCase
         $attributesArray = ['title' => 'title', 'body' => 'body'];
 
         $object = (new Factory(Post::class))
-            ->afterPersist(function (Post $post, array $attributes) use ($attributesArray) {
+            ->afterPersist(function(Post $post, array $attributes) use ($attributesArray) {
                 $this->assertSame($attributesArray, $attributes);
 
                 $post->increaseViewCount();
             })
-            ->afterPersist(function (Post $post, array $attributes) use ($attributesArray) {
+            ->afterPersist(function(Post $post, array $attributes) use ($attributesArray) {
                 $this->assertSame($attributesArray, $attributes);
 
                 $post->increaseViewCount();

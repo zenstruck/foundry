@@ -17,7 +17,7 @@ trait ResetGlobalState
      */
     public static function resetGlobalState()
     {
-        $reset = static function ($class, $property, $value) {
+        $reset = static function($class, $property, $value) {
             $property = (new \ReflectionClass($class))->getProperty($property);
             $property->setAccessible(true);
             $property->setValue($value);

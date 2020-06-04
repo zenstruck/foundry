@@ -38,6 +38,7 @@ return PhpCsFixer\Config::create()
             'allow_unused_params' => true,
             'remove_inheritdoc' => true,
         ],
+        'function_declaration' => ['closure_function_spacing' => 'none'],
     ))
     ->setRiskyAllowed(true)
     ->setFinder($finder)

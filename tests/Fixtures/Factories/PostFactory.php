@@ -12,7 +12,7 @@ final class PostFactory extends CustomFactory
 {
     public function published(): self
     {
-        return $this->addState(function () {
+        return $this->addState(function() {
             return ['published_at' => self::faker()->dateTime];
         });
     }
