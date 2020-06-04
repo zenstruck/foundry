@@ -10,8 +10,8 @@
 >
     <php>
         <ini name="error_reporting" value="-1" />
-        <server name="KERNEL_CLASS" value="Zenstruck\Foundry\Tests\Fixtures\Kernel" />
-        <server name="DATABASE_URL" value="mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7" />
+        <env name="KERNEL_CLASS" value="Zenstruck\Foundry\Tests\Fixtures\Kernel" />
+        <env name="DATABASE_URL" value="mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7" />
     </php>
 
     <testsuites>
