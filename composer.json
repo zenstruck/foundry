@@ -17,6 +17,7 @@
         "fzaninotto/faker": "^1.0"
     },
     "require-dev": {
+        "dama/doctrine-test-bundle": "^6.0",
         "doctrine/doctrine-bundle": "^1.8|^2.0",
         "doctrine/orm": "^2.3",
         "symfony/framework-bundle": "^3.4|^4.0|^5.0",
