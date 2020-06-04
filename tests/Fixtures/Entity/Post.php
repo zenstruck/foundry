@@ -46,6 +46,10 @@ class Post
      */
     private $publishedAt;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Category::class)
+     * @ORM\JoinColumn
+     */
     private $category;
 
     public function __construct(string $title, string $body, string $shortDescription = null)

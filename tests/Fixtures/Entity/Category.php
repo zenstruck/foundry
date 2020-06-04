@@ -20,4 +20,9 @@ class Category
      * @ORM\Column(type="string", length=255)
      */
     private $name;
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
 }
