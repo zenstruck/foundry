@@ -7,7 +7,7 @@ use Doctrine\Persistence\ObjectRepository;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-abstract class CustomFactory extends Factory
+abstract class ModelFactory extends Factory
 {
     private function __construct()
     {

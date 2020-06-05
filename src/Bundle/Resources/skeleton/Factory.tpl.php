@@ -6,7 +6,7 @@ use <?= $entity->getName() ?>;
 <?php if ($repository): ?>use <?= $repository->getName() ?>;
 use Zenstruck\Foundry\RepositoryProxy;
 <?php endif ?>
-use Zenstruck\Foundry\CustomFactory;
+use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
 
 /**
@@ -22,7 +22,7 @@ use Zenstruck\Foundry\Proxy;
  * @method <?= $entity->getShortName() ?>|Proxy persist($attributes = [], ?bool $proxy = null)
  * @method <?= $entity->getShortName() ?>[]|Proxy[] persistMany(int $number, $attributes = [], ?bool $proxy = null)
  */
-final class <?= $class_name ?> extends CustomFactory
+final class <?= $class_name ?> extends ModelFactory
 {
     protected function getDefaults(): array
     {

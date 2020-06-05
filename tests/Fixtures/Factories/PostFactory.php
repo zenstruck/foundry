@@ -2,13 +2,13 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
-use Zenstruck\Foundry\CustomFactory;
+use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class PostFactory extends CustomFactory
+final class PostFactory extends ModelFactory
 {
     public function published(): self
     {

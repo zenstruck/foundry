@@ -582,7 +582,7 @@ namespace App\Tests\Factories;
 use App\Entity\Post;
 use App\Repository\PostRepository;
 use Zenstruck\Foundry\RepositoryProxy;
-use Zenstruck\Foundry\CustomFactory;
+use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
 
 /**
@@ -596,7 +596,7 @@ use Zenstruck\Foundry\Proxy;
  * @method Post|Proxy persist($attributes = [], ?bool $proxy = null)
  * @method Post[]|Proxy[] persistMany(int $number, $attributes = [], ?bool $proxy = null)
  */
-final class PostFactory extends CustomFactory
+final class PostFactory extends ModelFactory
 {
     protected function getDefaults(): array
     {
@@ -653,10 +653,10 @@ you can add "states":
 namespace App\Tests\Factories;
 
 use App\Entity\Post;
-use Zenstruck\Foundry\CustomFactory;
+use Zenstruck\Foundry\ModelFactory;
 use function Zenstruck\Foundry\persist;
 
-final class PostFactory extends CustomFactory
+final class PostFactory extends ModelFactory
 {
     // ...
 
@@ -714,10 +714,10 @@ You can override your model factory's `initialize()` method to add default state
 namespace App\Tests\Factories;
 
 use App\Entity\Post;
-use Zenstruck\Foundry\CustomFactory;
+use Zenstruck\Foundry\ModelFactory;
 use function Zenstruck\Foundry\persist;
 
-final class PostFactory extends CustomFactory
+final class PostFactory extends ModelFactory
 {
     // ...
 

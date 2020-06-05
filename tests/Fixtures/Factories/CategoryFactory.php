@@ -2,13 +2,13 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
-use Zenstruck\Foundry\CustomFactory;
+use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class CategoryFactory extends CustomFactory
+final class CategoryFactory extends ModelFactory
 {
     protected static function getClass(): string
     {

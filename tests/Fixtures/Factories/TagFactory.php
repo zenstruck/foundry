@@ -2,13 +2,13 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
-use Zenstruck\Foundry\CustomFactory;
+use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class TagFactory extends CustomFactory
+final class TagFactory extends ModelFactory
 {
     protected static function getClass(): string
     {

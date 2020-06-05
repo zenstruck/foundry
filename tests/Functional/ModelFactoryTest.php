@@ -8,7 +8,7 @@ use Zenstruck\Foundry\Tests\FunctionalTestCase;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class CustomFactoryTest extends FunctionalTestCase
+final class ModelFactoryTest extends FunctionalTestCase
 {
     /**
      * @test
