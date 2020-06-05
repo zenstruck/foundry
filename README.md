@@ -1,5 +1,9 @@
 # Foundry
 
+[![CI Status](https://github.com/zenstruck/foundry/workflows/CI/badge.svg)](https://github.com/zenstruck/foundry/actions?query=workflow%3ACI)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/zenstruck/foundry/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/zenstruck/foundry/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/zenstruck/foundry/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/zenstruck/foundry/?branch=master)
+
 A model factory library for creating expressive, auto-completable, on-demand test fixtures with Symfony and Doctrine.
 
 Traditionally, data fixtures are defined in one or more files outside of your tests. When writing tests using these
