@@ -1,0 +1,8 @@
+filter:
+  dependency_paths: [vendor/]
+checks:
+  php: true
+#tools:
+#  external_code_coverage:
+#    timeout: 900
+#    runs: 2
