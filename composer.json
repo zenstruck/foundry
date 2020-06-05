@@ -1,10 +1,10 @@
 {
     "name": "zenstruck/foundry",
-    "description": "TODO",
+    "description": "A model factory library for creating expressive, auto-completable, on-demand test fixtures with Symfony and Doctrine.",
     "homepage": "https://github.com/zenstruck/foundry",
     "type": "library",
     "license": "MIT",
-    "keywords": ["fixture", "factory", "test"],
+    "keywords": ["fixture", "factory", "test", "symfony", "faker", "doctrine"],
     "authors": [
         {
             "name": "Kevin Bond",
