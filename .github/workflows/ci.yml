@@ -132,12 +132,11 @@ jobs:
       - name: Run code coverage with DAMADoctrineTestBundle
         run: vendor/bin/phpunit -v --coverage-text --coverage-clover=dama-coverage.clover
 
-#      TODO ENABLE
-#      - name: Send code coverage
-#        run: |
-#          wget https://scrutinizer-ci.com/ocular.phar
-#          php ocular.phar code-coverage:upload --format=php-clover coverage.clover
-#          php ocular.phar code-coverage:upload --format=php-clover dama-coverage.clover
+      - name: Send code coverage
+        run: |
+          wget https://scrutinizer-ci.com/ocular.phar
+          php ocular.phar code-coverage:upload --format=php-clover coverage.clover
+          php ocular.phar code-coverage:upload --format=php-clover dama-coverage.clover
 
   composer-validate:
     name: Validate composer.json
