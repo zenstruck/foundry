@@ -639,13 +639,9 @@ PostFactory::findOrCreate(['title' => 'My Title']); // instance of Proxy|Post
 
 PostFactory::repository(); // Instance of RepositoryProxy|PostRepository
 
-// create objects directly
-PostFactory::make(); // instance of Post
-PostFactory::make(['title' => 'My Title']); // instance of Post with $title = 'My Title'
-PostFactory::makeMany(3); // array of 3 Post objects
-PostFactory::create(); // instance of Proxy|Post
-PostFactory::create(['title' => 'My Title']); // instance of Proxy|Post with Post::$title = 'My Title'
-PostFactory::createMany(3); // array of 3 Proxy|Post objects
+// instantiate objects (without persisting)
+PostFactory::new()->instantiate(); // instance of Post
+PostFactory::new()->instantiate(['title' => 'My Title']); // instance of Post with $title = 'My Title'
 ```
 
 #### States

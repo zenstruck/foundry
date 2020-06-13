@@ -31,17 +31,17 @@ final class CustomFactoryTest extends TestCase
     /**
      * @test
      */
-    public function can_make(): void
+    public function can_instantiate(): void
     {
-        $this->assertSame('title', PostFactory::make(['title' => 'title'])->getTitle());
+        $this->assertSame('title', PostFactory::new()->instantiate(['title' => 'title'])->getTitle());
     }
 
     /**
      * @test
      */
-    public function can_make_many(): void
+    public function can_instantiate_many(): void
     {
-        $objects = PostFactory::makeMany(2, ['title' => 'title']);
+        $objects = PostFactory::new()->instantiateMany(2, ['title' => 'title']);
 
         $this->assertCount(2, $objects);
         $this->assertSame('title', $objects[0]->getTitle());
