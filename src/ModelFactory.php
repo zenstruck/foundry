@@ -41,52 +41,6 @@ abstract class ModelFactory extends Factory
     }
 
     /**
-     * Instantiate and persist.
-     *
-     * @param array|callable $attributes
-     *
-     * @return Proxy|object
-     */
-    final public static function create($attributes = [], ?bool $proxy = null): object
-    {
-        return static::new()->persist($attributes, $proxy);
-    }
-
-    /**
-     * Instantiate many and persist.
-     *
-     * @param array|callable $attributes
-     *
-     * @return Proxy[]|object[]
-     */
-    final public static function createMany(int $number, $attributes = [], ?bool $proxy = null): array
-    {
-        return static::new()->persistMany($number, $attributes, $proxy);
-    }
-
-    /**
-     * Instantiate without persisting.
-     *
-     * @param array|callable $attributes
-     */
-    final public static function make($attributes = []): object
-    {
-        return static::new()->instantiate($attributes);
-    }
-
-    /**
-     * Instantiate many without persisting.
-     *
-     * @param array|callable $attributes
-     *
-     * @return object[]
-     */
-    final public static function makeMany(int $number, $attributes = []): array
-    {
-        return static::new()->instantiateMany($number, $attributes);
-    }
-
-    /**
      * Try and find existing object for the given $attributes. If not found,
      * instantiate and persist.
      *
@@ -98,7 +52,7 @@ abstract class ModelFactory extends Factory
             return $found;
         }
 
-        return self::create($attributes);
+        return self::new()->persist($attributes);
     }
 
     /**

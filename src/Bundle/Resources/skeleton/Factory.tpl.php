@@ -10,11 +10,7 @@ use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
 
 /**
- * @method static <?= $entity->getShortName() ?> make($attributes = [])
- * @method static <?= $entity->getShortName() ?>[] makeMany(int $number, $attributes = [])
- * @method static <?= $entity->getShortName() ?>|Proxy create($attributes = [], ?bool $proxy = null)
  * @method static <?= $entity->getShortName() ?>|Proxy findOrCreate(array $attributes)
- * @method static <?= $entity->getShortName() ?>[]|Proxy[] createMany(int $number, $attributes = [], ?bool $proxy = null)
 <?php if ($repository): ?> * @method static <?= $repository->getShortName() ?>|RepositoryProxy repository(bool $proxy = true)
 <?php endif ?>
  * @method <?= $entity->getShortName() ?> instantiate($attributes = [])

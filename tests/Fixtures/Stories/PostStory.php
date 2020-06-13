@@ -12,12 +12,12 @@ final class PostStory extends Story
 {
     protected function build(): void
     {
-        $this->add('postA', PostFactory::create([
+        $this->add('postA', PostFactory::new()->persist([
             'title' => 'Post A',
             'category' => CategoryStory::php(),
         ]));
 
-        $this->add('postB', PostFactory::create([
+        $this->add('postB', PostFactory::new()->persist([
             'title' => 'Post B',
             'category' => CategoryStory::php(),
         ], false));
@@ -27,7 +27,7 @@ final class PostStory extends Story
             'category' => CategoryStory::symfony(),
         ]));
 
-        PostFactory::create([
+        PostFactory::new()->persist([
             'title' => 'Post D',
             'category' => CategoryStory::php(),
         ]);

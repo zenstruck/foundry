@@ -17,7 +17,7 @@ final class ProxyTest extends FunctionalTestCase
      */
     public function can_assert_persisted(): void
     {
-        $post = PostFactory::create();
+        $post = PostFactory::new()->persist();
 
         $post->assertPersisted();
     }
@@ -27,7 +27,7 @@ final class ProxyTest extends FunctionalTestCase
      */
     public function can_remove_and_assert_not_persisted(): void
     {
-        $post = PostFactory::create();
+        $post = PostFactory::new()->persist();
 
         $post->remove();
 
@@ -39,7 +39,7 @@ final class ProxyTest extends FunctionalTestCase
      */
     public function functions_are_passed_to_wrapped_object(): void
     {
-        $post = PostFactory::create(['title' => 'my title']);
+        $post = PostFactory::new()->persist(['title' => 'my title']);
 
         $this->assertSame('my title', $post->getTitle());
     }
@@ -49,7 +49,7 @@ final class ProxyTest extends FunctionalTestCase
      */
     public function can_convert_to_string_if_wrapped_object_can(): void
     {
-        $post = PostFactory::create(['title' => 'my title']);
+        $post = PostFactory::new()->persist(['title' => 'my title']);
 
         $this->assertSame('my title', (string) $post);
     }
@@ -62,7 +62,7 @@ final class ProxyTest extends FunctionalTestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(\sprintf('Proxied object "%s" cannot be converted to a string.', Category::class));
 
-        (string) CategoryFactory::create();
+        (string) CategoryFactory::new()->persist();
     }
 
     /**
@@ -70,7 +70,7 @@ final class ProxyTest extends FunctionalTestCase
      */
     public function can_refetch_object_if_object_manager_has_been_cleared(): void
     {
-        $post = PostFactory::create(['title' => 'my title']);
+        $post = PostFactory::new()->persist(['title' => 'my title']);
 
         self::$container->get('doctrine')->getManager()->clear();
 
@@ -82,7 +82,7 @@ final class ProxyTest extends FunctionalTestCase
      */
     public function exception_thrown_if_trying_to_refresh_deleted_object(): void
     {
-        $post = PostFactory::create();
+        $post = PostFactory::new()->persist();
 
         self::$container->get('doctrine')->getManager()->clear();
 
@@ -99,7 +99,7 @@ final class ProxyTest extends FunctionalTestCase
      */
     public function can_force_set_and_save(): void
     {
-        $post = PostFactory::create(['title' => 'my title']);
+        $post = PostFactory::new()->persist(['title' => 'my title']);
 
         $post->repository()->assertNotExists(['title' => 'new title']);
 
