@@ -12,7 +12,7 @@ final class TagStory extends Story
 {
     protected function build(): void
     {
-        $this->add('dev', TagFactory::new()->persist(['name' => 'dev']));
-        $this->add('design', TagFactory::new()->persist(['name' => 'design']));
+        $this->add('dev', TagFactory::new()->create(['name' => 'dev']));
+        $this->add('design', TagFactory::new()->create(['name' => 'design']));
     }
 }

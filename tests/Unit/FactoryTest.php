@@ -238,7 +238,7 @@ final class FactoryTest extends TestCase
     /**
      * @test
      */
-    public function can_persist_object(): void
+    public function can_create_object(): void
     {
         $registry = $this->createMock(ManagerRegistry::class);
         $registry
@@ -250,7 +250,7 @@ final class FactoryTest extends TestCase
 
         PersistenceManager::register($registry);
 
-        $object = (new Factory(Post::class))->persist(['title' => 'title', 'body' => 'body']);
+        $object = (new Factory(Post::class))->create(['title' => 'title', 'body' => 'body']);
 
         $this->assertInstanceOf(Proxy::class, $object);
         $this->assertSame('title', $object->withoutAutoRefresh()->getTitle());
@@ -259,7 +259,7 @@ final class FactoryTest extends TestCase
     /**
      * @test
      */
-    public function can_persist_many_objects(): void
+    public function can_create_many_objects(): void
     {
         $registry = $this->createMock(ManagerRegistry::class);
         $registry
@@ -271,7 +271,7 @@ final class FactoryTest extends TestCase
 
         PersistenceManager::register($registry);
 
-        $objects = (new Factory(Post::class))->persistMany(3, ['title' => 'title', 'body' => 'body']);
+        $objects = (new Factory(Post::class))->createMany(3, ['title' => 'title', 'body' => 'body']);
 
         $this->assertCount(3, $objects);
         $this->assertInstanceOf(Proxy::class, $objects[0]);
@@ -285,7 +285,7 @@ final class FactoryTest extends TestCase
     /**
      * @test
      */
-    public function can_disable_proxy_when_persisting(): void
+    public function can_disable_proxy_when_creating(): void
     {
         $registry = $this->createMock(ManagerRegistry::class);
         $registry
@@ -297,7 +297,7 @@ final class FactoryTest extends TestCase
 
         PersistenceManager::register($registry);
 
-        $object = (new Factory(Post::class))->persist(['title' => 'title', 'body' => 'body'], false);
+        $object = (new Factory(Post::class))->create(['title' => 'title', 'body' => 'body'], false);
 
         $this->assertInstanceOf(Post::class, $object);
         $this->assertSame('title', $object->getTitle());
@@ -320,7 +320,7 @@ final class FactoryTest extends TestCase
 
         PersistenceManager::register($registry);
 
-        $object = (new Factory(Post::class))->persist(['title' => 'title', 'body' => 'body']);
+        $object = (new Factory(Post::class))->create(['title' => 'title', 'body' => 'body']);
 
         $this->assertInstanceOf(Post::class, $object);
         $this->assertSame('title', $object->getTitle());
@@ -329,7 +329,7 @@ final class FactoryTest extends TestCase
     /**
      * @test
      */
-    public function persiting_with_factory_attribute_persists_the_factory(): void
+    public function creating_with_factory_attribute_persists_the_factory(): void
     {
         $registry = $this->createMock(ManagerRegistry::class);
         $registry
@@ -341,7 +341,7 @@ final class FactoryTest extends TestCase
 
         PersistenceManager::register($registry);
 
-        $object = (new Factory(Post::class))->persist([
+        $object = (new Factory(Post::class))->create([
             'title' => 'title',
             'body' => 'body',
             'category' => new Factory(Category::class),
@@ -379,7 +379,7 @@ final class FactoryTest extends TestCase
 
                 $post->increaseViewCount();
             })
-            ->persist($attributesArray)
+            ->create($attributesArray)
         ;
 
         $this->assertSame(2, $object->withoutAutoRefresh()->getViewCount());

@@ -42,7 +42,7 @@ abstract class Story
     {
         // ensure factories are persisted
         if ($object instanceof Factory) {
-            $object = $object->persist();
+            $object = $object->create();
         }
 
         // ensure all objects are wrapped in a auto-refreshing proxy

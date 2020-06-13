@@ -24,7 +24,7 @@ public function test_can_post_a_comment(): void
     // 1. "Arrange"
     $post = PostFactory::new() // New Post factory
         ->published()          // Make the post in a "published" state
-        ->persist([            // Instantiate Post object and persist
+        ->create([             // Instantiate Post object and persist
             'slug' => 'post-a' // This test only requires the slug field - all other fields are random data
         ])
     ;
@@ -296,21 +296,21 @@ section for more information on the returned `Proxy` object):
 use App\Entity\Post;
 use Zenstruck\Foundry\Factory;
 use function Zenstruck\Foundry\faker;
-use function Zenstruck\Foundry\persist;
-use function Zenstruck\Foundry\persist_many;
+use function Zenstruck\Foundry\create;
+use function Zenstruck\Foundry\create_many;
 
 // instance of Zenstruck\Foundry\Proxy wrapping Post with title "Post A"
-(new Factory(Post::class))->persist(['title' => 'Post A']);
+(new Factory(Post::class))->create(['title' => 'Post A']);
 
 // disable proxying (instance of Post)
-(new Factory(Post::class))->persist(['title' => 'Post A'], false);
+(new Factory(Post::class))->create(['title' => 'Post A'], false);
 
 // array of 6 Post Proxy objects with random titles
-(new Factory(Post::class))->persistMany(6, fn() => ['title' => faker()->sentence]);
+(new Factory(Post::class))->createMany(6, fn() => ['title' => faker()->sentence]);
 
 // alternatively, use the helper functions
-persist(Post::class, ['title' => 'Post A']);
-persist_many(6, Post::class, fn() => ['title' => faker()->sentence]);
+create(Post::class, ['title' => 'Post A']);
+create_many(6, Post::class, fn() => ['title' => faker()->sentence]);
 ```
 
 You can globally disable object proxying during persisting:
@@ -334,7 +334,7 @@ that returns an array. Using a *callable* helps with ensuring random data as the
 use App\Entity\Category;
 use App\Entity\Post;
 use Zenstruck\Foundry\Factory;
-use function Zenstruck\Foundry\persist;
+use function Zenstruck\Foundry\create;
 
 $post = (new Factory(Post::class, ['title' => 'Post A']))
     ->withAttributes([
@@ -351,7 +351,7 @@ $post = (new Factory(Post::class, ['title' => 'Post A']))
         'published-at' => new \DateTime('last week'),
 
         // Proxies are automatically converted to their wrapped object
-        'category' => persist(Category::class, ['name' => 'symfony']),
+        'category' => create(Category::class, ['name' => 'symfony']),
     ])
     ->withAttributes(fn() => ['createdAt' => Factory::faker()->dateTime])
     ->instantiate(['title' => 'Different Title'])
@@ -463,9 +463,9 @@ with your "post-act" test assertions. Almost all calls to Proxy methods, first r
 
 ```php
 use App\Entity\Post;
-use function Zenstruck\Foundry\persist;
+use function Zenstruck\Foundry\create;
 
-$post = persist(Post::class, ['title' => 'My Title']); // instance of Zenstruck\Foundry\Proxy
+$post = create(Post::class, ['title' => 'My Title']); // instance of Zenstruck\Foundry\Proxy
 
 // get the wrapped object
 $post->object(); // instance of Post
@@ -590,15 +590,12 @@ use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
 
 /**
- * @method static Post make($attributes = [])
- * @method static Post[] makeMany(int $number, $attributes = [])
- * @method static Post|Proxy create($attributes = [], ?bool $proxy = null)
- * @method static Post[]|Proxy[] createMany(int $number, $attributes = [], ?bool $proxy = null)
+ * @method static Post|Proxy findOrCreate(array $attributes)
  * @method static PostRepository|RepositoryProxy repository(bool $proxy = true)
  * @method Post instantiate($attributes = [])
  * @method Post[] instantiateMany(int $number, $attributes = [])
- * @method Post|Proxy persist($attributes = [], ?bool $proxy = null)
- * @method Post[]|Proxy[] persistMany(int $number, $attributes = [], ?bool $proxy = null)
+ * @method Post|Proxy create($attributes = [], ?bool $proxy = null)
+ * @method Post[]|Proxy[] createMany(int $number, $attributes = [], ?bool $proxy = null)
  */
 final class PostFactory extends ModelFactory
 {
@@ -627,12 +624,12 @@ available.
 ```php
 use App\Tests\Factories\PostFactory;
 
-$post = PostFactory::new()->persist(); // Proxy with random data from `getDefaults()`
+$post = PostFactory::new()->create(); // Proxy with random data from `getDefaults()`
 
 $post->getTitle(); // getTitle() can be autocompleted by your IDE!
 
-PostFactory::new()->persist(['title' => 'My Title']); // override defaults 
-PostFactory::new(['title' => 'My Title'])->persist(); // alternative to above
+PostFactory::new()->create(['title' => 'My Title']); // override defaults 
+PostFactory::new(['title' => 'My Title'])->create(); // alternative to above
 
 // find a persisted object for the given attributes, if not found, create with the attributes
 PostFactory::findOrCreate(['title' => 'My Title']); // instance of Proxy|Post
@@ -654,7 +651,7 @@ namespace App\Tests\Factories;
 
 use App\Entity\Post;
 use Zenstruck\Foundry\ModelFactory;
-use function Zenstruck\Foundry\persist;
+use function Zenstruck\Foundry\create;
 
 final class PostFactory extends ModelFactory
 {
@@ -674,7 +671,7 @@ final class PostFactory extends ModelFactory
     {
         return $this->afterInstantiate(function (Post $post) use ($tags) {
             foreach ($tags as $tag) {
-                $post->addTag(persist(Tag::class, ['name' => $tag])->object());
+                $post->addTag(create(Tag::class, ['name' => $tag])->object());
             }
         });
     }
@@ -691,19 +688,19 @@ final class PostFactory extends ModelFactory
 You can use states to make your tests very explicit to improve readability:
 
 ```php
-$post = PostFactory::new()->unpublished()->persist();
-$post = PostFactory::new()->withViewCount(3)->persist();
-$post = PostFactory::new()->withTags('dev', 'design')->persist();
+$post = PostFactory::new()->unpublished()->create();
+$post = PostFactory::new()->withViewCount(3)->create();
+$post = PostFactory::new()->withTags('dev', 'design')->create();
 
 // combine multiple states
 $post = PostFactory::new()
     ->withTags('dev')
     ->unpublished()
-    ->persist()
+    ->create()
 ;
 
 // states that don't require arguments can be added as strings to PostFactory::new()
-$post = PostFactory::new('published', 'withViewCount')->persist();
+$post = PostFactory::new('published', 'withViewCount')->create();
 ```
 
 #### Initialize
@@ -715,7 +712,7 @@ namespace App\Tests\Factories;
 
 use App\Entity\Post;
 use Zenstruck\Foundry\ModelFactory;
-use function Zenstruck\Foundry\persist;
+use function Zenstruck\Foundry\create;
 
 final class PostFactory extends ModelFactory
 {

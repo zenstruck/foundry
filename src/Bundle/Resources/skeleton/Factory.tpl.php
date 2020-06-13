@@ -15,8 +15,8 @@ use Zenstruck\Foundry\Proxy;
 <?php endif ?>
  * @method <?= $entity->getShortName() ?> instantiate($attributes = [])
  * @method <?= $entity->getShortName() ?>[] instantiateMany(int $number, $attributes = [])
- * @method <?= $entity->getShortName() ?>|Proxy persist($attributes = [], ?bool $proxy = null)
- * @method <?= $entity->getShortName() ?>[]|Proxy[] persistMany(int $number, $attributes = [], ?bool $proxy = null)
+ * @method <?= $entity->getShortName() ?>|Proxy create($attributes = [], ?bool $proxy = null)
+ * @method <?= $entity->getShortName() ?>[]|Proxy[] createMany(int $number, $attributes = [], ?bool $proxy = null)
  */
 final class <?= $class_name ?> extends ModelFactory
 {
