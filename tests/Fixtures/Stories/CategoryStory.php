@@ -12,7 +12,7 @@ final class CategoryStory extends Story
 {
     protected function build(): void
     {
-        $this->add('php', CategoryFactory::new()->persist(['name' => 'php']));
-        $this->add('symfony', CategoryFactory::new()->persist(['name' => 'symfony']));
+        $this->add('php', CategoryFactory::new()->create(['name' => 'php']));
+        $this->add('symfony', CategoryFactory::new()->create(['name' => 'symfony']));
     }
 }

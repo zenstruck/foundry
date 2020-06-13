@@ -52,7 +52,7 @@ abstract class ModelFactory extends Factory
             return $found;
         }
 
-        return self::new()->persist($attributes);
+        return self::new()->create($attributes);
     }
 
     /**

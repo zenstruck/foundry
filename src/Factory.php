@@ -63,7 +63,7 @@ class Factory
      *
      * @return Proxy|object
      */
-    final public function persist($attributes = [], ?bool $proxy = null): object
+    final public function create($attributes = [], ?bool $proxy = null): object
     {
         $object = $this->doInstantiate($attributes, true);
 
@@ -81,9 +81,9 @@ class Factory
      *
      * @return Proxy[]|object[]
      */
-    final public function persistMany(int $number, $attributes = [], ?bool $proxy = null): array
+    final public function createMany(int $number, $attributes = [], ?bool $proxy = null): array
     {
-        return \array_map(fn() => $this->persist($attributes, $proxy), \array_fill(0, $number, null));
+        return \array_map(fn() => $this->create($attributes, $proxy), \array_fill(0, $number, null));
     }
 
     /**
@@ -224,6 +224,6 @@ class Factory
             return $value;
         }
 
-        return $persist ? $value->persist([], false) : $value->instantiate();
+        return $persist ? $value->create([], false) : $value->instantiate();
     }
 }

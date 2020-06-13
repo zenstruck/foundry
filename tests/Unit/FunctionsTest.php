@@ -12,11 +12,11 @@ use Zenstruck\Foundry\RepositoryProxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 use Zenstruck\Foundry\Tests\ResetGlobals;
+use function Zenstruck\Foundry\create;
+use function Zenstruck\Foundry\create_many;
 use function Zenstruck\Foundry\faker;
 use function Zenstruck\Foundry\instantiate;
 use function Zenstruck\Foundry\instantiate_many;
-use function Zenstruck\Foundry\persist;
-use function Zenstruck\Foundry\persist_many;
 use function Zenstruck\Foundry\repository;
 
 /**
@@ -59,7 +59,7 @@ final class FunctionsTest extends TestCase
     /**
      * @test
      */
-    public function persist(): void
+    public function create(): void
     {
         $registry = $this->createMock(ManagerRegistry::class);
         $registry
@@ -71,7 +71,7 @@ final class FunctionsTest extends TestCase
 
         PersistenceManager::register($registry);
 
-        $object = persist(Category::class);
+        $object = create(Category::class);
 
         $this->assertInstanceOf(Proxy::class, $object);
     }
@@ -79,7 +79,7 @@ final class FunctionsTest extends TestCase
     /**
      * @test
      */
-    public function persist_many(): void
+    public function create_many(): void
     {
         $registry = $this->createMock(ManagerRegistry::class);
         $registry
@@ -91,7 +91,7 @@ final class FunctionsTest extends TestCase
 
         PersistenceManager::register($registry);
 
-        $objects = persist_many(3, Category::class);
+        $objects = create_many(3, Category::class);
 
         $this->assertCount(3, $objects);
     }

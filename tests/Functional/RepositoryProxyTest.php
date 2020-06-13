@@ -31,7 +31,7 @@ final class RepositoryProxyTest extends FunctionalTestCase
 
         $repository->assertEmpty();
 
-        CategoryFactory::new()->persistMany(2);
+        CategoryFactory::new()->createMany(2);
 
         $repository->assertCount(2);
         $repository->assertCountGreaterThan(1);
@@ -47,7 +47,7 @@ final class RepositoryProxyTest extends FunctionalTestCase
     {
         $repository = repository(Category::class);
 
-        CategoryFactory::new()->persistMany(2);
+        CategoryFactory::new()->createMany(2);
 
         $object = $repository->first();
 
@@ -70,7 +70,7 @@ final class RepositoryProxyTest extends FunctionalTestCase
     public function find_can_be_passed_proxy_or_object_or_array(): void
     {
         $repository = repository(Category::class);
-        $proxy = CategoryFactory::new()->persist(['name' => 'foo']);
+        $proxy = CategoryFactory::new()->create(['name' => 'foo']);
 
         $this->assertInstanceOf(Proxy::class, $repository->find($proxy));
         $this->assertInstanceOf(Proxy::class, $repository->find($proxy->object()));

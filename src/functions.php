@@ -14,23 +14,23 @@ function factory(string $class, $defaultAttributes = []): Factory
 }
 
 /**
- * @see Factory::persist()
+ * @see Factory::create()
  *
  * @return Proxy|object
  */
-function persist(string $class, $attributes = [], ?bool $proxy = null): object
+function create(string $class, $attributes = [], ?bool $proxy = null): object
 {
-    return factory($class)->persist($attributes, $proxy);
+    return factory($class)->create($attributes, $proxy);
 }
 
 /**
- * @see Factory::persistMany()
+ * @see Factory::createMany()
  *
  * @return Proxy[]|object[]
  */
-function persist_many(int $number, string $class, $attributes = [], ?bool $proxy = null): array
+function create_many(int $number, string $class, $attributes = [], ?bool $proxy = null): array
 {
-    return factory($class)->persistMany($number, $attributes, $proxy);
+    return factory($class)->createMany($number, $attributes, $proxy);
 }
 
 /**
