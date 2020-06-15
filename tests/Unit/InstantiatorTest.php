@@ -4,7 +4,6 @@ namespace Zenstruck\Foundry\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Instantiator;
-use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -14,252 +13,467 @@ final class InstantiatorTest extends TestCase
     /**
      * @test
      */
-    public function default_mode_calls_constructor_and_sets_properties(): void
+    public function default_instantiate(): void
     {
-        /** @var Post $object */
-        $object = Instantiator::default()(
-            [
-                'title' => 'title',
-                'body' => 'body',
-                'shortDescription' => 'description',
-                'viewCount' => 3,
-            ],
-            PostForInstantiate::class
-        );
+        $object = (new Instantiator())([
+            'propA' => 'A',
+            'propB' => 'B',
+            'propC' => 'C',
+            'propD' => 'D',
+        ], InstantiatorDummy::class);
 
-        $this->assertInstanceOf(PostForInstantiate::class, $object);
-        $this->assertSame('(constructor) title', $object->getTitle());
-        $this->assertSame('(constructor) body', $object->getBody());
-        $this->assertSame('(constructor) description', $object->getShortDescription());
-        $this->assertSame(3, $object->getViewCount());
+        $this->assertSame('A', $object->propA);
+        $this->assertSame('A', $object->getPropA());
+        $this->assertSame('constructor B', $object->getPropB());
+        $this->assertSame('constructor C', $object->getPropC());
+        $this->assertSame('setter D', $object->getPropD());
     }
 
     /**
      * @test
      */
-    public function allows_snake_case_constructor_and_object_properties(): void
+    public function can_use_snake_case_attributes(): void
     {
-        /** @var Post $object */
-        $object = Instantiator::default()(
-            [
-                'title' => 'title',
-                'body' => 'body',
-                'short_description' => 'description',
-                'view_count' => 3,
-            ],
-            PostForInstantiate::class
-        );
+        $object = (new Instantiator())([
+            'prop_a' => 'A',
+            'prop_b' => 'B',
+            'prop_c' => 'C',
+            'prop_d' => 'D',
+        ], InstantiatorDummy::class);
 
-        $this->assertInstanceOf(PostForInstantiate::class, $object);
-        $this->assertSame('(constructor) title', $object->getTitle());
-        $this->assertSame('(constructor) body', $object->getBody());
-        $this->assertSame('(constructor) description', $object->getShortDescription());
-        $this->assertSame(3, $object->getViewCount());
+        $this->assertSame('A', $object->propA);
+        $this->assertSame('A', $object->getPropA());
+        $this->assertSame('constructor B', $object->getPropB());
+        $this->assertSame('constructor C', $object->getPropC());
+        $this->assertSame('setter D', $object->getPropD());
     }
 
     /**
      * @test
      */
-    public function allows_kebab_case_constructor_and_object_properties(): void
+    public function can_use_kebab_case_attributes(): void
     {
-        /** @var Post $object */
-        $object = Instantiator::default()(
-            [
-                'title' => 'title',
-                'body' => 'body',
-                'short-description' => 'description',
-                'view-count' => 3,
-            ],
-            PostForInstantiate::class
-        );
+        $object = (new Instantiator())([
+            'prop-a' => 'A',
+            'prop-b' => 'B',
+            'prop-c' => 'C',
+            'prop-d' => 'D',
+        ], InstantiatorDummy::class);
 
-        $this->assertInstanceOf(PostForInstantiate::class, $object);
-        $this->assertSame('(constructor) title', $object->getTitle());
-        $this->assertSame('(constructor) body', $object->getBody());
-        $this->assertSame('(constructor) description', $object->getShortDescription());
-        $this->assertSame(3, $object->getViewCount());
+        $this->assertSame('A', $object->propA);
+        $this->assertSame('A', $object->getPropA());
+        $this->assertSame('constructor B', $object->getPropB());
+        $this->assertSame('constructor C', $object->getPropC());
+        $this->assertSame('setter D', $object->getPropD());
     }
 
     /**
      * @test
      */
-    public function allows_default_constructor_parameters(): void
+    public function can_leave_off_default_constructor_argument(): void
     {
-        /** @var Post $object */
-        $object = Instantiator::default()(
-            [
-                'title' => 'title',
-                'body' => 'body',
-            ],
-            PostForInstantiate::class
-        );
+        $object = (new Instantiator())([
+            'propB' => 'B',
+        ], InstantiatorDummy::class);
 
-        $this->assertInstanceOf(PostForInstantiate::class, $object);
-        $this->assertSame('(constructor) title', $object->getTitle());
-        $this->assertSame('(constructor) body', $object->getBody());
-        $this->assertNull($object->getShortDescription());
-        $this->assertSame(0, $object->getViewCount());
+        $this->assertSame('constructor B', $object->getPropB());
+        $this->assertNull($object->getPropC());
     }
 
     /**
      * @test
      */
-    public function allows_extra_attributes_by_default(): void
+    public function can_instantiate_object_with_private_constructor(): void
     {
-        /** @var Post $object */
-        $object = Instantiator::default()(
-            [
-                'title' => 'title',
-                'body' => 'body',
-                'extra' => 'foo',
-            ],
-            PostForInstantiate::class
-        );
+        $object = (new Instantiator())([
+            'propA' => 'A',
+            'propB' => 'B',
+            'propC' => 'C',
+            'propD' => 'D',
+        ], PrivateConstructorInstantiatorDummy::class);
 
-        $this->assertInstanceOf(PostForInstantiate::class, $object);
+        $this->assertSame('A', $object->propA);
+        $this->assertSame('A', $object->getPropA());
+        $this->assertSame('setter B', $object->getPropB());
+        $this->assertSame('setter C', $object->getPropC());
+        $this->assertSame('setter D', $object->getPropD());
     }
 
     /**
      * @test
      */
-    public function strict_mode_does_not_allow_extra_attributes(): void
+    public function missing_constructor_argument_throws_exception(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(\sprintf('Class "%s" does not have property "extra"', PostForInstantiate::class));
+        $this->expectExceptionMessage('Missing constructor argument "propB" for "Zenstruck\Foundry\Tests\Unit\InstantiatorDummy".');
 
-        Instantiator::default()->strict()(
-            [
-                'title' => 'title',
-                'body' => 'body',
-                'extra' => 'foo',
-            ],
-            PostForInstantiate::class
-        );
+        (new Instantiator())([], InstantiatorDummy::class);
     }
 
     /**
      * @test
      */
-    public function default_mode_throws_exception_if_missing_constructor_argument(): void
+    public function extra_attributes_throws_exception(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(\sprintf('Missing constructor argument "body" for "%s"', PostForInstantiate::class));
+        $this->expectExceptionMessage('Cannot set attribute "extra" for object "Zenstruck\Foundry\Tests\Unit\InstantiatorDummy" (not public and no setter).');
 
-        Instantiator::default()(['title' => 'title'], PostForInstantiate::class);
+        (new Instantiator())([
+            'propB' => 'B',
+            'extra' => 'foo',
+        ], InstantiatorDummy::class);
     }
 
     /**
      * @test
      */
-    public function only_constructor_mode_throws_exception_if_missing_constructor_argument(): void
+    public function can_prefix_extra_attribute_key_with_optional_to_avoid_exception(): void
+    {
+        $object = (new Instantiator())([
+            'propB' => 'B',
+            'optional:extra' => 'foo',
+        ], InstantiatorDummy::class);
+
+        $this->assertSame('constructor B', $object->getPropB());
+    }
+
+    /**
+     * @test
+     */
+    public function can_always_allow_extra_attributes(): void
+    {
+        $object = (new Instantiator())->allowExtraAttributes()([
+            'propB' => 'B',
+            'extra' => 'foo',
+        ], InstantiatorDummy::class);
+
+        $this->assertSame('constructor B', $object->getPropB());
+    }
+
+    /**
+     * @test
+     */
+    public function can_disable_constructor(): void
+    {
+        $object = (new Instantiator())->withoutConstructor()([
+            'propA' => 'A',
+            'propB' => 'B',
+            'propC' => 'C',
+            'propD' => 'D',
+        ], InstantiatorDummy::class);
+
+        $this->assertSame('A', $object->propA);
+        $this->assertSame('A', $object->getPropA());
+        $this->assertSame('setter B', $object->getPropB());
+        $this->assertSame('setter C', $object->getPropC());
+        $this->assertSame('setter D', $object->getPropD());
+    }
+
+    /**
+     * @test
+     */
+    public function prefixing_attribute_key_with_force_sets_the_property_directly(): void
+    {
+        $object = (new Instantiator())([
+            'propA' => 'A',
+            'propB' => 'B',
+            'propC' => 'C',
+            'force:propD' => 'D',
+        ], InstantiatorDummy::class);
+
+        $this->assertSame('A', $object->propA);
+        $this->assertSame('A', $object->getPropA());
+        $this->assertSame('constructor B', $object->getPropB());
+        $this->assertSame('constructor C', $object->getPropC());
+        $this->assertSame('D', $object->getPropD());
+    }
+
+    /**
+     * @test
+     */
+    public function prefixing_snake_case_attribute_key_with_force_sets_the_property_directly(): void
+    {
+        $object = (new Instantiator())([
+            'prop_a' => 'A',
+            'prop_b' => 'B',
+            'prop_c' => 'C',
+            'force:prop_d' => 'D',
+        ], InstantiatorDummy::class);
+
+        $this->assertSame('A', $object->propA);
+        $this->assertSame('A', $object->getPropA());
+        $this->assertSame('constructor B', $object->getPropB());
+        $this->assertSame('constructor C', $object->getPropC());
+        $this->assertSame('D', $object->getPropD());
+    }
+
+    /**
+     * @test
+     */
+    public function prefixing_kebab_case_attribute_key_with_force_sets_the_property_directly(): void
+    {
+        $object = (new Instantiator())([
+            'prop-a' => 'A',
+            'prop-b' => 'B',
+            'prop-c' => 'C',
+            'force:prop-d' => 'D',
+        ], InstantiatorDummy::class);
+
+        $this->assertSame('A', $object->propA);
+        $this->assertSame('A', $object->getPropA());
+        $this->assertSame('constructor B', $object->getPropB());
+        $this->assertSame('constructor C', $object->getPropC());
+        $this->assertSame('D', $object->getPropD());
+    }
+
+    /**
+     * @test
+     */
+    public function prefixing_invalid_attribute_key_with_force_throws_exception(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(\sprintf('Missing constructor argument "body" for "%s"', PostForInstantiate::class));
+        $this->expectExceptionMessage('Class "Zenstruck\Foundry\Tests\Unit\InstantiatorDummy" does not have property "extra".');
 
-        Instantiator::onlyConstructor()(['title' => 'title'], PostForInstantiate::class);
+        (new Instantiator())([
+            'propB' => 'B',
+            'force:extra' => 'foo',
+        ], InstantiatorDummy::class);
     }
 
     /**
      * @test
      */
-    public function without_constructor_mode_bypasses_constructor(): void
+    public function can_use_force_set_and_get(): void
     {
-        /** @var Post $object */
-        $object = Instantiator::withoutConstructor()(
-            [
-                'title' => 'title',
-            ],
-            PostForInstantiate::class
-        );
+        $object = new InstantiatorDummy('B');
 
-        $this->assertInstanceOf(PostForInstantiate::class, $object);
-        $this->assertSame('title', $object->getTitle());
-        $this->assertNull($object->getBody());
+        $this->assertNull(Instantiator::forceGet($object, 'propE'));
+        $this->assertNull(Instantiator::forceGet($object, 'prop_e'));
+        $this->assertNull(Instantiator::forceGet($object, 'prop-e'));
+
+        Instantiator::forceSet($object, 'propE', 'camel');
+
+        $this->assertSame('camel', Instantiator::forceGet($object, 'propE'));
+        $this->assertSame('camel', Instantiator::forceGet($object, 'prop_e'));
+        $this->assertSame('camel', Instantiator::forceGet($object, 'prop-e'));
+
+        Instantiator::forceSet($object, 'prop_e', 'snake');
+
+        $this->assertSame('snake', Instantiator::forceGet($object, 'propE'));
+        $this->assertSame('snake', Instantiator::forceGet($object, 'prop_e'));
+        $this->assertSame('snake', Instantiator::forceGet($object, 'prop-e'));
+
+        Instantiator::forceSet($object, 'prop-e', 'kebab');
+
+        $this->assertSame('kebab', Instantiator::forceGet($object, 'propE'));
+        $this->assertSame('kebab', Instantiator::forceGet($object, 'prop_e'));
+        $this->assertSame('kebab', Instantiator::forceGet($object, 'prop-e'));
     }
 
     /**
      * @test
      */
-    public function only_constructor_mode_does_not_set_properties(): void
-    {
-        /** @var Post $object */
-        $object = Instantiator::onlyConstructor()(
-            [
-                'title' => 'title',
-                'body' => 'body',
-                'shortDescription' => 'description',
-                'viewCount' => 3,
-            ],
-            PostForInstantiate::class
-        );
-
-        $this->assertInstanceOf(PostForInstantiate::class, $object);
-        $this->assertSame('(constructor) title', $object->getTitle());
-        $this->assertSame('(constructor) body', $object->getBody());
-        $this->assertSame('(constructor) description', $object->getShortDescription());
-        $this->assertSame(0, $object->getViewCount());
-    }
-
-    /**
-     * @test
-     */
-    public function can_force_set_non_public_properties(): void
-    {
-        $post = new PostForInstantiate('title', 'body');
-
-        $this->assertSame('(constructor) title', $post->getTitle());
-
-        Instantiator::default()->forceSet($post, 'title', 'new title');
-        Instantiator::default()->forceSet($post, 'missing', 'foobar');
-
-        $this->assertSame('new title', $post->getTitle());
-    }
-
-    /**
-     * @test
-     */
-    public function force_set_with_missing_attribute_and_strict_mode_throws_exception(): void
+    public function force_set_throws_exception_for_invalid_property(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(\sprintf('Class "%s" does not have property "missing"', PostForInstantiate::class));
+        $this->expectExceptionMessage('Class "Zenstruck\Foundry\Tests\Unit\InstantiatorDummy" does not have property "invalid".');
 
-        Instantiator::default()->strict()->forceSet(new PostForInstantiate('title', 'body'), 'missing', 'foobar');
+        Instantiator::forceSet(new InstantiatorDummy('B'), 'invalid', 'value');
     }
 
     /**
      * @test
      */
-    public function can_force_get_non_public_properties(): void
-    {
-        $post = new PostForInstantiate('title', 'body');
-
-        $this->assertSame('(constructor) title', Instantiator::default()->forceGet($post, 'title'));
-        $this->assertNull(Instantiator::default()->forceGet($post, 'missing'));
-    }
-
-    /**
-     * @test
-     */
-    public function force_get_with_missing_attribute_and_strict_mode_throws_exception(): void
+    public function force_get_throws_exception_for_invalid_property(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(\sprintf('Class "%s" does not have property "missing"', PostForInstantiate::class));
+        $this->expectExceptionMessage('Class "Zenstruck\Foundry\Tests\Unit\InstantiatorDummy" does not have property "invalid".');
 
-        Instantiator::default()->strict()->forceGet(new PostForInstantiate('title', 'body'), 'missing');
+        Instantiator::forceGet(new InstantiatorDummy('B'), 'invalid');
+    }
+
+    /**
+     * @test
+     */
+    public function can_use_always_force_mode(): void
+    {
+        $object = (new Instantiator())->alwaysForceProperties()([
+            'propA' => 'A',
+            'propB' => 'B',
+            'propC' => 'C',
+            'propD' => 'D',
+        ], InstantiatorDummy::class);
+
+        $this->assertSame('A', $object->propA);
+        $this->assertSame('A', $object->getPropA());
+        $this->assertSame('constructor B', $object->getPropB());
+        $this->assertSame('constructor C', $object->getPropC());
+        $this->assertSame('D', $object->getPropD());
+    }
+
+    /**
+     * @test
+     */
+    public function can_use_always_force_mode_allows_snake_case(): void
+    {
+        $object = (new Instantiator())->alwaysForceProperties()([
+            'prop_a' => 'A',
+            'prop_b' => 'B',
+            'prop_c' => 'C',
+            'prop_d' => 'D',
+        ], InstantiatorDummy::class);
+
+        $this->assertSame('A', $object->propA);
+        $this->assertSame('A', $object->getPropA());
+        $this->assertSame('constructor B', $object->getPropB());
+        $this->assertSame('constructor C', $object->getPropC());
+        $this->assertSame('D', $object->getPropD());
+    }
+
+    /**
+     * @test
+     */
+    public function can_use_always_force_mode_allows_kebab_case(): void
+    {
+        $object = (new Instantiator())->alwaysForceProperties()([
+            'prop-a' => 'A',
+            'prop-b' => 'B',
+            'prop-c' => 'C',
+            'prop-d' => 'D',
+        ], InstantiatorDummy::class);
+
+        $this->assertSame('A', $object->propA);
+        $this->assertSame('A', $object->getPropA());
+        $this->assertSame('constructor B', $object->getPropB());
+        $this->assertSame('constructor C', $object->getPropC());
+        $this->assertSame('D', $object->getPropD());
+    }
+
+    /**
+     * @test
+     */
+    public function always_force_mode_throws_exception_for_extra_attributes(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Class "Zenstruck\Foundry\Tests\Unit\InstantiatorDummy" does not have property "extra".');
+
+        (new Instantiator())->alwaysForceProperties()([
+            'propB' => 'B',
+            'extra' => 'foo',
+        ], InstantiatorDummy::class);
+    }
+
+    /**
+     * @test
+     */
+    public function always_force_mode_allows_optional_attribute_name_prefix(): void
+    {
+        $object = (new Instantiator())->alwaysForceProperties()([
+            'propB' => 'B',
+            'propD' => 'D',
+            'optional:extra' => 'foo',
+        ], InstantiatorDummy::class);
+
+        $this->assertSame('D', $object->getPropD());
+    }
+
+    /**
+     * @test
+     */
+    public function always_force_mode_with_allow_extra_attributes_mode(): void
+    {
+        $object = (new Instantiator())->allowExtraAttributes()->alwaysForceProperties()([
+            'propB' => 'B',
+            'propD' => 'D',
+            'extra' => 'foo',
+        ], InstantiatorDummy::class);
+
+        $this->assertSame('D', $object->getPropD());
+    }
+
+    /**
+     * @test
+     */
+    public function always_force_mode_can_set_parent_class_properties(): void
+    {
+        $object = (new Instantiator())->alwaysForceProperties()([
+            'propA' => 'A',
+            'propB' => 'B',
+            'propC' => 'C',
+            'propD' => 'D',
+            'propE' => 'E',
+        ], ExtendedInstantiatorDummy::class);
+
+        $this->assertSame('A', $object->propA);
+        $this->assertSame('A', $object->getPropA());
+        $this->assertSame('constructor B', $object->getPropB());
+        $this->assertSame('constructor C', $object->getPropC());
+        $this->assertSame('D', $object->getPropD());
+        $this->assertSame('E', Instantiator::forceGet($object, 'propE'));
     }
 }
 
-class PostForInstantiate extends Post
+class InstantiatorDummy
 {
-    public function __construct(string $title, string $body, string $shortDescription = null)
+    public $propA;
+    public $propD;
+    private $propB;
+    private $propC;
+    private $propE;
+
+    public function __construct($propB, $propC = null)
     {
-        $title = '(constructor) '.$title;
-        $body = '(constructor) '.$body;
+        $this->propB = 'constructor '.$propB;
 
-        if ($shortDescription) {
-            $shortDescription = '(constructor) '.$shortDescription;
+        if ($propC) {
+            $this->propC = 'constructor '.$propC;
         }
+    }
 
-        parent::__construct($title, $body, $shortDescription);
+    public function getPropA()
+    {
+        return $this->propA;
+    }
+
+    public function getPropB()
+    {
+        return $this->propB;
+    }
+
+    public function setPropB($propB)
+    {
+        $this->propB = 'setter '.$propB;
+    }
+
+    public function getPropC()
+    {
+        return $this->propC;
+    }
+
+    public function setPropC($propC)
+    {
+        $this->propC = 'setter '.$propC;
+    }
+
+    public function getPropD()
+    {
+        return $this->propD;
+    }
+
+    public function setPropD($propD)
+    {
+        $this->propD = 'setter '.$propD;
+    }
+}
+
+class ExtendedInstantiatorDummy extends InstantiatorDummy
+{
+}
+
+class PrivateConstructorInstantiatorDummy extends InstantiatorDummy
+{
+    private function __construct()
+    {
+        parent::__construct('B', 'C');
     }
 }

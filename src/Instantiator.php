@@ -2,160 +2,149 @@
 
 namespace Zenstruck\Foundry;
 
+use Symfony\Component\PropertyAccess\Exception\ExceptionInterface as PropertyAccessException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class Instantiator
 {
-    private const MODE_CONSTRUCTOR_AND_PROPERTIES = 1;
-    private const MODE_ONLY_CONSTRUCTOR = 2;
-    private const MODE_ONLY_PROPERTIES = 3;
+    private static ?PropertyAccessor $propertyAccessor = null;
 
-    private int $mode;
-    private bool $strict = false;
-
-    private function __construct(int $mode)
-    {
-        $this->mode = $mode;
-    }
+    private bool $withoutConstructor = false;
+    private bool $allowExtraAttributes = false;
+    private bool $alwaysForceProperties = false;
 
     public function __invoke(array $attributes, string $class): object
     {
         $object = $this->instantiate($class, $attributes);
 
-        if (self::MODE_ONLY_CONSTRUCTOR === $this->mode) {
-            return $object;
-        }
+        foreach ($attributes as $attribute => $value) {
+            if (0 === \mb_strpos($attribute, 'optional:')) {
+                continue;
+            }
 
-        foreach ($attributes as $name => $value) {
-            $this->forceSet($object, $name, $value);
+            if ($this->alwaysForceProperties) {
+                try {
+                    self::forceSet($object, $attribute, $value);
+                } catch (\InvalidArgumentException $e) {
+                    if (!$this->allowExtraAttributes) {
+                        throw $e;
+                    }
+                }
+
+                continue;
+            }
+
+            if (0 === \mb_strpos($attribute, 'force:')) {
+                self::forceSet($object, \mb_substr($attribute, 6), $value);
+
+                continue;
+            }
+
+            try {
+                self::propertyAccessor()->setValue($object, $attribute, $value);
+            } catch (PropertyAccessException $e) {
+                // see if attribute was snake/kebab cased
+                try {
+                    self::propertyAccessor()->setValue($object, self::camel($attribute), $value);
+                } catch (PropertyAccessException $e) {
+                    if (!$this->allowExtraAttributes) {
+                        throw new \InvalidArgumentException(\sprintf('Cannot set attribute "%s" for object "%s" (not public and no setter).', $attribute, $class), 0, $e);
+                    }
+                }
+            }
         }
 
         return $object;
     }
 
     /**
-     * This mode instantiates the object with the given attributes as constructor arguments, then
-     * sets the remaining attributes to properties (public and private).
+     * Instantiate objects without calling the constructor.
      */
-    public static function default(): self
+    public function withoutConstructor(): self
     {
-        return new self(self::MODE_CONSTRUCTOR_AND_PROPERTIES);
-    }
-
-    /**
-     * This mode only instantiates the object with the given attributes as constructor arguments.
-     */
-    public static function onlyConstructor(): self
-    {
-        return new self(self::MODE_ONLY_CONSTRUCTOR);
-    }
-
-    /**
-     * This mode instantiates the object without calling the constructor, then sets the attributes to
-     * properties (public and private).
-     */
-    public static function withoutConstructor(): self
-    {
-        return new self(self::MODE_ONLY_PROPERTIES);
-    }
-
-    /**
-     * Throws \InvalidArgumentException for attributes passed that don't exist.
-     */
-    public function strict(): self
-    {
-        $this->strict = true;
+        $this->withoutConstructor = true;
 
         return $this;
     }
 
-    public function forceSet(object $object, string $property, $value): void
+    /**
+     * Ignore attributes that can't be set to object.
+     */
+    public function allowExtraAttributes(): self
     {
-        $property = $this->propertyForAttributeName($object, $property);
+        $this->allowExtraAttributes = true;
 
-        if (!$property) {
-            return;
-        }
-
-        $property->setValue($object, $value);
+        return $this;
     }
 
     /**
-     * @return mixed|null
+     * Always force properties, never use setters (still uses constructor unless disabled).
+     */
+    public function alwaysForceProperties(): self
+    {
+        $this->alwaysForceProperties = true;
+
+        return $this;
+    }
+
+    /**
+     * @param mixed $value
      *
-     * @throws \InvalidArgumentException if $strict = true
+     * @throws \InvalidArgumentException if property does not exist for $object
      */
-    public function forceGet(object $object, string $property)
+    public static function forceSet(object $object, string $property, $value): void
     {
-        $property = $this->propertyForAttributeName($object, $property);
-
-        return $property ? $property->getValue($object) : null;
+        self::accessibleProperty($object, $property)->setValue($object, $value);
     }
 
     /**
-     * Check if property exists for passed $name - if not, try camel-casing the name.
+     * @return mixed
      */
-    private function propertyForAttributeName(object $object, string $name): ?\ReflectionProperty
+    public static function forceGet(object $object, string $property)
+    {
+        return self::accessibleProperty($object, $property)->getValue($object);
+    }
+
+    private static function propertyAccessor(): PropertyAccessor
+    {
+        return self::$propertyAccessor ?: self::$propertyAccessor = PropertyAccess::createPropertyAccessor();
+    }
+
+    private static function accessibleProperty(object $object, string $name): \ReflectionProperty
     {
         $class = new \ReflectionClass($object);
 
         // try fetching first by exact name, if not found, try camel-case
-        if (!$property = self::getReflectionProperty($class, $name)) {
-            $property = self::getReflectionProperty($class, self::camel($name));
+        if (!$property = self::reflectionProperty($class, $name)) {
+            $property = self::reflectionProperty($class, self::camel($name));
         }
 
-        if (!$property && $this->strict) {
+        if (!$property) {
             throw new \InvalidArgumentException(\sprintf('Class "%s" does not have property "%s".', $class->getName(), $name));
         }
 
-        if ($property && !$property->isPublic()) {
+        if (!$property->isPublic()) {
             $property->setAccessible(true);
         }
 
         return $property;
     }
 
-    private static function getReflectionProperty(\ReflectionClass $class, string $name): ?\ReflectionProperty
+    private static function reflectionProperty(\ReflectionClass $class, string $name): ?\ReflectionProperty
     {
         try {
             return $class->getProperty($name);
         } catch (\ReflectionException $e) {
             if ($class = $class->getParentClass()) {
-                return self::getReflectionProperty($class, $name);
+                return self::reflectionProperty($class, $name);
             }
         }
 
         return null;
-    }
-
-    private function instantiate(string $class, array &$attributes): object
-    {
-        $class = new \ReflectionClass($class);
-        $constructor = $class->getConstructor();
-
-        if (self::MODE_ONLY_PROPERTIES === $this->mode || !$constructor || !$constructor->isPublic()) {
-            return $class->newInstanceWithoutConstructor();
-        }
-
-        $arguments = [];
-
-        foreach ($constructor->getParameters() as $parameter) {
-            $name = self::attributeNameForParameter($parameter, $attributes);
-
-            if (\array_key_exists($name, $attributes)) {
-                $arguments[] = $attributes[$name];
-            } elseif ($parameter->isDefaultValueAvailable()) {
-                $arguments[] = $parameter->getDefaultValue();
-            } else {
-                throw new \InvalidArgumentException(\sprintf('Missing constructor argument "%s" for "%s".', $parameter->getName(), $class->getName()));
-            }
-
-            // unset attribute so it isn't used when setting object properties
-            unset($attributes[$name]);
-        }
-
-        return $class->newInstance(...$arguments);
     }
 
     /**
@@ -216,5 +205,34 @@ final class Instantiator
         }, $string, 1);
 
         return \mb_strtolower(\preg_replace(['/(\p{Lu}+)(\p{Lu}\p{Ll})/u', '/([\p{Ll}0-9])(\p{Lu})/u'], '\1_\2', $string), 'UTF-8');
+    }
+
+    private function instantiate(string $class, array &$attributes): object
+    {
+        $class = new \ReflectionClass($class);
+        $constructor = $class->getConstructor();
+
+        if ($this->withoutConstructor || !$constructor || !$constructor->isPublic()) {
+            return $class->newInstanceWithoutConstructor();
+        }
+
+        $arguments = [];
+
+        foreach ($constructor->getParameters() as $parameter) {
+            $name = self::attributeNameForParameter($parameter, $attributes);
+
+            if (\array_key_exists($name, $attributes)) {
+                $arguments[] = $attributes[$name];
+            } elseif ($parameter->isDefaultValueAvailable()) {
+                $arguments[] = $parameter->getDefaultValue();
+            } else {
+                throw new \InvalidArgumentException(\sprintf('Missing constructor argument "%s" for "%s".', $parameter->getName(), $class->getName()));
+            }
+
+            // unset attribute so it isn't used when setting object properties
+            unset($attributes[$name]);
+        }
+
+        return $class->newInstance(...$arguments);
     }
 }
