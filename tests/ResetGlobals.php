@@ -28,7 +28,6 @@ trait ResetGlobals
         $reset(Factory::class, 'faker', null);
         $reset(PersistenceManager::class, 'managerRegistry', null);
         $reset(Proxy::class, 'autoRefreshByDefault', true);
-        $reset(Proxy::class, 'instantiator', null);
         $reset(StoryManager::class, 'globalInstances', []);
         $reset(StoryManager::class, 'instances', []);
     }

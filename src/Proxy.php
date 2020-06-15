@@ -12,7 +12,6 @@ use PHPUnit\Framework\Assert;
 final class Proxy
 {
     private static bool $autoRefreshByDefault = true;
-    private static ?Instantiator $instantiator = null;
 
     private object $object;
     private string $class;
@@ -113,7 +112,7 @@ final class Proxy
         $object = $this->object();
 
         foreach ($properties as $property => $value) {
-            self::instantiator()->forceSet($object, $property, $value);
+            Instantiator::forceSet($object, $property, $value);
         }
 
         return $this;
@@ -124,7 +123,7 @@ final class Proxy
      */
     public function forceGet(string $property)
     {
-        return self::instantiator()->forceGet($this->object(), $property);
+        return Instantiator::forceGet($this->object(), $property);
     }
 
     /**
@@ -183,10 +182,5 @@ final class Proxy
     private function objectManager(): ObjectManager
     {
         return PersistenceManager::objectManagerFor($this->class);
-    }
-
-    private static function instantiator(): Instantiator
-    {
-        return self::$instantiator ?: self::$instantiator = Instantiator::default()->strict();
     }
 }

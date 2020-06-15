@@ -401,8 +401,19 @@ use Zenstruck\Foundry\Factory;
 #### Instantiator
 
 By default, objects are instantiated with the object's constructor. Attributes that match constructor arguments are
-used. Remaining attributes are set to the object's matching properties (public/protected/private). Extra attributes
-are ignored. You can customize the instantiator several ways:
+used. Remaining attributes are set to the object using Symfony's PropertyAccess component (using setters). Any extra
+attributes cause an exception to be thrown.
+
+When using the default instantiator, there are two attribute key prefixes to change behavior:
+
+```php
+$post = (new Factory(Post::class))->create([
+    'force:body' => 'some body', // "force set" the body property (even private/protected, does not use setter)
+    'optional:extra' => 'value', // attributes prefixed with "optional:" do not cause an exception
+]);
+```
+
+You can customize the instantiator several ways:
 
 ```php
 use Zenstruck\Foundry\Instantiator;
@@ -410,18 +421,19 @@ use Zenstruck\Foundry\Factory;
 
 // set the instantiator for the current factory
 (new Factory(Post::class))
-    // instantiate by only using the constructor (no "force setting" attributes)
-    ->instantiator(Instantiator::onlyConstructor())
+    // instantiate the object without calling the constructor
+    ->instantiator((new Instantiator())->withoutConstructor())
 
-    // instantiate the object without calling the constructor (only "force set" attributes
-    ->instantiator(Instantiator::withoutConstructor())
+    // extra attributes are ignored
+    ->instantiator((new Instantiator())->allowExtraAttributes())
 
-    // "strict" mode - extra attributes cause an exception
-    ->instantiator(Instantiator::default()->strict())
-    ->instantiator(Instantiator::onlyConstructor()->strict())
-    ->instantiator(Instantiator::withoutConstructor()->strict())
+    // never use setters, always "force set" properties (even private/protected, does not use setter)
+    ->instantiator((new Instantiator())->alwaysForceProperties())
 
-    // The instantiator is just a callable, you can provide your own
+    // can combine the different "modes"
+    ->instantiator((new Instantiator())->withoutConstructor()->allowExtraAttributes()->alwaysForceProperties())
+
+    // the instantiator is just a callable, you can provide your own
     ->instantiator(function(array $attibutes, string $class): object {
         return new Post(); // ... your own logic
     })
@@ -435,7 +447,7 @@ instantiators):
 // tests/bootstrap.php
 // ...
 Zenstruck\Foundry\Factory::registerDefaultInstantiator(
-    Zenstruck\Foundry\Instantiator::withoutConstructor()
+    (new Zenstruck\Foundry\Instantiator())->alwaysForceProperties()
 );
 ```
 
