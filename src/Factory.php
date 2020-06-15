@@ -206,7 +206,7 @@ class Factory
 
     private static function defaultInstantiator(): callable
     {
-        return self::$defaultInstantiator ?: self::$defaultInstantiator = Instantiator::default();
+        return self::$defaultInstantiator ?: self::$defaultInstantiator = new Instantiator();
     }
 
     /**

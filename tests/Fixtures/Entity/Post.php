@@ -100,8 +100,18 @@ class Post
         return $this->category;
     }
 
+    public function setCategory(Category $category)
+    {
+        $this->category = $category;
+    }
+
     public function isPublished(): bool
     {
         return null !== $this->publishedAt;
+    }
+
+    public function setPublishedAt(\DateTime $timestamp)
+    {
+        $this->publishedAt = $timestamp;
     }
 }
