@@ -8,7 +8,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class PostFactory extends ModelFactory
+class PostFactory extends ModelFactory
 {
     public function published(): self
     {

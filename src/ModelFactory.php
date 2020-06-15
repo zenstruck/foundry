@@ -33,6 +33,10 @@ abstract class ModelFactory extends Factory
             ->initialize()
         ;
 
+        if (!$factory instanceof static) {
+            throw new \TypeError(\sprintf('"%1$s::initialize()" must return an instance of "%1$s".', static::class));
+        }
+
         foreach ($states as $state) {
             $factory = $factory->{$state}();
         }
@@ -65,8 +69,10 @@ abstract class ModelFactory extends Factory
 
     /**
      * Override to add default instantiator and default afterInstantiate/afterPersist events.
+     *
+     * @return static
      */
-    protected function initialize(): self
+    protected function initialize()
     {
         return $this;
     }
