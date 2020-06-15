@@ -3,6 +3,10 @@
 namespace Zenstruck\Foundry\Tests\Functional;
 
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithInvalidInitialize;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithNullInitialize;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithValidInitialize;
 use Zenstruck\Foundry\Tests\FunctionalTestCase;
 
 /**
@@ -20,5 +24,36 @@ final class ModelFactoryTest extends FunctionalTestCase
         CategoryFactory::repository()->assertCount(1);
         CategoryFactory::findOrCreate(['name' => 'php']);
         CategoryFactory::repository()->assertCount(1);
+    }
+
+    /**
+     * @test
+     */
+    public function can_override_initialize(): void
+    {
+        $this->assertFalse(PostFactory::new()->create()->isPublished());
+        $this->assertTrue(PostFactoryWithValidInitialize::new()->create()->isPublished());
+    }
+
+    /**
+     * @test
+     */
+    public function initialize_must_return_an_instance_of_the_current_factory(): void
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage(\sprintf('"%1$s::initialize()" must return an instance of "%1$s".', PostFactoryWithInvalidInitialize::class));
+
+        PostFactoryWithInvalidInitialize::new();
+    }
+
+    /**
+     * @test
+     */
+    public function initialize_must_return_a_value(): void
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage(\sprintf('"%1$s::initialize()" must return an instance of "%1$s".', PostFactoryWithNullInitialize::class));
+
+        PostFactoryWithNullInitialize::new();
     }
 }
