@@ -76,4 +76,101 @@ final class RepositoryProxyTest extends FunctionalTestCase
         $this->assertInstanceOf(Proxy::class, $repository->find($proxy->object()));
         $this->assertInstanceOf(Proxy::class, $repository->find(['name' => 'foo']));
     }
+
+    /**
+     * @test
+     */
+    public function can_find_random_object(): void
+    {
+        CategoryFactory::new()->createMany(5);
+
+        $ids = [];
+
+        while (5 !== \count(\array_unique($ids))) {
+            $ids[] = repository(Category::class)->random()->getId();
+        }
+
+        $this->assertCount(5, \array_unique($ids));
+    }
+
+    /**
+     * @test
+     */
+    public function at_least_one_object_must_exist_to_get_random_object(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('At least 1 "%s" object(s) must have been persisted (0 persisted).', Category::class));
+
+        repository(Category::class)->random();
+    }
+
+    /**
+     * @test
+     */
+    public function can_find_random_set_of_objects(): void
+    {
+        CategoryFactory::new()->createMany(5);
+
+        $objects = repository(Category::class)->randomSet(3);
+
+        $this->assertCount(3, $objects);
+        $this->assertCount(3, \array_unique(\array_map(fn($category) => $category->getId(), $objects)));
+    }
+
+    /**
+     * @test
+     */
+    public function can_find_random_set_of_objects_with_min_and_max(): void
+    {
+        CategoryFactory::new()->createMany(5);
+
+        $counts = [];
+
+        while (4 !== \count(\array_unique($counts))) {
+            $counts[] = \count(repository(Category::class)->randomSet(0, 3));
+        }
+
+        $this->assertCount(4, \array_unique($counts));
+        $this->assertContains(0, $counts);
+        $this->assertContains(1, $counts);
+        $this->assertContains(2, $counts);
+        $this->assertContains(3, $counts);
+        $this->assertNotContains(4, $counts);
+        $this->assertNotContains(5, $counts);
+    }
+
+    /**
+     * @test
+     */
+    public function the_number_of_persisted_objects_must_be_at_least_the_random_set_max(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('At least 2 "%s" object(s) must have been persisted (1 persisted).', Category::class));
+
+        CategoryFactory::new()->createMany(1);
+
+        repository(Category::class)->randomSet(2);
+    }
+
+    /**
+     * @test
+     */
+    public function random_set_min_cannot_be_less_than_zero(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Min must be positive (-1 given).');
+
+        repository(Category::class)->randomSet(-1);
+    }
+
+    /**
+     * @test
+     */
+    public function random_set_max_cannot_be_less_than_min(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Max (3) cannot be less than min (5).');
+
+        repository(Category::class)->randomSet(5, 3);
+    }
 }
