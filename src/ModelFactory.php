@@ -60,6 +60,27 @@ abstract class ModelFactory extends Factory
     }
 
     /**
+     * Get a random persisted object.
+     *
+     * @return Proxy|object
+     */
+    final public static function random(): object
+    {
+        return self::repository(true)->random();
+    }
+
+    /**
+     * @param int      $min The minimum number of objects to return (if max is null, will always return this amount)
+     * @param int|null $max The max number of objects to return
+     *
+     * @return Proxy[]|object[]
+     */
+    final public static function randomSet(int $min, ?int $max = null): array
+    {
+        return self::repository(true)->randomSet($min, $max);
+    }
+
+    /**
      * @return RepositoryProxy|ObjectRepository
      */
     final public static function repository(bool $proxy = true): ObjectRepository
