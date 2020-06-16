@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -47,10 +48,15 @@ class Post
     private $publishedAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Category::class)
+     * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="posts")
      * @ORM\JoinColumn
      */
     private $category;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Tag::class, inversedBy="posts")
+     */
+    private $tags;
 
     public function __construct(string $title, string $body, string $shortDescription = null)
     {
@@ -58,6 +64,7 @@ class Post
         $this->body = $body;
         $this->shortDescription = $shortDescription;
         $this->createdAt = new \DateTime('now');
+        $this->tags = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -100,7 +107,7 @@ class Post
         return $this->category;
     }
 
-    public function setCategory(Category $category)
+    public function setCategory(?Category $category)
     {
         $this->category = $category;
     }
@@ -113,5 +120,24 @@ class Post
     public function setPublishedAt(\DateTime $timestamp)
     {
         $this->publishedAt = $timestamp;
+    }
+
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    public function addTag(Tag $tag)
+    {
+        if (!$this->tags->contains($tag)) {
+            $this->tags[] = $tag;
+        }
+    }
+
+    public function removeTag(Tag $tag)
+    {
+        if ($this->tags->contains($tag)) {
+            $this->tags->removeElement($tag);
+        }
     }
 }

@@ -62,11 +62,12 @@ public function test_can_post_a_comment(): void
     1. [Instantiate](#instantiate)
     2. [Persist](#persist)
     3. [Attributes](#attributes)
-    4. [Events](#events)
-    5. [Instantiator](#instantiator)
-    6. [Immutable](#immutable)
-    7. [Object Proxy](#object-proxy)
-    8. [Repository Proxy](#repository-proxy)
+    4. [Doctrine Relationships](#doctrine-relationships)
+    5. [Events](#events)
+    6. [Instantiator](#instantiator)
+    7. [Immutable](#immutable)
+    8. [Object Proxy](#object-proxy)
+    9. [Repository Proxy](#repository-proxy)
 6. [Model Factories](#model-factories)
     1. [Generate](#generate)
     2. [Usage](#usage)
@@ -362,6 +363,56 @@ $post->getBody(); // "Post A Body..."
 $post->getCategory()->getName(); // "symfony"
 $post->getPublishedAt(); // \DateTime('last week')
 $post->getCreatedAt(); // random \DateTime
+```
+
+#### Doctrine Relationships
+
+Assuming your entites follow the
+[best practices for Doctrine Relationships](https://symfony.com/doc/current/doctrine/associations.html) and you are
+using the [default instantiator](#instantiator), Foundry *just works* with doctrine relationships:
+
+```php
+use function Zenstruck\Foundry\create;
+use function Zenstruck\Foundry\factory;
+
+// ManyToOne
+create(Post::class, [
+    'category' => $category, // $category is instance of Category
+]);
+create(Post::class, [
+    // Proxy objects are converted to object before calling Post::setCategory()
+    'category' => create(Category::class, ['name' => 'My Category']),
+]);
+create(Post::class, [
+    // Factory objects are persisted before calling Post::setCategory()
+    'category' => factory(Category::class, ['name' => 'My Category']),
+]);
+
+// OneToMany
+create(Category::class, [
+    'posts' => [
+        $post, // $post is instance of Post, Category::addPost($post) will be called during instantiation
+
+        // Proxy objects are converted to object before calling Category::addPost()
+        create(Post::class, ['title' => 'Post B', 'body' => 'body']),
+
+        // Factory objects are persisted before calling Category::addPost()
+        factory(Post::class, ['title' => 'Post A', 'body' => 'body']),
+    ],
+]);
+
+// ManyToMany
+create(Post::class, [
+    'tags' => [
+        $tag, // $tag is instance of Tag, Post::addTag($tag) will be called during instantiation
+
+        // Proxy objects are converted to object before calling Post::addTag()
+        create(Tag::class, ['name' => 'My Tag']),
+
+        // Factory objects are persisted before calling Post::addTag()
+        factory(Tag::class, ['name' => 'My Tag']),
+    ],
+]);
 ```
 
 #### Events
