@@ -220,6 +220,11 @@ class Factory
             return $value->object();
         }
 
+        if (\is_array($value)) {
+            // possible OneToMany/ManyToMany relationship
+            return \array_map(fn($value) => self::filterNormalizedProperty($value, $persist), $value);
+        }
+
         if (!$value instanceof self) {
             return $value;
         }
