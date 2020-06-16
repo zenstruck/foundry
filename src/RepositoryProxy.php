@@ -125,6 +125,49 @@ final class RepositoryProxy implements ObjectRepository
     }
 
     /**
+     * @return Proxy|object
+     */
+    public function random(): Proxy
+    {
+        return $this->randomSet(1)[0];
+    }
+
+    /**
+     * @param int      $min The minimum number of objects to return (if max is null, will always return this amount)
+     * @param int|null $max The max number of objects to return
+     *
+     * @return Proxy[]|object[]
+     *
+     * @throws \RuntimeException         if not enough persisted objects to satisfy the max
+     * @throws \InvalidArgumentException if min is less than zero
+     * @throws \InvalidArgumentException if max is less than min
+     */
+    public function randomSet(int $min, ?int $max = null): array
+    {
+        if (null === $max) {
+            $max = $min;
+        }
+
+        if ($min < 0) {
+            throw new \InvalidArgumentException(\sprintf('Min must be positive (%d given).', $min));
+        }
+
+        if ($max < $min) {
+            throw new \InvalidArgumentException(\sprintf('Max (%d) cannot be less than min (%d).', $max, $min));
+        }
+
+        $all = \array_values($this->findAll());
+
+        \shuffle($all);
+
+        if (\count($all) < $max) {
+            throw new \RuntimeException(\sprintf('At least %d "%s" object(s) must have been persisted (%d persisted).', $max, $this->getClassName(), \count($all)));
+        }
+
+        return \array_slice($all, 0, \random_int($min, $max));
+    }
+
+    /**
      * @param object|array|mixed $criteria
      *
      * @return Proxy|object|null
