@@ -56,4 +56,46 @@ final class ModelFactoryTest extends FunctionalTestCase
 
         PostFactoryWithNullInitialize::new();
     }
+
+    public function can_find_random_object(): void
+    {
+        CategoryFactory::new()->createMany(5);
+
+        $ids = [];
+
+        while (5 !== \count(\array_unique($ids))) {
+            $ids[] = CategoryFactory::random()->getId();
+        }
+
+        $this->assertCount(5, \array_unique($ids));
+    }
+
+    public function can_find_random_set_of_objects(): void
+    {
+        CategoryFactory::new()->createMany(5);
+
+        $objects = CategoryFactory::randomSet(3);
+
+        $this->assertCount(3, $objects);
+        $this->assertCount(3, \array_unique(\array_map(fn($category) => $category->getId(), $objects)));
+    }
+
+    public function can_find_random_set_of_objects_with_min_and_max(): void
+    {
+        CategoryFactory::new()->createMany(5);
+
+        $counts = [];
+
+        while (4 !== \count(\array_unique($counts))) {
+            $counts[] = \count(CategoryFactory::randomSet(0, 3));
+        }
+
+        $this->assertCount(4, \array_unique($counts));
+        $this->assertContains(0, $counts);
+        $this->assertContains(1, $counts);
+        $this->assertContains(2, $counts);
+        $this->assertContains(3, $counts);
+        $this->assertNotContains(4, $counts);
+        $this->assertNotContains(5, $counts);
+    }
 }

@@ -11,6 +11,8 @@ use Zenstruck\Foundry\Proxy;
 
 /**
  * @method static <?= $entity->getShortName() ?>|Proxy findOrCreate(array $attributes)
+ * @method static <?= $entity->getShortName() ?>|Proxy random()
+ * @method static <?= $entity->getShortName() ?>[]|Proxy[] randomSet(int $min, ?int $max = null)
 <?php if ($repository): ?> * @method static <?= $repository->getShortName() ?>|RepositoryProxy repository(bool $proxy = true)
 <?php endif ?>
  * @method <?= $entity->getShortName() ?> instantiate($attributes = [])

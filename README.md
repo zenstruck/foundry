@@ -563,6 +563,9 @@ $repository->assertNotExists(['title' => 'My Title']);
 $repository->getCount(); // number of rows in the database table
 $repository->first(); // get the first object (wrapped in a object proxy)
 $repository->truncate(); // delete all rows in the database table
+$repository->random(); // get a random object
+$repository->randomSet(5); // get 5 random objects
+$repository->randomSet(0, 5); // get 0-5 random objects
 
 // instance of ObjectRepository (all returned objects are proxied)
 $repository->find(1);                               // Proxy|Post|null
@@ -603,6 +606,8 @@ use Zenstruck\Foundry\Proxy;
 
 /**
  * @method static Post|Proxy findOrCreate(array $attributes)
+ * @method static Post|Proxy random()
+ * @method static Post[]|Proxy[] randomSet(int $min, ?int $max = null)
  * @method static PostRepository|RepositoryProxy repository(bool $proxy = true)
  * @method Post instantiate($attributes = [])
  * @method Post[] instantiateMany(int $number, $attributes = [])
@@ -645,6 +650,15 @@ PostFactory::new(['title' => 'My Title'])->create(); // alternative to above
 
 // find a persisted object for the given attributes, if not found, create with the attributes
 PostFactory::findOrCreate(['title' => 'My Title']); // instance of Proxy|Post
+
+// get a random object that has been persisted
+PostFactory::random(); // instance of Proxy|Post
+
+// get a random set of objects that have been persisted
+PostFactory::randomSet(4); // array containing 4 instances of Proxy|Post's
+
+// random set of persisted objects with min/max
+PostFactory::randomSet(0, 5); // array containing 0-5 instances of Proxy|Post's
 
 PostFactory::repository(); // Instance of RepositoryProxy|PostRepository
 
