@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -21,6 +22,16 @@ class Category
      */
     private $name;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Post::class, mappedBy="category")
+     */
+    private $posts;
+
+    public function __construct()
+    {
+        $this->posts = new ArrayCollection();
+    }
+
     public function getId()
     {
         return $this->id;
@@ -34,5 +45,29 @@ class Category
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    public function getPosts()
+    {
+        return $this->posts;
+    }
+
+    public function addPost(Post $post)
+    {
+        if (!$this->posts->contains($post)) {
+            $this->posts[] = $post;
+            $post->setCategory($this);
+        }
+    }
+
+    public function removePost(Post $post)
+    {
+        if ($this->posts->contains($post)) {
+            $this->posts->removeElement($post);
+            // set the owning side to null (unless already changed)
+            if ($post->getCategory() === $this) {
+                $post->setCategory(null);
+            }
+        }
     }
 }
