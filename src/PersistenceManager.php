@@ -37,15 +37,6 @@ final class PersistenceManager
         return $object;
     }
 
-    public static function proxy(object $object): Proxy
-    {
-        if ($object instanceof Proxy) {
-            return $object;
-        }
-
-        return new Proxy($object);
-    }
-
     public static function register(ManagerRegistry $managerRegistry): void
     {
         self::$managerRegistry = $managerRegistry;
