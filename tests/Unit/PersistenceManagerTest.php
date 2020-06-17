@@ -104,16 +104,6 @@ final class PersistenceManagerTest extends TestCase
     /**
      * @test
      */
-    public function proxying_a_proxy_returns_the_proxy(): void
-    {
-        $proxy = PersistenceManager::proxy(new Category());
-
-        $this->assertSame($proxy, PersistenceManager::proxy($proxy));
-    }
-
-    /**
-     * @test
-     */
     public function exception_thrown_if_no_manager_registry_registered(): void
     {
         $this->expectException(\RuntimeException::class);
