@@ -58,7 +58,7 @@ class Post
      */
     private $tags;
 
-    public function __construct(string $title, string $body, string $shortDescription = null)
+    public function __construct(string $title, string $body, ?string $shortDescription = null)
     {
         $this->title = $title;
         $this->body = $body;
