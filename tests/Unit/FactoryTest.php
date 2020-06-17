@@ -200,7 +200,7 @@ final class FactoryTest extends TestCase
         $object = (new Factory(Post::class))->instantiate([
             'title' => 'title',
             'body' => 'body',
-            'category' => (new Proxy(new Category()))->withoutAutoRefresh(),
+            'category' => Proxy::unpersisted(new Category()),
         ]);
 
         $this->assertInstanceOf(Category::class, $object->getCategory());
