@@ -105,7 +105,7 @@ final class RepositoryProxy implements ObjectRepository
     /**
      * @return Proxy|object|null
      */
-    public function first(): ?object
+    public function first(): ?Proxy
     {
         return $this->findOneBy([]);
     }
@@ -172,7 +172,7 @@ final class RepositoryProxy implements ObjectRepository
      *
      * @return Proxy|object|null
      */
-    public function find($criteria): ?object
+    public function find($criteria): ?Proxy
     {
         if ($criteria instanceof Proxy) {
             $criteria = $criteria->object();
@@ -204,7 +204,7 @@ final class RepositoryProxy implements ObjectRepository
     /**
      * @return Proxy|object|null
      */
-    public function findOneBy(array $criteria): ?object
+    public function findOneBy(array $criteria): ?Proxy
     {
         return $this->proxyResult($this->repository->findOneBy(self::normalizeCriteria($criteria)));
     }

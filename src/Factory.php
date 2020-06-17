@@ -62,7 +62,7 @@ class Factory
      *
      * @return Proxy|object
      */
-    final public function create($attributes = []): object
+    final public function create($attributes = []): Proxy
     {
         $object = $this->doInstantiate($attributes, true);
 

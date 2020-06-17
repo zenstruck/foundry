@@ -48,7 +48,7 @@ abstract class ModelFactory extends Factory
      *
      * @return Proxy|object
      */
-    final public static function findOrCreate(array $attributes): object
+    final public static function findOrCreate(array $attributes): Proxy
     {
         if ($found = self::repository()->find($attributes)) {
             return $found;
@@ -62,7 +62,7 @@ abstract class ModelFactory extends Factory
      *
      * @return Proxy|object
      */
-    final public static function random(): object
+    final public static function random(): Proxy
     {
         return self::repository()->random();
     }
