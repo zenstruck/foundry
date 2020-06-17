@@ -303,9 +303,6 @@ use function Zenstruck\Foundry\create_many;
 // instance of Zenstruck\Foundry\Proxy wrapping Post with title "Post A"
 (new Factory(Post::class))->create(['title' => 'Post A']);
 
-// disable proxying (instance of Post)
-(new Factory(Post::class))->create(['title' => 'Post A'], false);
-
 // array of 6 Post Proxy objects with random titles
 (new Factory(Post::class))->createMany(6, fn() => ['title' => faker()->sentence]);
 
@@ -610,9 +607,6 @@ $repository->findBy(['title' => 'My Title']);       // Proxy[]|Post[]
 
 // can call methods on the underlying repository (returned objects are proxied)
 $repository->findOneByTitle('My Title'); // Proxy|Post|null
-
-// get repository without proxying
-repository(Post::class, false); // instance of PostRepository
 ```
 
 ### Model Factories
@@ -645,8 +639,8 @@ use Zenstruck\Foundry\Proxy;
  * @method static PostRepository|RepositoryProxy repository()
  * @method Post instantiate($attributes = [])
  * @method Post[] instantiateMany(int $number, $attributes = [])
- * @method Post|Proxy create($attributes = [], bool $proxy = true)
- * @method Post[]|Proxy[] createMany(int $number, $attributes = [], bool $proxy = true)
+ * @method Post|Proxy create($attributes = [])
+ * @method Post[]|Proxy[] createMany(int $number, $attributes = [])
  */
 final class PostFactory extends ModelFactory
 {
