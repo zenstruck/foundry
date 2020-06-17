@@ -14,19 +14,12 @@ final class ProxyTest extends TestCase
 {
     use ResetGlobals;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Proxy::autoRefreshByDefault(false);
-    }
-
     /**
      * @test
      */
     public function can_force_get_and_set_non_public_properties(): void
     {
-        $proxy = new Proxy(new Category());
+        $proxy = (new Proxy(new Category()))->withoutAutoRefresh();
 
         $this->assertNull($proxy->forceGet('name'));
 
@@ -40,9 +33,9 @@ final class ProxyTest extends TestCase
      */
     public function can_access_wrapped_objects_properties(): void
     {
-        $proxy = new Proxy(new class() {
+        $proxy = (new Proxy(new class() {
             public $property;
-        });
+        }))->withoutAutoRefresh();
 
         $this->assertFalse(isset($proxy->property));
 

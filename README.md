@@ -581,14 +581,6 @@ $post->repository(); // instance of Zenstruck\Foundry\RepositoryProxy wrapping P
 $post->repository(false); // instance of un-proxied PostRepository
 ```
 
-You can globally disable auto-refreshing of proxies:
-
-```php
-// tests/bootstrap.php
-// ...
-Zenstruck\Foundry\Proxy::autoRefreshByDefault(false);
-```
-
 #### Repository Proxy
 
 This library provides a Repository Proxy that wraps your object repositories to provide useful assertions and methods:

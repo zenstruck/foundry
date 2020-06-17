@@ -4,7 +4,6 @@ namespace Zenstruck\Foundry\Tests;
 
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\PersistenceManager;
-use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\StoryManager;
 
 /**
@@ -27,7 +26,6 @@ trait ResetGlobals
         $reset(Factory::class, 'proxyByDefault', true);
         $reset(Factory::class, 'faker', null);
         $reset(PersistenceManager::class, 'managerRegistry', null);
-        $reset(Proxy::class, 'autoRefreshByDefault', true);
         $reset(StoryManager::class, 'globalInstances', []);
         $reset(StoryManager::class, 'instances', []);
     }
