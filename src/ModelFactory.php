@@ -2,8 +2,6 @@
 
 namespace Zenstruck\Foundry;
 
-use Doctrine\Persistence\ObjectRepository;
-
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
@@ -52,7 +50,7 @@ abstract class ModelFactory extends Factory
      */
     final public static function findOrCreate(array $attributes): object
     {
-        if ($found = self::repository(true)->find($attributes)) {
+        if ($found = self::repository()->find($attributes)) {
             return $found;
         }
 
@@ -66,7 +64,7 @@ abstract class ModelFactory extends Factory
      */
     final public static function random(): object
     {
-        return self::repository(true)->random();
+        return self::repository()->random();
     }
 
     /**
@@ -77,15 +75,12 @@ abstract class ModelFactory extends Factory
      */
     final public static function randomSet(int $min, ?int $max = null): array
     {
-        return self::repository(true)->randomSet($min, $max);
+        return self::repository()->randomSet($min, $max);
     }
 
-    /**
-     * @return RepositoryProxy|ObjectRepository
-     */
-    final public static function repository(bool $proxy = true): ObjectRepository
+    final public static function repository(): RepositoryProxy
     {
-        return PersistenceManager::repositoryFor(static::getClass(), $proxy);
+        return PersistenceManager::repositoryFor(static::getClass());
     }
 
     /**

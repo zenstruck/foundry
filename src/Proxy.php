@@ -3,7 +3,6 @@
 namespace Zenstruck\Foundry;
 
 use Doctrine\Persistence\ObjectManager;
-use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\Assert;
 
 /**
@@ -124,12 +123,9 @@ final class Proxy
         return Instantiator::forceGet($this->object(), $property);
     }
 
-    /**
-     * @return RepositoryProxy|ObjectRepository
-     */
-    public function repository(bool $proxy = true): ObjectRepository
+    public function repository(): RepositoryProxy
     {
-        return PersistenceManager::repositoryFor($this->class, $proxy);
+        return PersistenceManager::repositoryFor($this->class);
     }
 
     public function withAutoRefresh(): self

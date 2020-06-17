@@ -577,8 +577,7 @@ $post->forceGet('createdAt');
 $post->forceGet('created_at');
 $post->forceGet('created-at');
 
-$post->repository(); // instance of Zenstruck\Foundry\RepositoryProxy wrapping PostRepository
-$post->repository(false); // instance of un-proxied PostRepository
+$post->repository(); // instance of RepositoryProxy wrapping PostRepository
 ```
 
 #### Repository Proxy
@@ -589,7 +588,7 @@ This library provides a Repository Proxy that wraps your object repositories to 
 use App\Entity\Post;
 use function Zenstruck\Foundry\repository;
 
-// instance of Zenstruck\Foundry\RepositoryProxy that wraps App\Repository\PostRepository
+// instance of RepositoryProxy that wraps PostRepository
 $repository = repository(Post::class);
 
 // PHPUnit assertions
@@ -651,7 +650,7 @@ use Zenstruck\Foundry\Proxy;
  * @method static Post|Proxy findOrCreate(array $attributes)
  * @method static Post|Proxy random()
  * @method static Post[]|Proxy[] randomSet(int $min, ?int $max = null)
- * @method static PostRepository|RepositoryProxy repository(bool $proxy = true)
+ * @method static PostRepository|RepositoryProxy repository()
  * @method Post instantiate($attributes = [])
  * @method Post[] instantiateMany(int $number, $attributes = [])
  * @method Post|Proxy create($attributes = [], ?bool $proxy = null)
@@ -703,7 +702,7 @@ PostFactory::randomSet(4); // array containing 4 instances of Proxy|Post's
 // random set of persisted objects with min/max
 PostFactory::randomSet(0, 5); // array containing 0-5 instances of Proxy|Post's
 
-PostFactory::repository(); // Instance of RepositoryProxy|PostRepository
+PostFactory::repository(); // Instance of RepositoryProxy wrapping PostRepository
 
 // instantiate objects (without persisting)
 PostFactory::new()->instantiate(); // instance of Post
