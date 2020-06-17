@@ -72,7 +72,7 @@ class Factory
             $callback($object, $attributes, PersistenceManager::objectManagerFor($object));
         }
 
-        return new Proxy($object);
+        return Proxy::persisted($object);
     }
 
     /**

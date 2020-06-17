@@ -45,9 +45,14 @@ abstract class Story
             $object = $object->create();
         }
 
-        // ensure all objects are proxied
+        // ensure objects are proxied
         if (!$object instanceof Proxy) {
-            $object = new Proxy($object);
+            $object = Proxy::persisted($object);
+        }
+
+        // ensure proxies are persisted
+        if (!$object->isPersisted()) {
+            $object->save();
         }
 
         $this->objects[$name] = $object;

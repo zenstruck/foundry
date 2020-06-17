@@ -99,12 +99,33 @@ final class ProxyTest extends FunctionalTestCase
      */
     public function can_force_set_and_save(): void
     {
-        $post = PostFactory::new()->create(['title' => 'my title']);
+        $post = PostFactory::new()->create(['title' => 'old title']);
 
         $post->repository()->assertNotExists(['title' => 'new title']);
 
         $post->forceSet('title', 'new title')->save();
 
         $post->repository()->assertExists(['title' => 'new title']);
+    }
+
+    /**
+     * @test
+     */
+    public function can_force_set_multiple_fields_if_auto_refreshing_is_disabled(): void
+    {
+        $post = PostFactory::new()->create(['title' => 'old title', 'body' => 'old body']);
+
+        $this->assertSame('old title', $post->getTitle());
+        $this->assertSame('old body', $post->getBody());
+
+        $post
+            ->withoutAutoRefresh()
+            ->forceSet('title', 'new title')
+            ->forceSet('body', 'new body')
+            ->save()
+        ;
+
+        $this->assertSame('new title', $post->getTitle());
+        $this->assertSame('new body', $post->getBody());
     }
 }

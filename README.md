@@ -537,15 +537,14 @@ $post->setTitle('New Title');
 $post->save(); 
 
 /**
- * CAVEAT - when calling multiple methods that change the object state, the previous state will be lost because
+ * CAVEAT - When calling multiple methods that change the object state, the previous state will be lost because
  * of auto-refreshing. Use "withoutAutoRefresh()" to overcome this.
  */
 $post->withoutAutoRefresh();    // disable auto-refreshing
 $post->refresh();               // manually refresh
 $post->setTitle('New Title');   // won't be auto-refreshed
 $post->setBody('New Body');     // won't be auto-refreshed
-$post->save();                  // save changes
-$post->withAutoRefresh();       // re-enable auto-refreshing
+$post->save();                  // save changes (auto-refreshing re-enabled)
 
 // set private/protected properties
 $post->forceSet('createdAt', new \DateTime()); 
@@ -553,8 +552,8 @@ $post->forceSet('created_at', new \DateTime()); // can use snake case
 $post->forceSet('created-at', new \DateTime()); // can use kebab case
 
 /**
- * CAVEAT - when force setting multiple properties, the previous set's changes will be lost because
- * of auto-refreshing. Use "withoutAutoRefresh()" or forceSetAll() to overcome this.
+ * CAVEAT - When force setting multiple properties, the previous set's changes will be lost because
+ * of auto-refreshing. Use "withoutAutoRefresh()" (shown above) or "forceSetAll()" to overcome this.
  */
 $post->forceSetAll([
     'title' => 'Different title',
