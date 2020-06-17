@@ -314,14 +314,6 @@ create(Post::class, ['title' => 'Post A']);
 create_many(6, Post::class, fn() => ['title' => faker()->sentence]);
 ```
 
-You can globally disable object proxying during persisting:
-
-```php
-// tests/bootstrap.php
-// ...
-Zenstruck\Foundry\Factory::proxyByDefault(false);
-```
-
 **NOTE**: The persist operations require that a `Doctrine\Persistence\ManagerRegistry` be registered with
 `Zenstruck\Foundry\PersistenceManager` via `\Zenstruck\Foundry\PersistenceManager::register($registry)`. If using the
 [`Factories`](#test-traits) test trait, this is handled for you.
@@ -653,8 +645,8 @@ use Zenstruck\Foundry\Proxy;
  * @method static PostRepository|RepositoryProxy repository()
  * @method Post instantiate($attributes = [])
  * @method Post[] instantiateMany(int $number, $attributes = [])
- * @method Post|Proxy create($attributes = [], ?bool $proxy = null)
- * @method Post[]|Proxy[] createMany(int $number, $attributes = [], ?bool $proxy = null)
+ * @method Post|Proxy create($attributes = [], bool $proxy = true)
+ * @method Post[]|Proxy[] createMany(int $number, $attributes = [], bool $proxy = true)
  */
 final class PostFactory extends ModelFactory
 {
