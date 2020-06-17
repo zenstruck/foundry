@@ -17,9 +17,9 @@ function factory(string $class, $defaultAttributes = []): Factory
  *
  * @return Proxy|object
  */
-function create(string $class, $attributes = [], bool $proxy = true): object
+function create(string $class, $attributes = []): object
 {
-    return factory($class)->create($attributes, $proxy);
+    return factory($class)->create($attributes);
 }
 
 /**
@@ -27,9 +27,9 @@ function create(string $class, $attributes = [], bool $proxy = true): object
  *
  * @return Proxy[]|object[]
  */
-function create_many(int $number, string $class, $attributes = [], bool $proxy = true): array
+function create_many(int $number, string $class, $attributes = []): array
 {
-    return factory($class)->createMany($number, $attributes, $proxy);
+    return factory($class)->createMany($number, $attributes);
 }
 
 /**
