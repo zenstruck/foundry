@@ -11,7 +11,6 @@ class Factory
 {
     /** @var callable|null */
     private static $defaultInstantiator;
-    private static bool $proxyByDefault = true;
     private static ?Faker\Generator $faker = null;
 
     private string $class;
@@ -63,7 +62,7 @@ class Factory
      *
      * @return Proxy|object
      */
-    final public function create($attributes = [], ?bool $proxy = null): object
+    final public function create($attributes = [], bool $proxy = true): object
     {
         $object = $this->doInstantiate($attributes, true);
 
@@ -73,7 +72,7 @@ class Factory
             $callback($object, $attributes, PersistenceManager::objectManagerFor($object));
         }
 
-        return ($proxy ?? self::$proxyByDefault) ? PersistenceManager::proxy($object) : $object;
+        return $proxy ? PersistenceManager::proxy($object) : $object;
     }
 
     /**
@@ -81,7 +80,7 @@ class Factory
      *
      * @return Proxy[]|object[]
      */
-    final public function createMany(int $number, $attributes = [], ?bool $proxy = null): array
+    final public function createMany(int $number, $attributes = [], bool $proxy = true): array
     {
         return \array_map(fn() => $this->create($attributes, $proxy), \array_fill(0, $number, null));
     }
@@ -139,11 +138,6 @@ class Factory
         $cloned->instantiator = $instantiator;
 
         return $cloned;
-    }
-
-    final public static function proxyByDefault(bool $value): void
-    {
-        self::$proxyByDefault = $value;
     }
 
     /**

@@ -306,29 +306,6 @@ final class FactoryTest extends TestCase
     /**
      * @test
      */
-    public function can_globally_disable_proxying(): void
-    {
-        Factory::proxyByDefault(false);
-
-        $registry = $this->createMock(ManagerRegistry::class);
-        $registry
-            ->expects($this->once())
-            ->method('getManagerForClass')
-            ->with(Post::class)
-            ->willReturn($this->createMock(ObjectManager::class))
-        ;
-
-        PersistenceManager::register($registry);
-
-        $object = (new Factory(Post::class))->create(['title' => 'title', 'body' => 'body']);
-
-        $this->assertInstanceOf(Post::class, $object);
-        $this->assertSame('title', $object->getTitle());
-    }
-
-    /**
-     * @test
-     */
     public function creating_with_factory_attribute_persists_the_factory(): void
     {
         $registry = $this->createMock(ManagerRegistry::class);
