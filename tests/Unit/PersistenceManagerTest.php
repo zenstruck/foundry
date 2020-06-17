@@ -70,7 +70,7 @@ final class PersistenceManagerTest extends TestCase
 
         PersistenceManager::register($registry);
 
-        $proxy = (new Proxy(new Category()))->withoutAutoRefresh();
+        $proxy = Proxy::unpersisted(new Category());
 
         $this->assertInstanceOf(RepositoryProxy::class, PersistenceManager::repositoryFor($proxy));
     }

@@ -12,11 +12,13 @@ final class Proxy
 {
     private object $object;
     private string $class;
-    private bool $autoRefresh = true;
+    private bool $autoRefresh;
+    private bool $persisted;
 
-    public function __construct(object $object)
+    private function __construct(object $object, bool $persisted)
     {
         $this->object = $object;
+        $this->autoRefresh = $this->persisted = $persisted;
         $this->class = \get_class($object);
     }
 
@@ -54,9 +56,24 @@ final class Proxy
         return $this->object()->__toString();
     }
 
+    public static function persisted(object $object): self
+    {
+        return new self($object, true);
+    }
+
+    public static function unpersisted(object $object): self
+    {
+        return new self($object, false);
+    }
+
+    public function isPersisted(): bool
+    {
+        return $this->persisted;
+    }
+
     public function object(): object
     {
-        if ($this->autoRefresh) {
+        if ($this->autoRefresh && $this->persisted) {
             $this->refresh();
         }
 
@@ -67,6 +84,7 @@ final class Proxy
     {
         $this->objectManager()->persist($this->object);
         $this->objectManager()->flush();
+        $this->autoRefresh = $this->persisted = true;
 
         return $this;
     }
@@ -75,12 +93,17 @@ final class Proxy
     {
         $this->objectManager()->remove($this->object);
         $this->objectManager()->flush();
+        $this->autoRefresh = $this->persisted = false;
 
         return $this;
     }
 
     public function refresh(): self
     {
+        if (!$this->persisted) {
+            throw new \RuntimeException(\sprintf('Cannot refresh unpersisted object (%s).', $this->class));
+        }
+
         if ($this->objectManager()->contains($this->object)) {
             $this->objectManager()->refresh($this->object);
 
@@ -126,13 +149,6 @@ final class Proxy
     public function repository(): RepositoryProxy
     {
         return PersistenceManager::repositoryFor($this->class);
-    }
-
-    public function withAutoRefresh(): self
-    {
-        $this->autoRefresh = true;
-
-        return $this;
     }
 
     public function withoutAutoRefresh(): self
