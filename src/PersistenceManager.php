@@ -4,7 +4,6 @@ namespace Zenstruck\Foundry;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
-use Doctrine\Persistence\ObjectRepository;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -15,10 +14,8 @@ final class PersistenceManager
 
     /**
      * @param object|string $objectOrClass
-     *
-     * @return RepositoryProxy|ObjectRepository
      */
-    public static function repositoryFor($objectOrClass, bool $proxy = true): ObjectRepository
+    public static function repositoryFor($objectOrClass): RepositoryProxy
     {
         if ($objectOrClass instanceof Proxy) {
             $objectOrClass = $objectOrClass->object();
@@ -28,9 +25,7 @@ final class PersistenceManager
             $objectOrClass = \get_class($objectOrClass);
         }
 
-        $repository = self::managerRegistry()->getRepository($objectOrClass);
-
-        return $proxy ? new RepositoryProxy($repository) : $repository;
+        return new RepositoryProxy(self::managerRegistry()->getRepository($objectOrClass));
     }
 
     /**

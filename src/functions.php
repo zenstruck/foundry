@@ -2,7 +2,6 @@
 
 namespace Zenstruck\Foundry;
 
-use Doctrine\Persistence\ObjectRepository;
 use Faker;
 
 /**
@@ -51,12 +50,10 @@ function instantiate_many(int $number, string $class, $attributes = []): array
 
 /**
  * @see PersistenceManager::repositoryFor()
- *
- * @return RepositoryProxy|ObjectRepository
  */
-function repository($objectOrClass, bool $proxy = true): ObjectRepository
+function repository($objectOrClass): RepositoryProxy
 {
-    return PersistenceManager::repositoryFor($objectOrClass, $proxy);
+    return PersistenceManager::repositoryFor($objectOrClass);
 }
 
 /**

@@ -78,27 +78,6 @@ final class PersistenceManagerTest extends TestCase
     /**
      * @test
      */
-    public function can_disable_proxying_when_getting_repository(): void
-    {
-        $registry = $this->createMock(ManagerRegistry::class);
-        $registry
-            ->expects($this->once())
-            ->method('getRepository')
-            ->with(Category::class)
-            ->willReturn($this->createMock(ObjectRepository::class))
-        ;
-
-        PersistenceManager::register($registry);
-
-        $repository = PersistenceManager::repositoryFor(new Category(), false);
-
-        $this->assertInstanceOf(ObjectRepository::class, $repository);
-        $this->assertNotInstanceOf(RepositoryProxy::class, $repository);
-    }
-
-    /**
-     * @test
-     */
     public function can_persist_object(): void
     {
         $category = new Category();
