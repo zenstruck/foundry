@@ -11,11 +11,9 @@ use PHPUnit\Framework\Assert;
  */
 final class Proxy
 {
-    private static bool $autoRefreshByDefault = true;
-
     private object $object;
     private string $class;
-    private ?bool $autoRefresh = null;
+    private bool $autoRefresh = true;
 
     public function __construct(object $object)
     {
@@ -59,7 +57,7 @@ final class Proxy
 
     public function object(): object
     {
-        if ($this->autoRefresh ?? self::$autoRefreshByDefault) {
+        if ($this->autoRefresh) {
             $this->refresh();
         }
 
@@ -162,11 +160,6 @@ final class Proxy
         Assert::assertNull($this->fetchObject(), 'The object is persisted but it should not be.');
 
         return $this;
-    }
-
-    public static function autoRefreshByDefault(bool $value): void
-    {
-        self::$autoRefreshByDefault = $value;
     }
 
     /**
