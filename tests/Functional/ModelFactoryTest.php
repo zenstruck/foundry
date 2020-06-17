@@ -57,6 +57,9 @@ final class ModelFactoryTest extends FunctionalTestCase
         PostFactoryWithNullInitialize::new();
     }
 
+    /**
+     * @test
+     */
     public function can_find_random_object(): void
     {
         CategoryFactory::new()->createMany(5);
@@ -70,6 +73,9 @@ final class ModelFactoryTest extends FunctionalTestCase
         $this->assertCount(5, \array_unique($ids));
     }
 
+    /**
+     * @test
+     */
     public function can_find_random_set_of_objects(): void
     {
         CategoryFactory::new()->createMany(5);
@@ -80,6 +86,9 @@ final class ModelFactoryTest extends FunctionalTestCase
         $this->assertCount(3, \array_unique(\array_map(fn($category) => $category->getId(), $objects)));
     }
 
+    /**
+     * @test
+     */
     public function can_find_random_set_of_objects_with_min_and_max(): void
     {
         CategoryFactory::new()->createMany(5);
