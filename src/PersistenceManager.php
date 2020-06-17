@@ -28,16 +28,13 @@ final class PersistenceManager
         return new RepositoryProxy(self::managerRegistry()->getRepository($objectOrClass));
     }
 
-    /**
-     * @return Proxy|object
-     */
-    public static function persist(object $object, bool $proxy = true): object
+    public static function persist(object $object): object
     {
         $objectManager = self::objectManagerFor($object);
         $objectManager->persist($object);
         $objectManager->flush();
 
-        return $proxy ? self::proxy($object) : $object;
+        return $object;
     }
 
     public static function proxy(object $object): Proxy
