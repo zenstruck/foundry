@@ -98,33 +98,6 @@ final class PersistenceManagerTest extends TestCase
 
         $object = PersistenceManager::persist($category);
 
-        $this->assertInstanceOf(Proxy::class, $object);
-        $this->assertSame($category, $object->withoutAutoRefresh()->object());
-    }
-
-    /**
-     * @test
-     */
-    public function can_persist_object_without_proxy(): void
-    {
-        $category = new Category();
-
-        $manager = $this->createMock(ObjectManager::class);
-        $manager->expects($this->once())->method('persist')->with($category);
-        $manager->expects($this->once())->method('flush');
-
-        $registry = $this->createMock(ManagerRegistry::class);
-        $registry
-            ->expects($this->once())
-            ->method('getManagerForClass')
-            ->with(Category::class)
-            ->willReturn($manager)
-        ;
-
-        PersistenceManager::register($registry);
-
-        $object = PersistenceManager::persist($category, false);
-
         $this->assertSame($category, $object);
     }
 

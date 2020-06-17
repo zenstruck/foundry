@@ -66,7 +66,7 @@ class Factory
     {
         $object = $this->doInstantiate($attributes, true);
 
-        PersistenceManager::persist($object, false);
+        PersistenceManager::persist($object);
 
         foreach ($this->afterPersist as $callback) {
             $callback($object, $attributes, PersistenceManager::objectManagerFor($object));
