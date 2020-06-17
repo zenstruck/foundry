@@ -39,6 +39,7 @@ return PhpCsFixer\Config::create()
             'remove_inheritdoc' => true,
         ],
         'function_declaration' => ['closure_function_spacing' => 'none'],
+        'nullable_type_declaration_for_default_null_value' => true,
     ))
     ->setRiskyAllowed(true)
     ->setFinder($finder)
