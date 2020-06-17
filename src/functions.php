@@ -17,7 +17,7 @@ function factory(string $class, $defaultAttributes = []): Factory
  *
  * @return Proxy|object
  */
-function create(string $class, $attributes = []): object
+function create(string $class, $attributes = []): Proxy
 {
     return factory($class)->create($attributes);
 }
