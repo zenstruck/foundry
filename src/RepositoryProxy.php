@@ -222,7 +222,7 @@ final class RepositoryProxy implements ObjectRepository
     private function proxyResult($result)
     {
         if (\is_object($result) && $this->getClassName() === \get_class($result)) {
-            return PersistenceManager::proxy($result);
+            return new Proxy($result);
         }
 
         if (\is_array($result)) {

@@ -45,8 +45,12 @@ abstract class Story
             $object = $object->create();
         }
 
-        // ensure all objects are wrapped in a auto-refreshing proxy
-        $this->objects[$name] = PersistenceManager::proxy($object)->withAutoRefresh();
+        // ensure all objects are proxied
+        if (!$object instanceof Proxy) {
+            $object = new Proxy($object);
+        }
+
+        $this->objects[$name] = $object;
 
         return $this;
     }
