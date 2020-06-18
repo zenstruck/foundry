@@ -12,13 +12,12 @@ final class Proxy
 {
     private object $object;
     private string $class;
-    private bool $autoRefresh;
-    private bool $persisted;
+    private bool $autoRefresh = false;
+    private bool $persisted = false;
 
-    private function __construct(object $object, bool $persisted)
+    public function __construct(object $object)
     {
         $this->object = $object;
-        $this->autoRefresh = $this->persisted = $persisted;
         $this->class = \get_class($object);
     }
 
@@ -58,12 +57,10 @@ final class Proxy
 
     public static function persisted(object $object): self
     {
-        return new self($object, true);
-    }
+        $proxy = new self($object);
+        $proxy->persisted = $proxy->autoRefresh = true;
 
-    public static function unpersisted(object $object): self
-    {
-        return new self($object, false);
+        return $proxy;
     }
 
     public function isPersisted(): bool
@@ -149,6 +146,17 @@ final class Proxy
     public function repository(): RepositoryProxy
     {
         return PersistenceManager::repositoryFor($this->class);
+    }
+
+    public function withAutoRefresh(): self
+    {
+        if (!$this->persisted) {
+            throw new \RuntimeException(\sprintf('Cannot enable auto-refresh on unpersisted object (%s).', $this->class));
+        }
+
+        $this->autoRefresh = true;
+
+        return $this;
     }
 
     public function withoutAutoRefresh(): self

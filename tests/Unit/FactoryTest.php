@@ -206,7 +206,7 @@ final class FactoryTest extends TestCase
         $object = (new Factory(Post::class))->withoutPersisting()->create([
             'title' => 'title',
             'body' => 'body',
-            'category' => Proxy::unpersisted(new Category()),
+            'category' => new Proxy(new Category()),
         ]);
 
         $this->assertInstanceOf(Category::class, $object->getCategory());
@@ -249,7 +249,7 @@ final class FactoryTest extends TestCase
     {
         $registry = $this->createMock(ManagerRegistry::class);
         $registry
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getManagerForClass')
             ->with(Post::class)
             ->willReturn($this->createMock(ObjectManager::class))
@@ -270,7 +270,7 @@ final class FactoryTest extends TestCase
     {
         $registry = $this->createMock(ManagerRegistry::class);
         $registry
-            ->expects($this->exactly(3))
+            ->expects($this->exactly(6))
             ->method('getManagerForClass')
             ->with(Post::class)
             ->willReturn($this->createMock(ObjectManager::class))
@@ -296,7 +296,7 @@ final class FactoryTest extends TestCase
     {
         $registry = $this->createMock(ManagerRegistry::class);
         $registry
-            ->expects($this->exactly(3)) // once for persisting, once for each afterPersist event
+            ->expects($this->exactly(4)) // once for persisting, once for each afterPersist event
             ->method('getManagerForClass')
             ->with(Post::class)
             ->willReturn($this->createMock(ObjectManager::class))

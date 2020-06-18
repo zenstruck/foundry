@@ -22,7 +22,7 @@ final class ProxyTest extends TestCase
      */
     public function can_force_get_and_set_non_public_properties(): void
     {
-        $proxy = Proxy::unpersisted(new Category());
+        $proxy = new Proxy(new Category());
 
         $this->assertNull($proxy->forceGet('name'));
 
@@ -36,7 +36,7 @@ final class ProxyTest extends TestCase
      */
     public function can_access_wrapped_objects_properties(): void
     {
-        $proxy = Proxy::unpersisted(new class() {
+        $proxy = new Proxy(new class() {
             public $property;
         });
 
@@ -61,7 +61,7 @@ final class ProxyTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Cannot refresh unpersisted object (Zenstruck\Foundry\Tests\Fixtures\Entity\Category).');
 
-        Proxy::unpersisted(new Category())->refresh();
+        (new Proxy(new Category()))->refresh();
     }
 
     /**
@@ -78,7 +78,7 @@ final class ProxyTest extends TestCase
         ;
         PersistenceManager::register($registry);
 
-        $category = Proxy::unpersisted(new Category());
+        $category = new Proxy(new Category());
 
         $this->assertFalse($category->isPersisted());
 
