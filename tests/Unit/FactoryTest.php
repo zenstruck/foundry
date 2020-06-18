@@ -44,28 +44,28 @@ final class FactoryTest extends TestCase
         $attributeArray = ['title' => 'title', 'body' => 'body'];
         $attributeCallback = fn(Faker\Generator $faker) => ['title' => 'title', 'body' => 'body'];
 
-        $objects = (new Factory(Post::class, $attributeArray))->instantiateMany(3);
+        $objects = (new Factory(Post::class, $attributeArray))->withoutPersisting()->instantiateMany(3);
 
         $this->assertCount(3, $objects);
         $this->assertSame('title', $objects[0]->getTitle());
         $this->assertSame('title', $objects[1]->getTitle());
         $this->assertSame('title', $objects[2]->getTitle());
 
-        $objects = (new Factory(Post::class))->instantiateMany(3, $attributeArray);
+        $objects = (new Factory(Post::class))->withoutPersisting()->instantiateMany(3, $attributeArray);
 
         $this->assertCount(3, $objects);
         $this->assertSame('title', $objects[0]->getTitle());
         $this->assertSame('title', $objects[1]->getTitle());
         $this->assertSame('title', $objects[2]->getTitle());
 
-        $objects = (new Factory(Post::class))->withAttributes($attributeArray)->instantiateMany(3);
+        $objects = (new Factory(Post::class))->withAttributes($attributeArray)->withoutPersisting()->instantiateMany(3);
 
         $this->assertCount(3, $objects);
         $this->assertSame('title', $objects[0]->getTitle());
         $this->assertSame('title', $objects[1]->getTitle());
         $this->assertSame('title', $objects[2]->getTitle());
 
-        $objects = (new Factory(Post::class, $attributeCallback))->instantiateMany(3);
+        $objects = (new Factory(Post::class, $attributeCallback))->withoutPersisting()->instantiateMany(3);
 
         $this->assertCount(3, $objects);
         $this->assertSame('title', $objects[0]->getTitle());
@@ -79,7 +79,7 @@ final class FactoryTest extends TestCase
         $this->assertSame('title', $objects[1]->getTitle());
         $this->assertSame('title', $objects[2]->getTitle());
 
-        $objects = (new Factory(Post::class))->withAttributes($attributeCallback)->instantiateMany(3);
+        $objects = (new Factory(Post::class))->withAttributes($attributeCallback)->withoutPersisting()->instantiateMany(3);
 
         $this->assertCount(3, $objects);
         $this->assertSame('title', $objects[0]->getTitle());
@@ -211,7 +211,7 @@ final class FactoryTest extends TestCase
      */
     public function instantiating_with_factory_attribute_instantiates_the_factory(): void
     {
-        $object = (new Factory(Post::class))->instantiate([
+        $object = (new Factory(Post::class))->withoutPersisting()->instantiate([
             'title' => 'title',
             'body' => 'body',
             'category' => new Factory(Category::class),
@@ -229,6 +229,7 @@ final class FactoryTest extends TestCase
         $objectId = \spl_object_id($factory);
 
         $this->assertNotSame(\spl_object_id($factory->withAttributes([])), $objectId);
+        $this->assertNotSame(\spl_object_id($factory->withoutPersisting()), $objectId);
         $this->assertNotSame(\spl_object_id($factory->instantiator(function() {})), $objectId);
         $this->assertNotSame(\spl_object_id($factory->beforeInstantiate(function() {})), $objectId);
         $this->assertNotSame(\spl_object_id($factory->afterInstantiate(function() {})), $objectId);

@@ -37,7 +37,7 @@ function create_many(int $number, string $class, $attributes = []): array
  */
 function instantiate(string $class, $attributes = []): object
 {
-    return factory($class)->instantiate($attributes);
+    return factory($class)->withoutPersisting()->instantiate($attributes);
 }
 
 /**
@@ -45,7 +45,7 @@ function instantiate(string $class, $attributes = []): object
  */
 function instantiate_many(int $number, string $class, $attributes = []): array
 {
-    return factory($class)->instantiateMany($number, $attributes);
+    return factory($class)->withoutPersisting()->instantiateMany($number, $attributes);
 }
 
 /**
