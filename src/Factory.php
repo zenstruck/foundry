@@ -48,19 +48,21 @@ class Factory
      */
     final public function create($attributes = []): Proxy
     {
-        $object = $this->instantiate($attributes);
+        $proxy = new Proxy($this->instantiate($attributes));
 
         if (!$this->persist) {
-            return Proxy::unpersisted($object);
+            return $proxy;
         }
 
-        PersistenceManager::persist($object);
+        $proxy->save();
+
+        $object = $proxy->withoutAutoRefresh()->object();
 
         foreach ($this->afterPersist as $callback) {
             $callback($object, $attributes, PersistenceManager::objectManagerFor($object));
         }
 
-        return Proxy::persisted($object);
+        return $proxy->withAutoRefresh();
     }
 
     /**
