@@ -277,11 +277,14 @@ use function Zenstruck\Foundry\faker;
 use function Zenstruck\Foundry\instantiate;
 use function Zenstruck\Foundry\instantiate_many;
 
-(new Factory(Post::class))->instantiate(); // instance of Post
-(new Factory(Post::class))->instantiate(['title' => 'Post A']); // instance of Post with $title set to "Post A"
+(new Factory(Post::class))->withoutPersisting()->create(); // instance of Proxy (unpersisted) wrapping Post
+(new Factory(Post::class))->withoutPersisting()->create()->object(); // instance of Post
 
-// array of 6 Post objects with random titles
-(new Factory(Post::class))->instantiateMany(6, fn() => ['title' => faker()->sentence]);
+// instance of Proxy wrapping Post with $title set to "Post A"
+(new Factory(Post::class))->withoutPersisting()->create(['title' => 'Post A']); 
+
+// array of 6 Proxy objects (unpersisted) wrapping Post objects with random titles
+(new Factory(Post::class))->withoutPersisting()->createMany(6, fn() => ['title' => faker()->sentence]);
 
 // alternatively, use the helper functions
 instantiate(Post::class, ['title' => 'Post A']);
@@ -344,7 +347,7 @@ $post = (new Factory(Post::class, ['title' => 'Post A']))
         'category' => create(Category::class, ['name' => 'symfony']),
     ])
     ->withAttributes(fn() => ['createdAt' => Factory::faker()->dateTime])
-    ->instantiate(['title' => 'Different Title'])
+    ->create(['title' => 'Different Title'])
 ;
 
 $post->getTitle(); // "Different Title"
@@ -690,8 +693,11 @@ PostFactory::randomSet(0, 5); // array containing 0-5 instances of Proxy|Post's
 PostFactory::repository(); // Instance of RepositoryProxy wrapping PostRepository
 
 // instantiate objects (without persisting)
-PostFactory::new()->instantiate(); // instance of Post
-PostFactory::new()->instantiate(['title' => 'My Title']); // instance of Post with $title = 'My Title'
+PostFactory::new()->withoutPersisting()->create(); // instance of Proxy (unpersisted) wrapping Post object
+PostFactory::new()->withoutPersisting()->create()->object(); // Post object
+
+// instance of Proxy (unpersisted) wrapping Post object with $title = 'My Title'
+PostFactory::new()->withoutPersisting()->create(['title' => 'My Title']);
 ```
 
 #### States

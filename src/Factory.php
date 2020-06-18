@@ -43,30 +43,16 @@ class Factory
 
     /**
      * @param array|callable $attributes
-     */
-    final public function instantiate($attributes = []): object
-    {
-        return $this->doInstantiate($attributes);
-    }
-
-    /**
-     * @param array|callable $attributes
-     *
-     * @return object[]
-     */
-    final public function instantiateMany(int $number, $attributes = []): array
-    {
-        return \array_map(fn() => $this->instantiate($attributes), \array_fill(0, $number, null));
-    }
-
-    /**
-     * @param array|callable $attributes
      *
      * @return Proxy|object
      */
     final public function create($attributes = []): Proxy
     {
-        $object = $this->doInstantiate($attributes);
+        $object = $this->instantiate($attributes);
+
+        if (!$this->persist) {
+            return Proxy::unpersisted($object);
+        }
 
         PersistenceManager::persist($object);
 
@@ -179,7 +165,7 @@ class Factory
     /**
      * @param array|callable $attributes
      */
-    private function doInstantiate($attributes): object
+    private function instantiate($attributes): object
     {
         // merge the factory attribute set with the passed attributes
         $attributeSet = \array_merge($this->attributeSet, [$attributes]);
@@ -196,7 +182,7 @@ class Factory
         }
 
         // filter each attribute to convert proxies and factories to objects
-        $attributes = \array_map(fn($value) => $this->filterNormalizedProperty($value), $attributes);
+        $attributes = \array_map(fn($value) => $this->normalizeAttribute($value), $attributes);
 
         // instantiate the object with the users instantiator or if not set, the default instantiator
         $object = ($this->instantiator ?? self::defaultInstantiator())($attributes, $this->class);
@@ -218,7 +204,7 @@ class Factory
      *
      * @return mixed
      */
-    private function filterNormalizedProperty($value)
+    private function normalizeAttribute($value)
     {
         if ($value instanceof Proxy) {
             return $value->object();
@@ -226,15 +212,18 @@ class Factory
 
         if (\is_array($value)) {
             // possible OneToMany/ManyToMany relationship
-            return \array_map(fn($value) => $this->filterNormalizedProperty($value), $value);
+            return \array_map(fn($value) => $this->normalizeAttribute($value), $value);
         }
 
         if (!$value instanceof self) {
             return $value;
         }
 
-        $value = $value->instantiate();
+        if (!$this->persist) {
+            // ensure attribute Factory's are also not persisted
+            $value = $value->withoutPersisting();
+        }
 
-        return $this->persist ? PersistenceManager::persist($value) : $value;
+        return $value->create()->object();
     }
 }

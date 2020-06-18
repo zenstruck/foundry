@@ -39,10 +39,11 @@ final class FunctionsTest extends TestCase
      */
     public function instantiate(): void
     {
-        $object = instantiate(Post::class, ['title' => 'title', 'body' => 'body']);
+        $proxy = instantiate(Post::class, ['title' => 'title', 'body' => 'body']);
 
-        $this->assertInstanceOf(Post::class, $object);
-        $this->assertSame('title', $object->getTitle());
+        $this->assertInstanceOf(Post::class, $proxy->object());
+        $this->assertFalse($proxy->isPersisted());
+        $this->assertSame('title', $proxy->getTitle());
     }
 
     /**
@@ -53,7 +54,8 @@ final class FunctionsTest extends TestCase
         $objects = instantiate_many(3, Category::class);
 
         $this->assertCount(3, $objects);
-        $this->assertInstanceOf(Category::class, $objects[0]);
+        $this->assertInstanceOf(Category::class, $objects[0]->object());
+        $this->assertFalse($objects[0]->isPersisted());
     }
 
     /**
