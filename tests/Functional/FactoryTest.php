@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Foundry\Tests\Functional;
 
+use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
@@ -87,5 +88,19 @@ final class FactoryTest extends FunctionalTestCase
         $this->assertCount(2, $posts);
         $this->assertContains('Post A', $posts);
         $this->assertContains('Post B', $posts);
+    }
+
+    /**
+     * @test
+     */
+    public function creating_with_factory_attribute_persists_the_factory(): void
+    {
+        $object = (new Factory(Post::class))->create([
+            'title' => 'title',
+            'body' => 'body',
+            'category' => new Factory(Category::class, ['name' => 'name']),
+        ]);
+
+        $this->assertNotNull($object->getCategory()->getId());
     }
 }
