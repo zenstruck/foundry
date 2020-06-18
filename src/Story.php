@@ -47,7 +47,7 @@ abstract class Story
 
         // ensure objects are proxied
         if (!$object instanceof Proxy) {
-            $object = Proxy::persisted($object);
+            $object = new Proxy($object);
         }
 
         // ensure proxies are persisted
