@@ -33,19 +33,23 @@ function create_many(int $number, string $class, $attributes = []): array
 }
 
 /**
- * @see Factory::instantiate()
+ * Instantiate object without persisting.
+ *
+ * @return Proxy|object "unpersisted" Proxy wrapping the instantiated object
  */
-function instantiate(string $class, $attributes = []): object
+function instantiate(string $class, $attributes = []): Proxy
 {
-    return factory($class)->withoutPersisting()->instantiate($attributes);
+    return factory($class)->withoutPersisting()->create($attributes);
 }
 
 /**
- * @see Factory::instantiateMany()
+ * Instantiate X objects without persisting.
+ *
+ * @return Proxy[]|object[] "unpersisted" Proxy's wrapping the instantiated objects
  */
 function instantiate_many(int $number, string $class, $attributes = []): array
 {
-    return factory($class)->withoutPersisting()->instantiateMany($number, $attributes);
+    return factory($class)->withoutPersisting()->createMany($number, $attributes);
 }
 
 /**
