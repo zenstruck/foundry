@@ -8,7 +8,6 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Zenstruck\Foundry\Manager;
 
 /**
  * @internal
@@ -71,8 +70,6 @@ final class DatabaseResetter
                 '--em' => $manager,
             ]);
         }
-
-        Manager::boot($application->getKernel()->getContainer(), $registry);
 
         GlobalState::flush();
     }

@@ -28,13 +28,16 @@ trait Factories
             static::bootKernel();
         }
 
-        Manager::boot(static::$kernel->getContainer(), new LazyManagerRegistry(static function() {
-            if (!static::$booted) {
-                static::bootKernel();
-            }
+        static::$kernel->getContainer()->get(Manager::class)
+            ->setManagerRegistry(new LazyManagerRegistry(static function() {
+                if (!static::$booted) {
+                    static::bootKernel();
+                }
 
-            return static::$kernel->getContainer()->get('doctrine');
-        }));
+                return static::$kernel->getContainer()->get('doctrine');
+            })
+        )
+    ;
 
         self::ensureKernelShutdown();
     }

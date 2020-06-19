@@ -2,17 +2,14 @@
 
 namespace Zenstruck\Foundry\Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
-use Zenstruck\Foundry\Tests\Reset;
+use Zenstruck\Foundry\Tests\UnitTestCase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class ModelFactoryTest extends TestCase
+final class ModelFactoryTest extends UnitTestCase
 {
-    use Reset;
-
     /**
      * @test
      */

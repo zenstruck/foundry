@@ -17,5 +17,6 @@ final class ZenstruckFoundryExtension extends Extension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 
         $loader->load('makers.xml');
+        $loader->load('services.xml');
     }
 }

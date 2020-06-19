@@ -5,14 +5,11 @@ namespace Zenstruck\Foundry\Tests\Unit;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
-use PHPUnit\Framework\TestCase;
-use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\Manager;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\RepositoryProxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
-use Zenstruck\Foundry\Tests\Reset;
+use Zenstruck\Foundry\Tests\UnitTestCase;
 use function Zenstruck\Foundry\create;
 use function Zenstruck\Foundry\create_many;
 use function Zenstruck\Foundry\faker;
@@ -23,10 +20,8 @@ use function Zenstruck\Foundry\repository;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class FunctionsTest extends TestCase
+final class FunctionsTest extends UnitTestCase
 {
-    use Reset;
-
     /**
      * @test
      */
@@ -72,7 +67,7 @@ final class FunctionsTest extends TestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        Factory::boot(new Manager($registry));
+        $this->manager->setManagerRegistry($registry);
 
         $object = create(Category::class);
 
@@ -92,7 +87,7 @@ final class FunctionsTest extends TestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        Factory::boot(new Manager($registry));
+        $this->manager->setManagerRegistry($registry);
 
         $objects = create_many(3, Category::class);
 
@@ -112,7 +107,7 @@ final class FunctionsTest extends TestCase
             ->willReturn($this->createMock(ObjectRepository::class))
         ;
 
-        Factory::boot(new Manager($registry));
+        $this->manager->setManagerRegistry($registry);
 
         $this->assertInstanceOf(RepositoryProxy::class, repository(new Category()));
     }
