@@ -201,7 +201,7 @@ final class FactoryTest extends UnitTestCase
         $object = (new Factory(Post::class))->withoutPersisting()->create([
             'title' => 'title',
             'body' => 'body',
-            'category' => new Proxy(new Category(), $this->manager),
+            'category' => new Proxy(new Category()),
         ]);
 
         $this->assertInstanceOf(Category::class, $object->getCategory());
