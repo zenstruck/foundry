@@ -6,6 +6,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Zenstruck\Foundry\Story;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -18,5 +19,9 @@ final class ZenstruckFoundryExtension extends Extension
 
         $loader->load('makers.xml');
         $loader->load('services.xml');
+
+        $container->registerForAutoconfiguration(Story::class)
+            ->addTag('foundry.story')
+        ;
     }
 }
