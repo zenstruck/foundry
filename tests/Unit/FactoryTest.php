@@ -296,7 +296,7 @@ final class FactoryTest extends TestCase
     {
         $registry = $this->createMock(ManagerRegistry::class);
         $registry
-            ->expects($this->exactly(4)) // once for persisting, once for each afterPersist event
+            ->expects($this->exactly(2)) // once for persisting, once for each afterPersist event
             ->method('getManagerForClass')
             ->with(Post::class)
             ->willReturn($this->createMock(ObjectManager::class))
@@ -305,21 +305,35 @@ final class FactoryTest extends TestCase
         PersistenceManager::register($registry);
 
         $attributesArray = ['title' => 'title', 'body' => 'body'];
+        $calls = 0;
 
         $object = (new Factory(Post::class))
-            ->afterPersist(function(Post $post, array $attributes) use ($attributesArray) {
+            ->afterPersist(function(Proxy $post, array $attributes) use ($attributesArray, &$calls) {
+                /* @var Post $post */
                 $this->assertSame($attributesArray, $attributes);
 
                 $post->increaseViewCount();
+                ++$calls;
             })
-            ->afterPersist(function(Post $post, array $attributes) use ($attributesArray) {
+            ->afterPersist(function(Post $post, array $attributes) use ($attributesArray, &$calls) {
                 $this->assertSame($attributesArray, $attributes);
 
                 $post->increaseViewCount();
+                ++$calls;
+            })
+            ->afterPersist(function(Post $post, array $attributes) use ($attributesArray, &$calls) {
+                $this->assertSame($attributesArray, $attributes);
+
+                $post->increaseViewCount();
+                ++$calls;
+            })
+            ->afterPersist(static function() use (&$calls) {
+                ++$calls;
             })
             ->create($attributesArray)
         ;
 
-        $this->assertSame(2, $object->withoutAutoRefresh()->getViewCount());
+        $this->assertSame(3, $object->withoutAutoRefresh()->getViewCount());
+        $this->assertSame(4, $calls);
     }
 }

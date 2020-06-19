@@ -54,12 +54,10 @@ class Factory
             return $proxy;
         }
 
-        $proxy->save();
-
-        $object = $proxy->withoutAutoRefresh()->object();
+        $proxy->save()->withoutAutoRefresh();
 
         foreach ($this->afterPersist as $callback) {
-            $callback($object, $attributes, PersistenceManager::objectManagerFor($object));
+            $this->callAfterPersist($callback, $proxy, $attributes);
         }
 
         return $proxy->withAutoRefresh();
@@ -154,6 +152,18 @@ class Factory
     final public static function faker(): Faker\Generator
     {
         return self::$faker ?: self::$faker = Faker\Factory::create();
+    }
+
+    private function callAfterPersist(callable $callback, Proxy $proxy, array $attributes): void
+    {
+        $object = $proxy;
+        $parameters = (new \ReflectionFunction($callback))->getParameters();
+
+        if (isset($parameters[0]) && $parameters[0]->getType() && $this->class === $parameters[0]->getType()->getName()) {
+            $object = $object->object();
+        }
+
+        $callback($object, $attributes);
     }
 
     /**
