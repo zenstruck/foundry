@@ -15,23 +15,31 @@ final class StoryManager
     /** @var array<string, Story> */
     private static array $instances = [];
 
-    public static function has(string $story): bool
+    /** @var Story[] */
+    private iterable $stories;
+
+    /**
+     * @param Story[] $stories
+     */
+    public function __construct(?iterable $stories = null)
     {
-        return \array_key_exists($story, self::$globalInstances) || \array_key_exists($story, self::$instances);
+        $this->stories = $stories ?: [];
     }
 
-    public static function get(string $story): Story
+    public function load(string $class): Story
     {
-        if (\array_key_exists($story, self::$globalInstances)) {
-            return self::$globalInstances[$story];
+        if (\array_key_exists($class, self::$globalInstances)) {
+            return self::$globalInstances[$class];
         }
 
-        return self::$instances[$story];
-    }
+        if (\array_key_exists($class, self::$instances)) {
+            return self::$instances[$class];
+        }
 
-    public static function set(Story $story): void
-    {
-        self::$instances[\get_class($story)] = $story;
+        $story = $this->getOrCreateStory($class);
+        $story->build();
+
+        return self::$instances[$class] = $story;
     }
 
     public static function setGlobalState(): void
@@ -48,5 +56,16 @@ final class StoryManager
     public static function globalReset(): void
     {
         self::$globalInstances = self::$instances = [];
+    }
+
+    private function getOrCreateStory(string $class): Story
+    {
+        foreach ($this->stories as $story) {
+            if ($class === \get_class($story)) {
+                return $story;
+            }
+        }
+
+        return new $class();
     }
 }
