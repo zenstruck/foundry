@@ -413,8 +413,8 @@ The following events can be added to factories. Multiple event callbacks can be 
 they were added.
 
 ```php
-use Doctrine\Persistence\ObjectManager;
 use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\Proxy;
 
 (new Factory(Post::class))
     ->beforeInstantiate(function(array $attributes): array {
@@ -427,11 +427,18 @@ use Zenstruck\Foundry\Factory;
         // $object is the instantiated object
         // $attributes contains the attributes used to instantiate the object and any extras
     })
-    ->afterPersist(function(Post $object, array $attributes, ObjectManager $om) {
+    ->afterPersist(function(Proxy $object, array $attributes) {
+        /* @var Post $object */
         // this event is only called if the object was persisted
-        // $object is the persisted object
+        // $proxy is a Proxy wrapping the persisted object
         // $attributes contains the attributes used to instantiate the object and any extras
-        // $om is the ObjectManager used to persist $object
+    })
+
+    // if the first argument is type-hinted as the object, it will be passed to the closure (and not the proxy)
+    ->afterPersist(function(Post $object, array $attributes) {
+        // this event is only called if the object was persisted
+        // $object is the persisted Post object
+        // $attributes contains the attributes used to instantiate the object and any extras
     })
     
     // multiple events are allowed
