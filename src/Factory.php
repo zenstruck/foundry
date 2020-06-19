@@ -46,7 +46,7 @@ class Factory
      */
     final public function create($attributes = []): Proxy
     {
-        $proxy = new Proxy($this->instantiate($attributes), self::manager());
+        $proxy = new Proxy($this->instantiate($attributes));
 
         if (!$this->persist) {
             return $proxy;
