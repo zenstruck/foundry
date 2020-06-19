@@ -5,6 +5,7 @@ namespace Zenstruck\Foundry\Tests\Functional;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\CategoryStory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\PostStory;
+use Zenstruck\Foundry\Tests\Fixtures\Stories\ServiceStory;
 use Zenstruck\Foundry\Tests\FunctionalTestCase;
 
 /**
@@ -50,5 +51,13 @@ final class StoryTest extends FunctionalTestCase
         $this->expectException(\InvalidArgumentException::class);
 
         CategoryStory::load()->get('invalid');
+    }
+
+    /**
+     * @test
+     */
+    public function stories_can_be_services(): void
+    {
+        $this->assertSame('From Service', ServiceStory::post()->getTitle());
     }
 }

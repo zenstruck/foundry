@@ -12,6 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 use Zenstruck\Foundry\Bundle\ZenstruckFoundryBundle;
+use Zenstruck\Foundry\Tests\Fixtures\Stories\ServiceStory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -44,6 +45,12 @@ class Kernel extends BaseKernel
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
     {
         $c->register('logger', NullLogger::class);
+
+        $c->register(Service::class);
+        $c->register(ServiceStory::class)
+            ->setAutoconfigured(true)
+            ->setAutowired(true)
+        ;
 
         $c->loadFromExtension('framework', [
             'secret' => 'S3CRET',
