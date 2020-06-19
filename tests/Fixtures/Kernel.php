@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures;
 
+use DAMA\DoctrineTestBundle\DAMADoctrineTestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -20,10 +21,12 @@ class Kernel extends BaseKernel
 
     public function registerBundles(): iterable
     {
-        return [
-            new FrameworkBundle(),
-            new DoctrineBundle(),
-        ];
+        yield new FrameworkBundle();
+        yield new DoctrineBundle();
+
+        if (isset($_ENV['USE_DAMA_DOCTRINE_TEST_BUNDLE'])) {
+            yield new DAMADoctrineTestBundle();
+        }
     }
 
     public function getLogDir(): string
