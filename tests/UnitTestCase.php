@@ -2,6 +2,8 @@
 
 namespace Zenstruck\Foundry\Tests;
 
+use Doctrine\Persistence\ManagerRegistry;
+use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\Manager;
 use Zenstruck\Foundry\StoryManager;
@@ -9,12 +11,14 @@ use Zenstruck\Foundry\StoryManager;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-trait Reset
+abstract class UnitTestCase extends TestCase
 {
+    protected ?Manager $manager = null;
+
     /**
      * @before
      */
-    public static function reset()
+    public function setUpFoundry(): void
     {
         $reset = static function($class, $property, $value) {
             $property = (new \ReflectionClass($class))->getProperty($property);
@@ -25,6 +29,6 @@ trait Reset
         $reset(StoryManager::class, 'globalInstances', []);
         $reset(StoryManager::class, 'instances', []);
 
-        Factory::boot(new Manager());
+        Factory::boot($this->manager = new Manager($this->createMock(ManagerRegistry::class), new StoryManager([])));
     }
 }

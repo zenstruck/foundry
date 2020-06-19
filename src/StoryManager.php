@@ -21,9 +21,9 @@ final class StoryManager
     /**
      * @param Story[] $stories
      */
-    public function __construct(?iterable $stories = null)
+    public function __construct(iterable $stories)
     {
-        $this->stories = $stories ?: [];
+        $this->stories = $stories;
     }
 
     public function load(string $class): Story

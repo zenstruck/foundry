@@ -5,21 +5,17 @@ namespace Zenstruck\Foundry\Tests\Unit;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Faker;
-use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\Manager;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
-use Zenstruck\Foundry\Tests\Reset;
+use Zenstruck\Foundry\Tests\UnitTestCase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class FactoryTest extends TestCase
+final class FactoryTest extends UnitTestCase
 {
-    use Reset;
-
     /**
      * @test
      */
@@ -187,9 +183,9 @@ final class FactoryTest extends TestCase
      */
     public function can_register_default_instantiator(): void
     {
-        Factory::boot((new Manager())->setInstantiator(function() {
+        $this->manager->setInstantiator(function() {
             return new Post('different title', 'different body');
-        }));
+        });
 
         $object = (new Factory(Post::class, ['title' => 'title', 'body' => 'body']))->withoutPersisting()->create();
 
@@ -205,7 +201,7 @@ final class FactoryTest extends TestCase
         $object = (new Factory(Post::class))->withoutPersisting()->create([
             'title' => 'title',
             'body' => 'body',
-            'category' => new Proxy(new Category(), new Manager()),
+            'category' => new Proxy(new Category(), $this->manager),
         ]);
 
         $this->assertInstanceOf(Category::class, $object->getCategory());
@@ -254,7 +250,7 @@ final class FactoryTest extends TestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        Factory::boot(new Manager($registry));
+        $this->manager->setManagerRegistry($registry);
 
         $object = (new Factory(Post::class))->create(['title' => 'title', 'body' => 'body']);
 
@@ -275,7 +271,7 @@ final class FactoryTest extends TestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        Factory::boot(new Manager($registry));
+        $this->manager->setManagerRegistry($registry);
 
         $objects = (new Factory(Post::class))->createMany(3, ['title' => 'title', 'body' => 'body']);
 
@@ -301,7 +297,7 @@ final class FactoryTest extends TestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        Factory::boot(new Manager($registry));
+        $this->manager->setManagerRegistry($registry);
 
         $attributesArray = ['title' => 'title', 'body' => 'body'];
         $calls = 0;
