@@ -10,7 +10,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\TagFactory;
  */
 final class TagStory extends Story
 {
-    protected function build(): void
+    public function build(): void
     {
         $this->add('dev', TagFactory::new()->create(['name' => 'dev']));
         $this->add('design', TagFactory::new()->create(['name' => 'design']));

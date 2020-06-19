@@ -10,10 +10,6 @@ abstract class Story
     /** @var array<string, Proxy> */
     private array $objects = [];
 
-    private function __construct()
-    {
-    }
-
     final public function __call(string $method, array $arguments)
     {
         return $this->get($method);
@@ -26,16 +22,7 @@ abstract class Story
 
     final public static function load(): self
     {
-        if (StoryManager::has(static::class)) {
-            return StoryManager::get(static::class);
-        }
-
-        $story = new static();
-        $story->build();
-
-        StoryManager::set($story);
-
-        return $story;
+        return Factory::manager()->stories()->load(static::class);
     }
 
     final public function add(string $name, object $object): self
@@ -69,5 +56,5 @@ abstract class Story
         return $this->objects[$name];
     }
 
-    abstract protected function build(): void;
+    abstract public function build(): void;
 }

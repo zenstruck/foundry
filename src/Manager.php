@@ -13,14 +13,16 @@ use Psr\Container\ContainerInterface;
 final class Manager
 {
     private ?ManagerRegistry $managerRegistry;
+    private StoryManager $stories;
     private Faker\Generator $faker;
 
     /** @var callable */
     private $instantiator;
 
-    public function __construct(?ManagerRegistry $managerRegistry = null)
+    public function __construct(?ManagerRegistry $managerRegistry = null, ?StoryManager $storyManager = null)
     {
         $this->managerRegistry = $managerRegistry;
+        $this->stories = $storyManager ?: new StoryManager();
         $this->faker = Faker\Factory::create();
         $this->instantiator = new Instantiator();
     }
@@ -34,6 +36,11 @@ final class Manager
         }
 
         Factory::boot($manager);
+    }
+
+    public function stories(): StoryManager
+    {
+        return $this->stories;
     }
 
     public function faker(): Faker\Generator

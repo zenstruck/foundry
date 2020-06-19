@@ -10,7 +10,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
  */
 final class CategoryStory extends Story
 {
-    protected function build(): void
+    public function build(): void
     {
         $this->add('php', CategoryFactory::new()->create(['name' => 'php']));
         $this->add('symfony', CategoryFactory::new()->create(['name' => 'symfony']));
