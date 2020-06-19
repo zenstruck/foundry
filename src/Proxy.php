@@ -11,15 +11,13 @@ use PHPUnit\Framework\Assert;
 final class Proxy
 {
     private object $object;
-    private Manager $manager;
     private string $class;
     private bool $autoRefresh = false;
     private bool $persisted = false;
 
-    public function __construct(object $object, Manager $manager)
+    public function __construct(object $object)
     {
         $this->object = $object;
-        $this->manager = $manager;
         $this->class = \get_class($object);
     }
 
@@ -57,9 +55,9 @@ final class Proxy
         return $this->object()->__toString();
     }
 
-    public static function persisted(object $object, Manager $manager): self
+    public static function persisted(object $object): self
     {
-        $proxy = new self($object, $manager);
+        $proxy = new self($object);
         $proxy->persisted = $proxy->autoRefresh = true;
 
         return $proxy;
@@ -147,7 +145,7 @@ final class Proxy
 
     public function repository(): RepositoryProxy
     {
-        return $this->manager->repositoryFor($this->class);
+        return Factory::manager()->repositoryFor($this->class);
     }
 
     public function withAutoRefresh(): self
@@ -196,6 +194,6 @@ final class Proxy
 
     private function objectManager(): ObjectManager
     {
-        return $this->manager->objectManagerFor($this->class);
+        return Factory::manager()->objectManagerFor($this->class);
     }
 }

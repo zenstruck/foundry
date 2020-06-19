@@ -15,12 +15,10 @@ use PHPUnit\Framework\Assert;
 final class RepositoryProxy implements ObjectRepository
 {
     private ObjectRepository $repository;
-    private Manager $manager;
 
-    public function __construct(ObjectRepository $repository, Manager $manager)
+    public function __construct(ObjectRepository $repository)
     {
         $this->repository = $repository;
-        $this->manager = $manager;
     }
 
     public function __call(string $method, array $arguments)
@@ -117,7 +115,7 @@ final class RepositoryProxy implements ObjectRepository
      */
     public function truncate(): void
     {
-        $om = $this->manager->objectManagerFor($this->getClassName());
+        $om = Factory::manager()->objectManagerFor($this->getClassName());
 
         if (!$om instanceof EntityManagerInterface) {
             throw new \RuntimeException('This operation is only available when using doctrine/orm');
@@ -224,7 +222,7 @@ final class RepositoryProxy implements ObjectRepository
     private function proxyResult($result)
     {
         if (\is_object($result) && $this->getClassName() === \get_class($result)) {
-            return Proxy::persisted($result, $this->manager);
+            return Proxy::persisted($result);
         }
 
         if (\is_array($result)) {
