@@ -9,9 +9,7 @@ use Faker;
  */
 class Factory
 {
-    /** @var callable|null */
-    private static $defaultInstantiator;
-    private static ?Faker\Generator $faker = null;
+    private static ?Manager $manager = null;
 
     private string $class;
 
@@ -48,7 +46,7 @@ class Factory
      */
     final public function create($attributes = []): Proxy
     {
-        $proxy = new Proxy($this->instantiate($attributes));
+        $proxy = new Proxy($this->instantiate($attributes), self::manager());
 
         if (!$this->persist) {
             return $proxy;
@@ -136,22 +134,26 @@ class Factory
         return $cloned;
     }
 
-    /**
-     * @param callable $instantiator (array $attributes, string $class): object
-     */
-    final public static function registerDefaultInstantiator(callable $instantiator): void
+    final public static function boot(Manager $manager): void
     {
-        self::$defaultInstantiator = $instantiator;
+        self::$manager = $manager;
     }
 
-    final public static function registerFaker(Faker\Generator $faker): void
+    /**
+     * @internal
+     */
+    final public static function manager(): Manager
     {
-        self::$faker = $faker;
+        if (!self::$manager) {
+            throw new \RuntimeException('Factory not yet booted.'); // todo
+        }
+
+        return self::$manager;
     }
 
     final public static function faker(): Faker\Generator
     {
-        return self::$faker ?: self::$faker = Faker\Factory::create();
+        return self::manager()->faker();
     }
 
     private function callAfterPersist(callable $callback, Proxy $proxy, array $attributes): void
@@ -197,18 +199,13 @@ class Factory
         $attributes = \array_map(fn($value) => $this->normalizeAttribute($value), $attributes);
 
         // instantiate the object with the users instantiator or if not set, the default instantiator
-        $object = ($this->instantiator ?? self::defaultInstantiator())($attributes, $this->class);
+        $object = ($this->instantiator ?? self::manager()->instantiator())($attributes, $this->class);
 
         foreach ($this->afterInstantiate as $callback) {
             $callback($object, $attributes);
         }
 
         return $object;
-    }
-
-    private static function defaultInstantiator(): callable
-    {
-        return self::$defaultInstantiator ?: self::$defaultInstantiator = new Instantiator();
     }
 
     /**

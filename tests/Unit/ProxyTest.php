@@ -5,24 +5,24 @@ namespace Zenstruck\Foundry\Tests\Unit;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
-use Zenstruck\Foundry\PersistenceManager;
+use Zenstruck\Foundry\Manager;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
-use Zenstruck\Foundry\Tests\ResetGlobals;
+use Zenstruck\Foundry\Tests\Reset;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class ProxyTest extends TestCase
 {
-    use ResetGlobals;
+    use Reset;
 
     /**
      * @test
      */
     public function can_force_get_and_set_non_public_properties(): void
     {
-        $proxy = new Proxy(new Category());
+        $proxy = new Proxy(new Category(), new Manager());
 
         $this->assertNull($proxy->forceGet('name'));
 
@@ -38,7 +38,7 @@ final class ProxyTest extends TestCase
     {
         $proxy = new Proxy(new class() {
             public $property;
-        });
+        }, new Manager());
 
         $this->assertFalse(isset($proxy->property));
 
@@ -61,7 +61,7 @@ final class ProxyTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Cannot refresh unpersisted object (Zenstruck\Foundry\Tests\Fixtures\Entity\Category).');
 
-        (new Proxy(new Category()))->refresh();
+        (new Proxy(new Category(), new Manager()))->refresh();
     }
 
     /**
@@ -76,9 +76,8 @@ final class ProxyTest extends TestCase
             ->with(Category::class)
             ->willReturn($this->createMock(ObjectManager::class))
         ;
-        PersistenceManager::register($registry);
 
-        $category = new Proxy(new Category());
+        $category = new Proxy(new Category(), new Manager($registry));
 
         $this->assertFalse($category->isPersisted());
 

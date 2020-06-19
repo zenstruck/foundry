@@ -7,18 +7,18 @@ use Doctrine\Persistence\ObjectManager;
 use Faker;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\PersistenceManager;
+use Zenstruck\Foundry\Manager;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
-use Zenstruck\Foundry\Tests\ResetGlobals;
+use Zenstruck\Foundry\Tests\Reset;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class FactoryTest extends TestCase
 {
-    use ResetGlobals;
+    use Reset;
 
     /**
      * @test
@@ -176,11 +176,10 @@ final class FactoryTest extends TestCase
      */
     public function can_register_custom_faker(): void
     {
-        $faker = Factory::faker();
+        $defaultFaker = Factory::faker();
+        Factory::manager()->setFaker(new Faker\Generator());
 
-        Factory::registerFaker(new Faker\Generator());
-
-        $this->assertNotSame(\spl_object_id(Factory::faker()), \spl_object_id($faker));
+        $this->assertNotSame(\spl_object_id(Factory::faker()), \spl_object_id($defaultFaker));
     }
 
     /**
@@ -188,9 +187,9 @@ final class FactoryTest extends TestCase
      */
     public function can_register_default_instantiator(): void
     {
-        Factory::registerDefaultInstantiator(function() {
+        Factory::boot((new Manager())->setInstantiator(function() {
             return new Post('different title', 'different body');
-        });
+        }));
 
         $object = (new Factory(Post::class, ['title' => 'title', 'body' => 'body']))->withoutPersisting()->create();
 
@@ -206,7 +205,7 @@ final class FactoryTest extends TestCase
         $object = (new Factory(Post::class))->withoutPersisting()->create([
             'title' => 'title',
             'body' => 'body',
-            'category' => new Proxy(new Category()),
+            'category' => new Proxy(new Category(), new Manager()),
         ]);
 
         $this->assertInstanceOf(Category::class, $object->getCategory());
@@ -255,7 +254,7 @@ final class FactoryTest extends TestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        PersistenceManager::register($registry);
+        Factory::boot(new Manager($registry));
 
         $object = (new Factory(Post::class))->create(['title' => 'title', 'body' => 'body']);
 
@@ -276,7 +275,7 @@ final class FactoryTest extends TestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        PersistenceManager::register($registry);
+        Factory::boot(new Manager($registry));
 
         $objects = (new Factory(Post::class))->createMany(3, ['title' => 'title', 'body' => 'body']);
 
@@ -302,7 +301,7 @@ final class FactoryTest extends TestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        PersistenceManager::register($registry);
+        Factory::boot(new Manager($registry));
 
         $attributesArray = ['title' => 'title', 'body' => 'body'];
         $calls = 0;
