@@ -4,7 +4,6 @@ namespace Zenstruck\Foundry\Test;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\Manager;
 use Zenstruck\Foundry\StoryManager;
 
 /**
@@ -28,16 +27,15 @@ trait Factories
             static::bootKernel();
         }
 
-        static::$kernel->getContainer()->get(Manager::class)
-            ->setManagerRegistry(new LazyManagerRegistry(static function() {
+        Configuration::bootFactory(static::$kernel->getContainer())->setManagerRegistry(
+            new LazyManagerRegistry(static function() {
                 if (!static::$booted) {
                     static::bootKernel();
                 }
 
                 return static::$kernel->getContainer()->get('doctrine');
             })
-        )
-    ;
+        );
 
         self::ensureKernelShutdown();
     }
