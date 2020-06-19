@@ -45,11 +45,21 @@ jobs:
       - name: Install dependencies
         run: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-suggest
 
-      - name: Run tests
+      - name: Run tests WITHOUT ZenstruckFoundryBundle
         run: vendor/bin/phpunit -v
 
-      - name: Run tests with DAMADoctrineTestBundle
+      - name: Run tests WITH ZenstruckFoundryBundle
+        run: vendor/bin/phpunit -v
+        env:
+          USE_FOUNDRY_BUNDLE: 1
+
+      - name: Run tests WITH DAMADoctrineTestBundle and WITHOUT ZenstruckFoundryBundle
         run: vendor/bin/phpunit -v --configuration phpunit-dama-doctrine.xml.dist
+
+      - name: Run tests WITH DAMADoctrineTestBundle and WITH ZenstruckFoundryBundle
+        run: vendor/bin/phpunit -v --configuration phpunit-dama-doctrine.xml.dist
+        env:
+          USE_FOUNDRY_BUNDLE: 1
 
   code-coverage:
     name: Code Coverage
@@ -84,17 +94,29 @@ jobs:
       - name: Install dependencies
         run: composer update --prefer-dist --no-interaction --no-suggest
 
-      - name: Run code coverage
+      - name: Run code coverage WITHOUT ZenstruckFoundryBundle
         run: vendor/bin/phpunit -v --coverage-text --coverage-clover=coverage.clover
 
-      - name: Run code coverage with DAMADoctrineTestBundle
-        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=dama-coverage.clover
+      - name: Run code coverage WITH ZenstruckFoundryBundle
+        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=bundle-coverage.clover
+        env:
+          USE_FOUNDRY_BUNDLE: 1
+
+      - name: Run code coverage WITH DAMADoctrineTestBundle and WITHOUT ZenstruckFoundryBundle
+        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=coverage-dama.clover
+
+      - name: Run code coverage WITH DAMADoctrineTestBundle and WITH ZenstruckFoundryBundle
+        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=bundle-coverage-dama.clover
+        env:
+          USE_FOUNDRY_BUNDLE: 1
 
       - name: Send code coverage
         run: |
           wget https://scrutinizer-ci.com/ocular.phar
           php ocular.phar code-coverage:upload --format=php-clover coverage.clover
-          php ocular.phar code-coverage:upload --format=php-clover dama-coverage.clover
+          php ocular.phar code-coverage:upload --format=php-clover bundle-coverage.clover
+          php ocular.phar code-coverage:upload --format=php-clover coverage-dama.clover
+          php ocular.phar code-coverage:upload --format=php-clover bundle-coverage-dama.clover
 
   composer-validate:
     name: Validate composer.json
