@@ -25,9 +25,12 @@ class Kernel extends BaseKernel
     {
         yield new FrameworkBundle();
         yield new DoctrineBundle();
-        yield new ZenstruckFoundryBundle();
 
-        if (isset($_ENV['USE_DAMA_DOCTRINE_TEST_BUNDLE'])) {
+        if (\getenv('USE_FOUNDRY_BUNDLE')) {
+            yield new ZenstruckFoundryBundle();
+        }
+
+        if (\getenv('USE_DAMA_DOCTRINE_TEST_BUNDLE')) {
             yield new DAMADoctrineTestBundle();
         }
     }

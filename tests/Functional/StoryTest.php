@@ -58,6 +58,10 @@ final class StoryTest extends FunctionalTestCase
      */
     public function stories_can_be_services(): void
     {
+        if (!\getenv('USE_FOUNDRY_BUNDLE')) {
+            $this->markTestSkipped('Stories cannot be services without the foundry bundle.');
+        }
+
         $this->assertSame('From Service', ServiceStory::post()->getTitle());
     }
 }
