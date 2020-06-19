@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Zenstruck\Foundry\Manager;
 
 /**
  * @internal
@@ -71,7 +72,9 @@ final class DatabaseResetter
             ]);
         }
 
-        GlobalState::flush($registry);
+        Manager::boot($application->getKernel()->getContainer(), $registry);
+
+        GlobalState::flush();
     }
 
     private static function dropSchema(Application $application, ManagerRegistry $registry): void

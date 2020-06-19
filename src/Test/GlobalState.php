@@ -2,8 +2,6 @@
 
 namespace Zenstruck\Foundry\Test;
 
-use Doctrine\Persistence\ManagerRegistry;
-use Zenstruck\Foundry\PersistenceManager;
 use Zenstruck\Foundry\StoryManager;
 
 /**
@@ -21,11 +19,9 @@ final class GlobalState
     /**
      * @internal
      */
-    public static function flush(ManagerRegistry $registry): void
+    public static function flush(): void
     {
         StoryManager::globalReset();
-
-        PersistenceManager::register($registry);
 
         foreach (self::$callbacks as $callback) {
             $callback();
