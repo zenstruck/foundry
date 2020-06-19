@@ -5,7 +5,6 @@ namespace Zenstruck\Foundry;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Faker;
-use Psr\Container\ContainerInterface;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -19,23 +18,12 @@ final class Manager
     /** @var callable */
     private $instantiator;
 
-    public function __construct(?ManagerRegistry $managerRegistry = null, ?StoryManager $storyManager = null)
+    public function __construct(ManagerRegistry $managerRegistry, StoryManager $storyManager)
     {
         $this->managerRegistry = $managerRegistry;
-        $this->stories = $storyManager ?: new StoryManager();
+        $this->stories = $storyManager;
         $this->faker = Faker\Factory::create();
         $this->instantiator = new Instantiator();
-    }
-
-    public static function boot(ContainerInterface $container, ?ManagerRegistry $managerRegistry = null): void
-    {
-        $manager = $container->has(self::class) ? $container->get(self::class) : new self();
-
-        if ($managerRegistry) {
-            $manager->setManagerRegistry($managerRegistry);
-        }
-
-        Factory::boot($manager);
     }
 
     public function stories(): StoryManager

@@ -134,6 +134,9 @@ class Factory
         return $cloned;
     }
 
+    /**
+     * @internal
+     */
     final public static function boot(Manager $manager): void
     {
         self::$manager = $manager;

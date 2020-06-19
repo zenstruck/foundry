@@ -11,6 +11,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
+use Zenstruck\Foundry\Bundle\ZenstruckFoundryBundle;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -23,6 +24,7 @@ class Kernel extends BaseKernel
     {
         yield new FrameworkBundle();
         yield new DoctrineBundle();
+        yield new ZenstruckFoundryBundle();
 
         if (isset($_ENV['USE_DAMA_DOCTRINE_TEST_BUNDLE'])) {
             yield new DAMADoctrineTestBundle();
