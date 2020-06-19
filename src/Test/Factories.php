@@ -4,7 +4,7 @@ namespace Zenstruck\Foundry\Test;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\PersistenceManager;
+use Zenstruck\Foundry\Manager;
 use Zenstruck\Foundry\StoryManager;
 
 /**
@@ -24,13 +24,19 @@ trait Factories
             throw new \RuntimeException(\sprintf('The "%s" trait can only be used on TestCases that extend "%s".', __TRAIT__, KernelTestCase::class));
         }
 
-        PersistenceManager::register(new LazyManagerRegistry(static function() {
+        if (!static::$booted) {
+            static::bootKernel();
+        }
+
+        Manager::boot(static::$kernel->getContainer(), new LazyManagerRegistry(static function() {
             if (!static::$booted) {
                 static::bootKernel();
             }
 
             return static::$kernel->getContainer()->get('doctrine');
         }));
+
+        self::ensureKernelShutdown();
     }
 
     /**
