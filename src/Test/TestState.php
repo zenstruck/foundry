@@ -4,8 +4,8 @@ namespace Zenstruck\Foundry\Test;
 
 use Faker;
 use Psr\Container\ContainerInterface;
+use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\Manager;
 use Zenstruck\Foundry\StoryManager;
 
 /**
@@ -42,21 +42,21 @@ final class TestState
     /**
      * @internal
      */
-    public static function bootFactory(ContainerInterface $container): Manager
+    public static function bootFactory(ContainerInterface $container): Configuration
     {
-        $manager = self::$useBundle ? $container->get(Manager::class) : new Manager($container->get('doctrine'), new StoryManager([]));
+        $configuration = self::$useBundle ? $container->get(Configuration::class) : new Configuration($container->get('doctrine'), new StoryManager([]));
 
         if (self::$instantiator) {
-            $manager->setInstantiator(self::$instantiator);
+            $configuration->setInstantiator(self::$instantiator);
         }
 
         if (self::$faker) {
-            $manager->setFaker(self::$faker);
+            $configuration->setFaker(self::$faker);
         }
 
-        Factory::boot($manager);
+        Factory::boot($configuration);
 
-        return $manager;
+        return $configuration;
     }
 
     /**

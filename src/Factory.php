@@ -9,7 +9,7 @@ use Faker;
  */
 class Factory
 {
-    private static ?Manager $manager = null;
+    private static ?Configuration $configuration = null;
 
     private string $class;
 
@@ -137,26 +137,26 @@ class Factory
     /**
      * @internal
      */
-    final public static function boot(Manager $manager): void
+    final public static function boot(Configuration $configuration): void
     {
-        self::$manager = $manager;
+        self::$configuration = $configuration;
     }
 
     /**
      * @internal
      */
-    final public static function manager(): Manager
+    final public static function configuration(): Configuration
     {
-        if (!self::$manager) {
+        if (!self::$configuration) {
             throw new \RuntimeException('Factory not yet booted.'); // todo
         }
 
-        return self::$manager;
+        return self::$configuration;
     }
 
     final public static function faker(): Faker\Generator
     {
-        return self::manager()->faker();
+        return self::configuration()->faker();
     }
 
     private function callAfterPersist(callable $callback, Proxy $proxy, array $attributes): void
@@ -202,7 +202,7 @@ class Factory
         $attributes = \array_map(fn($value) => $this->normalizeAttribute($value), $attributes);
 
         // instantiate the object with the users instantiator or if not set, the default instantiator
-        $object = ($this->instantiator ?? self::manager()->instantiator())($attributes, $this->class);
+        $object = ($this->instantiator ?? self::configuration()->instantiator())($attributes, $this->class);
 
         foreach ($this->afterInstantiate as $callback) {
             $callback($object, $attributes);

@@ -53,11 +53,11 @@ function instantiate_many(int $number, string $class, $attributes = []): array
 }
 
 /**
- * @see Manager::repositoryFor()
+ * @see Configuration::repositoryFor()
  */
 function repository($objectOrClass): RepositoryProxy
 {
-    return Factory::manager()->repositoryFor($objectOrClass);
+    return Factory::configuration()->repositoryFor($objectOrClass);
 }
 
 /**

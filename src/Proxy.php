@@ -145,7 +145,7 @@ final class Proxy
 
     public function repository(): RepositoryProxy
     {
-        return Factory::manager()->repositoryFor($this->class);
+        return Factory::configuration()->repositoryFor($this->class);
     }
 
     public function withAutoRefresh(): self
@@ -194,6 +194,6 @@ final class Proxy
 
     private function objectManager(): ObjectManager
     {
-        return Factory::manager()->objectManagerFor($this->class);
+        return Factory::configuration()->objectManagerFor($this->class);
     }
 }

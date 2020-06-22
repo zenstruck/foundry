@@ -80,7 +80,7 @@ abstract class ModelFactory extends Factory
 
     final public static function repository(): RepositoryProxy
     {
-        return self::manager()->repositoryFor(static::getClass());
+        return self::configuration()->repositoryFor(static::getClass());
     }
 
     /**
