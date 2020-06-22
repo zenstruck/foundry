@@ -72,7 +72,7 @@ final class DatabaseResetter
         }
 
         TestState::bootFactory($application->getKernel()->getContainer());
-        GlobalState::flush();
+        TestState::flushGlobalState();
     }
 
     private static function dropSchema(Application $application, ManagerRegistry $registry): void
