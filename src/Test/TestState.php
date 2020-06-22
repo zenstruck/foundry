@@ -60,9 +60,11 @@ final class TestState
     public static function bootFromContainer(ContainerInterface $container): Configuration
     {
         if (self::$useBundle) {
+            // todo improve/catch service not found exception - foundry-bundle not installed/configured...
             return self::bootFactory($container->get(Configuration::class));
         }
 
+        // todo improve/catch service not found exception - doctrine-bundle not installed/configured...
         return self::bootFactory(new Configuration($container->get('doctrine'), new StoryManager([])));
     }
 
