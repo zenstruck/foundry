@@ -20,15 +20,8 @@ abstract class UnitTestCase extends TestCase
      */
     public function setUpFoundry(): void
     {
-        $reset = static function($class, $property, $value) {
-            $property = (new \ReflectionClass($class))->getProperty($property);
-            $property->setAccessible(true);
-            $property->setValue($value);
-        };
+        $this->configuration = new Configuration($this->createMock(ManagerRegistry::class), new StoryManager([]));
 
-        $reset(StoryManager::class, 'globalInstances', []);
-        $reset(StoryManager::class, 'instances', []);
-
-        Factory::boot($this->configuration = new Configuration($this->createMock(ManagerRegistry::class), new StoryManager([])));
+        Factory::boot($this->configuration);
     }
 }
