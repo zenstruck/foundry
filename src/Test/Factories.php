@@ -27,7 +27,7 @@ trait Factories
             static::bootKernel();
         }
 
-        TestState::bootFactory(static::$kernel->getContainer())->setManagerRegistry(
+        TestState::bootFromContainer(static::$kernel->getContainer())->setManagerRegistry(
             new LazyManagerRegistry(static function() {
                 if (!static::$booted) {
                     static::bootKernel();

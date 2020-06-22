@@ -71,7 +71,7 @@ final class DatabaseResetter
             ]);
         }
 
-        TestState::bootFactory($application->getKernel()->getContainer());
+        TestState::bootFromContainer($application->getKernel()->getContainer());
         TestState::flushGlobalState();
     }
 
