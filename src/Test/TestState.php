@@ -39,13 +39,8 @@ final class TestState
         self::$globalStates[] = $callback;
     }
 
-    /**
-     * @internal
-     */
-    public static function bootFactory(ContainerInterface $container): Configuration
+    public static function bootFactory(Configuration $configuration): Configuration
     {
-        $configuration = self::$useBundle ? $container->get(Configuration::class) : new Configuration($container->get('doctrine'), new StoryManager([]));
-
         if (self::$instantiator) {
             $configuration->setInstantiator(self::$instantiator);
         }
@@ -57,6 +52,18 @@ final class TestState
         Factory::boot($configuration);
 
         return $configuration;
+    }
+
+    /**
+     * @internal
+     */
+    public static function bootFromContainer(ContainerInterface $container): Configuration
+    {
+        if (self::$useBundle) {
+            return self::bootFactory($container->get(Configuration::class));
+        }
+
+        return self::bootFactory(new Configuration($container->get('doctrine'), new StoryManager([])));
     }
 
     /**
