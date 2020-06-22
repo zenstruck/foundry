@@ -173,7 +173,7 @@ final class FactoryTest extends UnitTestCase
     public function can_register_custom_faker(): void
     {
         $defaultFaker = Factory::faker();
-        Factory::manager()->setFaker(new Faker\Generator());
+        Factory::configuration()->setFaker(new Faker\Generator());
 
         $this->assertNotSame(\spl_object_id(Factory::faker()), \spl_object_id($defaultFaker));
     }
@@ -183,7 +183,7 @@ final class FactoryTest extends UnitTestCase
      */
     public function can_register_default_instantiator(): void
     {
-        $this->manager->setInstantiator(function() {
+        $this->configuration->setInstantiator(function() {
             return new Post('different title', 'different body');
         });
 
@@ -250,7 +250,7 @@ final class FactoryTest extends UnitTestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        $this->manager->setManagerRegistry($registry);
+        $this->configuration->setManagerRegistry($registry);
 
         $object = (new Factory(Post::class))->create(['title' => 'title', 'body' => 'body']);
 
@@ -271,7 +271,7 @@ final class FactoryTest extends UnitTestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        $this->manager->setManagerRegistry($registry);
+        $this->configuration->setManagerRegistry($registry);
 
         $objects = (new Factory(Post::class))->createMany(3, ['title' => 'title', 'body' => 'body']);
 
@@ -297,7 +297,7 @@ final class FactoryTest extends UnitTestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        $this->manager->setManagerRegistry($registry);
+        $this->configuration->setManagerRegistry($registry);
 
         $attributesArray = ['title' => 'title', 'body' => 'body'];
         $calls = 0;

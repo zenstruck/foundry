@@ -67,7 +67,7 @@ final class FunctionsTest extends UnitTestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        $this->manager->setManagerRegistry($registry);
+        $this->configuration->setManagerRegistry($registry);
 
         $object = create(Category::class);
 
@@ -87,7 +87,7 @@ final class FunctionsTest extends UnitTestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        $this->manager->setManagerRegistry($registry);
+        $this->configuration->setManagerRegistry($registry);
 
         $objects = create_many(3, Category::class);
 
@@ -107,7 +107,7 @@ final class FunctionsTest extends UnitTestCase
             ->willReturn($this->createMock(ObjectRepository::class))
         ;
 
-        $this->manager->setManagerRegistry($registry);
+        $this->configuration->setManagerRegistry($registry);
 
         $this->assertInstanceOf(RepositoryProxy::class, repository(new Category()));
     }

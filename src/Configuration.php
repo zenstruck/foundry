@@ -9,7 +9,7 @@ use Faker;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class Manager
+final class Configuration
 {
     private ?ManagerRegistry $managerRegistry;
     private StoryManager $stories;
@@ -75,7 +75,7 @@ final class Manager
             $objectOrClass = \get_class($objectOrClass);
         }
 
-        return new RepositoryProxy($this->managerRegistry()->getRepository($objectOrClass), $this);
+        return new RepositoryProxy($this->managerRegistry->getRepository($objectOrClass));
     }
 
     /**
@@ -85,19 +85,10 @@ final class Manager
     {
         $class = \is_string($objectOrClass) ? $objectOrClass : \get_class($objectOrClass);
 
-        if (!$objectManager = $this->managerRegistry()->getManagerForClass($class)) {
+        if (!$objectManager = $this->managerRegistry->getManagerForClass($class)) {
             throw new \RuntimeException(\sprintf('No object manager registered for "%s".', $class));
         }
 
         return $objectManager;
-    }
-
-    private function managerRegistry(): ManagerRegistry
-    {
-        if (!$this->managerRegistry) {
-            throw new \RuntimeException('ManagerRegistry not set.'); // todo
-        }
-
-        return $this->managerRegistry;
     }
 }

@@ -22,7 +22,7 @@ abstract class Story
 
     final public static function load(): self
     {
-        return Factory::manager()->stories()->load(static::class);
+        return Factory::configuration()->stories()->load(static::class);
     }
 
     final public function add(string $name, object $object): self
