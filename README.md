@@ -85,16 +85,9 @@ public function test_can_post_a_comment(): void
     $ composer require zenstruck/foundry --dev
 
 To use the *Maker's*, ensure [Symfony MakerBundle](https://symfony.com/doc/current/bundles/SymfonyMakerBundle/index.html)
-is installed and enable the packaged bundle:
+is installed.
 
-```php
-# config/bundles.php
-
-return [
-    // ...
-    Zenstruck\Foundry\Bundle\ZenstruckFoundryBundle::class => ['dev' => true],
-];
-```
+*If not using Symfony Flex, be sure to enable the bundle in your **test**/**dev** environments.*
 
 ### Test Traits
 
@@ -156,13 +149,7 @@ faker()->email; // random email
 
 **NOTE**: You can register your own `Faker\Generator`:
 
-```php
-// tests/bootsrap.php
-// ...
-Zenstruck\Foundry\Factory::registerFaker(
-    Faker\Factory::create('fr_FR')
-);
-```
+**TODO**
 
 ### Sample Entities
 
@@ -313,10 +300,6 @@ use function Zenstruck\Foundry\create_many;
 create(Post::class, ['title' => 'Post A']);
 create_many(6, Post::class, fn() => ['title' => faker()->sentence]);
 ```
-
-**NOTE**: The persist operations require that a `Doctrine\Persistence\ManagerRegistry` be registered with
-`Zenstruck\Foundry\PersistenceManager` via `\Zenstruck\Foundry\PersistenceManager::register($registry)`. If using the
-[`Factories`](#test-traits) test trait, this is handled for you.
 
 #### Attributes
 
@@ -493,13 +476,7 @@ use Zenstruck\Foundry\Factory;
 You can also customize the instantiator globally for all your factories (can still be overruled by factory instance
 instantiators):
 
-```php
-// tests/bootstrap.php
-// ...
-Zenstruck\Foundry\Factory::registerDefaultInstantiator(
-    (new Zenstruck\Foundry\Instantiator())->alwaysForceProperties()
-);
-```
+**TODO**
 
 #### Immutable
 
@@ -519,7 +496,7 @@ $factory->afterPersist(function () {}); // new object
 
 #### Object Proxy
 
-By default, objects persisted by a factory are wrapped in a special [Proxy](src/Proxy.php) object. These objects help
+Objects created by a factory are wrapped in a special [Proxy](src/Proxy.php) object. These objects help
 with your "post-act" test assertions. Almost all calls to Proxy methods, first refresh the object from the database
 (even if your entity manager has been cleared).
 
@@ -847,8 +824,6 @@ public function test_using_story(): void
     PostStory::postA()->getTitle(); // "Post A"
 }
 ```
-
-**NOTE**: Story state objects are always proxies even if proxying was disabled.
 
 **NOTE**: Story state and objects persisted by them are reset after each test.
 
