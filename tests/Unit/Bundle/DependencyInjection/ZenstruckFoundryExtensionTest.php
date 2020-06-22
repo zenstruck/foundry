@@ -23,7 +23,6 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
     public function default_config(): void
     {
         $this->load();
-        $this->compile();
 
         $this->assertContainerBuilderHasService(Configuration::class);
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'setInstantiator', ['zenstruck_foundry.default_instantiator']);
@@ -54,7 +53,6 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
     public function custom_faker_service(): void
     {
         $this->load(['faker' => ['service' => 'my_faker']]);
-        $this->compile();
 
         $this->assertContainerBuilderHasService(Configuration::class);
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'setFaker', ['zenstruck_foundry.faker']);
@@ -82,7 +80,6 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
             'allow_extra_attributes' => true,
             'always_force_properties' => true,
         ]]);
-        $this->compile();
 
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('zenstruck_foundry.default_instantiator', 'withoutConstructor');
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('zenstruck_foundry.default_instantiator', 'allowExtraAttributes');
@@ -95,7 +92,6 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
     public function custom_instantiator_service(): void
     {
         $this->load(['instantiator' => ['service' => 'my_instantiator']]);
-        $this->compile();
 
         $this->assertContainerBuilderHasService(Configuration::class);
         $this->assertContainerBuilderHasAlias('zenstruck_foundry.default_instantiator', 'my_instantiator');
