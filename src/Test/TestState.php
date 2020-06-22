@@ -17,6 +17,7 @@ final class TestState
     private static $instantiator;
     private static ?Faker\Generator $faker = null;
     private static bool $useBundle = true;
+    private static array $globalStates = [];
 
     public static function setInstantiator(callable $instantiator): void
     {
@@ -33,6 +34,14 @@ final class TestState
         self::$useBundle = false;
     }
 
+    public static function addGlobalState(callable $callback): void
+    {
+        self::$globalStates[] = $callback;
+    }
+
+    /**
+     * @internal
+     */
     public static function bootFactory(ContainerInterface $container): Manager
     {
         $manager = self::$useBundle ? $container->get(Manager::class) : new Manager($container->get('doctrine'), new StoryManager([]));
@@ -48,5 +57,19 @@ final class TestState
         Factory::boot($manager);
 
         return $manager;
+    }
+
+    /**
+     * @internal
+     */
+    public static function flushGlobalState(): void
+    {
+        StoryManager::globalReset();
+
+        foreach (self::$globalStates as $callback) {
+            $callback();
+        }
+
+        StoryManager::setGlobalState();
     }
 }
