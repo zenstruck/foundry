@@ -75,10 +75,11 @@ public function test_can_post_a_comment(): void
     4. [Initialize](#initialize)
 7. [Stories](#stories)
 8. [Global State](#global-state)
-9. [Performance Considerations](#performance-considerations)
+9. [Full Default Bundle Configuration](#full-default-bundle-configuration)
+10. [Performance Considerations](#performance-considerations)
     1. [DAMADoctrineTestBundle](#damadoctrinetestbundle)
     2. [Miscellaneous](#miscellaneous) 
-10. [Credit](#credit)
+11. [Credit](#credit)
 
 ### Installation
 
@@ -149,7 +150,14 @@ faker()->email; // random email
 
 **NOTE**: You can register your own `Faker\Generator`:
 
-**TODO**
+```yaml
+# config/packages/dev/zenstruck_foundry.yaml and/or config/packages/test/zenstruck_foundry.yaml
+zenstruck_foundry:
+    faker:
+        locale: fr_FR # set the locale
+        # or
+        service: my_faker # use your own instance of Faker\Generator for complete control
+```
 
 ### Sample Entities
 
@@ -476,7 +484,16 @@ use Zenstruck\Foundry\Factory;
 You can also customize the instantiator globally for all your factories (can still be overruled by factory instance
 instantiators):
 
-**TODO**
+```yaml
+# config/packages/dev/zenstruck_foundry.yaml and/or config/packages/test/zenstruck_foundry.yaml
+zenstruck_foundry:
+    instantiator:
+        without_constructor: true # always instantiate objects without calling the constructor
+        allow_extra_attributes: true # always ignore extra attributes
+        always_force_properties: true # always "force set" properties
+        # or
+        service: my_instantiator # your own invokable service for complete control
+```
 
 #### Immutable
 
@@ -853,6 +870,36 @@ Zenstruck\Foundry\Test\TestState::addGlobalState(function () {
 ```
 
 **NOTE**: You can still access *Global State Stories* objects in your tests. They are still only loaded once.
+
+### Full Default Bundle Configuration
+
+```yaml
+zenstruck_foundry:
+
+    # Configure faker to be used by your factories.
+    faker:
+
+        # Change the default faker locale.
+        locale:               null # Example: fr_FR
+
+        # Customize the faker service.
+        service:              null # Example: my_faker
+
+    # Configure the default instantiator used by your factories.
+    instantiator:
+
+        # Whether or not to call an object's constructor during instantiation.
+        without_constructor:  null
+
+        # Whether or not to allow extra attributes.
+        allow_extra_attributes: null
+
+        # Whether or not to skip setters and force set object properties (public/private/protected) directly.
+        always_force_properties: null
+
+        # Customize the instantiator service.
+        service:              null # Example: my_instantiator
+```
 
 ### Performance Considerations
 

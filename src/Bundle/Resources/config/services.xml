@@ -5,13 +5,33 @@
         https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="zenstruck_foundry.default_instantiator" class="Zenstruck\Foundry\Instantiator" />
+        <service id="zenstruck_foundry.faker" class="Faker\Generator">
+            <factory class="Faker\Factory" method="create" />
+        </service>
+
         <service id="Zenstruck\Foundry\Configuration" public="true">
             <argument type="service" id="doctrine" />
             <argument type="service" id="Zenstruck\Foundry\StoryManager" />
+            <call method="setInstantiator">
+                <argument type="service" id="zenstruck_foundry.default_instantiator" />
+            </call>
+            <call method="setFaker">
+                <argument type="service" id="zenstruck_foundry.faker" />
+            </call>
         </service>
 
         <service id="Zenstruck\Foundry\StoryManager">
             <argument type="tagged_iterator" tag="foundry.story" />
+        </service>
+
+        <service id="Zenstruck\Foundry\Bundle\Maker\MakeFactory">
+            <argument type="service" id="Doctrine\Persistence\ManagerRegistry" />
+            <tag name="maker.command" />
+        </service>
+
+        <service id="Zenstruck\Foundry\Bundle\Maker\MakeStory">
+            <tag name="maker.command" />
         </service>
     </services>
 </container>
