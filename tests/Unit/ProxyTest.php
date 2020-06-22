@@ -73,7 +73,7 @@ final class ProxyTest extends UnitTestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        $this->manager->setManagerRegistry($registry);
+        $this->configuration->setManagerRegistry($registry);
 
         $category = new Proxy(new Category());
 

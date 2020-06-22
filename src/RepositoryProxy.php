@@ -115,7 +115,7 @@ final class RepositoryProxy implements ObjectRepository
      */
     public function truncate(): void
     {
-        $om = Factory::manager()->objectManagerFor($this->getClassName());
+        $om = Factory::configuration()->objectManagerFor($this->getClassName());
 
         if (!$om instanceof EntityManagerInterface) {
             throw new \RuntimeException('This operation is only available when using doctrine/orm');

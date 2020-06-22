@@ -5,7 +5,7 @@
         https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="Zenstruck\Foundry\Manager" public="true">
+        <service id="Zenstruck\Foundry\Configuration" public="true">
             <argument type="service" id="doctrine" />
             <argument type="service" id="Zenstruck\Foundry\StoryManager" />
         </service>

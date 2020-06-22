@@ -4,8 +4,8 @@ namespace Zenstruck\Foundry\Tests;
 
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
+use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\Manager;
 use Zenstruck\Foundry\StoryManager;
 
 /**
@@ -13,7 +13,7 @@ use Zenstruck\Foundry\StoryManager;
  */
 abstract class UnitTestCase extends TestCase
 {
-    protected ?Manager $manager = null;
+    protected ?Configuration $configuration = null;
 
     /**
      * @before
@@ -29,6 +29,6 @@ abstract class UnitTestCase extends TestCase
         $reset(StoryManager::class, 'globalInstances', []);
         $reset(StoryManager::class, 'instances', []);
 
-        Factory::boot($this->manager = new Manager($this->createMock(ManagerRegistry::class), new StoryManager([])));
+        Factory::boot($this->configuration = new Configuration($this->createMock(ManagerRegistry::class), new StoryManager([])));
     }
 }
