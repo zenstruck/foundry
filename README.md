@@ -835,7 +835,7 @@ If you have an initial database state you want for all tests, you can set this i
 // tests/bootstrap.php
 // ...
 
-Zenstruck\Foundry\Test\GlobalState::add(function () {
+Zenstruck\Foundry\Test\TestState::addGlobalState(function () {
     CategoryFactory::create(['name' => 'php']);
     CategoryFactory::create(['name' => 'symfony']);
 });
@@ -847,7 +847,7 @@ To avoid your boostrap file from becoming too complex, it is best to wrap your g
 // tests/bootstrap.php
 // ...
 
-Zenstruck\Foundry\Test\GlobalState::add(function () {
+Zenstruck\Foundry\Test\TestState::addGlobalState(function () {
     GlobalStory::load();
 });
 ```
