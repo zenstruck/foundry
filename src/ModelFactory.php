@@ -58,9 +58,7 @@ abstract class ModelFactory extends Factory
     }
 
     /**
-     * Get a random persisted object.
-     *
-     * @return Proxy|object
+     * @see RepositoryProxy::random()
      */
     final public static function random(): Proxy
     {
@@ -68,14 +66,19 @@ abstract class ModelFactory extends Factory
     }
 
     /**
-     * @param int      $min The minimum number of objects to return (if max is null, will always return this amount)
-     * @param int|null $max The max number of objects to return
-     *
-     * @return Proxy[]|object[]
+     * @see RepositoryProxy::randomSet()
      */
-    final public static function randomSet(int $min, ?int $max = null): array
+    final public static function randomSet(int $number): array
     {
-        return static::repository()->randomSet($min, $max);
+        return static::repository()->randomSet($number);
+    }
+
+    /**
+     * @see RepositoryProxy::randomRange()
+     */
+    final public static function randomRange(int $min, int $max): array
+    {
+        return static::repository()->randomRange($min, $max);
     }
 
     final public static function repository(): RepositoryProxy

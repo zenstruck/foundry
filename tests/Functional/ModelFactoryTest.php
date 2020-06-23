@@ -89,14 +89,14 @@ final class ModelFactoryTest extends FunctionalTestCase
     /**
      * @test
      */
-    public function can_find_random_set_of_objects_with_min_and_max(): void
+    public function can_find_random_range_of_objects(): void
     {
         CategoryFactory::new()->createMany(5);
 
         $counts = [];
 
         while (4 !== \count(\array_unique($counts))) {
-            $counts[] = \count(CategoryFactory::randomSet(0, 3));
+            $counts[] = \count(CategoryFactory::randomRange(0, 3));
         }
 
         $this->assertCount(4, \array_unique($counts));
