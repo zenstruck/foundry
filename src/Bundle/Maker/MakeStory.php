@@ -10,6 +10,7 @@ use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -26,6 +27,7 @@ final class MakeStory extends AbstractMaker
         $command
             ->setDescription('Creates a factory story')
             ->addArgument('name', InputArgument::OPTIONAL, 'The name of the story class (e.g. <fg=yellow>DefaultCategoriesStory</>)')
+            ->addOption('test', null, InputOption::VALUE_NONE, 'Create in <fg=yellow>tests/</> instead of <fg=yellow>src/</>')
         ;
     }
 
@@ -33,7 +35,7 @@ final class MakeStory extends AbstractMaker
     {
         $storyClassNameDetails = $generator->createClassNameDetails(
             $input->getArgument('name'),
-            'Tests\\Stories\\',
+            $input->getOption('test') ? 'Tests\\Stories' : 'Stories',
             'Story'
         );
 

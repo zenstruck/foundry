@@ -638,12 +638,17 @@ Create a model factory for one of your entities with the maker command:
 
     $ bin/console make:factory Post
 
-**NOTE**: Calling `make:factory` without arguments displays a list of registered entities in your app to choose from.
+**NOTES**:
+
+1. Creates `PostFactory.php` in `src/Factories`, add `--test` flag to create in `tests/Factories`.
+2. Calling `make:factory` without arguments displays a list of registered entities in your app to choose from.
 
 Customize the generated model factory (if not using the maker command, this is what you will need to create manually):
 
 ```php
-namespace App\Tests\Factories;
+// src/Factories/PostFactory.php
+
+namespace App\Factories;
 
 use App\Entity\Post;
 use App\Repository\PostRepository;
@@ -687,7 +692,7 @@ Model factories extend `Zenstruck/Foundry/Factory` so all [methods and functiona
 available.
 
 ```php
-use App\Tests\Factories\PostFactory;
+use App\Factories\PostFactory;
 
 $post = PostFactory::new()->create(); // Proxy with random data from `getDefaults()`
 
@@ -724,7 +729,7 @@ You can add any methods you want to your model factories (ie static methods that
 you can add "states":
 
 ```php
-namespace App\Tests\Factories;
+namespace App\Factories;
 
 use App\Entity\Post;
 use Zenstruck\Foundry\ModelFactory;
@@ -785,7 +790,7 @@ $post = PostFactory::new('published', 'withViewCount')->create();
 You can override your model factory's `initialize()` method to add default state/logic:
 
 ```php
-namespace App\Tests\Factories;
+namespace App\Factories;
 
 use App\Entity\Post;
 use Zenstruck\Foundry\ModelFactory;
@@ -817,17 +822,21 @@ Create a story using the maker command:
 
     $ bin/console make:story Post
 
-This creates a *Story* object in `tests/Stories`. Modify the *build* method to set the state for this story:
+**NOTE**: Creates `PostStory.php` in `src/Stories`, add `--test` flag to create in `tests/Stories`.
+
+Modify the *build* method to set the state for this story:
 
 ```php
-namespace App\Tests\Stories;
+// src/Stories/PostStory.php
 
-use App\Tests\Factories\PostFactory;
+namespace App\Stories;
+
+use App\Factories\PostFactory;
 use Zenstruck\Foundry\Story;
 
 final class PostStory extends Story
 {
-    protected function build(): void
+    public function build(): void
     {
         // use "add" to have the object managed by the story and can be accessed in
         // tests and other stories via PostStory::postA()
