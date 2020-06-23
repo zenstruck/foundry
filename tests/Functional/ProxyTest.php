@@ -119,7 +119,7 @@ final class ProxyTest extends FunctionalTestCase
         $this->assertSame('old body', $post->getBody());
 
         $post
-            ->withoutAutoRefresh()
+            ->disableAutoRefresh()
             ->forceSet('title', 'new title')
             ->forceSet('body', 'new body')
             ->save()
