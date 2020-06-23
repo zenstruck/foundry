@@ -126,7 +126,7 @@ class Factory
     /**
      * @param callable $instantiator (array $attributes, string $class): object
      */
-    final public function instantiator(callable $instantiator): self
+    final public function instantiateWith(callable $instantiator): self
     {
         $cloned = clone $this;
         $cloned->instantiator = $instantiator;
