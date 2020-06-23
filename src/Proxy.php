@@ -148,7 +148,7 @@ final class Proxy
         return Factory::configuration()->repositoryFor($this->class);
     }
 
-    public function withAutoRefresh(): self
+    public function enableAutoRefresh(): self
     {
         if (!$this->persisted) {
             throw new \RuntimeException(\sprintf('Cannot enable auto-refresh on unpersisted object (%s).', $this->class));
@@ -159,11 +159,20 @@ final class Proxy
         return $this;
     }
 
-    public function withoutAutoRefresh(): self
+    public function disableAutoRefresh(): self
     {
         $this->autoRefresh = false;
 
         return $this;
+    }
+
+    public function withoutAutoRefresh(callable $callback): self
+    {
+        $this->disableAutoRefresh();
+
+        $this->executeCallback($callback);
+
+        return $this->isPersisted() ? $this->enableAutoRefresh() : $this;
     }
 
     public function assertPersisted(): self
@@ -180,6 +189,21 @@ final class Proxy
         Assert::assertNull($this->fetchObject(), 'The object is persisted but it should not be.');
 
         return $this;
+    }
+
+    /**
+     * @internal
+     */
+    public function executeCallback(callable $callback, ...$arguments): void
+    {
+        $object = $this;
+        $parameters = (new \ReflectionFunction($callback))->getParameters();
+
+        if (isset($parameters[0]) && $parameters[0]->getType() && $this->class === $parameters[0]->getType()->getName()) {
+            $object = $object->object();
+        }
+
+        $callback($object, ...$arguments);
     }
 
     /**

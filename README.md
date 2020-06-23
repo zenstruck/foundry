@@ -519,6 +519,7 @@ with your "post-act" test assertions. Almost all calls to Proxy methods, first r
 
 ```php
 use App\Entity\Post;
+use Zenstruck\Foundry\Proxy;
 use function Zenstruck\Foundry\create;
 
 $post = create(Post::class, ['title' => 'My Title']); // instance of Zenstruck\Foundry\Proxy
@@ -542,13 +543,27 @@ $post->save();
 
 /**
  * CAVEAT - When calling multiple methods that change the object state, the previous state will be lost because
- * of auto-refreshing. Use "withoutAutoRefresh()" to overcome this.
+ * of auto-refreshing. Use "disableAutoRefresh()" or "withoutAutoRefresh()" to overcome this.
  */
-$post->withoutAutoRefresh();    // disable auto-refreshing
+$post->disableAutoRefresh();    // disable auto-refreshing
 $post->refresh();               // manually refresh
 $post->setTitle('New Title');   // won't be auto-refreshed
 $post->setBody('New Body');     // won't be auto-refreshed
 $post->save();                  // save changes (auto-refreshing re-enabled)
+
+// alternatively, use "withAutoRefresh()" - auto-refreshing disabled before running callback and re-enabled after
+$post->withoutAutoRefresh(function(Proxy $post) {
+    /* @var Post $post */
+    $post->setTitle('New Title');
+    $post->setBody('New Body');
+    $post->save();
+});
+
+// if the first argument is type-hinted as the wrapped object, it will be passed to the closure (and not the proxy)
+$post->withoutAutoRefresh(function(Post $post) {
+    $post->setTitle('New Title');
+    $post->setBody('New Body');
+})->save();
 
 // set private/protected properties
 $post->forceSet('createdAt', new \DateTime()); 
@@ -557,7 +572,8 @@ $post->forceSet('created-at', new \DateTime()); // can use kebab case
 
 /**
  * CAVEAT - When force setting multiple properties, the previous set's changes will be lost because
- * of auto-refreshing. Use "withoutAutoRefresh()" (shown above) or "forceSetAll()" to overcome this.
+ * of auto-refreshing. Use "disableAutoRefresh()"/"withoutAutoRefresh()" (shown above) or "forceSetAll()"
+ * to overcome this.
  */
 $post->forceSetAll([
     'title' => 'Different title',

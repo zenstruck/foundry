@@ -255,7 +255,7 @@ final class FactoryTest extends UnitTestCase
         $object = (new Factory(Post::class))->create(['title' => 'title', 'body' => 'body']);
 
         $this->assertInstanceOf(Proxy::class, $object);
-        $this->assertSame('title', $object->withoutAutoRefresh()->getTitle());
+        $this->assertSame('title', $object->disableAutoRefresh()->getTitle());
     }
 
     /**
@@ -279,9 +279,9 @@ final class FactoryTest extends UnitTestCase
         $this->assertInstanceOf(Proxy::class, $objects[0]);
         $this->assertInstanceOf(Proxy::class, $objects[1]);
         $this->assertInstanceOf(Proxy::class, $objects[2]);
-        $this->assertSame('title', $objects[0]->withoutAutoRefresh()->getTitle());
-        $this->assertSame('title', $objects[1]->withoutAutoRefresh()->getTitle());
-        $this->assertSame('title', $objects[2]->withoutAutoRefresh()->getTitle());
+        $this->assertSame('title', $objects[0]->disableAutoRefresh()->getTitle());
+        $this->assertSame('title', $objects[1]->disableAutoRefresh()->getTitle());
+        $this->assertSame('title', $objects[2]->disableAutoRefresh()->getTitle());
     }
 
     /**
@@ -322,13 +322,18 @@ final class FactoryTest extends UnitTestCase
                 $post->increaseViewCount();
                 ++$calls;
             })
+            ->afterPersist(function($post) use (&$calls) {
+                $this->assertInstanceOf(Proxy::class, $post);
+
+                ++$calls;
+            })
             ->afterPersist(static function() use (&$calls) {
                 ++$calls;
             })
             ->create($attributesArray)
         ;
 
-        $this->assertSame(3, $object->withoutAutoRefresh()->getViewCount());
-        $this->assertSame(4, $calls);
+        $this->assertSame(3, $object->disableAutoRefresh()->getViewCount());
+        $this->assertSame(5, $calls);
     }
 }

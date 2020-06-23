@@ -83,4 +83,31 @@ final class ProxyTest extends UnitTestCase
 
         $this->assertTrue($category->isPersisted());
     }
+
+    /**
+     * @test
+     */
+    public function can_use_without_auto_refresh_with_proxy_or_object_typehint(): void
+    {
+        $proxy = new Proxy(new Category());
+        $calls = 0;
+
+        $proxy
+            ->withoutAutoRefresh(static function(Proxy $proxy) use (&$calls) {
+                ++$calls;
+            })
+            ->withoutAutoRefresh(static function(Category $category) use (&$calls) {
+                ++$calls;
+            })
+            ->withoutAutoRefresh(function($proxy) use (&$calls) {
+                $this->assertInstanceOf(Proxy::class, $proxy);
+                ++$calls;
+            })
+            ->withoutAutoRefresh(static function() use (&$calls) {
+                ++$calls;
+            })
+        ;
+
+        $this->assertSame(4, $calls);
+    }
 }
