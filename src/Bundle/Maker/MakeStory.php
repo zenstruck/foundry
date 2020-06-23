@@ -35,7 +35,7 @@ final class MakeStory extends AbstractMaker
     {
         $storyClassNameDetails = $generator->createClassNameDetails(
             $input->getArgument('name'),
-            $input->getOption('test') ? 'Tests\\Stories' : 'Stories',
+            $input->getOption('test') ? 'Tests\\Story' : 'Story',
             'Story'
         );
 
