@@ -33,6 +33,11 @@ final class MakeStory extends AbstractMaker
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
+        if (!$input->getOption('test')) {
+            $io->text('// Note: pass <fg=yellow>--test</> if you want to generate stories in your <fg=yellow>tests/</> directory');
+            $io->newLine();
+        }
+
         $storyClassNameDetails = $generator->createClassNameDetails(
             $input->getArgument('name'),
             $input->getOption('test') ? 'Tests\\Story' : 'Story',
