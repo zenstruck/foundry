@@ -12,6 +12,7 @@ use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -35,6 +36,7 @@ final class MakeFactory extends AbstractMaker
         $command
             ->setDescription('Creates a custom factory for a Doctrine entity class')
             ->addArgument('entity', InputArgument::OPTIONAL, 'Entity class to create a factory for')
+            ->addOption('test', null, InputOption::VALUE_NONE, 'Create in <fg=yellow>tests/</> instead of <fg=yellow>src/</>')
         ;
 
         $inputConfig->setArgumentAsNonInteractive('entity');
@@ -67,7 +69,7 @@ final class MakeFactory extends AbstractMaker
         $entity = new \ReflectionClass($class);
         $factory = $generator->createClassNameDetails(
             $entity->getShortName(),
-            'Tests\\Factories\\',
+            $input->getOption('test') ? 'Tests\\Factories' : 'Factories',
             'Factory'
         );
 
