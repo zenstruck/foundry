@@ -50,11 +50,11 @@ abstract class ModelFactory extends Factory
      */
     final public static function findOrCreate(array $attributes): Proxy
     {
-        if ($found = self::repository()->find($attributes)) {
+        if ($found = static::repository()->find($attributes)) {
             return $found;
         }
 
-        return self::new()->create($attributes);
+        return static::new()->create($attributes);
     }
 
     /**
@@ -64,7 +64,7 @@ abstract class ModelFactory extends Factory
      */
     final public static function random(): Proxy
     {
-        return self::repository()->random();
+        return static::repository()->random();
     }
 
     /**
@@ -75,12 +75,12 @@ abstract class ModelFactory extends Factory
      */
     final public static function randomSet(int $min, ?int $max = null): array
     {
-        return self::repository()->randomSet($min, $max);
+        return static::repository()->randomSet($min, $max);
     }
 
     final public static function repository(): RepositoryProxy
     {
-        return self::configuration()->repositoryFor(static::getClass());
+        return static::configuration()->repositoryFor(static::getClass());
     }
 
     /**
