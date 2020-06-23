@@ -125,7 +125,11 @@ final class RepositoryProxy implements ObjectRepository
     }
 
     /**
+     * Fetch one random object.
+     *
      * @return Proxy|object
+     *
+     * @throws \RuntimeException if no objects are persisted
      */
     public function random(): Proxy
     {
@@ -133,8 +137,29 @@ final class RepositoryProxy implements ObjectRepository
     }
 
     /**
-     * @param int      $min The minimum number of objects to return (if max is null, will always return this amount)
-     * @param int|null $max The max number of objects to return
+     * Fetch a random set of objects.
+     *
+     * @param int $number The number of objects to return
+     *
+     * @return Proxy[]|object[]
+     *
+     * @throws \RuntimeException         if not enough persisted objects to satisfy the number requested
+     * @throws \InvalidArgumentException if number is less than zero
+     */
+    public function randomSet(int $number): array
+    {
+        if ($number < 0) {
+            throw new \InvalidArgumentException(\sprintf('$number must be positive (%d given).', $number));
+        }
+
+        return $this->randomRange($number, $number);
+    }
+
+    /**
+     * Fetch a random range of objects.
+     *
+     * @param int $min The minimum number of objects to return
+     * @param int $max The maximum number of objects to return
      *
      * @return Proxy[]|object[]
      *
@@ -142,18 +167,14 @@ final class RepositoryProxy implements ObjectRepository
      * @throws \InvalidArgumentException if min is less than zero
      * @throws \InvalidArgumentException if max is less than min
      */
-    public function randomSet(int $min, ?int $max = null): array
+    public function randomRange(int $min, int $max): array
     {
-        if (null === $max) {
-            $max = $min;
-        }
-
         if ($min < 0) {
-            throw new \InvalidArgumentException(\sprintf('Min must be positive (%d given).', $min));
+            throw new \InvalidArgumentException(\sprintf('$min must be positive (%d given).', $min));
         }
 
         if ($max < $min) {
-            throw new \InvalidArgumentException(\sprintf('Max (%d) cannot be less than min (%d).', $max, $min));
+            throw new \InvalidArgumentException(\sprintf('$max (%d) cannot be less than $min (%d).', $max, $min));
         }
 
         $all = \array_values($this->findAll());
