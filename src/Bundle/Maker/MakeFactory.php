@@ -69,7 +69,7 @@ final class MakeFactory extends AbstractMaker
         $entity = new \ReflectionClass($class);
         $factory = $generator->createClassNameDetails(
             $entity->getShortName(),
-            $input->getOption('test') ? 'Tests\\Factories' : 'Factories',
+            $input->getOption('test') ? 'Tests\\Factory' : 'Factory',
             'Factory'
         );
 
