@@ -91,7 +91,7 @@ final class FactoryTest extends UnitTestCase
         $attributeArray = ['title' => 'original title', 'body' => 'original body'];
 
         $object = (new Factory(Post::class))
-            ->instantiator(function(array $attributes, string $class) use ($attributeArray) {
+            ->instantiateWith(function(array $attributes, string $class) use ($attributeArray) {
                 $this->assertSame(Post::class, $class);
                 $this->assertSame($attributes, $attributeArray);
 
@@ -231,7 +231,7 @@ final class FactoryTest extends UnitTestCase
 
         $this->assertNotSame(\spl_object_id($factory->withAttributes([])), $objectId);
         $this->assertNotSame(\spl_object_id($factory->withoutPersisting()), $objectId);
-        $this->assertNotSame(\spl_object_id($factory->instantiator(function() {})), $objectId);
+        $this->assertNotSame(\spl_object_id($factory->instantiateWith(function() {})), $objectId);
         $this->assertNotSame(\spl_object_id($factory->beforeInstantiate(function() {})), $objectId);
         $this->assertNotSame(\spl_object_id($factory->afterInstantiate(function() {})), $objectId);
         $this->assertNotSame(\spl_object_id($factory->afterPersist(function() {})), $objectId);

@@ -463,19 +463,19 @@ use Zenstruck\Foundry\Factory;
 // set the instantiator for the current factory
 (new Factory(Post::class))
     // instantiate the object without calling the constructor
-    ->instantiator((new Instantiator())->withoutConstructor())
+    ->instantiateWith((new Instantiator())->withoutConstructor())
 
     // extra attributes are ignored
-    ->instantiator((new Instantiator())->allowExtraAttributes())
+    ->instantiateWith((new Instantiator())->allowExtraAttributes())
 
     // never use setters, always "force set" properties (even private/protected, does not use setter)
-    ->instantiator((new Instantiator())->alwaysForceProperties())
+    ->instantiateWith((new Instantiator())->alwaysForceProperties())
 
     // can combine the different "modes"
-    ->instantiator((new Instantiator())->withoutConstructor()->allowExtraAttributes()->alwaysForceProperties())
+    ->instantiateWith((new Instantiator())->withoutConstructor()->allowExtraAttributes()->alwaysForceProperties())
 
     // the instantiator is just a callable, you can provide your own
-    ->instantiator(function(array $attibutes, string $class): object {
+    ->instantiateWith(function(array $attibutes, string $class): object {
         return new Post(); // ... your own logic
     })
 ;
@@ -505,7 +505,7 @@ use Zenstruck\Foundry\Factory;
 
 $factory = new Factory(Post::class);
 $factory->withAttributes([]); // new object
-$factory->instantiator(function () {}); // new object
+$factory->instantiateWith(function () {}); // new object
 $factory->beforeInstantiate(function () {}); // new object
 $factory->afterInstantiate(function () {}); // new object
 $factory->afterPersist(function () {}); // new object
@@ -782,7 +782,7 @@ final class PostFactory extends ModelFactory
     {
         return $this
             ->published() // published by default
-            ->instantiator(function (array $attributes) {
+            ->instantiateWith(function (array $attributes) {
                 return new Post(); // custom instantiation for this factory
             })
             ->afterPersist(function () {}) // default event for this factory
