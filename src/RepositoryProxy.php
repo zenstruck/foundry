@@ -14,7 +14,8 @@ use PHPUnit\Framework\Assert;
  */
 final class RepositoryProxy implements ObjectRepository
 {
-    private ObjectRepository $repository;
+    /** @var ObjectRepository */
+    private $repository;
 
     public function __construct(ObjectRepository $repository)
     {

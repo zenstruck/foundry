@@ -9,26 +9,29 @@ use Faker;
  */
 class Factory
 {
-    private static ?Configuration $configuration = null;
+    /** @var Configuration|null */
+    private static $configuration;
 
-    private string $class;
+    /** @var string */
+    private $class;
 
     /** @var callable|null */
     private $instantiator;
 
-    private bool $persist = true;
+    /** @var bool */
+    private $persist = true;
 
     /** @var array<array|callable> */
-    private array $attributeSet = [];
+    private $attributeSet = [];
 
     /** @var callable[] */
-    private array $beforeInstantiate = [];
+    private $beforeInstantiate = [];
 
     /** @var callable[] */
-    private array $afterInstantiate = [];
+    private $afterInstantiate = [];
 
     /** @var callable[] */
-    private array $afterPersist = [];
+    private $afterPersist = [];
 
     /**
      * @param array|callable $defaultAttributes
@@ -68,7 +71,12 @@ class Factory
      */
     final public function createMany(int $number, $attributes = []): array
     {
-        return \array_map(fn() => $this->create($attributes), \array_fill(0, $number, null));
+        return \array_map(
+            function() use ($attributes) {
+                return $this->create($attributes);
+            },
+            \array_fill(0, $number, null)
+        );
     }
 
     public function withoutPersisting(): self
@@ -187,7 +195,12 @@ class Factory
         }
 
         // filter each attribute to convert proxies and factories to objects
-        $attributes = \array_map(fn($value) => $this->normalizeAttribute($value), $attributes);
+        $attributes = \array_map(
+            function($value) {
+                return $this->normalizeAttribute($value);
+            },
+            $attributes,
+        );
 
         // instantiate the object with the users instantiator or if not set, the default instantiator
         $object = ($this->instantiator ?? self::configuration()->instantiator())($attributes, $this->class);
@@ -212,7 +225,12 @@ class Factory
 
         if (\is_array($value)) {
             // possible OneToMany/ManyToMany relationship
-            return \array_map(fn($value) => $this->normalizeAttribute($value), $value);
+            return \array_map(
+                function($value) {
+                    return $this->normalizeAttribute($value);
+                },
+                $value
+            );
         }
 
         if (!$value instanceof self) {

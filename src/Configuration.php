@@ -11,9 +11,14 @@ use Faker;
  */
 final class Configuration
 {
-    private ManagerRegistry $managerRegistry;
-    private StoryManager $stories;
-    private Faker\Generator $faker;
+    /** @var ManagerRegistry */
+    private $managerRegistry;
+
+    /** @var StoryManager */
+    private $stories;
+
+    /** @var Faker\Generator */
+    private $faker;
 
     /** @var callable */
     private $instantiator;

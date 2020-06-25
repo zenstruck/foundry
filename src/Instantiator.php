@@ -11,11 +11,17 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
  */
 final class Instantiator
 {
-    private static ?PropertyAccessor $propertyAccessor = null;
+    /** @var PropertyAccessor|null */
+    private static $propertyAccessor;
 
-    private bool $withoutConstructor = false;
-    private bool $allowExtraAttributes = false;
-    private bool $alwaysForceProperties = false;
+    /** @var bool */
+    private $withoutConstructor = false;
+
+    /** @var bool */
+    private $allowExtraAttributes = false;
+
+    /** @var bool */
+    private $alwaysForceProperties = false;
 
     public function __invoke(array $attributes, string $class): object
     {

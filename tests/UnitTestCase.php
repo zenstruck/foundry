@@ -13,7 +13,8 @@ use Zenstruck\Foundry\StoryManager;
  */
 abstract class UnitTestCase extends TestCase
 {
-    protected ?Configuration $configuration = null;
+    /** @var Configuration|null */
+    protected $configuration;
 
     /**
      * @before

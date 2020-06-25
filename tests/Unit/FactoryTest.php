@@ -22,7 +22,9 @@ final class FactoryTest extends UnitTestCase
     public function can_instantiate_object(): void
     {
         $attributeArray = ['title' => 'title', 'body' => 'body'];
-        $attributeCallback = fn(Faker\Generator $faker) => ['title' => 'title', 'body' => 'body'];
+        $attributeCallback = static function(Faker\Generator $faker) {
+            return ['title' => 'title', 'body' => 'body'];
+        };
 
         $this->assertSame('title', (new Factory(Post::class, $attributeArray))->withoutPersisting()->create()->getTitle());
         $this->assertSame('title', (new Factory(Post::class))->withoutPersisting()->create($attributeArray)->getTitle());
@@ -38,7 +40,9 @@ final class FactoryTest extends UnitTestCase
     public function can_instantiate_many_objects(): void
     {
         $attributeArray = ['title' => 'title', 'body' => 'body'];
-        $attributeCallback = fn(Faker\Generator $faker) => ['title' => 'title', 'body' => 'body'];
+        $attributeCallback = static function(Faker\Generator $faker) {
+            return ['title' => 'title', 'body' => 'body'];
+        };
 
         $objects = (new Factory(Post::class, $attributeArray))->withoutPersisting()->createMany(3);
 

@@ -56,6 +56,7 @@ final class ProxyTest extends FunctionalTestCase
 
     /**
      * @test
+     * @requires PHP >= 7.4
      */
     public function cannot_convert_to_string_if_underlying_object_cant(): void
     {
@@ -63,6 +64,15 @@ final class ProxyTest extends FunctionalTestCase
         $this->expectExceptionMessage(\sprintf('Proxied object "%s" cannot be converted to a string.', Category::class));
 
         (string) CategoryFactory::new()->create();
+    }
+
+    /**
+     * @test
+     * @requires PHP < 7.4
+     */
+    public function on_php_versions_less_than_7_4_if_underlying_object_is_missing_to_string_proxy_to_string_returns_note(): void
+    {
+        $this->assertSame('(no __toString)', (string) CategoryFactory::new()->create());
     }
 
     /**

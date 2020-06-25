@@ -10,10 +10,17 @@ use PHPUnit\Framework\Assert;
  */
 final class Proxy
 {
-    private object $object;
-    private string $class;
-    private bool $autoRefresh = false;
-    private bool $persisted = false;
+    /** @var object */
+    private $object;
+
+    /** @var string */
+    private $class;
+
+    /** @var bool */
+    private $autoRefresh = false;
+
+    /** @var bool */
+    private $persisted = false;
 
     public function __construct(object $object)
     {
@@ -49,6 +56,10 @@ final class Proxy
     public function __toString(): string
     {
         if (!\method_exists($this->object, '__toString')) {
+            if (\PHP_VERSION_ID < 70400) {
+                return '(no __toString)';
+            }
+
             throw new \RuntimeException(\sprintf('Proxied object "%s" cannot be converted to a string.', $this->class));
         }
 
