@@ -19,7 +19,8 @@ use Symfony\Component\Console\Input\InputOption;
  */
 final class MakeFactory extends AbstractMaker
 {
-    private ManagerRegistry $managerRegistry;
+    /** @var ManagerRegistry */
+    private $managerRegistry;
 
     public function __construct(ManagerRegistry $managerRegistry)
     {

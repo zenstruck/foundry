@@ -16,7 +16,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 final class DatabaseResetter
 {
-    private static bool $hasBeenReset = false;
+    /** @var bool */
+    private static $hasBeenReset = false;
 
     public static function hasBeenReset(): bool
     {

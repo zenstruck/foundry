@@ -15,9 +15,15 @@ final class TestState
 {
     /** @var callable|null */
     private static $instantiator;
-    private static ?Faker\Generator $faker = null;
-    private static bool $useBundle = true;
-    private static array $globalStates = [];
+
+    /** @var Faker\Generator|null */
+    private static $faker;
+
+    /** @var bool */
+    private static $useBundle = true;
+
+    /** @var callable[] */
+    private static $globalStates = [];
 
     public static function setInstantiator(callable $instantiator): void
     {

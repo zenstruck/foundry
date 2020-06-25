@@ -42,7 +42,12 @@ final class FactoryTest extends FunctionalTestCase
             ],
         ]);
 
-        $posts = \array_map(fn($post) => $post->getTitle(), $category->getPosts()->toArray());
+        $posts = \array_map(
+            static function($post) {
+                return $post->getTitle();
+            },
+            $category->getPosts()->toArray()
+        );
 
         $this->assertCount(2, $posts);
         $this->assertContains('Post A', $posts);
@@ -63,7 +68,12 @@ final class FactoryTest extends FunctionalTestCase
             ],
         ]);
 
-        $tags = \array_map(fn($tag) => $tag->getName(), $post->getTags()->toArray());
+        $tags = \array_map(
+            static function($tag) {
+                return $tag->getName();
+            },
+            $post->getTags()->toArray()
+        );
 
         $this->assertCount(2, $tags);
         $this->assertContains('Tag A', $tags);
@@ -83,7 +93,12 @@ final class FactoryTest extends FunctionalTestCase
             ],
         ]);
 
-        $posts = \array_map(fn($post) => $post->getTitle(), $tag->getPosts()->toArray());
+        $posts = \array_map(
+            static function($post) {
+                return $post->getTitle();
+            },
+            $tag->getPosts()->toArray()
+        );
 
         $this->assertCount(2, $posts);
         $this->assertContains('Post A', $posts);

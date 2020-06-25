@@ -279,11 +279,15 @@ use function Zenstruck\Foundry\instantiate_many;
 (new Factory(Post::class))->withoutPersisting()->create(['title' => 'Post A']); 
 
 // array of 6 Proxy objects (unpersisted) wrapping Post objects with random titles
-(new Factory(Post::class))->withoutPersisting()->createMany(6, fn() => ['title' => faker()->sentence]);
+(new Factory(Post::class))->withoutPersisting()->createMany(6, function() {
+    return ['title' => faker()->sentence];
+});
 
 // alternatively, use the helper functions
 instantiate(Post::class, ['title' => 'Post A']);
-instantiate_many(6, Post::class, fn() => ['title' => faker()->sentence]);
+instantiate_many(6, Post::class, function() {
+    return ['title' => faker()->sentence];
+});
 ```
 
 #### Persist
@@ -302,11 +306,15 @@ use function Zenstruck\Foundry\create_many;
 (new Factory(Post::class))->create(['title' => 'Post A']);
 
 // array of 6 Post Proxy objects with random titles
-(new Factory(Post::class))->createMany(6, fn() => ['title' => faker()->sentence]);
+(new Factory(Post::class))->createMany(6, function() {
+    return ['title' => faker()->sentence];
+});
 
 // alternatively, use the helper functions
 create(Post::class, ['title' => 'Post A']);
-create_many(6, Post::class, fn() => ['title' => faker()->sentence]);
+create_many(6, Post::class, function() {
+    return ['title' => faker()->sentence];
+});
 ```
 
 #### Attributes
@@ -337,7 +345,7 @@ $post = (new Factory(Post::class, ['title' => 'Post A']))
         // Proxies are automatically converted to their wrapped object
         'category' => create(Category::class, ['name' => 'symfony']),
     ])
-    ->withAttributes(fn() => ['createdAt' => Factory::faker()->dateTime])
+    ->withAttributes(function() { return ['createdAt' => Factory::faker()->dateTime]; })
     ->create(['title' => 'Different Title'])
 ;
 
@@ -433,7 +441,7 @@ use Zenstruck\Foundry\Proxy;
     })
     
     // multiple events are allowed
-    ->beforeInstantiate(fn($attributes) => $attributes)
+    ->beforeInstantiate(function($attributes) { return $attributes; })
     ->afterInstantiate(function() {})
     ->afterPersist(function() {})
 ;

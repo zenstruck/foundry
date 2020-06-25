@@ -8,7 +8,7 @@ namespace Zenstruck\Foundry;
 abstract class Story
 {
     /** @var array<string, Proxy> */
-    private array $objects = [];
+    private $objects = [];
 
     final public function __call(string $method, array $arguments)
     {

@@ -10,13 +10,13 @@ namespace Zenstruck\Foundry;
 final class StoryManager
 {
     /** @var array<string, Story> */
-    private static array $globalInstances = [];
+    private static $globalInstances = [];
 
     /** @var array<string, Story> */
-    private static array $instances = [];
+    private static $instances = [];
 
     /** @var Story[] */
-    private iterable $stories;
+    private $stories;
 
     /**
      * @param Story[] $stories

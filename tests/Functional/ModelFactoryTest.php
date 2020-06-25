@@ -83,7 +83,7 @@ final class ModelFactoryTest extends FunctionalTestCase
         $objects = CategoryFactory::randomSet(3);
 
         $this->assertCount(3, $objects);
-        $this->assertCount(3, \array_unique(\array_map(fn($category) => $category->getId(), $objects)));
+        $this->assertCount(3, \array_unique(\array_map(static function($category) { return $category->getId(); }, $objects)));
     }
 
     /**
