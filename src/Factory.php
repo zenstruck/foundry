@@ -199,7 +199,7 @@ class Factory
             function($value) {
                 return $this->normalizeAttribute($value);
             },
-            $attributes,
+            $attributes
         );
 
         // instantiate the object with the users instantiator or if not set, the default instantiator
