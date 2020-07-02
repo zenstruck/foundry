@@ -4,6 +4,7 @@ namespace Zenstruck\Foundry\Test;
 
 use Faker;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\StoryManager;
@@ -66,12 +67,18 @@ final class TestState
     public static function bootFromContainer(ContainerInterface $container): Configuration
     {
         if (self::$useBundle) {
-            // todo improve/catch service not found exception - foundry-bundle not installed/configured...
-            return self::bootFactory($container->get(Configuration::class));
+            try {
+                return self::bootFactory($container->get(Configuration::class));
+            } catch (NotFoundExceptionInterface $e) {
+                throw new \LogicException('Could not boot Foundry, is the ZenstruckFoundryBundle installed/configured?', 0, $e);
+            }
         }
 
-        // todo improve/catch service not found exception - doctrine-bundle not installed/configured...
-        return self::bootFactory(new Configuration($container->get('doctrine'), new StoryManager([])));
+        try {
+            return self::bootFactory(new Configuration($container->get('doctrine'), new StoryManager([])));
+        } catch (NotFoundExceptionInterface $e) {
+            throw new \LogicException('Could not boot Foundry, is the DoctrineBundle installed/configured?', 0, $e);
+        }
     }
 
     /**

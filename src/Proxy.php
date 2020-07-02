@@ -186,18 +186,16 @@ final class Proxy
         return $this->isPersisted() ? $this->enableAutoRefresh() : $this;
     }
 
-    public function assertPersisted(): self
+    public function assertPersisted(string $message = 'The object is not persisted.'): self
     {
-        // todo improve message
-        Assert::assertNotNull($this->fetchObject(), 'The object is not persisted.');
+        Assert::assertNotNull($this->fetchObject(), $message);
 
         return $this;
     }
 
-    public function assertNotPersisted(): self
+    public function assertNotPersisted(string $message = 'The object is persisted but it should not be.'): self
     {
-        // todo improve message
-        Assert::assertNull($this->fetchObject(), 'The object is persisted but it should not be.');
+        Assert::assertNull($this->fetchObject(), $message);
 
         return $this;
     }
@@ -217,9 +215,6 @@ final class Proxy
         $callback($object, ...$arguments);
     }
 
-    /**
-     * Todo - move to RepositoryProxy?
-     */
     private function fetchObject(): ?object
     {
         $id = $this->objectManager()->getClassMetadata($this->class)->getIdentifierValues($this->object);

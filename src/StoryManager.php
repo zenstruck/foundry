@@ -66,7 +66,6 @@ final class StoryManager
             }
         }
 
-        // todo better error if story has constructor argument(s) but not registered as a service
         return new $class();
     }
 }
