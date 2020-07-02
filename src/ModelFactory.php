@@ -18,7 +18,6 @@ abstract class ModelFactory extends Factory
      */
     final public static function new($defaultAttributes = [], string ...$states): self
     {
-        // todo - is this too magical?
         if (\is_string($defaultAttributes)) {
             $states = \array_merge([$defaultAttributes], $states);
             $defaultAttributes = [];

@@ -26,7 +26,7 @@ final class <?= $class_name ?> extends ModelFactory
     protected function getDefaults(): array
     {
         return [
-            // TODO add your default values here (link to docs)
+            // TODO add your default values here (https://github.com/zenstruck/foundry#model-factories)
         ];
     }
 

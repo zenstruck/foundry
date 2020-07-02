@@ -8,6 +8,6 @@ final class <?= $class_name ?> extends Story
 {
     public function build(): void
     {
-        // TODO build your story here (link to docs)
+        // TODO build your story here (https://github.com/zenstruck/foundry#stories)
     }
 }

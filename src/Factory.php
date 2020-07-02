@@ -156,7 +156,7 @@ class Factory
     final public static function configuration(): Configuration
     {
         if (!self::$configuration) {
-            throw new \RuntimeException('Factory not yet booted.'); // todo
+            throw new \RuntimeException('Foundry is not yet booted, is the ZenstruckFoundryBundle installed/configured?');
         }
 
         return self::$configuration;

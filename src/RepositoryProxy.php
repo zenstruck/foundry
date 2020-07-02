@@ -36,47 +36,42 @@ final class RepositoryProxy implements ObjectRepository
         return \count($this->findAll());
     }
 
-    public function assertEmpty(): self
+    public function assertEmpty(string $message = ''): self
     {
-        return $this->assertCount(0);
+        return $this->assertCount(0, $message);
     }
 
-    public function assertCount(int $expectedCount): self
+    public function assertCount(int $expectedCount, string $message = ''): self
     {
-        // todo add message
-        Assert::assertSame($expectedCount, $this->getCount());
+        Assert::assertSame($expectedCount, $this->getCount(), $message);
 
         return $this;
     }
 
-    public function assertCountGreaterThan(int $expected): self
+    public function assertCountGreaterThan(int $expected, string $message = ''): self
     {
-        // todo add message
-        Assert::assertGreaterThan($expected, $this->getCount());
+        Assert::assertGreaterThan($expected, $this->getCount(), $message);
 
         return $this;
     }
 
-    public function assertCountGreaterThanOrEqual(int $expected): self
+    public function assertCountGreaterThanOrEqual(int $expected, string $message = ''): self
     {
-        // todo add message
-        Assert::assertGreaterThanOrEqual($expected, $this->getCount());
+        Assert::assertGreaterThanOrEqual($expected, $this->getCount(), $message);
 
         return $this;
     }
 
-    public function assertCountLessThan(int $expected): self
+    public function assertCountLessThan(int $expected, string $message = ''): self
     {
-        // todo add message
-        Assert::assertLessThan($expected, $this->getCount());
+        Assert::assertLessThan($expected, $this->getCount(), $message);
 
         return $this;
     }
 
-    public function assertCountLessThanOrEqual(int $expected): self
+    public function assertCountLessThanOrEqual(int $expected, string $message = ''): self
     {
-        // todo add message
-        Assert::assertLessThanOrEqual($expected, $this->getCount());
+        Assert::assertLessThanOrEqual($expected, $this->getCount(), $message);
 
         return $this;
     }
@@ -84,10 +79,9 @@ final class RepositoryProxy implements ObjectRepository
     /**
      * @param object|array|mixed $criteria
      */
-    public function assertExists($criteria): self
+    public function assertExists($criteria, string $message = ''): self
     {
-        // todo add message
-        Assert::assertNotNull($this->find($criteria));
+        Assert::assertNotNull($this->find($criteria), $message);
 
         return $this;
     }
@@ -95,10 +89,9 @@ final class RepositoryProxy implements ObjectRepository
     /**
      * @param object|array|mixed $criteria
      */
-    public function assertNotExists($criteria): self
+    public function assertNotExists($criteria, string $message = ''): self
     {
-        // todo add message
-        Assert::assertNull($this->find($criteria));
+        Assert::assertNull($this->find($criteria), $message);
 
         return $this;
     }

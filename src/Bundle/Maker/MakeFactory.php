@@ -112,7 +112,6 @@ final class MakeFactory extends AbstractMaker
 
     private function entityChoices(): array
     {
-        // todo remove choices that already have a factory
         $choices = [];
 
         foreach ($this->managerRegistry->getManagers() as $manager) {

@@ -50,7 +50,7 @@ abstract class Story
     final public function get(string $name): Proxy
     {
         if (!\array_key_exists($name, $this->objects)) {
-            throw new \InvalidArgumentException('explain that object was not registered'); // todo
+            throw new \InvalidArgumentException(\sprintf('"%s" was not registered. Did you forget to call "%s::add()"?', $name, static::class));
         }
 
         return $this->objects[$name];
