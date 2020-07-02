@@ -76,10 +76,11 @@ public function test_can_post_a_comment(): void
 7. [Stories](#stories)
 8. [Global Test State](#global-test-state)
 9. [Full Default Bundle Configuration](#full-default-bundle-configuration)
-10. [Performance Considerations](#performance-considerations)
+10. [Using without the Bundle](#using-without-the-bundle)
+11. [Performance Considerations](#performance-considerations)
     1. [DAMADoctrineTestBundle](#damadoctrinetestbundle)
     2. [Miscellaneous](#miscellaneous) 
-11. [Credit](#credit)
+12. [Credit](#credit)
 
 ### Installation
 
@@ -933,6 +934,32 @@ zenstruck_foundry:
 
         # Customize the instantiator service.
         service:              null # Example: my_instantiator
+```
+
+### Using without the Bundle
+
+The provided bundle is not strictly required to use Foundry. You can have all your factories, stories, and configuration
+live in your `tests/` directory.
+
+The best place to configure Foundry without the bundle is in your `tests/bootstrap.php` file:
+
+```php
+// tests/bootstrap.php
+// ...
+
+// required when not using the bundle so the test traits know not to look for it.
+Zenstruck\Foundry\Test\TestState::withoutBundle();
+
+// configure a default instantiator
+Zenstruck\Foundry\Test\TestState::setInstantiator(
+    (new Zenstruck\Foundry\Instantiator())
+        ->withoutConstructor()
+        ->allowExtraAttributes()
+        ->alwaysForceProperties()
+);
+
+// configure a custom faker
+Zenstruck\Foundry\Test\TestState::setFaker(Faker\Factory::create('fr_FR'));
 ```
 
 ### Performance Considerations
