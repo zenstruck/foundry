@@ -74,7 +74,7 @@ public function test_can_post_a_comment(): void
     3. [States](#states)
     4. [Initialize](#initialize)
 7. [Stories](#stories)
-8. [Global State](#global-state)
+8. [Global Test State](#global-test-state)
 9. [Full Default Bundle Configuration](#full-default-bundle-configuration)
 10. [Performance Considerations](#performance-considerations)
     1. [DAMADoctrineTestBundle](#damadoctrinetestbundle)
@@ -878,7 +878,7 @@ public function test_using_story(): void
 
 **NOTE**: Story state and objects persisted by them are reset after each test.
 
-### Global State
+### Global Test State
 
 If you have an initial database state you want for all tests, you can set this in your `tests/bootstrap.php`:
 
@@ -949,7 +949,7 @@ Follow its documentation to install. Foundry's `ResetDatabase` trait detects whe
 accordingly. Your database is still reset before running your test suite but the schema isn't reset before each test
 (just the first).
 
-**NOTE**: If using [Global State](#global-state), it is persisted to the database (not in a transaction) before your
+**NOTE**: If using [Global Test State](#global-test-state), it is persisted to the database (not in a transaction) before your
 test suite is run. This could further improve test speed if you have a complex global state.
 
 #### Miscellaneous
