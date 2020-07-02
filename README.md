@@ -75,13 +75,14 @@ public function test_can_post_a_comment(): void
     4. [Initialize](#initialize)
 7. [Stories](#stories)
     1. [Stories as Services](#stories-as-services)
-8. [Global Test State](#global-test-state)
-9. [Full Default Bundle Configuration](#full-default-bundle-configuration)
-10. [Using without the Bundle](#using-without-the-bundle)
-11. [Performance Considerations](#performance-considerations)
+8. [Seeding your Development Database](#seeding-your-development-database)
+9. [Global Test State](#global-test-state)
+10. [Full Default Bundle Configuration](#full-default-bundle-configuration)
+11. [Using without the Bundle](#using-without-the-bundle)
+12. [Performance Considerations](#performance-considerations)
     1. [DAMADoctrineTestBundle](#damadoctrinetestbundle)
     2. [Miscellaneous](#miscellaneous) 
-12. [Credit](#credit)
+13. [Credit](#credit)
 
 ### Installation
 
@@ -880,7 +881,7 @@ public function test_using_story(): void
 
 **NOTE**: Story state and objects persisted by them are reset after each test.
 
-### Stories as Services
+#### Stories as Services
 
 If you stories require dependencies, you can define them as a service:
 
@@ -916,6 +917,51 @@ If using a standard Symfony Flex app, this will be autowired/autoconfigured but 
 with `foundry.story`.
 
 **NOTE:** The provided bundle is required for stories as services.
+
+### Seeding your Development Database
+
+Foundry works out of the box with [DoctrineFixturesBundle](https://symfony.com/doc/master/bundles/DoctrineFixturesBundle/index.html).
+You can simply use your factory's and story's right within your fixture files:
+
+```php
+// src/DataFixtures/AppFixtures.php
+namespace App\DataFixtures;
+
+use App\Factory\CategoryFactory;
+use App\Factory\PostFactory;
+use App\Factory\TagFactory;
+use App\Story\GlobalStory;
+use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Persistence\ObjectManager;
+
+class AppFixtures extends Fixture
+{
+    public function load(ObjectManager $manager)
+    {
+        GlobalStory::load();
+
+        // create 10 Category's
+        CategoryFactory::new()->createMany(10);
+
+        // create 20 Tag's
+        TagFactory::new()->createMany(20);
+
+        // create 50 Post's
+        PostFactory::new()->createMany(50, function() {
+            return [
+                // each Post will have a random Category (created above)
+                'category' => CategoryFactory::random(),
+
+                // each Post will between 0 and 6 Tag's (created above)
+                'tags' => TagFactory::randomRange(0, 6),
+            ];
+        });
+    }
+}
+```
+
+Run the [`doctrine:fixtures:load`](https://symfony.com/doc/master/bundles/DoctrineFixturesBundle/index.html#loading-fixtures)
+as normal to seed your database.
 
 ### Global Test State
 
