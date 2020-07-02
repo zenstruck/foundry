@@ -74,6 +74,7 @@ public function test_can_post_a_comment(): void
     3. [States](#states)
     4. [Initialize](#initialize)
 7. [Stories](#stories)
+    1. [Stories as Services](#stories-as-services)
 8. [Global Test State](#global-test-state)
 9. [Full Default Bundle Configuration](#full-default-bundle-configuration)
 10. [Using without the Bundle](#using-without-the-bundle)
@@ -878,6 +879,43 @@ public function test_using_story(): void
 ```
 
 **NOTE**: Story state and objects persisted by them are reset after each test.
+
+### Stories as Services
+
+If you stories require dependencies, you can define them as a service:
+
+```php
+// src/Story/PostStory.php
+
+namespace App\Story;
+
+use App\Factory\PostFactory;
+use App\Service\ServiceA;
+use App\Service\ServiceB;
+use Zenstruck\Foundry\Story;
+
+final class PostStory extends Story
+{
+    private $serviceA;
+    private $serviceB;
+
+    public function __construct(ServiceA $serviceA, ServiceB $serviceB)
+    {
+        $this->serviceA = $serviceA;
+        $this->serviceB = $serviceB;
+    }
+
+    public function build(): void
+    {
+        // can use $this->serviceA, $this->serviceB here to help build this story
+    }
+}
+```
+
+If using a standard Symfony Flex app, this will be autowired/autoconfigured but if not, register the service and tag
+with `foundry.story`.
+
+**NOTE:** The provided bundle is required for stories as services.
 
 ### Global Test State
 
