@@ -16,8 +16,6 @@ use Zenstruck\Foundry\Proxy;
  * @method static <?= $entity->getShortName() ?>[]|Proxy[] randomRange(int $min, int $max)
 <?php if ($repository): ?> * @method static <?= $repository->getShortName() ?>|RepositoryProxy repository()
 <?php endif ?>
- * @method <?= $entity->getShortName() ?> instantiate($attributes = [])
- * @method <?= $entity->getShortName() ?>[] instantiateMany(int $number, $attributes = [])
  * @method <?= $entity->getShortName() ?>|Proxy create($attributes = [])
  * @method <?= $entity->getShortName() ?>[]|Proxy[] createMany(int $number, $attributes = [])
  */

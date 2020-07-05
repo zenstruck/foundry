@@ -673,8 +673,6 @@ use Zenstruck\Foundry\Proxy;
  * @method static Post[]|Proxy[] randomSet(int $number)
  * @method static Post[]|Proxy[] randomRange(int $min, int $max)
  * @method static PostRepository|RepositoryProxy repository()
- * @method Post instantiate($attributes = [])
- * @method Post[] instantiateMany(int $number, $attributes = [])
  * @method Post|Proxy create($attributes = [])
  * @method Post[]|Proxy[] createMany(int $number, $attributes = [])
  */
