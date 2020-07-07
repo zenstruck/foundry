@@ -1,6 +1,6 @@
 {
     "name": "zenstruck/foundry",
-    "description": "A model factory library for creating expressive, auto-completable, on-demand test fixtures with Symfony and Doctrine.",
+    "description": "A model factory library for creating expressive, auto-completable, on-demand dev/test fixtures with Symfony and Doctrine.",
     "homepage": "https://github.com/zenstruck/foundry",
     "type": "symfony-bundle",
     "license": "MIT",
