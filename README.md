@@ -38,6 +38,7 @@ to load fixtures or inside your tests, [where it has even more features](#using-
     10. [Doctrine Relationships](#doctrine-relationships)
     11. [Anonymous Factories](#anonymous-factories)
 6. [Stories](#stories)
+    1. [Stories as Services](#stories-as-services)
 7. [Testing](#testing)
     1. [Auto-Refresh & Force Setting](#auto-refresh--force-setting)
     2. [Repository](#repository)
@@ -737,6 +738,43 @@ PostStory::postA()->getTitle(); // "Post A"
 ```
 
 **NOTE**: Story state and objects persisted by them are reset after each test.
+
+### Stories as Services
+
+If you stories require dependencies, you can define them as a service:
+
+```php
+// src/Story/PostStory.php
+
+namespace App\Story;
+
+use App\Factory\PostFactory;
+use App\Service\ServiceA;
+use App\Service\ServiceB;
+use Zenstruck\Foundry\Story;
+
+final class PostStory extends Story
+{
+    private $serviceA;
+    private $serviceB;
+
+    public function __construct(ServiceA $serviceA, ServiceB $serviceB)
+    {
+        $this->serviceA = $serviceA;
+        $this->serviceB = $serviceB;
+    }
+
+    public function build(): void
+    {
+        // can use $this->serviceA, $this->serviceB here to help build this story
+    }
+}
+```
+
+If using a standard Symfony Flex app, this will be autowired/autoconfigured. If not, register the service and tag
+with `foundry.story`.
+
+**NOTE:** The provided bundle is required for stories as services.
 
 ## Testing
 
