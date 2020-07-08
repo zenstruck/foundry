@@ -46,7 +46,8 @@ final class MakeStory extends AbstractMaker
 
         $generator->generateClass(
             $storyClassNameDetails->getFullName(),
-            __DIR__.'/../Resources/skeleton/Story.tpl.php'
+            __DIR__.'/../Resources/skeleton/Story.tpl.php',
+            []
         );
 
         $generator->writeChanges();

@@ -5,3 +5,4 @@
 /build/
 /.php_cs.cache
 /.phpunit.result.cache
+/tests/Fixtures/tmp
