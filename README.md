@@ -48,7 +48,7 @@ to load fixtures or inside your tests, [where it has even more features](#using-
     9. [Using without the Bundle](#using-without-the-bundle)
 7. [Stories](#stories)
     1. [Stories as Services](#stories-as-services)
-8. [Full Default Bundle Configuration](#full-default-bundle-configuration)
+8. [Bundle Configuration](#bundle-configuration)
 9. [Credit](#credit)
 
 ## Installation
@@ -382,7 +382,7 @@ faker()->email; // random email
 **NOTE**: You can register your own `Faker\Generator`:
 
 ```yaml
-# config/packages/dev/zenstruck_foundry.yaml and/or config/packages/test/zenstruck_foundry.yaml
+# config/packages/dev/zenstruck_foundry.yaml (see Bundle Configuration section about sharing this in the test environment)
 zenstruck_foundry:
     faker:
         locale: fr_FR # set the locale
@@ -519,7 +519,7 @@ You can customize the instantiator globally for all your factories (can still be
 instantiators):
 
 ```yaml
-# config/packages/dev/zenstruck_foundry.yaml and/or config/packages/test/zenstruck_foundry.yaml
+# config/packages/dev/zenstruck_foundry.yaml (see Bundle Configuration section about sharing this in the test environment)
 zenstruck_foundry:
     instantiator:
         without_constructor: true # always instantiate objects without calling the constructor
@@ -1087,7 +1087,28 @@ with `foundry.story`.
 
 **NOTE:** The provided bundle is required for stories as services.
 
-## Full Default Bundle Configuration
+## Bundle Configuration
+
+Since the bundle is intended to be used in your *dev* and *test* environments, you'll want the configuration
+for each environment to match. The easiest way to do this is have your *test* config, import *dev*. This
+way, there is just one place to set your config.
+
+```yaml
+# config/packages/dev/zenstruck_foundry.yaml
+
+zenstruck_foundry:
+    # ...
+```
+
+```yaml
+# config/packages/test/zenstruck_foundry.yaml
+
+# just import the dev config
+imports:
+    - { resource: ../dev/zenstruck_foundry.yaml }
+```
+
+### Full Default Bundle Configuration
 
 ```yaml
 zenstruck_foundry:
