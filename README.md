@@ -11,7 +11,7 @@ Symfony and Doctrine:
 $post = PostFactory::new() // Create the factory for Post objects
     ->published()          // Make the post in a "published" state
     ->create([             // create & persist the Post object
-        'slug' => 'post-a' // This test only requires the slug field - all other fields are random data
+        'slug' => 'post-a' // This Post object only requires the slug field - all other fields are random data
     ])
 ;
 ```
@@ -24,14 +24,14 @@ to load fixtures or inside your tests, [where it has even more features](#using-
 1. [Installation](#installation)
 2. [Using with DoctrineFixturesBundle](#using-with-doctrinefixturesbundle)
 3. [Using in your Tests](#using-in-your-tests)
-4. [Sample Entities](#sample-entities)
+4. [Same Entities used in these Docs](#same-entities-used-in-these-docs)
 5. [Model Factories](#model-factories)
     1. [Generate](#generate)
-    2. [Usage](#usage)
-    3. [States](#states)
+    2. [Using your Factory](#using-your-factory)
+    3. [Reusable Model Factory "States"](#reusable-model-factory-states)
     4. [Attributes](#attributes)
     5. [Faker](#faker)
-    6. [Events](#events)
+    6. [Events / Hooks](#events--hooks)
     7. [Instantiation](#instantiation)
     8. [Initialization](#initialization)
     9. [Immutable](#immutable)
@@ -55,7 +55,8 @@ to load fixtures or inside your tests, [where it has even more features](#using-
 
     $ composer require zenstruck/foundry --dev
 
-To use the *Maker's*, ensure [Symfony MakerBundle](https://symfony.com/doc/current/bundles/SymfonyMakerBundle/index.html)
+To use the `make:*` commands from this bundle, ensure
+[Symfony MakerBundle](https://symfony.com/doc/current/bundles/SymfonyMakerBundle/index.html)
 is installed.
 
 *If not using Symfony Flex, be sure to enable the bundle in your **test**/**dev** environments.*
@@ -63,7 +64,7 @@ is installed.
 ## Using with DoctrineFixturesBundle
 
 Foundry works out of the box with [DoctrineFixturesBundle](https://symfony.com/doc/master/bundles/DoctrineFixturesBundle/index.html).
-You can simply use your factory's and story's right within your fixture files:
+You can simply use your factories and stories right within your fixture files:
 
 ```php
 // src/DataFixtures/AppFixtures.php
@@ -80,8 +81,6 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager)
     {
-        GlobalStory::load();
-
         // create 10 Category's
         CategoryFactory::new()->createMany(10);
 
@@ -98,6 +97,8 @@ class AppFixtures extends Fixture
                 'tags' => TagFactory::randomRange(0, 6),
             ];
         });
+
+        GlobalStory::load();
     }
 }
 ```
@@ -155,7 +156,7 @@ public function test_can_post_a_comment(): void
 
 [More documentation for using Foundry in your tests...](#testing)
 
-## Sample Entities
+## Same Entities used in these Docs
 
 For the remainder of the documentation, the following sample entities will be used:
 
@@ -245,20 +246,26 @@ class Post
 
 ## Model Factories
 
-You can create custom model factories to add IDE auto-completion and other useful features.
+The nicest way to use Foundry is to generate one *factory* class per entity. You can skip this
+and use [anonymous factories](#anonymous-factories), but *model factories* give you IDE auto-completion
+and access to other useful features.
 
 ### Generate
 
 Create a model factory for one of your entities with the maker command:
 
-    $ bin/console make:factory Post
+```
+$ bin/console make:factory
 
-**NOTES**:
+> Entity class to create a factory for:
+> Post
 
-1. Creates `PostFactory.php` in `src/Factory`, add `--test` flag to create in `tests/Factory`.
-2. Calling `make:factory` without arguments displays a list of registered entities in your app to choose from.
+created: src/Factory/PostFactory.php
 
-Customize the generated model factory (if not using the maker command, this is what you will need to create manually):
+Next: Open your new factory and set default values/states.
+```
+
+This command will generate a `PostFactory` class that looks like this:
 
 ```php
 // src/Factory/PostFactory.php
@@ -285,8 +292,7 @@ final class PostFactory extends ModelFactory
     protected function getDefaults(): array
     {
         return [
-            'title' => self::faker()->unique()->sentence,
-            'body' => self::faker()->sentence,
+            // TODO add your default values here (https://github.com/zenstruck/foundry#model-factories)
         ];
     }
 
@@ -297,25 +303,44 @@ final class PostFactory extends ModelFactory
 }
 ```
 
-**TIP**: It is best to have `getDefaults()` return the attributes to persist a valid object (all non-nullable fields).
+In the `getDefaults()`, you can return an array of all default values that any new object
+should have. [Faker](#faker) is available to easily get random data:
 
-### Usage
+```php
+protected function getDefaults(): array
+{
+    return [
+        // Symfony's property-access component is used to populate the properties
+        // this means that setTitle() will be called or you can have a $title constructor argument
+        'title' => self::faker()->unique()->sentence,
+        'body' => self::faker()->sentence,
+    ];
+}
+```
+
+**TIP**: It is best to have `getDefaults()` return the attributes to persist a valid object
+(all non-nullable fields).
+
+### Using your Factory
 
 ```php
 use App\Factory\PostFactory;
 
 PostFactory::new()->create(); // create/persist Post with random data from `getDefaults()`
 
-// the create method actually returns a "Proxy" wrapping the Post, call ->object() to get the real Post object
-$post = PostFactory::new()->create()->object();
+// create() returns the persisted Post object wrapped in a Proxy object
+$post = PostFactory::new()->create();
 
 // the "Proxy" magically calls the underlying Post methods and is type-hinted to "Post"
-$title = PostFactory::new()->create()->getTitle(); // getTitle() can be autocompleted by your IDE!
+$title = $post->getTitle(); // getTitle() can be autocompleted by your IDE!
+
+// if you need the actual Post object, use ->object()
+$realPost = $post->object();
 
 PostFactory::new()->create(['title' => 'My Title']); // override defaults 
 PostFactory::new(['title' => 'My Title'])->create(); // alternative to above
 
-// create/persist 5 Posts with random data from `getDefaults()`
+// create/persist 5 Posts with random data from getDefaults()
 PostFactory::new()->createMany(5); // returns Post[]|Proxy[]
 
 PostFactory::new()->createMany(5, ['title' => 'My Title']); // override defaults 
@@ -336,12 +361,12 @@ $posts = PostFactory::randomRange(0, 5); // array containing 0-5 "Post|Proxy" ob
 // instantiate objects (without persisting)
 $post = PostFactory::new()->withoutPersisting()->create(); // returns Post|Proxy
 $post->setTitle('something else'); // do something with object
-$post->save(); // persist the Post
+$post->save(); // persist the Post (save() is a method on Proxy)
 
 $post = PostFactory::new()->withoutPersisting()->create()->object(); // actual Post object
 ```
 
-### States
+### Reusable Model Factory "States"
 
 You can add any methods you want to your model factories (ie static methods that create an object in a certain way) but
 you can also add *states*:
@@ -358,6 +383,7 @@ final class PostFactory extends ModelFactory
 
     public function published(): self
     {
+        // call setPublishedAt() and pass a random DateTime
         return $this->addState(['published_at' => self::faker()->dateTime]);
     }
 
@@ -430,7 +456,7 @@ $post->getTitle(); // "Different Title"
 $post->getBody(); // "Post A Body..."
 $post->getCategory()->getName(); // "symfony"
 $post->getPublishedAt(); // \DateTime('last week')
-$post->getCreatedAt(); // random \DateTime
+$post->getCreatedAt(); // random \DateTime (different for each item)
 ```
 
 ### Faker
@@ -459,7 +485,7 @@ zenstruck_foundry:
         service: my_faker # use your own instance of Faker\Generator for complete control
 ```
 
-### Events
+### Events / Hooks
 
 The following events can be added to factories. Multiple event callbacks can be added, they are run in the order
 they were added.
@@ -500,11 +526,25 @@ PostFactory::new()
 ;
 ```
 
+You can also add hooks directly in your model factory class:
+
+```php
+protected function initialize(): self
+{
+    $this->beforePersist(function() {});
+
+    return $this;
+}
+```
+
+Read [Initialization](#initialization) to learn more about the `initialize()` method.
+
 ### Instantiation
 
-By default, objects are instantiated with the object's constructor. Attributes that match constructor arguments are
-used. Remaining attributes are set to the object using Symfony's [PropertyAccess](https://symfony.com/doc/current/components/property_access.html)
-component (setters/public properties). Any extra attributes cause an exception to be thrown.
+By default, objects are instantiated in the normal fashion, but using the object's constructor. Attributes
+that match constructor arguments are used. Remaining attributes are set to the object using Symfony's
+[PropertyAccess](https://symfony.com/doc/current/components/property_access.html) component (setters/public
+properties). Any extra attributes cause an exception to be thrown.
 
 When using the default instantiator, there are two attribute key prefixes to change behavior:
 
@@ -592,11 +632,11 @@ Factory's are immutable:
 use App\Factory\PostFactory;
 
 $factory = PostFactory::new();
-$factory->withAttributes([]); // new object
-$factory->instantiateWith(function () {}); // new object
-$factory->beforeInstantiate(function () {}); // new object
-$factory->afterInstantiate(function () {}); // new object
-$factory->afterPersist(function () {}); // new object
+$factory1 = $factory->withAttributes([]); // returns a new PostFactory object
+$factory2 = $factory->instantiateWith(function () {}); // returns a new PostFactory object
+$factory3 = $factory->beforeInstantiate(function () {}); // returns a new PostFactory object
+$factory4 = $factory->afterInstantiate(function () {}); // returns a new PostFactory object
+$factory5 = $factory->afterPersist(function () {}); // returns a new PostFactory object
 ```
 
 ### Doctrine Relationships
@@ -814,7 +854,9 @@ By default, `ResetDatabase` resets the default configured connection's database 
 schema. To customize the connection's and object manager's to be reset (or reset multiple connections/managers), set the
 following environment variables:
 
-```.env.test
+```
+# .env.test
+
 FOUNDRY_RESET_CONNECTIONS=connection1,connection2
 FOUNDRY_RESET_OBJECT_MANAGERS=manager1,manager2
 ```
@@ -832,7 +874,7 @@ use Zenstruck\Foundry\Proxy;
 $post = PostFactory::new()->create(['title' => 'My Title']); // instance of Zenstruck\Foundry\Proxy
 
 // get the wrapped object
-$post->object(); // instance of Post
+$realPost = $post->object(); // instance of Post
 
 // delete from the database
 $post->remove();
