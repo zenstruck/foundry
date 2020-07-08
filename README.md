@@ -22,32 +22,32 @@ to load fixtures or inside your tests, [where it has even more features](#using-
 ## Documentation
 
 1. [Installation](#installation)
-2. [Using with DoctrineFixturesBundle](#using-with-doctrinefixturesbundle)
-3. [Using in your Tests](#using-in-your-tests)
-4. [Same Entities used in these Docs](#same-entities-used-in-these-docs)
-5. [Model Factories](#model-factories)
+2. [Same Entities used in these Docs](#same-entities-used-in-these-docs)
+3. [Model Factories](#model-factories)
     1. [Generate](#generate)
     2. [Using your Factory](#using-your-factory)
     3. [Reusable Model Factory "States"](#reusable-model-factory-states)
     4. [Attributes](#attributes)
     5. [Faker](#faker)
     6. [Events / Hooks](#events--hooks)
-    7. [Instantiation](#instantiation)
-    8. [Initialization](#initialization)
+    7. [Initialization](#initialization)
+    8. [Instantiation](#instantiation)
     9. [Immutable](#immutable)
     10. [Doctrine Relationships](#doctrine-relationships)
     11. [Anonymous Factories](#anonymous-factories)
-6. [Stories](#stories)
-    1. [Stories as Services](#stories-as-services)
-7. [Testing](#testing)
-    1. [Auto-Refresh & Force Setting](#auto-refresh--force-setting)
-    2. [Repository](#repository)
-    3. [Assertions](#assertions)
-    4. [Global State](#global-state)
-    5. [Performance](#performance)
+4. [Using with DoctrineFixturesBundle](#using-with-doctrinefixturesbundle)
+5. [Using in your Tests](#using-in-your-tests)
+    1. [Enable Foundry in your TestCase](#enable-foundry-in-your-testcase)
+    2. [Auto-Refresh & Force Setting](#auto-refresh--force-setting)
+    3. [Repository](#repository)
+    4. [Assertions](#assertions)
+    5. [Global State](#global-state)
+    6. [Performance](#performance)
         1. [DAMADoctrineTestBundle](#damadoctrinetestbundle)
         2. [Miscellaneous](#miscellaneous)
-    6. [Using without the Bundle](#using-without-the-bundle)
+    9. [Using without the Bundle](#using-without-the-bundle)
+7. [Stories](#stories)
+    1. [Stories as Services](#stories-as-services)
 8. [Full Default Bundle Configuration](#full-default-bundle-configuration)
 9. [Credit](#credit)
 
@@ -60,101 +60,6 @@ To use the `make:*` commands from this bundle, ensure
 is installed.
 
 *If not using Symfony Flex, be sure to enable the bundle in your **test**/**dev** environments.*
-
-## Using with DoctrineFixturesBundle
-
-Foundry works out of the box with [DoctrineFixturesBundle](https://symfony.com/doc/master/bundles/DoctrineFixturesBundle/index.html).
-You can simply use your factories and stories right within your fixture files:
-
-```php
-// src/DataFixtures/AppFixtures.php
-namespace App\DataFixtures;
-
-use App\Factory\CategoryFactory;
-use App\Factory\PostFactory;
-use App\Factory\TagFactory;
-use App\Story\GlobalStory;
-use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Persistence\ObjectManager;
-
-class AppFixtures extends Fixture
-{
-    public function load(ObjectManager $manager)
-    {
-        // create 10 Category's
-        CategoryFactory::new()->createMany(10);
-
-        // create 20 Tag's
-        TagFactory::new()->createMany(20);
-
-        // create 50 Post's
-        PostFactory::new()->createMany(50, function() {
-            return [
-                // each Post will have a random Category (created above)
-                'category' => CategoryFactory::random(),
-
-                // each Post will between 0 and 6 Tag's (created above)
-                'tags' => TagFactory::randomRange(0, 6),
-            ];
-        });
-
-        GlobalStory::load();
-    }
-}
-```
-
-Run the [`doctrine:fixtures:load`](https://symfony.com/doc/master/bundles/DoctrineFixturesBundle/index.html#loading-fixtures)
-as normal to seed your database.
-
-## Using in your Tests
-
-Traditionally, data fixtures are defined in one or more files outside of your tests. When writing tests using these
-fixtures, your fixtures are a sort of a *black box*. There is no clear connection between the fixtures and what you
-are testing.
-
-Foundry allows each individual test to fully follow the [AAA](https://www.thephilocoder.com/unit-testing-aaa-pattern/)
-("Arrange", "Act", "Assert") testing pattern. You create your fixtures using "factories" at the beginning of each test.
-You only create fixtures that are applicable for the test. Additionally, these fixtures are created with only the
-attributes required for the test - attributes that are not applicable are filled with random data. The created fixture
-objects are wrapped in a "proxy" that helps with pre and post assertions. 
-
-Let's look at an example:
-
-```php
-public function test_can_post_a_comment(): void
-{
-    // 1. "Arrange"
-    $post = PostFactory::new() // New Post factory
-        ->published()          // Make the post in a "published" state
-        ->create([             // Instantiate Post object and persist
-            'slug' => 'post-a' // This test only requires the slug field - all other fields are random data
-        ])
-    ;
-    
-    // 1a. "Pre-Assertions"
-    $this->assertCount(0, $post->getComments());
-
-    // 2. "Act"
-    $client = static::createClient();
-    $client->request('GET', '/posts/post-a'); // Note the slug from the arrange step
-    $client->submitForm('Add', [
-        'comment[name]' => 'John',
-        'comment[body]' => 'My comment',
-    ]);
-
-    // 3. "Assert"
-    self::assertResponseRedirects('/posts/post-a');
-
-    $this->assertCount(1, $post->getComments()); // $post is auto-refreshed before calling ->getComments()
-
-    CommentFactory::repository()->assertExists([ // Doctrine repository wrapper with assertions
-        'name' => 'John',
-        'body' => 'My comment',
-    ]);
-}
-```
-
-[More documentation for using Foundry in your tests...](#testing)
 
 ## Same Entities used in these Docs
 
@@ -539,6 +444,33 @@ protected function initialize(): self
 
 Read [Initialization](#initialization) to learn more about the `initialize()` method.
 
+### Initialization
+
+You can override your model factory's `initialize()` method to add default state/logic:
+
+```php
+namespace App\Factory;
+
+use App\Entity\Post;
+use Zenstruck\Foundry\ModelFactory;
+
+final class PostFactory extends ModelFactory
+{
+    // ...
+
+    protected function initialize(): self
+    {
+        return $this
+            ->published() // published by default
+            ->instantiateWith(function (array $attributes) {
+                return new Post(); // custom instantiation for this factory
+            })
+            ->afterPersist(function () {}) // default event for this factory
+        ; 
+    }
+}
+```
+
 ### Instantiation
 
 By default, objects are instantiated in the normal fashion, but using the object's constructor. Attributes
@@ -595,33 +527,6 @@ zenstruck_foundry:
         always_force_properties: true # always "force set" properties
         # or
         service: my_instantiator # your own invokable service for complete control
-```
-
-### Initialization
-
-You can override your model factory's `initialize()` method to add default state/logic:
-
-```php
-namespace App\Factory;
-
-use App\Entity\Post;
-use Zenstruck\Foundry\ModelFactory;
-
-final class PostFactory extends ModelFactory
-{
-    // ...
-
-    protected function initialize(): self
-    {
-        return $this
-            ->published() // published by default
-            ->instantiateWith(function (array $attributes) {
-                return new Post(); // custom instantiation for this factory
-            })
-            ->afterPersist(function () {}) // default event for this factory
-        ; 
-    }
-}
 ```
 
 ### Immutable
@@ -724,99 +629,100 @@ $entity = instantiate(OtherEntity::class, ['field' => 'value']);
 $entity = instantiate_many(OtherEntity::class, 5, ['field' => 'value']);
 ```
 
-## Stories
+## Using with DoctrineFixturesBundle
 
-Stories are useful if you find your test's *arrange* step is getting complex (loading lots of fixtures) or duplicating
-logic between tests and/or your dev fixtures. They are used to extract a specific database *state* into a *story*.
-Stories can be loaded in your fixtures and in your tests, they can also depend on other stories.
-
-Create a story using the maker command:
-
-    $ bin/console make:story Post
-
-**NOTE**: Creates `PostStory.php` in `src/Story`, add `--test` flag to create in `tests/Story`.
-
-Modify the *build* method to set the state for this story:
+Foundry works out of the box with [DoctrineFixturesBundle](https://symfony.com/doc/master/bundles/DoctrineFixturesBundle/index.html).
+You can simply use your factories and stories right within your fixture files:
 
 ```php
-// src/Story/PostStory.php
+// src/DataFixtures/AppFixtures.php
+namespace App\DataFixtures;
 
-namespace App\Story;
-
+use App\Factory\CategoryFactory;
 use App\Factory\PostFactory;
-use Zenstruck\Foundry\Story;
+use App\Factory\TagFactory;
+use App\Story\GlobalStory;
+use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Persistence\ObjectManager;
 
-final class PostStory extends Story
+class AppFixtures extends Fixture
 {
-    public function build(): void
+    public function load(ObjectManager $manager)
     {
-        // use "add" to have the object managed by the story and can be accessed in
-        // tests and other stories via PostStory::postA()
-        $this->add('postA', PostFactory::create(['title' => 'Post A']));
+        // create 10 Category's
+        CategoryFactory::new()->createMany(10);
 
-        // still persisted but not managed by the story
-        PostFactory::create([
-            'title' => 'Post B',
-            'category' => CategoryStory::php(), // can use other stories
-        ]);
+        // create 20 Tag's
+        TagFactory::new()->createMany(20);
+
+        // create 50 Post's
+        PostFactory::new()->createMany(50, function() {
+            return [
+                // each Post will have a random Category (created above)
+                'category' => CategoryFactory::random(),
+
+                // each Post will between 0 and 6 Tag's (created above)
+                'tags' => TagFactory::randomRange(0, 6),
+            ];
+        });
+
+        GlobalStory::load();
     }
 }
 ```
 
-Use the new story in your tests:
+Run the [`doctrine:fixtures:load`](https://symfony.com/doc/master/bundles/DoctrineFixturesBundle/index.html#loading-fixtures)
+as normal to seed your database.
+
+## Using in your Tests
+
+Traditionally, data fixtures are defined in one or more files outside of your tests. When writing tests using these
+fixtures, your fixtures are a sort of a *black box*. There is no clear connection between the fixtures and what you
+are testing.
+
+Foundry allows each individual test to fully follow the [AAA](https://www.thephilocoder.com/unit-testing-aaa-pattern/)
+("Arrange", "Act", "Assert") testing pattern. You create your fixtures using "factories" at the beginning of each test.
+You only create fixtures that are applicable for the test. Additionally, these fixtures are created with only the
+attributes required for the test - attributes that are not applicable are filled with random data. The created fixture
+objects are wrapped in a "proxy" that helps with pre and post assertions. 
+
+Let's look at an example:
 
 ```php
-PostStory::load(); // loads the state defined in PostStory::build()
-
-PostStory::load(); // does nothing - already loaded
-
-PostStory::load()->get('postA'); // Proxy wrapping Post
-PostStory::load()->postA();      // alternative to above
-PostStory::postA();              // alternative to above (if not "loaded", loads the story first)
-
-PostStory::postA()->getTitle(); // "Post A"
-```
-
-**NOTE**: Story state and objects persisted by them are reset after each test.
-
-### Stories as Services
-
-If you stories require dependencies, you can define them as a service:
-
-```php
-// src/Story/PostStory.php
-
-namespace App\Story;
-
-use App\Factory\PostFactory;
-use App\Service\ServiceA;
-use App\Service\ServiceB;
-use Zenstruck\Foundry\Story;
-
-final class PostStory extends Story
+public function test_can_post_a_comment(): void
 {
-    private $serviceA;
-    private $serviceB;
+    // 1. "Arrange"
+    $post = PostFactory::new() // New Post factory
+        ->published()          // Make the post in a "published" state
+        ->create([             // Instantiate Post object and persist
+            'slug' => 'post-a' // This test only requires the slug field - all other fields are random data
+        ])
+    ;
+    
+    // 1a. "Pre-Assertions"
+    $this->assertCount(0, $post->getComments());
 
-    public function __construct(ServiceA $serviceA, ServiceB $serviceB)
-    {
-        $this->serviceA = $serviceA;
-        $this->serviceB = $serviceB;
-    }
+    // 2. "Act"
+    $client = static::createClient();
+    $client->request('GET', '/posts/post-a'); // Note the slug from the arrange step
+    $client->submitForm('Add', [
+        'comment[name]' => 'John',
+        'comment[body]' => 'My comment',
+    ]);
 
-    public function build(): void
-    {
-        // can use $this->serviceA, $this->serviceB here to help build this story
-    }
+    // 3. "Assert"
+    self::assertResponseRedirects('/posts/post-a');
+
+    $this->assertCount(1, $post->getComments()); // $post is auto-refreshed before calling ->getComments()
+
+    CommentFactory::repository()->assertExists([ // Doctrine repository wrapper with assertions
+        'name' => 'John',
+        'body' => 'My comment',
+    ]);
 }
 ```
 
-If using a standard Symfony Flex app, this will be autowired/autoconfigured. If not, register the service and tag
-with `foundry.story`.
-
-**NOTE:** The provided bundle is required for stories as services.
-
-## Testing
+### Enable Foundry in your TestCase
 
 Add the `Factories` trait for tests using factories:
 
@@ -1088,6 +994,98 @@ Zenstruck\Foundry\Test\TestState::setInstantiator(
 // configure a custom faker
 Zenstruck\Foundry\Test\TestState::setFaker(Faker\Factory::create('fr_FR'));
 ```
+
+## Stories
+
+Stories are useful if you find your test's *arrange* step is getting complex (loading lots of fixtures) or duplicating
+logic between tests and/or your dev fixtures. They are used to extract a specific database *state* into a *story*.
+Stories can be loaded in your fixtures and in your tests, they can also depend on other stories.
+
+Create a story using the maker command:
+
+    $ bin/console make:story Post
+
+**NOTE**: Creates `PostStory.php` in `src/Story`, add `--test` flag to create in `tests/Story`.
+
+Modify the *build* method to set the state for this story:
+
+```php
+// src/Story/PostStory.php
+
+namespace App\Story;
+
+use App\Factory\PostFactory;
+use Zenstruck\Foundry\Story;
+
+final class PostStory extends Story
+{
+    public function build(): void
+    {
+        // use "add" to have the object managed by the story and can be accessed in
+        // tests and other stories via PostStory::postA()
+        $this->add('postA', PostFactory::create(['title' => 'Post A']));
+
+        // still persisted but not managed by the story
+        PostFactory::create([
+            'title' => 'Post B',
+            'category' => CategoryStory::php(), // can use other stories
+        ]);
+    }
+}
+```
+
+Use the new story in your tests:
+
+```php
+PostStory::load(); // loads the state defined in PostStory::build()
+
+PostStory::load(); // does nothing - already loaded
+
+PostStory::load()->get('postA'); // Proxy wrapping Post
+PostStory::load()->postA();      // alternative to above
+PostStory::postA();              // alternative to above (if not "loaded", loads the story first)
+
+PostStory::postA()->getTitle(); // "Post A"
+```
+
+**NOTE**: Story state and objects persisted by them are reset after each test.
+
+### Stories as Services
+
+If you stories require dependencies, you can define them as a service:
+
+```php
+// src/Story/PostStory.php
+
+namespace App\Story;
+
+use App\Factory\PostFactory;
+use App\Service\ServiceA;
+use App\Service\ServiceB;
+use Zenstruck\Foundry\Story;
+
+final class PostStory extends Story
+{
+    private $serviceA;
+    private $serviceB;
+
+    public function __construct(ServiceA $serviceA, ServiceB $serviceB)
+    {
+        $this->serviceA = $serviceA;
+        $this->serviceB = $serviceB;
+    }
+
+    public function build(): void
+    {
+        // can use $this->serviceA, $this->serviceB here to help build this story
+    }
+}
+```
+
+If using a standard Symfony Flex app, this will be autowired/autoconfigured. If not, register the service and tag
+with `foundry.story`.
+
+**NOTE:** The provided bundle is required for stories as services.
 
 ## Full Default Bundle Configuration
 
