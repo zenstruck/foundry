@@ -364,6 +364,22 @@ $post->getPublishedAt(); // \DateTime('last week')
 $post->getCreatedAt(); // random \DateTime (different for each item)
 ```
 
+When using the [default instantiator](#instantiation), there are two attribute key prefixes to change
+behavior:
+
+```php
+$post = PostFactory::new()->create([
+    // "force set" the body property (even private/protected, does not use setter)
+    'force:body' => 'some body', 
+
+    // attributes that can't be mapped to object properties/constructor arguments cause
+    // an exception to be thrown when instantiating the object.
+    // attributes prefixed with "optional:" are ignored
+    // these "optional" attributes can be used in factory "events/hooks" (the prefix is not removed)
+    'optional:extra' => 'value', // attributes prefixed with "optional:" do not cause an exception
+]);
+```
+
 ### Faker
 
 This library provides a wrapper for [fzaninotto/faker](https://github.com/fzaninotto/Faker) to help with generating
@@ -477,15 +493,6 @@ By default, objects are instantiated in the normal fashion, but using the object
 that match constructor arguments are used. Remaining attributes are set to the object using Symfony's
 [PropertyAccess](https://symfony.com/doc/current/components/property_access.html) component (setters/public
 properties). Any extra attributes cause an exception to be thrown.
-
-When using the default instantiator, there are two attribute key prefixes to change behavior:
-
-```php
-$post = PostFactory::new()->create([
-    'force:body' => 'some body', // "force set" the body property (even private/protected, does not use setter)
-    'optional:extra' => 'value', // attributes prefixed with "optional:" do not cause an exception
-]);
-```
 
 You can customize the instantiator several ways:
 
