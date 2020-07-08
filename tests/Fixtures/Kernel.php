@@ -7,6 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Bundle\MakerBundle\MakerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
@@ -25,6 +26,7 @@ class Kernel extends BaseKernel
     {
         yield new FrameworkBundle();
         yield new DoctrineBundle();
+        yield new MakerBundle();
 
         if (\getenv('USE_FOUNDRY_BUNDLE')) {
             yield new ZenstruckFoundryBundle();

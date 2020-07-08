@@ -24,7 +24,7 @@
         "matthiasnoback/symfony-dependency-injection-test": "^4.1",
         "phpunit/phpunit": "^8.5",
         "symfony/framework-bundle": "^4.4|^5.0",
-        "symfony/maker-bundle": "^1.0"
+        "symfony/maker-bundle": "^1.5"
     },
     "config": {
         "preferred-install": "dist",
@@ -35,7 +35,11 @@
         "files": ["src/functions.php"]
     },
     "autoload-dev": {
-        "psr-4": { "Zenstruck\\Foundry\\Tests\\": "tests/" }
+        "psr-4": {
+            "Zenstruck\\Foundry\\Tests\\": "tests/",
+            "App\\": "tests/Fixtures/tmp/src",
+            "App\\Tests\\": "tests/Fixtures/tmp/tests"
+        }
     },
     "extra": {
         "branch-alias": {
