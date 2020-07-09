@@ -48,6 +48,7 @@ to load fixtures or inside your tests, [where it has even more features](#using-
     9. [Using without the Bundle](#using-without-the-bundle)
 7. [Stories](#stories)
     1. [Stories as Services](#stories-as-services)
+    2. [Story State](#story-state)
 8. [Bundle Configuration](#bundle-configuration)
 9. [Credit](#credit)
 
@@ -942,7 +943,8 @@ Zenstruck\Foundry\Test\TestState::addGlobalState(function () {
 });
 ```
 
-**NOTE**: You can still access *Global State Stories* objects in your tests. They are still only loaded once.
+**NOTE**: You can still access [Story State](#story-state) for *Global State Stories* in your tests and they are still
+only loaded once.
 
 ### Performance
 
@@ -1036,41 +1038,45 @@ Modify the *build* method to set the state for this story:
 
 namespace App\Story;
 
+use App\Factory\CategoryFactory;
 use App\Factory\PostFactory;
+use App\Factory\TagFactory;
 use Zenstruck\Foundry\Story;
 
 final class PostStory extends Story
 {
     public function build(): void
     {
-        // use "add" to have the object managed by the story and can be accessed in
-        // tests and other stories via PostStory::postA()
-        $this->add('postA', PostFactory::create(['title' => 'Post A']));
+        // create 10 Category's
+        CategoryFactory::new()->createMany(10);
 
-        // still persisted but not managed by the story
-        PostFactory::create([
-            'title' => 'Post B',
-            'category' => CategoryStory::php(), // can use other stories
-        ]);
+        // create 20 Tag's
+        TagFactory::new()->createMany(20);
+
+        // create 50 Post's
+        PostFactory::new()->createMany(50, function() {
+            return [
+                // each Post will have a random Category (created above)
+                'category' => CategoryFactory::random(),
+
+                // each Post will between 0 and 6 Tag's (created above)
+                'tags' => TagFactory::randomRange(0, 6),
+            ];
+        });
     }
 }
 ```
 
-Use the new story in your tests:
+Use the new story in your tests, dev fixtures, or even other stories:
 
 ```php
 PostStory::load(); // loads the state defined in PostStory::build()
 
 PostStory::load(); // does nothing - already loaded
-
-PostStory::load()->get('postA'); // Proxy wrapping Post
-PostStory::load()->postA();      // alternative to above
-PostStory::postA();              // alternative to above (if not "loaded", loads the story first)
-
-PostStory::postA()->getTitle(); // "Post A"
 ```
 
-**NOTE**: Story state and objects persisted by them are reset after each test.
+**NOTE**: Objects persisted in stories are cleared after each test (unless it is a
+["Global State Story"](#global-state)).
 
 ### Stories as Services
 
@@ -1108,6 +1114,41 @@ If using a standard Symfony Flex app, this will be autowired/autoconfigured. If 
 with `foundry.story`.
 
 **NOTE:** The provided bundle is required for stories as services.
+
+### Story State
+
+Another feature of *stories* is the ability for them to *remember* the objects they created to be referenced later:
+
+```php
+// src/Story/CategoryStory.php
+
+namespace App\Story;
+
+use App\Factory\CategoryFactory;
+use Zenstruck\Foundry\Story;
+
+final class PostStory extends Story
+{
+    public function build(): void
+    {
+        $this->add('php', CategoryFactory::new()->create(['name' => 'php']));
+
+        // factories are created when added as state
+        $this->add('symfony', CategoryFactory::new(['name' => 'symfony']));
+    }
+}
+```
+
+Later, you can access the story's state when creating other fixtures:
+
+```php
+PostFactory::new()->create(['category' => CategoryStory::load()->get('php')]);
+
+// or use the magic method (functionally equivalent to above)
+PostFactory::new()->create(['category' => CategoryStory::php()]);
+```
+
+**NOTE**: Story state is cleared after each test (unless it is a ["Global State Story"](#global-state)).
 
 ## Bundle Configuration
 
