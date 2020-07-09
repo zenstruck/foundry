@@ -201,6 +201,14 @@ final class PostFactory extends ModelFactory
         ];
     }
 
+    protected function initialize(): self
+    {
+        // see https://github.com/zenstruck/foundry#initialization
+        return $this
+            // ->beforeInstantiate(function(Post $post) {})
+        ;
+    }
+
     protected static function getClass(): string
     {
         return Post::class;

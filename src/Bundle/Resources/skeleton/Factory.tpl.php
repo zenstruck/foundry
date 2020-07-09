@@ -28,6 +28,14 @@ final class <?= $class_name ?> extends ModelFactory
         ];
     }
 
+    protected function initialize(): self
+    {
+        // see https://github.com/zenstruck/foundry#initialization
+        return $this
+            // ->beforeInstantiate(function(<?= $entity->getShortName() ?> $<?= \lcfirst($entity->getShortName()) ?>) {})
+        ;
+    }
+
     protected static function getClass(): string
     {
         return <?= $entity->getShortName() ?>::class;
