@@ -35,7 +35,7 @@ final class MakeFactory extends AbstractMaker
     public function configureCommand(Command $command, InputConfiguration $inputConfig): void
     {
         $command
-            ->setDescription('Creates a custom factory for a Doctrine entity class')
+            ->setDescription('Creates a Foundry model factory for a Doctrine entity class')
             ->addArgument('entity', InputArgument::OPTIONAL, 'Entity class to create a factory for')
             ->addOption('test', null, InputOption::VALUE_NONE, 'Create in <fg=yellow>tests/</> instead of <fg=yellow>src/</>')
         ;
