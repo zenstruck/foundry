@@ -21,10 +21,8 @@ final class MakeStoryTest extends MakerTestCase
         $this->assertFileNotExists(self::tempFile('src/Story/FooBarStory.php'));
 
         $tester->execute(['name' => $name]);
-        $output = $tester->getDisplay();
 
         $this->assertFileExists(self::tempFile('src/Story/FooBarStory.php'));
-        $this->assertStringContainsString('Note: pass --test if you want to generate stories in your tests/ directory', $output);
         $this->assertSame(<<<EOF
 <?php
 
@@ -92,10 +90,8 @@ EOF
         $this->assertFileNotExists(self::tempFile('tests/Story/FooBarStory.php'));
 
         $tester->execute(['name' => $name, '--test' => true]);
-        $output = $tester->getDisplay();
 
         $this->assertFileExists(self::tempFile('tests/Story/FooBarStory.php'));
-        $this->assertStringNotContainsString('Note: pass --test if you want to generate stories in your tests/ directory', $output);
         $this->assertSame(<<<EOF
 <?php
 
