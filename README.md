@@ -648,7 +648,6 @@ namespace App\DataFixtures;
 use App\Factory\CategoryFactory;
 use App\Factory\PostFactory;
 use App\Factory\TagFactory;
-use App\Story\GlobalStory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
@@ -672,8 +671,6 @@ class AppFixtures extends Fixture
                 'tags' => TagFactory::randomRange(0, 6),
             ];
         });
-
-        GlobalStory::load();
     }
 }
 ```
