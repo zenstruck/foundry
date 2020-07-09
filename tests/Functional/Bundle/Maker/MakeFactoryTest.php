@@ -50,6 +50,14 @@ final class CategoryFactory extends ModelFactory
         ];
     }
 
+    protected function initialize(): self
+    {
+        // see https://github.com/zenstruck/foundry#initialization
+        return \$this
+            // ->beforeInstantiate(function(Category \$category) {})
+        ;
+    }
+
     protected static function getClass(): string
     {
         return Category::class;
@@ -102,6 +110,14 @@ final class CategoryFactory extends ModelFactory
         ];
     }
 
+    protected function initialize(): self
+    {
+        // see https://github.com/zenstruck/foundry#initialization
+        return \$this
+            // ->beforeInstantiate(function(Category \$category) {})
+        ;
+    }
+
     protected static function getClass(): string
     {
         return Category::class;
@@ -149,6 +165,14 @@ final class CategoryFactory extends ModelFactory
         return [
             // TODO add your default values here (https://github.com/zenstruck/foundry#model-factories)
         ];
+    }
+
+    protected function initialize(): self
+    {
+        // see https://github.com/zenstruck/foundry#initialization
+        return \$this
+            // ->beforeInstantiate(function(Category \$category) {})
+        ;
     }
 
     protected static function getClass(): string
@@ -201,6 +225,14 @@ final class CategoryFactory extends ModelFactory
         return [
             // TODO add your default values here (https://github.com/zenstruck/foundry#model-factories)
         ];
+    }
+
+    protected function initialize(): self
+    {
+        // see https://github.com/zenstruck/foundry#initialization
+        return \$this
+            // ->beforeInstantiate(function(Category \$category) {})
+        ;
     }
 
     protected static function getClass(): string
