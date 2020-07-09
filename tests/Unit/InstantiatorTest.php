@@ -417,8 +417,7 @@ final class InstantiatorTest extends TestCase
      */
     public function invalid_attribute_type_with_allow_extra_enabled_throws_exception(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('must be an object", "string" given at property path "propF".');
+        $this->expectException(\Throwable::class);
 
         (new Instantiator())->allowExtraAttributes()([
             'propB' => 'B',
