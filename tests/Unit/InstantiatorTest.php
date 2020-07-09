@@ -411,6 +411,20 @@ final class InstantiatorTest extends TestCase
         $this->assertSame('D', $object->getPropD());
         $this->assertSame('E', Instantiator::forceGet($object, 'propE'));
     }
+
+    /**
+     * @test
+     */
+    public function invalid_attribute_type_with_allow_extra_enabled_throws_exception(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('must be an object", "string" given at property path "propF".');
+
+        (new Instantiator())->allowExtraAttributes()([
+            'propB' => 'B',
+            'propF' => 'F',
+        ], InstantiatorDummy::class);
+    }
 }
 
 class InstantiatorDummy
@@ -420,6 +434,7 @@ class InstantiatorDummy
     private $propB;
     private $propC;
     private $propE;
+    private $propF;
 
     public function __construct($propB, $propC = null)
     {
@@ -463,6 +478,11 @@ class InstantiatorDummy
     public function setPropD($propD)
     {
         $this->propD = 'setter '.$propD;
+    }
+
+    public function setPropF(object $propF)
+    {
+        $this->propF = $propF;
     }
 }
 

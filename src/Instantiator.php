@@ -2,7 +2,7 @@
 
 namespace Zenstruck\Foundry;
 
-use Symfony\Component\PropertyAccess\Exception\ExceptionInterface as PropertyAccessException;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -52,11 +52,11 @@ final class Instantiator
 
             try {
                 self::propertyAccessor()->setValue($object, $attribute, $value);
-            } catch (PropertyAccessException $e) {
+            } catch (NoSuchPropertyException $e) {
                 // see if attribute was snake/kebab cased
                 try {
                     self::propertyAccessor()->setValue($object, self::camel($attribute), $value);
-                } catch (PropertyAccessException $e) {
+                } catch (NoSuchPropertyException $e) {
                     if (!$this->allowExtraAttributes) {
                         throw new \InvalidArgumentException(\sprintf('Cannot set attribute "%s" for object "%s" (not public and no setter).', $attribute, $class), 0, $e);
                     }
