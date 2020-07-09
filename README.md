@@ -343,7 +343,7 @@ $post = PostFactory::new(['title' => 'Post A'])
         // can use snake case
         'published_at' => new \DateTime('now'), 
 
-        // factories are automatically instantiated (and persisted if the outer factory is persisted)
+        // CategoryFactory will be used to create a new Category for each Post
         'category' => CategoryFactory::new(['name' => 'php']), 
     ])
     ->withAttributes([
