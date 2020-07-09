@@ -622,7 +622,7 @@ PostFactory::new()->create([
 
 ### Anonymous Factories
 
-You can use foundry to create factories that don't have a `ModelFactory`:
+Foundry can be used to create factories for entities that you don't have model factories for:
 
 ```php
 use App\Entity\OtherEntity;
