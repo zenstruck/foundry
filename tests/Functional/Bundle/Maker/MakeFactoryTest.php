@@ -22,10 +22,8 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileNotExists(self::tempFile('src/Factory/CategoryFactory.php'));
 
         $tester->execute(['entity' => Category::class]);
-        $output = $tester->getDisplay();
 
         $this->assertFileExists(self::tempFile('src/Factory/CategoryFactory.php'));
-        $this->assertStringContainsString('Note: pass --test if you want to generate factories in your tests/ directory', $output);
         $this->assertSame(<<<EOF
 <?php
 
@@ -125,10 +123,8 @@ EOF
         $this->assertFileNotExists(self::tempFile('tests/Factory/CategoryFactory.php'));
 
         $tester->execute(['entity' => Category::class, '--test' => true]);
-        $output = $tester->getDisplay();
 
         $this->assertFileExists(self::tempFile('tests/Factory/CategoryFactory.php'));
-        $this->assertStringNotContainsString('Note: pass --test if you want to generate factories in your tests/ directory', $output);
         $this->assertSame(<<<EOF
 <?php
 

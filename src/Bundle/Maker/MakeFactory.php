@@ -49,6 +49,11 @@ final class MakeFactory extends AbstractMaker
             return;
         }
 
+        if (!$input->getOption('test')) {
+            $io->text('// Note: pass <fg=yellow>--test</> if you want to generate factories in your <fg=yellow>tests/</> directory');
+            $io->newLine();
+        }
+
         $argument = $command->getDefinition()->getArgument('entity');
         $entity = $io->choice($argument->getDescription(), $this->entityChoices());
 
@@ -57,11 +62,6 @@ final class MakeFactory extends AbstractMaker
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
-        if (!$input->getOption('test')) {
-            $io->text('// Note: pass <fg=yellow>--test</> if you want to generate factories in your <fg=yellow>tests/</> directory');
-            $io->newLine();
-        }
-
         $class = $input->getArgument('entity');
 
         if (!\class_exists($class)) {
