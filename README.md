@@ -336,9 +336,9 @@ use App\Factory\CategoryFactory;
 use App\Factory\PostFactory;
 use function Zenstruck\Foundry\faker;
 
-$post = PostFactory::new(['title' => 'Post A'])
+$posts = PostFactory::new(['title' => 'Post A'])
     ->withAttributes([
-        'body' => 'Post A Body...',
+        'body' => 'Post Body...',
 
         // can use snake case
         'published_at' => new \DateTime('now'), 
@@ -351,17 +351,25 @@ $post = PostFactory::new(['title' => 'Post A'])
         'published-at' => new \DateTime('last week'),
 
         // Proxies are automatically converted to their wrapped object
-        'category' => CategoryFactory::new(['name' => 'symfony'])->create(),
+        'category' => CategoryFactory::new()->create(),
     ])
     ->withAttributes(function() { return ['createdAt' => faker()->dateTime]; }) // see faker section below
-    ->create(['title' => 'Different Title'])
+
+    // create "2" Post's
+    ->createMany(2, ['title' => 'Different Title'])
 ;
 
-$post->getTitle(); // "Different Title"
-$post->getBody(); // "Post A Body..."
-$post->getCategory()->getName(); // "symfony"
-$post->getPublishedAt(); // \DateTime('last week')
-$post->getCreatedAt(); // random \DateTime (different for each item)
+$post[0]->getTitle(); // "Different Title"
+$post[0]->getBody(); // "Post Body..."
+$post[0]->getCategory(); // random Category
+$post[0]->getPublishedAt(); // \DateTime('last week')
+$post[0]->getCreatedAt(); // random \DateTime
+
+$post[1]->getTitle(); // "Different Title"
+$post[1]->getBody(); // "Post Body..."
+$post[1]->getCategory(); // random Category (different than above)
+$post[1]->getPublishedAt(); // \DateTime('last week')
+$post[1]->getCreatedAt(); // random \DateTime (different than above)
 ```
 
 When using the [default instantiator](#instantiation), there are two attribute key prefixes to change
