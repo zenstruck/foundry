@@ -460,9 +460,9 @@ You can also add hooks directly in your model factory class:
 ```php
 protected function initialize(): self
 {
-    $this->beforePersist(function() {});
-
-    return $this;
+    return $this
+        ->beforePersist(function() {})
+    ;
 }
 ```
 
@@ -494,6 +494,8 @@ final class PostFactory extends ModelFactory
     }
 }
 ```
+
+**NOTE**: Be sure to chain the states/hooks off of `$this` because factories are [Immutable](#immutable).
 
 ### Instantiation
 
