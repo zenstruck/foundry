@@ -1127,7 +1127,7 @@ namespace App\Story;
 use App\Factory\CategoryFactory;
 use Zenstruck\Foundry\Story;
 
-final class PostStory extends Story
+final class CategoryStory extends Story
 {
     public function build(): void
     {
