@@ -858,7 +858,7 @@ $post->getTitle(); // "New Title" (equivalent to $post->refresh()->getTitle())
 
 Without auto-refreshing enabled, the above call to `$post->getTitle()` would return "Original Title".
 
-**NOTE**: A situation you need to be aware of when using auto-refresh is all methods refresh the object first. If
+**NOTE**: A situation you need to be aware of when using auto-refresh is that all methods refresh the object first. If
 changing the object's state via multiple methods (or multiple force-sets), the previous changes will be lost:
 
 ```php
@@ -869,8 +869,8 @@ $post = PostFactory::new(['title' => 'Original Title', 'body' => 'Original Body'
     ->enableAutoRefresh()
 ;
 
-$post->setTitle('New Title'); // or using ->forceSet('title', 'New Title')
-$post->setBody('New Body'); // or using ->forceSet('body', 'New Body')
+$post->setTitle('New Title');
+$post->setBody('New Body'); // this causes the object to be refreshed, which means the "New Title" title was replaced by the database contents
 $post->save();
 
 $post->getBody(); // "New Body"
