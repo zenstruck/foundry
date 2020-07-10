@@ -17,7 +17,7 @@ final class Proxy
     private $class;
 
     /** @var bool */
-    private $autoRefresh = false;
+    private $autoRefresh;
 
     /** @var bool */
     private $persisted = false;
@@ -29,6 +29,7 @@ final class Proxy
     {
         $this->object = $object;
         $this->class = \get_class($object);
+        $this->autoRefresh = Factory::configuration()->defaultProxyAutoRefresh();
     }
 
     public function __call(string $method, array $arguments)

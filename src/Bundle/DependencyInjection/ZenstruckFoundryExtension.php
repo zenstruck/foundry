@@ -6,6 +6,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
+use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Story;
 
 /**
@@ -25,6 +26,12 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
 
         $this->configureFaker($mergedConfig['faker'], $container);
         $this->configureDefaultInstantiator($mergedConfig['instantiator'], $container);
+
+        if ($mergedConfig['auto_refresh_proxies']) {
+            $container->getDefinition(Configuration::class)
+                ->addMethodCall('alwaysAutoRefreshProxies')
+            ;
+        }
     }
 
     private function configureFaker(array $config, ContainerBuilder $container): void

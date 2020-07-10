@@ -913,6 +913,16 @@ $post->forceSetAll([
 $post->save();
 ```
 
+**NOTE**: You can optionally enable auto-refreshing globally to have every proxy auto-refreshable by default. With this
+enabled, you will have to *opt-out* of auto-refreshing as opposed to the default, which is *opt-in*. Be aware of the
+above situation before enabling.
+
+```yaml
+# config/packages/dev/zenstruck_foundry.yaml (see Bundle Configuration section about sharing this in the test environment)
+zenstruck_foundry:
+    auto_refresh_proxies: true
+```
+
 ### Repository Proxy
 
 This library provides a *Repository Proxy* that wraps your object repositories to provide useful assertions and methods:
@@ -1070,6 +1080,9 @@ Zenstruck\Foundry\Test\TestState::setInstantiator(
 
 // configure a custom faker
 Zenstruck\Foundry\Test\TestState::setFaker(Faker\Factory::create('fr_FR'));
+
+// enable auto-refreshing "globally"
+Zenstruck\Foundry\Test\TestState::alwaysAutoRefreshProxies();
 ```
 
 ## Stories
@@ -1228,6 +1241,9 @@ imports:
 
 ```yaml
 zenstruck_foundry:
+
+    # Whether to auto-refresh proxies by default (https://github.com/zenstruck/foundry#auto-refresh)
+    auto_refresh_proxies: false
 
     # Configure faker to be used by your factories.
     faker:
