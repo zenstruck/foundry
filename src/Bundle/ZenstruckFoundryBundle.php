@@ -13,6 +13,8 @@ final class ZenstruckFoundryBundle extends Bundle
 {
     public function boot()
     {
-        Factory::boot($this->container->get(Configuration::class));
+        if (!Factory::isBooted()) {
+            Factory::boot($this->container->get(Configuration::class));
+        }
     }
 }

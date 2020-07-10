@@ -153,11 +153,19 @@ class Factory
      */
     final public static function configuration(): Configuration
     {
-        if (!self::$configuration) {
-            throw new \RuntimeException('Foundry is not yet booted, is the ZenstruckFoundryBundle installed/configured?');
+        if (!self::isBooted()) {
+            throw new \RuntimeException('Foundry is not yet booted, is the ZenstruckFoundryBundle enabled/configured?');
         }
 
         return self::$configuration;
+    }
+
+    /**
+     * @internal
+     */
+    final public static function isBooted(): bool
+    {
+        return null !== self::$configuration;
     }
 
     final public static function faker(): Faker\Generator
