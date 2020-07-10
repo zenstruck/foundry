@@ -38,8 +38,10 @@ to load fixtures or inside your tests, [where it has even more features](#using-
 4. [Using with DoctrineFixturesBundle](#using-with-doctrinefixturesbundle)
 5. [Using in your Tests](#using-in-your-tests)
     1. [Enable Foundry in your TestCase](#enable-foundry-in-your-testcase)
-    2. [Auto-Refresh & Force Setting](#auto-refresh--force-setting)
-    3. [Repository](#repository)
+    2. [Object Proxy](#object-proxy)
+        1. [Force Setting](#force-setting)
+        2. [Auto-Refresh](#auto-refresh)
+    3. [Repository Proxy](#repository-proxy)
     4. [Assertions](#assertions)
     5. [Global State](#global-state)
     6. [Performance](#performance)
@@ -736,7 +738,7 @@ public function test_can_post_a_comment(): void
     // 3. "Assert"
     self::assertResponseRedirects('/posts/post-a');
 
-    $this->assertCount(1, $post->getComments()); // $post is auto-refreshed before calling ->getComments()
+    $this->assertCount(1, $post->refresh()->getComments()); // Refresh $post from the database and call ->getComments()
 
     CommentFactory::repository()->assertExists([ // Doctrine repository wrapper with assertions
         'name' => 'John',
@@ -790,77 +792,128 @@ FOUNDRY_RESET_CONNECTIONS=connection1,connection2
 FOUNDRY_RESET_OBJECT_MANAGERS=manager1,manager2
 ```
 
-### Auto-Refresh & Force Setting
+### Object Proxy
 
-Objects created by a factory are wrapped in a special [`Proxy`](src/Proxy.php) object. These objects help
-with your *pre and post act* test assertions. Almost all calls to Proxy methods, first refresh the object from the
-database (even if your entity manager has been cleared).
+Objects created by a factory are wrapped in a special *Proxy* object. These objects allow your doctrine entities
+to have [Active Record](https://en.wikipedia.org/wiki/Active_record_pattern) *like* behavior:
 
 ```php
 use App\Factory\PostFactory;
-use Zenstruck\Foundry\Proxy;
 
 $post = PostFactory::new()->create(['title' => 'My Title']); // instance of Zenstruck\Foundry\Proxy
 
 // get the wrapped object
 $realPost = $post->object(); // instance of Post
 
-// delete from the database
-$post->remove();
-
-// call any Post methods - before calling, the object is auto-refreshed from the database
+// call any Post method
 $post->getTitle(); // "My Title"
 
 // set property and save to the database
 $post->setTitle('New Title');
-$post->save(); 
+$post->save();
 
-/**
- * CAVEAT - When calling multiple methods that change the object state, the previous state will be lost because
- * of auto-refreshing. Use "disableAutoRefresh()" or "withoutAutoRefresh()" to overcome this.
- */
-$post->disableAutoRefresh();    // disable auto-refreshing
-$post->refresh();               // manually refresh
-$post->setTitle('New Title');   // won't be auto-refreshed
-$post->setBody('New Body');     // won't be auto-refreshed
-$post->save();                  // save changes (auto-refreshing re-enabled)
+// refresh from the database
+$post->refresh();
 
-// alternatively, use "withAutoRefresh()" - auto-refreshing disabled before running callback and re-enabled after
-$post->withoutAutoRefresh(function(Proxy $post) {
-    /* @var Post $post */
-    $post->setTitle('New Title');
-    $post->setBody('New Body');
-    $post->save();
-});
+// delete from the database
+$post->remove();
 
-// if the first argument is type-hinted as the wrapped object, it will be passed to the closure (and not the proxy)
-$post->withoutAutoRefresh(function(Post $post) {
-    $post->setTitle('New Title');
-    $post->setBody('New Body');
-})->save();
+$post->repository(); // repository proxy wrapping PostRepository (see Repository Proxy section below)
+```
 
+#### Force Setting
+
+Object proxies have helper methods to access non-public properties of the object the wrap:
+
+```php
 // set private/protected properties
 $post->forceSet('createdAt', new \DateTime()); 
 $post->forceSet('created_at', new \DateTime()); // can use snake case
 $post->forceSet('created-at', new \DateTime()); // can use kebab case
 
-/**
- * CAVEAT - When force setting multiple properties, the previous set's changes will be lost because
- * of auto-refreshing. Use "disableAutoRefresh()"/"withoutAutoRefresh()" (shown above) or "forceSetAll()"
- * to overcome this.
- */
-$post->forceSetAll([
-    'title' => 'Different title',
-    'createdAt' => new \DateTime(),
-]);
-
 // get private/protected properties
 $post->forceGet('createdAt');
-$post->forceGet('created_at');
-$post->forceGet('created-at');
+$post->forceGet('created_at'); // can use snake case
+$post->forceGet('created-at'); // can use kebab case
 ```
 
-### Repository
+#### Auto-Refresh
+
+Object proxies have the option to enable *auto refreshing* that removes the need to call `->refresh()` before calling
+methods on the underlying object. When auto-refresh is enabled, most calls to proxy objects first refresh the wrapped
+object from the database.
+
+```php
+use App\Factory\PostFactory;
+
+$post = PostFactory::new(['title' => 'Original Title'])
+    ->create()
+    ->enableAutoRefresh()
+;
+
+// ... logic that changes the $post title to "New Title" (like your functional test)
+
+$post->getTitle(); // "New Title" (equivalent to $post->refresh()->getTitle())
+```
+
+Without auto-refreshing enabled, the above call to `$post->getTitle()` would return "Original Title".
+
+**NOTE**: A situation you need to be aware of when using auto-refresh is all methods refresh the object first. If
+changing the object's state via multiple methods (or multiple force-sets), the previous changes will be lost:
+
+```php
+use App\Factory\PostFactory;
+
+$post = PostFactory::new(['title' => 'Original Title', 'body' => 'Original Body'])
+    ->create()
+    ->enableAutoRefresh()
+;
+
+$post->setTitle('New Title'); // or using ->forceSet('title', 'New Title')
+$post->setBody('New Body'); // or using ->forceSet('body', 'New Body')
+$post->save();
+
+$post->getBody(); // "New Body"
+$post->getTitle(); // "Original Title" !! because the subsequent call to ->setBody() "auto-refreshed" the object
+```
+
+To overcome this, you need to first disable auto-refreshing, then re-enable after making/saving the changes:
+
+```php
+use App\Entity\Post;
+use App\Factory\PostFactory;
+
+$post = PostFactory::new(['title' => 'Original Title', 'body' => 'Original Body'])
+    ->create()
+    ->enableAutoRefresh()
+;
+
+$post->disableAutoRefresh();
+$post->setTitle('New Title'); // or using ->forceSet('title', 'New Title')
+$post->setBody('New Body'); // or using ->forceSet('body', 'New Body')
+$post->enableAutoRefresh();
+$post->save();
+
+$post->getBody(); // "New Body"
+$post->getTitle(); // "New Title"
+
+// alternatively, use the ->withoutAutoRefresh() helper which first disables auto-refreshing, then re-enables after
+// executing the callback.
+$post->withoutAutoRefresh(function (Post $post) { // can pass either Post or Proxy to the callback
+    $post->setTitle('New Title');
+    $post->setBody('New Body');
+});
+$post->save();
+
+// if force-setting properties, you can use the ->forceSetAll() helper:
+$post->forceSetAll([
+    'title' => 'New Title',
+    'body' => 'New Body',
+]);
+$post->save();
+```
+
+### Repository Proxy
 
 This library provides a *Repository Proxy* that wraps your object repositories to provide useful assertions and methods:
 

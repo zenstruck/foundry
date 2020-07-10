@@ -75,7 +75,7 @@ final class Proxy
     public static function createFromPersisted(object $object): self
     {
         $proxy = new self($object);
-        $proxy->persisted = $proxy->autoRefresh = true;
+        $proxy->persisted = true;
 
         return $proxy;
     }
@@ -98,7 +98,7 @@ final class Proxy
     {
         $this->objectManager()->persist($this->object);
         $this->objectManager()->flush();
-        $this->autoRefresh = $this->persisted = true;
+        $this->persisted = true;
 
         return $this;
     }
@@ -183,13 +183,22 @@ final class Proxy
         return $this;
     }
 
+    /**
+     * Ensures "autoRefresh" is disabled when executing $callback. Re-enables
+     * "autoRefresh" after executing callback if it was enabled.
+     *
+     * @param callable $callback (object|Proxy $object): void
+     */
     public function withoutAutoRefresh(callable $callback): self
     {
-        $this->disableAutoRefresh();
+        $original = $this->autoRefresh;
+        $this->autoRefresh = false;
 
         $this->executeCallback($callback);
 
-        return $this->isPersisted() ? $this->enableAutoRefresh() : $this;
+        $this->autoRefresh = $original; // set to original value (even if it was false)
+
+        return $this;
     }
 
     public function assertPersisted(string $message = 'The object is not persisted.'): self

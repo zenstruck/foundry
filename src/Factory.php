@@ -55,13 +55,11 @@ class Factory
             return $proxy;
         }
 
-        $proxy->save()->disableAutoRefresh();
-
-        foreach ($this->afterPersist as $callback) {
-            $proxy->executeCallback($callback, $attributes);
-        }
-
-        return $proxy->enableAutoRefresh();
+        return $proxy->save()->withoutAutoRefresh(function(Proxy $proxy) use ($attributes) {
+            foreach ($this->afterPersist as $callback) {
+                $proxy->executeCallback($callback, $attributes);
+            }
+        });
     }
 
     /**
@@ -121,7 +119,7 @@ class Factory
     }
 
     /**
-     * @param callable $callback (object $object, array $attributes, ObjectManager $objectManager): void
+     * @param callable $callback (object|Proxy $object, array $attributes): void
      */
     final public function afterPersist(callable $callback): self
     {
