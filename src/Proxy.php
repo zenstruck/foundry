@@ -22,6 +22,9 @@ final class Proxy
     /** @var bool */
     private $persisted = false;
 
+    /**
+     * @internal
+     */
     public function __construct(object $object)
     {
         $this->object = $object;
@@ -66,7 +69,10 @@ final class Proxy
         return $this->object()->__toString();
     }
 
-    public static function persisted(object $object): self
+    /**
+     * @internal
+     */
+    public static function createFromPersisted(object $object): self
     {
         $proxy = new self($object);
         $proxy->persisted = $proxy->autoRefresh = true;
