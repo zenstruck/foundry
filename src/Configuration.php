@@ -7,6 +7,8 @@ use Doctrine\Persistence\ObjectManager;
 use Faker;
 
 /**
+ * @internal
+ *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class Configuration
@@ -22,6 +24,9 @@ final class Configuration
 
     /** @var callable */
     private $instantiator;
+
+    /** @var bool */
+    private $defaultProxyAutoRefresh = false;
 
     public function __construct(ManagerRegistry $managerRegistry, StoryManager $storyManager)
     {
@@ -46,6 +51,11 @@ final class Configuration
         return $this->instantiator;
     }
 
+    public function defaultProxyAutoRefresh(): bool
+    {
+        return $this->defaultProxyAutoRefresh;
+    }
+
     public function setManagerRegistry(ManagerRegistry $managerRegistry): self
     {
         $this->managerRegistry = $managerRegistry;
@@ -63,6 +73,13 @@ final class Configuration
     public function setFaker(Faker\Generator $faker): self
     {
         $this->faker = $faker;
+
+        return $this;
+    }
+
+    public function alwaysAutoRefreshProxies(): self
+    {
+        $this->defaultProxyAutoRefresh = true;
 
         return $this;
     }

@@ -21,6 +21,9 @@ final class TestState
     private static $faker;
 
     /** @var bool */
+    private static $alwaysAutoRefreshProxies = false;
+
+    /** @var bool */
     private static $useBundle = true;
 
     /** @var callable[] */
@@ -34,6 +37,11 @@ final class TestState
     public static function setFaker(Faker\Generator $faker): void
     {
         self::$faker = $faker;
+    }
+
+    public static function alwaysAutoRefreshProxies(): void
+    {
+        self::$alwaysAutoRefreshProxies = true;
     }
 
     public static function withoutBundle(): void
@@ -54,6 +62,10 @@ final class TestState
 
         if (self::$faker) {
             $configuration->setFaker(self::$faker);
+        }
+
+        if (self::$alwaysAutoRefreshProxies) {
+            $configuration->alwaysAutoRefreshProxies();
         }
 
         Factory::boot($configuration);

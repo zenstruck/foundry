@@ -16,6 +16,10 @@ final class Configuration implements ConfigurationInterface
 
         $treeBuilder->getRootNode()
             ->children()
+                ->booleanNode('auto_refresh_proxies')
+                    ->info('Whether to auto-refresh proxies by default (https://github.com/zenstruck/foundry#auto-refresh)')
+                    ->defaultFalse()
+                ->end()
                 ->arrayNode('faker')
                     ->addDefaultsIfNotSet()
                     ->info('Configure faker to be used by your factories.')

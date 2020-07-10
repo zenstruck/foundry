@@ -27,6 +27,7 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
         $this->assertContainerBuilderHasService(Configuration::class);
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'setInstantiator', ['zenstruck_foundry.default_instantiator']);
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'setFaker', ['zenstruck_foundry.faker']);
+        $this->assertCount(2, $this->container->findDefinition(Configuration::class)->getMethodCalls());
         $this->assertTrue($this->container->getDefinition(Configuration::class)->isPublic());
         $this->assertContainerBuilderHasService('zenstruck_foundry.default_instantiator', Instantiator::class);
         $this->assertEmpty($this->container->getDefinition('zenstruck_foundry.default_instantiator')->getMethodCalls());
@@ -128,6 +129,18 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
         $this->expectExceptionMessage('Invalid configuration for path "zenstruck_foundry.instantiator": Cannot set "always_force_properties" when using custom service.');
 
         $this->load(['instantiator' => ['service' => 'my_instantiator', 'always_force_properties' => true]]);
+    }
+
+    /**
+     * @test
+     */
+    public function can_enable_auto_refresh_proxies(): void
+    {
+        $this->load(['auto_refresh_proxies' => true]);
+
+        $this->assertContainerBuilderHasService(Configuration::class);
+        $this->assertCount(3, $this->container->findDefinition(Configuration::class)->getMethodCalls());
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'alwaysAutoRefreshProxies', []);
     }
 
     protected function getContainerExtensions(): array
