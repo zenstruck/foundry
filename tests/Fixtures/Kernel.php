@@ -12,8 +12,8 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
-use Zenstruck\Foundry\Bundle\ZenstruckFoundryBundle;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\ServiceStory;
+use Zenstruck\Foundry\ZenstruckFoundryBundle;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
