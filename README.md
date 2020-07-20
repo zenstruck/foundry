@@ -824,7 +824,7 @@ $post->repository(); // repository proxy wrapping PostRepository (see Repository
 
 #### Force Setting
 
-Object proxies have helper methods to access non-public properties of the object the wrap:
+Object proxies have helper methods to access non-public properties of the object they wrap:
 
 ```php
 // set private/protected properties
