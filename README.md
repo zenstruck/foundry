@@ -991,8 +991,8 @@ If you have an initial database state you want for all tests, you can set this i
 // ...
 
 Zenstruck\Foundry\Test\TestState::addGlobalState(function () {
-    CategoryFactory::create(['name' => 'php']);
-    CategoryFactory::create(['name' => 'symfony']);
+    CategoryFactory::new()->create(['name' => 'php']);
+    CategoryFactory::new()->create(['name' => 'symfony']);
 });
 ```
 
