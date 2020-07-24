@@ -154,7 +154,7 @@ class Factory
     final public static function configuration(): Configuration
     {
         if (!self::isBooted()) {
-            throw new \RuntimeException('Foundry is not yet booted, is the ZenstruckFoundryBundle enabled/configured?');
+            throw new \RuntimeException('Foundry is not yet booted. Using in a test: is your Test case using the Factories trait? Using in a fixture: is ZenstruckFoundryBundle enabled for this environment?');
         }
 
         return self::$configuration;
