@@ -729,6 +729,7 @@ public function test_can_post_a_comment(): void
     $this->assertCount(0, $post->getComments());
 
     // 2. "Act"
+    static::ensureKernelShutdown(); // creating factories boots the kernel; shutdown before creating the client
     $client = static::createClient();
     $client->request('GET', '/posts/post-a'); // Note the slug from the arrange step
     $client->submitForm('Add', [
