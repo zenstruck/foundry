@@ -36,6 +36,7 @@ to load fixtures or inside your tests, [where it has even more features](#using-
     9. [Immutable](#immutable)
     10. [Doctrine Relationships](#doctrine-relationships)
     11. [Anonymous Factories](#anonymous-factories)
+    12. [Without Persisting](#without-persisting)
 4. [Using with DoctrineFixturesBundle](#using-with-doctrinefixturesbundle)
 5. [Using in your Tests](#using-in-your-tests)
     1. [Enable Foundry in your TestCase](#enable-foundry-in-your-testcase)
@@ -274,13 +275,6 @@ $posts = PostFactory::randomSet(4); // array containing 4 "Post|Proxy" objects
 
 // random range of persisted objects
 $posts = PostFactory::randomRange(0, 5); // array containing 0-5 "Post|Proxy" objects
-
-// instantiate objects (without persisting)
-$post = PostFactory::new()->withoutPersisting()->create(); // returns Post|Proxy
-$post->setTitle('something else'); // do something with object
-$post->save(); // persist the Post (save() is a method on Proxy)
-
-$post = PostFactory::new()->withoutPersisting()->create()->object(); // actual Post object
 ```
 
 ### Reusable Model Factory "States"
@@ -643,7 +637,6 @@ $factory = factory(OtherEntity::class); // alternative to above
 // has the same API as ModelFactory's
 $factory->create(['field' => 'value']);
 $factory->createMany(5, ['field' => 'value']);
-$factory->withoutPersisting()->create(['field' => 'value']);
 $factory->instantiateWith(function () {});
 $factory->beforeInstantiate(function () {});
 $factory->afterInstantiate(function () {});
@@ -651,12 +644,62 @@ $factory->afterPersist(function () {});
 
 // convenience functions
 $entity = create(OtherEntity::class, ['field' => 'value']);
-$entity = create_many(OtherEntity::class, 5, ['field' => 'value']);
-
-// without persisting
-$entity = instantiate(OtherEntity::class, ['field' => 'value']);
-$entity = instantiate_many(OtherEntity::class, 5, ['field' => 'value']);
+$entities = create_many(OtherEntity::class, 5, ['field' => 'value']);
 ```
+
+### Without Persisting
+
+Factories can also create objects without persisting them. This can be useful for unit tests where you just want to test
+the behaviour of the actual object or for creating objects that are not entities. When created, they are still wrapped
+in a `Proxy` to optionally save later.
+
+```php
+use App\Factory\PostFactory;
+use App\Entity\OtherEntity;
+use Zenstruck\Foundry\Factory;
+use function Zenstruck\Foundry\instantiate;
+use function Zenstruck\Foundry\instantiate_many;
+
+$post = PostFactory::new()->withoutPersisting()->create(); // returns Post|Proxy
+$post->setTitle('something else'); // do something with object
+$post->save(); // persist the Post (save() is a method on Proxy)
+
+$post = PostFactory::new()->withoutPersisting()->create()->object(); // actual Post object
+
+$posts = PostFactory::new()->withoutPersisting()->createMany(5); // returns Post[]|Proxy[]
+
+// anonymous factories:
+$factory = new Factory(OtherEntity::class);
+
+$entity = $factory->withoutPersisting()->create(['field' => 'value']); // returns OtherEntity|Proxy
+
+$entity = $factory->withoutPersisting()->create(['field' => 'value'])->object(); // actual OtherEntity object
+
+$entities = $factory->withoutPersisting()->createMany(5, ['field' => 'value']); // returns OtherEntity[]|Proxy[]
+
+// convenience functions
+$entity = instantiate(OtherEntity::class, ['field' => 'value']);
+$entities = instantiate_many(OtherEntity::class, 5, ['field' => 'value']);
+```
+
+If you'd like your model factory to not persist by default, override its `initialize()` method to add this behaviour:
+
+```php
+protected function initialize(): self
+{
+    return $this
+        ->withoutPersisting()
+    ;
+}
+```
+
+Now, after creating objects using this factory, you'd have to call `->save()` to actually persist them to the database.
+
+**TIP**: If you'd like to disable persisting by default for all your model factories:
+
+1. Create an abstract model factory that extends `Zenstruck\Foundry\ModelFactory`.
+2. Override the `initialize()` method as shown above.
+3. Have all your model factories extend from this.
 
 ## Using with DoctrineFixturesBundle
 
@@ -781,6 +824,9 @@ class MyTest extends WebTestCase // TestCase must be an instance of KernelTestCa
 ```
 
 **TIP**: Create a base TestCase for tests using factories to avoid adding the traits to every TestCase.
+
+**NOTE**: If your tests [are not persisting](#without-persisting) the objects they create, these test traits are not
+required.
 
 By default, `ResetDatabase` resets the default configured connection's database and default configured object manager's
 schema. To customize the connection's and object manager's to be reset (or reset multiple connections/managers), set the
