@@ -3,10 +3,12 @@
 namespace Zenstruck\Foundry\Tests\Functional;
 
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\CommentFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithInvalidInitialize;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithNullInitialize;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithValidInitialize;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\UserFactory;
 use Zenstruck\Foundry\Tests\FunctionalTestCase;
 
 /**
@@ -106,5 +108,24 @@ final class ModelFactoryTest extends FunctionalTestCase
         $this->assertContains(3, $counts);
         $this->assertNotContains(4, $counts);
         $this->assertNotContains(5, $counts);
+    }
+
+    /**
+     * @test
+     */
+    public function one_to_many_with_nested_relationship(): void
+    {
+        $post = PostFactory::new()->create([
+            'comments' => [
+                CommentFactory::new(),
+                CommentFactory::new(),
+                CommentFactory::new(),
+                CommentFactory::new(),
+            ],
+        ]);
+
+        $this->assertCount(4, $post->getComments());
+        UserFactory::repository()->assertCount(4);
+        PostFactory::repository()->assertCount(1); // fails (count=5, 1 primary, 1 for each comment)
     }
 }
