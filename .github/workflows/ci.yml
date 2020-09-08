@@ -148,7 +148,9 @@ jobs:
             coverage: none
 
       -   name: Install dependencies
-          run: wget https://cs.symfony.com/download/php-cs-fixer-v2.phar -O php-cs-fixer.phar
+          run: |
+            wget https://cs.symfony.com/download/php-cs-fixer-v2.phar -O php-cs-fixer.phar
+            php php-cs-fixer.phar self-update
 
       -   name: Check CS
           run: php php-cs-fixer.phar fix --dry-run --diff
