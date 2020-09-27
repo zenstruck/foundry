@@ -8,6 +8,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithInvalidInitialize;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithNullInitialize;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithValidInitialize;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\TagFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\UserFactory;
 use Zenstruck\Foundry\Tests\FunctionalTestCase;
 
@@ -113,19 +114,104 @@ final class ModelFactoryTest extends FunctionalTestCase
     /**
      * @test
      */
-    public function one_to_many_with_nested_relationship(): void
+    public function one_to_many_with_nested_collection_relationship(): void
     {
         $post = PostFactory::new()->create([
-            'comments' => [
-                CommentFactory::new(),
-                CommentFactory::new(),
-                CommentFactory::new(),
-                CommentFactory::new(),
-            ],
+            'comments' => CommentFactory::new()->many(4),
         ]);
 
         $this->assertCount(4, $post->getComments());
         UserFactory::repository()->assertCount(4);
-        PostFactory::repository()->assertCount(1); // fails (count=5, 1 primary, 1 for each comment)
+        CommentFactory::repository()->assertCount(4);
+        PostFactory::repository()->assertCount(1);
+    }
+
+    /**
+     * @test
+     */
+    public function create_multiple_one_to_many_with_nested_collection_relationship(): void
+    {
+        $user = UserFactory::new()->create();
+        $posts = PostFactory::new()->createMany(2, [
+            'comments' => CommentFactory::new(['user' => $user])->many(4),
+        ]);
+
+        $this->assertCount(4, $posts[0]->getComments());
+        $this->assertCount(4, $posts[1]->getComments());
+        UserFactory::repository()->assertCount(1);
+        CommentFactory::repository()->assertCount(8);
+        PostFactory::repository()->assertCount(2);
+    }
+
+    /**
+     * @test
+     */
+    public function many_to_many_with_nested_collection_relationship(): void
+    {
+        $post = PostFactory::new()->create([
+            'tags' => TagFactory::new()->many(3),
+        ]);
+
+        $this->assertCount(3, $post->getTags());
+        TagFactory::repository()->assertCount(5); // 3 created by this test and 2 in global state
+        PostFactory::repository()->assertCount(1);
+    }
+
+    /**
+     * @test
+     */
+    public function inverse_many_to_many_with_nested_collection_relationship(): void
+    {
+        $tag = TagFactory::new()->create([
+            'posts' => PostFactory::new()->many(3),
+        ]);
+
+        $this->assertCount(3, $tag->getPosts());
+        TagFactory::repository()->assertCount(3); // 1 created by this test and 2 in global state
+        PostFactory::repository()->assertCount(3);
+    }
+
+    /**
+     * @test
+     */
+    public function create_multiple_many_to_many_with_nested_collection_relationship(): void
+    {
+        $posts = PostFactory::new()->createMany(2, [
+            'tags' => TagFactory::new()->many(3),
+        ]);
+
+        $this->assertCount(3, $posts[0]->getTags());
+        $this->assertCount(3, $posts[1]->getTags());
+        TagFactory::repository()->assertCount(8); // 6 created by this test and 2 in global state
+        PostFactory::repository()->assertCount(2);
+    }
+
+    /**
+     * @test
+     */
+    public function unpersisted_one_to_many_with_nested_collection_relationship(): void
+    {
+        $post = PostFactory::new()->withoutPersisting()->create([
+            'comments' => CommentFactory::new()->many(4),
+        ]);
+
+        $this->assertCount(4, $post->getComments());
+        UserFactory::repository()->assertEmpty();
+        CommentFactory::repository()->assertEmpty();
+        PostFactory::repository()->assertEmpty();
+    }
+
+    /**
+     * @test
+     */
+    public function unpersisted_many_to_many_with_nested_collection_relationship(): void
+    {
+        $post = PostFactory::new()->withoutPersisting()->create([
+            'tags' => TagFactory::new()->many(3),
+        ]);
+
+        $this->assertCount(3, $post->getTags());
+        TagFactory::repository()->assertCount(2); // 2 created in global state
+        PostFactory::repository()->assertEmpty();
     }
 }

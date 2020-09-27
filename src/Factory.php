@@ -92,18 +92,21 @@ class Factory
     }
 
     /**
+     * @see FactoryCollection::__construct()
+     */
+    final public function many(int $min, ?int $max = null): FactoryCollection
+    {
+        return new FactoryCollection($this, $min, $max);
+    }
+
+    /**
      * @param array|callable $attributes
      *
      * @return Proxy[]|object[]
      */
     final public function createMany(int $number, $attributes = []): array
     {
-        return \array_map(
-            function() use ($attributes) {
-                return $this->create($attributes);
-            },
-            \array_fill(0, $number, null)
-        );
+        return $this->many($number)->create($attributes);
     }
 
     public function withoutPersisting(): self
@@ -221,6 +224,10 @@ class Factory
             return $value->object();
         }
 
+        if ($value instanceof FactoryCollection) {
+            $value = $this->normalizeCollection($value);
+        }
+
         if (\is_array($value)) {
             // possible OneToMany/ManyToMany relationship
             return \array_map(
@@ -241,5 +248,35 @@ class Factory
         }
 
         return $value->create()->object();
+    }
+
+    private function normalizeCollection(FactoryCollection $collection): array
+    {
+        if ($this->persist && $field = $this->inverseRelationshipField($collection->factory())) {
+            $this->afterPersist[] = static function(Proxy $proxy) use ($collection, $field) {
+                $collection->create([$field => $proxy]);
+                $proxy->refresh();
+            };
+
+            // creation delegated to afterPersist event - return empty array here
+            return [];
+        }
+
+        return $collection->all();
+    }
+
+    private function inverseRelationshipField(self $factory): ?string
+    {
+        $collectionClass = $factory->class;
+        $collectionMetadata = self::configuration()->objectManagerFor($collectionClass)->getClassMetadata($collectionClass);
+
+        foreach ($collectionMetadata->getAssociationNames() as $field) {
+            // ensure 1-n and associated class matches
+            if ($collectionMetadata->isSingleValuedAssociation($field) && $collectionMetadata->getAssociationTargetClass($field) === $this->class) {
+                return $field;
+            }
+        }
+
+        return null; // no relationship found
     }
 }
