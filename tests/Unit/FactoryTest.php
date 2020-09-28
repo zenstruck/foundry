@@ -303,25 +303,25 @@ final class FactoryTest extends UnitTestCase
 
         $this->configuration->setManagerRegistry($registry);
 
-        $attributesArray = ['title' => 'title', 'body' => 'body'];
+        $expectedAttributes = ['short_description' => 'short desc', 'title' => 'title', 'body' => 'body'];
         $calls = 0;
 
-        $object = (new Factory(Post::class))
-            ->afterPersist(function(Proxy $post, array $attributes) use ($attributesArray, &$calls) {
+        $object = (new Factory(Post::class, ['short_description' => 'short desc']))
+            ->afterPersist(function(Proxy $post, array $attributes) use ($expectedAttributes, &$calls) {
                 /* @var Post $post */
-                $this->assertSame($attributesArray, $attributes);
+                $this->assertSame($expectedAttributes, $attributes);
 
                 $post->increaseViewCount();
                 ++$calls;
             })
-            ->afterPersist(function(Post $post, array $attributes) use ($attributesArray, &$calls) {
-                $this->assertSame($attributesArray, $attributes);
+            ->afterPersist(function(Post $post, array $attributes) use ($expectedAttributes, &$calls) {
+                $this->assertSame($expectedAttributes, $attributes);
 
                 $post->increaseViewCount();
                 ++$calls;
             })
-            ->afterPersist(function(Post $post, array $attributes) use ($attributesArray, &$calls) {
-                $this->assertSame($attributesArray, $attributes);
+            ->afterPersist(function(Post $post, array $attributes) use ($expectedAttributes, &$calls) {
+                $this->assertSame($expectedAttributes, $attributes);
 
                 $post->increaseViewCount();
                 ++$calls;
@@ -334,7 +334,7 @@ final class FactoryTest extends UnitTestCase
             ->afterPersist(static function() use (&$calls) {
                 ++$calls;
             })
-            ->create($attributesArray)
+            ->create(['title' => 'title', 'body' => 'body'])
         ;
 
         $this->assertSame(3, $object->getViewCount());
