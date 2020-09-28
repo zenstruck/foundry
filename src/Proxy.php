@@ -222,7 +222,7 @@ final class Proxy
     public function executeCallback(callable $callback, ...$arguments): void
     {
         $object = $this;
-        $parameters = (new \ReflectionFunction($callback))->getParameters();
+        $parameters = (new \ReflectionFunction(\Closure::fromCallable($callback)))->getParameters();
 
         if (isset($parameters[0]) && $parameters[0]->getType() && $this->class === $parameters[0]->getType()->getName()) {
             $object = $object->object();
