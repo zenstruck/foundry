@@ -49,7 +49,36 @@ class Factory
      */
     final public function create($attributes = []): Proxy
     {
-        $proxy = new Proxy($this->instantiate($attributes));
+        // merge the factory attribute set with the passed attributes
+        $attributeSet = \array_merge($this->attributeSet, [$attributes]);
+
+        // normalize each attribute set and collapse
+        $attributes = \array_merge(...\array_map([$this, 'normalizeAttributes'], $attributeSet));
+
+        foreach ($this->beforeInstantiate as $callback) {
+            $attributes = $callback($attributes);
+
+            if (!\is_array($attributes)) {
+                throw new \LogicException('Before Instantiate event callback must return an array.');
+            }
+        }
+
+        // filter each attribute to convert proxies and factories to objects
+        $attributes = \array_map(
+            function($value) {
+                return $this->normalizeAttribute($value);
+            },
+            $attributes
+        );
+
+        // instantiate the object with the users instantiator or if not set, the default instantiator
+        $object = ($this->instantiator ?? self::configuration()->instantiator())($attributes, $this->class);
+
+        foreach ($this->afterInstantiate as $callback) {
+            $callback($object, $attributes);
+        }
+
+        $proxy = new Proxy($object);
 
         if (!$this->persist) {
             return $proxy;
@@ -179,43 +208,6 @@ class Factory
     private static function normalizeAttributes($attributes): array
     {
         return \is_callable($attributes) ? $attributes(self::faker()) : $attributes;
-    }
-
-    /**
-     * @param array|callable $attributes
-     */
-    private function instantiate($attributes): object
-    {
-        // merge the factory attribute set with the passed attributes
-        $attributeSet = \array_merge($this->attributeSet, [$attributes]);
-
-        // normalize each attribute set and collapse
-        $attributes = \array_merge(...\array_map([$this, 'normalizeAttributes'], $attributeSet));
-
-        foreach ($this->beforeInstantiate as $callback) {
-            $attributes = $callback($attributes);
-
-            if (!\is_array($attributes)) {
-                throw new \LogicException('Before Instantiate event callback must return an array.');
-            }
-        }
-
-        // filter each attribute to convert proxies and factories to objects
-        $attributes = \array_map(
-            function($value) {
-                return $this->normalizeAttribute($value);
-            },
-            $attributes
-        );
-
-        // instantiate the object with the users instantiator or if not set, the default instantiator
-        $object = ($this->instantiator ?? self::configuration()->instantiator())($attributes, $this->class);
-
-        foreach ($this->afterInstantiate as $callback) {
-            $callback($object, $attributes);
-        }
-
-        return $object;
     }
 
     /**
