@@ -106,8 +106,46 @@ final class ProxyTest extends UnitTestCase
             ->withoutAutoRefresh(static function() use (&$calls) {
                 ++$calls;
             })
+            ->withoutAutoRefresh([$this, 'functionWithProxy'])
+            ->withoutAutoRefresh([$this, 'functionWithObject'])
+            ->withoutAutoRefresh([$this, 'functionWithNoTypeHint'])
+            ->withoutAutoRefresh([self::class, 'staticFunctionWithProxy'])
+            ->withoutAutoRefresh([self::class, 'staticFunctionWithObject'])
+            ->withoutAutoRefresh([self::class, 'staticFunctionWithNoTypeHint'])
         ;
 
         $this->assertSame(4, $calls);
+    }
+
+    public function functionWithProxy(Proxy $proxy)
+    {
+        $this->assertInstanceOf(Category::class, $proxy->object());
+    }
+
+    public function functionWithObject(Category $category)
+    {
+        $this->assertInstanceOf(Category::class, $category);
+    }
+
+    public function functionWithNoTypeHint($proxy)
+    {
+        $this->assertInstanceOf(Proxy::class, $proxy);
+        $this->assertInstanceOf(Category::class, $proxy->object());
+    }
+
+    public static function staticFunctionWithProxy(Proxy $proxy)
+    {
+        self::assertInstanceOf(Category::class, $proxy->object());
+    }
+
+    public static function staticFunctionWithObject(Category $category)
+    {
+        self::assertInstanceOf(Category::class, $category);
+    }
+
+    public static function staticFunctionWithNoTypeHint($proxy)
+    {
+        self::assertInstanceOf(Proxy::class, $proxy);
+        self::assertInstanceOf(Category::class, $proxy->object());
     }
 }
