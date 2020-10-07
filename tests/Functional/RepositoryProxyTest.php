@@ -2,10 +2,12 @@
 
 namespace Zenstruck\Foundry\Tests\Functional;
 
+use Doctrine\Common\Proxy\Proxy as DoctrineProxy;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 use Zenstruck\Foundry\Tests\FunctionalTestCase;
 use function Zenstruck\Foundry\repository;
 
@@ -196,5 +198,28 @@ final class RepositoryProxyTest extends FunctionalTestCase
         $this->expectExceptionMessage('$max (3) cannot be less than $min (5).');
 
         repository(Category::class)->randomRange(5, 3);
+    }
+
+    /**
+     * @see https://github.com/zenstruck/foundry/issues/42
+     *
+     * @test
+     */
+    public function doctrine_proxies_are_converted_to_foundry_proxies(): void
+    {
+        PostFactory::new()->create(['category' => CategoryFactory::new()]);
+
+        // clear the em so nothing is tracked
+        static::$kernel->getContainer()->get('doctrine')->getManager()->clear();
+
+        // load a random Post which causes the em to track a "doctrine proxy" for category
+        PostFactory::random();
+
+        // load a random Category which should be a "doctrine proxy"
+        $category = CategoryFactory::random()->object();
+
+        // ensure the category is a "doctrine proxy" and a Category
+        $this->assertInstanceOf(DoctrineProxy::class, $category);
+        $this->assertInstanceOf(Category::class, $category);
     }
 }
