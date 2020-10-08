@@ -67,6 +67,28 @@ jobs:
           USE_FOUNDRY_BUNDLE: 1
           DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
+      - name: 'Test: SQLite'
+        run: vendor/bin/phpunit -v
+        env:
+          DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
+
+      - name: 'Test: SQLite, FoundryBundle'
+        run: vendor/bin/phpunit -v
+        env:
+          USE_FOUNDRY_BUNDLE: 1
+          DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
+
+      - name: 'Test: SQLite, DAMABundle'
+        run: vendor/bin/phpunit -v --configuration phpunit-dama-doctrine.xml.dist
+        env:
+          DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
+
+      - name: 'Test: SQLite, FoundryBundle, DAMABundle'
+        run: vendor/bin/phpunit -v --configuration phpunit-dama-doctrine.xml.dist
+        env:
+          USE_FOUNDRY_BUNDLE: 1
+          DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
+
   code-coverage:
     name: Code Coverage
     runs-on: ubuntu-latest
@@ -122,6 +144,28 @@ jobs:
           USE_FOUNDRY_BUNDLE: 1
           DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
+      - name: 'Coverage: SQLite'
+        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=sqlite.clover
+        env:
+          DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
+
+      - name: 'Coverage: SQLite, FoundryBundle'
+        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=sqlite-foundry.clover
+        env:
+          USE_FOUNDRY_BUNDLE: 1
+          DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
+
+      - name: 'Coverage: SQLite, DAMABundle'
+        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=sqlite-dama.clover
+        env:
+          DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
+
+      - name: 'Coverage: SQLite, FoundryBundle, DAMABundle'
+        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=sqlite-foundry-dama.clover
+        env:
+          USE_FOUNDRY_BUNDLE: 1
+          DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
+
       - name: Send code coverage
         run: |
           wget https://scrutinizer-ci.com/ocular.phar
@@ -129,6 +173,10 @@ jobs:
           php ocular.phar code-coverage:upload --format=php-clover mysql-foundry.clover
           php ocular.phar code-coverage:upload --format=php-clover mysql-dama.clover
           php ocular.phar code-coverage:upload --format=php-clover mysql-foundry-dama.clover
+          php ocular.phar code-coverage:upload --format=php-clover sqlite.clover
+          php ocular.phar code-coverage:upload --format=php-clover sqlite-foundry.clover
+          php ocular.phar code-coverage:upload --format=php-clover sqlite-dama.clover
+          php ocular.phar code-coverage:upload --format=php-clover sqlite-foundry-dama.clover
 
   composer-validate:
     name: Validate composer.json
