@@ -147,7 +147,7 @@ jobs:
       - name: 'Test: SQLite, FoundryBundle, DAMABundle'
         run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
         env:
-#          USE_FOUNDRY_BUNDLE: 1
+          USE_FOUNDRY_BUNDLE: 1
           DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
 
       - name: 'Test: MySQL, Mongo'
@@ -292,7 +292,7 @@ jobs:
       - name: 'Coverage: SQLite, FoundryBundle, DAMABundle'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=sqlite-foundry-dama.clover --configuration phpunit-dama-doctrine.xml.dist
         env:
-#          USE_FOUNDRY_BUNDLE: 1
+          USE_FOUNDRY_BUNDLE: 1
           DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
 
       - name: 'Test: MySQL, Mongo'
