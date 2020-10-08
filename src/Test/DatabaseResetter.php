@@ -39,11 +39,14 @@ final class DatabaseResetter
         $registry = $kernel->getContainer()->get('doctrine');
 
         foreach (self::connectionsToReset($registry) as $connection) {
-            self::runCommand($application, 'doctrine:database:drop', [
-                '--connection' => $connection,
-                '--if-exists' => true,
-                '--force' => true,
-            ]);
+            $dropParams = ['--connection' => $connection, '--force' => true];
+
+            if ('sqlite' !== $registry->getConnection($connection)->getDatabasePlatform()->getName()) {
+                // sqlite does not support "--if-exists" (ref: https://github.com/doctrine/dbal/pull/2402)
+                $dropParams['--if-exists'] = true;
+            }
+
+            self::runCommand($application, 'doctrine:database:drop', $dropParams);
 
             self::runCommand($application, 'doctrine:database:create', [
                 '--connection' => $connection,
