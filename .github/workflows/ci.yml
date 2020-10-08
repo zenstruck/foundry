@@ -45,21 +45,27 @@ jobs:
       - name: Install dependencies
         run: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-suggest
 
-      - name: Run tests WITHOUT ZenstruckFoundryBundle
+      - name: 'Test: MySQL'
         run: vendor/bin/phpunit -v
+        env:
+          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
-      - name: Run tests WITH ZenstruckFoundryBundle
+      - name: 'Test: MySQL, FoundryBundle'
         run: vendor/bin/phpunit -v
         env:
           USE_FOUNDRY_BUNDLE: 1
+          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
-      - name: Run tests WITH DAMADoctrineTestBundle and WITHOUT ZenstruckFoundryBundle
+      - name: 'Test: MySQL, DAMABundle'
         run: vendor/bin/phpunit -v --configuration phpunit-dama-doctrine.xml.dist
+        env:
+          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
-      - name: Run tests WITH DAMADoctrineTestBundle and WITH ZenstruckFoundryBundle
+      - name: 'Test: MySQL, FoundryBundle, DAMABundle'
         run: vendor/bin/phpunit -v --configuration phpunit-dama-doctrine.xml.dist
         env:
           USE_FOUNDRY_BUNDLE: 1
+          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
   code-coverage:
     name: Code Coverage
@@ -94,29 +100,35 @@ jobs:
       - name: Install dependencies
         run: composer update --prefer-dist --no-interaction --no-suggest
 
-      - name: Run code coverage WITHOUT ZenstruckFoundryBundle
-        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=coverage.clover
+      - name: 'Coverage: MySQL'
+        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=mysql.clover
+        env:
+          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
-      - name: Run code coverage WITH ZenstruckFoundryBundle
-        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=bundle-coverage.clover
+      - name: 'Coverage: MySQL, FoundryBundle'
+        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=mysql-foundry.clover
         env:
           USE_FOUNDRY_BUNDLE: 1
+          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
-      - name: Run code coverage WITH DAMADoctrineTestBundle and WITHOUT ZenstruckFoundryBundle
-        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=coverage-dama.clover
+      - name: 'Coverage: MySQL, DAMABundle'
+        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=mysql-dama.clover
+        env:
+          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
-      - name: Run code coverage WITH DAMADoctrineTestBundle and WITH ZenstruckFoundryBundle
-        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=bundle-coverage-dama.clover
+      - name: 'Coverage: MySQL, FoundryBundle, DAMABundle'
+        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=mysql-foundry-dama.clover
         env:
           USE_FOUNDRY_BUNDLE: 1
+          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: Send code coverage
         run: |
           wget https://scrutinizer-ci.com/ocular.phar
-          php ocular.phar code-coverage:upload --format=php-clover coverage.clover
-          php ocular.phar code-coverage:upload --format=php-clover bundle-coverage.clover
-          php ocular.phar code-coverage:upload --format=php-clover coverage-dama.clover
-          php ocular.phar code-coverage:upload --format=php-clover bundle-coverage-dama.clover
+          php ocular.phar code-coverage:upload --format=php-clover mysql.clover
+          php ocular.phar code-coverage:upload --format=php-clover mysql-foundry.clover
+          php ocular.phar code-coverage:upload --format=php-clover mysql-dama.clover
+          php ocular.phar code-coverage:upload --format=php-clover mysql-foundry-dama.clover
 
   composer-validate:
     name: Validate composer.json
