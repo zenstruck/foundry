@@ -133,12 +133,12 @@ jobs:
           DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Coverage: MySQL, DAMABundle'
-        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=mysql-dama.clover
+        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=mysql-dama.clover --configuration phpunit-dama-doctrine.xml.dist
         env:
           DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Coverage: MySQL, FoundryBundle, DAMABundle'
-        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=mysql-foundry-dama.clover
+        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=mysql-foundry-dama.clover --configuration phpunit-dama-doctrine.xml.dist
         env:
           USE_FOUNDRY_BUNDLE: 1
           DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
@@ -155,14 +155,14 @@ jobs:
           DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
 
       - name: 'Coverage: SQLite, DAMABundle'
-        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=sqlite-dama.clover
+        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=sqlite-dama.clover --configuration phpunit-dama-doctrine.xml.dist
         env:
           DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
 
       - name: 'Coverage: SQLite, FoundryBundle, DAMABundle'
-        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=sqlite-foundry-dama.clover
+        run: vendor/bin/phpunit -v --coverage-text --coverage-clover=sqlite-foundry-dama.clover --configuration phpunit-dama-doctrine.xml.dist
         env:
-          USE_FOUNDRY_BUNDLE: 1
+#          USE_FOUNDRY_BUNDLE: 1
           DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
 
       - name: Send code coverage
