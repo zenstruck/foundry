@@ -571,51 +571,113 @@ $factory5 = $factory->afterPersist(function () {}); // returns a new PostFactory
 
 Assuming your entites follow the
 [best practices for Doctrine Relationships](https://symfony.com/doc/current/doctrine/associations.html) and you are
-using the [default instantiator](#instantiator), Foundry *just works* with doctrine relationships:
+using the [default instantiator](#instantiator), Foundry *just works* with doctrine relationships. There are some
+nuances with the different relationships and how entities are created. The following tries to document these for
+each relationship type.
+
+#### Many-to-One
+
+The following assumes the `Comment` entity has a many-to-one relationship with `Post`:
 
 ```php
-use App\Factory\CategoryFactory;
+use App\Factory\CommentFactory;
+use App\Factory\PostFactory;
+
+// Example 1: pre-create Post and attach to Comment
+$post = PostFactory::new()->create(); // instance of Proxy
+
+CommentFactory::new()->create(['post' => $post]);
+CommentFactory::new()->create(['post' => $post->object()]); // functionally the same as above
+
+// Example 2: pre-create Posts and choose a random one
+PostFactory::new()->many(5)->create(); // create 5 Posts
+
+CommentFactory::new()->create(['post' => PostFactory::random()]);
+
+// Example 3: create a separate Post for each Comment
+CommentFactory::new()->many(5)->create([
+    // this attribute is an instance of PostFactory that is created separately for each Comment created
+    'post' => PostFactory::new(),
+]);
+
+// Example 4: create multiple Comments with the same Post
+CommentFactory::new()->many(5)->create([
+    'post' => PostFactory::new()->create(), // note the "->create" here
+]);
+```
+
+**TIP 1**: It is recommended that the only relationship you define in `ModelFactory::getDefaults()` is non-null
+Many-to-One's.
+
+**TIP 2**: It is also recommended that your `ModelFactory::getDefaults()` return a `Factory` and not the created entity:
+
+```php
+protected function getDefaults(): array
+{
+    return [
+        'post' => PostFactory::new(), // RECOMMENDED
+
+        'post' => PostFactory::new()->create(), // NOT RECOMMENDED - will potentially result in extra unintended Posts
+    ];
+}
+```
+
+#### One-to-Many
+
+The following assumes the `Post` entity has a one-to-many relationship with `Comment`:
+
+```php
+use App\Factory\CommentFactory;
+use App\Factory\PostFactory;
+
+// Example 1: Create a Post with 6 Comments
+PostFactory::new()->create(['comments' => CommentFactory::new()->many(6)]);
+
+// Example 2: Create 6 Posts each with 4 Comments (24 Comments total)
+PostFactory::new()->many(6)->create(['comments' => CommentFactory::new()->many(4)]);
+
+// Example 3: Create 6 Posts each with between 0 and 10 Comments
+PostFactory::new()->many(6)->create(['comments' => CommentFactory::new()->many(0, 10)]);
+```
+
+#### Many-to-Many
+
+The following assumes the `Post` entity has a many-to-many relationship with `Tag`:
+
+```php
 use App\Factory\PostFactory;
 use App\Factory\TagFactory;
 
-// ManyToOne
-PostFactory::new()->create([
-    'category' => $category, // $category is instance of Category
-]);
-PostFactory::new()->create([
-    // Proxy objects are converted to object before calling Post::setCategory()
-    'category' => CategoryFactory::new()->create(['name' => 'My Category']),
-]);
-PostFactory::new()->create([
-    // Factory objects are persisted before calling Post::setCategory()
-    'category' => CategoryFactory::new(['name' => 'My Category']),
-]);
+// Example 1: pre-create Tags and attach to Post
+$tags = TagFactory::new()->many(3)->create();
 
-// OneToMany
-CategoryFactory::new()->create([
-    'posts' => [
-        $post, // $post is instance of Post, Category::addPost($post) will be called during instantiation
+PostFactory::new()->create(['tags' => $tags]);
 
-        // Proxy objects are converted to object before calling Category::addPost()
-        PostFactory::new()->create(['title' => 'Post B', 'body' => 'body']),
+// Example 2: pre-create Tags and choose a random set
+TagFactory::new()->many(10)->create();
 
-        // Factory objects are persisted before calling Category::addPost()
-        PostFactory::new(['title' => 'Post A', 'body' => 'body']),
-    ],
-]);
+PostFactory::new()
+    ->many(5) // create 5 posts
+    ->create(function() { // note the callback - this ensures that each of the 5 posts has a different random set
+        return ['tags' => TagFactory::randomSet(2)]; // each post uses 2 random tags from those already in the database
+    })
+;
 
-// ManyToMany
-PostFactory::new()->create([
-    'tags' => [
-        $tag, // $tag is instance of Tag, Post::addTag($tag) will be called during instantiation
+// Example 3: pre-create Tags and choose a random range
+TagFactory::new()->many(10)->create();
 
-        // Proxy objects are converted to object before calling Post::addTag()
-        TagFactory::new()->create(['name' => 'My Tag']),
+PostFactory::new()
+    ->many(5) // create 5 posts
+    ->create(function() { // note the callback - this ensures that each of the 5 posts has a different random range
+        return ['tags' => TagFactory::randomRange(0, 5)]; // each post uses between 0 and 5 random tags from those already in the database
+    })
+;
 
-        // Factory objects are persisted before calling Post::addTag()
-        TagFactory::new(['name' => 'My Tag']),
-    ],
-]);
+// Example 4: create 3 Posts each with 3 unique Tags
+PostFactory::new()->many(3)->create(['tags' => TagFactory::new()->many(3)]);
+
+// Example 5: create 3 Posts each with between 0 and 3 unique Tags
+PostFactory::new()->many(3)->create(['tags' => TagFactory::new()->many(0, 3)]);
 ```
 
 ### Anonymous Factories
@@ -711,6 +773,7 @@ You can simply use your factories and stories right within your fixture files:
 namespace App\DataFixtures;
 
 use App\Factory\CategoryFactory;
+use App\Factory\CommentFactory;
 use App\Factory\PostFactory;
 use App\Factory\TagFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -729,11 +792,14 @@ class AppFixtures extends Fixture
         // create 50 Post's
         PostFactory::new()->createMany(50, function() {
             return [
-                // each Post will have a random Category (created above)
+                // each Post will have a random Category (chosen from those created above)
                 'category' => CategoryFactory::random(),
 
-                // each Post will between 0 and 6 Tag's (created above)
+                // each Post will have between 0 and 6 Tag's (chosen from those created above)
                 'tags' => TagFactory::randomRange(0, 6),
+
+                // each Post will have between 0 and 10 Comment's that are created new
+                'comments' => CommentFactory::new()->many(0, 10),
             ];
         });
     }

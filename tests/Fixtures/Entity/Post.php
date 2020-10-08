@@ -58,6 +58,11 @@ class Post
      */
     private $tags;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="post")
+     */
+    private $comments;
+
     public function __construct(string $title, string $body, ?string $shortDescription = null)
     {
         $this->title = $title;
@@ -65,6 +70,7 @@ class Post
         $this->shortDescription = $shortDescription;
         $this->createdAt = new \DateTime('now');
         $this->tags = new ArrayCollection();
+        $this->comments = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -139,5 +145,33 @@ class Post
         if ($this->tags->contains($tag)) {
             $this->tags->removeElement($tag);
         }
+    }
+
+    public function getComments()
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments[] = $comment;
+            $comment->setPost($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): self
+    {
+        if ($this->comments->contains($comment)) {
+            $this->comments->removeElement($comment);
+            // set the owning side to null (unless already changed)
+            if ($comment->getPost() === $this) {
+                $comment->setPost(null);
+            }
+        }
+
+        return $this;
     }
 }
