@@ -1120,8 +1120,10 @@ Zenstruck\Foundry\Test\TestState::addGlobalState(function () {
 });
 ```
 
-**NOTE**: You can still access [Story State](#story-state) for *Global State Stories* in your tests and they are still
+**NOTES**:
+1. You can still access [Story State](#story-state) for *Global State Stories* in your tests and they are still
 only loaded once.
+2. The [`ResetDatabase`](#enable-foundry-in-your-testcase) trait is required when using global state.
 
 ### Performance
 
