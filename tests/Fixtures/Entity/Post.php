@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="Zenstruck\Foundry\Tests\Fixtures\Repository\PostRepository")
+ * @ORM\Table(name="posts")
  */
 class Post
 {

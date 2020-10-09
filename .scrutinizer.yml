@@ -5,7 +5,7 @@ checks:
 tools:
   external_code_coverage:
     timeout: 900
-    runs: 8
+    runs: 12
 build:
   nodes:
     analysis:
