@@ -7,7 +7,7 @@ namespace Zenstruck\Foundry;
  */
 abstract class ModelFactory extends Factory
 {
-    private function __construct()
+    public function __construct()
     {
         parent::__construct(static::getClass());
     }
@@ -23,7 +23,7 @@ abstract class ModelFactory extends Factory
             $defaultAttributes = [];
         }
 
-        $factory = new static();
+        $factory = self::configuration()->factories()->create(static::class);
         $factory = $factory
             ->withAttributes([$factory, 'getDefaults'])
             ->withAttributes($defaultAttributes)

@@ -19,6 +19,9 @@ final class Configuration
     /** @var StoryManager */
     private $stories;
 
+    /** @var ModelFactoryManager */
+    private $factories;
+
     /** @var Faker\Generator */
     private $faker;
 
@@ -28,10 +31,11 @@ final class Configuration
     /** @var bool */
     private $defaultProxyAutoRefresh = false;
 
-    public function __construct(ManagerRegistry $managerRegistry, StoryManager $storyManager)
+    public function __construct(ManagerRegistry $managerRegistry, StoryManager $storyManager, ModelFactoryManager $factories)
     {
         $this->managerRegistry = $managerRegistry;
         $this->stories = $storyManager;
+        $this->factories = $factories;
         $this->faker = Faker\Factory::create();
         $this->instantiator = new Instantiator();
     }
@@ -39,6 +43,11 @@ final class Configuration
     public function stories(): StoryManager
     {
         return $this->stories;
+    }
+
+    public function factories(): ModelFactoryManager
+    {
+        return $this->factories;
     }
 
     public function faker(): Faker\Generator

@@ -7,6 +7,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\ModelFactoryManager;
 use Zenstruck\Foundry\StoryManager;
 
 /**
@@ -87,7 +88,7 @@ final class TestState
         }
 
         try {
-            return self::bootFactory(new Configuration($container->get('doctrine'), new StoryManager([])));
+            return self::bootFactory(new Configuration($container->get('doctrine'), new StoryManager([]), new ModelFactoryManager([])));
         } catch (NotFoundExceptionInterface $e) {
             throw new \LogicException('Could not boot Foundry, is the DoctrineBundle installed/configured?', 0, $e);
         }

@@ -21,6 +21,13 @@ use Zenstruck\Foundry\Proxy;
  */
 final class <?= $class_name ?> extends ModelFactory
 {
+    public function __construct()
+    {
+        parent::__construct();
+
+        // TODO inject services if required (https://github.com/zenstruck/foundry#factories-as-services)
+    }
+
     protected function getDefaults(): array
     {
         return [

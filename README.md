@@ -35,8 +35,9 @@ to load fixtures or inside your tests, [where it has even more features](#using-
     8. [Instantiation](#instantiation)
     9. [Immutable](#immutable)
     10. [Doctrine Relationships](#doctrine-relationships)
-    11. [Anonymous Factories](#anonymous-factories)
-    12. [Without Persisting](#without-persisting)
+    11. [Factories as Services](#factories-as-services)
+    12. [Anonymous Factories](#anonymous-factories)
+    13. [Without Persisting](#without-persisting)
 4. [Using with DoctrineFixturesBundle](#using-with-doctrinefixturesbundle)
 5. [Using in your Tests](#using-in-your-tests)
     1. [Enable Foundry in your TestCase](#enable-foundry-in-your-testcase)
@@ -199,6 +200,13 @@ use Zenstruck\Foundry\Proxy;
  */
 final class PostFactory extends ModelFactory
 {
+    public function __construct()
+    {
+        parent::__construct();
+
+        // TODO inject services if required (https://github.com/zenstruck/foundry#factories-as-services)
+    }
+
     protected function getDefaults(): array
     {
         return [
@@ -276,6 +284,9 @@ $posts = PostFactory::randomSet(4); // array containing 4 "Post|Proxy" objects
 // random range of persisted objects
 $posts = PostFactory::randomRange(0, 5); // array containing 0-5 "Post|Proxy" objects
 ```
+
+**WARNING**: Never instantiate your `ModelFactory` with the constructor (ie `new PostFactory()`). This will
+cause the factory to not be instantiated properly. Always instantiate with `PostFactory::new()`.
 
 ### Reusable Model Factory "States"
 
@@ -679,6 +690,71 @@ PostFactory::new()->many(3)->create(['tags' => TagFactory::new()->many(3)]);
 // Example 5: create 3 Posts each with between 0 and 3 unique Tags
 PostFactory::new()->many(3)->create(['tags' => TagFactory::new()->many(0, 3)]);
 ```
+
+### Factories as Services
+
+If your factories require dependencies, you can define them as a service. The following example demonstrates a very
+common use-case: encoding a password with the `UserPasswordEncoderInterface` service.
+
+```php
+// src/Factory/UserFactory.php
+
+namespace App\Story;
+
+use App\Entity\User;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Zenstruck\Foundry\ModelFactory;
+
+final class UserFactory extends ModelFactory
+{
+    private $passwordEncoder;
+
+    public function __construct(UserPasswordEncoderInterface $passwordEncoder)
+    {
+        parent::__construct();
+
+        $this->passwordEncoder = $passwordEncoder;
+    }
+
+    protected function getDefaults(): array
+    {
+        return [
+            'email' => self::faker()->unique()->safeEmail,
+            'password' => '1234',
+        ];
+    }
+
+    protected function initialize(): self
+    {
+        return $this
+            ->afterInstantiate(function(User $user) {
+                $user->setPassword($this->passwordEncoder->encodePassword($user, $user->getPassword()));
+            })
+        ;
+    }
+
+    protected static function getClass(): string
+    {
+        return User::class;
+    }
+}
+```
+
+If using a standard Symfony Flex app, this will be autowired/autoconfigured. If not, register the service and tag
+with `foundry.factory`.
+
+Use the factory as normal:
+
+```php
+UserFactory::new()->create(['password' => 'mypass'])->getPassword(); // "mypass" encoded
+UserFactory::new()->create()->getPassword(); // "1234" encoded (because "1234" is set as the default password)
+```
+
+**NOTES**:
+1. The provided bundle is required for factories as services.
+2. If using `make:factory --test`, factories will be created in the `tests/Factory` directory which is not
+autowired/autoconfigured in a standard Symfony Flex app. You will have to manually register these as
+services.
 
 ### Anonymous Factories
 
@@ -1172,6 +1248,27 @@ these tests to be unnecessarily slow. You can improve the speed by reducing the 
             memory_cost: 10 # Lowest possible value for argon
     ```
 
+3. Pre-encode user passwords with a known value via `bin/console security:encode-password` and set this in
+`ModelFactory::getDefaults()`. Add the known value as a `const` on your factory:
+
+    ```php
+    class UserFactory extends ModelFactory
+    {
+        public const DEFAULT_PASSWORD = '1234'; // the password used to create the pre-encoded version below
+    
+        protected function getDefaults(): array
+        {
+            return [
+                // ...
+                'password' => '$argon2id$v=19$m=65536,t=4,p=1$pLFF3D2gnvDmxMuuqH4BrA$3vKfv0cw+6EaNspq9btVAYc+jCOqrmWRstInB2fRPeQ',
+            ];
+        }
+    }
+    ```
+
+    Now, in your tests, when you need access to the unencoded password for a user created with `UserFactory`, use
+    `UserFactory::DEFAULT_PASSWORD`.
+
 ### Using without the Bundle
 
 The provided bundle is not strictly required to use Foundry for tests. You can have all your factories, stories, and
@@ -1262,7 +1359,7 @@ PostStory::load(); // does nothing - already loaded
 
 ### Stories as Services
 
-If you stories require dependencies, you can define them as a service:
+If your stories require dependencies, you can define them as a service:
 
 ```php
 // src/Story/PostStory.php
