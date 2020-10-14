@@ -86,8 +86,6 @@ final class MakeFactory extends AbstractMaker
             $repository = null;
         }
 
-        \lcfirst('FooBar');
-
         $generator->generateClass(
             $factory->getFullName(),
             __DIR__.'/../Resources/skeleton/Factory.tpl.php',
