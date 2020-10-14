@@ -7,6 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Story;
 
 /**
@@ -22,6 +23,10 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
 
         $container->registerForAutoconfiguration(Story::class)
             ->addTag('foundry.story')
+        ;
+
+        $container->registerForAutoconfiguration(ModelFactory::class)
+            ->addTag('foundry.factory')
         ;
 
         $this->configureFaker($mergedConfig['faker'], $container);

@@ -13,6 +13,7 @@
         <service id="Zenstruck\Foundry\Configuration" public="true">
             <argument type="service" id="doctrine" />
             <argument type="service" id="Zenstruck\Foundry\StoryManager" />
+            <argument type="service" id="Zenstruck\Foundry\ModelFactoryManager" />
             <call method="setInstantiator">
                 <argument type="service" id="zenstruck_foundry.default_instantiator" />
             </call>
@@ -23,6 +24,10 @@
 
         <service id="Zenstruck\Foundry\StoryManager">
             <argument type="tagged_iterator" tag="foundry.story" />
+        </service>
+
+        <service id="Zenstruck\Foundry\ModelFactoryManager">
+            <argument type="tagged_iterator" tag="foundry.factory" />
         </service>
 
         <service id="Zenstruck\Foundry\Bundle\Maker\MakeFactory">
