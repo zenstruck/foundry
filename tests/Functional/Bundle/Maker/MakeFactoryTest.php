@@ -54,7 +54,7 @@ final class CategoryFactory extends ModelFactory
     {
         // see https://github.com/zenstruck/foundry#initialization
         return \$this
-            // ->beforeInstantiate(function(Category \$category) {})
+            // ->afterInstantiate(function(Category \$category) {})
         ;
     }
 
@@ -114,7 +114,7 @@ final class CategoryFactory extends ModelFactory
     {
         // see https://github.com/zenstruck/foundry#initialization
         return \$this
-            // ->beforeInstantiate(function(Category \$category) {})
+            // ->afterInstantiate(function(Category \$category) {})
         ;
     }
 
@@ -171,7 +171,7 @@ final class CategoryFactory extends ModelFactory
     {
         // see https://github.com/zenstruck/foundry#initialization
         return \$this
-            // ->beforeInstantiate(function(Category \$category) {})
+            // ->afterInstantiate(function(Category \$category) {})
         ;
     }
 
@@ -231,7 +231,7 @@ final class CategoryFactory extends ModelFactory
     {
         // see https://github.com/zenstruck/foundry#initialization
         return \$this
-            // ->beforeInstantiate(function(Category \$category) {})
+            // ->afterInstantiate(function(Category \$category) {})
         ;
     }
 

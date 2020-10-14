@@ -210,7 +210,7 @@ final class PostFactory extends ModelFactory
     {
         // see https://github.com/zenstruck/foundry#initialization
         return $this
-            // ->beforeInstantiate(function(Post $post) {})
+            // ->afterInstantiate(function(Post $post) {})
         ;
     }
 
