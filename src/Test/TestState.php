@@ -24,9 +24,6 @@ final class TestState
     /** @var bool */
     private static $alwaysAutoRefreshProxies = false;
 
-    /** @var bool */
-    private static $useBundle = true;
-
     /** @var callable[] */
     private static $globalStates = [];
 
@@ -45,9 +42,11 @@ final class TestState
         self::$alwaysAutoRefreshProxies = true;
     }
 
+    /**
+     * @deprecated Foundry now auto-detects if the bundle is installed
+     */
     public static function withoutBundle(): void
     {
-        self::$useBundle = false;
     }
 
     public static function addGlobalState(callable $callback): void
@@ -79,12 +78,8 @@ final class TestState
      */
     public static function bootFromContainer(ContainerInterface $container): Configuration
     {
-        if (self::$useBundle) {
-            try {
-                return self::bootFactory($container->get(Configuration::class));
-            } catch (NotFoundExceptionInterface $e) {
-                throw new \LogicException('Could not boot Foundry, is the ZenstruckFoundryBundle installed/configured?', 0, $e);
-            }
+        if ($container->has(Configuration::class)) {
+            return self::bootFactory($container->get(Configuration::class));
         }
 
         try {

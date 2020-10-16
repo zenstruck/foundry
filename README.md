@@ -1282,9 +1282,6 @@ The best place to configure Foundry without the bundle is in your `tests/bootstr
 // tests/bootstrap.php
 // ...
 
-// required when not using the bundle so the test traits know not to look for it.
-Zenstruck\Foundry\Test\TestState::withoutBundle();
-
 // configure a default instantiator
 Zenstruck\Foundry\Test\TestState::setInstantiator(
     (new Zenstruck\Foundry\Instantiator())

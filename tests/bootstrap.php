@@ -8,10 +8,6 @@ require \dirname(__DIR__).'/vendor/autoload.php';
 
 (new Filesystem())->remove(\sys_get_temp_dir().'/zenstruck-foundry');
 
-if (!\getenv('USE_FOUNDRY_BUNDLE')) {
-    TestState::withoutBundle();
-}
-
 TestState::addGlobalState(static function() {
     TagStory::load();
 });
