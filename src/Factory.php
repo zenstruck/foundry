@@ -183,6 +183,19 @@ class Factory
     /**
      * @internal
      */
+    final public static function shutdown(): void
+    {
+        if (!self::isBooted()) {
+            return;
+        }
+
+        self::$configuration->faker()->unique(true); // reset unique
+        self::$configuration = null;
+    }
+
+    /**
+     * @internal
+     */
     final public static function configuration(): Configuration
     {
         if (!self::isBooted()) {

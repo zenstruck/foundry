@@ -46,7 +46,7 @@ trait Factories
      */
     public static function _tearDownFactories(): void
     {
-        Factory::faker()->unique(true); // reset unique
+        Factory::shutdown();
         StoryManager::reset();
     }
 }
