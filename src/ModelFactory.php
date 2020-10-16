@@ -23,7 +23,7 @@ abstract class ModelFactory extends Factory
             $defaultAttributes = [];
         }
 
-        $factory = self::configuration()->factories()->create(static::class);
+        $factory = self::isBooted() ? self::configuration()->factories()->create(static::class) : new static();
         $factory = $factory
             ->withAttributes([$factory, 'getDefaults'])
             ->withAttributes($defaultAttributes)

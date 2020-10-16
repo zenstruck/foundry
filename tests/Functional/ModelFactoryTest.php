@@ -214,4 +214,24 @@ final class ModelFactoryTest extends FunctionalTestCase
         TagFactory::repository()->assertCount(2); // 2 created in global state
         PostFactory::repository()->assertEmpty();
     }
+
+    /**
+     * @test
+     * @dataProvider dataProvider
+     */
+    public function can_use_model_factories_in_a_data_provider(PostFactory $factory, bool $published): void
+    {
+        $post = $factory->create();
+
+        $post->assertPersisted();
+        $this->assertSame($published, $post->isPublished());
+    }
+
+    public static function dataProvider(): array
+    {
+        return [
+            [PostFactory::new(), false],
+            [PostFactory::new()->published(), true],
+        ];
+    }
 }
