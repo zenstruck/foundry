@@ -2,6 +2,9 @@
 
 namespace Zenstruck\Foundry\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Test\Factories;
+use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CommentFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
@@ -10,13 +13,14 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithNullInitialize;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithValidInitialize;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\TagFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\UserFactory;
-use Zenstruck\Foundry\Tests\FunctionalTestCase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class ModelFactoryTest extends FunctionalTestCase
+final class ModelFactoryTest extends KernelTestCase
 {
+    use ResetDatabase, Factories;
+
     /**
      * @test
      */

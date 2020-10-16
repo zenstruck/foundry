@@ -5,6 +5,7 @@ namespace Zenstruck\Foundry;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Faker;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
  * @internal
@@ -13,7 +14,7 @@ use Faker;
  */
 final class Configuration
 {
-    /** @var ManagerRegistry */
+    /** @var ManagerRegistry|null */
     private $managerRegistry;
 
     /** @var StoryManager */
@@ -31,11 +32,10 @@ final class Configuration
     /** @var bool */
     private $defaultProxyAutoRefresh = false;
 
-    public function __construct(ManagerRegistry $managerRegistry, StoryManager $storyManager, ModelFactoryManager $factories)
+    public function __construct()
     {
-        $this->managerRegistry = $managerRegistry;
-        $this->stories = $storyManager;
-        $this->factories = $factories;
+        $this->stories = new StoryManager([]);
+        $this->factories = new ModelFactoryManager([]);
         $this->faker = Faker\Factory::create();
         $this->instantiator = new Instantiator();
     }
@@ -79,6 +79,20 @@ final class Configuration
         return $this;
     }
 
+    public function setStoryManager(StoryManager $manager): self
+    {
+        $this->stories = $manager;
+
+        return $this;
+    }
+
+    public function setModelFactoryManager(ModelFactoryManager $manager): self
+    {
+        $this->factories = $manager;
+
+        return $this;
+    }
+
     public function setFaker(Faker\Generator $faker): self
     {
         $this->faker = $faker;
@@ -106,7 +120,7 @@ final class Configuration
             $objectOrClass = \get_class($objectOrClass);
         }
 
-        return new RepositoryProxy($this->managerRegistry->getRepository($objectOrClass));
+        return new RepositoryProxy($this->managerRegistry()->getRepository($objectOrClass));
     }
 
     /**
@@ -116,10 +130,19 @@ final class Configuration
     {
         $class = \is_string($objectOrClass) ? $objectOrClass : \get_class($objectOrClass);
 
-        if (!$objectManager = $this->managerRegistry->getManagerForClass($class)) {
+        if (!$objectManager = $this->managerRegistry()->getManagerForClass($class)) {
             throw new \RuntimeException(\sprintf('No object manager registered for "%s".', $class));
         }
 
         return $objectManager;
+    }
+
+    private function managerRegistry(): ManagerRegistry
+    {
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('Foundry was booted without doctrine. Ensure your TestCase extends '.KernelTestCase::class);
+        }
+
+        return $this->managerRegistry;
     }
 }

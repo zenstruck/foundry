@@ -944,7 +944,7 @@ Add the `Factories` trait for tests using factories:
 use Zenstruck\Foundry\Test\Factories;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class MyTest extends WebTestCase // TestCase must be an instance of KernelTestCase
+class MyTest extends WebTestCase
 {
     use Factories;
     
@@ -960,7 +960,7 @@ use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class MyTest extends WebTestCase // TestCase must be an instance of KernelTestCase
+class MyTest extends WebTestCase
 {
     use ResetDatabase, Factories;
     

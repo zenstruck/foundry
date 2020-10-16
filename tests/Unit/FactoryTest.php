@@ -5,17 +5,21 @@ namespace Zenstruck\Foundry\Tests\Unit;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Faker;
+use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
-use Zenstruck\Foundry\Tests\UnitTestCase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class FactoryTest extends UnitTestCase
+final class FactoryTest extends TestCase
 {
+    use Factories;
+
     /**
      * @test
      */
@@ -177,7 +181,7 @@ final class FactoryTest extends UnitTestCase
     public function can_register_custom_faker(): void
     {
         $defaultFaker = Factory::faker();
-        Factory::configuration()->setFaker(new Faker\Generator());
+        Factory::configuration()->setFaker(Faker\Factory::create());
 
         $this->assertNotSame(\spl_object_id(Factory::faker()), \spl_object_id($defaultFaker));
     }
@@ -187,7 +191,7 @@ final class FactoryTest extends UnitTestCase
      */
     public function can_register_default_instantiator(): void
     {
-        $this->configuration->setInstantiator(function() {
+        Factory::configuration()->setInstantiator(function() {
             return new Post('different title', 'different body');
         });
 
@@ -254,7 +258,7 @@ final class FactoryTest extends UnitTestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        $this->configuration->setManagerRegistry($registry);
+        Factory::configuration()->setManagerRegistry($registry);
 
         $object = (new Factory(Post::class))->create(['title' => 'title', 'body' => 'body']);
 
@@ -275,7 +279,7 @@ final class FactoryTest extends UnitTestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        $this->configuration->setManagerRegistry($registry);
+        Factory::configuration()->setManagerRegistry($registry);
 
         $objects = (new Factory(Post::class))->createMany(3, ['title' => 'title', 'body' => 'body']);
 
@@ -301,7 +305,7 @@ final class FactoryTest extends UnitTestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        $this->configuration->setManagerRegistry($registry);
+        Factory::configuration()->setManagerRegistry($registry);
 
         $expectedAttributes = ['short_description' => 'short desc', 'title' => 'title', 'body' => 'body'];
         $calls = 0;
@@ -339,5 +343,16 @@ final class FactoryTest extends UnitTestCase
 
         $this->assertSame(3, $object->getViewCount());
         $this->assertSame(5, $calls);
+    }
+
+    /**
+     * @test
+     */
+    public function trying_to_persist_without_manager_registry_throws_exception(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Foundry was booted without doctrine. Ensure your TestCase extends '.KernelTestCase::class);
+
+        (new Factory(Post::class))->create(['title' => 'title', 'body' => 'body']);
     }
 }

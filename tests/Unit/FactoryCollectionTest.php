@@ -2,16 +2,19 @@
 
 namespace Zenstruck\Foundry\Tests\Unit;
 
+use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\FactoryCollection;
+use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
-use Zenstruck\Foundry\Tests\UnitTestCase;
 use function Zenstruck\Foundry\factory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class FactoryCollectionTest extends UnitTestCase
+final class FactoryCollectionTest extends TestCase
 {
+    use Factories;
+
     /**
      * @test
      */

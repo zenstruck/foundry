@@ -7,7 +7,6 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\ModelFactoryManager;
 use Zenstruck\Foundry\StoryManager;
 
 /**
@@ -54,8 +53,10 @@ final class TestState
         self::$globalStates[] = $callback;
     }
 
-    public static function bootFactory(Configuration $configuration): Configuration
+    public static function bootFoundry(?Configuration $configuration = null): void
     {
+        $configuration = $configuration ?? new Configuration();
+
         if (self::$instantiator) {
             $configuration->setInstantiator(self::$instantiator);
         }
@@ -69,24 +70,44 @@ final class TestState
         }
 
         Factory::boot($configuration);
+    }
 
-        return $configuration;
+    public static function shutdownFoundry(): void
+    {
+        Factory::shutdown();
+        StoryManager::reset();
+    }
+
+    /**
+     * @deprecated use TestState::bootFoundry()
+     */
+    public static function bootFactory(Configuration $configuration): Configuration
+    {
+        self::bootFoundry($configuration);
+
+        return Factory::configuration();
     }
 
     /**
      * @internal
      */
-    public static function bootFromContainer(ContainerInterface $container): Configuration
+    public static function bootFromContainer(ContainerInterface $container): void
     {
         if ($container->has(Configuration::class)) {
-            return self::bootFactory($container->get(Configuration::class));
+            self::bootFoundry($container->get(Configuration::class));
+
+            return;
         }
 
+        $configuration = new Configuration();
+
         try {
-            return self::bootFactory(new Configuration($container->get('doctrine'), new StoryManager([]), new ModelFactoryManager([])));
+            $configuration->setManagerRegistry($container->get('doctrine'));
         } catch (NotFoundExceptionInterface $e) {
             throw new \LogicException('Could not boot Foundry, is the DoctrineBundle installed/configured?', 0, $e);
         }
+
+        self::bootFoundry($configuration);
     }
 
     /**

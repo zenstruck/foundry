@@ -2,14 +2,18 @@
 
 namespace Zenstruck\Foundry\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Test\Factories;
+use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryServiceFactory;
-use Zenstruck\Foundry\Tests\FunctionalTestCase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class ModelFactoryServiceTest extends FunctionalTestCase
+final class ModelFactoryServiceTest extends KernelTestCase
 {
+    use ResetDatabase, Factories;
+
     /**
      * @before
      */

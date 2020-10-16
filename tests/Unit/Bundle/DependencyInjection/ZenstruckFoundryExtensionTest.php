@@ -10,6 +10,7 @@ use Zenstruck\Foundry\Bundle\Maker\MakeFactory;
 use Zenstruck\Foundry\Bundle\Maker\MakeStory;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Instantiator;
+use Zenstruck\Foundry\ModelFactoryManager;
 use Zenstruck\Foundry\StoryManager;
 
 /**
@@ -27,7 +28,10 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
         $this->assertContainerBuilderHasService(Configuration::class);
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'setInstantiator', ['zenstruck_foundry.default_instantiator']);
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'setFaker', ['zenstruck_foundry.faker']);
-        $this->assertCount(2, $this->container->findDefinition(Configuration::class)->getMethodCalls());
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'setManagerRegistry', ['doctrine']);
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'setStoryManager', [StoryManager::class]);
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'setModelFactoryManager', [ModelFactoryManager::class]);
+        $this->assertCount(5, $this->container->findDefinition(Configuration::class)->getMethodCalls());
         $this->assertTrue($this->container->getDefinition(Configuration::class)->isPublic());
         $this->assertContainerBuilderHasService('zenstruck_foundry.default_instantiator', Instantiator::class);
         $this->assertEmpty($this->container->getDefinition('zenstruck_foundry.default_instantiator')->getMethodCalls());
@@ -139,7 +143,7 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
         $this->load(['auto_refresh_proxies' => true]);
 
         $this->assertContainerBuilderHasService(Configuration::class);
-        $this->assertCount(3, $this->container->findDefinition(Configuration::class)->getMethodCalls());
+        $this->assertCount(6, $this->container->findDefinition(Configuration::class)->getMethodCalls());
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'alwaysAutoRefreshProxies', []);
     }
 

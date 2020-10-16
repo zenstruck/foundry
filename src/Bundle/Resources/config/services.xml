@@ -11,9 +11,15 @@
         </service>
 
         <service id="Zenstruck\Foundry\Configuration" public="true">
-            <argument type="service" id="doctrine" />
-            <argument type="service" id="Zenstruck\Foundry\StoryManager" />
-            <argument type="service" id="Zenstruck\Foundry\ModelFactoryManager" />
+            <call method="setManagerRegistry">
+                <argument type="service" id="doctrine" />
+            </call>
+            <call method="setStoryManager">
+                <argument type="service" id="Zenstruck\Foundry\StoryManager" />
+            </call>
+            <call method="setModelFactoryManager">
+                <argument type="service" id="Zenstruck\Foundry\ModelFactoryManager" />
+            </call>
             <call method="setInstantiator">
                 <argument type="service" id="zenstruck_foundry.default_instantiator" />
             </call>

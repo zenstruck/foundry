@@ -2,17 +2,21 @@
 
 namespace Zenstruck\Foundry\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Test\Factories;
+use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\CategoryStory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\PostStory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\ServiceStory;
-use Zenstruck\Foundry\Tests\FunctionalTestCase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class StoryTest extends FunctionalTestCase
+final class StoryTest extends KernelTestCase
 {
+    use ResetDatabase, Factories;
+
     /**
      * @test
      */
