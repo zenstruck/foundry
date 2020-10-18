@@ -18,8 +18,8 @@ final class ModelFactoryTest extends TestCase
      */
     public function can_set_states_with_method(): void
     {
-        $this->assertFalse(PostFactory::new()->withoutPersisting()->create()->isPublished());
-        $this->assertTrue(PostFactory::new()->published()->withoutPersisting()->create()->isPublished());
+        $this->assertFalse(PostFactory::new()->create()->isPublished());
+        $this->assertTrue(PostFactory::new()->published()->create()->isPublished());
     }
 
     /**
@@ -27,8 +27,8 @@ final class ModelFactoryTest extends TestCase
      */
     public function can_set_state_via_new(): void
     {
-        $this->assertFalse(PostFactory::new()->withoutPersisting()->create()->isPublished());
-        $this->assertTrue(PostFactory::new('published')->withoutPersisting()->create()->isPublished());
+        $this->assertFalse(PostFactory::new()->create()->isPublished());
+        $this->assertTrue(PostFactory::new('published')->create()->isPublished());
     }
 
     /**
@@ -36,7 +36,7 @@ final class ModelFactoryTest extends TestCase
      */
     public function can_instantiate(): void
     {
-        $this->assertSame('title', PostFactory::new()->withoutPersisting()->create(['title' => 'title'])->getTitle());
+        $this->assertSame('title', PostFactory::new()->create(['title' => 'title'])->getTitle());
     }
 
     /**
@@ -44,7 +44,7 @@ final class ModelFactoryTest extends TestCase
      */
     public function can_instantiate_many(): void
     {
-        $objects = PostFactory::new()->withoutPersisting()->createMany(2, ['title' => 'title']);
+        $objects = PostFactory::new()->createMany(2, ['title' => 'title']);
 
         $this->assertCount(2, $objects);
         $this->assertSame('title', $objects[0]->getTitle());

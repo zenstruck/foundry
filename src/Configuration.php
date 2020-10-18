@@ -137,9 +137,14 @@ final class Configuration
         return $objectManager;
     }
 
+    public function hasManagerRegistry(): bool
+    {
+        return null !== $this->managerRegistry;
+    }
+
     private function managerRegistry(): ManagerRegistry
     {
-        if (!$this->managerRegistry) {
+        if (!$this->hasManagerRegistry()) {
             throw new \RuntimeException('Foundry was booted without doctrine. Ensure your TestCase extends '.KernelTestCase::class);
         }
 
