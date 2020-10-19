@@ -66,6 +66,10 @@ final class StoryManager
             }
         }
 
-        return new $class();
+        try {
+            return new $class();
+        } catch (\ArgumentCountError $e) {
+            throw new \RuntimeException('Stories with dependencies (Story services) cannot be used without the foundry bundle.', 0, $e);
+        }
     }
 }

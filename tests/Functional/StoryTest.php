@@ -68,4 +68,19 @@ final class StoryTest extends KernelTestCase
 
         $this->assertSame('From Service', ServiceStory::post()->getTitle());
     }
+
+    /**
+     * @test
+     */
+    public function service_stories_cannot_be_used_without_the_bundle(): void
+    {
+        if (\getenv('USE_FOUNDRY_BUNDLE')) {
+            $this->markTestSkipped('ZenstruckFoundryBundle enabled.');
+        }
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Stories with dependencies (Story services) cannot be used without the foundry bundle.');
+
+        ServiceStory::load();
+    }
 }
