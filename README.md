@@ -49,10 +49,11 @@ Want to watch a screencast 🎥 about it? Check out https://symfonycasts.com/fou
     3. [Repository Proxy](#repository-proxy)
     4. [Assertions](#assertions)
     5. [Global State](#global-state)
-    6. [Performance](#performance)
+    6. [PHPUnit Data Providers](#phpunit-data-providers)
+    7. [Performance](#performance)
         1. [DAMADoctrineTestBundle](#damadoctrinetestbundle)
         2. [Miscellaneous](#miscellaneous)
-    9. [Using without the Bundle](#using-without-the-bundle)
+    8. [Using without the Bundle](#using-without-the-bundle)
 7. [Stories](#stories)
     1. [Stories as Services](#stories-as-services)
     2. [Story State](#story-state)
@@ -1202,6 +1203,34 @@ Zenstruck\Foundry\Test\TestState::addGlobalState(function () {
 1. You can still access [Story State](#story-state) for *Global State Stories* in your tests and they are still
 only loaded once.
 2. The [`ResetDatabase`](#enable-foundry-in-your-testcase) trait is required when using global state.
+
+### PHPUnit Data Providers
+
+It is possible to use factories in
+[PHPUnit data providers](https://phpunit.readthedocs.io/en/9.3/writing-tests-for-phpunit.html#data-providers):
+
+```php
+use App\Factory\PostFactory;
+
+/**
+ * @dataProvider postDataProvider
+ */
+public function test_post_via_data_provider(PostFactory $factory): void
+{
+    $post = $factory->create();
+
+    // ...
+}
+
+public static function postDataProvider(): iterable
+{
+    yield [PostFactory::new()];
+    yield [PostFactory::new()->published()];
+}
+```
+
+**NOTE**: Due to data providers being computed early in the phpunit process, it is not possible to use
+[Factory Services](#factories-as-services) in them.
 
 ### Performance
 
