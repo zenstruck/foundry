@@ -3,6 +3,7 @@
 namespace Zenstruck\Foundry\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryServiceFactory;
@@ -52,6 +53,19 @@ final class ModelFactoryServiceTest extends KernelTestCase
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Model Factories with dependencies (Model Factory services) cannot be used without the foundry bundle.');
+
+        CategoryServiceFactory::new();
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_create_service_factories_without_foundry_booted(): void
+    {
+        Factory::shutdown();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Model Factories with dependencies (Model Factory services) cannot be created before foundry is booted.');
 
         CategoryServiceFactory::new();
     }
