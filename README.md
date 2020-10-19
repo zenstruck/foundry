@@ -53,7 +53,9 @@ Want to watch a screencast 🎥 about it? Check out https://symfonycasts.com/fou
     7. [Performance](#performance)
         1. [DAMADoctrineTestBundle](#damadoctrinetestbundle)
         2. [Miscellaneous](#miscellaneous)
-    8. [Using without the Bundle](#using-without-the-bundle)
+    8. [Non-Kernel Test](#non-kernel-tests)
+    9. [Test-Only Configuration](#test-only-configuration)
+    10. [Using without the Bundle](#using-without-the-bundle)
 7. [Stories](#stories)
     1. [Stories as Services](#stories-as-services)
     2. [Story State](#story-state)
@@ -1300,12 +1302,41 @@ these tests to be unnecessarily slow. You can improve the speed by reducing the 
     Now, in your tests, when you need access to the unencoded password for a user created with `UserFactory`, use
     `UserFactory::DEFAULT_PASSWORD`.
 
-### Using without the Bundle
+### Non-Kernel Tests
 
-The provided bundle is not strictly required to use Foundry for tests. You can have all your factories, stories, and
-configuration live in your `tests/` directory.
+Foundry can be used in standard PHPUnit unit tests (TestCase's that just extend `PHPUnit\Framework\TestCase` and not
+`Symfony\Bundle\FrameworkBundle\Test\KernelTestCase`). These tests still require using the `Factories` trait to boot
+Foundry but will not have doctrine available. Factories created in these tests will not be persisted (calling
+[`->withoutPersisting()`](#without-persisting) is not necessary). Because the bundle is not available in these tests,
+any bundle configuration you have will not be picked up. You will need to add
+[Test-Only Configuration](#test-only-configuration). Unfortunately, this may mean duplicating your bundle configuration
+here.
 
-The best place to configure Foundry without the bundle is in your `tests/bootstrap.php` file:
+```php
+use App\Factory\PostFactory;
+use PHPUnit\Framework\TestCase;
+use Zenstruck\Foundry\Test\Factories;
+
+class MyUnitTest extends TestCase
+{
+    use Factories;
+
+    public function some_test(): void
+    {
+        $post = PostFactory::new()->create();
+
+        // $post is not persisted to the database
+    }
+}
+```
+
+**NOTE**: [Factories as Services](#factories-as-services) and [Stories as Services](#stories-as-services) are not
+usable in non-Kernel tests.
+
+### Test-Only Configuration
+
+Foundry can be configured statically, with pure PHP, in your `tests/bootstrap.php`. This is useful if you have a mix
+of Kernel and [non-Kernel tests](#non-kernel-tests) or if using Foundry [without the bundle](#using-without-the-bundle):
 
 ```php
 // tests/bootstrap.php
@@ -1325,6 +1356,15 @@ Zenstruck\Foundry\Test\TestState::setFaker(Faker\Factory::create('fr_FR'));
 // enable auto-refreshing "globally"
 Zenstruck\Foundry\Test\TestState::alwaysAutoRefreshProxies();
 ```
+
+**NOTE**: If using [bundle configuration](#bundle-configuration) as well, *test-only configuration* will override the
+bundle configuration.
+
+### Using without the Bundle
+
+The provided bundle is not strictly required to use Foundry for tests. You can have all your factories, stories, and
+configuration live in your `tests/` directory. You can configure foundry with
+[Test-Only Configuration](#test-only-configuration).
 
 ## Stories
 
