@@ -15,20 +15,14 @@ final class ModelFactoryServiceTest extends KernelTestCase
     use ResetDatabase, Factories;
 
     /**
-     * @before
-     */
-    public function skipIfNotUsingFoundryBundle(): void
-    {
-        if (!\getenv('USE_FOUNDRY_BUNDLE')) {
-            $this->markTestSkipped('ZenstruckFoundryBundle not enabled.');
-        }
-    }
-
-    /**
      * @test
      */
     public function can_create_service_factory(): void
     {
+        if (!\getenv('USE_FOUNDRY_BUNDLE')) {
+            $this->markTestSkipped('ZenstruckFoundryBundle not enabled.');
+        }
+
         $factory = CategoryServiceFactory::new();
 
         $this->assertSame('From Service', $factory->create()->getName());
@@ -40,6 +34,25 @@ final class ModelFactoryServiceTest extends KernelTestCase
      */
     public function service_factories_are_not_the_same_object(): void
     {
+        if (!\getenv('USE_FOUNDRY_BUNDLE')) {
+            $this->markTestSkipped('ZenstruckFoundryBundle not enabled.');
+        }
+
         $this->assertNotSame(CategoryServiceFactory::new(), CategoryServiceFactory::new());
+    }
+
+    /**
+     * @test
+     */
+    public function service_factories_cannot_be_used_without_bundle(): void
+    {
+        if (\getenv('USE_FOUNDRY_BUNDLE')) {
+            $this->markTestSkipped('ZenstruckFoundryBundle enabled.');
+        }
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Model Factories with dependencies (Model Factory services) cannot be used without the foundry bundle.');
+
+        CategoryServiceFactory::new();
     }
 }

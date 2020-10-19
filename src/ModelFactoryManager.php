@@ -27,6 +27,10 @@ final class ModelFactoryManager
             }
         }
 
-        return new $class();
+        try {
+            return new $class();
+        } catch (\ArgumentCountError $e) {
+            throw new \RuntimeException('Model Factories with dependencies (Model Factory services) cannot be used without the foundry bundle.', 0, $e);
+        }
     }
 }
