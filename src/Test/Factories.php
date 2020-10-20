@@ -4,7 +4,6 @@ namespace Zenstruck\Foundry\Test;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\StoryManager;
 
 /**
  * @mixin KernelTestCase
@@ -20,14 +19,17 @@ trait Factories
     public static function _setUpFactories(): void
     {
         if (!\is_subclass_of(static::class, KernelTestCase::class)) {
-            throw new \RuntimeException(\sprintf('The "%s" trait can only be used on TestCases that extend "%s".', __TRAIT__, KernelTestCase::class));
+            TestState::bootFoundry();
+
+            return;
         }
 
         if (!static::$booted) {
             static::bootKernel();
         }
 
-        TestState::bootFromContainer(static::$kernel->getContainer())->setManagerRegistry(
+        TestState::bootFromContainer(static::$kernel->getContainer());
+        Factory::configuration()->setManagerRegistry(
             new LazyManagerRegistry(static function() {
                 if (!static::$booted) {
                     static::bootKernel();
@@ -46,7 +48,6 @@ trait Factories
      */
     public static function _tearDownFactories(): void
     {
-        Factory::faker()->unique(true); // reset unique
-        StoryManager::reset();
+        TestState::shutdownFoundry();
     }
 }

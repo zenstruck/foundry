@@ -23,7 +23,12 @@ abstract class ModelFactory extends Factory
             $defaultAttributes = [];
         }
 
-        $factory = self::configuration()->factories()->create(static::class);
+        try {
+            $factory = self::isBooted() ? self::configuration()->factories()->create(static::class) : new static();
+        } catch (\ArgumentCountError $e) {
+            throw new \RuntimeException('Model Factories with dependencies (Model Factory services) cannot be created before foundry is booted.', 0, $e);
+        }
+
         $factory = $factory
             ->withAttributes([$factory, 'getDefaults'])
             ->withAttributes($defaultAttributes)

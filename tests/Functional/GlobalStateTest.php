@@ -2,15 +2,19 @@
 
 namespace Zenstruck\Foundry\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Test\Factories;
+use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\TagFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\TagStory;
-use Zenstruck\Foundry\Tests\FunctionalTestCase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class GlobalStateTest extends FunctionalTestCase
+final class GlobalStateTest extends KernelTestCase
 {
+    use ResetDatabase, Factories;
+
     /**
      * @test
      */

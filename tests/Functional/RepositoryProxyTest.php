@@ -3,19 +3,23 @@
 namespace Zenstruck\Foundry\Tests\Functional;
 
 use Doctrine\Common\Proxy\Proxy as DoctrineProxy;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Test\Factories;
+use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
-use Zenstruck\Foundry\Tests\FunctionalTestCase;
 use function Zenstruck\Foundry\repository;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class RepositoryProxyTest extends FunctionalTestCase
+final class RepositoryProxyTest extends KernelTestCase
 {
+    use ResetDatabase, Factories;
+
     /**
      * @test
      */

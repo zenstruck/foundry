@@ -2,17 +2,21 @@
 
 namespace Zenstruck\Foundry\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Test\Factories;
+use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
-use Zenstruck\Foundry\Tests\FunctionalTestCase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class ProxyTest extends FunctionalTestCase
+final class ProxyTest extends KernelTestCase
 {
+    use ResetDatabase, Factories;
+
     /**
      * @test
      */

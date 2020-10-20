@@ -2,22 +2,25 @@
 
 namespace Zenstruck\Foundry\Tests\Unit;
 
+use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\FactoryCollection;
+use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
-use Zenstruck\Foundry\Tests\UnitTestCase;
 use function Zenstruck\Foundry\factory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class FactoryCollectionTest extends UnitTestCase
+final class FactoryCollectionTest extends TestCase
 {
+    use Factories;
+
     /**
      * @test
      */
     public function can_create_with_static_size(): void
     {
-        $collection = new FactoryCollection(factory(Category::class)->withoutPersisting(), 2);
+        $collection = new FactoryCollection(factory(Category::class), 2);
 
         $this->assertCount(2, $collection->create());
         $this->assertCount(2, $collection->create());
@@ -31,7 +34,7 @@ final class FactoryCollectionTest extends UnitTestCase
      */
     public function can_create_with_random_range(): void
     {
-        $collection = new FactoryCollection(factory(Category::class)->withoutPersisting(), 0, 3);
+        $collection = new FactoryCollection(factory(Category::class), 0, 3);
         $counts = [];
 
         while (4 !== \count(\array_unique($counts))) {
@@ -55,6 +58,6 @@ final class FactoryCollectionTest extends UnitTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectDeprecationMessage('Min must be less than max.');
 
-        new FactoryCollection(factory(Category::class)->withoutPersisting(), 4, 3);
+        new FactoryCollection(factory(Category::class), 4, 3);
     }
 }

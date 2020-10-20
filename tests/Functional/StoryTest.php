@@ -2,17 +2,21 @@
 
 namespace Zenstruck\Foundry\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Test\Factories;
+use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\CategoryStory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\PostStory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\ServiceStory;
-use Zenstruck\Foundry\Tests\FunctionalTestCase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class StoryTest extends FunctionalTestCase
+final class StoryTest extends KernelTestCase
 {
+    use ResetDatabase, Factories;
+
     /**
      * @test
      */
@@ -63,5 +67,20 @@ final class StoryTest extends FunctionalTestCase
         }
 
         $this->assertSame('From Service', ServiceStory::post()->getTitle());
+    }
+
+    /**
+     * @test
+     */
+    public function service_stories_cannot_be_used_without_the_bundle(): void
+    {
+        if (\getenv('USE_FOUNDRY_BUNDLE')) {
+            $this->markTestSkipped('ZenstruckFoundryBundle enabled.');
+        }
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Stories with dependencies (Story services) cannot be used without the foundry bundle.');
+
+        ServiceStory::load();
     }
 }

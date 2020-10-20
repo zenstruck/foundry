@@ -2,6 +2,9 @@
 
 namespace Zenstruck\Foundry\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Test\Factories;
+use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CommentFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
@@ -10,13 +13,14 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithNullInitialize;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithValidInitialize;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\TagFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\UserFactory;
-use Zenstruck\Foundry\Tests\FunctionalTestCase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class ModelFactoryTest extends FunctionalTestCase
+final class ModelFactoryTest extends KernelTestCase
 {
+    use ResetDatabase, Factories;
+
     /**
      * @test
      */
@@ -213,5 +217,25 @@ final class ModelFactoryTest extends FunctionalTestCase
         $this->assertCount(3, $post->getTags());
         TagFactory::repository()->assertCount(2); // 2 created in global state
         PostFactory::repository()->assertEmpty();
+    }
+
+    /**
+     * @test
+     * @dataProvider dataProvider
+     */
+    public function can_use_model_factories_in_a_data_provider(PostFactory $factory, bool $published): void
+    {
+        $post = $factory->create();
+
+        $post->assertPersisted();
+        $this->assertSame($published, $post->isPublished());
+    }
+
+    public static function dataProvider(): array
+    {
+        return [
+            [PostFactory::new(), false],
+            [PostFactory::new()->published(), true],
+        ];
     }
 }

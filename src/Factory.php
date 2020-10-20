@@ -80,7 +80,7 @@ class Factory
 
         $proxy = new Proxy($object);
 
-        if (!$this->persist) {
+        if (!$this->isPersisting()) {
             return $proxy;
         }
 
@@ -183,6 +183,19 @@ class Factory
     /**
      * @internal
      */
+    final public static function shutdown(): void
+    {
+        if (!self::isBooted()) {
+            return;
+        }
+
+        self::$configuration->faker()->unique(true); // reset unique
+        self::$configuration = null;
+    }
+
+    /**
+     * @internal
+     */
     final public static function configuration(): Configuration
     {
         if (!self::isBooted()) {
@@ -242,7 +255,7 @@ class Factory
             return $value;
         }
 
-        if (!$this->persist) {
+        if (!$this->isPersisting()) {
             // ensure attribute Factory's are also not persisted
             $value = $value->withoutPersisting();
         }
@@ -252,7 +265,7 @@ class Factory
 
     private function normalizeCollection(FactoryCollection $collection): array
     {
-        if ($this->persist && $field = $this->inverseRelationshipField($collection->factory())) {
+        if ($this->isPersisting() && $field = $this->inverseRelationshipField($collection->factory())) {
             $this->afterPersist[] = static function(Proxy $proxy) use ($collection, $field) {
                 $collection->create([$field => $proxy]);
                 $proxy->refresh();
@@ -278,5 +291,10 @@ class Factory
         }
 
         return null; // no relationship found
+    }
+
+    private function isPersisting(): bool
+    {
+        return self::configuration()->hasManagerRegistry() ? $this->persist : false;
     }
 }
