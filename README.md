@@ -1231,8 +1231,11 @@ public static function postDataProvider(): iterable
 }
 ```
 
-**NOTE**: Due to data providers being computed early in the phpunit process, it is not possible to use
-[Factory Services](#factories-as-services) in them.
+**NOTES**:
+1. Be sure your data provider returns only instances of `ModelFactory` and you do not try and call `->create()` on them.
+Data providers are computed early in the phpunit process before Foundry is booted.
+2. For the same reason as above, it is not possible to use [Factory Services](#factories-as-services) with required
+constructor arguments (the container is not yet available).
 
 ### Performance
 
@@ -1330,8 +1333,10 @@ class MyUnitTest extends TestCase
 }
 ```
 
-**NOTE**: [Factories as Services](#factories-as-services) and [Stories as Services](#stories-as-services) are not
-usable in non-Kernel tests.
+**NOTE**: [Factories as Services](#factories-as-services) and [Stories as Services](#stories-as-services) with required 
+constructor arguments are not usable in non-Kernel tests. The container is not available to resolve their dependencies.
+The easiest work-around is to make the test an instance of `Symfony\Bundle\FrameworkBundle\Test\KernelTestCase` so the
+container is available.
 
 ### Test-Only Configuration
 
