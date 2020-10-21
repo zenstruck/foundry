@@ -55,10 +55,6 @@ final class RepositoryProxyTest extends KernelTestCase
 
         CategoryFactory::new()->createMany(2);
 
-        $object = $repository->first();
-
-        $this->assertInstanceOf(Proxy::class, $object);
-
         $objects = $repository->findAll();
 
         $this->assertCount(2, $objects);
@@ -237,5 +233,32 @@ final class RepositoryProxyTest extends KernelTestCase
         $categoryC = CategoryFactory::new()->create();
 
         $this->assertSame($categoryC->getId(), CategoryFactory::repository()->findOneBy([], ['id' => 'DESC'])->getId());
+    }
+
+    /**
+     * @test
+     */
+    public function first_and_last_return_the_correct_object(): void
+    {
+        $categoryA = CategoryFactory::new()->create(['name' => '3']);
+        $categoryB = CategoryFactory::new()->create(['name' => '2']);
+        $categoryC = CategoryFactory::new()->create(['name' => '1']);
+        $repository = CategoryFactory::repository();
+
+        $this->assertSame($categoryA->getId(), $repository->first()->getId());
+        $this->assertSame($categoryC->getId(), $repository->first('name')->getId());
+        $this->assertSame($categoryC->getId(), $repository->last()->getId());
+        $this->assertSame($categoryA->getId(), $repository->last('name')->getId());
+    }
+
+    /**
+     * @test
+     */
+    public function first_and_last_return_null_if_empty(): void
+    {
+        $this->assertNull(CategoryFactory::repository()->first());
+        $this->assertNull(CategoryFactory::repository()->first('name'));
+        $this->assertNull(CategoryFactory::repository()->last());
+        $this->assertNull(CategoryFactory::repository()->last('name'));
     }
 }
