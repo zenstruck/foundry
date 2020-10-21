@@ -219,9 +219,9 @@ final class RepositoryProxy implements ObjectRepository
     /**
      * @return Proxy|object|null
      */
-    public function findOneBy(array $criteria): ?Proxy
+    public function findOneBy(array $criteria, ?array $orderBy = null): ?Proxy
     {
-        return $this->proxyResult($this->repository->findOneBy(self::normalizeCriteria($criteria)));
+        return $this->proxyResult($this->repository->findOneBy(self::normalizeCriteria($criteria), $orderBy));
     }
 
     public function getClassName(): string
