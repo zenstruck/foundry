@@ -217,6 +217,8 @@ final class RepositoryProxy implements ObjectRepository
     }
 
     /**
+     * @param array|null $orderBy Doctrine\ORM\EntityRepository adds this optional parameter
+     *
      * @return Proxy|object|null
      */
     public function findOneBy(array $criteria, ?array $orderBy = null): ?Proxy
