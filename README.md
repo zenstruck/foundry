@@ -1135,7 +1135,10 @@ $repository = repository(Post::class);
 
 // helpful methods - all returned object(s) are proxied
 $repository->getCount(); // number of rows in the database table
-$repository->first(); // get the first object (wrapped in a object proxy)
+$repository->first(); // get the first object (assumes an auto-incremented "id" column)
+$repository->first('createdAt'); // assuming "createdAt" is a datetime column, this will return latest object
+$repository->last(); // get the last object (assumes an auto-incremented "id" column)
+$repository->last('createdAt'); // assuming "createdAt" is a datetime column, this will return oldest object
 $repository->truncate(); // delete all rows in the database table
 $repository->random(); // get a random object
 $repository->randomSet(5); // get 5 random objects
