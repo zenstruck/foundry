@@ -261,4 +261,17 @@ final class RepositoryProxyTest extends KernelTestCase
         $this->assertNull(CategoryFactory::repository()->last());
         $this->assertNull(CategoryFactory::repository()->last('name'));
     }
+
+    /**
+     * @test
+     */
+    public function repository_proxy_is_countable_and_iterable(): void
+    {
+        CategoryFactory::new()->createMany(4);
+
+        $repository = CategoryFactory::repository();
+
+        $this->assertCount(4, $repository);
+        $this->assertCount(4, \iterator_to_array($repository));
+    }
 }

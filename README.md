@@ -1134,7 +1134,8 @@ $repository = PostFactory::repository();
 $repository = repository(Post::class);
 
 // helpful methods - all returned object(s) are proxied
-$repository->getCount(); // number of rows in the database table
+$repository->count(); // number of rows in the database table
+count($repository); // equivalent to above (RepositoryProxy implements \Countable)
 $repository->first(); // get the first object (assumes an auto-incremented "id" column)
 $repository->first('createdAt'); // assuming "createdAt" is a datetime column, this will return latest object
 $repository->last(); // get the last object (assumes an auto-incremented "id" column)
@@ -1145,11 +1146,12 @@ $repository->randomSet(5); // get 5 random objects
 $repository->randomRange(0, 5); // get 0-5 random objects
 
 // instance of ObjectRepository - all returned object(s) are proxied
-$repository->find(1);                               // Proxy|Post|null
-$repository->find(['title' => 'My Title']);         // Proxy|Post|null
-$repository->findOneBy(['title' => 'My Title']);    // Proxy|Post|null
-$repository->findAll();                             // Proxy[]|Post[]
-$repository->findBy(['title' => 'My Title']);       // Proxy[]|Post[]
+$repository->find(1); // Proxy|Post|null
+$repository->find(['title' => 'My Title']); // Proxy|Post|null
+$repository->findOneBy(['title' => 'My Title']); // Proxy|Post|null
+$repository->findAll(); // Proxy[]|Post[]
+iterator_to_array($repository); // equivalent to above (RepositoryProxy implements \IteratorAggregate)
+$repository->findBy(['title' => 'My Title']); // Proxy[]|Post[]
 
 // can call methods on the underlying repository - returned object(s) are proxied
 $repository->findOneByTitle('My Title'); // Proxy|Post|null
