@@ -141,11 +141,17 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
     {
         $om = Factory::configuration()->objectManagerFor($this->getClassName());
 
-        if (!$om instanceof EntityManagerInterface) {
-            throw new \RuntimeException('This operation is only available when using doctrine/orm');
+        if ($om instanceof EntityManagerInterface) {
+            $om->createQuery("DELETE {$this->getClassName()} e")->execute();
+
+            return;
         }
 
-        $om->createQuery("DELETE {$this->getClassName()} e")->execute();
+        foreach ($this as $object) {
+            $om->remove($object);
+        }
+
+        $om->flush();
     }
 
     /**
