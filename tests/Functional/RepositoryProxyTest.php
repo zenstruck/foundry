@@ -226,4 +226,16 @@ final class RepositoryProxyTest extends KernelTestCase
         $this->assertInstanceOf(DoctrineProxy::class, $category);
         $this->assertInstanceOf(Category::class, $category);
     }
+
+    /**
+     * @test
+     */
+    public function proxy_wrapping_orm_entity_manager_can_order_by_in_find_one_by(): void
+    {
+        $categoryA = CategoryFactory::new()->create();
+        $categoryB = CategoryFactory::new()->create();
+        $categoryC = CategoryFactory::new()->create();
+
+        $this->assertSame($categoryC->getId(), CategoryFactory::repository()->findOneBy([], ['id' => 'DESC'])->getId());
+    }
 }
