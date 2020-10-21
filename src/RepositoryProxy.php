@@ -12,7 +12,7 @@ use PHPUnit\Framework\Assert;
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class RepositoryProxy implements ObjectRepository
+final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Countable
 {
     /** @var ObjectRepository */
     private $repository;
@@ -27,13 +27,35 @@ final class RepositoryProxy implements ObjectRepository
         return $this->proxyResult($this->repository->{$method}(...$arguments));
     }
 
-    public function getCount(): int
+    public function count(): int
     {
         if ($this->repository instanceof EntityRepository) {
+            // use query to avoid loading all entities
             return $this->repository->count([]);
         }
 
+        if ($this->repository instanceof \Countable) {
+            return \count($this->repository);
+        }
+
         return \count($this->findAll());
+    }
+
+    public function getIterator(): \Traversable
+    {
+        if (\is_iterable($this->repository)) {
+            return yield from $this->repository;
+        }
+
+        yield from $this->findAll();
+    }
+
+    /**
+     * @deprecated use Repository::count()
+     */
+    public function getCount(): int
+    {
+        return $this->count();
     }
 
     public function assertEmpty(string $message = ''): self
@@ -43,35 +65,35 @@ final class RepositoryProxy implements ObjectRepository
 
     public function assertCount(int $expectedCount, string $message = ''): self
     {
-        Assert::assertSame($expectedCount, $this->getCount(), $message);
+        Assert::assertSame($expectedCount, $this->count(), $message);
 
         return $this;
     }
 
     public function assertCountGreaterThan(int $expected, string $message = ''): self
     {
-        Assert::assertGreaterThan($expected, $this->getCount(), $message);
+        Assert::assertGreaterThan($expected, $this->count(), $message);
 
         return $this;
     }
 
     public function assertCountGreaterThanOrEqual(int $expected, string $message = ''): self
     {
-        Assert::assertGreaterThanOrEqual($expected, $this->getCount(), $message);
+        Assert::assertGreaterThanOrEqual($expected, $this->count(), $message);
 
         return $this;
     }
 
     public function assertCountLessThan(int $expected, string $message = ''): self
     {
-        Assert::assertLessThan($expected, $this->getCount(), $message);
+        Assert::assertLessThan($expected, $this->count(), $message);
 
         return $this;
     }
 
     public function assertCountLessThanOrEqual(int $expected, string $message = ''): self
     {
-        Assert::assertLessThanOrEqual($expected, $this->getCount(), $message);
+        Assert::assertLessThanOrEqual($expected, $this->count(), $message);
 
         return $this;
     }
@@ -119,11 +141,17 @@ final class RepositoryProxy implements ObjectRepository
     {
         $om = Factory::configuration()->objectManagerFor($this->getClassName());
 
-        if (!$om instanceof EntityManagerInterface) {
-            throw new \RuntimeException('This operation is only available when using doctrine/orm');
+        if ($om instanceof EntityManagerInterface) {
+            $om->createQuery("DELETE {$this->getClassName()} e")->execute();
+
+            return;
         }
 
-        $om->createQuery("DELETE {$this->getClassName()} e")->execute();
+        foreach ($this as $object) {
+            $om->remove($object);
+        }
+
+        $om->flush();
     }
 
     /**
@@ -225,12 +253,22 @@ final class RepositoryProxy implements ObjectRepository
     }
 
     /**
-     * @param array|null $orderBy Doctrine\ORM\EntityRepository adds this optional parameter
+     * @param array|null $orderBy Some ObjectRepository's (ie Doctrine\ORM\EntityRepository) add this optional parameter
      *
      * @return Proxy|object|null
+     *
+     * @throws \RuntimeException if the wrapped ObjectRepository does not have the $orderBy parameter
      */
     public function findOneBy(array $criteria, ?array $orderBy = null): ?Proxy
     {
+        if (\is_array($orderBy)) {
+            $wrappedParams = (new \ReflectionClass($this->repository))->getMethod('findOneBy')->getParameters();
+
+            if (!isset($wrappedParams[1]) || 'orderBy' !== $wrappedParams[1]->getName() || !$wrappedParams[1]->isArray()) {
+                throw new \RuntimeException(\sprintf('Wrapped repository\'s (%s) findOneBy method does not have an $orderBy parameter.', \get_class($this->repository)));
+            }
+        }
+
         return $this->proxyResult($this->repository->findOneBy(self::normalizeCriteria($criteria), $orderBy));
     }
 
