@@ -99,9 +99,17 @@ final class RepositoryProxy implements ObjectRepository
     /**
      * @return Proxy|object|null
      */
-    public function first(): ?Proxy
+    public function first(string $sortedField = 'id'): ?Proxy
     {
-        return $this->findOneBy([]);
+        return $this->findBy([], [$sortedField => 'ASC'], 1)[0] ?? null;
+    }
+
+    /**
+     * @return Proxy|object|null
+     */
+    public function last(string $sortedField = 'id'): ?Proxy
+    {
+        return $this->findBy([], [$sortedField => 'DESC'], 1)[0] ?? null;
     }
 
     /**
