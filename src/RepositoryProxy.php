@@ -253,12 +253,22 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
     }
 
     /**
-     * @param array|null $orderBy Doctrine\ORM\EntityRepository adds this optional parameter
+     * @param array|null $orderBy Some ObjectRepository's (ie Doctrine\ORM\EntityRepository) add this optional parameter
      *
      * @return Proxy|object|null
+     *
+     * @throws \RuntimeException if the wrapped ObjectRepository does not have the $orderBy parameter
      */
     public function findOneBy(array $criteria, ?array $orderBy = null): ?Proxy
     {
+        if (\is_array($orderBy)) {
+            $wrappedParams = (new \ReflectionClass($this->repository))->getMethod('findOneBy')->getParameters();
+
+            if (!isset($wrappedParams[1]) || 'orderBy' !== $wrappedParams[1]->getName() || !$wrappedParams[1]->isArray()) {
+                throw new \RuntimeException(\sprintf('Wrapped repository\'s (%s) findOneBy method does not have an $orderBy parameter.', \get_class($this->repository)));
+            }
+        }
+
         return $this->proxyResult($this->repository->findOneBy(self::normalizeCriteria($criteria), $orderBy));
     }
 
