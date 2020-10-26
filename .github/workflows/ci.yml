@@ -30,7 +30,7 @@ jobs:
         run: mysql --host 127.0.0.1 -uroot -p1234 -e "STATUS"
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v1
+        uses: shivammathur/setup-php@2.7.0
         with:
           php-version: ${{ matrix.php }}
           coverage: none
@@ -107,7 +107,7 @@ jobs:
         run: mysql --host 127.0.0.1 -uroot -p1234 -e "STATUS"
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@2.7.0
         with:
           php-version: 7.4
           coverage: xdebug
@@ -185,7 +185,7 @@ jobs:
           uses: actions/checkout@v2.3.3
 
       -   name: Setup PHP
-          uses: shivammathur/setup-php@v1
+          uses: shivammathur/setup-php@2.7.0
           with:
             php-version: 7.4
             coverage: none
@@ -201,7 +201,7 @@ jobs:
           uses: actions/checkout@v2.3.3
 
       -   name: Setup PHP
-          uses: shivammathur/setup-php@v1
+          uses: shivammathur/setup-php@2.7.0
           with:
             php-version: 7.4
             coverage: none
