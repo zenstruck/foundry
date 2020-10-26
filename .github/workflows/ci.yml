@@ -36,7 +36,7 @@ jobs:
           coverage: none
 
       - name: Cache dependencies
-        uses: actions/cache@v1
+        uses: actions/cache@v2.1.2
         with:
           path: ~/.composer/cache/files
           key: dependencies-${{ matrix.php }}-${{ matrix.stability }}-${{ hashFiles('composer.json') }}
@@ -113,7 +113,7 @@ jobs:
           coverage: xdebug
 
       - name: Cache dependencies
-        uses: actions/cache@v1
+        uses: actions/cache@v2.1.2
         with:
           path: ~/.composer/cache/files
           key: dependencies-coverage-${{ matrix.php }}-${{ hashFiles('composer.json') }}
