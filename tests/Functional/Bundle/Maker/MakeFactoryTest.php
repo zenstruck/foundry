@@ -19,7 +19,7 @@ final class MakeFactoryTest extends MakerTestCase
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
 
-        $this->assertFileNotExists(self::tempFile('src/Factory/CategoryFactory.php'));
+        $this->assertFileDoesNotExist(self::tempFile('src/Factory/CategoryFactory.php'));
 
         $tester->execute(['entity' => Category::class]);
 
@@ -83,7 +83,7 @@ EOF
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
 
-        $this->assertFileNotExists(self::tempFile('src/Factory/CategoryFactory.php'));
+        $this->assertFileDoesNotExist(self::tempFile('src/Factory/CategoryFactory.php'));
 
         $tester->setInputs([Category::class]);
         $tester->execute([]);
@@ -150,7 +150,7 @@ EOF
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
 
-        $this->assertFileNotExists(self::tempFile('tests/Factory/CategoryFactory.php'));
+        $this->assertFileDoesNotExist(self::tempFile('tests/Factory/CategoryFactory.php'));
 
         $tester->execute(['entity' => Category::class, '--test' => true]);
 
@@ -214,7 +214,7 @@ EOF
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
 
-        $this->assertFileNotExists(self::tempFile('tests/Factory/CategoryFactory.php'));
+        $this->assertFileDoesNotExist(self::tempFile('tests/Factory/CategoryFactory.php'));
 
         $tester->setInputs([Category::class]);
         $tester->execute(['--test' => true]);
@@ -281,13 +281,13 @@ EOF
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
 
-        $this->assertFileNotExists(self::tempFile('src/Factory/InvalidFactory.php'));
+        $this->assertFileDoesNotExist(self::tempFile('src/Factory/InvalidFactory.php'));
 
         try {
             $tester->execute(['entity' => 'Invalid']);
         } catch (RuntimeCommandException $e) {
             $this->assertSame('Entity "Invalid" not found.', $e->getMessage());
-            $this->assertFileNotExists(self::tempFile('src/Factory/InvalidFactory.php'));
+            $this->assertFileDoesNotExist(self::tempFile('src/Factory/InvalidFactory.php'));
 
             return;
         }

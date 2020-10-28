@@ -18,7 +18,7 @@ final class MakeStoryTest extends MakerTestCase
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:story'));
 
-        $this->assertFileNotExists(self::tempFile('src/Story/FooBarStory.php'));
+        $this->assertFileDoesNotExist(self::tempFile('src/Story/FooBarStory.php'));
 
         $tester->execute(['name' => $name]);
 
@@ -51,7 +51,7 @@ EOF
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:story'));
 
-        $this->assertFileNotExists(self::tempFile('src/Story/FooBarStory.php'));
+        $this->assertFileDoesNotExist(self::tempFile('src/Story/FooBarStory.php'));
 
         $tester->setInputs([$name]);
         $tester->execute([]);
@@ -87,7 +87,7 @@ EOF
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:story'));
 
-        $this->assertFileNotExists(self::tempFile('tests/Story/FooBarStory.php'));
+        $this->assertFileDoesNotExist(self::tempFile('tests/Story/FooBarStory.php'));
 
         $tester->execute(['name' => $name, '--test' => true]);
 
@@ -120,7 +120,7 @@ EOF
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:story'));
 
-        $this->assertFileNotExists(self::tempFile('tests/Story/FooBarStory.php'));
+        $this->assertFileDoesNotExist(self::tempFile('tests/Story/FooBarStory.php'));
 
         $tester->setInputs([$name]);
         $tester->execute(['--test' => true]);
