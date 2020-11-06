@@ -36,6 +36,17 @@ final class ModelFactoryTest extends KernelTestCase
     /**
      * @test
      */
+    public function can_find_or_create_using_prefixed_fields(): void
+    {
+        CategoryFactory::findOrCreate(['force:name' => 'php', 'optional:version' => 7.4]);
+        CategoryFactory::repository()->assertCount(1);
+        CategoryFactory::findOrCreate(['force:name' => 'php', 'optional:version' => 7.4]);
+        CategoryFactory::repository()->assertCount(1);
+    }
+
+    /**
+     * @test
+     */
     public function can_override_initialize(): void
     {
         $this->assertFalse(PostFactory::new()->create()->isPublished());

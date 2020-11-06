@@ -115,6 +115,21 @@ final class Instantiator
         return self::accessibleProperty($object, $property)->getValue($object);
     }
 
+    public static function getFindCriteriaFromAttributes(array $attributes): array
+    {
+        $criteria = [];
+        foreach ($attributes as $key => $value) {
+            if (0 === \mb_strpos($key, 'optional:')) {
+                continue;
+            }
+
+            $normalizedKey = false !== \mb_strpos($key, ':') ? \mb_substr($key, \mb_strpos($key, ':') + 1) : $key;
+            $criteria[$normalizedKey] = $value;
+        }
+
+        return $criteria;
+    }
+
     private static function propertyAccessor(): PropertyAccessor
     {
         return self::$propertyAccessor ?: self::$propertyAccessor = PropertyAccess::createPropertyAccessor();
