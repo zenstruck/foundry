@@ -109,6 +109,9 @@ class Factory
         return $this->many($number)->create($attributes);
     }
 
+    /**
+     * @return static
+     */
     public function withoutPersisting(): self
     {
         $cloned = clone $this;
@@ -119,6 +122,8 @@ class Factory
 
     /**
      * @param array|callable $attributes
+     *
+     * @return static
      */
     final public function withAttributes($attributes = []): self
     {
@@ -130,6 +135,8 @@ class Factory
 
     /**
      * @param callable $callback (array $attributes): array
+     *
+     * @return static
      */
     final public function beforeInstantiate(callable $callback): self
     {
@@ -141,6 +148,8 @@ class Factory
 
     /**
      * @param callable $callback (object $object, array $attributes): void
+     *
+     * @return static
      */
     final public function afterInstantiate(callable $callback): self
     {
@@ -152,6 +161,8 @@ class Factory
 
     /**
      * @param callable $callback (object|Proxy $object, array $attributes): void
+     *
+     * @return static
      */
     final public function afterPersist(callable $callback): self
     {
@@ -163,6 +174,8 @@ class Factory
 
     /**
      * @param callable $instantiator (array $attributes, string $class): object
+     *
+     * @return static
      */
     final public function instantiateWith(callable $instantiator): self
     {

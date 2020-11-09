@@ -20,11 +20,17 @@ abstract class Story
         return static::load()->get($name);
     }
 
+    /**
+     * @return static
+     */
     final public static function load(): self
     {
         return Factory::configuration()->stories()->load(static::class);
     }
 
+    /**
+     * @return static
+     */
     final public function add(string $name, object $object): self
     {
         // ensure factories are persisted

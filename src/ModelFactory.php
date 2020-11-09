@@ -15,6 +15,8 @@ abstract class ModelFactory extends Factory
     /**
      * @param array|callable|string $defaultAttributes If string, assumes state
      * @param string                ...$states         Optionally pass default states (these must be methods on your ObjectFactory with no arguments)
+     *
+     * @return static
      */
     final public static function new($defaultAttributes = [], string ...$states): self
     {
@@ -102,6 +104,8 @@ abstract class ModelFactory extends Factory
 
     /**
      * @param array|callable $attributes
+     *
+     * @return static
      */
     final protected function addState($attributes = []): self
     {
