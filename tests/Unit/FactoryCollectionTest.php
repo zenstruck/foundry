@@ -56,7 +56,7 @@ final class FactoryCollectionTest extends TestCase
     public function min_must_be_less_than_or_equal_to_max(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectDeprecationMessage('Min must be less than max.');
+        $this->expectExceptionMessage('Min must be less than max.');
 
         new FactoryCollection(factory(Category::class), 4, 3);
     }
