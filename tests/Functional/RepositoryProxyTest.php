@@ -273,5 +273,6 @@ final class RepositoryProxyTest extends KernelTestCase
 
         $this->assertCount(4, $repository);
         $this->assertCount(4, \iterator_to_array($repository));
+        $this->assertSame(4, $repository->getCount());
     }
 }

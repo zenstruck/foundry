@@ -51,10 +51,12 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
     }
 
     /**
-     * @deprecated use Repository::count()
+     * @deprecated use RepositoryProxy::count()
      */
     public function getCount(): int
     {
+        trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using RepositoryProxy::getCount() is deprecated, use RepositoryProxy::count() (it is now Countable).');
+
         return $this->count();
     }
 
