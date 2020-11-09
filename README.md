@@ -1549,13 +1549,13 @@ zenstruck_foundry:
     instantiator:
 
         # Whether or not to call an object's constructor during instantiation.
-        without_constructor:  null
+        without_constructor: false
 
         # Whether or not to allow extra attributes.
-        allow_extra_attributes: null
+        allow_extra_attributes: false
 
         # Whether or not to skip setters and force set object properties (public/private/protected) directly.
-        always_force_properties: null
+        always_force_properties: false
 
         # Customize the instantiator service.
         service:              null # Example: my_instantiator
