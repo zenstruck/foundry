@@ -110,7 +110,7 @@ final class Proxy
      */
     public function object(): object
     {
-        if (!$this->autoRefresh || !$this->persisted) {
+        if (!$this->autoRefresh || !$this->persisted || !Factory::configuration()->isFlushingEnabled()) {
             return $this->object;
         }
 
@@ -139,7 +139,11 @@ final class Proxy
     public function save(): self
     {
         $this->objectManager()->persist($this->object);
-        $this->objectManager()->flush();
+
+        if (Factory::configuration()->isFlushingEnabled()) {
+            $this->objectManager()->flush();
+        }
+
         $this->persisted = true;
 
         return $this;

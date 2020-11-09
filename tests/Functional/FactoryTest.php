@@ -142,4 +142,50 @@ final class FactoryTest extends KernelTestCase
         $this->assertNull($object1->getValue());
         $this->assertSame('an address', $object2->getValue());
     }
+
+    public function can_delay_flush(): void
+    {
+        AnonymousFactory::new(Post::class)->assert()->empty();
+        AnonymousFactory::new(Category::class)->assert()->empty();
+
+        AnonymousFactory::delayFlush(function() {
+            AnonymousFactory::new(Post::class)->create([
+                'title' => 'title',
+                'body' => 'body',
+                'category' => AnonymousFactory::new(Category::class, ['name' => 'name']),
+            ]);
+
+            AnonymousFactory::new(Post::class)->assert()->empty();
+            AnonymousFactory::new(Category::class)->assert()->empty();
+        });
+
+        AnonymousFactory::new(Post::class)->assert()->count(1);
+        AnonymousFactory::new(Category::class)->assert()->count(1);
+    }
+
+    /**
+     * @test
+     */
+    public function auto_refresh_is_disabled_during_delay_flush(): void
+    {
+        AnonymousFactory::new(Post::class)->assert()->empty();
+        AnonymousFactory::new(Category::class)->assert()->empty();
+
+        AnonymousFactory::delayFlush(function() {
+            $post = AnonymousFactory::new(Post::class)->create([
+                'title' => 'title',
+                'body' => 'body',
+                'category' => AnonymousFactory::new(Category::class, ['name' => 'name']),
+            ]);
+
+            $post->setTitle('new title');
+            $post->setBody('new body');
+
+            AnonymousFactory::new(Post::class)->assert()->empty();
+            AnonymousFactory::new(Category::class)->assert()->empty();
+        });
+
+        AnonymousFactory::new(Post::class)->assert()->count(1);
+        AnonymousFactory::new(Category::class)->assert()->count(1);
+    }
 }
