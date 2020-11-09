@@ -127,6 +127,34 @@ final class InstantiatorTest extends TestCase
     /**
      * @test
      */
+    public function can_set_attributes_that_should_be_optional(): void
+    {
+        $object = (new Instantiator())->allowExtraAttributes(['extra'])([
+            'propB' => 'B',
+            'extra' => 'foo',
+        ], InstantiatorDummy::class);
+
+        $this->assertSame('constructor B', $object->getPropB());
+    }
+
+    /**
+     * @test
+     */
+    public function extra_attributes_not_defined_throws_exception(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot set attribute "extra2" for object "Zenstruck\Foundry\Tests\Unit\InstantiatorDummy" (not public and no setter).');
+
+        (new Instantiator())->allowExtraAttributes(['extra1'])([
+            'propB' => 'B',
+            'extra1' => 'foo',
+            'extra2' => 'bar',
+        ], InstantiatorDummy::class);
+    }
+
+    /**
+     * @test
+     */
     public function can_prefix_extra_attribute_key_with_optional_to_avoid_exception(): void
     {
         $object = (new Instantiator())([
@@ -167,6 +195,20 @@ final class InstantiatorTest extends TestCase
         $this->assertSame('setter B', $object->getPropB());
         $this->assertSame('setter C', $object->getPropC());
         $this->assertSame('setter D', $object->getPropD());
+    }
+
+    /**
+     * @test
+     */
+    public function can_set_attributes_that_should_be_force_set(): void
+    {
+        $object = (new Instantiator())->withoutConstructor()->alwaysForceProperties(['propD'])([
+            'propB' => 'B',
+            'propD' => 'D',
+        ], InstantiatorDummy::class);
+
+        $this->assertSame('setter B', $object->getPropB());
+        $this->assertSame('D', $object->getPropD());
     }
 
     /**

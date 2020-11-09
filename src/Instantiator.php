@@ -20,19 +20,25 @@ final class Instantiator
     /** @var bool */
     private $allowExtraAttributes = false;
 
+    /** @var array */
+    private $extraAttributes = [];
+
     /** @var bool */
     private $alwaysForceProperties = false;
+
+    /** @var array */
+    private $forceProperties = [];
 
     public function __invoke(array $attributes, string $class): object
     {
         $object = $this->instantiate($class, $attributes);
 
         foreach ($attributes as $attribute => $value) {
-            if (0 === \mb_strpos($attribute, 'optional:')) {
+            if (0 === \mb_strpos($attribute, 'optional:') || \in_array($attribute, $this->extraAttributes, true)) {
                 continue;
             }
 
-            if ($this->alwaysForceProperties) {
+            if ($this->alwaysForceProperties || \in_array($attribute, $this->forceProperties, true)) {
                 try {
                     self::forceSet($object, $attribute, $value);
                 } catch (\InvalidArgumentException $e) {
@@ -79,20 +85,32 @@ final class Instantiator
 
     /**
      * Ignore attributes that can't be set to object.
+     *
+     * @param string[] $attributes The attributes you'd like the instantiator to ignore (if empty, ignore any extra)
      */
-    public function allowExtraAttributes(): self
+    public function allowExtraAttributes(array $attributes = []): self
     {
-        $this->allowExtraAttributes = true;
+        if (empty($attributes)) {
+            $this->allowExtraAttributes = true;
+        }
+
+        $this->extraAttributes = $attributes;
 
         return $this;
     }
 
     /**
      * Always force properties, never use setters (still uses constructor unless disabled).
+     *
+     * @param string[] $properties The properties you'd like the instantiator to "force set" (if empty, force set all)
      */
-    public function alwaysForceProperties(): self
+    public function alwaysForceProperties(array $properties = []): self
     {
-        $this->alwaysForceProperties = true;
+        if (empty($properties)) {
+            $this->alwaysForceProperties = true;
+        }
+
+        $this->forceProperties = $properties;
 
         return $this;
     }

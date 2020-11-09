@@ -538,8 +538,14 @@ PostFactory::new()
     // instantiate the object without calling the constructor
     ->instantiateWith((new Instantiator())->withoutConstructor())
 
-    // extra attributes are ignored
+    // "foo" and "bar" attributes are ignored when instantiating
+    ->instantiateWith((new Instantiator())->allowExtraAttributes(['foo', 'bar']))
+
+    // all extra attributes are ignored when instantiating
     ->instantiateWith((new Instantiator())->allowExtraAttributes())
+
+    // force set "title" and "body" when instantiating
+    ->instantiateWith((new Instantiator())->alwaysForceProperties(['title', 'body']))
 
     // never use setters, always "force set" properties (even private/protected, does not use setter)
     ->instantiateWith((new Instantiator())->alwaysForceProperties())
