@@ -25,7 +25,8 @@
         "matthiasnoback/symfony-dependency-injection-test": "^4.1",
         "symfony/framework-bundle": "^4.4|^5.0",
         "symfony/maker-bundle": "^1.13",
-        "symfony/phpunit-bridge": "^5.1"
+        "symfony/phpunit-bridge": "^5.1",
+        "vimeo/psalm": "^4.1"
     },
     "config": {
         "preferred-install": "dist",
