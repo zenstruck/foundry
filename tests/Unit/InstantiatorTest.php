@@ -3,6 +3,7 @@
 namespace Zenstruck\Foundry\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Zenstruck\Foundry\Instantiator;
 
 /**
@@ -10,6 +11,8 @@ use Zenstruck\Foundry\Instantiator;
  */
 final class InstantiatorTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     /**
      * @test
      */
@@ -154,9 +157,12 @@ final class InstantiatorTest extends TestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_prefix_extra_attribute_key_with_optional_to_avoid_exception(): void
     {
+        $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using "optional:" attribute prefixes is deprecated, use Instantiator::allowExtraAttributes() instead (https://github.com/zenstruck/foundry#instantiation).');
+
         $object = (new Instantiator())([
             'propB' => 'B',
             'optional:extra' => 'foo',
@@ -213,9 +219,12 @@ final class InstantiatorTest extends TestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function prefixing_attribute_key_with_force_sets_the_property_directly(): void
     {
+        $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using "force:" property prefixes is deprecated, use Instantiator::alwaysForceProperties() instead (https://github.com/zenstruck/foundry#instantiation).');
+
         $object = (new Instantiator())([
             'propA' => 'A',
             'propB' => 'B',
@@ -232,9 +241,12 @@ final class InstantiatorTest extends TestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function prefixing_snake_case_attribute_key_with_force_sets_the_property_directly(): void
     {
+        $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using "force:" property prefixes is deprecated, use Instantiator::alwaysForceProperties() instead (https://github.com/zenstruck/foundry#instantiation).');
+
         $object = (new Instantiator())([
             'prop_a' => 'A',
             'prop_b' => 'B',
@@ -251,9 +263,12 @@ final class InstantiatorTest extends TestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function prefixing_kebab_case_attribute_key_with_force_sets_the_property_directly(): void
     {
+        $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using "force:" property prefixes is deprecated, use Instantiator::alwaysForceProperties() instead (https://github.com/zenstruck/foundry#instantiation).');
+
         $object = (new Instantiator())([
             'prop-a' => 'A',
             'prop-b' => 'B',
@@ -270,9 +285,11 @@ final class InstantiatorTest extends TestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function prefixing_invalid_attribute_key_with_force_throws_exception(): void
     {
+        $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using "force:" property prefixes is deprecated, use Instantiator::alwaysForceProperties() instead (https://github.com/zenstruck/foundry#instantiation).');
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Class "Zenstruck\Foundry\Tests\Unit\InstantiatorDummy" does not have property "extra".');
 
@@ -407,9 +424,12 @@ final class InstantiatorTest extends TestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function always_force_mode_allows_optional_attribute_name_prefix(): void
     {
+        $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using "optional:" attribute prefixes is deprecated, use Instantiator::allowExtraAttributes() instead (https://github.com/zenstruck/foundry#instantiation).');
+
         $object = (new Instantiator())->alwaysForceProperties()([
             'propB' => 'B',
             'propD' => 'D',

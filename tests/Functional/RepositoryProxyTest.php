@@ -3,6 +3,7 @@
 namespace Zenstruck\Foundry\Tests\Functional;
 
 use Doctrine\Common\Proxy\Proxy as DoctrineProxy;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Test\Factories;
@@ -18,7 +19,7 @@ use function Zenstruck\Foundry\repository;
  */
 final class RepositoryProxyTest extends KernelTestCase
 {
-    use ResetDatabase, Factories;
+    use ResetDatabase, Factories, ExpectDeprecationTrait;
 
     /**
      * @test
@@ -273,6 +274,18 @@ final class RepositoryProxyTest extends KernelTestCase
 
         $this->assertCount(4, $repository);
         $this->assertCount(4, \iterator_to_array($repository));
-        $this->assertSame(4, $repository->getCount());
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    public function can_use_get_count(): void
+    {
+        CategoryFactory::new()->createMany(4);
+
+        $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using RepositoryProxy::getCount() is deprecated, use RepositoryProxy::count() (it is now Countable).');
+
+        $this->assertSame(4, CategoryFactory::repository()->getCount());
     }
 }

@@ -3,21 +3,21 @@
 echo "Running without FoundryBundle and without DamaDoctrineTestBundle"
 echo "================================================================"
 echo ""
-USE_FOUNDRY_BUNDLE=0 vendor/bin/phpunit
+USE_FOUNDRY_BUNDLE=0 vendor/bin/simple-phpunit
 
 echo ""
 echo "Running with FoundryBundle and without DamaDoctrineTestBundle"
 echo "============================================================="
 echo ""
-USE_FOUNDRY_BUNDLE=1 vendor/bin/phpunit
+USE_FOUNDRY_BUNDLE=1 vendor/bin/simple-phpunit
 
 echo "Running without FoundryBundle and with DamaDoctrineTestBundle"
 echo "============================================================="
 echo ""
-USE_FOUNDRY_BUNDLE=0 vendor/bin/phpunit -c phpunit-dama-doctrine.xml
+USE_FOUNDRY_BUNDLE=0 vendor/bin/simple-phpunit -c phpunit-dama-doctrine.xml
 
 echo ""
 echo "Running with FoundryBundle and with DamaDoctrineTestBundle"
 echo "=========================================================="
 echo ""
-USE_FOUNDRY_BUNDLE=1 vendor/bin/phpunit -c phpunit-dama-doctrine.xml
+USE_FOUNDRY_BUNDLE=1 vendor/bin/simple-phpunit -c phpunit-dama-doctrine.xml
