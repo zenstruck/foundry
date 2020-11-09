@@ -69,6 +69,7 @@ final class Instantiator
                 // see if attribute was snake/kebab cased
                 try {
                     self::propertyAccessor()->setValue($object, self::camel($attribute), $value);
+                    trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using a differently cased attribute is deprecated, use the same case as the object property instead.');
                 } catch (NoSuchPropertyException $e) {
                     if (!$this->allowExtraAttributes) {
                         throw new \InvalidArgumentException(\sprintf('Cannot set attribute "%s" for object "%s" (not public and no setter).', $attribute, $class), 0, $e);
@@ -150,8 +151,10 @@ final class Instantiator
         $class = new \ReflectionClass($object);
 
         // try fetching first by exact name, if not found, try camel-case
-        if (!$property = self::reflectionProperty($class, $name)) {
-            $property = self::reflectionProperty($class, self::camel($name));
+        $property = self::reflectionProperty($class, $name);
+
+        if (!$property && $property = self::reflectionProperty($class, self::camel($name))) {
+            trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using a differently cased attribute is deprecated, use the same case as the object property instead.');
         }
 
         if (!$property) {
@@ -194,6 +197,8 @@ final class Instantiator
         $name = self::snake($name);
 
         if (\array_key_exists($name, $attributes)) {
+            trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using a differently cased attribute is deprecated, use the same case as the object property instead.');
+
             return $name;
         }
 
@@ -201,6 +206,8 @@ final class Instantiator
         $name = \str_replace('_', '-', $name);
 
         if (\array_key_exists($name, $attributes)) {
+            trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using a differently cased attribute is deprecated, use the same case as the object property instead.');
+
             return $name;
         }
 

@@ -362,16 +362,10 @@ $posts = PostFactory::new(['title' => 'Post A'])
     ->withAttributes([
         'body' => 'Post Body...',
 
-        // can use snake case
-        'published_at' => new \DateTime('now'), 
-
         // CategoryFactory will be used to create a new Category for each Post
         'category' => CategoryFactory::new(['name' => 'php']), 
     ])
     ->withAttributes([
-        // can use kebab case
-        'published-at' => new \DateTime('last week'),
-
         // Proxies are automatically converted to their wrapped object
         'category' => CategoryFactory::new()->create(),
     ])
@@ -1012,14 +1006,10 @@ Object proxies have helper methods to access non-public properties of the object
 
 ```php
 // set private/protected properties
-$post->forceSet('createdAt', new \DateTime()); 
-$post->forceSet('created_at', new \DateTime()); // can use snake case
-$post->forceSet('created-at', new \DateTime()); // can use kebab case
+$post->forceSet('createdAt', new \DateTime());
 
 // get private/protected properties
 $post->forceGet('createdAt');
-$post->forceGet('created_at'); // can use snake case
-$post->forceGet('created-at'); // can use kebab case
 ```
 
 #### Auto-Refresh

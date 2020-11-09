@@ -304,10 +304,10 @@ final class FactoryTest extends TestCase
 
         Factory::configuration()->setManagerRegistry($registry);
 
-        $expectedAttributes = ['short_description' => 'short desc', 'title' => 'title', 'body' => 'body'];
+        $expectedAttributes = ['shortDescription' => 'short desc', 'title' => 'title', 'body' => 'body'];
         $calls = 0;
 
-        $object = (new Factory(Post::class, ['short_description' => 'short desc']))
+        $object = (new Factory(Post::class, ['shortDescription' => 'short desc']))
             ->afterPersist(function(Proxy $post, array $attributes) use ($expectedAttributes, &$calls) {
                 /* @var Post $post */
                 $this->assertSame($expectedAttributes, $attributes);

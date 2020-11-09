@@ -34,9 +34,12 @@ final class InstantiatorTest extends TestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_use_snake_case_attributes(): void
     {
+        $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using a differently cased attribute is deprecated, use the same case as the object property instead.');
+
         $object = (new Instantiator())([
             'prop_a' => 'A',
             'prop_b' => 'B',
@@ -53,9 +56,12 @@ final class InstantiatorTest extends TestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_use_kebab_case_attributes(): void
     {
+        $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using a differently cased attribute is deprecated, use the same case as the object property instead.');
+
         $object = (new Instantiator())([
             'prop-a' => 'A',
             'prop-b' => 'B',
@@ -307,6 +313,23 @@ final class InstantiatorTest extends TestCase
         $object = new InstantiatorDummy('B');
 
         $this->assertNull(Instantiator::forceGet($object, 'propE'));
+
+        Instantiator::forceSet($object, 'propE', 'value');
+
+        $this->assertSame('value', Instantiator::forceGet($object, 'propE'));
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    public function can_use_force_set_and_get_with_kebab_and_snake_case(): void
+    {
+        $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using a differently cased attribute is deprecated, use the same case as the object property instead.');
+
+        $object = new InstantiatorDummy('B');
+
+        $this->assertNull(Instantiator::forceGet($object, 'propE'));
         $this->assertNull(Instantiator::forceGet($object, 'prop_e'));
         $this->assertNull(Instantiator::forceGet($object, 'prop-e'));
 
@@ -372,9 +395,12 @@ final class InstantiatorTest extends TestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_use_always_force_mode_allows_snake_case(): void
     {
+        $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using a differently cased attribute is deprecated, use the same case as the object property instead.');
+
         $object = (new Instantiator())->alwaysForceProperties()([
             'prop_a' => 'A',
             'prop_b' => 'B',
@@ -391,9 +417,12 @@ final class InstantiatorTest extends TestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_use_always_force_mode_allows_kebab_case(): void
     {
+        $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using a differently cased attribute is deprecated, use the same case as the object property instead.');
+
         $object = (new Instantiator())->alwaysForceProperties()([
             'prop-a' => 'A',
             'prop-b' => 'B',
