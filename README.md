@@ -394,22 +394,6 @@ $post[1]->getPublishedAt(); // \DateTime('last week')
 $post[1]->getCreatedAt(); // random \DateTime (different than above)
 ```
 
-When using the [default instantiator](#instantiation), there are two attribute key prefixes to change
-behavior:
-
-```php
-$post = PostFactory::new()->create([
-    // "force set" the body property (even private/protected, does not use setter)
-    'force:body' => 'some body', 
-
-    // attributes that can't be mapped to object properties/constructor arguments cause
-    // an exception to be thrown when instantiating the object.
-    // attributes prefixed with "optional:" are ignored
-    // these "optional" attributes can be used in factory "events/hooks" (the prefix is not removed)
-    'optional:extra' => 'value', // attributes prefixed with "optional:" do not cause an exception
-]);
-```
-
 ### Faker
 
 This library provides a wrapper for [fzaninotto/faker](https://github.com/fzaninotto/Faker) to help with generating
