@@ -120,6 +120,8 @@ final class MakeFactory extends AbstractMaker
             }
         }
 
+        \sort($choices);
+
         return $choices;
     }
 }
