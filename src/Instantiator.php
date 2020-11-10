@@ -20,8 +20,14 @@ final class Instantiator
     /** @var bool */
     private $allowExtraAttributes = false;
 
+    /** @var array */
+    private $extraAttributes = [];
+
     /** @var bool */
     private $alwaysForceProperties = false;
+
+    /** @var array */
+    private $forceProperties = [];
 
     public function __invoke(array $attributes, string $class): object
     {
@@ -29,10 +35,15 @@ final class Instantiator
 
         foreach ($attributes as $attribute => $value) {
             if (0 === \mb_strpos($attribute, 'optional:')) {
+                trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using "optional:" attribute prefixes is deprecated, use Instantiator::allowExtraAttributes() instead (https://github.com/zenstruck/foundry#instantiation).');
                 continue;
             }
 
-            if ($this->alwaysForceProperties) {
+            if (\in_array($attribute, $this->extraAttributes, true)) {
+                continue;
+            }
+
+            if ($this->alwaysForceProperties || \in_array($attribute, $this->forceProperties, true)) {
                 try {
                     self::forceSet($object, $attribute, $value);
                 } catch (\InvalidArgumentException $e) {
@@ -45,6 +56,8 @@ final class Instantiator
             }
 
             if (0 === \mb_strpos($attribute, 'force:')) {
+                trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using "force:" property prefixes is deprecated, use Instantiator::alwaysForceProperties() instead (https://github.com/zenstruck/foundry#instantiation).');
+
                 self::forceSet($object, \mb_substr($attribute, 6), $value);
 
                 continue;
@@ -56,6 +69,7 @@ final class Instantiator
                 // see if attribute was snake/kebab cased
                 try {
                     self::propertyAccessor()->setValue($object, self::camel($attribute), $value);
+                    trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using a differently cased attribute is deprecated, use the same case as the object property instead.');
                 } catch (NoSuchPropertyException $e) {
                     if (!$this->allowExtraAttributes) {
                         throw new \InvalidArgumentException(\sprintf('Cannot set attribute "%s" for object "%s" (not public and no setter).', $attribute, $class), 0, $e);
@@ -79,20 +93,32 @@ final class Instantiator
 
     /**
      * Ignore attributes that can't be set to object.
+     *
+     * @param string[] $attributes The attributes you'd like the instantiator to ignore (if empty, ignore any extra)
      */
-    public function allowExtraAttributes(): self
+    public function allowExtraAttributes(array $attributes = []): self
     {
-        $this->allowExtraAttributes = true;
+        if (empty($attributes)) {
+            $this->allowExtraAttributes = true;
+        }
+
+        $this->extraAttributes = $attributes;
 
         return $this;
     }
 
     /**
      * Always force properties, never use setters (still uses constructor unless disabled).
+     *
+     * @param string[] $properties The properties you'd like the instantiator to "force set" (if empty, force set all)
      */
-    public function alwaysForceProperties(): self
+    public function alwaysForceProperties(array $properties = []): self
     {
-        $this->alwaysForceProperties = true;
+        if (empty($properties)) {
+            $this->alwaysForceProperties = true;
+        }
+
+        $this->forceProperties = $properties;
 
         return $this;
     }
@@ -125,8 +151,10 @@ final class Instantiator
         $class = new \ReflectionClass($object);
 
         // try fetching first by exact name, if not found, try camel-case
-        if (!$property = self::reflectionProperty($class, $name)) {
-            $property = self::reflectionProperty($class, self::camel($name));
+        $property = self::reflectionProperty($class, $name);
+
+        if (!$property && $property = self::reflectionProperty($class, self::camel($name))) {
+            trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using a differently cased attribute is deprecated, use the same case as the object property instead.');
         }
 
         if (!$property) {
@@ -169,6 +197,8 @@ final class Instantiator
         $name = self::snake($name);
 
         if (\array_key_exists($name, $attributes)) {
+            trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using a differently cased attribute is deprecated, use the same case as the object property instead.');
+
             return $name;
         }
 
@@ -176,6 +206,8 @@ final class Instantiator
         $name = \str_replace('_', '-', $name);
 
         if (\array_key_exists($name, $attributes)) {
+            trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using a differently cased attribute is deprecated, use the same case as the object property instead.');
+
             return $name;
         }
 

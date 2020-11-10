@@ -362,16 +362,10 @@ $posts = PostFactory::new(['title' => 'Post A'])
     ->withAttributes([
         'body' => 'Post Body...',
 
-        // can use snake case
-        'published_at' => new \DateTime('now'), 
-
         // CategoryFactory will be used to create a new Category for each Post
         'category' => CategoryFactory::new(['name' => 'php']), 
     ])
     ->withAttributes([
-        // can use kebab case
-        'published-at' => new \DateTime('last week'),
-
         // Proxies are automatically converted to their wrapped object
         'category' => CategoryFactory::new()->create(),
     ])
@@ -392,22 +386,6 @@ $post[1]->getBody(); // "Post Body..."
 $post[1]->getCategory(); // random Category (different than above)
 $post[1]->getPublishedAt(); // \DateTime('last week')
 $post[1]->getCreatedAt(); // random \DateTime (different than above)
-```
-
-When using the [default instantiator](#instantiation), there are two attribute key prefixes to change
-behavior:
-
-```php
-$post = PostFactory::new()->create([
-    // "force set" the body property (even private/protected, does not use setter)
-    'force:body' => 'some body', 
-
-    // attributes that can't be mapped to object properties/constructor arguments cause
-    // an exception to be thrown when instantiating the object.
-    // attributes prefixed with "optional:" are ignored
-    // these "optional" attributes can be used in factory "events/hooks" (the prefix is not removed)
-    'optional:extra' => 'value', // attributes prefixed with "optional:" do not cause an exception
-]);
 ```
 
 ### Faker
@@ -538,8 +516,14 @@ PostFactory::new()
     // instantiate the object without calling the constructor
     ->instantiateWith((new Instantiator())->withoutConstructor())
 
-    // extra attributes are ignored
+    // "foo" and "bar" attributes are ignored when instantiating
+    ->instantiateWith((new Instantiator())->allowExtraAttributes(['foo', 'bar']))
+
+    // all extra attributes are ignored when instantiating
     ->instantiateWith((new Instantiator())->allowExtraAttributes())
+
+    // force set "title" and "body" when instantiating
+    ->instantiateWith((new Instantiator())->alwaysForceProperties(['title', 'body']))
 
     // never use setters, always "force set" properties (even private/protected, does not use setter)
     ->instantiateWith((new Instantiator())->alwaysForceProperties())
@@ -1022,14 +1006,10 @@ Object proxies have helper methods to access non-public properties of the object
 
 ```php
 // set private/protected properties
-$post->forceSet('createdAt', new \DateTime()); 
-$post->forceSet('created_at', new \DateTime()); // can use snake case
-$post->forceSet('created-at', new \DateTime()); // can use kebab case
+$post->forceSet('createdAt', new \DateTime());
 
 // get private/protected properties
 $post->forceGet('createdAt');
-$post->forceGet('created_at'); // can use snake case
-$post->forceGet('created-at'); // can use kebab case
 ```
 
 #### Auto-Refresh

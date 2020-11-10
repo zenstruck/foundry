@@ -11,6 +11,7 @@
     <php>
         <ini name="error_reporting" value="-1" />
         <env name="KERNEL_CLASS" value="Zenstruck\Foundry\Tests\Fixtures\Kernel" />
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0"/>
     </php>
 
     <testsuites>

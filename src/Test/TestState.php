@@ -46,6 +46,7 @@ final class TestState
      */
     public static function withoutBundle(): void
     {
+        trigger_deprecation('zenstruck\foundry', '1.4.0', 'TestState::withoutBundle() is deprecated, the bundle is now auto-detected.');
     }
 
     public static function addGlobalState(callable $callback): void
@@ -83,6 +84,8 @@ final class TestState
      */
     public static function bootFactory(Configuration $configuration): Configuration
     {
+        trigger_deprecation('zenstruck\foundry', '1.4.0', 'TestState::bootFactory() is deprecated, use TestState::bootFoundry().');
+
         self::bootFoundry($configuration);
 
         return Factory::configuration();
