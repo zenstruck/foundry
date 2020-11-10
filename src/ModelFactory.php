@@ -3,6 +3,9 @@
 namespace Zenstruck\Foundry;
 
 /**
+ * @template TModel of object
+ * @template-extends Factory<TModel>
+ *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 abstract class ModelFactory extends Factory
@@ -53,6 +56,8 @@ abstract class ModelFactory extends Factory
      * instantiate and persist.
      *
      * @return Proxy|object
+     *
+     * @psalm-return Proxy<TModel>
      */
     final public static function findOrCreate(array $attributes): Proxy
     {
@@ -87,6 +92,7 @@ abstract class ModelFactory extends Factory
         return static::repository()->randomRange($min, $max);
     }
 
+    /** @psalm-return RepositoryProxy<TModel> */
     final public static function repository(): RepositoryProxy
     {
         return static::configuration()->repositoryFor(static::getClass());
@@ -112,6 +118,7 @@ abstract class ModelFactory extends Factory
         return $this->withAttributes($attributes);
     }
 
+    /** @psalm-return class-string<TModel> */
     abstract protected static function getClass(): string;
 
     abstract protected function getDefaults(): array;

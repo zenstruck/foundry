@@ -8,13 +8,14 @@ use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\Assert;
 
 /**
- * @mixin EntityRepository
+ * @mixin EntityRepository<TProxiedObject>
+ * @template TProxiedObject of object
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Countable
 {
-    /** @var ObjectRepository */
+    /** @var ObjectRepository<TProxiedObject> */
     private $repository;
 
     public function __construct(ObjectRepository $repository)
@@ -122,6 +123,8 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
 
     /**
      * @return Proxy|object|null
+     *
+     * @psalm-return Proxy<TProxiedObject>|null
      */
     public function first(string $sortedField = 'id'): ?Proxy
     {
@@ -130,6 +133,8 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
 
     /**
      * @return Proxy|object|null
+     *
+     * @psalm-return Proxy<TProxiedObject>|null
      */
     public function last(string $sortedField = 'id'): ?Proxy
     {
@@ -162,6 +167,8 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
      * @return Proxy|object
      *
      * @throws \RuntimeException if no objects are persisted
+     *
+     * @psalm-return Proxy<TProxiedObject>
      */
     public function random(): Proxy
     {
@@ -224,6 +231,9 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
      * @param object|array|mixed $criteria
      *
      * @return Proxy|object|null
+     *
+     * @psalm-param Proxy<TProxiedObject>|array|mixed $criteria
+     * @psalm-return Proxy<TProxiedObject>|list<Proxy<TProxiedObject>>|null
      */
     public function find($criteria): ?Proxy
     {
@@ -260,6 +270,8 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
      * @return Proxy|object|null
      *
      * @throws \RuntimeException if the wrapped ObjectRepository does not have the $orderBy parameter
+     *
+     * @psalm-return Proxy<TProxiedObject>|null
      */
     public function findOneBy(array $criteria, ?array $orderBy = null): ?Proxy
     {
@@ -274,6 +286,9 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
         return $this->proxyResult($this->repository->findOneBy(self::normalizeCriteria($criteria), $orderBy));
     }
 
+    /**
+     * @psalm-return class-string<TProxiedObject>
+     */
     public function getClassName(): string
     {
         return $this->repository->getClassName();
@@ -283,6 +298,11 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
      * @param mixed $result
      *
      * @return Proxy|Proxy[]|object|object[]|mixed
+     *
+     * @psalm-suppress InvalidReturnStatement
+     * @psalm-suppress InvalidReturnType
+     * @psalm-param TProxiedObject|list<TProxiedObject> $result
+     * @psalm-return ($result is array ? list<Proxy<TProxiedObject>> : Proxy<TProxiedObject>)
      */
     private function proxyResult($result)
     {

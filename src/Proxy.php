@@ -6,14 +6,23 @@ use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\Assert;
 
 /**
+ * @template TProxiedObject of object
+ * @mixin TProxiedObject
+ *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class Proxy
 {
-    /** @var object */
+    /**
+     * @var object
+     * @psalm-var TProxiedObject
+     */
     private $object;
 
-    /** @var string */
+    /**
+     * @var string
+     * @psalm-var class-string<TProxiedObject>
+     */
     private $class;
 
     /** @var bool */
@@ -24,6 +33,8 @@ final class Proxy
 
     /**
      * @internal
+     *
+     * @psalm-param TProxiedObject $object
      */
     public function __construct(object $object)
     {
@@ -72,6 +83,10 @@ final class Proxy
 
     /**
      * @internal
+     *
+     * @template TObject as object
+     * @psalm-param TObject $object
+     * @psalm-return Proxy<TObject>
      */
     public static function createFromPersisted(object $object): self
     {
@@ -86,6 +101,9 @@ final class Proxy
         return $this->persisted;
     }
 
+    /**
+     * @psalm-return TProxiedObject
+     */
     public function object(): object
     {
         if ($this->autoRefresh && $this->persisted) {
@@ -231,6 +249,9 @@ final class Proxy
         $callback($object, ...$arguments);
     }
 
+    /**
+     * @psalm-return TProxiedObject|null
+     */
     private function fetchObject(): ?object
     {
         $id = $this->objectManager()->getClassMetadata($this->class)->getIdentifierValues($this->object);

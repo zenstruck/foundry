@@ -6,6 +6,10 @@ use Faker;
 
 /**
  * @see Factory::__construct()
+ *
+ * @template TObject as object
+ * @psalm-param class-string<TObject> $class
+ * @psalm-return Factory<TObject>
  */
 function factory(string $class, $defaultAttributes = []): Factory
 {
@@ -16,6 +20,10 @@ function factory(string $class, $defaultAttributes = []): Factory
  * @see Factory::create()
  *
  * @return Proxy|object
+ *
+ * @template TObject of object
+ * @psalm-param class-string<TObject> $class
+ * @psalm-return Proxy<TObject>
  */
 function create(string $class, $attributes = []): Proxy
 {
@@ -26,6 +34,10 @@ function create(string $class, $attributes = []): Proxy
  * @see Factory::createMany()
  *
  * @return Proxy[]|object[]
+ *
+ * @template TObject of object
+ * @psalm-param class-string<TObject> $class
+ * @psalm-return list<Proxy<TObject>>
  */
 function create_many(int $number, string $class, $attributes = []): array
 {
@@ -36,6 +48,10 @@ function create_many(int $number, string $class, $attributes = []): array
  * Instantiate object without persisting.
  *
  * @return Proxy|object "unpersisted" Proxy wrapping the instantiated object
+ *
+ * @template TObject of object
+ * @psalm-param class-string<TObject> $class
+ * @psalm-return Proxy<TObject>
  */
 function instantiate(string $class, $attributes = []): Proxy
 {
@@ -46,6 +62,10 @@ function instantiate(string $class, $attributes = []): Proxy
  * Instantiate X objects without persisting.
  *
  * @return Proxy[]|object[] "unpersisted" Proxy's wrapping the instantiated objects
+ *
+ * @template TObject of object
+ * @psalm-param class-string<TObject> $class
+ * @psalm-return list<Proxy<TObject>>
  */
 function instantiate_many(int $number, string $class, $attributes = []): array
 {
