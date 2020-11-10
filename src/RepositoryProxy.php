@@ -44,6 +44,8 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
 
     public function getIterator(): \Traversable
     {
+        // TODO: $this->repository is set to ObjectRepository, which is not
+        //       iterable. Can this every be another RepositoryProxy?
         if (\is_iterable($this->repository)) {
             return yield from $this->repository;
         }
@@ -235,7 +237,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
      * @psalm-param Proxy<TProxiedObject>|array|mixed $criteria
      * @psalm-return Proxy<TProxiedObject>|list<Proxy<TProxiedObject>>|null
      */
-    public function find($criteria): ?Proxy
+    public function find($criteria)
     {
         if ($criteria instanceof Proxy) {
             $criteria = $criteria->object();

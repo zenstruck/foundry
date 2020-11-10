@@ -152,6 +152,7 @@ final class Configuration
     private function managerRegistry(): ManagerRegistry
     {
         if (!$this->hasManagerRegistry()) {
+            /** @psalm-suppress MissingDependency */
             throw new \RuntimeException('Foundry was booted without doctrine. Ensure your TestCase extends '.KernelTestCase::class);
         }
 

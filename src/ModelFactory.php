@@ -62,7 +62,7 @@ abstract class ModelFactory extends Factory
     final public static function findOrCreate(array $attributes): Proxy
     {
         if ($found = static::repository()->find($attributes)) {
-            return $found;
+            return \is_array($found) ? $found[0] : $found;
         }
 
         return static::new()->create($attributes);

@@ -12,6 +12,20 @@
         </ignoreFiles>
     </projectFiles>
 
+    <issueHandlers>
+        <InvalidCatch>
+            <errorLevel type="suppress">
+                <!-- this interface does not extend from a throwable -->
+                <referencedClass name="Psr\Container\NotFoundExceptionInterface"/>
+            </errorLevel>
+        </InvalidCatch>
+        <UndefinedClass>
+            <errorLevel type="suppress">
+                <referencedClass name="PHPUnit\Framework\Assert"/>
+            </errorLevel>
+        </UndefinedClass>
+    </issueHandlers>
+
     <plugins>
         <pluginClass class="Psalm\SymfonyPsalmPlugin\Plugin"/>
         <pluginClass class="Weirdan\DoctrinePsalmPlugin\Plugin"/>
