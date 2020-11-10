@@ -221,6 +221,8 @@ class Factory
 
     /**
      * @internal
+     * @psalm-suppress InvalidNullableReturnType
+     * @psalm-suppress NullableReturnStatement
      */
     final public static function configuration(): Configuration
     {
