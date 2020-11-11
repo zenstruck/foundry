@@ -279,4 +279,4 @@ jobs:
           php php-cs-fixer.phar self-update
 
       - name: Check CS
-        run: php php-cs-fixer.phar fix --dry-run --diff
+        run: php php-cs-fixer.phar fix --dry-run --diff --diff-format=udiff
