@@ -29,7 +29,10 @@ jobs:
     strategy:
       matrix:
         php: [7.2, 7.3, 7.4]
-        stability: [prefer-lowest, prefer-stable]
+        stability: [prefer-stable]
+        include:
+          - php: 7.2
+            stability: prefer-lowest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2.3.3
