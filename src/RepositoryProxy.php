@@ -15,7 +15,7 @@ use PHPUnit\Framework\Assert;
  */
 final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Countable
 {
-    /** @var ObjectRepository<TProxiedObject> */
+    /** @var ObjectRepository<TProxiedObject>|EntityRepository<TProxiedObject> */
     private $repository;
 
     public function __construct(ObjectRepository $repository)

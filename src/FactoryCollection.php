@@ -39,6 +39,7 @@ final class FactoryCollection
      *
      * @return Proxy[]|object[]
      *
+     * @psalm-suppress InvalidReturnType
      * @psalm-return list<Proxy<TObject>>
      */
     public function create($attributes = []): array
@@ -58,6 +59,7 @@ final class FactoryCollection
      */
     public function all(): array
     {
+        /** @psalm-suppress TooManyArguments */
         return \array_map(
             function() {
                 return clone $this->factory;
