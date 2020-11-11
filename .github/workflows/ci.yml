@@ -248,35 +248,35 @@ jobs:
     name: Validate composer.json
     runs-on: ubuntu-latest
     steps:
-      -   name: Checkout code
-          uses: actions/checkout@v2.3.3
+      - name: Checkout code
+        uses: actions/checkout@v2.3.3
 
-      -   name: Setup PHP
-          uses: shivammathur/setup-php@2.7.0
-          with:
-            php-version: 7.4
-            coverage: none
+      - name: Setup PHP
+        uses: shivammathur/setup-php@2.7.0
+        with:
+          php-version: 7.4
+          coverage: none
 
-      -   name: Validate composer.json
-          run: composer validate --strict --no-check-lock
+      - name: Validate composer.json
+        run: composer validate --strict --no-check-lock
 
   cs-check:
     name: PHP Coding Standards
     runs-on: ubuntu-latest
     steps:
-      -   name: Checkout code
-          uses: actions/checkout@v2.3.3
+      - name: Checkout code
+        uses: actions/checkout@v2.3.3
 
-      -   name: Setup PHP
-          uses: shivammathur/setup-php@2.7.0
-          with:
-            php-version: 7.4
-            coverage: none
+      - name: Setup PHP
+        uses: shivammathur/setup-php@2.7.0
+        with:
+          php-version: 7.4
+          coverage: none
 
-      -   name: Install dependencies
-          run: |
-            wget https://cs.symfony.com/download/php-cs-fixer-v2.phar -O php-cs-fixer.phar
-            php php-cs-fixer.phar self-update
+      - name: Install dependencies
+        run: |
+          wget https://cs.symfony.com/download/php-cs-fixer-v2.phar -O php-cs-fixer.phar
+          php php-cs-fixer.phar self-update
 
-      -   name: Check CS
-          run: php php-cs-fixer.phar fix --dry-run --diff
+      - name: Check CS
+        run: php php-cs-fixer.phar fix --dry-run --diff
