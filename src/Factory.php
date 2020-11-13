@@ -5,6 +5,8 @@ namespace Zenstruck\Foundry;
 use Faker;
 
 /**
+ * @template TObject as object
+ *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 class Factory
@@ -12,7 +14,10 @@ class Factory
     /** @var Configuration|null */
     private static $configuration;
 
-    /** @var string */
+    /**
+     * @var string
+     * @psalm-var class-string<TObject>
+     */
     private $class;
 
     /** @var callable|null */
@@ -35,6 +40,8 @@ class Factory
 
     /**
      * @param array|callable $defaultAttributes
+     *
+     * @psalm-param class-string<TObject> $class
      */
     public function __construct(string $class, $defaultAttributes = [])
     {
@@ -46,6 +53,8 @@ class Factory
      * @param array|callable $attributes
      *
      * @return Proxy|object
+     *
+     * @psalm-return Proxy<TObject>
      */
     final public function create($attributes = []): Proxy
     {
@@ -93,6 +102,8 @@ class Factory
 
     /**
      * @see FactoryCollection::__construct()
+     *
+     * @psalm-return FactoryCollection<TObject>
      */
     final public function many(int $min, ?int $max = null): FactoryCollection
     {
@@ -103,6 +114,8 @@ class Factory
      * @param array|callable $attributes
      *
      * @return Proxy[]|object[]
+     *
+     * @psalm-return list<Proxy<TObject>>
      */
     final public function createMany(int $number, $attributes = []): array
     {
@@ -208,6 +221,8 @@ class Factory
 
     /**
      * @internal
+     * @psalm-suppress InvalidNullableReturnType
+     * @psalm-suppress NullableReturnStatement
      */
     final public static function configuration(): Configuration
     {

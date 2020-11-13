@@ -3,11 +3,13 @@
 namespace Zenstruck\Foundry;
 
 /**
+ * @template TObject as object
+ *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class FactoryCollection
 {
-    /** @var Factory */
+    /** @var Factory<TObject> */
     private $factory;
 
     /** @var int */
@@ -18,6 +20,8 @@ final class FactoryCollection
 
     /**
      * @param int|null $max If set, when created, the collection will be a random size between $min and $max
+     *
+     * @psalm-param Factory<TObject> $factory
      */
     public function __construct(Factory $factory, int $min, ?int $max = null)
     {
@@ -34,6 +38,9 @@ final class FactoryCollection
      * @param array|callable $attributes
      *
      * @return Proxy[]|object[]
+     *
+     * @psalm-suppress InvalidReturnType
+     * @psalm-return list<Proxy<TObject>>
      */
     public function create($attributes = []): array
     {
@@ -47,9 +54,12 @@ final class FactoryCollection
 
     /**
      * @return Factory[]
+     *
+     * @psalm-return list<Factory<TObject>>
      */
     public function all(): array
     {
+        /** @psalm-suppress TooManyArguments */
         return \array_map(
             function() {
                 return clone $this->factory;

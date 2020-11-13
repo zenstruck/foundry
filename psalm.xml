@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<psalm
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+    errorLevel="4"
+>
+    <projectFiles>
+        <directory name="src"/>
+        <ignoreFiles>
+            <directory name="src/Bundle/Resources"/>
+        </ignoreFiles>
+    </projectFiles>
+
+    <issueHandlers>
+        <InvalidCatch>
+            <errorLevel type="suppress">
+                <!-- this interface does not extend from a throwable -->
+                <referencedClass name="Psr\Container\NotFoundExceptionInterface"/>
+            </errorLevel>
+        </InvalidCatch>
+        <UndefinedClass>
+            <errorLevel type="suppress">
+                <referencedClass name="PHPUnit\Framework\Assert"/>
+            </errorLevel>
+        </UndefinedClass>
+    </issueHandlers>
+
+    <plugins>
+        <pluginClass class="Psalm\SymfonyPsalmPlugin\Plugin"/>
+        <pluginClass class="Weirdan\DoctrinePsalmPlugin\Plugin"/>
+    </plugins>
+</psalm>

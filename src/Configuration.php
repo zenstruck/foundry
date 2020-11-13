@@ -109,6 +109,12 @@ final class Configuration
 
     /**
      * @param object|string $objectOrClass
+     *
+     * @psalm-suppress InvalidReturnType
+     * @psalm-suppress InvalidReturnStatement
+     * @template TObject of object
+     * @psalm-param Proxy<TObject>|TObject|class-string<TObject> $objectOrClass
+     * @psalm-return RepositoryProxy<TObject>
      */
     public function repositoryFor($objectOrClass): RepositoryProxy
     {
@@ -137,6 +143,7 @@ final class Configuration
         return $objectManager;
     }
 
+    /** @psalm-assert !null $this->managerRegistry */
     public function hasManagerRegistry(): bool
     {
         return null !== $this->managerRegistry;
@@ -145,6 +152,7 @@ final class Configuration
     private function managerRegistry(): ManagerRegistry
     {
         if (!$this->hasManagerRegistry()) {
+            /** @psalm-suppress MissingDependency */
             throw new \RuntimeException('Foundry was booted without doctrine. Ensure your TestCase extends '.KernelTestCase::class);
         }
 
