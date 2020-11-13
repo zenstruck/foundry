@@ -1541,6 +1541,67 @@ zenstruck_foundry:
         service:              null # Example: my_instantiator
 ```
 
+<details>
+<summary>You can also use PHP syntax. Click to see how.</summary>
+<br>
+
+Add this line in your `src/Kernel.php`.
+```diff
+    protected function configureContainer(ContainerConfigurator $container): void
+    {
+         $container->import('../config/{packages}/*.yaml');
++        $container->import('../config/{packages}/'.$this->environment.'/*.php');
+         $container->import('../config/{packages}/'.$this->environment.'/*.yaml');
+        //...
+    }
+```
+And now you are ready to create the `zenstruck_foundry.php` file:
+```php
+// config/packages/dev/zenstruck_foundry.php
+
+<?php
+declare(strict_types=1);
+
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+
+return static function (ContainerConfigurator $config): void
+{
+    $config->extension('zenstruck_foundry', [
+
+        // Whether to auto-refresh proxies by default (https://github.com/zenstruck/foundry#auto-refresh)
+        'auto_refresh_proxies' => false,
+
+        // Configure faker to be used by your factories.
+        'faker' => [
+
+            // Change the default faker locale.
+            'locale' => null,
+
+            // Customize the faker service.
+            'service' => null
+        ],
+
+        // Configure the default instantiator used by your factories.
+        'instantiator' => [
+
+            // Whether or not to call an object's constructor during instantiation.
+            'without_constructor' => false,
+
+            // Whether or not to allow extra attributes.
+            'allow_extra_attributes' => false,
+
+            // Whether or not to skip setters and force set object properties (public/private/protected) directly.
+            'always_force_properties' => false,
+
+            // Customize the instantiator service.
+            'service' => null
+        ]
+    ]);
+};
+```
+</details>
+
+
 ## Credit
 
 The [AAA](https://www.thephilocoder.com/unit-testing-aaa-pattern/) style of testing was first introduced to me by
