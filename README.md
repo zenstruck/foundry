@@ -390,7 +390,7 @@ $post[1]->getCreatedAt(); // random \DateTime (different than above)
 
 ### Faker
 
-This library provides a wrapper for [fzaninotto/faker](https://github.com/fzaninotto/Faker) to help with generating
+This library provides a wrapper for [FakerPHP/faker](https://fakerphp.github.io/) to help with generating
 random data for your factories:
 
 ```php
