@@ -297,8 +297,9 @@ values that are defined in the `PostFactory::getDefaults()`.
 ```php
 use App\Factory\PostFactory;
 
-PostFactory::new(['title' => 'My Title'])->create();
-PostFactory::new(['title' => 'My Title'])->createMany(5);
+$factory = PostFactory::new(['title' => 'My Title']);
+$factory->create();
+$factory->createMany(5);
 ```
 
 ### Reusable Model Factory "States"
