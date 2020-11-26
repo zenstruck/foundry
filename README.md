@@ -267,15 +267,11 @@ $title = $post->getTitle(); // getTitle() can be autocompleted by your IDE!
 
 // if you need the actual Post object, use ->object()
 $realPost = $post->object();
-
-PostFactory::new()->create(['title' => 'My Title']); // override defaults 
-PostFactory::new(['title' => 'My Title'])->create(); // alternative to above
+PostFactory::new()->create(['title' => 'My Title']);
 
 // create/persist 5 Posts with random data from getDefaults()
 PostFactory::new()->createMany(5); // returns Post[]|Proxy[]
-
-PostFactory::new()->createMany(5, ['title' => 'My Title']); // override defaults 
-PostFactory::new(['title' => 'My Title'])->createMany(5); // alternative to above
+PostFactory::new()->createMany(5, ['title' => 'My Title']);
 
 // find a persisted object for the given attributes, if not found, create with the attributes
 PostFactory::findOrCreate(['title' => 'My Title']); // returns Post|Proxy
@@ -290,8 +286,21 @@ $posts = PostFactory::randomSet(4); // array containing 4 "Post|Proxy" objects
 $posts = PostFactory::randomRange(0, 5); // array containing 0-5 "Post|Proxy" objects
 ```
 
-**WARNING**: Never instantiate your `ModelFactory` with the constructor (ie `new PostFactory()`). This will
+### Instantiate your `ModelFactory`
+
+One should never instantiate your `ModelFactory` with the constructor (ie `new PostFactory()`). This will
 cause the factory to not be instantiated properly. Always instantiate with `PostFactory::new()`.
+
+The first argument to `PostFactory::new()` will allow you to overwrite the default
+values that are defined in the `PostFactory::getDefaults()`.
+
+```php
+use App\Factory\PostFactory;
+
+$factory = PostFactory::new(['title' => 'My Title']);
+$factory->create();
+$factory->createMany(5);
+```
 
 ### Reusable Model Factory "States"
 
