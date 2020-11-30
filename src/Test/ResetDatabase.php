@@ -63,5 +63,7 @@ trait ResetDatabase
         }
 
         DatabaseResetter::resetSchema(static::$kernel);
+
+        static::ensureKernelShutdown();
     }
 }
