@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Zenstruck\Foundry\Factory;
 
 /**
  * @internal
@@ -75,7 +76,10 @@ final class DatabaseResetter
             ]);
         }
 
-        TestState::bootFromContainer($application->getKernel()->getContainer());
+        if (!Factory::isBooted()) {
+            TestState::bootFromContainer($application->getKernel()->getContainer());
+        }
+
         TestState::flushGlobalState();
     }
 
