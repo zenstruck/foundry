@@ -24,11 +24,10 @@ trait Factories
             return;
         }
 
-        if (!static::$booted) {
-            static::bootKernel();
-        }
+        $kernel = static::createKernel();
+        $kernel->boot();
 
-        TestState::bootFromContainer(static::$kernel->getContainer());
+        TestState::bootFromContainer($kernel->getContainer());
         Factory::configuration()->setManagerRegistry(
             new LazyManagerRegistry(static function() {
                 if (!static::$booted) {
@@ -39,7 +38,7 @@ trait Factories
             })
         );
 
-        self::ensureKernelShutdown();
+        $kernel->shutdown();
     }
 
     /**
