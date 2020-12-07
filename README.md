@@ -603,6 +603,13 @@ PostFactory::new()->many(5)->create(); // create 5 Posts
 
 CommentFactory::new()->create(['post' => PostFactory::random()]);
 
+// or create many, each with a different random Post
+CommentFactory::new()->many(5) // create 5 comments
+    ->create(function() { // note the callback - this ensures that each of the 5 comments has a different Post
+        return ['post' => PostFactory::random()]; // each comment set to a random Post from those already in the database
+    })
+;
+
 // Example 3: create a separate Post for each Comment
 CommentFactory::new()->many(5)->create([
     // this attribute is an instance of PostFactory that is created separately for each Comment created
