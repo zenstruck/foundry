@@ -26,21 +26,22 @@ trait ResetDatabase
             throw new \RuntimeException(\sprintf('The "%s" trait can only be used on TestCases that extend "%s".', __TRAIT__, KernelTestCase::class));
         }
 
-        static::ensureKernelShutdown();
-
         if ($isDAMADoctrineTestBundleEnabled = DatabaseResetter::isDAMADoctrineTestBundleEnabled()) {
             // disable static connections for this operation
             StaticDriver::setKeepStaticConnections(false);
         }
 
-        DatabaseResetter::resetDatabase(static::bootKernel());
+        $kernel = static::createKernel();
+        $kernel->boot();
+
+        DatabaseResetter::resetDatabase($kernel);
 
         if ($isDAMADoctrineTestBundleEnabled) {
             // re-enable static connections
             StaticDriver::setKeepStaticConnections(true);
         }
 
-        static::ensureKernelShutdown();
+        $kernel->shutdown();
     }
 
     /**
@@ -58,10 +59,11 @@ trait ResetDatabase
             throw new \RuntimeException(\sprintf('The "%s" trait can only be used on TestCases that extend "%s".', __TRAIT__, KernelTestCase::class));
         }
 
-        if (!static::$booted) {
-            static::bootKernel();
-        }
+        $kernel = static::createKernel();
+        $kernel->boot();
 
-        DatabaseResetter::resetSchema(static::$kernel);
+        DatabaseResetter::resetSchema($kernel);
+
+        $kernel->shutdown();
     }
 }
