@@ -29,10 +29,10 @@ jobs:
     strategy:
       matrix:
         php: [7.2, 7.3, 7.4, 8.0]
-        stability: [prefer-stable]
+        stability: [highest]
         include:
           - php: 7.2
-            stability: prefer-lowest
+            stability: lowest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2.3.3
@@ -47,14 +47,11 @@ jobs:
           extensions: pgsql
           coverage: none
 
-      - name: Cache dependencies
-        uses: actions/cache@v2.1.2
-        with:
-          path: ~/.composer/cache/files
-          key: dependencies-${{ matrix.php }}-${{ matrix.stability }}-${{ hashFiles('composer.json') }}
-
       - name: Install dependencies
-        run: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-suggest
+        uses: ramsey/composer-install@v1
+        with:
+          dependency-versions: ${{ matrix.stability }}
+          composer-options: --prefer-dist
 
       - name: 'Test: MySQL'
         run: vendor/bin/simple-phpunit -v
@@ -155,14 +152,10 @@ jobs:
           extensions: pgsql
           coverage: xdebug
 
-      - name: Cache dependencies
-        uses: actions/cache@v2.1.2
-        with:
-          path: ~/.composer/cache/files
-          key: dependencies-coverage-${{ matrix.php }}-${{ hashFiles('composer.json') }}
-
       - name: Install dependencies
-        run: composer update --prefer-dist --no-interaction --no-suggest
+        uses: ramsey/composer-install@v1
+        with:
+          composer-options: --prefer-dist
 
       - name: 'Coverage: MySQL'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql.clover
