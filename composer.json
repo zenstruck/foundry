@@ -27,8 +27,7 @@
         "symfony/framework-bundle": "^4.4|^5.0",
         "symfony/maker-bundle": "^1.13",
         "symfony/phpunit-bridge": "^5.2",
-        "vimeo/psalm": "^3.18|^4.0",
-        "weirdan/doctrine-psalm-plugin": "^0.11.3|^1.0@dev"
+        "vimeo/psalm": "^3.18|^4.0"
     },
     "config": {
         "preferred-install": "dist",
