@@ -13,7 +13,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Stories\TagStory;
  */
 final class GlobalStateTest extends KernelTestCase
 {
-    use ResetDatabase, Factories;
+    use Factories, ResetDatabase;
 
     /**
      * @test

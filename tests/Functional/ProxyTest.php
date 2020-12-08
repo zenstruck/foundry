@@ -15,7 +15,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
  */
 final class ProxyTest extends KernelTestCase
 {
-    use ResetDatabase, Factories;
+    use Factories, ResetDatabase;
 
     /**
      * @test

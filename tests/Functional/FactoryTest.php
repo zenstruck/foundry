@@ -17,7 +17,7 @@ use function Zenstruck\Foundry\factory;
  */
 final class FactoryTest extends KernelTestCase
 {
-    use ResetDatabase, Factories;
+    use Factories, ResetDatabase;
 
     /**
      * @test

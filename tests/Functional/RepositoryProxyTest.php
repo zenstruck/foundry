@@ -19,7 +19,7 @@ use function Zenstruck\Foundry\repository;
  */
 final class RepositoryProxyTest extends KernelTestCase
 {
-    use ResetDatabase, Factories, ExpectDeprecationTrait;
+    use ExpectDeprecationTrait, Factories, ResetDatabase;
 
     /**
      * @test
