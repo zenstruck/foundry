@@ -15,7 +15,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Stories\ServiceStory;
  */
 final class StoryTest extends KernelTestCase
 {
-    use ResetDatabase, Factories;
+    use Factories, ResetDatabase;
 
     /**
      * @test

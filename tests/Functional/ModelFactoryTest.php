@@ -19,7 +19,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\UserFactory;
  */
 final class ModelFactoryTest extends KernelTestCase
 {
-    use ResetDatabase, Factories;
+    use Factories, ResetDatabase;
 
     /**
      * @test

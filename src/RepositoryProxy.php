@@ -285,7 +285,12 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
             }
         }
 
-        return $this->proxyResult($this->repository->findOneBy(self::normalizeCriteria($criteria), $orderBy));
+        $result = $this->repository->findOneBy(self::normalizeCriteria($criteria), $orderBy);
+        if (null === $result) {
+            return null;
+        }
+
+        return $this->proxyResult($result);
     }
 
     /**
@@ -303,8 +308,9 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
      *
      * @psalm-suppress InvalidReturnStatement
      * @psalm-suppress InvalidReturnType
-     * @psalm-param TProxiedObject|list<TProxiedObject> $result
-     * @psalm-return ($result is array ? list<Proxy<TProxiedObject>> : Proxy<TProxiedObject>)
+     * @template TResult of object
+     * @psalm-param TResult|list<TResult> $result
+     * @psalm-return ($result is array ? list<Proxy<TResult>> : Proxy<TResult>)
      */
     private function proxyResult($result)
     {

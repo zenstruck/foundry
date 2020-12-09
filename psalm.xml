@@ -28,6 +28,5 @@
 
     <plugins>
         <pluginClass class="Psalm\SymfonyPsalmPlugin\Plugin"/>
-        <pluginClass class="Weirdan\DoctrinePsalmPlugin\Plugin"/>
     </plugins>
 </psalm>
