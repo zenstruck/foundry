@@ -287,14 +287,10 @@ jobs:
           php-version: 7.4
           coverage: none
 
-      - name: Cache dependencies
-        uses: actions/cache@v2.1.2
-        with:
-          path: ~/.composer/cache/files
-          key: dependencies-7.4-prefer-stable-${{ hashFiles('composer.json') }}
-
       - name: Install dependencies
-        run: composer update --prefer-stable --prefer-dist --no-interaction --no-suggest
+        uses: ramsey/composer-install@v1
+        with:
+          composer-options: --prefer-dist
 
       - name: Run static analysis
         run: vendor/bin/psalm --output-format=github
