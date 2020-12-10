@@ -116,7 +116,11 @@ final class Proxy
     public function save(): self
     {
         $this->objectManager()->persist($this->object);
-        $this->objectManager()->flush();
+
+        if (Factory::configuration()->isFlushingEnabled()) {
+            $this->objectManager()->flush();
+        }
+
         $this->persisted = true;
 
         return $this;

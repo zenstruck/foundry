@@ -32,6 +32,9 @@ final class Configuration
     /** @var bool */
     private $defaultProxyAutoRefresh = false;
 
+    /** @var bool */
+    private $flushEnabled = true;
+
     public function __construct()
     {
         $this->stories = new StoryManager([]);
@@ -105,6 +108,24 @@ final class Configuration
         $this->defaultProxyAutoRefresh = true;
 
         return $this;
+    }
+
+    public function isFlushingEnabled(): bool
+    {
+        return $this->flushEnabled;
+    }
+
+    public function delayFlush(callable $callback): void
+    {
+        $this->flushEnabled = false;
+
+        $callback();
+
+        foreach ($this->managerRegistry()->getManagers() as $manager) {
+            $manager->flush();
+        }
+
+        $this->flushEnabled = true;
     }
 
     /**
