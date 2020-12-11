@@ -223,19 +223,10 @@ jobs:
 #          USE_FOUNDRY_BUNDLE: 1
           DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
 
-      - name: Send code coverage
-        run: |
-          wget https://scrutinizer-ci.com/ocular.phar
-          php ocular.phar code-coverage:upload --format=php-clover mysql.clover
-          php ocular.phar code-coverage:upload --format=php-clover mysql-foundry.clover
-          php ocular.phar code-coverage:upload --format=php-clover mysql-dama.clover
-          php ocular.phar code-coverage:upload --format=php-clover mysql-foundry-dama.clover
-          php ocular.phar code-coverage:upload --format=php-clover postgres.clover
-          php ocular.phar code-coverage:upload --format=php-clover postgres-foundry.clover
-          php ocular.phar code-coverage:upload --format=php-clover sqlite.clover
-          php ocular.phar code-coverage:upload --format=php-clover sqlite-foundry.clover
-          php ocular.phar code-coverage:upload --format=php-clover sqlite-dama.clover
-          php ocular.phar code-coverage:upload --format=php-clover sqlite-foundry-dama.clover
+      - name: Publish coverage report to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          files: ./mysql.clover,./mysql-foundry.clover,./mysql-dama.clover,./mysql-foundry-dama.clover,./postgres.clover,./postgres-foundry.clover,./sqlite.clover,./sqlite-foundry.clover,./sqlite-dama.clover,./sqlite-foundry-dama.clover
 
   composer-validate:
     name: Validate composer.json
