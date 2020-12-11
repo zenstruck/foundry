@@ -226,7 +226,7 @@ jobs:
       - name: Publish coverage report to Codecov
         uses: codecov/codecov-action@v1
         with:
-          files: ./mysql.clover,./mysql-foundry.clover,./mysql-dama.clover,./mysql-foundry-dama.clover,./postgres.clover,./postgres-foundry.clover,./sqlite.clover,./sqlite-foundry.clover,./sqlite-dama.clover,./sqlite-foundry-dama.clover
+          file: ./*.clover
 
   composer-validate:
     name: Validate composer.json
