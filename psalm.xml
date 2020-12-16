@@ -24,6 +24,13 @@
                 <referencedClass name="PHPUnit\Framework\Assert"/>
             </errorLevel>
         </UndefinedClass>
+        <InternalMethod>
+            <errorLevel type="suppress">
+                <!-- Reference: https://github.com/dmaicher/doctrine-test-bundle/issues/139 -->
+                <referencedMethod name="DAMA\DoctrineTestBundle\Doctrine\DBAL\AbstractStaticDriver::isKeepStaticConnections" />
+                <referencedMethod name="DAMA\DoctrineTestBundle\Doctrine\DBAL\AbstractStaticDriver::setKeepStaticConnections" />
+            </errorLevel>
+        </InternalMethod>
     </issueHandlers>
 
     <plugins>
