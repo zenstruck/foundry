@@ -151,6 +151,7 @@ jobs:
           php-version: 7.4
           extensions: pgsql
           coverage: xdebug
+          ini-values: xdebug.mode=coverage
 
       - name: Install dependencies
         uses: ramsey/composer-install@v1
