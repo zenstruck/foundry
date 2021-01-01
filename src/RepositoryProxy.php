@@ -314,7 +314,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
      */
     private function proxyResult($result)
     {
-        if (\is_object($result) && \is_a($result, $this->getClassName())) {
+        if (\is_a($result, $this->getClassName())) {
             return Proxy::createFromPersisted($result);
         }
 
