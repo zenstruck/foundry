@@ -4,6 +4,8 @@ namespace Zenstruck\Foundry;
 
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\Assert;
+use Zenstruck\Callback;
+use Zenstruck\Callback\Parameter;
 
 /**
  * @template TProxiedObject of object
@@ -239,14 +241,14 @@ final class Proxy
      */
     public function executeCallback(callable $callback, ...$arguments): void
     {
-        $object = $this;
-        $parameters = (new \ReflectionFunction(\Closure::fromCallable($callback)))->getParameters();
-
-        if (isset($parameters[0]) && $parameters[0]->getType() && $this->class === $parameters[0]->getType()->getName()) {
-            $object = $object->object();
-        }
-
-        $callback($object, ...$arguments);
+        Callback::createFor($callback)->invoke(
+            Parameter::union(
+                Parameter::untyped($this),
+                Parameter::typed(self::class, $this),
+                Parameter::typed($this->class, Parameter::factory(function() { return $this->object(); }))
+            )->optional(),
+            ...$arguments
+        );
     }
 
     /**
