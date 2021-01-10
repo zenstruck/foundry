@@ -77,6 +77,22 @@ abstract class ModelFactory extends Factory
     }
 
     /**
+     * Fetch one random object and create a new object if none exists.
+     *
+     * @return Proxy|object
+     *
+     * @psalm-return Proxy<TModel>
+     */
+    final public static function randomOrCreate(): Proxy
+    {
+        try {
+            return static::repository()->random();
+        } catch (\RuntimeException $e) {
+            return static::new()->create();
+        }
+    }
+
+    /**
      * @see RepositoryProxy::randomSet()
      */
     final public static function randomSet(int $number): array
