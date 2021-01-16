@@ -18,7 +18,7 @@ final class ModelFactoryTest extends TestCase
      */
     public function can_set_states_with_method(): void
     {
-        $this->assertFalse(PostFactory::new()->create()->isPublished());
+        $this->assertFalse(PostFactory::createOne()->isPublished());
         $this->assertTrue(PostFactory::new()->published()->create()->isPublished());
     }
 
@@ -27,7 +27,7 @@ final class ModelFactoryTest extends TestCase
      */
     public function can_set_state_via_new(): void
     {
-        $this->assertFalse(PostFactory::new()->create()->isPublished());
+        $this->assertFalse(PostFactory::createOne()->isPublished());
         $this->assertTrue(PostFactory::new('published')->create()->isPublished());
     }
 
@@ -37,6 +37,7 @@ final class ModelFactoryTest extends TestCase
     public function can_instantiate(): void
     {
         $this->assertSame('title', PostFactory::new()->create(['title' => 'title'])->getTitle());
+        $this->assertSame('title', PostFactory::createOne(['title' => 'title'])->getTitle());
     }
 
     /**

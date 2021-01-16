@@ -52,6 +52,18 @@ abstract class ModelFactory extends Factory
     }
 
     /**
+     * A shortcut to create a single model without states.
+     *
+     * @return Proxy|object
+     *
+     * @psalm-return Proxy<TModel>
+     */
+    final public static function createOne(array $attributes = []): Proxy
+    {
+        return static::new()->create($attributes);
+    }
+
+    /**
      * Try and find existing object for the given $attributes. If not found,
      * instantiate and persist.
      *

@@ -34,6 +34,7 @@ use Zenstruck\\Foundry\\ModelFactory;
 use Zenstruck\\Foundry\\Proxy;
 
 /**
+ * @method static Category|Proxy createOne(array \$attributes = [])
  * @method static Category|Proxy findOrCreate(array \$attributes)
  * @method static Category|Proxy random()
  * @method static Category[]|Proxy[] randomSet(int \$number)
@@ -101,6 +102,7 @@ use Zenstruck\\Foundry\\ModelFactory;
 use Zenstruck\\Foundry\\Proxy;
 
 /**
+ * @method static Category|Proxy createOne(array \$attributes = [])
  * @method static Category|Proxy findOrCreate(array \$attributes)
  * @method static Category|Proxy random()
  * @method static Category[]|Proxy[] randomSet(int \$number)
@@ -165,6 +167,7 @@ use Zenstruck\\Foundry\\ModelFactory;
 use Zenstruck\\Foundry\\Proxy;
 
 /**
+ * @method static Category|Proxy createOne(array \$attributes = [])
  * @method static Category|Proxy findOrCreate(array \$attributes)
  * @method static Category|Proxy random()
  * @method static Category[]|Proxy[] randomSet(int \$number)
@@ -232,6 +235,7 @@ use Zenstruck\\Foundry\\ModelFactory;
 use Zenstruck\\Foundry\\Proxy;
 
 /**
+ * @method static Category|Proxy createOne(array \$attributes = [])
  * @method static Category|Proxy findOrCreate(array \$attributes)
  * @method static Category|Proxy random()
  * @method static Category[]|Proxy[] randomSet(int \$number)

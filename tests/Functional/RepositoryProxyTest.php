@@ -73,7 +73,7 @@ final class RepositoryProxyTest extends KernelTestCase
     public function find_can_be_passed_proxy_or_object_or_array(): void
     {
         $repository = repository(Category::class);
-        $proxy = CategoryFactory::new()->create(['name' => 'foo']);
+        $proxy = CategoryFactory::createOne(['name' => 'foo']);
 
         $this->assertInstanceOf(Proxy::class, $repository->find($proxy));
         $this->assertInstanceOf(Proxy::class, $repository->find($proxy->object()));
@@ -136,7 +136,7 @@ final class RepositoryProxyTest extends KernelTestCase
      */
     public function the_number_of_persisted_objects_must_be_at_least_the_random_set_number(): void
     {
-        CategoryFactory::new()->createMany(1);
+        CategoryFactory::createOne();
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(\sprintf('At least 2 "%s" object(s) must have been persisted (1 persisted).', Category::class));
@@ -171,7 +171,7 @@ final class RepositoryProxyTest extends KernelTestCase
      */
     public function the_number_of_persisted_objects_must_be_at_least_the_random_range_max(): void
     {
-        CategoryFactory::new()->createMany(1);
+        CategoryFactory::createOne();
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(\sprintf('At least 2 "%s" object(s) must have been persisted (1 persisted).', Category::class));
@@ -208,7 +208,7 @@ final class RepositoryProxyTest extends KernelTestCase
      */
     public function doctrine_proxies_are_converted_to_foundry_proxies(): void
     {
-        PostFactory::new()->create(['category' => CategoryFactory::new()]);
+        PostFactory::createOne(['category' => CategoryFactory::new()]);
 
         // clear the em so nothing is tracked
         static::$kernel->getContainer()->get('doctrine')->getManager()->clear();
@@ -229,9 +229,9 @@ final class RepositoryProxyTest extends KernelTestCase
      */
     public function proxy_wrapping_orm_entity_manager_can_order_by_in_find_one_by(): void
     {
-        $categoryA = CategoryFactory::new()->create();
-        $categoryB = CategoryFactory::new()->create();
-        $categoryC = CategoryFactory::new()->create();
+        $categoryA = CategoryFactory::createOne();
+        $categoryB = CategoryFactory::createOne();
+        $categoryC = CategoryFactory::createOne();
 
         $this->assertSame($categoryC->getId(), CategoryFactory::repository()->findOneBy([], ['id' => 'DESC'])->getId());
     }
@@ -241,9 +241,9 @@ final class RepositoryProxyTest extends KernelTestCase
      */
     public function first_and_last_return_the_correct_object(): void
     {
-        $categoryA = CategoryFactory::new()->create(['name' => '3']);
-        $categoryB = CategoryFactory::new()->create(['name' => '2']);
-        $categoryC = CategoryFactory::new()->create(['name' => '1']);
+        $categoryA = CategoryFactory::createOne(['name' => '3']);
+        $categoryB = CategoryFactory::createOne(['name' => '2']);
+        $categoryC = CategoryFactory::createOne(['name' => '1']);
         $repository = CategoryFactory::repository();
 
         $this->assertSame($categoryA->getId(), $repository->first()->getId());

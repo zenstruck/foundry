@@ -195,6 +195,7 @@ use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
 
 /**
+ * @method static Post|Proxy createOne(array $attributes = [])
  * @method static Post|Proxy findOrCreate(array $attributes)
  * @method static Post|Proxy random()
  * @method static Post[]|Proxy[] randomSet(int $number)
@@ -257,17 +258,20 @@ protected function getDefaults(): array
 ```php
 use App\Factory\PostFactory;
 
-PostFactory::new()->create(); // create/persist Post with random data from `getDefaults()`
+// create/persist Post with random data from `getDefaults()`
+PostFactory::createOne();
 
-// create() returns the persisted Post object wrapped in a Proxy object
-$post = PostFactory::new()->create();
+// or provide values for some properties (others will be random)
+PostFactory::createOne(['title' => 'My Title']);
+
+// createOne() returns the persisted Post object wrapped in a Proxy object
+$post = PostFactory::createOne();
 
 // the "Proxy" magically calls the underlying Post methods and is type-hinted to "Post"
 $title = $post->getTitle(); // getTitle() can be autocompleted by your IDE!
 
 // if you need the actual Post object, use ->object()
 $realPost = $post->object();
-PostFactory::new()->create(['title' => 'My Title']);
 
 // create/persist 5 Posts with random data from getDefaults()
 PostFactory::new()->createMany(5); // returns Post[]|Proxy[]
@@ -284,22 +288,6 @@ $posts = PostFactory::randomSet(4); // array containing 4 "Post|Proxy" objects
 
 // random range of persisted objects
 $posts = PostFactory::randomRange(0, 5); // array containing 0-5 "Post|Proxy" objects
-```
-
-### Instantiate your `ModelFactory`
-
-One should never instantiate your `ModelFactory` with the constructor (ie `new PostFactory()`). This will
-cause the factory to not be instantiated properly. Always instantiate with `PostFactory::new()`.
-
-The first argument to `PostFactory::new()` will allow you to overwrite the default
-values that are defined in the `PostFactory::getDefaults()`.
-
-```php
-use App\Factory\PostFactory;
-
-$factory = PostFactory::new(['title' => 'My Title']);
-$factory->create();
-$factory->createMany(5);
 ```
 
 ### Reusable Model Factory "States"
@@ -340,6 +328,9 @@ final class PostFactory extends ModelFactory
 You can use states to make your tests very explicit to improve readability:
 
 ```php
+// never use the constructor (i.e. "new PostFactory()"), but use the
+// "new()" method. After defining the states, call "create()" to create
+// and persist the model.
 $post = PostFactory::new()->unpublished()->create();
 $post = PostFactory::new()->withViewCount(3)->create();
 
@@ -367,6 +358,8 @@ use App\Factory\CategoryFactory;
 use App\Factory\PostFactory;
 use function Zenstruck\Foundry\faker;
 
+// The first argument to "new()" allows you to overwrite the default
+// values that are defined in the `PostFactory::getDefaults()`
 $posts = PostFactory::new(['title' => 'Post A'])
     ->withAttributes([
         'body' => 'Post Body...',
@@ -376,7 +369,7 @@ $posts = PostFactory::new(['title' => 'Post A'])
     ])
     ->withAttributes([
         // Proxies are automatically converted to their wrapped object
-        'category' => CategoryFactory::new()->create(),
+        'category' => CategoryFactory::createOne(),
     ])
     ->withAttributes(function() { return ['createdAt' => faker()->dateTime]; }) // see faker section below
 
@@ -593,15 +586,15 @@ use App\Factory\CommentFactory;
 use App\Factory\PostFactory;
 
 // Example 1: pre-create Post and attach to Comment
-$post = PostFactory::new()->create(); // instance of Proxy
+$post = PostFactory::createOne(); // instance of Proxy
 
-CommentFactory::new()->create(['post' => $post]);
-CommentFactory::new()->create(['post' => $post->object()]); // functionally the same as above
+CommentFactory::createOne(['post' => $post]);
+CommentFactory::createOne(['post' => $post->object()]); // functionally the same as above
 
 // Example 2: pre-create Posts and choose a random one
 PostFactory::new()->many(5)->create(); // create 5 Posts
 
-CommentFactory::new()->create(['post' => PostFactory::random()]);
+CommentFactory::createOne(['post' => PostFactory::random()]);
 
 // or create many, each with a different random Post
 CommentFactory::new()->many(5) // create 5 comments
@@ -618,7 +611,7 @@ CommentFactory::new()->many(5)->create([
 
 // Example 4: create multiple Comments with the same Post
 CommentFactory::new()->many(5)->create([
-    'post' => PostFactory::new()->create(), // note the "->create" here
+    'post' => PostFactory::createOne(), // note the "createOne()" here
 ]);
 ```
 
@@ -631,9 +624,13 @@ Many-to-One's.
 protected function getDefaults(): array
 {
     return [
-        'post' => PostFactory::new(), // RECOMMENDED
+        // RECOMMENDED
+        'post' => PostFactory::new(),
+        'post' => PostFactory::new()->published(),
 
-        'post' => PostFactory::new()->create(), // NOT RECOMMENDED - will potentially result in extra unintended Posts
+        // NOT RECOMMENDED - will potentially result in extra unintended Posts
+        'post' => PostFactory::createOne(), 
+        'post' => PostFactory::new()->published()->create(),
     ];
 }
 ```
@@ -647,7 +644,7 @@ use App\Factory\CommentFactory;
 use App\Factory\PostFactory;
 
 // Example 1: Create a Post with 6 Comments
-PostFactory::new()->create(['comments' => CommentFactory::new()->many(6)]);
+PostFactory::createOne(['comments' => CommentFactory::new()->many(6)]);
 
 // Example 2: Create 6 Posts each with 4 Comments (24 Comments total)
 PostFactory::new()->many(6)->create(['comments' => CommentFactory::new()->many(4)]);
@@ -667,7 +664,7 @@ use App\Factory\TagFactory;
 // Example 1: pre-create Tags and attach to Post
 $tags = TagFactory::new()->many(3)->create();
 
-PostFactory::new()->create(['tags' => $tags]);
+PostFactory::createOne(['tags' => $tags]);
 
 // Example 2: pre-create Tags and choose a random set
 TagFactory::new()->many(10)->create();
@@ -751,8 +748,8 @@ with `foundry.factory`.
 Use the factory as normal:
 
 ```php
-UserFactory::new()->create(['password' => 'mypass'])->getPassword(); // "mypass" encoded
-UserFactory::new()->create()->getPassword(); // "1234" encoded (because "1234" is set as the default password)
+UserFactory::createOne(['password' => 'mypass'])->getPassword(); // "mypass" encoded
+UserFactory::createOne()->getPassword(); // "1234" encoded (because "1234" is set as the default password)
 ```
 
 **NOTES**:
@@ -958,14 +955,14 @@ class MyTest extends WebTestCase
         // factories boots the kernel)
         $client = self::createClient();
 
-        $post = PostFactory::new()->create();
+        $post = PostFactory::createOne();
 
         // ...
     }
 
     public function test_2(): void
     {
-        $post = PostFactory::new()->create();
+        $post = PostFactory::createOne();
 
         // if you want to create your factories before creating the client,
         // you will need to shut down the kernel first.
@@ -1017,7 +1014,7 @@ to have [Active Record](https://en.wikipedia.org/wiki/Active_record_pattern) *li
 ```php
 use App\Factory\PostFactory;
 
-$post = PostFactory::new()->create(['title' => 'My Title']); // instance of Zenstruck\Foundry\Proxy
+$post = PostFactory::createOne()->create(['title' => 'My Title']); // instance of Zenstruck\Foundry\Proxy
 
 // get the wrapped object
 $realPost = $post->object(); // instance of Post
@@ -1182,7 +1179,7 @@ Both object and repository proxy's have helpful PHPUnit assertions:
 ```php
 use App\Factory\PostFactory;
 
-$post = PostFactory::new()->create();
+$post = PostFactory::createOne();
 
 $post->assertPersisted();
 $post->assertNotPersisted();
@@ -1208,8 +1205,8 @@ If you have an initial database state you want for all tests, you can set this i
 // ...
 
 Zenstruck\Foundry\Test\TestState::addGlobalState(function () {
-    CategoryFactory::new()->create(['name' => 'php']);
-    CategoryFactory::new()->create(['name' => 'symfony']);
+    CategoryFactory::createOne(['name' => 'php']);
+    CategoryFactory::createOne(['name' => 'symfony']);
 });
 ```
 
@@ -1349,7 +1346,7 @@ class MyUnitTest extends TestCase
 
     public function some_test(): void
     {
-        $post = PostFactory::new()->create();
+        $post = PostFactory::createOne();
 
         // $post is not persisted to the database
     }
@@ -1506,7 +1503,7 @@ final class CategoryStory extends Story
 {
     public function build(): void
     {
-        $this->add('php', CategoryFactory::new()->create(['name' => 'php']));
+        $this->add('php', CategoryFactory::createOne(['name' => 'php']));
 
         // factories are created when added as state
         $this->add('symfony', CategoryFactory::new(['name' => 'symfony']));
@@ -1517,10 +1514,10 @@ final class CategoryStory extends Story
 Later, you can access the story's state when creating other fixtures:
 
 ```php
-PostFactory::new()->create(['category' => CategoryStory::load()->get('php')]);
+PostFactory::createOne(['category' => CategoryStory::load()->get('php')]);
 
 // or use the magic method (functionally equivalent to above)
-PostFactory::new()->create(['category' => CategoryStory::php()]);
+PostFactory::createOne(['category' => CategoryStory::php()]);
 ```
 
 **NOTE**: Story state is cleared after each test (unless it is a ["Global State Story"](#global-state)).
