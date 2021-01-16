@@ -166,41 +166,45 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
     /**
      * Fetch one random object.
      *
+     * @param array $attributes The findBy criteria
+     *
      * @return Proxy|object
      *
      * @throws \RuntimeException if no objects are persisted
      *
      * @psalm-return Proxy<TProxiedObject>
      */
-    public function random(): Proxy
+    public function random(array $attributes = []): Proxy
     {
-        return $this->randomSet(1)[0];
+        return $this->randomSet(1, $attributes)[0];
     }
 
     /**
      * Fetch a random set of objects.
      *
-     * @param int $number The number of objects to return
+     * @param int   $number     The number of objects to return
+     * @param array $attributes The findBy criteria
      *
      * @return Proxy[]|object[]
      *
      * @throws \RuntimeException         if not enough persisted objects to satisfy the number requested
      * @throws \InvalidArgumentException if number is less than zero
      */
-    public function randomSet(int $number): array
+    public function randomSet(int $number, array $attributes = []): array
     {
         if ($number < 0) {
             throw new \InvalidArgumentException(\sprintf('$number must be positive (%d given).', $number));
         }
 
-        return $this->randomRange($number, $number);
+        return $this->randomRange($number, $number, $attributes);
     }
 
     /**
      * Fetch a random range of objects.
      *
-     * @param int $min The minimum number of objects to return
-     * @param int $max The maximum number of objects to return
+     * @param int   $min        The minimum number of objects to return
+     * @param int   $max        The maximum number of objects to return
+     * @param array $attributes The findBy criteria
      *
      * @return Proxy[]|object[]
      *
@@ -208,7 +212,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
      * @throws \InvalidArgumentException if min is less than zero
      * @throws \InvalidArgumentException if max is less than min
      */
-    public function randomRange(int $min, int $max): array
+    public function randomRange(int $min, int $max, array $attributes = []): array
     {
         if ($min < 0) {
             throw new \InvalidArgumentException(\sprintf('$min must be positive (%d given).', $min));
@@ -218,7 +222,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
             throw new \InvalidArgumentException(\sprintf('$max (%d) cannot be less than $min (%d).', $max, $min));
         }
 
-        $all = \array_values($this->findAll());
+        $all = \array_values($this->findBy($attributes));
 
         \shuffle($all);
 

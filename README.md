@@ -198,10 +198,10 @@ use Zenstruck\Foundry\Proxy;
  * @method static Post|Proxy createOne(array $attributes = [])
  * @method static Post[]|Proxy[] createMany(int $number, $attributes = [])
  * @method static Post|Proxy findOrCreate(array $attributes)
- * @method static Post|Proxy random()
- * @method static Post|Proxy randomOrCreate()
- * @method static Post[]|Proxy[] randomSet(int $number)
- * @method static Post[]|Proxy[] randomRange(int $min, int $max)
+ * @method static Post|Proxy random(array $attributes = [])
+ * @method static Post|Proxy randomOrCreate(array $attributes = []))
+ * @method static Post[]|Proxy[] randomSet(int $number, array $attributes = []))
+ * @method static Post[]|Proxy[] randomRange(int $min, int $max, array $attributes = []))
  * @method static PostRepository|RepositoryProxy repository()
  * @method Post|Proxy create($attributes = [])
  */
@@ -283,15 +283,19 @@ PostFactory::findOrCreate(['title' => 'My Title']); // returns Post|Proxy
 
 // get a random object that has been persisted
 $post = PostFactory::random(); // returns Post|Proxy
+$post = PostFactory::random(['author' => 'kevin']); // filter by the passed attributes
 
 // or automatically persist a new random object if none exists
 $post = PostFactory::randomOrCreate();
+$post = PostFactory::randomOrCreate(['author' => 'kevin']); // filter by or create with the passed attributes
 
 // get a random set of objects that have been persisted
 $posts = PostFactory::randomSet(4); // array containing 4 "Post|Proxy" objects
+$posts = PostFactory::randomSet(4, ['author' => 'kevin']); // filter by the passed attributes
 
 // random range of persisted objects
 $posts = PostFactory::randomRange(0, 5); // array containing 0-5 "Post|Proxy" objects
+$posts = PostFactory::randomRange(0, 5, ['author' => 'kevin']); // filter by the passed attributes
 ```
 
 ### Reusable Model Factory "States"
@@ -1162,8 +1166,11 @@ $repository->last(); // get the last object (assumes an auto-incremented "id" co
 $repository->last('createdAt'); // assuming "createdAt" is a datetime column, this will return oldest object
 $repository->truncate(); // delete all rows in the database table
 $repository->random(); // get a random object
+$repository->random(['author' => 'kevin']); // get a random object filtered by the passed criteria
 $repository->randomSet(5); // get 5 random objects
+$repository->randomSet(5, ['author' => 'kevin']); // get 5 random objects filtered by the passed criteria
 $repository->randomRange(0, 5); // get 0-5 random objects
+$repository->randomRange(0, 5, ['author' => 'kevin']); // get 0-5 random objects filtered by the passed criteria
 
 // instance of ObjectRepository - all returned object(s) are proxied
 $repository->find(1); // Proxy|Post|null
