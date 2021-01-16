@@ -38,7 +38,7 @@ final class RepositoryProxyTest extends KernelTestCase
 
         $repository->assertEmpty();
 
-        CategoryFactory::new()->createMany(2);
+        CategoryFactory::createMany(2);
 
         $repository->assertCount(2);
         $repository->assertCountGreaterThan(1);
@@ -54,7 +54,7 @@ final class RepositoryProxyTest extends KernelTestCase
     {
         $repository = repository(Category::class);
 
-        CategoryFactory::new()->createMany(2);
+        CategoryFactory::createMany(2);
 
         $objects = $repository->findAll();
 
@@ -85,7 +85,7 @@ final class RepositoryProxyTest extends KernelTestCase
      */
     public function can_find_random_object(): void
     {
-        CategoryFactory::new()->createMany(5);
+        CategoryFactory::createMany(5);
 
         $ids = [];
 
@@ -112,7 +112,7 @@ final class RepositoryProxyTest extends KernelTestCase
      */
     public function can_find_random_set_of_objects(): void
     {
-        CategoryFactory::new()->createMany(5);
+        CategoryFactory::createMany(5);
 
         $objects = repository(Category::class)->randomSet(3);
 
@@ -149,7 +149,7 @@ final class RepositoryProxyTest extends KernelTestCase
      */
     public function can_find_random_range_of_objects(): void
     {
-        CategoryFactory::new()->createMany(5);
+        CategoryFactory::createMany(5);
 
         $counts = [];
 
@@ -268,7 +268,7 @@ final class RepositoryProxyTest extends KernelTestCase
      */
     public function repository_proxy_is_countable_and_iterable(): void
     {
-        CategoryFactory::new()->createMany(4);
+        CategoryFactory::createMany(4);
 
         $repository = CategoryFactory::repository();
 
@@ -282,7 +282,7 @@ final class RepositoryProxyTest extends KernelTestCase
      */
     public function can_use_get_count(): void
     {
-        CategoryFactory::new()->createMany(4);
+        CategoryFactory::createMany(4);
 
         $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using RepositoryProxy::getCount() is deprecated, use RepositoryProxy::count() (it is now Countable).');
 

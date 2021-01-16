@@ -49,6 +49,17 @@ class Factory
         $this->attributeSet[] = $defaultAttributes;
     }
 
+    public function __call(string $name, array $arguments)
+    {
+        if ('createMany' !== $name) {
+            throw new \BadMethodCallException(\sprintf('Call to undefined method "%s::%s".', static::class, $name));
+        }
+
+        trigger_deprecation('zenstruck/foundry', '1.7', 'Calling instance method "%1$s::createMany()" is deprecated and will be removed in 2.0, use the static "%1$s:createMany()" method instead.', static::class);
+
+        return $this->many($arguments[0])->create($arguments[1] ?? []);
+    }
+
     /**
      * @param array|callable $attributes
      *
@@ -108,18 +119,6 @@ class Factory
     final public function many(int $min, ?int $max = null): FactoryCollection
     {
         return new FactoryCollection($this, $min, $max);
-    }
-
-    /**
-     * @param array|callable $attributes
-     *
-     * @return Proxy[]|object[]
-     *
-     * @psalm-return list<Proxy<TObject>>
-     */
-    final public function createMany(int $number, $attributes = []): array
-    {
-        return $this->many($number)->create($attributes);
     }
 
     /**

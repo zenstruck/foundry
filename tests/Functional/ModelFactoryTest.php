@@ -69,7 +69,7 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function can_find_random_object(): void
     {
-        CategoryFactory::new()->createMany(5);
+        CategoryFactory::createMany(5);
 
         $ids = [];
 
@@ -85,7 +85,7 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function can_find_random_set_of_objects(): void
     {
-        CategoryFactory::new()->createMany(5);
+        CategoryFactory::createMany(5);
 
         $objects = CategoryFactory::randomSet(3);
 
@@ -98,7 +98,7 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function can_find_random_range_of_objects(): void
     {
-        CategoryFactory::new()->createMany(5);
+        CategoryFactory::createMany(5);
 
         $counts = [];
 
@@ -136,7 +136,7 @@ final class ModelFactoryTest extends KernelTestCase
     public function create_multiple_one_to_many_with_nested_collection_relationship(): void
     {
         $user = UserFactory::createOne();
-        $posts = PostFactory::new()->createMany(2, [
+        $posts = PostFactory::createMany(2, [
             'comments' => CommentFactory::new(['user' => $user])->many(4),
         ]);
 
@@ -180,7 +180,7 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function create_multiple_many_to_many_with_nested_collection_relationship(): void
     {
-        $posts = PostFactory::new()->createMany(2, [
+        $posts = PostFactory::createMany(2, [
             'tags' => TagFactory::new()->many(3),
         ]);
 

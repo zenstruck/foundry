@@ -41,7 +41,7 @@ function create(string $class, $attributes = []): Proxy
  */
 function create_many(int $number, string $class, $attributes = []): array
 {
-    return factory($class)->createMany($number, $attributes);
+    return factory($class)->many($number)->create($attributes);
 }
 
 /**
@@ -69,7 +69,7 @@ function instantiate(string $class, $attributes = []): Proxy
  */
 function instantiate_many(int $number, string $class, $attributes = []): array
 {
-    return factory($class)->withoutPersisting()->createMany($number, $attributes);
+    return factory($class)->withoutPersisting()->many($number)->create($attributes);
 }
 
 /**

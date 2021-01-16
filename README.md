@@ -196,13 +196,13 @@ use Zenstruck\Foundry\Proxy;
 
 /**
  * @method static Post|Proxy createOne(array $attributes = [])
+ * @method static Post[]|Proxy[] createMany(int $number, $attributes = [])
  * @method static Post|Proxy findOrCreate(array $attributes)
  * @method static Post|Proxy random()
  * @method static Post[]|Proxy[] randomSet(int $number)
  * @method static Post[]|Proxy[] randomRange(int $min, int $max)
  * @method static PostRepository|RepositoryProxy repository()
  * @method Post|Proxy create($attributes = [])
- * @method Post[]|Proxy[] createMany(int $number, $attributes = [])
  */
 final class PostFactory extends ModelFactory
 {
@@ -274,8 +274,8 @@ $title = $post->getTitle(); // getTitle() can be autocompleted by your IDE!
 $realPost = $post->object();
 
 // create/persist 5 Posts with random data from getDefaults()
-PostFactory::new()->createMany(5); // returns Post[]|Proxy[]
-PostFactory::new()->createMany(5, ['title' => 'My Title']);
+PostFactory::createMany(5); // returns Post[]|Proxy[]
+PostFactory::createMany(5, ['title' => 'My Title']);
 
 // find a persisted object for the given attributes, if not found, create with the attributes
 PostFactory::findOrCreate(['title' => 'My Title']); // returns Post|Proxy
@@ -374,7 +374,7 @@ $posts = PostFactory::new(['title' => 'Post A'])
     ->withAttributes(function() { return ['createdAt' => faker()->dateTime]; }) // see faker section below
 
     // create "2" Post's
-    ->createMany(2, ['title' => 'Different Title'])
+    ->many(2)->create(['title' => 'Different Title'])
 ;
 
 $post[0]->getTitle(); // "Different Title"
@@ -592,25 +592,26 @@ CommentFactory::createOne(['post' => $post]);
 CommentFactory::createOne(['post' => $post->object()]); // functionally the same as above
 
 // Example 2: pre-create Posts and choose a random one
-PostFactory::new()->many(5)->create(); // create 5 Posts
+PostFactory::createMany(5); // create 5 Posts
 
 CommentFactory::createOne(['post' => PostFactory::random()]);
 
 // or create many, each with a different random Post
-CommentFactory::new()->many(5) // create 5 comments
-    ->create(function() { // note the callback - this ensures that each of the 5 comments has a different Post
+CommentFactory::createMany(
+    5, // create 5 comments
+    function() { // note the callback - this ensures that each of the 5 comments has a different Post
         return ['post' => PostFactory::random()]; // each comment set to a random Post from those already in the database
-    })
-;
+    }
+);
 
 // Example 3: create a separate Post for each Comment
-CommentFactory::new()->many(5)->create([
+CommentFactory::createMany(5, [
     // this attribute is an instance of PostFactory that is created separately for each Comment created
     'post' => PostFactory::new(),
 ]);
 
 // Example 4: create multiple Comments with the same Post
-CommentFactory::new()->many(5)->create([
+CommentFactory::createMany(5, [
     'post' => PostFactory::createOne(), // note the "createOne()" here
 ]);
 ```
@@ -647,10 +648,10 @@ use App\Factory\PostFactory;
 PostFactory::createOne(['comments' => CommentFactory::new()->many(6)]);
 
 // Example 2: Create 6 Posts each with 4 Comments (24 Comments total)
-PostFactory::new()->many(6)->create(['comments' => CommentFactory::new()->many(4)]);
+PostFactory::createMany(6, ['comments' => CommentFactory::new()->many(4)]);
 
 // Example 3: Create 6 Posts each with between 0 and 10 Comments
-PostFactory::new()->many(6)->create(['comments' => CommentFactory::new()->many(0, 10)]);
+PostFactory::createMany(6, ['comments' => CommentFactory::new()->many(0, 10)]);
 ```
 
 #### Many-to-Many
@@ -662,12 +663,12 @@ use App\Factory\PostFactory;
 use App\Factory\TagFactory;
 
 // Example 1: pre-create Tags and attach to Post
-$tags = TagFactory::new()->many(3)->create();
+$tags = TagFactory::createMany(3);
 
 PostFactory::createOne(['tags' => $tags]);
 
 // Example 2: pre-create Tags and choose a random set
-TagFactory::new()->many(10)->create();
+TagFactory::createMany(10);
 
 PostFactory::new()
     ->many(5) // create 5 posts
@@ -677,7 +678,7 @@ PostFactory::new()
 ;
 
 // Example 3: pre-create Tags and choose a random range
-TagFactory::new()->many(10)->create();
+TagFactory::createMany(10);
 
 PostFactory::new()
     ->many(5) // create 5 posts
@@ -687,10 +688,10 @@ PostFactory::new()
 ;
 
 // Example 4: create 3 Posts each with 3 unique Tags
-PostFactory::new()->many(3)->create(['tags' => TagFactory::new()->many(3)]);
+PostFactory::createMany(3, ['tags' => TagFactory::new()->many(3)]);
 
 // Example 5: create 3 Posts each with between 0 and 3 unique Tags
-PostFactory::new()->many(3)->create(['tags' => TagFactory::new()->many(0, 3)]);
+PostFactory::createMany(3, ['tags' => TagFactory::new()->many(0, 3)]);
 ```
 
 ### Factories as Services
@@ -776,7 +777,7 @@ $factory = factory(OtherEntity::class); // alternative to above
 
 // has the same API as ModelFactory's
 $factory->create(['field' => 'value']);
-$factory->createMany(5, ['field' => 'value']);
+$factory->many(5)->create(['field' => 'value']);
 $factory->instantiateWith(function () {});
 $factory->beforeInstantiate(function () {});
 $factory->afterInstantiate(function () {});
@@ -806,7 +807,7 @@ $post->save(); // persist the Post (save() is a method on Proxy)
 
 $post = PostFactory::new()->withoutPersisting()->create()->object(); // actual Post object
 
-$posts = PostFactory::new()->withoutPersisting()->createMany(5); // returns Post[]|Proxy[]
+$posts = PostFactory::new()->withoutPersisting()->many(5)->create(); // returns Post[]|Proxy[]
 
 // anonymous factories:
 $factory = new Factory(OtherEntity::class);
@@ -815,7 +816,7 @@ $entity = $factory->withoutPersisting()->create(['field' => 'value']); // return
 
 $entity = $factory->withoutPersisting()->create(['field' => 'value'])->object(); // actual OtherEntity object
 
-$entities = $factory->withoutPersisting()->createMany(5, ['field' => 'value']); // returns OtherEntity[]|Proxy[]
+$entities = $factory->withoutPersisting()->many(5)->create(['field' => 'value']); // returns OtherEntity[]|Proxy[]
 
 // convenience functions
 $entity = instantiate(OtherEntity::class, ['field' => 'value']);
@@ -862,13 +863,13 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager)
     {
         // create 10 Category's
-        CategoryFactory::new()->createMany(10);
+        CategoryFactory::createMany(10);
 
         // create 20 Tag's
-        TagFactory::new()->createMany(20);
+        TagFactory::createMany(20);
 
         // create 50 Post's
-        PostFactory::new()->createMany(50, function() {
+        PostFactory::createMany(50, function() {
             return [
                 // each Post will have a random Category (chosen from those created above)
                 'category' => CategoryFactory::random(),
@@ -1420,13 +1421,13 @@ final class PostStory extends Story
     public function build(): void
     {
         // create 10 Category's
-        CategoryFactory::new()->createMany(10);
+        CategoryFactory::createMany(10);
 
         // create 20 Tag's
-        TagFactory::new()->createMany(20);
+        TagFactory::createMany(20);
 
         // create 50 Post's
-        PostFactory::new()->createMany(50, function() {
+        PostFactory::createMany(50, function() {
             return [
                 // each Post will have a random Category (created above)
                 'category' => CategoryFactory::random(),

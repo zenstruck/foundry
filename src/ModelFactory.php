@@ -6,6 +6,9 @@ namespace Zenstruck\Foundry;
  * @template TModel of object
  * @template-extends Factory<TModel>
  *
+ * @method static Proxy[]|object[] createMany(int $number, array|callable $attributes = [])
+ * @psalm-method static list<Proxy<TModel>> createMany(int $number, array|callable $attributes = [])
+ *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 abstract class ModelFactory extends Factory
@@ -13,6 +16,15 @@ abstract class ModelFactory extends Factory
     public function __construct()
     {
         parent::__construct(static::getClass());
+    }
+
+    public static function __callStatic(string $name, array $arguments)
+    {
+        if ('createMany' !== $name) {
+            throw new \BadMethodCallException(\sprintf('Call to undefined static method "%s::%s".', static::class, __METHOD__));
+        }
+
+        return static::new()->many($arguments[0])->create($arguments[1] ?? []);
     }
 
     /**

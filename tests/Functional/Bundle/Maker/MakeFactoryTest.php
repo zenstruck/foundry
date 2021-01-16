@@ -35,12 +35,12 @@ use Zenstruck\\Foundry\\Proxy;
 
 /**
  * @method static Category|Proxy createOne(array \$attributes = [])
+ * @method static Category[]|Proxy[] createMany(int \$number, \$attributes = [])
  * @method static Category|Proxy findOrCreate(array \$attributes)
  * @method static Category|Proxy random()
  * @method static Category[]|Proxy[] randomSet(int \$number)
  * @method static Category[]|Proxy[] randomRange(int \$min, int \$max)
  * @method Category|Proxy create(\$attributes = [])
- * @method Category[]|Proxy[] createMany(int \$number, \$attributes = [])
  */
 final class CategoryFactory extends ModelFactory
 {
@@ -103,12 +103,12 @@ use Zenstruck\\Foundry\\Proxy;
 
 /**
  * @method static Category|Proxy createOne(array \$attributes = [])
+ * @method static Category[]|Proxy[] createMany(int \$number, \$attributes = [])
  * @method static Category|Proxy findOrCreate(array \$attributes)
  * @method static Category|Proxy random()
  * @method static Category[]|Proxy[] randomSet(int \$number)
  * @method static Category[]|Proxy[] randomRange(int \$min, int \$max)
  * @method Category|Proxy create(\$attributes = [])
- * @method Category[]|Proxy[] createMany(int \$number, \$attributes = [])
  */
 final class CategoryFactory extends ModelFactory
 {
@@ -168,12 +168,12 @@ use Zenstruck\\Foundry\\Proxy;
 
 /**
  * @method static Category|Proxy createOne(array \$attributes = [])
+ * @method static Category[]|Proxy[] createMany(int \$number, \$attributes = [])
  * @method static Category|Proxy findOrCreate(array \$attributes)
  * @method static Category|Proxy random()
  * @method static Category[]|Proxy[] randomSet(int \$number)
  * @method static Category[]|Proxy[] randomRange(int \$min, int \$max)
  * @method Category|Proxy create(\$attributes = [])
- * @method Category[]|Proxy[] createMany(int \$number, \$attributes = [])
  */
 final class CategoryFactory extends ModelFactory
 {
@@ -236,12 +236,12 @@ use Zenstruck\\Foundry\\Proxy;
 
 /**
  * @method static Category|Proxy createOne(array \$attributes = [])
+ * @method static Category[]|Proxy[] createMany(int \$number, \$attributes = [])
  * @method static Category|Proxy findOrCreate(array \$attributes)
  * @method static Category|Proxy random()
  * @method static Category[]|Proxy[] randomSet(int \$number)
  * @method static Category[]|Proxy[] randomRange(int \$min, int \$max)
  * @method Category|Proxy create(\$attributes = [])
- * @method Category[]|Proxy[] createMany(int \$number, \$attributes = [])
  */
 final class CategoryFactory extends ModelFactory
 {
