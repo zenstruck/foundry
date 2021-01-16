@@ -36,6 +36,7 @@ use Zenstruck\\Foundry\\Proxy;
 /**
  * @method static Category|Proxy findOrCreate(array \$attributes)
  * @method static Category|Proxy random()
+ * @method static Category|Proxy randomOrCreate()
  * @method static Category[]|Proxy[] randomSet(int \$number)
  * @method static Category[]|Proxy[] randomRange(int \$min, int \$max)
  * @method Category|Proxy create(\$attributes = [])
@@ -103,6 +104,7 @@ use Zenstruck\\Foundry\\Proxy;
 /**
  * @method static Category|Proxy findOrCreate(array \$attributes)
  * @method static Category|Proxy random()
+ * @method static Category|Proxy randomOrCreate()
  * @method static Category[]|Proxy[] randomSet(int \$number)
  * @method static Category[]|Proxy[] randomRange(int \$min, int \$max)
  * @method Category|Proxy create(\$attributes = [])
@@ -167,6 +169,7 @@ use Zenstruck\\Foundry\\Proxy;
 /**
  * @method static Category|Proxy findOrCreate(array \$attributes)
  * @method static Category|Proxy random()
+ * @method static Category|Proxy randomOrCreate()
  * @method static Category[]|Proxy[] randomSet(int \$number)
  * @method static Category[]|Proxy[] randomRange(int \$min, int \$max)
  * @method Category|Proxy create(\$attributes = [])
@@ -234,6 +237,7 @@ use Zenstruck\\Foundry\\Proxy;
 /**
  * @method static Category|Proxy findOrCreate(array \$attributes)
  * @method static Category|Proxy random()
+ * @method static Category|Proxy randomOrCreate()
  * @method static Category[]|Proxy[] randomSet(int \$number)
  * @method static Category[]|Proxy[] randomRange(int \$min, int \$max)
  * @method Category|Proxy create(\$attributes = [])

@@ -12,6 +12,7 @@ use Zenstruck\Foundry\Proxy;
 /**
  * @method static <?= $entity->getShortName() ?>|Proxy findOrCreate(array $attributes)
  * @method static <?= $entity->getShortName() ?>|Proxy random()
+ * @method static <?= $entity->getShortName() ?>|Proxy randomOrCreate()
  * @method static <?= $entity->getShortName() ?>[]|Proxy[] randomSet(int $number)
  * @method static <?= $entity->getShortName() ?>[]|Proxy[] randomRange(int $min, int $max)
 <?php if ($repository): ?> * @method static <?= $repository->getShortName() ?>|RepositoryProxy repository()

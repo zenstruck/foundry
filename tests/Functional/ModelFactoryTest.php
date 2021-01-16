@@ -5,6 +5,7 @@ namespace Zenstruck\Foundry\Tests\Functional;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CommentFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
@@ -78,6 +79,16 @@ final class ModelFactoryTest extends KernelTestCase
         }
 
         $this->assertCount(5, \array_unique($ids));
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_random_object_if_none_exists(): void
+    {
+        CategoryFactory::repository()->assertCount(0);
+        $this->assertInstanceOf(Category::class, CategoryFactory::randomOrCreate()->object());
+        CategoryFactory::repository()->assertCount(1);
     }
 
     /**

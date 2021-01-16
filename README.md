@@ -197,6 +197,7 @@ use Zenstruck\Foundry\Proxy;
 /**
  * @method static Post|Proxy findOrCreate(array $attributes)
  * @method static Post|Proxy random()
+ * @method static Post|Proxy randomOrCreate()
  * @method static Post[]|Proxy[] randomSet(int $number)
  * @method static Post[]|Proxy[] randomRange(int $min, int $max)
  * @method static PostRepository|RepositoryProxy repository()
@@ -278,6 +279,9 @@ PostFactory::findOrCreate(['title' => 'My Title']); // returns Post|Proxy
 
 // get a random object that has been persisted
 $post = PostFactory::random(); // returns Post|Proxy
+
+// or automatically persist a new random object if none exists
+$post = PostFactory::randomOrCreate();
 
 // get a random set of objects that have been persisted
 $posts = PostFactory::randomSet(4); // array containing 4 "Post|Proxy" objects
