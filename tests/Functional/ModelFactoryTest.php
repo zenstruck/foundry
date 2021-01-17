@@ -89,6 +89,22 @@ final class ModelFactoryTest extends KernelTestCase
         CategoryFactory::repository()->assertCount(0);
         $this->assertInstanceOf(Category::class, CategoryFactory::randomOrCreate()->object());
         CategoryFactory::repository()->assertCount(1);
+        $this->assertInstanceOf(Category::class, CategoryFactory::randomOrCreate()->object());
+        CategoryFactory::repository()->assertCount(1);
+    }
+
+    /**
+     * @test
+     */
+    public function can_get_or_create_random_object_with_attributes(): void
+    {
+        CategoryFactory::createMany(5, ['name' => 'name1']);
+
+        CategoryFactory::repository()->assertCount(5);
+        $this->assertSame('name2', CategoryFactory::randomOrCreate(['name' => 'name2'])->getName());
+        CategoryFactory::repository()->assertCount(6);
+        $this->assertSame('name2', CategoryFactory::randomOrCreate(['name' => 'name2'])->getName());
+        CategoryFactory::repository()->assertCount(6);
     }
 
     /**
@@ -102,6 +118,21 @@ final class ModelFactoryTest extends KernelTestCase
 
         $this->assertCount(3, $objects);
         $this->assertCount(3, \array_unique(\array_map(static function($category) { return $category->getId(); }, $objects)));
+    }
+
+    /**
+     * @test
+     */
+    public function can_find_random_set_of_objects_with_attributes(): void
+    {
+        CategoryFactory::createMany(20, ['name' => 'name1']);
+        CategoryFactory::createMany(5, ['name' => 'name2']);
+
+        $objects = CategoryFactory::randomSet(2, ['name' => 'name2']);
+
+        $this->assertCount(2, $objects);
+        $this->assertSame('name2', $objects[0]->getName());
+        $this->assertSame('name2', $objects[1]->getName());
     }
 
     /**
@@ -124,6 +155,24 @@ final class ModelFactoryTest extends KernelTestCase
         $this->assertContains(3, $counts);
         $this->assertNotContains(4, $counts);
         $this->assertNotContains(5, $counts);
+    }
+
+    /**
+     * @test
+     */
+    public function can_find_random_range_of_objects_with_attributes(): void
+    {
+        CategoryFactory::createMany(20, ['name' => 'name1']);
+        CategoryFactory::createMany(5, ['name' => 'name2']);
+
+        $objects = CategoryFactory::randomRange(2, 4, ['name' => 'name2']);
+
+        $this->assertGreaterThanOrEqual(2, \count($objects));
+        $this->assertLessThanOrEqual(4, \count($objects));
+
+        foreach ($objects as $object) {
+            $this->assertSame('name2', $object->getName());
+        }
     }
 
     /**

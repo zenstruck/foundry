@@ -95,9 +95,9 @@ abstract class ModelFactory extends Factory
     /**
      * @see RepositoryProxy::random()
      */
-    final public static function random(): Proxy
+    final public static function random(array $attributes = []): Proxy
     {
-        return static::repository()->random();
+        return static::repository()->random($attributes);
     }
 
     /**
@@ -107,29 +107,29 @@ abstract class ModelFactory extends Factory
      *
      * @psalm-return Proxy<TModel>
      */
-    final public static function randomOrCreate(): Proxy
+    final public static function randomOrCreate(array $attributes = []): Proxy
     {
         try {
-            return static::repository()->random();
+            return static::repository()->random($attributes);
         } catch (\RuntimeException $e) {
-            return static::new()->create();
+            return static::new()->create($attributes);
         }
     }
 
     /**
      * @see RepositoryProxy::randomSet()
      */
-    final public static function randomSet(int $number): array
+    final public static function randomSet(int $number, array $attributes = []): array
     {
-        return static::repository()->randomSet($number);
+        return static::repository()->randomSet($number, $attributes);
     }
 
     /**
      * @see RepositoryProxy::randomRange()
      */
-    final public static function randomRange(int $min, int $max): array
+    final public static function randomRange(int $min, int $max, array $attributes = []): array
     {
-        return static::repository()->randomRange($min, $max);
+        return static::repository()->randomRange($min, $max, $attributes);
     }
 
     /** @psalm-return RepositoryProxy<TModel> */
