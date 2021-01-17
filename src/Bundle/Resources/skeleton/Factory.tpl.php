@@ -10,6 +10,8 @@ use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
 
 /**
+ * @method static <?= $entity->getShortName() ?>|Proxy createOne(array $attributes = [])
+ * @method static <?= $entity->getShortName() ?>[]|Proxy[] createMany(int $number, $attributes = [])
  * @method static <?= $entity->getShortName() ?>|Proxy findOrCreate(array $attributes)
  * @method static <?= $entity->getShortName() ?>|Proxy random()
  * @method static <?= $entity->getShortName() ?>|Proxy randomOrCreate()
@@ -18,7 +20,6 @@ use Zenstruck\Foundry\Proxy;
 <?php if ($repository): ?> * @method static <?= $repository->getShortName() ?>|RepositoryProxy repository()
 <?php endif ?>
  * @method <?= $entity->getShortName() ?>|Proxy create($attributes = [])
- * @method <?= $entity->getShortName() ?>[]|Proxy[] createMany(int $number, $attributes = [])
  */
 final class <?= $class_name ?> extends ModelFactory
 {

@@ -38,7 +38,7 @@ final class RepositoryProxyTest extends KernelTestCase
 
         $repository->assertEmpty();
 
-        CategoryFactory::new()->createMany(2);
+        CategoryFactory::createMany(2);
 
         $repository->assertCount(2);
         $repository->assertCountGreaterThan(1);
@@ -54,7 +54,7 @@ final class RepositoryProxyTest extends KernelTestCase
     {
         $repository = repository(Category::class);
 
-        CategoryFactory::new()->createMany(2);
+        CategoryFactory::createMany(2);
 
         $objects = $repository->findAll();
 
@@ -73,7 +73,7 @@ final class RepositoryProxyTest extends KernelTestCase
     public function find_can_be_passed_proxy_or_object_or_array(): void
     {
         $repository = repository(Category::class);
-        $proxy = CategoryFactory::new()->create(['name' => 'foo']);
+        $proxy = CategoryFactory::createOne(['name' => 'foo']);
 
         $this->assertInstanceOf(Proxy::class, $repository->find($proxy));
         $this->assertInstanceOf(Proxy::class, $repository->find($proxy->object()));
@@ -85,7 +85,7 @@ final class RepositoryProxyTest extends KernelTestCase
      */
     public function can_find_random_object(): void
     {
-        CategoryFactory::new()->createMany(5);
+        CategoryFactory::createMany(5);
 
         $ids = [];
 
@@ -112,7 +112,7 @@ final class RepositoryProxyTest extends KernelTestCase
      */
     public function can_find_random_set_of_objects(): void
     {
-        CategoryFactory::new()->createMany(5);
+        CategoryFactory::createMany(5);
 
         $objects = repository(Category::class)->randomSet(3);
 
@@ -136,7 +136,7 @@ final class RepositoryProxyTest extends KernelTestCase
      */
     public function the_number_of_persisted_objects_must_be_at_least_the_random_set_number(): void
     {
-        CategoryFactory::new()->createMany(1);
+        CategoryFactory::createOne();
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(\sprintf('At least 2 "%s" object(s) must have been persisted (1 persisted).', Category::class));
@@ -149,7 +149,7 @@ final class RepositoryProxyTest extends KernelTestCase
      */
     public function can_find_random_range_of_objects(): void
     {
-        CategoryFactory::new()->createMany(5);
+        CategoryFactory::createMany(5);
 
         $counts = [];
 
@@ -171,7 +171,7 @@ final class RepositoryProxyTest extends KernelTestCase
      */
     public function the_number_of_persisted_objects_must_be_at_least_the_random_range_max(): void
     {
-        CategoryFactory::new()->createMany(1);
+        CategoryFactory::createOne();
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(\sprintf('At least 2 "%s" object(s) must have been persisted (1 persisted).', Category::class));
@@ -208,7 +208,7 @@ final class RepositoryProxyTest extends KernelTestCase
      */
     public function doctrine_proxies_are_converted_to_foundry_proxies(): void
     {
-        PostFactory::new()->create(['category' => CategoryFactory::new()]);
+        PostFactory::createOne(['category' => CategoryFactory::new()]);
 
         // clear the em so nothing is tracked
         static::$kernel->getContainer()->get('doctrine')->getManager()->clear();
@@ -229,9 +229,9 @@ final class RepositoryProxyTest extends KernelTestCase
      */
     public function proxy_wrapping_orm_entity_manager_can_order_by_in_find_one_by(): void
     {
-        $categoryA = CategoryFactory::new()->create();
-        $categoryB = CategoryFactory::new()->create();
-        $categoryC = CategoryFactory::new()->create();
+        $categoryA = CategoryFactory::createOne();
+        $categoryB = CategoryFactory::createOne();
+        $categoryC = CategoryFactory::createOne();
 
         $this->assertSame($categoryC->getId(), CategoryFactory::repository()->findOneBy([], ['id' => 'DESC'])->getId());
     }
@@ -241,9 +241,9 @@ final class RepositoryProxyTest extends KernelTestCase
      */
     public function first_and_last_return_the_correct_object(): void
     {
-        $categoryA = CategoryFactory::new()->create(['name' => '3']);
-        $categoryB = CategoryFactory::new()->create(['name' => '2']);
-        $categoryC = CategoryFactory::new()->create(['name' => '1']);
+        $categoryA = CategoryFactory::createOne(['name' => '3']);
+        $categoryB = CategoryFactory::createOne(['name' => '2']);
+        $categoryC = CategoryFactory::createOne(['name' => '1']);
         $repository = CategoryFactory::repository();
 
         $this->assertSame($categoryA->getId(), $repository->first()->getId());
@@ -268,7 +268,7 @@ final class RepositoryProxyTest extends KernelTestCase
      */
     public function repository_proxy_is_countable_and_iterable(): void
     {
-        CategoryFactory::new()->createMany(4);
+        CategoryFactory::createMany(4);
 
         $repository = CategoryFactory::repository();
 
@@ -282,7 +282,7 @@ final class RepositoryProxyTest extends KernelTestCase
      */
     public function can_use_get_count(): void
     {
-        CategoryFactory::new()->createMany(4);
+        CategoryFactory::createMany(4);
 
         $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using RepositoryProxy::getCount() is deprecated, use RepositoryProxy::count() (it is now Countable).');
 

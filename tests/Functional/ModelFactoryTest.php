@@ -39,8 +39,8 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function can_override_initialize(): void
     {
-        $this->assertFalse(PostFactory::new()->create()->isPublished());
-        $this->assertTrue(PostFactoryWithValidInitialize::new()->create()->isPublished());
+        $this->assertFalse(PostFactory::createOne()->isPublished());
+        $this->assertTrue(PostFactoryWithValidInitialize::createOne()->isPublished());
     }
 
     /**
@@ -70,7 +70,7 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function can_find_random_object(): void
     {
-        CategoryFactory::new()->createMany(5);
+        CategoryFactory::createMany(5);
 
         $ids = [];
 
@@ -96,7 +96,7 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function can_find_random_set_of_objects(): void
     {
-        CategoryFactory::new()->createMany(5);
+        CategoryFactory::createMany(5);
 
         $objects = CategoryFactory::randomSet(3);
 
@@ -109,7 +109,7 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function can_find_random_range_of_objects(): void
     {
-        CategoryFactory::new()->createMany(5);
+        CategoryFactory::createMany(5);
 
         $counts = [];
 
@@ -131,7 +131,7 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function one_to_many_with_nested_collection_relationship(): void
     {
-        $post = PostFactory::new()->create([
+        $post = PostFactory::createOne([
             'comments' => CommentFactory::new()->many(4),
         ]);
 
@@ -146,8 +146,8 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function create_multiple_one_to_many_with_nested_collection_relationship(): void
     {
-        $user = UserFactory::new()->create();
-        $posts = PostFactory::new()->createMany(2, [
+        $user = UserFactory::createOne();
+        $posts = PostFactory::createMany(2, [
             'comments' => CommentFactory::new(['user' => $user])->many(4),
         ]);
 
@@ -163,7 +163,7 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function many_to_many_with_nested_collection_relationship(): void
     {
-        $post = PostFactory::new()->create([
+        $post = PostFactory::createOne([
             'tags' => TagFactory::new()->many(3),
         ]);
 
@@ -177,7 +177,7 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function inverse_many_to_many_with_nested_collection_relationship(): void
     {
-        $tag = TagFactory::new()->create([
+        $tag = TagFactory::createOne([
             'posts' => PostFactory::new()->many(3),
         ]);
 
@@ -191,7 +191,7 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function create_multiple_many_to_many_with_nested_collection_relationship(): void
     {
-        $posts = PostFactory::new()->createMany(2, [
+        $posts = PostFactory::createMany(2, [
             'tags' => TagFactory::new()->many(3),
         ]);
 
