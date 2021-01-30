@@ -257,14 +257,10 @@ jobs:
         with:
           php-version: 7.4
           coverage: none
-
-      - name: Install dependencies
-        run: |
-          wget https://cs.symfony.com/download/php-cs-fixer-v2.phar -O php-cs-fixer.phar
-          php php-cs-fixer.phar self-update
+          tools: php-cs-fixer
 
       - name: Check CS
-        run: php php-cs-fixer.phar fix --dry-run --diff --diff-format=udiff
+        run: php-cs-fixer fix --dry-run --diff --diff-format=udiff
 
   static-analysis:
     name: Psalm Static Analysis
