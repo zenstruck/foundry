@@ -261,7 +261,7 @@ class Factory
     private function normalizeAttribute($value)
     {
         if ($value instanceof Proxy) {
-            return $value->object();
+            return $value->isPersisted() ? $value->refresh()->object() : $value->object();
         }
 
         if ($value instanceof FactoryCollection) {
@@ -279,7 +279,7 @@ class Factory
         }
 
         if (!$value instanceof self) {
-            return $value;
+            return \is_object($value) ? self::normalizeObject($value) : $value;
         }
 
         if (!$this->isPersisting()) {
@@ -288,6 +288,15 @@ class Factory
         }
 
         return $value->create()->object();
+    }
+
+    private static function normalizeObject(object $object): object
+    {
+        try {
+            return Proxy::createFromPersisted($object)->refresh()->object();
+        } catch (\RuntimeException $e) {
+            return $object;
+        }
     }
 
     private function normalizeCollection(FactoryCollection $collection): array
