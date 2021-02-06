@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Foundry\Tests\Functional;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
@@ -297,5 +298,33 @@ final class ModelFactoryTest extends KernelTestCase
             [PostFactory::new(), false],
             [PostFactory::new()->published(), true],
         ];
+    }
+
+    /**
+     * @test
+     */
+    public function many_to_one_unmanaged_entity(): void
+    {
+        $category = CategoryFactory::createOne(['name' => 'My Category']);
+
+        self::$container->get(EntityManagerInterface::class)->clear();
+
+        $post = PostFactory::createOne(['category' => $category]);
+
+        $this->assertSame('My Category', $post->getCategory()->getName());
+    }
+
+    /**
+     * @test
+     */
+    public function many_to_one_unmanaged_raw_entity(): void
+    {
+        $category = CategoryFactory::createOne(['name' => 'My Category'])->object();
+
+        self::$container->get(EntityManagerInterface::class)->clear();
+
+        $post = PostFactory::createOne(['category' => $category]);
+
+        $this->assertSame('My Category', $post->getCategory()->getName());
     }
 }
