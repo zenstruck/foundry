@@ -284,7 +284,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
         if (\is_array($orderBy)) {
             $wrappedParams = (new \ReflectionClass($this->repository))->getMethod('findOneBy')->getParameters();
 
-            if (!isset($wrappedParams[1]) || 'orderBy' !== $wrappedParams[1]->getName() || !$wrappedParams[1]->getType() instanceof \ReflectionNamedType || 'array' !== $wrappedParams[1]->getType()->getName()) {
+            if (!isset($wrappedParams[1]) || 'orderBy' !== $wrappedParams[1]->getName() || !($type = $wrappedParams[1]->getType()) instanceof \ReflectionNamedType || 'array' !== $type->getName()) {
                 throw new \RuntimeException(\sprintf('Wrapped repository\'s (%s) findOneBy method does not have an $orderBy parameter.', \get_class($this->repository)));
             }
         }
