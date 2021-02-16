@@ -32,10 +32,15 @@ final class MakeFactory extends AbstractMaker
         return 'make:factory';
     }
 
+    public static function getCommandDescription(): string
+    {
+        return 'Creates a Foundry model factory for a Doctrine entity class';
+    }
+
     public function configureCommand(Command $command, InputConfiguration $inputConfig): void
     {
         $command
-            ->setDescription('Creates a Foundry model factory for a Doctrine entity class')
+            ->setDescription(self::getCommandDescription())
             ->addArgument('entity', InputArgument::OPTIONAL, 'Entity class to create a factory for')
             ->addOption('test', null, InputOption::VALUE_NONE, 'Create in <fg=yellow>tests/</> instead of <fg=yellow>src/</>')
         ;

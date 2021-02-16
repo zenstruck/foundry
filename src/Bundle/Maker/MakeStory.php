@@ -23,10 +23,15 @@ final class MakeStory extends AbstractMaker
         return 'make:story';
     }
 
+    public static function getCommandDescription(): string
+    {
+        return 'Creates a Foundry story';
+    }
+
     public function configureCommand(Command $command, InputConfiguration $inputConfig): void
     {
         $command
-            ->setDescription('Creates a Foundry story')
+            ->setDescription(self::getCommandDescription())
             ->addArgument('name', InputArgument::OPTIONAL, 'The name of the story class (e.g. <fg=yellow>DefaultCategoriesStory</>)')
             ->addOption('test', null, InputOption::VALUE_NONE, 'Create in <fg=yellow>tests/</> instead of <fg=yellow>src/</>')
         ;
