@@ -13,6 +13,8 @@ use Zenstruck\Foundry\Proxy;
  * @method static <?= $entity->getShortName() ?>|Proxy createOne(array $attributes = [])
  * @method static <?= $entity->getShortName() ?>[]|Proxy[] createMany(int $number, $attributes = [])
  * @method static <?= $entity->getShortName() ?>|Proxy findOrCreate(array $attributes)
+ * @method static <?= $entity->getShortName() ?>|Proxy first(string $sortedField = 'id')
+ * @method static <?= $entity->getShortName() ?>|Proxy last(string $sortedField = 'id')
  * @method static <?= $entity->getShortName() ?>|Proxy random(array $attributes = [])
  * @method static <?= $entity->getShortName() ?>|Proxy randomOrCreate(array $attributes = [])
  * @method static <?= $entity->getShortName() ?>[]|Proxy[] randomSet(int $number, array $attributes = [])

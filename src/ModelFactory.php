@@ -93,6 +93,34 @@ abstract class ModelFactory extends Factory
     }
 
     /**
+     * @see RepositoryProxy::first()
+     *
+     * @throws \RuntimeException If no entities exist
+     */
+    final public static function first(string $sortedField = 'id'): Proxy
+    {
+        if (null === $proxy = static::repository()->first($sortedField)) {
+            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', static::getClass()));
+        }
+
+        return $proxy;
+    }
+
+    /**
+     * @see RepositoryProxy::last()
+     *
+     * @throws \RuntimeException If no entities exist
+     */
+    final public static function last(string $sortedField = 'id'): Proxy
+    {
+        if (null === $proxy = static::repository()->last($sortedField)) {
+            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', static::getClass()));
+        }
+
+        return $proxy;
+    }
+
+    /**
      * @see RepositoryProxy::random()
      */
     final public static function random(array $attributes = []): Proxy

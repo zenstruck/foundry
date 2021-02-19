@@ -198,6 +198,8 @@ use Zenstruck\Foundry\Proxy;
  * @method static Post|Proxy createOne(array $attributes = [])
  * @method static Post[]|Proxy[] createMany(int $number, $attributes = [])
  * @method static Post|Proxy findOrCreate(array $attributes)
+ * @method static Post|Proxy first(string $sortedField = 'id')
+ * @method static Post|Proxy last(string $sortedField = 'id')
  * @method static Post|Proxy random(array $attributes = [])
  * @method static Post|Proxy randomOrCreate(array $attributes = []))
  * @method static Post[]|Proxy[] randomSet(int $number, array $attributes = []))
@@ -280,6 +282,11 @@ PostFactory::createMany(5, ['title' => 'My Title']);
 
 // find a persisted object for the given attributes, if not found, create with the attributes
 PostFactory::findOrCreate(['title' => 'My Title']); // returns Post|Proxy
+
+PostFactory::first(); // get the first object (assumes an auto-incremented "id" column)
+PostFactory::first('createdAt'); // assuming "createdAt" is a datetime column, this will return latest object
+PostFactory::last(); // get the last object (assumes an auto-incremented "id" column)
+PostFactory::last('createdAt'); // assuming "createdAt" is a datetime column, this will return oldest object
 
 // get a random object that has been persisted
 $post = PostFactory::random(); // returns Post|Proxy

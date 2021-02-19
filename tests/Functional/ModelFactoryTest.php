@@ -327,4 +327,39 @@ final class ModelFactoryTest extends KernelTestCase
 
         $this->assertSame('My Category', $post->getCategory()->getName());
     }
+
+    /**
+     * @test
+     */
+    public function first_and_last_return_the_correct_object(): void
+    {
+        $categoryA = CategoryFactory::createOne(['name' => '3']);
+        $categoryB = CategoryFactory::createOne(['name' => '2']);
+        $categoryC = CategoryFactory::createOne(['name' => '1']);
+
+        $this->assertSame($categoryA->getId(), CategoryFactory::first()->getId());
+        $this->assertSame($categoryC->getId(), CategoryFactory::first('name')->getId());
+        $this->assertSame($categoryC->getId(), CategoryFactory::last()->getId());
+        $this->assertSame($categoryA->getId(), CategoryFactory::last('name')->getId());
+    }
+
+    /**
+     * @test
+     */
+    public function first_throws_exception_if_no_entities_exist(): void
+    {
+        $this->expectException(\RuntimeException::class);
+
+        CategoryFactory::first();
+    }
+
+    /**
+     * @test
+     */
+    public function last_throws_exception_if_no_entities_exist(): void
+    {
+        $this->expectException(\RuntimeException::class);
+
+        CategoryFactory::last();
+    }
 }
