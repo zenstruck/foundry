@@ -160,7 +160,25 @@ abstract class ModelFactory extends Factory
         return static::repository()->randomRange($min, $max, $attributes);
     }
 
-    /** @psalm-return RepositoryProxy<TModel> */
+    /**
+     * @see RepositoryProxy::count()
+     */
+    final public static function count(): int
+    {
+        return static::repository()->count();
+    }
+
+    /**
+     * @see RepositoryProxy::truncate()
+     */
+    final public static function truncate(): void
+    {
+        static::repository()->truncate();
+    }
+
+    /**
+     * @psalm-return RepositoryProxy<TModel>
+     */
     final public static function repository(): RepositoryProxy
     {
         return static::configuration()->repositoryFor(static::getClass());

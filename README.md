@@ -288,6 +288,10 @@ PostFactory::first('createdAt'); // assuming "createdAt" is a datetime column, t
 PostFactory::last(); // get the last object (assumes an auto-incremented "id" column)
 PostFactory::last('createdAt'); // assuming "createdAt" is a datetime column, this will return oldest object
 
+PostFactory::truncate(); // empty the database table
+
+PostFactory::count(); // the number of persisted Posts
+
 // get a random object that has been persisted
 $post = PostFactory::random(); // returns Post|Proxy
 $post = PostFactory::random(['author' => 'kevin']); // filter by the passed attributes

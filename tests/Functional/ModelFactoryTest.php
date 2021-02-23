@@ -362,4 +362,20 @@ final class ModelFactoryTest extends KernelTestCase
 
         CategoryFactory::last();
     }
+
+    /**
+     * @test
+     */
+    public function can_count_and_truncate_model_factory(): void
+    {
+        $this->assertSame(0, CategoryFactory::count());
+
+        CategoryFactory::createMany(4);
+
+        $this->assertSame(4, CategoryFactory::count());
+
+        CategoryFactory::truncate();
+
+        $this->assertSame(0, CategoryFactory::count());
+    }
 }
