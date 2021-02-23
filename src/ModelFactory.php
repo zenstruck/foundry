@@ -206,6 +206,11 @@ abstract class ModelFactory extends Factory
         return static::repository()->findBy($attributes);
     }
 
+    final public static function assert(): RepositoryAssertions
+    {
+        return static::repository()->assert();
+    }
+
     /**
      * @psalm-return RepositoryProxy<TModel>
      */

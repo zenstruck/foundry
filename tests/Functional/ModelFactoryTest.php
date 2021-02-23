@@ -28,11 +28,11 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function can_find_or_create(): void
     {
-        CategoryFactory::repository()->assertCount(0);
+        CategoryFactory::assert()->count(0);
         CategoryFactory::findOrCreate(['name' => 'php']);
-        CategoryFactory::repository()->assertCount(1);
+        CategoryFactory::assert()->count(1);
         CategoryFactory::findOrCreate(['name' => 'php']);
-        CategoryFactory::repository()->assertCount(1);
+        CategoryFactory::assert()->count(1);
     }
 
     /**
@@ -87,11 +87,11 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function can_create_random_object_if_none_exists(): void
     {
-        CategoryFactory::repository()->assertCount(0);
+        CategoryFactory::assert()->count(0);
         $this->assertInstanceOf(Category::class, CategoryFactory::randomOrCreate()->object());
-        CategoryFactory::repository()->assertCount(1);
+        CategoryFactory::assert()->count(1);
         $this->assertInstanceOf(Category::class, CategoryFactory::randomOrCreate()->object());
-        CategoryFactory::repository()->assertCount(1);
+        CategoryFactory::assert()->count(1);
     }
 
     /**
@@ -101,11 +101,11 @@ final class ModelFactoryTest extends KernelTestCase
     {
         CategoryFactory::createMany(5, ['name' => 'name1']);
 
-        CategoryFactory::repository()->assertCount(5);
+        CategoryFactory::assert()->count(5);
         $this->assertSame('name2', CategoryFactory::randomOrCreate(['name' => 'name2'])->getName());
-        CategoryFactory::repository()->assertCount(6);
+        CategoryFactory::assert()->count(6);
         $this->assertSame('name2', CategoryFactory::randomOrCreate(['name' => 'name2'])->getName());
-        CategoryFactory::repository()->assertCount(6);
+        CategoryFactory::assert()->count(6);
     }
 
     /**
@@ -186,9 +186,9 @@ final class ModelFactoryTest extends KernelTestCase
         ]);
 
         $this->assertCount(4, $post->getComments());
-        UserFactory::repository()->assertCount(4);
-        CommentFactory::repository()->assertCount(4);
-        PostFactory::repository()->assertCount(1);
+        UserFactory::assert()->count(4);
+        CommentFactory::assert()->count(4);
+        PostFactory::assert()->count(1);
     }
 
     /**
@@ -203,9 +203,9 @@ final class ModelFactoryTest extends KernelTestCase
 
         $this->assertCount(4, $posts[0]->getComments());
         $this->assertCount(4, $posts[1]->getComments());
-        UserFactory::repository()->assertCount(1);
-        CommentFactory::repository()->assertCount(8);
-        PostFactory::repository()->assertCount(2);
+        UserFactory::assert()->count(1);
+        CommentFactory::assert()->count(8);
+        PostFactory::assert()->count(2);
     }
 
     /**
@@ -218,8 +218,8 @@ final class ModelFactoryTest extends KernelTestCase
         ]);
 
         $this->assertCount(3, $post->getTags());
-        TagFactory::repository()->assertCount(5); // 3 created by this test and 2 in global state
-        PostFactory::repository()->assertCount(1);
+        TagFactory::assert()->count(5); // 3 created by this test and 2 in global state
+        PostFactory::assert()->count(1);
     }
 
     /**
@@ -232,8 +232,8 @@ final class ModelFactoryTest extends KernelTestCase
         ]);
 
         $this->assertCount(3, $tag->getPosts());
-        TagFactory::repository()->assertCount(3); // 1 created by this test and 2 in global state
-        PostFactory::repository()->assertCount(3);
+        TagFactory::assert()->count(3); // 1 created by this test and 2 in global state
+        PostFactory::assert()->count(3);
     }
 
     /**
@@ -247,8 +247,8 @@ final class ModelFactoryTest extends KernelTestCase
 
         $this->assertCount(3, $posts[0]->getTags());
         $this->assertCount(3, $posts[1]->getTags());
-        TagFactory::repository()->assertCount(8); // 6 created by this test and 2 in global state
-        PostFactory::repository()->assertCount(2);
+        TagFactory::assert()->count(8); // 6 created by this test and 2 in global state
+        PostFactory::assert()->count(2);
     }
 
     /**
@@ -261,9 +261,9 @@ final class ModelFactoryTest extends KernelTestCase
         ]);
 
         $this->assertCount(4, $post->getComments());
-        UserFactory::repository()->assertEmpty();
-        CommentFactory::repository()->assertEmpty();
-        PostFactory::repository()->assertEmpty();
+        UserFactory::assert()->empty();
+        CommentFactory::assert()->empty();
+        PostFactory::assert()->empty();
     }
 
     /**
@@ -276,8 +276,8 @@ final class ModelFactoryTest extends KernelTestCase
         ]);
 
         $this->assertCount(3, $post->getTags());
-        TagFactory::repository()->assertCount(2); // 2 created in global state
-        PostFactory::repository()->assertEmpty();
+        TagFactory::assert()->count(2); // 2 created in global state
+        PostFactory::assert()->empty();
     }
 
     /**

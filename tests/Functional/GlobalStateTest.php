@@ -20,9 +20,9 @@ final class GlobalStateTest extends KernelTestCase
      */
     public function tag_story_is_added_as_global_state(): void
     {
-        TagFactory::repository()->assertCount(2);
-        TagFactory::repository()->assertExists(['name' => 'dev']);
-        TagFactory::repository()->assertExists(['name' => 'design']);
+        TagFactory::repository()->assert()->count(2);
+        TagFactory::repository()->assert()->exists(['name' => 'dev']);
+        TagFactory::repository()->assert()->exists(['name' => 'design']);
     }
 
     /**
@@ -33,6 +33,6 @@ final class GlobalStateTest extends KernelTestCase
         TagStory::load();
         TagStory::load();
 
-        TagFactory::repository()->assertCount(2);
+        TagFactory::repository()->assert()->count(2);
     }
 }
