@@ -115,6 +115,9 @@ final class Proxy
         return $this->object;
     }
 
+    /**
+     * @psalm-return static
+     */
     public function save(): self
     {
         $this->objectManager()->persist($this->object);
@@ -209,6 +212,8 @@ final class Proxy
      * "autoRefresh" after executing callback if it was enabled.
      *
      * @param callable $callback (object|Proxy $object): void
+     *
+     * @psalm-return static
      */
     public function withoutAutoRefresh(callable $callback): self
     {
