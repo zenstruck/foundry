@@ -177,6 +177,36 @@ abstract class ModelFactory extends Factory
     }
 
     /**
+     * @see RepositoryProxy::findAll()
+     */
+    final public static function all(): array
+    {
+        return static::repository()->findAll();
+    }
+
+    /**
+     * @see RepositoryProxy::find()
+     *
+     * @throws \RuntimeException If no entity found
+     */
+    final public static function find($criteria): Proxy
+    {
+        if (null === $proxy = static::repository()->find($criteria)) {
+            throw new \RuntimeException(\sprintf('Could not find "%s" object.', static::getClass()));
+        }
+
+        return $proxy;
+    }
+
+    /**
+     * @see RepositoryProxy::findBy()
+     */
+    final public static function findBy(array $attributes): array
+    {
+        return static::repository()->findBy($attributes);
+    }
+
+    /**
      * @psalm-return RepositoryProxy<TModel>
      */
     final public static function repository(): RepositoryProxy

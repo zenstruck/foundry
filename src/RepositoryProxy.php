@@ -239,7 +239,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
      * @return Proxy|object|null
      *
      * @psalm-param Proxy<TProxiedObject>|array|mixed $criteria
-     * @psalm-return Proxy<TProxiedObject>|list<Proxy<TProxiedObject>>|null
+     * @psalm-return Proxy<TProxiedObject>|null
      */
     public function find($criteria)
     {

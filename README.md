@@ -197,11 +197,14 @@ use Zenstruck\Foundry\Proxy;
 /**
  * @method static Post|Proxy createOne(array $attributes = [])
  * @method static Post[]|Proxy[] createMany(int $number, $attributes = [])
+ * @method static Post|Proxy find($criteria)
  * @method static Post|Proxy findOrCreate(array $attributes)
  * @method static Post|Proxy first(string $sortedField = 'id')
  * @method static Post|Proxy last(string $sortedField = 'id')
  * @method static Post|Proxy random(array $attributes = [])
  * @method static Post|Proxy randomOrCreate(array $attributes = []))
+ * @method static Post[]|Proxy[] all()
+ * @method static Post[]|Proxy[] findBy(array $attributes)
  * @method static Post[]|Proxy[] randomSet(int $number, array $attributes = []))
  * @method static Post[]|Proxy[] randomRange(int $min, int $max, array $attributes = []))
  * @method static PostRepository|RepositoryProxy repository()
@@ -291,6 +294,13 @@ PostFactory::last('createdAt'); // assuming "createdAt" is a datetime column, th
 PostFactory::truncate(); // empty the database table
 
 PostFactory::count(); // the number of persisted Posts
+
+PostFactory::all(); // Post[]|Proxy[] all the persisted Posts
+
+PostFactory::findBy(['author' => 'kevin']); // Post[]|Proxy[] matching the filter
+
+$post = PostFactory::find(5); // Post|Proxy with the id of 5
+$post = PostFactory::find(['title' => 'My First Post']); // Post|Proxy matching the filter
 
 // get a random object that has been persisted
 $post = PostFactory::random(); // returns Post|Proxy

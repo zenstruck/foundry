@@ -378,4 +378,66 @@ final class ModelFactoryTest extends KernelTestCase
 
         $this->assertSame(0, CategoryFactory::count());
     }
+
+    /**
+     * @test
+     */
+    public function can_get_all_entities(): void
+    {
+        $this->assertSame([], CategoryFactory::all());
+
+        CategoryFactory::createMany(4);
+
+        $categories = CategoryFactory::all();
+
+        $this->assertCount(4, $categories);
+        $this->assertInstanceOf(Category::class, $categories[0]->object());
+        $this->assertInstanceOf(Category::class, $categories[1]->object());
+        $this->assertInstanceOf(Category::class, $categories[2]->object());
+        $this->assertInstanceOf(Category::class, $categories[3]->object());
+    }
+
+    /**
+     * @test
+     */
+    public function can_find_entity(): void
+    {
+        CategoryFactory::createOne(['name' => 'first']);
+        CategoryFactory::createOne(['name' => 'second']);
+        $category = CategoryFactory::createOne(['name' => 'third']);
+
+        $this->assertSame('second', CategoryFactory::find(['name' => 'second'])->getName());
+        $this->assertSame('third', CategoryFactory::find(['id' => $category->getId()])->getName());
+        $this->assertSame('third', CategoryFactory::find($category->getId())->getName());
+        $this->assertSame('third', CategoryFactory::find($category->object())->getName());
+        $this->assertSame('third', CategoryFactory::find($category)->getName());
+    }
+
+    /**
+     * @test
+     */
+    public function find_throws_exception_if_no_entities_exist(): void
+    {
+        $this->expectException(\RuntimeException::class);
+
+        CategoryFactory::find(99);
+    }
+
+    /**
+     * @test
+     */
+    public function can_find_by(): void
+    {
+        $this->assertSame([], CategoryFactory::findBy(['name' => 'name2']));
+
+        CategoryFactory::createOne(['name' => 'name1']);
+        CategoryFactory::createOne(['name' => 'name2']);
+        CategoryFactory::createOne(['name' => 'name2']);
+
+        $categories = CategoryFactory::findBy(['name' => 'name2']);
+
+        $this->assertCount(2, $categories);
+        $this->assertSame('name2', $categories[0]->getName());
+        $this->assertSame('name2', $categories[1]->getName());
+    }
 }
