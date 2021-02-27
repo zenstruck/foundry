@@ -93,6 +93,34 @@ abstract class ModelFactory extends Factory
     }
 
     /**
+     * @see RepositoryProxy::first()
+     *
+     * @throws \RuntimeException If no entities exist
+     */
+    final public static function first(string $sortedField = 'id'): Proxy
+    {
+        if (null === $proxy = static::repository()->first($sortedField)) {
+            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', static::getClass()));
+        }
+
+        return $proxy;
+    }
+
+    /**
+     * @see RepositoryProxy::last()
+     *
+     * @throws \RuntimeException If no entities exist
+     */
+    final public static function last(string $sortedField = 'id'): Proxy
+    {
+        if (null === $proxy = static::repository()->last($sortedField)) {
+            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', static::getClass()));
+        }
+
+        return $proxy;
+    }
+
+    /**
      * @see RepositoryProxy::random()
      */
     final public static function random(array $attributes = []): Proxy
@@ -132,7 +160,60 @@ abstract class ModelFactory extends Factory
         return static::repository()->randomRange($min, $max, $attributes);
     }
 
-    /** @psalm-return RepositoryProxy<TModel> */
+    /**
+     * @see RepositoryProxy::count()
+     */
+    final public static function count(): int
+    {
+        return static::repository()->count();
+    }
+
+    /**
+     * @see RepositoryProxy::truncate()
+     */
+    final public static function truncate(): void
+    {
+        static::repository()->truncate();
+    }
+
+    /**
+     * @see RepositoryProxy::findAll()
+     */
+    final public static function all(): array
+    {
+        return static::repository()->findAll();
+    }
+
+    /**
+     * @see RepositoryProxy::find()
+     *
+     * @throws \RuntimeException If no entity found
+     */
+    final public static function find($criteria): Proxy
+    {
+        if (null === $proxy = static::repository()->find($criteria)) {
+            throw new \RuntimeException(\sprintf('Could not find "%s" object.', static::getClass()));
+        }
+
+        return $proxy;
+    }
+
+    /**
+     * @see RepositoryProxy::findBy()
+     */
+    final public static function findBy(array $attributes): array
+    {
+        return static::repository()->findBy($attributes);
+    }
+
+    final public static function assert(): RepositoryAssertions
+    {
+        return static::repository()->assert();
+    }
+
+    /**
+     * @psalm-return RepositoryProxy<TModel>
+     */
     final public static function repository(): RepositoryProxy
     {
         return static::configuration()->repositoryFor(static::getClass());

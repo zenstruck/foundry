@@ -22,13 +22,13 @@ final class StoryTest extends KernelTestCase
      */
     public function stories_are_only_loaded_once(): void
     {
-        PostFactory::repository()->assertEmpty();
+        PostFactory::assert()->empty();
 
         PostStory::load();
         PostStory::load();
         PostStory::load();
 
-        PostFactory::repository()->assertCount(4);
+        PostFactory::assert()->count(4);
     }
 
     /**

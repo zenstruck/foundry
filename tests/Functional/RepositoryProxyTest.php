@@ -31,6 +31,7 @@ final class RepositoryProxyTest extends KernelTestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function assertions(): void
     {

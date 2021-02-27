@@ -5,7 +5,6 @@ namespace Zenstruck\Foundry;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ObjectRepository;
-use PHPUnit\Framework\Assert;
 
 /**
  * @mixin EntityRepository<TProxiedObject>
@@ -63,62 +62,103 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
         return $this->count();
     }
 
+    public function assert(): RepositoryAssertions
+    {
+        return new RepositoryAssertions($this);
+    }
+
+    /**
+     * @deprecated use RepositoryProxy::assert()->empty()
+     */
     public function assertEmpty(string $message = ''): self
     {
-        return $this->assertCount(0, $message);
-    }
+        trigger_deprecation('zenstruck\foundry', '1.8.0', 'Using RepositoryProxy::assertEmpty() is deprecated, use RepositoryProxy::assert()->empty().');
 
-    public function assertCount(int $expectedCount, string $message = ''): self
-    {
-        Assert::assertSame($expectedCount, $this->count(), $message);
-
-        return $this;
-    }
-
-    public function assertCountGreaterThan(int $expected, string $message = ''): self
-    {
-        Assert::assertGreaterThan($expected, $this->count(), $message);
-
-        return $this;
-    }
-
-    public function assertCountGreaterThanOrEqual(int $expected, string $message = ''): self
-    {
-        Assert::assertGreaterThanOrEqual($expected, $this->count(), $message);
-
-        return $this;
-    }
-
-    public function assertCountLessThan(int $expected, string $message = ''): self
-    {
-        Assert::assertLessThan($expected, $this->count(), $message);
-
-        return $this;
-    }
-
-    public function assertCountLessThanOrEqual(int $expected, string $message = ''): self
-    {
-        Assert::assertLessThanOrEqual($expected, $this->count(), $message);
+        $this->assert()->empty($message);
 
         return $this;
     }
 
     /**
-     * @param object|array|mixed $criteria
+     * @deprecated use RepositoryProxy::assert()->count()
+     */
+    public function assertCount(int $expectedCount, string $message = ''): self
+    {
+        trigger_deprecation('zenstruck\foundry', '1.8.0', 'Using RepositoryProxy::assertCount() is deprecated, use RepositoryProxy::assert()->count().');
+
+        $this->assert()->count($expectedCount, $message);
+
+        return $this;
+    }
+
+    /**
+     * @deprecated use RepositoryProxy::assert()->countGreaterThan()
+     */
+    public function assertCountGreaterThan(int $expected, string $message = ''): self
+    {
+        trigger_deprecation('zenstruck\foundry', '1.8.0', 'Using RepositoryProxy::assertCountGreaterThan() is deprecated, use RepositoryProxy::assert()->countGreaterThan().');
+
+        $this->assert()->countGreaterThan($expected, $message);
+
+        return $this;
+    }
+
+    /**
+     * @deprecated use RepositoryProxy::assert()->countGreaterThanOrEqual()
+     */
+    public function assertCountGreaterThanOrEqual(int $expected, string $message = ''): self
+    {
+        trigger_deprecation('zenstruck\foundry', '1.8.0', 'Using RepositoryProxy::assertCountGreaterThanOrEqual() is deprecated, use RepositoryProxy::assert()->countGreaterThanOrEqual().');
+
+        $this->assert()->countGreaterThanOrEqual($expected, $message);
+
+        return $this;
+    }
+
+    /**
+     * @deprecated use RepositoryProxy::assert()->countLessThan()
+     */
+    public function assertCountLessThan(int $expected, string $message = ''): self
+    {
+        trigger_deprecation('zenstruck\foundry', '1.8.0', 'Using RepositoryProxy::assertCountLessThan() is deprecated, use RepositoryProxy::assert()->countLessThan().');
+
+        $this->assert()->countLessThan($expected, $message);
+
+        return $this;
+    }
+
+    /**
+     * @deprecated use RepositoryProxy::assert()->countLessThanOrEqual()
+     */
+    public function assertCountLessThanOrEqual(int $expected, string $message = ''): self
+    {
+        trigger_deprecation('zenstruck\foundry', '1.8.0', 'Using RepositoryProxy::assertCountLessThanOrEqual() is deprecated, use RepositoryProxy::assert()->countLessThanOrEqual().');
+
+        $this->assert()->countLessThanOrEqual($expected, $message);
+
+        return $this;
+    }
+
+    /**
+     * @deprecated use RepositoryProxy::assert()->exists()
      */
     public function assertExists($criteria, string $message = ''): self
     {
-        Assert::assertNotNull($this->find($criteria), $message);
+        trigger_deprecation('zenstruck\foundry', '1.8.0', 'Using RepositoryProxy::assertExists() is deprecated, use RepositoryProxy::assert()->exists().');
+
+        $this->assert()->exists($criteria, $message);
 
         return $this;
     }
 
     /**
-     * @param object|array|mixed $criteria
+     * @deprecated use RepositoryProxy::assert()->notExists()
      */
     public function assertNotExists($criteria, string $message = ''): self
     {
-        Assert::assertNull($this->find($criteria), $message);
+        trigger_deprecation('zenstruck\foundry', '1.8.0', 'Using RepositoryProxy::assertNotExists() is deprecated, use RepositoryProxy::assert()->notExists().');
+
+        $this->assert()->notExists($criteria, $message);
 
         return $this;
     }
@@ -239,7 +279,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
      * @return Proxy|object|null
      *
      * @psalm-param Proxy<TProxiedObject>|array|mixed $criteria
-     * @psalm-return Proxy<TProxiedObject>|list<Proxy<TProxiedObject>>|null
+     * @psalm-return Proxy<TProxiedObject>|null
      */
     public function find($criteria)
     {

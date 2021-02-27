@@ -197,9 +197,14 @@ use Zenstruck\Foundry\Proxy;
 /**
  * @method static Post|Proxy createOne(array $attributes = [])
  * @method static Post[]|Proxy[] createMany(int $number, $attributes = [])
+ * @method static Post|Proxy find($criteria)
  * @method static Post|Proxy findOrCreate(array $attributes)
+ * @method static Post|Proxy first(string $sortedField = 'id')
+ * @method static Post|Proxy last(string $sortedField = 'id')
  * @method static Post|Proxy random(array $attributes = [])
  * @method static Post|Proxy randomOrCreate(array $attributes = []))
+ * @method static Post[]|Proxy[] all()
+ * @method static Post[]|Proxy[] findBy(array $attributes)
  * @method static Post[]|Proxy[] randomSet(int $number, array $attributes = []))
  * @method static Post[]|Proxy[] randomRange(int $min, int $max, array $attributes = []))
  * @method static PostRepository|RepositoryProxy repository()
@@ -280,6 +285,22 @@ PostFactory::createMany(5, ['title' => 'My Title']);
 
 // find a persisted object for the given attributes, if not found, create with the attributes
 PostFactory::findOrCreate(['title' => 'My Title']); // returns Post|Proxy
+
+PostFactory::first(); // get the first object (assumes an auto-incremented "id" column)
+PostFactory::first('createdAt'); // assuming "createdAt" is a datetime column, this will return latest object
+PostFactory::last(); // get the last object (assumes an auto-incremented "id" column)
+PostFactory::last('createdAt'); // assuming "createdAt" is a datetime column, this will return oldest object
+
+PostFactory::truncate(); // empty the database table
+
+PostFactory::count(); // the number of persisted Posts
+
+PostFactory::all(); // Post[]|Proxy[] all the persisted Posts
+
+PostFactory::findBy(['author' => 'kevin']); // Post[]|Proxy[] matching the filter
+
+$post = PostFactory::find(5); // Post|Proxy with the id of 5
+$post = PostFactory::find(['title' => 'My First Post']); // Post|Proxy matching the filter
 
 // get a random object that has been persisted
 $post = PostFactory::random(); // returns Post|Proxy
@@ -938,7 +959,7 @@ public function test_can_post_a_comment(): void
 
     $this->assertCount(1, $post->refresh()->getComments()); // Refresh $post from the database and call ->getComments()
 
-    CommentFactory::repository()->assertExists([ // Doctrine repository wrapper with assertions
+    CommentFactory::assert()->exists([ // Doctrine repository assertions
         'name' => 'John',
         'body' => 'My comment',
     ]);
@@ -1186,7 +1207,7 @@ $repository->findOneByTitle('My Title'); // Proxy|Post|null
 
 ### Assertions
 
-Both object and repository proxy's have helpful PHPUnit assertions:
+Both object proxy's and your ModelFactory's have helpful PHPUnit assertions:
 
 ```php
 use App\Factory\PostFactory;
@@ -1196,16 +1217,14 @@ $post = PostFactory::createOne();
 $post->assertPersisted();
 $post->assertNotPersisted();
 
-$repository = PostFactory::repository();
-
-$repository->assertEmpty();
-$repository->assertCount(3);
-$repository->assertCountGreaterThan(3);
-$repository->assertCountGreaterThanOrEqual(3);
-$repository->assertCountLessThan(3);
-$repository->assertCountLessThanOrEqual(3);
-$repository->assertExists(['title' => 'My Title']);
-$repository->assertNotExists(['title' => 'My Title']);
+PostFactory::assert()->empty();
+PostFactory::assert()->count(3);
+PostFactory::assert()->countGreaterThan(3);
+PostFactory::assert()->countGreaterThanOrEqual(3);
+PostFactory::assert()->countLessThan(3);
+PostFactory::assert()->countLessThanOrEqual(3);
+PostFactory::assert()->exists(['title' => 'My Title']);
+PostFactory::assert()->notExists(['title' => 'My Title']);
 ```
 
 ### Global State

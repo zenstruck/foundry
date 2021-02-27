@@ -116,11 +116,11 @@ final class ProxyTest extends KernelTestCase
     {
         $post = PostFactory::createOne(['title' => 'old title']);
 
-        $post->repository()->assertNotExists(['title' => 'new title']);
+        $post->repository()->assert()->notExists(['title' => 'new title']);
 
         $post->forceSet('title', 'new title')->save();
 
-        $post->repository()->assertExists(['title' => 'new title']);
+        $post->repository()->assert()->exists(['title' => 'new title']);
     }
 
     /**
