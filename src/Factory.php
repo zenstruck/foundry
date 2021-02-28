@@ -3,6 +3,8 @@
 namespace Zenstruck\Foundry;
 
 use Faker;
+use ProxyManager\Proxy\ValueHolderInterface;
+use Zenstruck\Foundry\Proxy\ProxyGenerator;
 
 /**
  * @template TObject as object
@@ -39,6 +41,12 @@ class Factory
     /** @var callable[] */
     private $afterPersist = [];
 
+    /** @var ProxyGenerator|null */
+    private $proxyGenerator;
+
+    /** @var array */
+    private $proxyMethods = [];
+
     /**
      * @param array|callable $defaultAttributes
      *
@@ -70,9 +78,9 @@ class Factory
      *
      * @return Proxy|object
      *
-     * @psalm-return Proxy<TObject>
+     * @psalm-return Proxy<TObject>|TObject
      */
-    final public function create($attributes = []): Proxy
+    final public function create($attributes = []): object
     {
         // merge the factory attribute set with the passed attributes
         $attributeSet = \array_merge($this->attributeSet, [$attributes]);
@@ -103,6 +111,16 @@ class Factory
             $callback($object, $attributes);
         }
 
+        if ($this->proxyGenerator) {
+            $object = $this->proxyGenerator->generate($object, $this->proxyMethods);
+
+            if ($this->isPersisting()) {
+                self::save($object);
+            }
+
+            return $object;
+        }
+
         $proxy = new Proxy($object);
 
         if (!$this->isPersisting()) {
@@ -114,6 +132,27 @@ class Factory
                 $proxy->executeCallback($callback, $attributes);
             }
         });
+    }
+
+    /**
+     * @psalm-param object|Proxy<object> $object
+     */
+    final public static function save(object $object): void
+    {
+        $object = self::realObject($object);
+
+        $objectManager = self::configuration()->objectManagerFor($object);
+        $objectManager->persist($object);
+        $objectManager->flush();
+    }
+
+    final public static function remove(object $object): void
+    {
+        $object = self::realObject($object);
+
+        $objectManager = self::configuration()->objectManagerFor($object);
+        $objectManager->remove($object);
+        $objectManager->flush();
     }
 
     /**
@@ -251,6 +290,17 @@ class Factory
     }
 
     /**
+     * Instead of returning an instance of {@see Proxy}, use a generator to create a real proxy for the object.
+     */
+    public function withProxyGenerator(array $proxyMethods = []): self
+    {
+        $this->proxyGenerator = new ProxyGenerator(self::configuration());
+        $this->proxyMethods = $proxyMethods;
+
+        return $this;
+    }
+
+    /**
      * @internal
      *
      * @psalm-return class-string<TObject>
@@ -347,5 +397,26 @@ class Factory
     private function isPersisting(): bool
     {
         return self::configuration()->hasManagerRegistry() ? $this->persist : false;
+    }
+
+    /**
+     * @template T of object
+     * @psalm-param T|Proxy<T>|ValueHolderInterface<T> $proxyObject
+     * @psalm-return T
+     *
+     * @psalm-suppress InvalidReturnType
+     * @psalm-suppress InvalidReturnStatement
+     */
+    private static function realObject(object $proxyObject): object
+    {
+        if ($proxyObject instanceof Proxy) {
+            return $proxyObject->object();
+        }
+
+        if ($proxyObject instanceof ValueHolderInterface && $valueHolder = $proxyObject->getWrappedValueHolderValue()) {
+            return $valueHolder;
+        }
+
+        return $proxyObject;
     }
 }

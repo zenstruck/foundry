@@ -2,6 +2,8 @@
 
 namespace Zenstruck\Foundry;
 
+use ProxyManager\Proxy\ValueHolderInterface;
+
 /**
  * @template TModel of object
  * @template-extends Factory<TModel>
@@ -68,9 +70,9 @@ abstract class ModelFactory extends Factory
      *
      * @return Proxy|object
      *
-     * @psalm-return Proxy<TModel>
+     * @psalm-return Proxy<TModel>|ValueHolderInterface<TModel>|TModel
      */
-    final public static function createOne(array $attributes = []): Proxy
+    final public static function createOne(array $attributes = []): object
     {
         return static::new()->create($attributes);
     }
@@ -81,9 +83,9 @@ abstract class ModelFactory extends Factory
      *
      * @return Proxy|object
      *
-     * @psalm-return Proxy<TModel>
+     * @psalm-return Proxy<TModel>|ValueHolderInterface<TModel>
      */
-    final public static function findOrCreate(array $attributes): Proxy
+    final public static function findOrCreate(array $attributes): object
     {
         if ($found = static::repository()->find($attributes)) {
             return \is_array($found) ? $found[0] : $found;
@@ -97,7 +99,7 @@ abstract class ModelFactory extends Factory
      *
      * @throws \RuntimeException If no entities exist
      */
-    final public static function first(string $sortedField = 'id'): Proxy
+    final public static function first(string $sortedField = 'id'): object
     {
         if (null === $proxy = static::repository()->first($sortedField)) {
             throw new \RuntimeException(\sprintf('No "%s" objects persisted.', static::getClass()));
@@ -111,7 +113,7 @@ abstract class ModelFactory extends Factory
      *
      * @throws \RuntimeException If no entities exist
      */
-    final public static function last(string $sortedField = 'id'): Proxy
+    final public static function last(string $sortedField = 'id'): object
     {
         if (null === $proxy = static::repository()->last($sortedField)) {
             throw new \RuntimeException(\sprintf('No "%s" objects persisted.', static::getClass()));
@@ -123,7 +125,7 @@ abstract class ModelFactory extends Factory
     /**
      * @see RepositoryProxy::random()
      */
-    final public static function random(array $attributes = []): Proxy
+    final public static function random(array $attributes = []): object
     {
         return static::repository()->random($attributes);
     }
@@ -133,9 +135,9 @@ abstract class ModelFactory extends Factory
      *
      * @return Proxy|object
      *
-     * @psalm-return Proxy<TModel>
+     * @psalm-return Proxy<TModel>|ValueHolderInterface<TModel>
      */
-    final public static function randomOrCreate(array $attributes = []): Proxy
+    final public static function randomOrCreate(array $attributes = []): object
     {
         try {
             return static::repository()->random($attributes);
@@ -189,7 +191,7 @@ abstract class ModelFactory extends Factory
      *
      * @throws \RuntimeException If no entity found
      */
-    final public static function find($criteria): Proxy
+    final public static function find($criteria): object
     {
         if (null === $proxy = static::repository()->find($criteria)) {
             throw new \RuntimeException(\sprintf('Could not find "%s" object.', static::getClass()));
