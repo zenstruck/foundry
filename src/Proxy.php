@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Foundry;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\Assert;
 use Zenstruck\Callback;
@@ -108,9 +109,23 @@ final class Proxy
      */
     public function object(): object
     {
-        if ($this->autoRefresh && $this->persisted) {
-            $this->refresh();
+        if (!$this->autoRefresh || !$this->persisted) {
+            return $this->object;
         }
+
+        $om = $this->objectManager();
+
+        // only check for changes if the object is managed in the current om
+        if ($om instanceof EntityManagerInterface && $om->contains($this->object)) {
+            // cannot use UOW::recomputeSingleEntityChangeSet() here as it wrongly computes embedded objects as changed
+            $om->getUnitOfWork()->computeChangeSet($om->getClassMetadata($this->class), $this->object);
+
+            if (!empty($om->getUnitOfWork()->getEntityChangeSet($this->object))) {
+                throw new \RuntimeException(\sprintf('Cannot auto refresh "%s" as there are unsaved changes. Be sure to call ->save() or disable auto refreshing (see https://github.com/zenstruck/foundry#auto-refresh for details).', $this->class));
+            }
+        }
+
+        $this->refresh();
 
         return $this->object;
     }

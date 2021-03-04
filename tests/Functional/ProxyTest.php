@@ -3,10 +3,12 @@
 namespace Zenstruck\Foundry\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\AnonymousFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 
@@ -146,22 +148,72 @@ final class ProxyTest extends KernelTestCase
     /**
      * @test
      */
-    public function demonstrate_setting_field_problem_with_auto_refreshing_enabled(): void
+    public function exception_thrown_if_trying_to_autorefresh_object_with_unsaved_changes(): void
     {
-        $post = PostFactory::createOne(['title' => 'old title', 'body' => 'old body']);
+        $post = PostFactory::createOne(['title' => 'old title', 'body' => 'old body'])
+            ->enableAutoRefresh()
+        ;
 
         $this->assertSame('old title', $post->getTitle());
         $this->assertSame('old body', $post->getBody());
 
         $post
             ->enableAutoRefresh()
-            ->forceSet('title', 'new title') // will not be saved because the following ->forceSet() refreshes the object
-            ->forceSet('body', 'new body')
-            ->save()
+            ->forceSet('title', 'new title')
+        ;
+
+        $this->expectException(\RuntimeException::class);
+
+        // exception thrown because of "unsaved changes" to $post from above
+        $post->forceSet('body', 'new body');
+    }
+
+    /**
+     * @test
+     */
+    public function can_autorefresh_between_kernel_boots(): void
+    {
+        $post = PostFactory::createOne(['title' => 'old title', 'body' => 'old body'])
+            ->enableAutoRefresh()
         ;
 
         $this->assertSame('old title', $post->getTitle());
-        $this->assertSame('new body', $post->getBody());
+        $this->assertSame('old body', $post->getBody());
+
+        // reboot kernel
+        self::ensureKernelShutdown();
+        self::bootKernel();
+
+        $this->assertSame('old title', $post->getTitle());
+        $this->assertSame('old body', $post->getBody());
+    }
+
+    /**
+     * @test
+     */
+    public function can_autorefresh_entity_with_embedded_object(): void
+    {
+        $contact = AnonymousFactory::new(Contact::class)->create(['name' => 'john'])
+            ->enableAutoRefresh()
+        ;
+
+        $this->assertSame('john', $contact->getName());
+
+        // I discovered when autorefreshing the second time, the embedded
+        // object is included in the changeset when using UOW::recomputeSingleEntityChangeSet().
+        // Changing to UOW::computeChangeSet() fixes this.
+        $this->assertSame('john', $contact->getName());
+        $this->assertNull($contact->getAddress()->getValue());
+
+        $contact->getAddress()->setValue('address');
+        $contact->save();
+
+        $this->assertSame('address', $contact->getAddress()->getValue());
+
+        self::ensureKernelShutdown();
+        self::bootKernel();
+
+        $this->assertSame('address', $contact->getAddress()->getValue());
     }
 
     /**
@@ -241,7 +293,7 @@ final class ProxyTest extends KernelTestCase
     /**
      * @test
      */
-    public function without_auto_refresh_re_enables_if_enabled_originally(): void
+    public function without_auto_refresh_keeps_disabled_if_originally_disabled(): void
     {
         $post = PostFactory::createOne(['title' => 'old title', 'body' => 'old body']);
 
@@ -249,7 +301,6 @@ final class ProxyTest extends KernelTestCase
         $this->assertSame('old body', $post->getBody());
 
         $post
-            ->enableAutoRefresh()
             ->withoutAutoRefresh(static function(Proxy $proxy) {
                 $proxy
                     ->forceSet('title', 'new title')
@@ -257,12 +308,12 @@ final class ProxyTest extends KernelTestCase
                 ;
             })
             ->save()
-            ->forceSet('title', 'another new title') // will not be saved because the following ->forceSet() refreshes the object
+            ->forceSet('title', 'another new title')
             ->forceSet('body', 'another new body')
             ->save()
         ;
 
-        $this->assertSame('new title', $post->getTitle());
+        $this->assertSame('another new title', $post->getTitle());
         $this->assertSame('another new body', $post->getBody());
     }
 }
