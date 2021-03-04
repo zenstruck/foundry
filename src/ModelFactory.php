@@ -21,7 +21,7 @@ abstract class ModelFactory extends Factory
     public static function __callStatic(string $name, array $arguments)
     {
         if ('createMany' !== $name) {
-            throw new \BadMethodCallException(\sprintf('Call to undefined static method "%s::%s".', static::class, __METHOD__));
+            throw new \BadMethodCallException(\sprintf('Call to undefined static method "%s::%s".', static::class, $name));
         }
 
         return static::new()->many($arguments[0])->create($arguments[1] ?? []);
