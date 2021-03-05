@@ -32,10 +32,10 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
         $this->configureFaker($mergedConfig['faker'], $container);
         $this->configureDefaultInstantiator($mergedConfig['instantiator'], $container);
 
-        if ($mergedConfig['auto_refresh_proxies']) {
-            $container->getDefinition(Configuration::class)
-                ->addMethodCall('alwaysAutoRefreshProxies')
-            ;
+        if (true === $mergedConfig['auto_refresh_proxies']) {
+            $container->getDefinition(Configuration::class)->addMethodCall('enableDefaultProxyAutoRefresh');
+        } elseif (false === $mergedConfig['auto_refresh_proxies']) {
+            $container->getDefinition(Configuration::class)->addMethodCall('disableDefaultProxyAutoRefresh');
         }
     }
 

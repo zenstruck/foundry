@@ -144,7 +144,19 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
 
         $this->assertContainerBuilderHasService(Configuration::class);
         $this->assertCount(6, $this->container->findDefinition(Configuration::class)->getMethodCalls());
-        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'alwaysAutoRefreshProxies', []);
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'enableDefaultProxyAutoRefresh', []);
+    }
+
+    /**
+     * @test
+     */
+    public function can_disable_auto_refresh_proxies(): void
+    {
+        $this->load(['auto_refresh_proxies' => false]);
+
+        $this->assertContainerBuilderHasService(Configuration::class);
+        $this->assertCount(6, $this->container->findDefinition(Configuration::class)->getMethodCalls());
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'disableDefaultProxyAutoRefresh', []);
     }
 
     protected function getContainerExtensions(): array
