@@ -8,7 +8,7 @@ on:
 
 jobs:
   tests:
-    name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
+    name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - ${{ matrix.versions }}
     runs-on: ubuntu-latest
     services:
       mysql:
@@ -29,10 +29,15 @@ jobs:
     strategy:
       matrix:
         php: [7.2, 7.3, 7.4, 8.0]
-        stability: [highest]
+        stability: ['@stable']
+        versions: [highest]
         include:
           - php: 7.2
-            stability: lowest
+            stability: '@stable'
+            versions: lowest
+          - php: 8.0
+            stability: '@dev'
+            versions: highest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2.3.3
@@ -47,10 +52,14 @@ jobs:
           extensions: pgsql, sqlite
           coverage: none
 
+      - name: Set minimum-stability to dev
+        run: composer config minimum-stability dev
+        if: ${{ matrix.stability == '@dev' }}
+
       - name: Install dependencies
         uses: ramsey/composer-install@v1
         with:
-          dependency-versions: ${{ matrix.stability }}
+          dependency-versions: ${{ matrix.versions }}
           composer-options: --prefer-dist
 
       - name: 'Test: MySQL'
