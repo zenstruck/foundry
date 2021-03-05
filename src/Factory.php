@@ -246,6 +246,16 @@ class Factory
     }
 
     /**
+     * @internal
+     *
+     * @psalm-return class-string<TObject>
+     */
+    final protected function class(): string
+    {
+        return $this->class;
+    }
+
+    /**
      * @param array|callable $attributes
      */
     private static function normalizeAttributes($attributes): array

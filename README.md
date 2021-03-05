@@ -793,16 +793,14 @@ services.
 Foundry can be used to create factories for entities that you don't have model factories for:
 
 ```php
-use App\Entity\OtherEntity;
-use Zenstruck\Foundry\Factory;
+use App\Entity\Post;
+use Zenstruck\Foundry\AnonymousFactory;
 use function Zenstruck\Foundry\factory;
 use function Zenstruck\Foundry\create;
 use function Zenstruck\Foundry\create_many;
-use function Zenstruck\Foundry\instantiate;
-use function Zenstruck\Foundry\instantiate_many;
 
-$factory = new Factory(OtherEntity::class);
-$factory = factory(OtherEntity::class); // alternative to above
+$factory = AnonymousFactory::new(Post::class);
+$factory = factory(Post::class); // alternative to above
 
 // has the same API as ModelFactory's
 $factory->create(['field' => 'value']);
@@ -812,9 +810,45 @@ $factory->beforeInstantiate(function () {});
 $factory->afterInstantiate(function () {});
 $factory->afterPersist(function () {});
 
+// find a persisted object for the given attributes, if not found, create with the attributes
+$factory->findOrCreate(['title' => 'My Title']);
+
+$factory->first(); // get the first object (assumes an auto-incremented "id" column)
+$factory->first('createdAt'); // assuming "createdAt" is a datetime column, this will return latest object
+$factory->last(); // get the last object (assumes an auto-incremented "id" column)
+$factory->last('createdAt'); // assuming "createdAt" is a datetime column, this will return oldest object
+
+$factory->truncate(); // empty the database table
+$factory->count(); // the number of persisted Post's
+$factory->all(); // Post[]|Proxy[] all the persisted Post's
+
+$factory->findBy(['author' => 'kevin']); // Post[]|Proxy[] matching the filter
+
+$factory->find(5); // Post|Proxy with the id of 5
+$factory->find(['title' => 'My First Post']); // Post|Proxy matching the filter
+
+// get a random object that has been persisted
+$factory->random(); // returns Post|Proxy
+$factory->random(['author' => 'kevin']); // filter by the passed attributes
+
+// or automatically persist a new random object if none exists
+$factory->randomOrCreate();
+$factory->randomOrCreate(['author' => 'kevin']); // filter by or create with the passed attributes
+
+// get a random set of objects that have been persisted
+$factory->randomSet(4); // array containing 4 "Post|Proxy" objects
+$factory->randomSet(4, ['author' => 'kevin']); // filter by the passed attributes
+
+// random range of persisted objects
+$factory->randomRange(0, 5); // array containing 0-5 "Post|Proxy" objects
+$factory->randomRange(0, 5, ['author' => 'kevin']); // filter by the passed attributes
+
+// repository proxy wrapping PostRepository (see Repository Proxy section below)
+$factory->repository();
+
 // convenience functions
-$entity = create(OtherEntity::class, ['field' => 'value']);
-$entities = create_many(OtherEntity::class, 5, ['field' => 'value']);
+$entity = create(Post::class, ['field' => 'value']);
+$entities = create_many(Post::class, 5, ['field' => 'value']);
 ```
 
 ### Without Persisting
@@ -825,8 +859,8 @@ in a `Proxy` to optionally save later.
 
 ```php
 use App\Factory\PostFactory;
-use App\Entity\OtherEntity;
-use Zenstruck\Foundry\Factory;
+use App\Entity\Post;
+use Zenstruck\Foundry\AnonymousFactory;
 use function Zenstruck\Foundry\instantiate;
 use function Zenstruck\Foundry\instantiate_many;
 
@@ -839,17 +873,17 @@ $post = PostFactory::new()->withoutPersisting()->create()->object(); // actual P
 $posts = PostFactory::new()->withoutPersisting()->many(5)->create(); // returns Post[]|Proxy[]
 
 // anonymous factories:
-$factory = new Factory(OtherEntity::class);
+$factory = new AnonymousFactory(Post::class);
 
-$entity = $factory->withoutPersisting()->create(['field' => 'value']); // returns OtherEntity|Proxy
+$entity = $factory->withoutPersisting()->create(['field' => 'value']); // returns Post|Proxy
 
-$entity = $factory->withoutPersisting()->create(['field' => 'value'])->object(); // actual OtherEntity object
+$entity = $factory->withoutPersisting()->create(['field' => 'value'])->object(); // actual Post object
 
-$entities = $factory->withoutPersisting()->many(5)->create(['field' => 'value']); // returns OtherEntity[]|Proxy[]
+$entities = $factory->withoutPersisting()->many(5)->create(['field' => 'value']); // returns Post[]|Proxy[]
 
 // convenience functions
-$entity = instantiate(OtherEntity::class, ['field' => 'value']);
-$entities = instantiate_many(OtherEntity::class, 5, ['field' => 'value']);
+$entity = instantiate(Post::class, ['field' => 'value']);
+$entities = instantiate_many(Post::class, 5, ['field' => 'value']);
 ```
 
 If you'd like your model factory to not persist by default, override its `initialize()` method to add this behaviour:

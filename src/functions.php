@@ -9,11 +9,11 @@ use Faker;
  *
  * @template TObject as object
  * @psalm-param class-string<TObject> $class
- * @psalm-return Factory<TObject>
+ * @psalm-return AnonymousFactory<TObject>
  */
-function factory(string $class, $defaultAttributes = []): Factory
+function factory(string $class, $defaultAttributes = []): AnonymousFactory
 {
-    return new Factory($class, $defaultAttributes);
+    return new AnonymousFactory($class, $defaultAttributes);
 }
 
 /**
