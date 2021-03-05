@@ -6,6 +6,7 @@ use Faker;
 
 /**
  * @template TObject as object
+ * @abstract
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
@@ -45,6 +46,10 @@ class Factory
      */
     public function __construct(string $class, $defaultAttributes = [])
     {
+        if (self::class === static::class) {
+            trigger_deprecation('zenstruck/foundry', '1.9', 'Instantiating "%s" directly is deprecated and this class will be abstract in 2.0, use "%s" instead.', self::class, AnonymousFactory::class);
+        }
+
         $this->class = $class;
         $this->attributeSet[] = $defaultAttributes;
     }
