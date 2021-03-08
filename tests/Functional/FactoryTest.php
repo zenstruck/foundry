@@ -3,7 +3,7 @@
 namespace Zenstruck\Foundry\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\AnonymousFactory;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
@@ -114,10 +114,10 @@ final class FactoryTest extends KernelTestCase
      */
     public function creating_with_factory_attribute_persists_the_factory(): void
     {
-        $object = (new Factory(Post::class))->create([
+        $object = (new AnonymousFactory(Post::class))->create([
             'title' => 'title',
             'body' => 'body',
-            'category' => new Factory(Category::class, ['name' => 'name']),
+            'category' => new AnonymousFactory(Category::class, ['name' => 'name']),
         ]);
 
         $this->assertNotNull($object->getCategory()->getId());
