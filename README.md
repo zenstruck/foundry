@@ -321,7 +321,7 @@ $posts = PostFactory::randomRange(0, 5, ['author' => 'kevin']); // filter by the
 
 ### Reusable Model Factory "States"
 
-You can add any methods you want to your model factories (ie static methods that create an object in a certain way) but
+You can add any methods you want to your model factories (i.e. static methods that create an object in a certain way) but
 you can also add *states*:
 
 ```php
