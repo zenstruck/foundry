@@ -530,7 +530,7 @@ final class PostFactory extends ModelFactory
 
 ### Instantiation
 
-By default, objects are instantiated in the normal fashion, but using the object's constructor. Attributes
+By default, objects are instantiated in the normal fashion, by using the object's constructor. Attributes
 that match constructor arguments are used. Remaining attributes are set to the object using Symfony's
 [PropertyAccess](https://symfony.com/doc/current/components/property_access.html) component (setters/public
 properties). Any extra attributes cause an exception to be thrown.
