@@ -535,7 +535,7 @@ that match constructor arguments are used. Remaining attributes are set to the o
 [PropertyAccess](https://symfony.com/doc/current/components/property_access.html) component (setters/public
 properties). Any extra attributes cause an exception to be thrown.
 
-You can customize the instantiator several ways:
+You can customize the instantiator in several ways:
 
 ```php
 use App\Entity\Post;
