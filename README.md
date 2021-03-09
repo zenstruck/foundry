@@ -321,7 +321,7 @@ $posts = PostFactory::randomRange(0, 5, ['author' => 'kevin']); // filter by the
 
 ### Reusable Model Factory "States"
 
-You can add any methods you want to your model factories (ie static methods that create an object in a certain way) but
+You can add any methods you want to your model factories (i.e. static methods that create an object in a certain way) but
 you can also add *states*:
 
 ```php
@@ -530,12 +530,12 @@ final class PostFactory extends ModelFactory
 
 ### Instantiation
 
-By default, objects are instantiated in the normal fashion, but using the object's constructor. Attributes
+By default, objects are instantiated in the normal fashion, by using the object's constructor. Attributes
 that match constructor arguments are used. Remaining attributes are set to the object using Symfony's
 [PropertyAccess](https://symfony.com/doc/current/components/property_access.html) component (setters/public
 properties). Any extra attributes cause an exception to be thrown.
 
-You can customize the instantiator several ways:
+You can customize the instantiator in several ways:
 
 ```php
 use App\Entity\Post;
