@@ -331,6 +331,36 @@ final class ModelFactoryTest extends KernelTestCase
     /**
      * @test
      */
+    public function many_to_one_managed_entity_with_pending_changes(): void
+    {
+        $category = CategoryFactory::createOne(['name' => 'My Category']);
+        $category->setName('New Category Name');
+
+        $post = PostFactory::createOne(['category' => $category]);
+
+        $category->save();
+
+        $this->assertSame('New Category Name', $post->getCategory()->getName());
+    }
+
+    /**
+     * @test
+     */
+    public function many_to_one_managed_raw_entity_with_pending_changes(): void
+    {
+        $category = CategoryFactory::createOne(['name' => 'My Category'])->object();
+        $category->setName('New Category Name');
+
+        $post = PostFactory::createOne(['category' => $category]);
+
+        CategoryFactory::repository()->flush();
+
+        $this->assertSame('New Category Name', $post->getCategory()->getName());
+    }
+
+    /**
+     * @test
+     */
     public function first_and_last_return_the_correct_object(): void
     {
         $categoryA = CategoryFactory::createOne(['name' => '3']);
