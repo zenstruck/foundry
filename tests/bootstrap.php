@@ -6,7 +6,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Stories\TagStory;
 
 require \dirname(__DIR__).'/vendor/autoload.php';
 
-(new Filesystem())->remove(\sys_get_temp_dir().'/zenstruck-foundry');
+(new Filesystem())->remove(__DIR__.'/../var');
 
 TestState::disableDefaultProxyAutoRefresh();
 TestState::addGlobalState(static function() {

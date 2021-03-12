@@ -39,16 +39,6 @@ class Kernel extends BaseKernel
         }
     }
 
-    public function getLogDir(): string
-    {
-        return \sys_get_temp_dir().'/zenstruck-foundry/logs';
-    }
-
-    public function getCacheDir(): string
-    {
-        return \sys_get_temp_dir().'/zenstruck-foundry/cache';
-    }
-
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
     {
         $c->register('logger', NullLogger::class);
