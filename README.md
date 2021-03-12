@@ -241,6 +241,8 @@ final class PostFactory extends ModelFactory
 }
 ```
 
+**TIP**: Using `make:factory --test` will generate the factory in `tests/Factory`!
+
 In the `getDefaults()`, you can return an array of all default values that any new object
 should have. [Faker](#faker) is available to easily get random data:
 
