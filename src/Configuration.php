@@ -29,8 +29,8 @@ final class Configuration
     /** @var callable */
     private $instantiator;
 
-    /** @var bool */
-    private $defaultProxyAutoRefresh = false;
+    /** @var bool|null */
+    private $defaultProxyAutoRefresh;
 
     public function __construct()
     {
@@ -62,6 +62,12 @@ final class Configuration
 
     public function defaultProxyAutoRefresh(): bool
     {
+        if (null === $this->defaultProxyAutoRefresh) {
+            trigger_deprecation('zenstruck\foundry', '1.9', 'Not explicitly configuring the default proxy auto-refresh is deprecated and will default to "true" in 2.0. Use "zenstruck_foundry.auto_refresh_proxies" in the bundle config or TestState::enableDefaultProxyAutoRefresh()/disableDefaultProxyAutoRefresh().');
+
+            $this->defaultProxyAutoRefresh = false;
+        }
+
         return $this->defaultProxyAutoRefresh;
     }
 
@@ -100,9 +106,16 @@ final class Configuration
         return $this;
     }
 
-    public function alwaysAutoRefreshProxies(): self
+    public function enableDefaultProxyAutoRefresh(): self
     {
         $this->defaultProxyAutoRefresh = true;
+
+        return $this;
+    }
+
+    public function disableDefaultProxyAutoRefresh(): self
+    {
+        $this->defaultProxyAutoRefresh = false;
 
         return $this;
     }

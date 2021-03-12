@@ -88,6 +88,12 @@ class Kernel extends BaseKernel
                 ],
             ],
         ]);
+
+        if (\getenv('USE_FOUNDRY_BUNDLE')) {
+            $c->loadFromExtension('zenstruck_foundry', [
+                'auto_refresh_proxies' => false,
+            ]);
+        }
     }
 
     protected function configureRoutes(RouteCollectionBuilder $routes): void

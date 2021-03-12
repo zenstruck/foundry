@@ -1135,7 +1135,8 @@ $post->getTitle(); // "New Title" (equivalent to $post->refresh()->getTitle())
 Without auto-refreshing enabled, the above call to `$post->getTitle()` would return "Original Title".
 
 **NOTE**: A situation you need to be aware of when using auto-refresh is that all methods refresh the object first. If
-changing the object's state via multiple methods (or multiple force-sets), the previous changes will be lost:
+changing the object's state via multiple methods (or multiple force-sets), an "unsaved changes" exception will be
+thrown:
 
 ```php
 use App\Factory\PostFactory;
@@ -1146,11 +1147,7 @@ $post = PostFactory::new(['title' => 'Original Title', 'body' => 'Original Body'
 ;
 
 $post->setTitle('New Title');
-$post->setBody('New Body'); // this causes the object to be refreshed, which means the "New Title" title was replaced by the database contents
-$post->save();
-
-$post->getBody(); // "New Body"
-$post->getTitle(); // "Original Title" !! because the subsequent call to ->setBody() "auto-refreshed" the object
+$post->setBody('New Body'); // exception thrown because of "unsaved changes" to $post from above
 ```
 
 To overcome this, you need to first disable auto-refreshing, then re-enable after making/saving the changes:
@@ -1189,14 +1186,13 @@ $post->forceSetAll([
 $post->save();
 ```
 
-**NOTE**: You can optionally enable auto-refreshing globally to have every proxy auto-refreshable by default. With this
-enabled, you will have to *opt-out* of auto-refreshing as opposed to the default, which is *opt-in*. Be aware of the
-above situation before enabling.
+**NOTE**: You can enable/disable auto-refreshing globally to have every proxy auto-refreshable by default or not. When
+enabled, you will have to *opt-out* of auto-refreshing.
 
 ```yaml
 # config/packages/dev/zenstruck_foundry.yaml (see Bundle Configuration section about sharing this in the test environment)
 zenstruck_foundry:
-    auto_refresh_proxies: true
+    auto_refresh_proxies: true/false
 ```
 
 ### Repository Proxy
@@ -1446,7 +1442,10 @@ Zenstruck\Foundry\Test\TestState::setInstantiator(
 Zenstruck\Foundry\Test\TestState::setFaker(Faker\Factory::create('fr_FR'));
 
 // enable auto-refreshing "globally"
-Zenstruck\Foundry\Test\TestState::alwaysAutoRefreshProxies();
+Zenstruck\Foundry\Test\TestState::enableDefaultProxyAutoRefresh();
+
+// disable auto-refreshing "globally"
+Zenstruck\Foundry\Test\TestState::disableDefaultProxyAutoRefresh();
 ```
 
 **NOTE**: If using [bundle configuration](#bundle-configuration) as well, *test-only configuration* will override the
@@ -1616,7 +1615,7 @@ imports:
 zenstruck_foundry:
 
     # Whether to auto-refresh proxies by default (https://github.com/zenstruck/foundry#auto-refresh)
-    auto_refresh_proxies: false
+    auto_refresh_proxies: true
 
     # Configure faker to be used by your factories.
     faker:

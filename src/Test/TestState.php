@@ -20,8 +20,8 @@ final class TestState
     /** @var Faker\Generator|null */
     private static $faker;
 
-    /** @var bool */
-    private static $alwaysAutoRefreshProxies = false;
+    /** @var bool|null */
+    private static $defaultProxyAutoRefresh;
 
     /** @var callable[] */
     private static $globalStates = [];
@@ -36,9 +36,24 @@ final class TestState
         self::$faker = $faker;
     }
 
+    public static function enableDefaultProxyAutoRefresh(): void
+    {
+        self::$defaultProxyAutoRefresh = true;
+    }
+
+    public static function disableDefaultProxyAutoRefresh(): void
+    {
+        self::$defaultProxyAutoRefresh = false;
+    }
+
+    /**
+     * @deprecated Use TestState::enableDefaultProxyAutoRefresh()
+     */
     public static function alwaysAutoRefreshProxies(): void
     {
-        self::$alwaysAutoRefreshProxies = true;
+        trigger_deprecation('zenstruck\foundry', '1.9', 'TestState::alwaysAutoRefreshProxies() is deprecated, use TestState::enableDefaultProxyAutoRefresh().');
+
+        self::enableDefaultProxyAutoRefresh();
     }
 
     /**
@@ -66,8 +81,10 @@ final class TestState
             $configuration->setFaker(self::$faker);
         }
 
-        if (self::$alwaysAutoRefreshProxies) {
-            $configuration->alwaysAutoRefreshProxies();
+        if (true === self::$defaultProxyAutoRefresh) {
+            $configuration->enableDefaultProxyAutoRefresh();
+        } elseif (false === self::$defaultProxyAutoRefresh) {
+            $configuration->disableDefaultProxyAutoRefresh();
         }
 
         Factory::boot($configuration);

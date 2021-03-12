@@ -18,7 +18,7 @@ final class Configuration implements ConfigurationInterface
             ->children()
                 ->booleanNode('auto_refresh_proxies')
                     ->info('Whether to auto-refresh proxies by default (https://github.com/zenstruck/foundry#auto-refresh)')
-                    ->defaultFalse()
+                    ->defaultNull()
                 ->end()
                 ->arrayNode('faker')
                     ->addDefaultsIfNotSet()

@@ -8,6 +8,7 @@ require \dirname(__DIR__).'/vendor/autoload.php';
 
 (new Filesystem())->remove(\sys_get_temp_dir().'/zenstruck-foundry');
 
+TestState::disableDefaultProxyAutoRefresh();
 TestState::addGlobalState(static function() {
     TagStory::load();
 });
