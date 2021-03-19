@@ -62,6 +62,10 @@ final class Configuration
 
     public function defaultProxyAutoRefresh(): bool
     {
+        if (!$this->hasManagerRegistry()) {
+            return false;
+        }
+
         if (null === $this->defaultProxyAutoRefresh) {
             trigger_deprecation('zenstruck\foundry', '1.9', 'Not explicitly configuring the default proxy auto-refresh is deprecated and will default to "true" in 2.0. Use "zenstruck_foundry.auto_refresh_proxies" in the bundle config or TestState::enableDefaultProxyAutoRefresh()/disableDefaultProxyAutoRefresh().');
 
