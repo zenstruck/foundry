@@ -1007,6 +1007,7 @@ public function test_can_post_a_comment(): void
 Add the `Factories` trait for tests using factories:
 
 ```php
+use App\Factory\PostFactory;
 use Zenstruck\Foundry\Test\Factories;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -1016,24 +1017,7 @@ class MyTest extends WebTestCase
 
     public function test_1(): void
     {
-        // if using the test client, create before creating factories
-        // (creating the client requires the kernel be shutdown and creating
-        // factories boots the kernel)
-        $client = self::createClient();
-
         $post = PostFactory::createOne();
-
-        // ...
-    }
-
-    public function test_2(): void
-    {
-        $post = PostFactory::createOne();
-
-        // if you want to create your factories before creating the client,
-        // you will need to shut down the kernel first.
-        self::ensureKernelShutdown();
-        $client = self::createClient();
 
         // ...
     }
