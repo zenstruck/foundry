@@ -4,7 +4,6 @@ namespace Zenstruck\Foundry\Tests\Fixtures;
 
 use DAMA\DoctrineTestBundle\DAMADoctrineTestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
-use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\MakerBundle\MakerBundle;
@@ -41,8 +40,6 @@ class Kernel extends BaseKernel
 
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
     {
-        $c->register('logger', NullLogger::class);
-
         $c->register(Service::class);
         $c->register(ServiceStory::class)
             ->setAutoconfigured(true)
