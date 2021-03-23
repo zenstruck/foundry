@@ -84,6 +84,18 @@ jobs:
           USE_FOUNDRY_BUNDLE: 1
           DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
+      - name: 'Test: MySQL, DoctrineMigrationsBundle'
+        run: vendor/bin/simple-phpunit -v
+        env:
+          FOUNDRY_RESET_MODE: migrate
+          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+
+      - name: 'Test: MySQL, DoctrineMigrationsBundle, DAMABundle'
+        run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
+        env:
+          FOUNDRY_RESET_MODE: migrate
+          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+
       - name: 'Test: PostgreSQL'
         run: vendor/bin/simple-phpunit -v
         env:
@@ -187,6 +199,18 @@ jobs:
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-foundry-dama.clover --configuration phpunit-dama-doctrine.xml.dist
         env:
           USE_FOUNDRY_BUNDLE: 1
+          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+
+      - name: 'Test: MySQL, DoctrineMigrationsBundle'
+        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-migrations.clover
+        env:
+          FOUNDRY_RESET_MODE: migrate
+          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+
+      - name: 'Test: MySQL, DoctrineMigrationsBundle, DAMABundle'
+        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-migrations-dama.clover --configuration phpunit-dama-doctrine.xml.dist
+        env:
+          FOUNDRY_RESET_MODE: migrate
           DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Coverage: PostgreSQL'

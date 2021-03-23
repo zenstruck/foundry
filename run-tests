@@ -21,3 +21,13 @@ echo "Running with FoundryBundle and with DamaDoctrineTestBundle"
 echo "=========================================================="
 echo ""
 USE_FOUNDRY_BUNDLE=1 vendor/bin/simple-phpunit -c phpunit-dama-doctrine.xml
+
+echo "Running with DoctineMigrationsBundle and without DamaDoctrineTestBundle"
+echo "======================================================================="
+echo ""
+USE_FOUNDRY_BUNDLE=0 FOUNDRY_RESET_MODE=migrate vendor/bin/simple-phpunit
+
+echo "Running with DoctineMigrationsBundle and with DamaDoctrineTestBundle"
+echo "===================================================================="
+echo ""
+USE_FOUNDRY_BUNDLE=0 FOUNDRY_RESET_MODE=migrate vendor/bin/simple-phpunit -c phpunit-dama-doctrine.xml

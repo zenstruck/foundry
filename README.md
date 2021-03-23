@@ -43,24 +43,25 @@ Want to watch a screencast 🎥 about it? Check out https://symfonycasts.com/fou
 4. [Using with DoctrineFixturesBundle](#using-with-doctrinefixturesbundle)
 5. [Using in your Tests](#using-in-your-tests)
     1. [Enable Foundry in your TestCase](#enable-foundry-in-your-testcase)
-    2. [Object Proxy](#object-proxy)
+    2. [Database Reset](#database-reset)
+    3. [Object Proxy](#object-proxy)
         1. [Force Setting](#force-setting)
         2. [Auto-Refresh](#auto-refresh)
-    3. [Repository Proxy](#repository-proxy)
-    4. [Assertions](#assertions)
-    5. [Global State](#global-state)
-    6. [PHPUnit Data Providers](#phpunit-data-providers)
-    7. [Performance](#performance)
+    4. [Repository Proxy](#repository-proxy)
+    5. [Assertions](#assertions)
+    6. [Global State](#global-state)
+    7. [PHPUnit Data Providers](#phpunit-data-providers)
+    8. [Performance](#performance)
         1. [DAMADoctrineTestBundle](#damadoctrinetestbundle)
         2. [Miscellaneous](#miscellaneous)
-    8. [Non-Kernel Test](#non-kernel-tests)
-    9. [Test-Only Configuration](#test-only-configuration)
-    10. [Using without the Bundle](#using-without-the-bundle)
-7. [Stories](#stories)
+    9. [Non-Kernel Test](#non-kernel-tests)
+    10. [Test-Only Configuration](#test-only-configuration)
+    11. [Using without the Bundle](#using-without-the-bundle)
+6. [Stories](#stories)
     1. [Stories as Services](#stories-as-services)
     2. [Story State](#story-state)
-8. [Bundle Configuration](#bundle-configuration)
-9. [Credit](#credit)
+7. [Bundle Configuration](#bundle-configuration)
+8. [Credit](#credit)
 
 ## Installation
 
@@ -1024,8 +1025,10 @@ class MyTest extends WebTestCase
 }
 ```
 
-This library requires that your database be reset before each test. The packaged `ResetDatabase` trait handles this for
-you. Before the first test, it drops (if exists) and creates the test database. Before each test, it resets the schema.
+### Database Reset
+
+This library requires that your database be reset before each test. The packaged `ResetDatabase` trait handles
+this for you.
 
 ```php
 use Zenstruck\Foundry\Test\Factories;
@@ -1039,6 +1042,15 @@ class MyTest extends WebTestCase
     // ...
 }
 ```
+
+Before the first test using the `ResetDatabase` trait, it drops (if exists) and creates the test database.
+Then, by default, before each test, it resets the schema using `doctrine:schema:drop`/`doctrine:schema:create`.
+
+Alternatively, you can have it run your migrations instead by setting the env variable `FOUNDRY_RESET_MODE=migrate`
+(in your `.env.test`). When using this *mode*, before each test, the database is dropped/created and your migrations
+run (via `doctrine:migrations:migrate`). This mode can really make your test suite slow (especially if you have a lot
+of migrations). It is highly recommended to use [DamaDoctrineTestBundle](#damadoctrinetestbundle) to improve the
+speed. When this bundle is enabled, the database is dropped/created and migrated only once for the suite.
 
 **TIP**: Create a base TestCase for tests using factories to avoid adding the traits to every TestCase.
 
