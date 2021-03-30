@@ -266,7 +266,7 @@ jobs:
         with:
           php-version: 7.4
           coverage: none
-          tools: php-cs-fixer
+          tools: php-cs-fixer:2.18.3
 
       - name: Check CS
         run: php-cs-fixer fix --dry-run --diff --diff-format=udiff
