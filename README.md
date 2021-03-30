@@ -494,7 +494,7 @@ You can also add hooks directly in your model factory class:
 protected function initialize(): self
 {
     return $this
-        ->beforePersist(function() {})
+        ->afterPersist(function() {})
     ;
 }
 ```
