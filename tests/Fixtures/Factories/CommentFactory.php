@@ -11,8 +11,8 @@ final class CommentFactory extends ModelFactory
     {
         return [
             'user' => UserFactory::new(),
-            'body' => self::faker()->sentence,
-            'created_at' => self::faker()->dateTime,
+            'body' => self::faker()->sentence(),
+            'created_at' => self::faker()->dateTime(),
             'post' => PostFactory::new(),
         ];
     }

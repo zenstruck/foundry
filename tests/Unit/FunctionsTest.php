@@ -31,7 +31,7 @@ final class FunctionsTest extends TestCase
      */
     public function faker(): void
     {
-        $this->assertIsString(faker()->name);
+        $this->assertIsString(faker()->name());
     }
 
     /**

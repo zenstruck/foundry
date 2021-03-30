@@ -252,8 +252,8 @@ protected function getDefaults(): array
     return [
         // Symfony's property-access component is used to populate the properties
         // this means that setTitle() will be called or you can have a $title constructor argument
-        'title' => self::faker()->unique()->sentence,
-        'body' => self::faker()->sentence,
+        'title' => self::faker()->unique()->sentence(),
+        'body' => self::faker()->sentence(),
     ];
 }
 ```
@@ -339,7 +339,7 @@ final class PostFactory extends ModelFactory
     public function published(): self
     {
         // call setPublishedAt() and pass a random DateTime
-        return $this->addState(['published_at' => self::faker()->dateTime]);
+        return $this->addState(['published_at' => self::faker()->dateTime()]);
     }
 
     public function unpublished(): self
@@ -402,7 +402,7 @@ $posts = PostFactory::new(['title' => 'Post A'])
         // Proxies are automatically converted to their wrapped object
         'category' => CategoryFactory::createOne(),
     ])
-    ->withAttributes(function() { return ['createdAt' => faker()->dateTime]; }) // see faker section below
+    ->withAttributes(function() { return ['createdAt' => faker()->dateTime()]; }) // see faker section below
 
     // create "2" Post's
     ->many(2)->create(['title' => 'Different Title'])
@@ -430,10 +430,10 @@ random data for your factories:
 use Zenstruck\Foundry\Factory;
 use function Zenstruck\Foundry\faker;
 
-Factory::faker()->name; // random name
+Factory::faker()->name(); // random name
 
 // alternatively, use the helper function
-faker()->email; // random email
+faker()->email(); // random email
 ```
 
 **NOTE**: You can register your own `Faker\Generator`:
@@ -753,7 +753,7 @@ final class UserFactory extends ModelFactory
     protected function getDefaults(): array
     {
         return [
-            'email' => self::faker()->unique()->safeEmail,
+            'email' => self::faker()->unique()->safeEmail(),
             'password' => '1234',
         ];
     }

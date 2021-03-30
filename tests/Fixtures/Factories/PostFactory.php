@@ -13,7 +13,7 @@ class PostFactory extends ModelFactory
     public function published(): self
     {
         return $this->addState(function() {
-            return ['published_at' => self::faker()->dateTime];
+            return ['published_at' => self::faker()->dateTime()];
         });
     }
 
@@ -25,8 +25,8 @@ class PostFactory extends ModelFactory
     protected function getDefaults(): array
     {
         return [
-            'title' => self::faker()->sentence,
-            'body' => self::faker()->sentence,
+            'title' => self::faker()->sentence(),
+            'body' => self::faker()->sentence(),
         ];
     }
 }

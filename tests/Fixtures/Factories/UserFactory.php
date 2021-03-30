@@ -10,7 +10,7 @@ final class UserFactory extends ModelFactory
     protected function getDefaults(): array
     {
         return [
-            'name' => self::faker()->name,
+            'name' => self::faker()->name(),
         ];
     }
 
