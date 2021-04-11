@@ -733,7 +733,7 @@ common use-case: encoding a password with the `UserPasswordEncoderInterface` ser
 ```php
 // src/Factory/UserFactory.php
 
-namespace App\Story;
+namespace App\Factory;
 
 use App\Entity\User;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
