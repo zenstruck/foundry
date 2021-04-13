@@ -3,6 +3,7 @@
 namespace Zenstruck\Foundry\Test;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\ChainManagerRegistry;
 use Zenstruck\Foundry\Factory;
 
 /**
@@ -29,13 +30,15 @@ trait Factories
 
         TestState::bootFromContainer($kernel->getContainer());
         Factory::configuration()->setManagerRegistry(
-            new LazyManagerRegistry(static function() {
-                if (!static::$booted) {
-                    static::bootKernel();
-                }
+            new LazyManagerRegistry(
+                static function () {
+                    if (!static::$booted) {
+                        static::bootKernel();
+                    }
 
-                return static::$kernel->getContainer()->get('doctrine');
-            })
+                    return static::$kernel->getContainer()->get(ChainManagerRegistry::class);
+                }
+            )
         );
 
         $kernel->shutdown();

@@ -5,6 +5,7 @@ namespace Zenstruck\Foundry\Test;
 use Faker;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Zenstruck\Foundry\ChainManagerRegistry;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\StoryManager;
@@ -122,7 +123,7 @@ final class TestState
         $configuration = new Configuration();
 
         try {
-            $configuration->setManagerRegistry($container->get('doctrine'));
+            $configuration->setManagerRegistry($container->get(ChainManagerRegistry::class));
         } catch (NotFoundExceptionInterface $e) {
             throw new \LogicException('Could not boot Foundry, is the DoctrineBundle installed/configured?', 0, $e);
         }

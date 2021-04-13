@@ -128,7 +128,7 @@ final class MakeFactory extends AbstractMaker
         \sort($choices);
 
         if (empty($choices)) {
-            throw new RuntimeCommandException('No entities found.');
+            throw new RuntimeCommandException('No entities or documents found.');
         }
 
         return $choices;
