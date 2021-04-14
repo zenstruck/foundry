@@ -6,30 +6,33 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 
-class ChainManagerRegistry implements ManagerRegistry
+/**
+ * @internal
+ */
+final class ChainManagerRegistry implements ManagerRegistry
 {
-    /** @var array<ManagerRegistry> */
+    /** @var list<ManagerRegistry> */
     private $managerRegistries;
 
-    /** @param array<ManagerRegistry> $managerRegistries */
+    /** @param list<ManagerRegistry> $managerRegistries */
     public function __construct(array $managerRegistries)
     {
-        if (count($managerRegistries) === 0) {
+        if (0 === \count($managerRegistries)) {
             throw new \InvalidArgumentException('no manager registry provided');
         }
 
         $this->managerRegistries = $managerRegistries;
     }
 
-    public function getRepository($class, $persistentManagerName = null): ObjectRepository
+    public function getRepository($persistentObject, $persistentManagerName = null): ObjectRepository
     {
         foreach ($this->managerRegistries as $managerRegistry) {
-            if ($repository = $managerRegistry->getRepository($class)) {
+            if ($repository = $managerRegistry->getRepository($persistentObject, $persistentManagerName)) {
                 return $repository;
             }
         }
 
-        throw new \LogicException("Cannot find repository for class $class");
+        throw new \LogicException("Cannot find repository for class {$persistentObject}");
     }
 
     public function getManagerForClass($class): ?ObjectManager
@@ -45,10 +48,10 @@ class ChainManagerRegistry implements ManagerRegistry
 
     public function getManagers(): array
     {
-        return array_reduce(
+        return \array_reduce(
             $this->managerRegistries,
-            static function (array $carry, ManagerRegistry $managerRegistry) {
-                return array_merge($carry, $managerRegistry->getManagers());
+            static function(array $carry, ManagerRegistry $managerRegistry) {
+                return \array_merge($carry, $managerRegistry->getManagers());
             },
             []
         );

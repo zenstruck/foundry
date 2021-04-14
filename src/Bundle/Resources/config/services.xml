@@ -45,7 +45,8 @@
             <tag name="maker.command" />
         </service>
 
-        <service id="Zenstruck\Foundry\ChainManagerRegistry" public="true">
+        <service id="Zenstruck\Foundry\ChainManagerRegistry">
+            <argument/> <!-- list<ManagerRegistry> set by compiler pass -->
         </service>
     </services>
 </container>
