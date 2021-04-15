@@ -4,6 +4,7 @@ namespace Zenstruck\Foundry\Tests\Fixtures;
 
 use DAMA\DoctrineTestBundle\DAMADoctrineTestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\MakerBundle\MakerBundle;
@@ -35,6 +36,10 @@ class Kernel extends BaseKernel
 
         if (\getenv('USE_DAMA_DOCTRINE_TEST_BUNDLE')) {
             yield new DAMADoctrineTestBundle();
+        }
+
+        if (\getenv('MONGO_URL')) {
+            yield new DoctrineMongoDBBundle();
         }
     }
 
@@ -79,6 +84,18 @@ class Kernel extends BaseKernel
         if (\getenv('USE_FOUNDRY_BUNDLE')) {
             $c->loadFromExtension('zenstruck_foundry', [
                 'auto_refresh_proxies' => false,
+            ]);
+        }
+
+        if (\getenv('MONGO_URL')) {
+            $c->loadFromExtension('doctrine_mongodb', [
+                'connections' => [
+                    'default' => ['server' => '%env(resolve:MONGO_URL)%'],
+                ],
+                'default_database' => 'mongo',
+                'document_managers' => [
+                    'default' => ['auto_mapping' => true],
+                ],
             ]);
         }
     }

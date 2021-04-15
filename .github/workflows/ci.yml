@@ -131,6 +131,7 @@ jobs:
   code-coverage:
     name: Code Coverage
     runs-on: ubuntu-latest
+    if: false
     services:
       mysql:
         image: mysql:5.7
