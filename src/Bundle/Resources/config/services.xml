@@ -12,7 +12,7 @@
 
         <service id="Zenstruck\Foundry\Configuration" public="true">
             <call method="setManagerRegistry">
-                <argument type="service" id="doctrine" />
+                <argument type="service" id="Zenstruck\Foundry\ChainManagerRegistry" />
             </call>
             <call method="setStoryManager">
                 <argument type="service" id="Zenstruck\Foundry\StoryManager" />
@@ -37,13 +37,17 @@
         </service>
 
         <service id="Zenstruck\Foundry\Bundle\Maker\MakeFactory">
-            <argument type="service" id="doctrine" />
+            <argument type="service" id="Zenstruck\Foundry\ChainManagerRegistry" />
             <argument type="tagged_iterator" tag="foundry.factory" />
             <tag name="maker.command" />
         </service>
 
         <service id="Zenstruck\Foundry\Bundle\Maker\MakeStory">
             <tag name="maker.command" />
+        </service>
+
+        <service id="Zenstruck\Foundry\ChainManagerRegistry">
+            <argument/> <!-- list<ManagerRegistry> set by compiler pass -->
         </service>
     </services>
 </container>
