@@ -2,9 +2,11 @@
 
 namespace Zenstruck\Foundry\Test;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Faker;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Zenstruck\Foundry\ChainManagerRegistry;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\StoryManager;
@@ -122,12 +124,35 @@ final class TestState
         $configuration = new Configuration();
 
         try {
-            $configuration->setManagerRegistry($container->get('doctrine'));
+            $configuration->setManagerRegistry(self::initializeChainManagerRegistry($container));
         } catch (NotFoundExceptionInterface $e) {
             throw new \LogicException('Could not boot Foundry, is the DoctrineBundle installed/configured?', 0, $e);
         }
 
         self::bootFoundry($configuration);
+    }
+
+    /**
+     * @internal
+     */
+    public static function initializeChainManagerRegistry(ContainerInterface $container): ChainManagerRegistry
+    {
+        /** @var list<ManagerRegistry> $managerRegistries */
+        $managerRegistries = [];
+
+        if ($container->has('doctrine')) {
+            $managerRegistries[] = $container->get('doctrine');
+        }
+
+        if ($container->has('doctrine_mongodb')) {
+            $managerRegistries[] = $container->get('doctrine_mongodb');
+        }
+
+        if (0 === \count($managerRegistries)) {
+            throw new \LogicException('Neither doctrine/orm nor doctrine/mongodb-odm are present.');
+        }
+
+        return new ChainManagerRegistry($managerRegistries);
     }
 
     /**
