@@ -8,6 +8,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Zenstruck\Foundry\Bundle\DependencyInjection\ZenstruckFoundryExtension;
 use Zenstruck\Foundry\Bundle\Maker\MakeFactory;
 use Zenstruck\Foundry\Bundle\Maker\MakeStory;
+use Zenstruck\Foundry\ChainManagerRegistry;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Instantiator;
 use Zenstruck\Foundry\ModelFactoryManager;
@@ -28,7 +29,7 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
         $this->assertContainerBuilderHasService(Configuration::class);
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'setInstantiator', ['zenstruck_foundry.default_instantiator']);
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'setFaker', ['zenstruck_foundry.faker']);
-        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'setManagerRegistry', ['doctrine']);
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'setManagerRegistry', [ChainManagerRegistry::class]);
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'setStoryManager', [StoryManager::class]);
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'setModelFactoryManager', [ModelFactoryManager::class]);
         $this->assertCount(5, $this->container->findDefinition(Configuration::class)->getMethodCalls());

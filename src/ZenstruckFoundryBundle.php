@@ -2,8 +2,10 @@
 
 namespace Zenstruck\Foundry;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Zenstruck\Foundry\Bundle\DependencyInjection\ChainManagerRegistryPass;
 use Zenstruck\Foundry\Bundle\DependencyInjection\ZenstruckFoundryExtension;
 
 /**
@@ -18,6 +20,13 @@ final class ZenstruckFoundryBundle extends Bundle
         if (!Factory::isBooted()) {
             Factory::boot($this->container->get(Configuration::class));
         }
+    }
+
+    public function build(ContainerBuilder $container): void
+    {
+        parent::build($container);
+
+        $container->addCompilerPass(new ChainManagerRegistryPass());
     }
 
     protected function createContainerExtension(): ?ExtensionInterface
