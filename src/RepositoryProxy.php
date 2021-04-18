@@ -196,8 +196,9 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
             return;
         }
 
-        foreach ($this as $object) {
-            $om->remove($object);
+        // todo: use a better way to truncate mongo collections
+        foreach ($this as $proxy) {
+            $om->remove($proxy->object());
         }
 
         $om->flush();

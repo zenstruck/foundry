@@ -24,13 +24,16 @@ final class ODMSchemaResetter extends AbstractSchemaResetter
     public function resetSchema(): void
     {
         foreach ($this->objectManagersToReset() as $manager) {
-            $this->runCommand(
-                $this->application,
-                'doctrine:mongodb:schema:drop',
-                [
-                    '--dm' => $manager,
-                ]
-            );
+            try {
+                $this->runCommand(
+                    $this->application,
+                    'doctrine:mongodb:schema:drop',
+                    [
+                        '--dm' => $manager,
+                    ]
+                );
+            } catch (\Exception $e) {
+            }
 
             $this->runCommand(
                 $this->application,

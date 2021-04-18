@@ -27,7 +27,11 @@ class Kernel extends BaseKernel
     public function registerBundles(): iterable
     {
         yield new FrameworkBundle();
-        yield new DoctrineBundle();
+
+        if (\getenv('DATABASE_URL')) {
+            yield new DoctrineBundle();
+        }
+
         yield new MakerBundle();
 
         if (\getenv('USE_FOUNDRY_BUNDLE')) {
@@ -64,22 +68,27 @@ class Kernel extends BaseKernel
             'test' => true,
         ]);
 
-        $c->loadFromExtension('doctrine', [
-            'dbal' => ['url' => '%env(resolve:DATABASE_URL)%'],
-            'orm' => [
-                'auto_generate_proxy_classes' => true,
-                'auto_mapping' => true,
-                'mappings' => [
-                    'Test' => [
-                        'is_bundle' => false,
-                        'type' => 'annotation',
-                        'dir' => '%kernel.project_dir%/tests/Fixtures/Entity',
-                        'prefix' => 'Zenstruck\Foundry\Tests\Fixtures\Entity',
-                        'alias' => 'Test',
+        if (\getenv('DATABASE_URL')) {
+            $c->loadFromExtension(
+                'doctrine',
+                [
+                    'dbal' => ['url' => '%env(resolve:DATABASE_URL)%'],
+                    'orm' => [
+                        'auto_generate_proxy_classes' => true,
+                        'auto_mapping' => true,
+                        'mappings' => [
+                            'Test' => [
+                                'is_bundle' => false,
+                                'type' => 'annotation',
+                                'dir' => '%kernel.project_dir%/tests/Fixtures/Entity',
+                                'prefix' => 'Zenstruck\Foundry\Tests\Fixtures\Entity',
+                                'alias' => 'Test',
+                            ],
+                        ],
                     ],
-                ],
-            ],
-        ]);
+                ]
+            );
+        }
 
         if (\getenv('USE_FOUNDRY_BUNDLE')) {
             $c->loadFromExtension('zenstruck_foundry', [
@@ -94,7 +103,18 @@ class Kernel extends BaseKernel
                 ],
                 'default_database' => 'mongo',
                 'document_managers' => [
-                    'default' => ['auto_mapping' => true],
+                    'default' => [
+                        'auto_mapping' => true,
+                        'mappings' => [
+                            'Test' => [
+                                'is_bundle' => false,
+                                'type' => 'annotation',
+                                'dir' => '%kernel.project_dir%/tests/Fixtures/Document',
+                                'prefix' => 'Zenstruck\Foundry\Tests\Fixtures\Document',
+                                'alias' => 'Test',
+                            ],
+                        ],
+                    ],
                 ],
             ]);
         }
