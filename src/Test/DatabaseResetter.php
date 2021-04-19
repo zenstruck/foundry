@@ -34,11 +34,6 @@ final class DatabaseResetter
         return \class_exists(StaticDriver::class) && StaticDriver::isKeepStaticConnections();
     }
 
-    public static function isResetUsingMigrations(): bool
-    {
-        return 'migrate' === ($_SERVER['FOUNDRY_RESET_MODE'] ?? 'schema');
-    }
-
     public static function resetDatabase(KernelInterface $kernel): void
     {
         $application = self::createApplication($kernel);
@@ -57,6 +52,11 @@ final class DatabaseResetter
 
         self::dropSchema($application, $registry);
         self::createSchema($application, $registry);
+    }
+
+    private static function isResetUsingMigrations(): bool
+    {
+        return 'migrate' === ($_SERVER['FOUNDRY_RESET_MODE'] ?? 'schema');
     }
 
     private static function dropAndCreateDatabase(Application $application, ManagerRegistry $registry): void
