@@ -36,7 +36,7 @@ final class DatabaseResetter
 
     public static function isResetUsingMigrations(): bool
     {
-        return 'migrate' === ($_SERVER['FOUNDRY_RESET_MODE'] ?? null);
+        return 'migrate' === ($_SERVER['FOUNDRY_RESET_MODE'] ?? 'schema');
     }
 
     public static function resetDatabase(KernelInterface $kernel): void
