@@ -39,21 +39,7 @@ final class DatabaseResetter
         $application = self::createApplication($kernel);
         $registry = $kernel->getContainer()->get('doctrine');
 
-        foreach (self::connectionsToReset($registry) as $connection) {
-            $dropParams = ['--connection' => $connection, '--force' => true];
-
-            if ('sqlite' !== $registry->getConnection($connection)->getDatabasePlatform()->getName()) {
-                // sqlite does not support "--if-exists" (ref: https://github.com/doctrine/dbal/pull/2402)
-                $dropParams['--if-exists'] = true;
-            }
-
-            self::runCommand($application, 'doctrine:database:drop', $dropParams);
-
-            self::runCommand($application, 'doctrine:database:create', [
-                '--connection' => $connection,
-            ]);
-        }
-
+        self::dropAndCreateDatabase($application, $registry);
         self::createSchema($application, $registry);
 
         self::$hasBeenReset = true;
@@ -68,12 +54,39 @@ final class DatabaseResetter
         self::createSchema($application, $registry);
     }
 
+    private static function isResetUsingMigrations(): bool
+    {
+        return 'migrate' === ($_SERVER['FOUNDRY_RESET_MODE'] ?? 'schema');
+    }
+
+    private static function dropAndCreateDatabase(Application $application, ManagerRegistry $registry): void
+    {
+        foreach (self::connectionsToReset($registry) as $connection) {
+            $dropParams = ['--connection' => $connection, '--force' => true];
+
+            if ('sqlite' !== $registry->getConnection($connection)->getDatabasePlatform()->getName()) {
+                // sqlite does not support "--if-exists" (ref: https://github.com/doctrine/dbal/pull/2402)
+                $dropParams['--if-exists'] = true;
+            }
+
+            self::runCommand($application, 'doctrine:database:drop', $dropParams);
+
+            self::runCommand($application, 'doctrine:database:create', [
+                '--connection' => $connection,
+            ]);
+        }
+    }
+
     private static function createSchema(Application $application, ManagerRegistry $registry): void
     {
-        foreach (self::objectManagersToReset($registry) as $manager) {
-            self::runCommand($application, 'doctrine:schema:create', [
-                '--em' => $manager,
-            ]);
+        if (self::isResetUsingMigrations()) {
+            self::runCommand($application, 'doctrine:migrations:migrate', ['-n' => true]);
+        } else {
+            foreach (self::objectManagersToReset($registry) as $manager) {
+                self::runCommand($application, 'doctrine:schema:create', [
+                    '--em' => $manager,
+                ]);
+            }
         }
 
         if (!Factory::isBooted()) {
@@ -85,6 +98,12 @@ final class DatabaseResetter
 
     private static function dropSchema(Application $application, ManagerRegistry $registry): void
     {
+        if (self::isResetUsingMigrations()) {
+            self::dropAndCreateDatabase($application, $registry);
+
+            return;
+        }
+
         foreach (self::objectManagersToReset($registry) as $manager) {
             self::runCommand($application, 'doctrine:schema:drop', [
                 '--em' => $manager,

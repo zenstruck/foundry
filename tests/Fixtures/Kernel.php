@@ -4,6 +4,7 @@ namespace Zenstruck\Foundry\Tests\Fixtures;
 
 use DAMA\DoctrineTestBundle\DAMADoctrineTestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\MakerBundle\MakerBundle;
@@ -35,6 +36,10 @@ class Kernel extends BaseKernel
 
         if (\getenv('USE_DAMA_DOCTRINE_TEST_BUNDLE')) {
             yield new DAMADoctrineTestBundle();
+        }
+
+        if ('migrate' === \getenv('FOUNDRY_RESET_MODE')) {
+            yield new DoctrineMigrationsBundle();
         }
     }
 
@@ -79,6 +84,14 @@ class Kernel extends BaseKernel
         if (\getenv('USE_FOUNDRY_BUNDLE')) {
             $c->loadFromExtension('zenstruck_foundry', [
                 'auto_refresh_proxies' => false,
+            ]);
+        }
+
+        if ('migrate' === \getenv('FOUNDRY_RESET_MODE')) {
+            $c->loadFromExtension('doctrine_migrations', [
+                'migrations_paths' => [
+                    'Zenstruck\Foundry\Tests\Fixtures\Migrations' => '%kernel.project_dir%/tests/Fixtures/Migrations',
+                ],
             ]);
         }
     }
