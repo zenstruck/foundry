@@ -3,6 +3,7 @@
 namespace Zenstruck\Foundry;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\MappingException;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 
@@ -27,8 +28,12 @@ final class ChainManagerRegistry implements ManagerRegistry
     public function getRepository($persistentObject, $persistentManagerName = null): ObjectRepository
     {
         foreach ($this->managerRegistries as $managerRegistry) {
-            if ($repository = $managerRegistry->getRepository($persistentObject, $persistentManagerName)) {
-                return $repository;
+            try {
+                if ($repository = $managerRegistry->getRepository($persistentObject, $persistentManagerName)) {
+                    return $repository;
+                }
+            } catch (MappingException $exception) {
+                // the class is not managed by the current manager
             }
         }
 
@@ -51,7 +56,7 @@ final class ChainManagerRegistry implements ManagerRegistry
         return \array_reduce(
             $this->managerRegistries,
             static function(array $carry, ManagerRegistry $managerRegistry) {
-                return \array_merge($carry, $managerRegistry->getManagers());
+                return \array_merge($carry, \array_values($managerRegistry->getManagers()));
             },
             []
         );

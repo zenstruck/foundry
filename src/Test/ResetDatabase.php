@@ -50,11 +50,6 @@ trait ResetDatabase
      */
     public static function _resetSchema(): void
     {
-        if (DatabaseResetter::isDAMADoctrineTestBundleEnabled()) {
-            // not required as the DAMADoctrineTestBundle wraps each test in a transaction
-            return;
-        }
-
         if (!\is_subclass_of(static::class, KernelTestCase::class)) {
             throw new \RuntimeException(\sprintf('The "%s" trait can only be used on TestCases that extend "%s".', __TRAIT__, KernelTestCase::class));
         }
