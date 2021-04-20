@@ -2,26 +2,21 @@
 
 namespace Zenstruck\Foundry\Tests\Functional;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
-use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\AddressFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CommentFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ContactFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithInvalidInitialize;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithNullInitialize;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithValidInitialize;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\TagFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\UserFactory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class ModelFactoryTest extends KernelTestCase
+abstract class ModelFactoryTest extends KernelTestCase
 {
     use ContainerBC, Factories, ResetDatabase;
 
@@ -30,42 +25,13 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function can_find_or_create(): void
     {
-        CategoryFactory::assert()->count(0);
-        CategoryFactory::findOrCreate(['name' => 'php']);
-        CategoryFactory::assert()->count(1);
-        CategoryFactory::findOrCreate(['name' => 'php']);
-        CategoryFactory::assert()->count(1);
-    }
+        $categoryFactoryClass = $this->categoryFactoryClass();
 
-    /**
-     * @test
-     */
-    public function can_override_initialize(): void
-    {
-        $this->assertFalse(PostFactory::createOne()->isPublished());
-        $this->assertTrue(PostFactoryWithValidInitialize::createOne()->isPublished());
-    }
-
-    /**
-     * @test
-     */
-    public function initialize_must_return_an_instance_of_the_current_factory(): void
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage(\sprintf('"%1$s::initialize()" must return an instance of "%1$s".', PostFactoryWithInvalidInitialize::class));
-
-        PostFactoryWithInvalidInitialize::new();
-    }
-
-    /**
-     * @test
-     */
-    public function initialize_must_return_a_value(): void
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage(\sprintf('"%1$s::initialize()" must return an instance of "%1$s".', PostFactoryWithNullInitialize::class));
-
-        PostFactoryWithNullInitialize::new();
+        $categoryFactoryClass::assert()->count(0);
+        $categoryFactoryClass::findOrCreate(['name' => 'php']);
+        $categoryFactoryClass::assert()->count(1);
+        $categoryFactoryClass::findOrCreate(['name' => 'php']);
+        $categoryFactoryClass::assert()->count(1);
     }
 
     /**
@@ -73,12 +39,14 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function can_find_random_object(): void
     {
-        CategoryFactory::createMany(5);
+        $categoryFactoryClass = $this->categoryFactoryClass();
+
+        $categoryFactoryClass::createMany(5);
 
         $ids = [];
 
         while (5 !== \count(\array_unique($ids))) {
-            $ids[] = CategoryFactory::random()->getId();
+            $ids[] = $categoryFactoryClass::random()->getId();
         }
 
         $this->assertCount(5, \array_unique($ids));
@@ -89,11 +57,13 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function can_create_random_object_if_none_exists(): void
     {
-        CategoryFactory::assert()->count(0);
-        $this->assertInstanceOf(Category::class, CategoryFactory::randomOrCreate()->object());
-        CategoryFactory::assert()->count(1);
-        $this->assertInstanceOf(Category::class, CategoryFactory::randomOrCreate()->object());
-        CategoryFactory::assert()->count(1);
+        $categoryFactoryClass = $this->categoryFactoryClass();
+
+        $categoryFactoryClass::assert()->count(0);
+        $this->assertInstanceOf($this->categoryClass(), $categoryFactoryClass::randomOrCreate()->object());
+        $categoryFactoryClass::assert()->count(1);
+        $this->assertInstanceOf($this->categoryClass(), $categoryFactoryClass::randomOrCreate()->object());
+        $categoryFactoryClass::assert()->count(1);
     }
 
     /**
@@ -101,13 +71,15 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function can_get_or_create_random_object_with_attributes(): void
     {
-        CategoryFactory::createMany(5, ['name' => 'name1']);
+        $categoryFactoryClass = $this->categoryFactoryClass();
 
-        CategoryFactory::assert()->count(5);
-        $this->assertSame('name2', CategoryFactory::randomOrCreate(['name' => 'name2'])->getName());
-        CategoryFactory::assert()->count(6);
-        $this->assertSame('name2', CategoryFactory::randomOrCreate(['name' => 'name2'])->getName());
-        CategoryFactory::assert()->count(6);
+        $categoryFactoryClass::createMany(5, ['name' => 'name1']);
+
+        $categoryFactoryClass::assert()->count(5);
+        $this->assertSame('name2', $categoryFactoryClass::randomOrCreate(['name' => 'name2'])->getName());
+        $categoryFactoryClass::assert()->count(6);
+        $this->assertSame('name2', $categoryFactoryClass::randomOrCreate(['name' => 'name2'])->getName());
+        $categoryFactoryClass::assert()->count(6);
     }
 
     /**
@@ -115,9 +87,11 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function can_find_random_set_of_objects(): void
     {
-        CategoryFactory::createMany(5);
+        $categoryFactoryClass = $this->categoryFactoryClass();
 
-        $objects = CategoryFactory::randomSet(3);
+        $categoryFactoryClass::createMany(5);
+
+        $objects = $categoryFactoryClass::randomSet(3);
 
         $this->assertCount(3, $objects);
         $this->assertCount(3, \array_unique(\array_map(static function($category) { return $category->getId(); }, $objects)));
@@ -128,10 +102,12 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function can_find_random_set_of_objects_with_attributes(): void
     {
-        CategoryFactory::createMany(20, ['name' => 'name1']);
-        CategoryFactory::createMany(5, ['name' => 'name2']);
+        $categoryFactoryClass = $this->categoryFactoryClass();
 
-        $objects = CategoryFactory::randomSet(2, ['name' => 'name2']);
+        $categoryFactoryClass::createMany(20, ['name' => 'name1']);
+        $categoryFactoryClass::createMany(5, ['name' => 'name2']);
+
+        $objects = $categoryFactoryClass::randomSet(2, ['name' => 'name2']);
 
         $this->assertCount(2, $objects);
         $this->assertSame('name2', $objects[0]->getName());
@@ -143,12 +119,14 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function can_find_random_range_of_objects(): void
     {
-        CategoryFactory::createMany(5);
+        $categoryFactoryClass = $this->categoryFactoryClass();
+
+        $categoryFactoryClass::createMany(5);
 
         $counts = [];
 
         while (4 !== \count(\array_unique($counts))) {
-            $counts[] = \count(CategoryFactory::randomRange(0, 3));
+            $counts[] = \count($categoryFactoryClass::randomRange(0, 3));
         }
 
         $this->assertCount(4, \array_unique($counts));
@@ -165,10 +143,12 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function can_find_random_range_of_objects_with_attributes(): void
     {
-        CategoryFactory::createMany(20, ['name' => 'name1']);
-        CategoryFactory::createMany(5, ['name' => 'name2']);
+        $categoryFactoryClass = $this->categoryFactoryClass();
 
-        $objects = CategoryFactory::randomRange(2, 4, ['name' => 'name2']);
+        $categoryFactoryClass::createMany(20, ['name' => 'name1']);
+        $categoryFactoryClass::createMany(5, ['name' => 'name2']);
+
+        $objects = $categoryFactoryClass::randomRange(2, 4, ['name' => 'name2']);
 
         $this->assertGreaterThanOrEqual(2, \count($objects));
         $this->assertLessThanOrEqual(4, \count($objects));
@@ -335,14 +315,16 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function first_and_last_return_the_correct_object(): void
     {
-        $categoryA = CategoryFactory::createOne(['name' => '3']);
-        $categoryB = CategoryFactory::createOne(['name' => '2']);
-        $categoryC = CategoryFactory::createOne(['name' => '1']);
+        $categoryFactoryClass = $this->categoryFactoryClass();
 
-        $this->assertSame($categoryA->getId(), CategoryFactory::first()->getId());
-        $this->assertSame($categoryC->getId(), CategoryFactory::first('name')->getId());
-        $this->assertSame($categoryC->getId(), CategoryFactory::last()->getId());
-        $this->assertSame($categoryA->getId(), CategoryFactory::last('name')->getId());
+        $categoryA = $categoryFactoryClass::createOne(['name' => '3']);
+        $categoryB = $categoryFactoryClass::createOne(['name' => '2']);
+        $categoryC = $categoryFactoryClass::createOne(['name' => '1']);
+
+        $this->assertSame($categoryA->getId(), $categoryFactoryClass::first()->getId());
+        $this->assertSame($categoryC->getId(), $categoryFactoryClass::first('name')->getId());
+        $this->assertSame($categoryC->getId(), $categoryFactoryClass::last()->getId());
+        $this->assertSame($categoryA->getId(), $categoryFactoryClass::last('name')->getId());
     }
 
     /**
@@ -352,7 +334,7 @@ final class ModelFactoryTest extends KernelTestCase
     {
         $this->expectException(\RuntimeException::class);
 
-        CategoryFactory::first();
+        $this->categoryFactoryClass()::first();
     }
 
     /**
@@ -362,7 +344,7 @@ final class ModelFactoryTest extends KernelTestCase
     {
         $this->expectException(\RuntimeException::class);
 
-        CategoryFactory::last();
+        $this->categoryFactoryClass()::last();
     }
 
     /**
@@ -370,15 +352,17 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function can_count_and_truncate_model_factory(): void
     {
-        $this->assertSame(0, CategoryFactory::count());
+        $categoryFactoryClass = $this->categoryFactoryClass();
 
-        CategoryFactory::createMany(4);
+        $this->assertSame(0, $categoryFactoryClass::count());
 
-        $this->assertSame(4, CategoryFactory::count());
+        $categoryFactoryClass::createMany(4);
 
-        CategoryFactory::truncate();
+        $this->assertSame(4, $categoryFactoryClass::count());
 
-        $this->assertSame(0, CategoryFactory::count());
+        $categoryFactoryClass::truncate();
+
+        $this->assertSame(0, $categoryFactoryClass::count());
     }
 
     /**
@@ -386,17 +370,19 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function can_get_all_entities(): void
     {
-        $this->assertSame([], CategoryFactory::all());
+        $categoryFactoryClass = $this->categoryFactoryClass();
 
-        CategoryFactory::createMany(4);
+        $this->assertSame([], $categoryFactoryClass::all());
 
-        $categories = CategoryFactory::all();
+        $categoryFactoryClass::createMany(4);
+
+        $categories = $categoryFactoryClass::all();
 
         $this->assertCount(4, $categories);
-        $this->assertInstanceOf(Category::class, $categories[0]->object());
-        $this->assertInstanceOf(Category::class, $categories[1]->object());
-        $this->assertInstanceOf(Category::class, $categories[2]->object());
-        $this->assertInstanceOf(Category::class, $categories[3]->object());
+        $this->assertInstanceOf($this->categoryClass(), $categories[0]->object());
+        $this->assertInstanceOf($this->categoryClass(), $categories[1]->object());
+        $this->assertInstanceOf($this->categoryClass(), $categories[2]->object());
+        $this->assertInstanceOf($this->categoryClass(), $categories[3]->object());
     }
 
     /**
@@ -404,15 +390,20 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function can_find_entity(): void
     {
-        CategoryFactory::createOne(['name' => 'first']);
-        CategoryFactory::createOne(['name' => 'second']);
-        $category = CategoryFactory::createOne(['name' => 'third']);
+        $categoryFactoryClass = $this->categoryFactoryClass();
 
-        $this->assertSame('second', CategoryFactory::find(['name' => 'second'])->getName());
-        $this->assertSame('third', CategoryFactory::find(['id' => $category->getId()])->getName());
-        $this->assertSame('third', CategoryFactory::find($category->getId())->getName());
-        $this->assertSame('third', CategoryFactory::find($category->object())->getName());
-        $this->assertSame('third', CategoryFactory::find($category)->getName());
+        $categoryFactoryClass::createOne(['name' => 'first']);
+        $categoryFactoryClass::createOne(['name' => 'second']);
+        $category = $categoryFactoryClass::createOne(['name' => 'third']);
+
+        $this->assertSame('second', $categoryFactoryClass::find(['name' => 'second'])->getName());
+        $this->assertSame('third', $categoryFactoryClass::find(['id' => $category->getId()])->getName());
+        $this->assertSame('third', $categoryFactoryClass::find($category->getId())->getName());
+
+        if ($this instanceof ORMModelFactoryTest) {
+            $this->assertSame('third', $categoryFactoryClass::find($category)->getName());
+            $this->assertSame('third', $categoryFactoryClass::find($category->object())->getName());
+        }
     }
 
     /**
@@ -422,7 +413,7 @@ final class ModelFactoryTest extends KernelTestCase
     {
         $this->expectException(\RuntimeException::class);
 
-        CategoryFactory::find(99);
+        $this->categoryFactoryClass()::find(99);
     }
 
     /**
@@ -430,13 +421,15 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function can_find_by(): void
     {
-        $this->assertSame([], CategoryFactory::findBy(['name' => 'name2']));
+        $categoryFactoryClass = $this->categoryFactoryClass();
 
-        CategoryFactory::createOne(['name' => 'name1']);
-        CategoryFactory::createOne(['name' => 'name2']);
-        CategoryFactory::createOne(['name' => 'name2']);
+        $this->assertSame([], $categoryFactoryClass::findBy(['name' => 'name2']));
 
-        $categories = CategoryFactory::findBy(['name' => 'name2']);
+        $categoryFactoryClass::createOne(['name' => 'name1']);
+        $categoryFactoryClass::createOne(['name' => 'name2']);
+        $categoryFactoryClass::createOne(['name' => 'name2']);
+
+        $categories = $categoryFactoryClass::findBy(['name' => 'name2']);
 
         $this->assertCount(2, $categories);
         $this->assertSame('name2', $categories[0]->getName());
@@ -468,4 +461,8 @@ final class ModelFactoryTest extends KernelTestCase
         $this->assertSame('Sally', $object->getName());
         $this->assertSame('Some address', $object->getAddress()->getValue());
     }
+
+    abstract protected function categoryClass(): string;
+
+    abstract protected function categoryFactoryClass(): string;
 }

@@ -26,6 +26,10 @@ jobs:
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      mongo:
+        image: mongo:4
+        ports:
+          - 27017:27017
     strategy:
       matrix:
         php: [7.4, 8.0, 8.1]
@@ -53,7 +57,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: pgsql, sqlite
+          extensions: pgsql, sqlite, mongodb
           coverage: none
           tools: flex
 
@@ -143,9 +147,34 @@ jobs:
 #          USE_FOUNDRY_BUNDLE: 1
           DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
 
+      - name: 'Test: MySQL, Mongo'
+        run: vendor/bin/simple-phpunit -v
+        env:
+          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
+
+      - name: 'Test: MySQL, Mongo, FoundryBundle'
+        run: vendor/bin/simple-phpunit -v
+        env:
+          USE_FOUNDRY_BUNDLE: 1
+          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
+
+      - name: 'Test: MySQL, Mongo, DAMABundle'
+        run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
+        env:
+          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
+
+      - name: 'Test: Mongo standalone'
+        run: vendor/bin/simple-phpunit -v
+        env:
+          MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
+
   code-coverage:
     name: Code Coverage
     runs-on: ubuntu-latest
+    if: false
     services:
       mysql:
         image: mysql:5.7
@@ -293,6 +322,7 @@ jobs:
     uses: zenstruck/.github/.github/workflows/php-cs-fixer.yml@main
 
   static-analysis:
+    if: false
     name: Psalm Static Analysis
     runs-on: ubuntu-latest
     steps:

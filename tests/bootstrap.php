@@ -9,6 +9,9 @@ require \dirname(__DIR__).'/vendor/autoload.php';
 (new Filesystem())->remove(__DIR__.'/../var');
 
 TestState::disableDefaultProxyAutoRefresh();
-TestState::addGlobalState(static function() {
-    TagStory::load();
-});
+
+if (\getenv('DATABASE_URL')) {
+    TestState::addGlobalState(static function() {
+        TagStory::load();
+    });
+}

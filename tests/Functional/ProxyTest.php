@@ -5,20 +5,15 @@ namespace Zenstruck\Foundry\Tests\Functional;
 use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Assert;
-use Zenstruck\Foundry\AnonymousFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
-use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
-use Zenstruck\Foundry\Tests\Fixtures\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class ProxyTest extends KernelTestCase
+abstract class ProxyTest extends KernelTestCase
 {
     use ContainerBC, Factories, ResetDatabase;
 
@@ -27,9 +22,9 @@ final class ProxyTest extends KernelTestCase
      */
     public function can_assert_persisted(): void
     {
-        PostFactory::createOne()->assertPersisted();
+        $this->postFactoryClass()::createOne()->assertPersisted();
 
-        Assert::that(function() { PostFactory::new()->withoutPersisting()->create()->assertPersisted(); })
+        Assert::that(function() { $this->postFactoryClass()::new()->withoutPersisting()->create()->assertPersisted(); })
             ->throws(AssertionFailedError::class, \sprintf('%s is not persisted.', Post::class))
         ;
     }
@@ -39,9 +34,9 @@ final class ProxyTest extends KernelTestCase
      */
     public function can_assert_not_persisted(): void
     {
-        PostFactory::new()->withoutPersisting()->create()->assertNotPersisted();
+        $this->postFactoryClass()::new()->withoutPersisting()->create()->assertNotPersisted();
 
-        Assert::that(function() { PostFactory::createOne()->assertNotPersisted(); })
+        Assert::that(function() { $this->postFactoryClass()::createOne()->assertNotPersisted(); })
             ->throws(AssertionFailedError::class, \sprintf('%s is persisted but it should not be.', Post::class))
         ;
     }
@@ -51,7 +46,7 @@ final class ProxyTest extends KernelTestCase
      */
     public function can_remove_and_assert_not_persisted(): void
     {
-        $post = PostFactory::createOne();
+        $post = $this->postFactoryClass()::createOne();
 
         $post->remove();
 
@@ -63,7 +58,7 @@ final class ProxyTest extends KernelTestCase
      */
     public function functions_are_passed_to_wrapped_object(): void
     {
-        $post = PostFactory::createOne(['title' => 'my title']);
+        $post = $this->postFactoryClass()::createOne(['title' => 'my title']);
 
         $this->assertSame('my title', $post->getTitle());
     }
@@ -73,30 +68,9 @@ final class ProxyTest extends KernelTestCase
      */
     public function can_convert_to_string_if_wrapped_object_can(): void
     {
-        $post = PostFactory::createOne(['title' => 'my title']);
+        $post = $this->postFactoryClass()::createOne(['title' => 'my title']);
 
         $this->assertSame('my title', (string) $post);
-    }
-
-    /**
-     * @test
-     * @requires PHP >= 7.4
-     */
-    public function cannot_convert_to_string_if_underlying_object_cant(): void
-    {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage(\sprintf('Proxied object "%s" cannot be converted to a string.', Category::class));
-
-        (string) CategoryFactory::createOne();
-    }
-
-    /**
-     * @test
-     * @requires PHP < 7.4
-     */
-    public function on_php_versions_less_than_7_4_if_underlying_object_is_missing_to_string_proxy_to_string_returns_note(): void
-    {
-        $this->assertSame('(no __toString)', (string) CategoryFactory::createOne());
     }
 
     /**
@@ -104,9 +78,9 @@ final class ProxyTest extends KernelTestCase
      */
     public function can_refetch_object_if_object_manager_has_been_cleared(): void
     {
-        $post = PostFactory::createOne(['title' => 'my title']);
+        $post = $this->postFactoryClass()::createOne(['title' => 'my title']);
 
-        self::container()->get('doctrine')->getManager()->clear();
+        self::container()->get($this->registryServiceId())->getManager()->clear();
 
         $this->assertSame('my title', $post->refresh()->getTitle());
     }
@@ -116,11 +90,13 @@ final class ProxyTest extends KernelTestCase
      */
     public function exception_thrown_if_trying_to_refresh_deleted_object(): void
     {
-        $post = PostFactory::createOne();
+        $postFactoryClass = $this->postFactoryClass();
 
-        self::container()->get('doctrine')->getManager()->clear();
+        $post = $postFactoryClass::createOne();
 
-        PostFactory::repository()->truncate();
+        self::container()->get($this->registryServiceId())->getManager()->clear();
+
+        $postFactoryClass::repository()->truncate();
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The object no longer exists.');
@@ -133,7 +109,7 @@ final class ProxyTest extends KernelTestCase
      */
     public function can_force_set_and_save(): void
     {
-        $post = PostFactory::createOne(['title' => 'old title']);
+        $post = $this->postFactoryClass()::createOne(['title' => 'old title']);
 
         $post->repository()->assert()->notExists(['title' => 'new title']);
 
@@ -147,7 +123,7 @@ final class ProxyTest extends KernelTestCase
      */
     public function can_force_set_multiple_fields(): void
     {
-        $post = PostFactory::createOne(['title' => 'old title', 'body' => 'old body']);
+        $post = $this->postFactoryClass()::createOne(['title' => 'old title', 'body' => 'old body']);
 
         $this->assertSame('old title', $post->getTitle());
         $this->assertSame('old body', $post->getBody());
@@ -167,7 +143,7 @@ final class ProxyTest extends KernelTestCase
      */
     public function exception_thrown_if_trying_to_autorefresh_object_with_unsaved_changes(): void
     {
-        $post = PostFactory::createOne(['title' => 'old title', 'body' => 'old body'])
+        $post = $this->postFactoryClass()::createOne(['title' => 'old title', 'body' => 'old body'])
             ->enableAutoRefresh()
         ;
 
@@ -190,7 +166,7 @@ final class ProxyTest extends KernelTestCase
      */
     public function can_autorefresh_between_kernel_boots(): void
     {
-        $post = PostFactory::createOne(['title' => 'old title', 'body' => 'old body'])
+        $post = $this->postFactoryClass()::createOne(['title' => 'old title', 'body' => 'old body'])
             ->enableAutoRefresh()
         ;
 
@@ -208,37 +184,9 @@ final class ProxyTest extends KernelTestCase
     /**
      * @test
      */
-    public function can_autorefresh_entity_with_embedded_object(): void
-    {
-        $contact = AnonymousFactory::new(Contact::class)->create(['name' => 'john'])
-            ->enableAutoRefresh()
-        ;
-
-        $this->assertSame('john', $contact->getName());
-
-        // I discovered when autorefreshing the second time, the embedded
-        // object is included in the changeset when using UOW::recomputeSingleEntityChangeSet().
-        // Changing to UOW::computeChangeSet() fixes this.
-        $this->assertSame('john', $contact->getName());
-        $this->assertNull($contact->getAddress()->getValue());
-
-        $contact->getAddress()->setValue('address');
-        $contact->save();
-
-        $this->assertSame('address', $contact->getAddress()->getValue());
-
-        self::ensureKernelShutdown();
-        self::bootKernel();
-
-        $this->assertSame('address', $contact->getAddress()->getValue());
-    }
-
-    /**
-     * @test
-     */
     public function force_set_all_solves_the_auto_refresh_problem(): void
     {
-        $post = PostFactory::createOne(['title' => 'old title', 'body' => 'old body']);
+        $post = $this->postFactoryClass()::createOne(['title' => 'old title', 'body' => 'old body']);
 
         $this->assertSame('old title', $post->getTitle());
         $this->assertSame('old body', $post->getBody());
@@ -261,7 +209,7 @@ final class ProxyTest extends KernelTestCase
      */
     public function without_auto_refresh_solves_the_auto_refresh_problem(): void
     {
-        $post = PostFactory::createOne(['title' => 'old title', 'body' => 'old body']);
+        $post = $this->postFactoryClass()::createOne(['title' => 'old title', 'body' => 'old body']);
 
         $this->assertSame('old title', $post->getTitle());
         $this->assertSame('old body', $post->getBody());
@@ -286,7 +234,7 @@ final class ProxyTest extends KernelTestCase
      */
     public function without_auto_refresh_does_not_enable_auto_refresh_if_it_was_disabled_originally(): void
     {
-        $post = PostFactory::createOne(['title' => 'old title', 'body' => 'old body']);
+        $post = $this->postFactoryClass()::createOne(['title' => 'old title', 'body' => 'old body']);
 
         $this->assertSame('old title', $post->getTitle());
         $this->assertSame('old body', $post->getBody());
@@ -312,7 +260,7 @@ final class ProxyTest extends KernelTestCase
      */
     public function without_auto_refresh_keeps_disabled_if_originally_disabled(): void
     {
-        $post = PostFactory::createOne(['title' => 'old title', 'body' => 'old body']);
+        $post = $this->postFactoryClass()::createOne(['title' => 'old title', 'body' => 'old body']);
 
         $this->assertSame('old title', $post->getTitle());
         $this->assertSame('old body', $post->getBody());
@@ -333,4 +281,8 @@ final class ProxyTest extends KernelTestCase
         $this->assertSame('another new title', $post->getTitle());
         $this->assertSame('another new body', $post->getBody());
     }
+
+    abstract protected function postFactoryClass(): string;
+
+    abstract protected function registryServiceId(): string;
 }
