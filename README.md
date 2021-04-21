@@ -409,17 +409,17 @@ $posts = PostFactory::new(['title' => 'Post A'])
     ->many(2)->create(['title' => 'Different Title'])
 ;
 
-$post[0]->getTitle(); // "Different Title"
-$post[0]->getBody(); // "Post Body..."
-$post[0]->getCategory(); // random Category
-$post[0]->getPublishedAt(); // \DateTime('last week')
-$post[0]->getCreatedAt(); // random \DateTime
+$posts[0]->getTitle(); // "Different Title"
+$posts[0]->getBody(); // "Post Body..."
+$posts[0]->getCategory(); // random Category
+$posts[0]->getPublishedAt(); // \DateTime('last week')
+$posts[0]->getCreatedAt(); // random \DateTime
 
-$post[1]->getTitle(); // "Different Title"
-$post[1]->getBody(); // "Post Body..."
-$post[1]->getCategory(); // random Category (different than above)
-$post[1]->getPublishedAt(); // \DateTime('last week')
-$post[1]->getCreatedAt(); // random \DateTime (different than above)
+$posts[1]->getTitle(); // "Different Title"
+$posts[1]->getBody(); // "Post Body..."
+$posts[1]->getCategory(); // random Category (different than above)
+$posts[1]->getPublishedAt(); // \DateTime('last week')
+$posts[1]->getCreatedAt(); // random \DateTime (different than above)
 ```
 
 ### Faker
