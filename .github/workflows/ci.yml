@@ -159,7 +159,6 @@ jobs:
   code-coverage:
     name: Code Coverage
     runs-on: ubuntu-latest
-    if: false
     services:
       mysql:
         image: mysql:5.7
@@ -176,6 +175,10 @@ jobs:
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      mongo:
+        image: mongo:4
+        ports:
+          - 27017:27017
     steps:
       - name: Checkout code
         uses: actions/checkout@v2.3.3
@@ -261,6 +264,30 @@ jobs:
         env:
 #          USE_FOUNDRY_BUNDLE: 1
           DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
+
+      - name: 'Test: MySQL, Mongo'
+        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-mongo.clover
+        env:
+          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
+
+      - name: 'Test: MySQL, Mongo, FoundryBundle'
+        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-mongo-foundry.clover
+        env:
+          USE_FOUNDRY_BUNDLE: 1
+          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
+
+      - name: 'Test: MySQL, Mongo, DAMABundle'
+        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-mongo-dama.clover --configuration phpunit-dama-doctrine.xml.dist
+        env:
+          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
+
+      - name: 'Test: Mongo standalone'
+        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mongo.clover
+        env:
+          MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
 
       - name: Publish coverage report to Codecov
         uses: codecov/codecov-action@v1
