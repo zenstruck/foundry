@@ -328,7 +328,6 @@ jobs:
         run: php-cs-fixer fix --dry-run --diff --diff-format=udiff
 
   static-analysis:
-    if: false
     name: Psalm Static Analysis
     runs-on: ubuntu-latest
     steps:
@@ -347,4 +346,4 @@ jobs:
           composer-options: --prefer-dist
 
       - name: Run static analysis
-        run: vendor/bin/psalm --output-format=github
+        run: vendor/bin/psalm --output-format=github --php-version=7.4
