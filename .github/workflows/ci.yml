@@ -349,7 +349,6 @@ jobs:
     uses: zenstruck/.github/.github/workflows/php-cs-fixer.yml@main
 
   static-analysis:
-    if: false
     name: Psalm Static Analysis
     runs-on: ubuntu-latest
     steps:
@@ -371,4 +370,4 @@ jobs:
         run: composer bin psalm install
 
       - name: Run static analysis
-        run: bin/tools/psalm/vendor/vimeo/psalm/psalm --output-format=github
+        run: bin/tools/psalm/vendor/vimeo/psalm/psalm --output-format=github --php-version=7.4
