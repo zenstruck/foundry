@@ -5,6 +5,7 @@ namespace Zenstruck\Foundry\Tests\Functional\Bundle\Maker;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 use Symfony\Component\Console\Tester\CommandTester;
+use Zenstruck\Foundry\Tests\Fixtures\Document\Comment;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 
 /**
@@ -321,5 +322,24 @@ EOF
         }
 
         $this->fail('Exception not thrown.');
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_factory_for_embedded_document(): void
+    {
+        if (false === \getenv('MONGO_URL')) {
+            self::markTestSkipped('doctrine/odm not enabled.');
+        }
+
+        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
+
+        $this->assertFileDoesNotExist(self::tempFile('src/Factory/CommentFactory.php'));
+
+        $tester->setInputs([Comment::class]);
+        $tester->execute([]);
+
+        $this->assertFileExists(self::tempFile('src/Factory/CommentFactory.php'));
     }
 }
