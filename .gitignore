@@ -3,7 +3,7 @@
 /phpunit-dama-doctrine.xml
 /vendor/
 /build/
-/.php_cs.cache
+/.php-cs-fixer.cache
 /.phpunit.result.cache
 /tests/Fixtures/tmp
 /var/
