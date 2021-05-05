@@ -22,7 +22,7 @@ return $config
             'imports_order' => ['const', 'class', 'function'],
         ],
         'ordered_class_elements' => true,
-        'native_function_invocation' => true,
+        'native_function_invocation' => ['include' => ['@internal']],
         'explicit_indirect_variable' => true,
         'explicit_string_variable' => true,
         'escape_implicit_backslashes' => true,
