@@ -5,8 +5,10 @@ $finder = PhpCsFixer\Finder::create()
     ->notName('*.tpl.php')
 ;
 
-return PhpCsFixer\Config::create()
-    ->setRules(array(
+$config = new PhpCsFixer\Config();
+
+return $config
+    ->setRules([
         '@Symfony' => true,
         '@Symfony:risky' => true,
         '@DoctrineAnnotation' => true,
@@ -41,7 +43,7 @@ return PhpCsFixer\Config::create()
         'phpdoc_to_comment' => false,
         'function_declaration' => ['closure_function_spacing' => 'none'],
         'nullable_type_declaration_for_default_null_value' => true,
-    ))
+    ])
     ->setRiskyAllowed(true)
     ->setFinder($finder)
 ;
