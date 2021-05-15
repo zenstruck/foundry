@@ -41,7 +41,7 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
             $container->getDefinition(Configuration::class)->addMethodCall('disableDefaultProxyAutoRefresh');
         }
 
-        if (!class_exists(AbstractMaker::class)) {
+        if (!\class_exists(AbstractMaker::class)) {
             $container->register(StubMakeFactory::class)->addTag('console.command');
             $container->register(StubMakeStory::class)->addTag('console.command');
         }
