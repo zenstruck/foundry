@@ -38,6 +38,7 @@
 
         <service id="Zenstruck\Foundry\Bundle\Maker\MakeFactory">
             <argument type="service" id="doctrine" />
+            <argument type="tagged_iterator" tag="foundry.factory" />
             <tag name="maker.command" />
         </service>
 

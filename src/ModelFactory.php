@@ -219,6 +219,9 @@ abstract class ModelFactory extends Factory
         return static::configuration()->repositoryFor(static::getClass());
     }
 
+    /** @psalm-return class-string<TModel> */
+    abstract public static function getClass(): string;
+
     /**
      * Override to add default instantiator and default afterInstantiate/afterPersist events.
      *
@@ -238,9 +241,6 @@ abstract class ModelFactory extends Factory
     {
         return $this->withAttributes($attributes);
     }
-
-    /** @psalm-return class-string<TModel> */
-    abstract protected static function getClass(): string;
 
     abstract protected function getDefaults(): array;
 }
