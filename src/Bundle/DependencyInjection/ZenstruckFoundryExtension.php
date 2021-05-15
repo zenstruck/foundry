@@ -2,10 +2,13 @@
 
 namespace Zenstruck\Foundry\Bundle\DependencyInjection;
 
+use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
+use Zenstruck\Foundry\Bundle\Command\StubMakeFactory;
+use Zenstruck\Foundry\Bundle\Command\StubMakeStory;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Story;
@@ -36,6 +39,11 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
             $container->getDefinition(Configuration::class)->addMethodCall('enableDefaultProxyAutoRefresh');
         } elseif (false === $mergedConfig['auto_refresh_proxies']) {
             $container->getDefinition(Configuration::class)->addMethodCall('disableDefaultProxyAutoRefresh');
+        }
+
+        if (!class_exists(AbstractMaker::class)) {
+            $container->register(StubMakeFactory::class)->addTag('console.command');
+            $container->register(StubMakeStory::class)->addTag('console.command');
         }
     }
 
