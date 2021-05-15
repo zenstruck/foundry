@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Zenstruck\Foundry\Bundle\Command;
 
 use Symfony\Component\Console\Command\Command;
