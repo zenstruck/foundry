@@ -220,7 +220,16 @@ abstract class ModelFactory extends Factory
     }
 
     /** @psalm-return class-string<TModel> */
-    abstract public static function getClass(): string;
+    abstract protected static function getClass(): string;
+
+    /**
+     * @internal
+     * @psalm-return class-string<TModel>
+     */
+    final public static function getEntityClass(): string
+    {
+        return static::getClass();
+    }
 
     /**
      * Override to add default instantiator and default afterInstantiate/afterPersist events.

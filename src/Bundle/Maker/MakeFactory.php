@@ -34,7 +34,7 @@ final class MakeFactory extends AbstractMaker
 
         $factories = \iterator_to_array($factories);
         $this->entitiesWithFactories = \array_map(static function(ModelFactory $factory) {
-            return $factory::getClass();
+            return $factory::getEntityClass();
         }, $factories);
     }
 

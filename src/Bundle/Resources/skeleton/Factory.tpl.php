@@ -50,7 +50,7 @@ final class <?= $class_name ?> extends ModelFactory
         ;
     }
 
-    public static function getClass(): string
+    protected static function getClass(): string
     {
         return <?= $entity->getShortName() ?>::class;
     }
