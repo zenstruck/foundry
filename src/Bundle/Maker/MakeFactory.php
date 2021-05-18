@@ -26,16 +26,15 @@ final class MakeFactory extends AbstractMaker
     /** @var string[] */
     private $entitiesWithFactories;
 
-    public function __construct(
-        ManagerRegistry $managerRegistry,
-        \Traversable $factories
-    ) {
+    public function __construct(ManagerRegistry $managerRegistry, \Traversable $factories)
+    {
         $this->managerRegistry = $managerRegistry;
-
-        $factories = \iterator_to_array($factories);
-        $this->entitiesWithFactories = \array_map(static function(ModelFactory $factory) {
-            return $factory::getEntityClass();
-        }, $factories);
+        $this->entitiesWithFactories = \array_map(
+            static function(ModelFactory $factory) {
+                return $factory::getEntityClass();
+            },
+            \iterator_to_array($factories)
+        );
     }
 
     public static function getCommandName(): string
