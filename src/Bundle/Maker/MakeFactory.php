@@ -28,7 +28,7 @@ final class MakeFactory extends AbstractMaker
 
     public function __construct(
         ManagerRegistry $managerRegistry,
-        iterable $factories
+        \Traversable $factories
     ) {
         $this->managerRegistry = $managerRegistry;
 
