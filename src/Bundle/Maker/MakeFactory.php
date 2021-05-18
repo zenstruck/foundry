@@ -13,6 +13,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Zenstruck\Foundry\ModelFactory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -22,9 +23,18 @@ final class MakeFactory extends AbstractMaker
     /** @var ManagerRegistry */
     private $managerRegistry;
 
-    public function __construct(ManagerRegistry $managerRegistry)
+    /** @var string[] */
+    private $entitiesWithFactories;
+
+    public function __construct(ManagerRegistry $managerRegistry, \Traversable $factories)
     {
         $this->managerRegistry = $managerRegistry;
+        $this->entitiesWithFactories = \array_map(
+            static function(ModelFactory $factory) {
+                return $factory::getEntityClass();
+            },
+            \iterator_to_array($factories)
+        );
     }
 
     public static function getCommandName(): string
@@ -121,7 +131,9 @@ final class MakeFactory extends AbstractMaker
 
         foreach ($this->managerRegistry->getManagers() as $manager) {
             foreach ($manager->getMetadataFactory()->getAllMetadata() as $metadata) {
-                $choices[] = $metadata->getName();
+                if (!\in_array($metadata->getName(), $this->entitiesWithFactories, true)) {
+                    $choices[] = $metadata->getName();
+                }
             }
         }
 

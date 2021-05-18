@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 use Symfony\Component\Console\Tester\CommandTester;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -90,39 +91,40 @@ EOF
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
 
-        $this->assertFileDoesNotExist(self::tempFile('src/Factory/CategoryFactory.php'));
+        $this->assertFileDoesNotExist(self::tempFile('src/Factory/TagFactory.php'));
 
-        $tester->setInputs([Category::class]);
+        $tester->setInputs([Tag::class]);
         $tester->execute([]);
         $output = $tester->getDisplay();
 
-        $this->assertFileExists(self::tempFile('src/Factory/CategoryFactory.php'));
+        $this->assertStringNotContainsString(Category::class, $output);
+        $this->assertFileExists(self::tempFile('src/Factory/TagFactory.php'));
         $this->assertStringContainsString('Note: pass --test if you want to generate factories in your tests/ directory', $output);
         $this->assertSame(<<<EOF
 <?php
 
 namespace App\\Factory;
 
-use Zenstruck\\Foundry\\Tests\\Fixtures\\Entity\\Category;
+use Zenstruck\\Foundry\\Tests\\Fixtures\\Entity\\Tag;
 use Zenstruck\\Foundry\\ModelFactory;
 use Zenstruck\\Foundry\\Proxy;
 
 /**
- * @method static Category|Proxy createOne(array \$attributes = [])
- * @method static Category[]|Proxy[] createMany(int \$number, \$attributes = [])
- * @method static Category|Proxy find(\$criteria)
- * @method static Category|Proxy findOrCreate(array \$attributes)
- * @method static Category|Proxy first(string \$sortedField = 'id')
- * @method static Category|Proxy last(string \$sortedField = 'id')
- * @method static Category|Proxy random(array \$attributes = [])
- * @method static Category|Proxy randomOrCreate(array \$attributes = [])
- * @method static Category[]|Proxy[] all()
- * @method static Category[]|Proxy[] findBy(array \$attributes)
- * @method static Category[]|Proxy[] randomSet(int \$number, array \$attributes = [])
- * @method static Category[]|Proxy[] randomRange(int \$min, int \$max, array \$attributes = [])
- * @method Category|Proxy create(\$attributes = [])
+ * @method static Tag|Proxy createOne(array \$attributes = [])
+ * @method static Tag[]|Proxy[] createMany(int \$number, \$attributes = [])
+ * @method static Tag|Proxy find(\$criteria)
+ * @method static Tag|Proxy findOrCreate(array \$attributes)
+ * @method static Tag|Proxy first(string \$sortedField = 'id')
+ * @method static Tag|Proxy last(string \$sortedField = 'id')
+ * @method static Tag|Proxy random(array \$attributes = [])
+ * @method static Tag|Proxy randomOrCreate(array \$attributes = [])
+ * @method static Tag[]|Proxy[] all()
+ * @method static Tag[]|Proxy[] findBy(array \$attributes)
+ * @method static Tag[]|Proxy[] randomSet(int \$number, array \$attributes = [])
+ * @method static Tag[]|Proxy[] randomRange(int \$min, int \$max, array \$attributes = [])
+ * @method Tag|Proxy create(\$attributes = [])
  */
-final class CategoryFactory extends ModelFactory
+final class TagFactory extends ModelFactory
 {
     public function __construct()
     {
@@ -142,18 +144,18 @@ final class CategoryFactory extends ModelFactory
     {
         // see https://github.com/zenstruck/foundry#initialization
         return \$this
-            // ->afterInstantiate(function(Category \$category) {})
+            // ->afterInstantiate(function(Tag \$tag) {})
         ;
     }
 
     protected static function getClass(): string
     {
-        return Category::class;
+        return Tag::class;
     }
 }
 
 EOF
-            , \file_get_contents(self::tempFile('src/Factory/CategoryFactory.php'))
+            , \file_get_contents(self::tempFile('src/Factory/TagFactory.php'))
         );
     }
 
@@ -235,39 +237,40 @@ EOF
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
 
-        $this->assertFileDoesNotExist(self::tempFile('tests/Factory/CategoryFactory.php'));
+        $this->assertFileDoesNotExist(self::tempFile('tests/Factory/TagFactory.php'));
 
-        $tester->setInputs([Category::class]);
+        $tester->setInputs([Tag::class]);
         $tester->execute(['--test' => true]);
         $output = $tester->getDisplay();
 
-        $this->assertFileExists(self::tempFile('tests/Factory/CategoryFactory.php'));
+        $this->assertFileExists(self::tempFile('tests/Factory/TagFactory.php'));
+        $this->assertStringNotContainsString(Category::class, $output);
         $this->assertStringNotContainsString('Note: pass --test if you want to generate factories in your tests/ directory', $output);
         $this->assertSame(<<<EOF
 <?php
 
 namespace App\\Tests\\Factory;
 
-use Zenstruck\\Foundry\\Tests\\Fixtures\\Entity\\Category;
+use Zenstruck\\Foundry\\Tests\\Fixtures\\Entity\\Tag;
 use Zenstruck\\Foundry\\ModelFactory;
 use Zenstruck\\Foundry\\Proxy;
 
 /**
- * @method static Category|Proxy createOne(array \$attributes = [])
- * @method static Category[]|Proxy[] createMany(int \$number, \$attributes = [])
- * @method static Category|Proxy find(\$criteria)
- * @method static Category|Proxy findOrCreate(array \$attributes)
- * @method static Category|Proxy first(string \$sortedField = 'id')
- * @method static Category|Proxy last(string \$sortedField = 'id')
- * @method static Category|Proxy random(array \$attributes = [])
- * @method static Category|Proxy randomOrCreate(array \$attributes = [])
- * @method static Category[]|Proxy[] all()
- * @method static Category[]|Proxy[] findBy(array \$attributes)
- * @method static Category[]|Proxy[] randomSet(int \$number, array \$attributes = [])
- * @method static Category[]|Proxy[] randomRange(int \$min, int \$max, array \$attributes = [])
- * @method Category|Proxy create(\$attributes = [])
+ * @method static Tag|Proxy createOne(array \$attributes = [])
+ * @method static Tag[]|Proxy[] createMany(int \$number, \$attributes = [])
+ * @method static Tag|Proxy find(\$criteria)
+ * @method static Tag|Proxy findOrCreate(array \$attributes)
+ * @method static Tag|Proxy first(string \$sortedField = 'id')
+ * @method static Tag|Proxy last(string \$sortedField = 'id')
+ * @method static Tag|Proxy random(array \$attributes = [])
+ * @method static Tag|Proxy randomOrCreate(array \$attributes = [])
+ * @method static Tag[]|Proxy[] all()
+ * @method static Tag[]|Proxy[] findBy(array \$attributes)
+ * @method static Tag[]|Proxy[] randomSet(int \$number, array \$attributes = [])
+ * @method static Tag[]|Proxy[] randomRange(int \$min, int \$max, array \$attributes = [])
+ * @method Tag|Proxy create(\$attributes = [])
  */
-final class CategoryFactory extends ModelFactory
+final class TagFactory extends ModelFactory
 {
     public function __construct()
     {
@@ -287,18 +290,18 @@ final class CategoryFactory extends ModelFactory
     {
         // see https://github.com/zenstruck/foundry#initialization
         return \$this
-            // ->afterInstantiate(function(Category \$category) {})
+            // ->afterInstantiate(function(Tag \$tag) {})
         ;
     }
 
     protected static function getClass(): string
     {
-        return Category::class;
+        return Tag::class;
     }
 }
 
 EOF
-            , \file_get_contents(self::tempFile('tests/Factory/CategoryFactory.php'))
+            , \file_get_contents(self::tempFile('tests/Factory/TagFactory.php'))
         );
     }
 
