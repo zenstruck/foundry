@@ -325,4 +325,34 @@ EOF
 
         $this->fail('Exception not thrown.');
     }
+
+    /**
+     * @test
+     */
+    public function can_customize_namespace(): void
+    {
+        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
+
+        $this->assertFileDoesNotExist(self::tempFile('src/My/Namespace/TagFactory.php'));
+
+        $tester->setInputs([Tag::class]);
+        $tester->execute(['--namespace' => 'My\\Namespace']);
+
+        $this->assertFileExists(self::tempFile('src/My/Namespace/TagFactory.php'));
+    }
+
+    /**
+     * @test
+     */
+    public function can_customize_namespace_with_test_flag(): void
+    {
+        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
+
+        $this->assertFileDoesNotExist(self::tempFile('tests/My/Namespace/TagFactory.php'));
+
+        $tester->setInputs([Tag::class]);
+        $tester->execute(['--namespace' => 'My\\Namespace', '--test' => true]);
+
+        $this->assertFileExists(self::tempFile('tests/My/Namespace/TagFactory.php'));
+    }
 }
