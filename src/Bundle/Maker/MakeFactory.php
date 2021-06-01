@@ -52,6 +52,7 @@ final class MakeFactory extends AbstractMaker
         $command
             ->setDescription(self::getCommandDescription())
             ->addArgument('entity', InputArgument::OPTIONAL, 'Entity class to create a factory for')
+            ->addOption('namespace', null, InputOption::VALUE_REQUIRED, 'Customize the namespace for generated factories', 'Factory')
             ->addOption('test', null, InputOption::VALUE_NONE, 'Create in <fg=yellow>tests/</> instead of <fg=yellow>src/</>')
         ;
 
@@ -90,7 +91,7 @@ final class MakeFactory extends AbstractMaker
         $entity = new \ReflectionClass($class);
         $factory = $generator->createClassNameDetails(
             $entity->getShortName(),
-            $input->getOption('test') ? 'Tests\\Factory' : 'Factory',
+            $input->getOption('test') ? 'Tests\\'.$input->getOption('namespace') : $input->getOption('namespace'),
             'Factory'
         );
 
