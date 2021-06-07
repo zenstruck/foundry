@@ -11,7 +11,9 @@ require \dirname(__DIR__).'/vendor/autoload.php';
 TestState::disableDefaultProxyAutoRefresh();
 
 if (\getenv('DATABASE_URL')) {
-    TestState::addGlobalState(static function() {
-        TagStory::load();
+    TestState::addGlobalState(static function(bool $shouldFlushGlobalStateForDAMA) {
+        if ($shouldFlushGlobalStateForDAMA) {
+            TagStory::load();
+        }
     });
 }
