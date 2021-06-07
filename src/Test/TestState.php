@@ -158,12 +158,12 @@ final class TestState
     /**
      * @internal
      */
-    public static function flushGlobalState(): void
+    public static function flushGlobalState(bool $shouldFlushGlobalStateForDAMA): void
     {
         StoryManager::globalReset();
 
         foreach (self::$globalStates as $callback) {
-            $callback();
+            $callback($shouldFlushGlobalStateForDAMA);
         }
 
         StoryManager::setGlobalState();

@@ -42,7 +42,7 @@ final class DatabaseResetter
 
         $databaseResetter->resetDatabase();
 
-        self::bootFoundry($kernel);
+        self::bootFoundry($kernel, true);
 
         self::$hasBeenReset = true;
     }
@@ -53,11 +53,7 @@ final class DatabaseResetter
             $databaseResetter->resetSchema();
         }
 
-        if (self::isDAMADoctrineTestBundleEnabled()) {
-            return;
-        }
-
-        self::bootFoundry($kernel);
+        self::bootFoundry($kernel, !self::isDAMADoctrineTestBundleEnabled());
     }
 
     /** @retrun array<SchemaResetterInterface> */
@@ -77,13 +73,13 @@ final class DatabaseResetter
         return $databaseResetters;
     }
 
-    private static function bootFoundry(KernelInterface $kernel): void
+    private static function bootFoundry(KernelInterface $kernel, bool $shouldFlushGlobalStateForDAMA): void
     {
         if (!Factory::isBooted()) {
             TestState::bootFromContainer($kernel->getContainer());
         }
 
-        TestState::flushGlobalState();
+        TestState::flushGlobalState($shouldFlushGlobalStateForDAMA);
     }
 
     private static function createApplication(KernelInterface $kernel): Application
