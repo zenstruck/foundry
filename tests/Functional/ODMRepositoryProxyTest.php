@@ -10,7 +10,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\CategoryFactory;
  */
 final class ODMRepositoryProxyTest extends RepositoryProxyTest
 {
-    public static function setUpBeforeClass(): void
+    public function setUp(): void
     {
         if (false === \getenv('MONGO_URL')) {
             self::markTestSkipped('doctrine/odm not enabled.');

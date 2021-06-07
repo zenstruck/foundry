@@ -2,6 +2,8 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Document;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 /**
@@ -9,6 +11,12 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
  */
 class Post
 {
+    /**
+     * @MongoDB\EmbedMany(
+     *     targetDocument=Comment::class
+     * )
+     */
+    protected $comments;
     /**
      * @MongoDB\Id
      */
@@ -50,6 +58,7 @@ class Post
         $this->body = $body;
         $this->shortDescription = $shortDescription;
         $this->createdAt = new \DateTime('now');
+        $this->comments = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -95,5 +104,31 @@ class Post
     public function setPublishedAt(\DateTime $timestamp)
     {
         $this->publishedAt = $timestamp;
+    }
+
+    /**
+     * @return Collection<Comment>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): self
+    {
+        if ($this->comments->contains($comment)) {
+            $this->comments->removeElement($comment);
+        }
+
+        return $this;
     }
 }

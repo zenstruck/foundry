@@ -9,7 +9,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
  */
 final class ORMAnonymousFactoryTest extends AnonymousFactoryTest
 {
-    public static function setUpBeforeClass(): void
+    public function setUp(): void
     {
         if (false === \getenv('DATABASE_URL')) {
             self::markTestSkipped('doctrine/orm not enabled.');
