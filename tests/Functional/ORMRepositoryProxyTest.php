@@ -14,7 +14,7 @@ use function Zenstruck\Foundry\repository;
  */
 final class ORMRepositoryProxyTest extends RepositoryProxyTest
 {
-    public static function setUpBeforeClass(): void
+    public function setUp(): void
     {
         if (false === \getenv('DATABASE_URL')) {
             self::markTestSkipped('doctrine/orm not enabled.');

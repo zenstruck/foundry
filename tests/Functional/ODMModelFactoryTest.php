@@ -15,7 +15,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\PostFactory;
  */
 final class ODMModelFactoryTest extends ModelFactoryTest
 {
-    public static function setUpBeforeClass(): void
+    public function setUp(): void
     {
         if (false === \getenv('MONGO_URL')) {
             self::markTestSkipped('doctrine/odm not enabled.');
