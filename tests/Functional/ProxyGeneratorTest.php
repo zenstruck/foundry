@@ -105,8 +105,6 @@ final class ProxyGeneratorTest extends ProxyTest
      */
     public function can_autorefresh_between_kernel_boots(): void
     {
-        $this->markTestSkipped('not supported');
-
         $post = static::$POST_FACTORY::createOne(['title' => 'old title', 'body' => 'old body']);
 
         $this->assertSame('old title', $post->getTitle());

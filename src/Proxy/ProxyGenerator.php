@@ -3,7 +3,6 @@
 namespace Zenstruck\Foundry\Proxy;
 
 use Doctrine\ORM\EntityManagerInterface;
-use ProxyManager\Factory\AccessInterceptorValueHolderFactory;
 use Zenstruck\Foundry\Configuration;
 
 /**
@@ -16,13 +15,13 @@ class ProxyGenerator
 {
     /** @var Configuration */
     private $configuration;
-    /** @var AccessInterceptorValueHolderFactory */
+    /** @var ValueReplacingAccessInterceptorValueHolderFactory */
     private $factory;
 
-    public function __construct(Configuration $configuration, ?AccessInterceptorValueHolderFactory $factory = null)
+    public function __construct(Configuration $configuration, ?ValueReplacingAccessInterceptorValueHolderFactory $factory = null)
     {
         $this->configuration = $configuration;
-        $this->factory = $factory ?? new AccessInterceptorValueHolderFactory();
+        $this->factory = $factory ?? new ValueReplacingAccessInterceptorValueHolderFactory();
     }
 
     public function generate(object $object, array $methods = []): object
