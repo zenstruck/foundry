@@ -10,3 +10,5 @@ coverage:
         threshold: 50%
 
 comment: false
+github_checks:
+  annotations: false
