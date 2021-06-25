@@ -88,12 +88,22 @@ final class MakeFactory extends AbstractMaker
             throw new RuntimeCommandException(\sprintf('Entity "%s" not found.', $input->getArgument('entity')));
         }
 
+        $namespace = $input->getOption('namespace');
+
+        // strip maker's root namespace if set
+        if (0 === \mb_strpos($namespace, $generator->getRootNamespace())) {
+            $namespace = \mb_substr($namespace, \mb_strlen($generator->getRootNamespace()));
+        }
+
+        $namespace = \trim($namespace, '\\');
+
+        // if creating in tests dir, ensure namespace prefixed with Tests\
+        if ($input->getOption('test') && 0 !== \mb_strpos($namespace, 'Tests\\')) {
+            $namespace = 'Tests\\'.$namespace;
+        }
+
         $entity = new \ReflectionClass($class);
-        $factory = $generator->createClassNameDetails(
-            $entity->getShortName(),
-            $input->getOption('test') ? 'Tests\\'.$input->getOption('namespace') : $input->getOption('namespace'),
-            'Factory'
-        );
+        $factory = $generator->createClassNameDetails($entity->getShortName(), $namespace, 'Factory');
 
         $repository = new \ReflectionClass($this->managerRegistry->getRepository($entity->getName()));
 

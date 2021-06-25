@@ -332,13 +332,15 @@ EOF
     public function can_customize_namespace(): void
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
+        $expectedFile = self::tempFile('src/My/Namespace/TagFactory.php');
 
-        $this->assertFileDoesNotExist(self::tempFile('src/My/Namespace/TagFactory.php'));
+        $this->assertFileDoesNotExist($expectedFile);
 
         $tester->setInputs([Tag::class]);
         $tester->execute(['--namespace' => 'My\\Namespace']);
 
-        $this->assertFileExists(self::tempFile('src/My/Namespace/TagFactory.php'));
+        $this->assertFileExists($expectedFile);
+        $this->assertStringContainsString('namespace App\\My\\Namespace;', \file_get_contents($expectedFile));
     }
 
     /**
@@ -347,12 +349,48 @@ EOF
     public function can_customize_namespace_with_test_flag(): void
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
+        $expectedFile = self::tempFile('tests/My/Namespace/TagFactory.php');
 
-        $this->assertFileDoesNotExist(self::tempFile('tests/My/Namespace/TagFactory.php'));
+        $this->assertFileDoesNotExist($expectedFile);
 
         $tester->setInputs([Tag::class]);
         $tester->execute(['--namespace' => 'My\\Namespace', '--test' => true]);
 
-        $this->assertFileExists(self::tempFile('tests/My/Namespace/TagFactory.php'));
+        $this->assertFileExists($expectedFile);
+        $this->assertStringContainsString('namespace App\\Tests\\My\\Namespace;', \file_get_contents($expectedFile));
+    }
+
+    /**
+     * @test
+     */
+    public function can_customize_namespace_with_root_namespace_prefix(): void
+    {
+        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
+        $expectedFile = self::tempFile('src/My/Namespace/TagFactory.php');
+
+        $this->assertFileDoesNotExist($expectedFile);
+
+        $tester->setInputs([Tag::class]);
+        $tester->execute(['--namespace' => 'App\\My\\Namespace']);
+
+        $this->assertFileExists($expectedFile);
+        $this->assertStringContainsString('namespace App\\My\\Namespace;', \file_get_contents($expectedFile));
+    }
+
+    /**
+     * @test
+     */
+    public function can_customize_namespace_with_test_flag_with_root_namespace_prefix(): void
+    {
+        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
+        $expectedFile = self::tempFile('tests/My/Namespace/TagFactory.php');
+
+        $this->assertFileDoesNotExist($expectedFile);
+
+        $tester->setInputs([Tag::class]);
+        $tester->execute(['--namespace' => 'App\\Tests\\My\\Namespace', '--test' => true]);
+
+        $this->assertFileExists($expectedFile);
+        $this->assertStringContainsString('namespace App\\Tests\\My\\Namespace;', \file_get_contents($expectedFile));
     }
 }
