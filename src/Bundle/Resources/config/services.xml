@@ -36,9 +36,14 @@
             <argument type="tagged_iterator" tag="foundry.factory" />
         </service>
 
+        <service id="Zenstruck\Foundry\Bundle\Extractor\Property">
+            <argument type="service" id="doctrine.orm.default_entity_manager" />
+        </service>
+
         <service id="Zenstruck\Foundry\Bundle\Maker\MakeFactory">
             <argument type="service" id="doctrine" />
             <argument type="tagged_iterator" tag="foundry.factory" />
+            <argument type="service" id="Zenstruck\Foundry\Bundle\Extractor\Property" />
             <tag name="maker.command" />
         </service>
 

@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Foundry\Bundle\Maker;
 
+
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
@@ -13,6 +14,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Zenstruck\Foundry\Bundle\Extractor\Property;
 use Zenstruck\Foundry\ModelFactory;
 
 /**
@@ -25,8 +27,9 @@ final class MakeFactory extends AbstractMaker
 
     /** @var string[] */
     private $entitiesWithFactories;
+    private Property $propertyExtractor;
 
-    public function __construct(ManagerRegistry $managerRegistry, \Traversable $factories)
+    public function __construct(ManagerRegistry $managerRegistry, \Traversable $factories, Property $propertyExtractor)
     {
         $this->managerRegistry = $managerRegistry;
         $this->entitiesWithFactories = \array_map(
@@ -35,6 +38,7 @@ final class MakeFactory extends AbstractMaker
             },
             \iterator_to_array($factories)
         );
+        $this->propertyExtractor = $propertyExtractor;
     }
 
     public static function getCommandName(): string
@@ -112,11 +116,14 @@ final class MakeFactory extends AbstractMaker
             $repository = null;
         }
 
+        $defaultProperties = $this->getProperties($entity);
+
         $generator->generateClass(
             $factory->getFullName(),
             __DIR__.'/../Resources/skeleton/Factory.tpl.php',
             [
                 'entity' => $entity,
+                'defaultProperties' => $defaultProperties,
                 'repository' => $repository,
             ]
         );
@@ -155,5 +162,12 @@ final class MakeFactory extends AbstractMaker
         }
 
         return $choices;
+    }
+
+    private function getProperties($classname)
+    {
+        $properties = $this->propertyExtractor->getScalarPropertiesFromDoctrineFieldMappings($classname);
+
+        return $properties;
     }
 }
