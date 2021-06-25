@@ -76,6 +76,18 @@ final class MakeFactory extends AbstractMaker
         $input->setArgument('entity', $entity);
     }
 
+    private function getNamespacePrefix(string $namespace, bool $isTest) : string
+    {
+        $appPos = strpos($namespace, 'App\\');
+        if ($appPos !== false && $appPos <= 1) {
+            $namespace = substr($namespace,$appPos+4);
+        }
+        if ($isTest && strpos($namespace, 'Tests\\') === false) {
+            $namespace = 'Tests\\'.$namespace;
+        }
+        return $namespace;
+    }
+
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
         $class = $input->getArgument('entity');
@@ -91,7 +103,7 @@ final class MakeFactory extends AbstractMaker
         $entity = new \ReflectionClass($class);
         $factory = $generator->createClassNameDetails(
             $entity->getShortName(),
-            $input->getOption('test') ? 'Tests\\'.$input->getOption('namespace') : $input->getOption('namespace'),
+            $this->getNamespacePrefix($input->getOption('namespace'),$input->getOption('test')),
             'Factory'
         );
 
