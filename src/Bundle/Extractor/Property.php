@@ -11,9 +11,20 @@ use function Zenstruck\Foundry\faker;
 
 class Property
 {
-    private array $properties = [];
-    private array $defaultProperties = [];
-    private EntityManagerInterface $em;
+    /**
+     * @var array
+     */
+    private $properties = [];
+
+    /**
+     * @var array
+     */
+    private $defaultProperties = [];
+
+    /**
+     * @var EntityManagerInterface
+     */
+    private $em;
 
     public function __construct(EntityManagerInterface $em)
     {
