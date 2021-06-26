@@ -1,17 +1,16 @@
 <?php
 
-
 namespace Zenstruck\Foundry\Bundle\Extractor;
 
 use function Zenstruck\Foundry\faker;
 
 /**
  * Here we can detect fields on names which can be created with faker.
- * After we found no Constraints we need we can use this List to create better values then a sentence
+ * After we found no Constraints we need we can use this List to create better values then a sentence.
  */
 class StringScalarDetectionList
 {
-    const SCALAR_DETECTION_LIST = [
+    public const SCALAR_DETECTION_LIST = [
       'company' => 'company',
       'name' => 'name',
       'firstName' => 'firstName',

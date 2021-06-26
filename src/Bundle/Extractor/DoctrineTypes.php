@@ -1,12 +1,10 @@
 <?php
 
-
 namespace Zenstruck\Foundry\Bundle\Extractor;
-
 
 class DoctrineTypes
 {
-    const DOCTRINE_TYPES = [
+    public const DOCTRINE_TYPES = [
         'ARRAY',
         'ASCII_STRING',
         'BIGINT',
@@ -40,6 +38,6 @@ class DoctrineTypes
      */
     public static function hasType(string $name): bool
     {
-        return in_array(strtoupper($name), self::DOCTRINE_TYPES);
+        return \in_array(\mb_strtoupper($name), self::DOCTRINE_TYPES);
     }
 }

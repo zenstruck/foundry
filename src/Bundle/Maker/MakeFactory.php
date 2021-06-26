@@ -2,7 +2,6 @@
 
 namespace Zenstruck\Foundry\Bundle\Maker;
 
-
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;

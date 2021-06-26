@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Zenstruck\Foundry\Bundle\Extractor;
-
 
 class ScalarType
 {
@@ -11,15 +9,15 @@ class ScalarType
      * boolean
      * integer
      * float
-     * string
+     * string.
      */
     public static function isScalarType(string $value): bool
     {
-        if ($value === 'boolean'
-            || $value === 'integer'
-            || $value === 'float'
-            || $value === 'string') {
-                return true;
+        if ('boolean' === $value
+            || 'integer' === $value
+            || 'float' === $value
+            || 'string' === $value) {
+            return true;
         }
 
         return false;
