@@ -27,7 +27,11 @@ final class MakeFactory extends AbstractMaker
 
     /** @var string[] */
     private $entitiesWithFactories;
-    private Property $propertyExtractor;
+
+    /**
+     * @var Property
+     */
+    private $propertyExtractor;
 
     public function __construct(ManagerRegistry $managerRegistry, \Traversable $factories, Property $propertyExtractor)
     {
