@@ -20,7 +20,7 @@ $post = PostFactory::new() // Create the factory for Post objects
 The factories can be used inside [DoctrineFixturesBundle](https://symfony.com/doc/master/bundles/DoctrineFixturesBundle/index.html)
 to load fixtures or inside your tests, [where it has even more features](#using-in-your-tests).
 
-Want to watch a screencast 🎥 about it? Check out https://symfonycasts.com/foundry
+Want to watch a screencast  about it? Check out https://symfonycasts.com/foundry
 
 ## Documentation
 
@@ -44,19 +44,19 @@ Want to watch a screencast 🎥 about it? Check out https://symfonycasts.com/fou
 5. [Using in your Tests](#using-in-your-tests)
     1. [Enable Foundry in your TestCase](#enable-foundry-in-your-testcase)
     2. [Database Reset](#database-reset)
-    3. [Object Proxy](#object-proxy)
-        1. [Force Setting](#force-setting)
-        2. [Auto-Refresh](#auto-refresh)
-    4. [Repository Proxy](#repository-proxy)
-    5. [Assertions](#assertions)
-    6. [Global State](#global-state)
-    7. [PHPUnit Data Providers](#phpunit-data-providers)
-    8. [Performance](#performance)
+    3. [Force Setting](#force-setting)
+    4. [Object Proxy](#object-proxy)
+        1. [Auto-Refresh](#auto-refresh)
+    5. [Repository Proxy](#repository-proxy)
+    6. [Assertions](#assertions)
+    7. [Global State](#global-state)
+    8. [PHPUnit Data Providers](#phpunit-data-providers)
+    9. [Performance](#performance)
         1. [DAMADoctrineTestBundle](#damadoctrinetestbundle)
         2. [Miscellaneous](#miscellaneous)
-    9. [Non-Kernel Test](#non-kernel-tests)
-    10. [Test-Only Configuration](#test-only-configuration)
-    11. [Using without the Bundle](#using-without-the-bundle)
+    10. [Non-Kernel Test](#non-kernel-tests)
+    11. [Test-Only Configuration](#test-only-configuration)
+    12. [Using without the Bundle](#using-without-the-bundle)
 6. [Stories](#stories)
     1. [Stories as Services](#stories-as-services)
     2. [Story State](#story-state)
@@ -193,23 +193,22 @@ use App\Entity\Post;
 use App\Repository\PostRepository;
 use Zenstruck\Foundry\RepositoryProxy;
 use Zenstruck\Foundry\ModelFactory;
-use Zenstruck\Foundry\Proxy;
 
 /**
- * @method static Post|Proxy createOne(array $attributes = [])
- * @method static Post[]|Proxy[] createMany(int $number, $attributes = [])
- * @method static Post|Proxy find($criteria)
- * @method static Post|Proxy findOrCreate(array $attributes)
- * @method static Post|Proxy first(string $sortedField = 'id')
- * @method static Post|Proxy last(string $sortedField = 'id')
- * @method static Post|Proxy random(array $attributes = [])
- * @method static Post|Proxy randomOrCreate(array $attributes = []))
- * @method static Post[]|Proxy[] all()
- * @method static Post[]|Proxy[] findBy(array $attributes)
- * @method static Post[]|Proxy[] randomSet(int $number, array $attributes = []))
- * @method static Post[]|Proxy[] randomRange(int $min, int $max, array $attributes = []))
+ * @method static Post createOne(array $attributes = [])
+ * @method static Post[] createMany(int $number, $attributes = [])
+ * @method static Post find($criteria)
+ * @method static Post findOrCreate(array $attributes)
+ * @method static Post first(string $sortedField = 'id')
+ * @method static Post last(string $sortedField = 'id')
+ * @method static Post random(array $attributes = [])
+ * @method static Post randomOrCreate(array $attributes = []))
+ * @method static Post[] all()
+ * @method static Post[] findBy(array $attributes)
+ * @method static Post[] randomSet(int $number, array $attributes = []))
+ * @method static Post[] randomRange(int $min, int $max, array $attributes = []))
  * @method static PostRepository|RepositoryProxy repository()
- * @method Post|Proxy create($attributes = [])
+ * @method Post create($attributes = [])
  */
 final class PostFactory extends ModelFactory
 {
@@ -273,21 +272,16 @@ PostFactory::createOne();
 // or provide values for some properties (others will be random)
 PostFactory::createOne(['title' => 'My Title']);
 
-// createOne() returns the persisted Post object wrapped in a Proxy object
+// createOne() returns the persisted Post object
 $post = PostFactory::createOne();
-
-// the "Proxy" magically calls the underlying Post methods and is type-hinted to "Post"
-$title = $post->getTitle(); // getTitle() can be autocompleted by your IDE!
-
-// if you need the actual Post object, use ->object()
-$realPost = $post->object();
+$title = $post->getTitle();
 
 // create/persist 5 Posts with random data from getDefaults()
-PostFactory::createMany(5); // returns Post[]|Proxy[]
+PostFactory::createMany(5); // returns an array of Post objects
 PostFactory::createMany(5, ['title' => 'My Title']);
 
 // find a persisted object for the given attributes, if not found, create with the attributes
-PostFactory::findOrCreate(['title' => 'My Title']); // returns Post|Proxy
+PostFactory::findOrCreate(['title' => 'My Title']); // returns a Post object
 
 PostFactory::first(); // get the first object (assumes an auto-incremented "id" column)
 PostFactory::first('createdAt'); // assuming "createdAt" is a datetime column, this will return latest object
@@ -298,15 +292,15 @@ PostFactory::truncate(); // empty the database table
 
 PostFactory::count(); // the number of persisted Posts
 
-PostFactory::all(); // Post[]|Proxy[] all the persisted Posts
+PostFactory::all(); // Post[] all the persisted Posts
 
-PostFactory::findBy(['author' => 'kevin']); // Post[]|Proxy[] matching the filter
+PostFactory::findBy(['author' => 'kevin']); // Post[] matching the filter
 
-$post = PostFactory::find(5); // Post|Proxy with the id of 5
-$post = PostFactory::find(['title' => 'My First Post']); // Post|Proxy matching the filter
+$post = PostFactory::find(5); // Post with the id of 5
+$post = PostFactory::find(['title' => 'My First Post']); // Post matching the filter
 
 // get a random object that has been persisted
-$post = PostFactory::random(); // returns Post|Proxy
+$post = PostFactory::random(); // returns Post
 $post = PostFactory::random(['author' => 'kevin']); // filter by the passed attributes
 
 // or automatically persist a new random object if none exists
@@ -314,13 +308,16 @@ $post = PostFactory::randomOrCreate();
 $post = PostFactory::randomOrCreate(['author' => 'kevin']); // filter by or create with the passed attributes
 
 // get a random set of objects that have been persisted
-$posts = PostFactory::randomSet(4); // array containing 4 "Post|Proxy" objects
+$posts = PostFactory::randomSet(4); // array containing 4 "Post" objects
 $posts = PostFactory::randomSet(4, ['author' => 'kevin']); // filter by the passed attributes
 
 // random range of persisted objects
-$posts = PostFactory::randomRange(0, 5); // array containing 0-5 "Post|Proxy" objects
+$posts = PostFactory::randomRange(0, 5); // array containing 0-5 "Post" objects
 $posts = PostFactory::randomRange(0, 5, ['author' => 'kevin']); // filter by the passed attributes
 ```
+
+Instead of the real Post object, all factory methods return a proxy object wrapping the Post object. This proxy behaves
+exactly like the real object (including type hints). Read more about this in [Proxy object](#proxy-object).
 
 ### Reusable Model Factory "States"
 
@@ -455,7 +452,6 @@ they were added.
 
 ```php
 use App\Factory\PostFactory;
-use Zenstruck\Foundry\Proxy;
 
 PostFactory::new()
     ->beforeInstantiate(function(array $attributes): array {
@@ -468,14 +464,6 @@ PostFactory::new()
         // $object is the instantiated object
         // $attributes contains the attributes used to instantiate the object and any extras
     })
-    ->afterPersist(function(Proxy $object, array $attributes) {
-        /* @var Post $object */
-        // this event is only called if the object was persisted
-        // $proxy is a Proxy wrapping the persisted object
-        // $attributes contains the attributes used to instantiate the object and any extras
-    })
-
-    // if the first argument is type-hinted as the object, it will be passed to the closure (and not the proxy)
     ->afterPersist(function(Post $object, array $attributes) {
         // this event is only called if the object was persisted
         // $object is the persisted Post object
@@ -618,10 +606,9 @@ use App\Factory\CommentFactory;
 use App\Factory\PostFactory;
 
 // Example 1: pre-create Post and attach to Comment
-$post = PostFactory::createOne(); // instance of Proxy
+$post = PostFactory::createOne();
 
 CommentFactory::createOne(['post' => $post]);
-CommentFactory::createOne(['post' => $post->object()]); // functionally the same as above
 
 // Example 2: pre-create Posts and choose a random one
 PostFactory::createMany(5); // create 5 Posts
@@ -823,15 +810,15 @@ $factory->last('createdAt'); // assuming "createdAt" is a datetime column, this 
 
 $factory->truncate(); // empty the database table
 $factory->count(); // the number of persisted Post's
-$factory->all(); // Post[]|Proxy[] all the persisted Post's
+$factory->all(); // Post[] all the persisted Post's
 
-$factory->findBy(['author' => 'kevin']); // Post[]|Proxy[] matching the filter
+$factory->findBy(['author' => 'kevin']); // Post[] matching the filter
 
-$factory->find(5); // Post|Proxy with the id of 5
-$factory->find(['title' => 'My First Post']); // Post|Proxy matching the filter
+$factory->find(5); // Post with the id of 5
+$factory->find(['title' => 'My First Post']); // Post matching the filter
 
 // get a random object that has been persisted
-$factory->random(); // returns Post|Proxy
+$factory->random(); // returns Post
 $factory->random(['author' => 'kevin']); // filter by the passed attributes
 
 // or automatically persist a new random object if none exists
@@ -839,11 +826,11 @@ $factory->randomOrCreate();
 $factory->randomOrCreate(['author' => 'kevin']); // filter by or create with the passed attributes
 
 // get a random set of objects that have been persisted
-$factory->randomSet(4); // array containing 4 "Post|Proxy" objects
+$factory->randomSet(4); // array containing 4 "Post" objects
 $factory->randomSet(4, ['author' => 'kevin']); // filter by the passed attributes
 
 // random range of persisted objects
-$factory->randomRange(0, 5); // array containing 0-5 "Post|Proxy" objects
+$factory->randomRange(0, 5); // array containing 0-5 "Post" objects
 $factory->randomRange(0, 5, ['author' => 'kevin']); // filter by the passed attributes
 
 // repository proxy wrapping PostRepository (see Repository Proxy section below)
@@ -857,8 +844,7 @@ $entities = create_many(Post::class, 5, ['field' => 'value']);
 ### Without Persisting
 
 Factories can also create objects without persisting them. This can be useful for unit tests where you just want to test
-the behaviour of the actual object or for creating objects that are not entities. When created, they are still wrapped
-in a `Proxy` to optionally save later.
+the behaviour of the actual object or for creating objects that are not entities.
 
 ```php
 use App\Factory\PostFactory;
@@ -867,22 +853,19 @@ use Zenstruck\Foundry\AnonymousFactory;
 use function Zenstruck\Foundry\instantiate;
 use function Zenstruck\Foundry\instantiate_many;
 
-$post = PostFactory::new()->withoutPersisting()->create(); // returns Post|Proxy
+$post = PostFactory::new()->withoutPersisting()->create(); // returns a Post object
 $post->setTitle('something else'); // do something with object
-$post->save(); // persist the Post (save() is a method on Proxy)
 
-$post = PostFactory::new()->withoutPersisting()->create()->object(); // actual Post object
+PostFactory::save($post); // persist the Post
 
-$posts = PostFactory::new()->withoutPersisting()->many(5)->create(); // returns Post[]|Proxy[]
+$posts = PostFactory::new()->withoutPersisting()->many(5)->create(); // returns Post[]
 
 // anonymous factories:
 $factory = new AnonymousFactory(Post::class);
 
-$entity = $factory->withoutPersisting()->create(['field' => 'value']); // returns Post|Proxy
+$entity = $factory->withoutPersisting()->create(['field' => 'value']); // returns Post
 
-$entity = $factory->withoutPersisting()->create(['field' => 'value'])->object(); // actual Post object
-
-$entities = $factory->withoutPersisting()->many(5)->create(['field' => 'value']); // returns Post[]|Proxy[]
+$entities = $factory->withoutPersisting()->many(5)->create(['field' => 'value']); // returns Post[]
 
 // convenience functions
 $entity = instantiate(Post::class, ['field' => 'value']);
@@ -994,7 +977,7 @@ public function test_can_post_a_comment(): void
     // 3. "Assert"
     self::assertResponseRedirects('/posts/post-a');
 
-    $this->assertCount(1, $post->refresh()->getComments()); // Refresh $post from the database and call ->getComments()
+    $this->assertCount(1, $post->getComments()); // Before calling getComments(), $post is reloaded from the database (see "Auto-Refresh" below)
 
     CommentFactory::assert()->exists([ // Doctrine repository assertions
         'name' => 'John',
@@ -1068,64 +1051,44 @@ FOUNDRY_RESET_CONNECTIONS=connection1,connection2
 FOUNDRY_RESET_OBJECT_MANAGERS=manager1,manager2
 ```
 
-### Object Proxy
+### Force Setting
 
-Objects created by a factory are wrapped in a special *Proxy* object. These objects allow your doctrine entities
-to have [Active Record](https://en.wikipedia.org/wiki/Active_record_pattern) *like* behavior:
-
-```php
-use App\Factory\PostFactory;
-
-$post = PostFactory::createOne()->create(['title' => 'My Title']); // instance of Zenstruck\Foundry\Proxy
-
-// get the wrapped object
-$realPost = $post->object(); // instance of Post
-
-// call any Post method
-$post->getTitle(); // "My Title"
-
-// set property and save to the database
-$post->setTitle('New Title');
-$post->save();
-
-// refresh from the database
-$post->refresh();
-
-// delete from the database
-$post->remove();
-
-$post->repository(); // repository proxy wrapping PostRepository (see Repository Proxy section below)
-```
-
-#### Force Setting
-
-Object proxies have helper methods to access non-public properties of the object they wrap:
+Sometimes, you want to set properties of an object that aren't accessible. Foundry provides some helper functions to set and read values of these
+inaccessible properties:
 
 ```php
+use function Zenstruck\Foundry\force_set;
+use function Zenstruck\Foundry\force_set_all;
+use function Zenstruck\Foundry\force_get;
+
 // set private/protected properties
-$post->forceSet('createdAt', new \DateTime());
+force_set($post, 'createdAt', new \DateTime());
+force_set_all($post, [
+    'createdAt' => new \DateTime(),
+    'updatedAt' => new \DateTime(),
+]);
 
 // get private/protected properties
-$post->forceGet('createdAt');
+force_get($post, 'createdAt');
 ```
+
+### Object Proxy
+
+All entities returned by the factory are actual special *proxy* objects that wrap the real entity.
 
 #### Auto-Refresh
 
-Object proxies have the option to enable *auto refreshing* that removes the need to call `->refresh()` before calling
-methods on the underlying object. When auto-refresh is enabled, most calls to proxy objects first refresh the wrapped
-object from the database.
+Object proxies use a technique called *auto refreshing* that reloads data from the database before calling methods on the
+underlying object.
 
 ```php
 use App\Factory\PostFactory;
 
-$post = PostFactory::new(['title' => 'Original Title'])
-    ->create()
-    ->enableAutoRefresh()
-;
+$post = PostFactory::createOne(['title' => 'Original Title']);
 
-// ... logic that changes the $post title to "New Title" (like your functional test)
+// ... logic that changes the $post title to "New Title" (like a request in your functional test)
 
-$post->getTitle(); // "New Title" (equivalent to $post->refresh()->getTitle())
+$post->getTitle(); // "New Title" (equivalent to PostFactory::repository()->find($post->getId())->getTitle())
 ```
 
 Without auto-refreshing enabled, the above call to `$post->getTitle()` would return "Original Title".
@@ -1137,10 +1100,7 @@ thrown:
 ```php
 use App\Factory\PostFactory;
 
-$post = PostFactory::new(['title' => 'Original Title', 'body' => 'Original Body'])
-    ->create()
-    ->enableAutoRefresh()
-;
+$post = PostFactory::createOne(['title' => 'Original Title', 'body' => 'Original Body']);
 
 $post->setTitle('New Title');
 $post->setBody('New Body'); // exception thrown because of "unsaved changes" to $post from above
@@ -1151,35 +1111,36 @@ To overcome this, you need to first disable auto-refreshing, then re-enable afte
 ```php
 use App\Entity\Post;
 use App\Factory\PostFactory;
+use function Zenstruck\Foundry\disable_autorefresh;
+use function Zenstruck\Foundry\enable_autorefresh;
+use function Zenstruck\Foundry\without_autorefresh;
+use function Zenstruck\Foundry\force_set_all;
 
-$post = PostFactory::new(['title' => 'Original Title', 'body' => 'Original Body'])
-    ->create()
-    ->enableAutoRefresh()
-;
+$post = PostFactory::createOne(['title' => 'Original Title', 'body' => 'Original Body']);
 
-$post->disableAutoRefresh();
-$post->setTitle('New Title'); // or using ->forceSet('title', 'New Title')
-$post->setBody('New Body'); // or using ->forceSet('body', 'New Body')
-$post->enableAutoRefresh();
-$post->save();
+disable_autorefresh($post);
+$post->setTitle('New Title'); // or using force_set($post, 'title', 'New Title')
+$post->setBody('New Body'); // or using force_set($post, 'body', 'New Body')
+enable_autorefresh($post);
+PostFactory::save($post);
 
 $post->getBody(); // "New Body"
 $post->getTitle(); // "New Title"
 
-// alternatively, use the ->withoutAutoRefresh() helper which first disables auto-refreshing, then re-enables after
+// alternatively, use the without_autorefresh() helper which first disables auto-refreshing, then re-enables after
 // executing the callback.
-$post->withoutAutoRefresh(function (Post $post) { // can pass either Post or Proxy to the callback
+without_autorefresh($post, function (Post $post) {
     $post->setTitle('New Title');
     $post->setBody('New Body');
 });
-$post->save();
+PostFactory::save($post);
 
-// if force-setting properties, you can use the ->forceSetAll() helper:
-$post->forceSetAll([
+// if force-setting properties, you can use the force_set_all() helper:
+force_set_all($post, [
     'title' => 'New Title',
     'body' => 'New Body',
 ]);
-$post->save();
+PostFactory::save($post);
 ```
 
 **NOTE**: You can enable/disable auto-refreshing globally to have every proxy auto-refreshable by default or not. When
@@ -1222,15 +1183,15 @@ $repository->randomRange(0, 5); // get 0-5 random objects
 $repository->randomRange(0, 5, ['author' => 'kevin']); // get 0-5 random objects filtered by the passed criteria
 
 // instance of ObjectRepository - all returned object(s) are proxied
-$repository->find(1); // Proxy|Post|null
-$repository->find(['title' => 'My Title']); // Proxy|Post|null
-$repository->findOneBy(['title' => 'My Title']); // Proxy|Post|null
-$repository->findAll(); // Proxy[]|Post[]
+$repository->find(1); // Post|null
+$repository->find(['title' => 'My Title']); // Post|null
+$repository->findOneBy(['title' => 'My Title']); // Post|null
+$repository->findAll(); // Post[]
 iterator_to_array($repository); // equivalent to above (RepositoryProxy implements \IteratorAggregate)
-$repository->findBy(['title' => 'My Title']); // Proxy[]|Post[]
+$repository->findBy(['title' => 'My Title']); // Post[]
 
 // can call methods on the underlying repository - returned object(s) are proxied
-$repository->findOneByTitle('My Title'); // Proxy|Post|null
+$repository->findOneByTitle('My Title'); // Post|null
 ```
 
 ### Assertions
