@@ -2,13 +2,12 @@
 
 namespace Zenstruck\Foundry\Tests\Functional\Bundle\Extractor;
 
-
-use Zenstruck\Foundry\Bundle\Extractor\Property;
 use DateTime;
 use ReflectionClass;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Url;
+use Zenstruck\Foundry\Bundle\Extractor\Property;
 use Zenstruck\Foundry\Test\Factories;
 
 class PropertyTest extends KernelTestCase
@@ -20,7 +19,7 @@ class PropertyTest extends KernelTestCase
      */
     private $property;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         self::bootKernel();
         $em = static::getContainer()->get('doctrine.orm.default_entity_manager');
@@ -30,8 +29,10 @@ class PropertyTest extends KernelTestCase
 
     /**
      * @TODO add an TestEntity in this bundle to decouple from Project and possibility to test all Cases
+     *
+     * @test
      */
-    public function testGetProbsFromEntity()
+    public function get_probs_from_entity()
     {
         // @TODO replace User Entity with Fixtures
         $this->markTestSkipped('replace User Entity with Fixtures');
@@ -43,31 +44,43 @@ class PropertyTest extends KernelTestCase
         $this->assertIsArray($probs['roles']);
         $this->assertEquals('ROLE_USER', $probs['roles'][0]);
         $this->assertTrue($probs['isVerifiedAccount']);
-        $this->assertEquals(10, strlen($probs['lastLogin']));
+        $this->assertEquals(10, \mb_strlen($probs['lastLogin']));
     }
 
-    public function testGenerateEmail()
+    /**
+     * @test
+     */
+    public function generate_email()
     {
         $email = $this->property->createScalarProperties('string', [], 'email');
 
         $this->assertStringContainsString('@', $email);
     }
 
-    public function testGenerateFirstname()
+    /**
+     * @test
+     */
+    public function generate_firstname()
     {
         $firstName = $this->property->createScalarProperties('string', [], 'firstName');
 
         $this->assertIsString($firstName);
     }
 
-    public function testGenerateInteger()
+    /**
+     * @test
+     */
+    public function generate_integer()
     {
         $int = $this->property->createScalarProperties('integer', [], 'postalCode');
 
         $this->assertIsInt($int);
     }
 
-    public function testGenerateBool()
+    /**
+     * @test
+     */
+    public function generate_bool()
     {
         $bool = $this->property->createScalarProperties('boolean', [], 'isActive');
 
@@ -75,14 +88,20 @@ class PropertyTest extends KernelTestCase
         $this->assertIsBool($bool);
     }
 
-    public function testGenerateFloat()
+    /**
+     * @test
+     */
+    public function generate_float()
     {
         $float = $this->property->createScalarProperties('float', [], 'price');
 
         $this->assertIsFloat($float);
     }
 
-    public function testCreateJsonPropertyWithFieldNameRoles()
+    /**
+     * @test
+     */
+    public function create_json_property_with_field_name_roles()
     {
         $roleUser = $this->property->createJsonPropertyFromAnnotationOrFieldName([], 'roles');
 
@@ -90,7 +109,10 @@ class PropertyTest extends KernelTestCase
         $this->assertEquals('ROLE_USER', $roleUser[0]);
     }
 
-    public function testCreateJsonPropertyWithDefault()
+    /**
+     * @test
+     */
+    public function create_json_property_with_default()
     {
         $roleUser = $this->property->createJsonPropertyFromAnnotationOrFieldName([], 'foo');
 
@@ -98,14 +120,20 @@ class PropertyTest extends KernelTestCase
         $this->assertEquals('DEFAULT', $roleUser[0]);
     }
 
-    public function testCreateStringPropertyFromAnnotationOrFieldNameWithFieldName()
+    /**
+     * @test
+     */
+    public function create_string_property_from_annotation_or_field_name_with_field_name()
     {
         $displayName = $this->property->createStringPropertyFromAnnotationOrFieldName([], 'displayName');
 
         $this->assertIsString($displayName);
     }
 
-    public function testCreateStringPropertyFromAnnotationOrFieldNameWithAnnotationEmail()
+    /**
+     * @test
+     */
+    public function create_string_property_from_annotation_or_field_name_with_annotation_email()
     {
         // @TODO investigate here
         $this->markTestSkipped('Symfony Constraints missing');
@@ -116,7 +144,10 @@ class PropertyTest extends KernelTestCase
         $this->assertStringContainsString('@', $email);
     }
 
-    public function testCreateStringPropertyFromAnnotationOrFieldNameWithAnnotationUrl()
+    /**
+     * @test
+     */
+    public function create_string_property_from_annotation_or_field_name_with_annotation_url()
     {
         // @TODO investigate here
         $this->markTestSkipped('Symfony Constraints missing');
@@ -127,7 +158,10 @@ class PropertyTest extends KernelTestCase
         $this->assertStringContainsString('http', $url);
     }
 
-    public function testCreateDate()
+    /**
+     * @test
+     */
+    public function create_date()
     {
         // reset our properties
         $this->property->setProperties([]);
@@ -138,7 +172,7 @@ class PropertyTest extends KernelTestCase
         $props = $this->property->getProperties();
         $date = new DateTime($props['someNiceDateField']);
         $this->assertCount(1, $props);
-        $this->assertEquals(10, strlen($props['someNiceDateField']));
+        $this->assertEquals(10, \mb_strlen($props['someNiceDateField']));
         $this->assertInstanceOf(DateTime::class, $date);
     }
 }

@@ -2,12 +2,15 @@
 
 namespace Zenstruck\Foundry\Tests\Functional\Bundle\Extractor;
 
-use Zenstruck\Foundry\Bundle\Extractor\ScalarType;
 use PHPUnit\Framework\TestCase;
+use Zenstruck\Foundry\Bundle\Extractor\ScalarType;
 
 class ScalarTypeTest extends TestCase
 {
-    public function testIsScalarType()
+    /**
+     * @test
+     */
+    public function is_scalar_type()
     {
         $scalarType = new ScalarType();
 
