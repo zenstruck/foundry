@@ -57,11 +57,9 @@ class Property
     }
 
     /**
-     * @return string
-     *
      * @throws Exception
      */
-    public function createFakerMethodFromDoctrineType(string $doctrineType)
+    public function createFakerMethodFromDoctrineType(string $doctrineType): string
     {
         $doctrineType = \mb_strtoupper($doctrineType);
 
