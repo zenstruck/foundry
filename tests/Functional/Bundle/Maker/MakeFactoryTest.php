@@ -5,6 +5,7 @@ namespace Zenstruck\Foundry\Tests\Functional\Bundle\Maker;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 use Symfony\Component\Console\Tester\CommandTester;
+use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
 
