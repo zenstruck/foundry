@@ -63,6 +63,8 @@ class Property
      */
     public function createFakerMethodFromDoctrineType(string $doctrineType)
     {
+        $doctrineType = \mb_strtoupper($doctrineType);
+
         if (\array_key_exists($doctrineType, DoctrineTypes::DOCTRINE_TYPES)) {
             return DoctrineTypes::DOCTRINE_TYPES[$doctrineType];
         }
