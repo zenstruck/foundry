@@ -169,7 +169,7 @@ final class MakeFactory extends AbstractMaker
 
     private function getProperties($classname)
     {
-        $properties = $this->propertyExtractor->getScalarPropertiesFromDoctrineFieldMappings($classname);
+        $properties = $this->propertyExtractor->getFakerMethodFromDoctrineFieldMappings($classname);
 
         return $properties;
     }

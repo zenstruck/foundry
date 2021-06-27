@@ -35,7 +35,7 @@ class Property
      * We only want create Defaults for non NULL probs
      * Dont create Default for field id
      */
-    public function getScalarPropertiesFromDoctrineFieldMappings(ReflectionClass $entity): array
+    public function getFakerMethodFromDoctrineFieldMappings(ReflectionClass $entity): array
     {
         $classMetaData = $this->em->getClassMetadata($entity->getName());
         $this->getDefaultFromProperty($entity);
