@@ -11,6 +11,7 @@ class DoctrineTypes
         'BINARY' => '// @TODO add Binary manualy',
         'BLOB' => 'self::faker()->text()',
         'BOOLEAN' => 'self::faker()->boolean()',
+        'DATE' => 'self::faker()->datetime()',
         'DATE_MUTABLE' => 'self::faker()->datetime()',
         'DATE_IMMUTABLE' => 'self::faker()->datetime()',
         'DATEINTERVAL' => '// @TODO add Dateinterval manualy',
