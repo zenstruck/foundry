@@ -26,9 +26,6 @@ class Property
     /**
      * @TODO Support for defaults is missing
      * @TODO Support for relations is missing
-     *
-     * We only want create Defaults for non NULL probs
-     * Dont create Default for field id
      */
     public function getFakerMethodFromDoctrineFieldMappings(ReflectionClass $entity): array
     {
