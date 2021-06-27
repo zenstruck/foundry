@@ -14,11 +14,6 @@ class Property
     private $properties = [];
 
     /**
-     * @var array
-     */
-    private $defaultProperties = [];
-
-    /**
      * @var EntityManagerInterface
      */
     private $em;
@@ -38,7 +33,6 @@ class Property
     public function getFakerMethodFromDoctrineFieldMappings(ReflectionClass $entity): array
     {
         $classMetaData = $this->em->getClassMetadata($entity->getName());
-        $this->getDefaultFromProperty($entity);
         $identifierFieldNames = $classMetaData->getIdentifierFieldNames();
 
         foreach ($classMetaData->fieldMappings as $property) {
@@ -68,16 +62,6 @@ class Property
         }
 
         throw new Exception('DOCTRINE_TYPE not found: '.$doctrineType);
-    }
-
-    /**
-     * @TODO
-     * We store defaults values from properties.
-     * if there is an default property which is not null|''|false we can use it? $this->defaultProperties
-     */
-    public function getDefaultFromProperty(ReflectionClass $reflectionClass): void
-    {
-        $this->defaultProperties = $reflectionClass->getDefaultProperties();
     }
 
     /**
