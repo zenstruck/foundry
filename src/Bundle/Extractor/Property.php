@@ -66,14 +66,4 @@ class Property
     public function getPropertiesFromDoctrineRelations()
     {
     }
-
-    public function getProperties(): array
-    {
-        return $this->properties;
-    }
-
-    public function setProperties(array $properties): void
-    {
-        $this->properties = $properties;
-    }
 }
