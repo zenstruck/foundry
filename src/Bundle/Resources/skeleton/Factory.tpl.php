@@ -39,6 +39,11 @@ final class <?= $class_name ?> extends ModelFactory
     {
         return [
             // TODO add your default values here (https://github.com/zenstruck/foundry#model-factories)
+<?php
+foreach ($defaultProperties as $fieldname => $type) {
+        echo "            '".$fieldname."' => ".$type."\n";
+}
+?>
         ];
     }
 

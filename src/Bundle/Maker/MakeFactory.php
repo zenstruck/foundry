@@ -13,6 +13,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Zenstruck\Foundry\Bundle\Extractor\Property;
 use Zenstruck\Foundry\ModelFactory;
 
 /**
@@ -26,7 +27,12 @@ final class MakeFactory extends AbstractMaker
     /** @var string[] */
     private $entitiesWithFactories;
 
-    public function __construct(ManagerRegistry $managerRegistry, \Traversable $factories)
+    /**
+     * @var Property
+     */
+    private $propertyExtractor;
+
+    public function __construct(ManagerRegistry $managerRegistry, \Traversable $factories, Property $propertyExtractor)
     {
         $this->managerRegistry = $managerRegistry;
         $this->entitiesWithFactories = \array_map(
@@ -35,6 +41,7 @@ final class MakeFactory extends AbstractMaker
             },
             \iterator_to_array($factories)
         );
+        $this->propertyExtractor = $propertyExtractor;
     }
 
     public static function getCommandName(): string
@@ -112,11 +119,14 @@ final class MakeFactory extends AbstractMaker
             $repository = null;
         }
 
+        $defaultProperties = $this->getProperties($entity);
+
         $generator->generateClass(
             $factory->getFullName(),
             __DIR__.'/../Resources/skeleton/Factory.tpl.php',
             [
                 'entity' => $entity,
+                'defaultProperties' => $defaultProperties,
                 'repository' => $repository,
             ]
         );
@@ -155,5 +165,12 @@ final class MakeFactory extends AbstractMaker
         }
 
         return $choices;
+    }
+
+    private function getProperties($classname)
+    {
+        $properties = $this->propertyExtractor->getFakerMethodFromDoctrineFieldMappings($classname);
+
+        return $properties;
     }
 }

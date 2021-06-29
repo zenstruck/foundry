@@ -62,6 +62,7 @@ final class CategoryFactory extends ModelFactory
     {
         return [
             // TODO add your default values here (https://github.com/zenstruck/foundry#model-factories)
+            'name' => self::faker()->text(),
         ];
     }
 
@@ -137,6 +138,7 @@ final class TagFactory extends ModelFactory
     {
         return [
             // TODO add your default values here (https://github.com/zenstruck/foundry#model-factories)
+            'name' => self::faker()->text(),
         ];
     }
 
@@ -208,6 +210,7 @@ final class CategoryFactory extends ModelFactory
     {
         return [
             // TODO add your default values here (https://github.com/zenstruck/foundry#model-factories)
+            'name' => self::faker()->text(),
         ];
     }
 
@@ -283,6 +286,7 @@ final class TagFactory extends ModelFactory
     {
         return [
             // TODO add your default values here (https://github.com/zenstruck/foundry#model-factories)
+            'name' => self::faker()->text(),
         ];
     }
 
