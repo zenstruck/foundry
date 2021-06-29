@@ -9,11 +9,6 @@ use ReflectionClass;
 class Property
 {
     /**
-     * @var array
-     */
-    private $properties = [];
-
-    /**
      * @var EntityManagerInterface
      */
     private $em;
@@ -28,6 +23,7 @@ class Property
      */
     public function getFakerMethodFromDoctrineFieldMappings(ReflectionClass $entity): array
     {
+        $properties = [];
         $classMetaData = $this->em->getClassMetadata($entity->getName());
         $identifierFieldNames = $classMetaData->getIdentifierFieldNames();
 
@@ -39,11 +35,11 @@ class Property
 
             // CREATE FROM DOCTRINE TYPE IF PROP IS NOT NULLABLE
             if (!$property['nullable']) {
-                $this->properties[$property['fieldName']] = $this->createFakerMethodFromDoctrineType($property['type']);
+                $properties[$property['fieldName']] = $this->createFakerMethodFromDoctrineType($property['type']);
             }
         }
 
-        return $this->properties;
+        return $properties;
     }
 
     /**
