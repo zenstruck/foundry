@@ -25,6 +25,10 @@ class PropertyTest extends KernelTestCase
      */
     public function skipIfNotUsingFoundryBundle(): void
     {
+        if (!\getenv('KERNEL_CLASS')) {
+            $this->markTestSkipped('App Kernel not found.');
+        }
+
         if (!\getenv('USE_FOUNDRY_BUNDLE')) {
             $this->markTestSkipped('ZenstruckFoundryBundle not enabled.');
         }
