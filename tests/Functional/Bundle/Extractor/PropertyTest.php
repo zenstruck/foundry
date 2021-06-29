@@ -16,7 +16,7 @@ class PropertyTest extends KernelTestCase
     protected function setUp(): void
     {
         self::bootKernel();
-        $em = static::getContainer()->get('doctrine.orm.default_entity_manager');
+        $em = static::$container->get('doctrine.orm.default_entity_manager');
         $this->property = new Property($em);
     }
 
