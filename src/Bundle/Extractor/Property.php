@@ -24,7 +24,6 @@ class Property
     }
 
     /**
-     * @TODO Support for defaults is missing
      * @TODO Support for relations is missing
      */
     public function getFakerMethodFromDoctrineFieldMappings(ReflectionClass $entity): array
