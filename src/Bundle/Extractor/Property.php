@@ -57,7 +57,7 @@ class Property
             return DoctrineTypes::DOCTRINE_TYPES[$doctrineType];
         }
 
-        throw new Exception('DOCTRINE_TYPE not found: '.$doctrineType);
+        return 'null, // @TODO add '.$doctrineType.' manually';
     }
 
     /**
