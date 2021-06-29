@@ -21,6 +21,16 @@ class PropertyTest extends KernelTestCase
     }
 
     /**
+     * @before
+     */
+    public function skipIfNotUsingFoundryBundle(): void
+    {
+        if (!\getenv('USE_FOUNDRY_BUNDLE')) {
+            $this->markTestSkipped('ZenstruckFoundryBundle not enabled.');
+        }
+    }
+
+    /**
      * @test
      * @dataProvider doctrineTypes
      */
