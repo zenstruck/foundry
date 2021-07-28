@@ -51,7 +51,7 @@ final class MakeStory extends AbstractMaker
         }
 
         $argument = $command->getDefinition()->getArgument('name');
-        $value = $io->ask($argument->getDescription(), $argument->getDefault(), [Validator::class, 'notBlank']);
+        $value = $io->ask($argument->getDescription(), null, [Validator::class, 'notBlank']);
         $input->setArgument($argument->getName(), $value);
     }
 
