@@ -312,6 +312,13 @@ class Factory
             $value = $value->withoutPersisting();
         }
 
+        // Check if the attribute is cascade persisted
+        $field = $this->relationshipField($value);
+        $cascadePersist = $this->hasCascadePersist($value, $field);
+        if (true === $cascadePersist) {
+            $value->setCascadePersisted(true);
+        }
+
         return $value->create()->object();
     }
 
@@ -340,6 +347,22 @@ class Factory
         }
 
         return $collection->all($cascadePersisted);
+    }
+
+    private function relationshipField(self $factory): ?string
+    {
+        $relationClass = $factory->class;
+        $factoryClass = $this->class;
+        $classMetadataFactory = self::configuration()->objectManagerFor($factoryClass)->getMetadataFactory()->getMetadataFor($factoryClass);
+
+        foreach ($classMetadataFactory->getAssociationNames() as $field) {
+            // ensure 1-1, n-1 and associated class matches
+            if (!$classMetadataFactory->isAssociationInverseSide($field) && $classMetadataFactory->getAssociationTargetClass($field) === $relationClass) {
+                return $field;
+            }
+        }
+
+        return null; // no relationship found
     }
 
     private function inverseRelationshipField(self $factory): ?string
@@ -371,8 +394,12 @@ class Factory
         // Find inversedBy key
         $inversedBy = $collectionMetadata->associationMappings[$field]['inversedBy'] ?? null;
 
-        // Find cascade metatada for the inversedBy field
-        $cascadeMetadata = $classMetadataFactory->associationMappings[$inversedBy]['cascade'] ?? [];
+        // Find cascade metatadata
+        if (null !== $inversedBy) {
+            $cascadeMetadata = $classMetadataFactory->associationMappings[$inversedBy]['cascade'] ?? [];
+        } else {
+            $cascadeMetadata = $classMetadataFactory->associationMappings[$field]['cascade'] ?? [];
+        }
 
         return in_array('persist', $cascadeMetadata, true);
     }
