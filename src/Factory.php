@@ -401,7 +401,7 @@ class Factory
             $cascadeMetadata = $classMetadataFactory->associationMappings[$field]['cascade'] ?? [];
         }
 
-        return in_array('persist', $cascadeMetadata, true);
+        return \in_array('persist', $cascadeMetadata, true);
     }
 
     private function isPersisting(): bool

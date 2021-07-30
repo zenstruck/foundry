@@ -62,7 +62,7 @@ final class FactoryCollection
         /** @psalm-suppress TooManyArguments */
         return \array_map(
             function() use ($cascadePersist) {
-                $cloned =  clone $this->factory;
+                $cloned = clone $this->factory;
                 $cloned->setCascadePersist($cascadePersist);
 
                 return $cloned;
