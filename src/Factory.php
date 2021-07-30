@@ -27,6 +27,9 @@ class Factory
     /** @var bool */
     private $persist = true;
 
+    /** @var bool */
+    private $cascadePersisted = false;
+
     /** @var array<array|callable> */
     private $attributeSet = [];
 
@@ -105,7 +108,7 @@ class Factory
 
         $proxy = new Proxy($object);
 
-        if (!$this->isPersisting()) {
+        if (!$this->isPersisting() || true === $this->cascadePersisted) {
             return $proxy;
         }
 
@@ -200,6 +203,13 @@ class Factory
         $cloned->instantiator = $instantiator;
 
         return $cloned;
+    }
+
+    final public function setCascadePersisted(bool $cascadePersisted): self
+    {
+        $this->cascadePersisted = $cascadePersisted;
+
+        return $this;
     }
 
     /**
@@ -316,7 +326,10 @@ class Factory
 
     private function normalizeCollection(FactoryCollection $collection): array
     {
-        if ($this->isPersisting() && $field = $this->inverseRelationshipField($collection->factory())) {
+        $field = $this->inverseRelationshipField($collection->factory());
+        $cascadePersisted = $this->hasCascadePersist($collection->factory(), $field);
+
+        if ($this->isPersisting() && $field && false === $cascadePersisted) {
             $this->afterPersist[] = static function(Proxy $proxy) use ($collection, $field) {
                 $collection->create([$field => $proxy]);
                 $proxy->refresh();
@@ -326,7 +339,7 @@ class Factory
             return [];
         }
 
-        return $collection->all();
+        return $collection->all($cascadePersisted);
     }
 
     private function inverseRelationshipField(self $factory): ?string
@@ -342,6 +355,26 @@ class Factory
         }
 
         return null; // no relationship found
+    }
+
+    private function hasCascadePersist(self $factory, ?string $field): bool
+    {
+        if (null === $field) {
+            return false;
+        }
+
+        $collectionClass = $factory->class;
+        $factoryClass = $this->class;
+        $collectionMetadata = self::configuration()->objectManagerFor($collectionClass)->getClassMetadata($collectionClass);
+        $classMetadataFactory = self::configuration()->objectManagerFor($factoryClass)->getMetadataFactory()->getMetadataFor($factoryClass);
+
+        // Find inversedBy key
+        $inversedBy = $collectionMetadata->associationMappings[$field]['inversedBy'] ?? null;
+
+        // Find cascade metatada for the inversedBy field
+        $cascadeMetadata = $classMetadataFactory->associationMappings[$inversedBy]['cascade'] ?? [];
+
+        return in_array('persist', $cascadeMetadata, true);
     }
 
     private function isPersisting(): bool

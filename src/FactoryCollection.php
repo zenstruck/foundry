@@ -57,12 +57,15 @@ final class FactoryCollection
      *
      * @psalm-return list<Factory<TObject>>
      */
-    public function all(): array
+    public function all(bool $cascadePersisted = false): array
     {
         /** @psalm-suppress TooManyArguments */
         return \array_map(
-            function() {
-                return clone $this->factory;
+            function() use ($cascadePersisted) {
+                $cloned =  clone $this->factory;
+                $cloned->setCascadePersisted($cascadePersisted);
+
+                return $cloned;
             },
             \array_fill(0, \random_int($this->min, $this->max), null)
         );
