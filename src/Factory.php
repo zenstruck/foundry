@@ -28,7 +28,7 @@ class Factory
     private $persist = true;
 
     /** @var bool */
-    private $cascadePersisted = false;
+    private $cascadePersist = false;
 
     /** @var array<array|callable> */
     private $attributeSet = [];
@@ -108,7 +108,7 @@ class Factory
 
         $proxy = new Proxy($object);
 
-        if (!$this->isPersisting() || true === $this->cascadePersisted) {
+        if (!$this->isPersisting() || true === $this->cascadePersist) {
             return $proxy;
         }
 
@@ -205,9 +205,9 @@ class Factory
         return $cloned;
     }
 
-    final public function setCascadePersisted(bool $cascadePersisted): self
+    final public function setCascadePersist(bool $cascadePersist): self
     {
-        $this->cascadePersisted = $cascadePersisted;
+        $this->cascadePersist = $cascadePersist;
 
         return $this;
     }
@@ -312,11 +312,11 @@ class Factory
             $value = $value->withoutPersisting();
         }
 
-        // Check if the attribute is cascade persisted
+        // Check if the attribute is cascade persist
         $field = $this->relationshipField($value);
         $cascadePersist = $this->hasCascadePersist($value, $field);
         if (true === $cascadePersist) {
-            $value->setCascadePersisted(true);
+            $value->setCascadePersist(true);
         }
 
         return $value->create()->object();
@@ -334,9 +334,9 @@ class Factory
     private function normalizeCollection(FactoryCollection $collection): array
     {
         $field = $this->inverseRelationshipField($collection->factory());
-        $cascadePersisted = $this->hasCascadePersist($collection->factory(), $field);
+        $cascadePersist = $this->hasCascadePersist($collection->factory(), $field);
 
-        if ($this->isPersisting() && $field && false === $cascadePersisted) {
+        if ($this->isPersisting() && $field && false === $cascadePersist) {
             $this->afterPersist[] = static function(Proxy $proxy) use ($collection, $field) {
                 $collection->create([$field => $proxy]);
                 $proxy->refresh();
@@ -346,7 +346,7 @@ class Factory
             return [];
         }
 
-        return $collection->all($cascadePersisted);
+        return $collection->all($cascadePersist);
     }
 
     private function relationshipField(self $factory): ?string
