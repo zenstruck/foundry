@@ -17,6 +17,7 @@
         "fakerphp/faker": "^1.5",
         "symfony/deprecation-contracts": "^2.2",
         "symfony/property-access": "^3.4|^4.4|^5.0",
+        "zenstruck/assert": "^1.0",
         "zenstruck/callback": "^1.1"
     },
     "require-dev": {
