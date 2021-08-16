@@ -26,7 +26,7 @@ final class Instantiator
     /** @var bool */
     private $alwaysForceProperties = false;
 
-    /** @var array */
+    /** @var string[] */
     private $forceProperties = [];
 
     public function __invoke(array $attributes, string $class): object
