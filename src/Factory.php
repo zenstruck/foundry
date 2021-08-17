@@ -313,10 +313,12 @@ class Factory
         }
 
         // Check if the attribute is cascade persist
-        $relationField = $this->relationshipField($value) ?? $this->inverseRelationshipField($value);
-        $cascadePersist = $this->hasCascadePersist($value, $relationField);
-        if (true === $cascadePersist) {
-            $value->setCascadePersist(true);
+        if (self::configuration()->hasManagerRegistry()) {
+            $relationField = $this->relationshipField($value) ?? $this->inverseRelationshipField($value);
+            $cascadePersist = $this->hasCascadePersist($value, $relationField);
+            if (true === $cascadePersist) {
+                $value->setCascadePersist(true);
+            }
         }
 
         return $value->create()->object();
