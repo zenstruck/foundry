@@ -205,13 +205,6 @@ class Factory
         return $cloned;
     }
 
-    final public function setCascadePersist(bool $cascadePersist): self
-    {
-        $this->cascadePersist = $cascadePersist;
-
-        return $this;
-    }
-
     /**
      * @internal
      */
@@ -348,7 +341,14 @@ class Factory
             return [];
         }
 
-        return $collection->all($cascadePersist);
+        return \array_map(
+            function(self $factory) {
+                $factory->cascadePersist = $this->cascadePersist;
+
+                return $factory;
+            },
+            $collection->all()
+        );
     }
 
     private function relationshipField(self $factory): ?string
