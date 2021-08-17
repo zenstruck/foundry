@@ -393,14 +393,16 @@ class Factory
         $collectionMetadata = self::configuration()->objectManagerFor($collectionClass)->getClassMetadata($collectionClass);
         $classMetadataFactory = self::configuration()->objectManagerFor($factoryClass)->getMetadataFactory()->getMetadataFor($factoryClass);
 
-        // Find inversedBy key
-        $inversedBy = $collectionMetadata->associationMappings[$field]['inversedBy'] ?? null;
+        if (false === $collectionMetadata->hasAssociation($field)) {
+            return false;
+        }
 
         // Find cascade metatadata
-        if (null !== $inversedBy) {
-            $cascadeMetadata = $classMetadataFactory->associationMappings[$inversedBy]['cascade'] ?? [];
+        $collectionAssociationMapping = $collectionMetadata->getAssociationMapping($field);
+        if (null !== $inversedBy = $collectionAssociationMapping['inversedBy']) {
+            $cascadeMetadata = $classMetadataFactory->getAssociationMapping($inversedBy)['cascade'] ?? [];
         } else {
-            $cascadeMetadata = $classMetadataFactory->associationMappings[$field]['cascade'] ?? [];
+            $cascadeMetadata = $classMetadataFactory->getAssociationMapping($field)['cascade'] ?? [];
         }
 
         return \in_array('persist', $cascadeMetadata, true);
