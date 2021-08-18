@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Foundry;
 
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Faker;
 
 /**
@@ -390,7 +391,7 @@ class Factory
         $collectionMetadata = self::configuration()->objectManagerFor($collectionClass)->getClassMetadata($collectionClass);
         $classMetadataFactory = self::configuration()->objectManagerFor($factoryClass)->getMetadataFactory()->getMetadataFor($factoryClass);
 
-        if (!$collectionMetadata instanceof \Doctrine\ORM\Mapping\ClassMetadataInfo || !$classMetadataFactory instanceof \Doctrine\ORM\Mapping\ClassMetadataInfo) {
+        if (!$collectionMetadata instanceof ClassMetadataInfo || !$classMetadataFactory instanceof ClassMetadataInfo) {
             return false;
         }
 
