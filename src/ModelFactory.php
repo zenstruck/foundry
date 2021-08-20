@@ -16,10 +16,12 @@ abstract class ModelFactory extends Factory
     }
 
     /**
+     * @param array|callable $attributes
+     *
      * @return list<TModel&Proxy<TModel>>
      * @psalm-return list<Proxy<TModel>>
      */
-    public static function createMany(int $number, callable $attributes = []): array
+    public static function createMany(int $number, $attributes = []): array
     {
         return static::new()->many($number)->create($attributes);
     }
