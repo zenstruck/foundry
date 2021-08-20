@@ -4,7 +4,10 @@ namespace Zenstruck\Foundry;
 
 /**
  * @template TModel of object
- * @extends Factory<TModel>
+ * @template-extends Factory<TModel>
+ *
+ * @method static Proxy[]|TModel[] createMany(int $number, array|callable $attributes = [])
+ * @psalm-method static list<Proxy<TModel>> createMany(int $number, array|callable $attributes = [])
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
