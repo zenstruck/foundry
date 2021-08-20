@@ -395,13 +395,12 @@ class Factory
             return false;
         }
 
-        if (false === $collectionMetadata->hasAssociation($field)) {
-            return false;
-        }
+        if ($collectionMetadata->hasAssociation($field)) {
+            $inversedBy = $collectionMetadata->getAssociationMapping($field)['inversedBy'];
+            if (null === $inversedBy) {
+                return false;
+            }
 
-        // Find cascade metatadata
-        $collectionAssociationMapping = $collectionMetadata->getAssociationMapping($field);
-        if (null !== $inversedBy = $collectionAssociationMapping['inversedBy']) {
             $cascadeMetadata = $classMetadataFactory->getAssociationMapping($inversedBy)['cascade'] ?? [];
         } else {
             $cascadeMetadata = $classMetadataFactory->getAssociationMapping($field)['cascade'] ?? [];
