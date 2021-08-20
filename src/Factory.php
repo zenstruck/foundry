@@ -308,7 +308,7 @@ class Factory
 
         // Check if the attribute is cascade persist
         if (self::configuration()->hasManagerRegistry()) {
-            $relationField = $this->relationshipField($value) ?? $this->inverseRelationshipField($value);
+            $relationField = $this->relationshipField($value);
             $value->cascadePersist = $this->hasCascadePersist($value, $relationField);
         }
 
@@ -351,13 +351,21 @@ class Factory
 
     private function relationshipField(self $factory): ?string
     {
-        $relationClass = $factory->class;
         $factoryClass = $this->class;
-        $classMetadataFactory = self::configuration()->objectManagerFor($factoryClass)->getMetadataFactory()->getMetadataFor($factoryClass);
+        $relationClass = $factory->class;
 
-        foreach ($classMetadataFactory->getAssociationNames() as $field) {
-            // ensure 1-1, n-1 and associated class matches
-            if (!$classMetadataFactory->isAssociationInverseSide($field) && $classMetadataFactory->getAssociationTargetClass($field) === $relationClass) {
+        // Check inversedBy side ($this is the owner of the relation)
+        $factoryClassMetadata = self::configuration()->objectManagerFor($factoryClass)->getMetadataFactory()->getMetadataFor($factoryClass);
+        foreach ($factoryClassMetadata->getAssociationNames() as $field) {
+            if (!$factoryClassMetadata->isAssociationInverseSide($field) && $factoryClassMetadata->getAssociationTargetClass($field) === $relationClass) {
+                return $field;
+            }
+        }
+
+        // Check mappedBy side ($factory is the owner of the relation)
+        $relationClassMetadata = self::configuration()->objectManagerFor($relationClass)->getClassMetadata($relationClass);
+        foreach ($relationClassMetadata->getAssociationNames() as $field) {
+            if (($relationClassMetadata->isSingleValuedAssociation($field) || $relationClassMetadata->isCollectionValuedAssociation($field)) && $relationClassMetadata->getAssociationTargetClass($field) === $factoryClass) {
                 return $field;
             }
         }
