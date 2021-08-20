@@ -37,7 +37,7 @@ final class FactoryCollection
     /**
      * @param array|callable $attributes
      *
-     * @return Proxy[]|object[]
+     * @return list<TObject&Proxy<TObject>>
      *
      * @psalm-suppress InvalidReturnType
      * @psalm-return list<Proxy<TObject>>
