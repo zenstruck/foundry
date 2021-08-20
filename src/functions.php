@@ -19,7 +19,7 @@ function factory(string $class, $defaultAttributes = []): AnonymousFactory
 /**
  * @see Factory::create()
  *
- * @return Proxy|object
+ * @return Proxy&TObject
  *
  * @template TObject of object
  * @psalm-param class-string<TObject> $class
@@ -47,7 +47,7 @@ function create_many(int $number, string $class, $attributes = []): array
 /**
  * Instantiate object without persisting.
  *
- * @return Proxy|object "unpersisted" Proxy wrapping the instantiated object
+ * @return Proxy&TObject "unpersisted" Proxy wrapping the instantiated object
  *
  * @template TObject of object
  * @psalm-param class-string<TObject> $class
