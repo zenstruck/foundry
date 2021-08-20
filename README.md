@@ -198,6 +198,7 @@ use Zenstruck\Foundry\Proxy;
 /**
  * @extends ModelFactory<\App\Entity\Post>
  * @method static PostRepository|RepositoryProxy repository()
+ * @method static Post[]|Proxy[] createMany(int $number, $attributes = [])
  * @method Post|Proxy create($attributes = [])
  */
 final class PostFactory extends ModelFactory

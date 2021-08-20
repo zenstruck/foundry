@@ -15,15 +15,13 @@ abstract class ModelFactory extends Factory
         parent::__construct(static::getClass());
     }
 
-    /**
-     * @param array|callable $attributes
-     *
-     * @return list<TModel&Proxy<TModel>>
-     * @psalm-return list<Proxy<TModel>>
-     */
-    public static function createMany(int $number, $attributes = []): array
+    public static function __callStatic(string $name, array $arguments)
     {
-        return static::new()->many($number)->create($attributes);
+        if ('createMany' !== $name) {
+            throw new \BadMethodCallException(\sprintf('Call to undefined static method "%s::%s".', static::class, $name));
+        }
+
+        return static::new()->many($arguments[0])->create($arguments[1] ?? []);
     }
 
     /**
