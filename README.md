@@ -134,7 +134,7 @@ class Post
      * @ORM\Column(type="text", nullable=true)
      */
     private $body;
-    
+
     /**
      * @ORM\Column(type="datetime")
      */
@@ -397,7 +397,7 @@ $posts = PostFactory::new(['title' => 'Post A'])
         'body' => 'Post Body...',
 
         // CategoryFactory will be used to create a new Category for each Post
-        'category' => CategoryFactory::new(['name' => 'php']), 
+        'category' => CategoryFactory::new(['name' => 'php']),
     ])
     ->withAttributes([
         // Proxies are automatically converted to their wrapped object
@@ -481,7 +481,7 @@ PostFactory::new()
         // $object is the persisted Post object
         // $attributes contains the attributes used to instantiate the object and any extras
     })
-    
+
     // multiple events are allowed
     ->beforeInstantiate(function($attributes) { return $attributes; })
     ->afterInstantiate(function() {})
@@ -524,7 +524,7 @@ final class PostFactory extends ModelFactory
                 return new Post(); // custom instantiation for this factory
             })
             ->afterPersist(function () {}) // default event for this factory
-        ; 
+        ;
     }
 }
 ```
@@ -662,7 +662,7 @@ protected function getDefaults(): array
         'post' => PostFactory::new()->published(),
 
         // NOT RECOMMENDED - will potentially result in extra unintended Posts
-        'post' => PostFactory::createOne(), 
+        'post' => PostFactory::createOne(),
         'post' => PostFactory::new()->published()->create(),
     ];
 }
@@ -964,7 +964,7 @@ Foundry allows each individual test to fully follow the [AAA](https://www.thephi
 ("Arrange", "Act", "Assert") testing pattern. You create your fixtures using "factories" at the beginning of each test.
 You only create fixtures that are applicable for the test. Additionally, these fixtures are created with only the
 attributes required for the test - attributes that are not applicable are filled with random data. The created fixture
-objects are wrapped in a "proxy" that helps with pre and post assertions. 
+objects are wrapped in a "proxy" that helps with pre and post assertions.
 
 Let's look at an example:
 
@@ -978,7 +978,7 @@ public function test_can_post_a_comment(): void
             'slug' => 'post-a' // This test only requires the slug field - all other fields are random data
         ])
     ;
-    
+
     // 1a. "Pre-Assertions"
     $this->assertCount(0, $post->getComments());
 
@@ -1038,7 +1038,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class MyTest extends WebTestCase
 {
     use ResetDatabase, Factories;
-    
+
     // ...
 }
 ```
@@ -1370,7 +1370,7 @@ these tests to be unnecessarily slow. You can improve the speed by reducing the 
     class UserFactory extends ModelFactory
     {
         public const DEFAULT_PASSWORD = '1234'; // the password used to create the pre-encoded version below
-    
+
         protected function getDefaults(): array
         {
             return [
@@ -1412,7 +1412,7 @@ class MyUnitTest extends TestCase
 }
 ```
 
-**NOTE**: [Factories as Services](#factories-as-services) and [Stories as Services](#stories-as-services) with required 
+**NOTE**: [Factories as Services](#factories-as-services) and [Stories as Services](#stories-as-services) with required
 constructor arguments are not usable in non-Kernel tests. The container is not available to resolve their dependencies.
 The easiest work-around is to make the test an instance of `Symfony\Bundle\FrameworkBundle\Test\KernelTestCase` so the
 container is available.
