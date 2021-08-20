@@ -19,11 +19,9 @@ abstract class ModelFactory extends Factory
      * @return list<TModel&Proxy<TModel>>
      * @psalm-return list<Proxy<TModel>>
      */
-    public static function createMany(): array
+    public static function createMany(int $number, callable $attributes = []): array
     {
-        $arguments = \func_get_args();
-
-        return static::new()->many($arguments[0])->create($arguments[1] ?? []);
+        return static::new()->many($number)->create($attributes);
     }
 
     /**
