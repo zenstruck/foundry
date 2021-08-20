@@ -46,10 +46,11 @@ final class ModelFactoryTest extends TestCase
      */
     public function can_instantiate_many_legacy(): void
     {
-        $objects = PostFactory::createMany(2, ['title' => 'title']);
+        $objects = PostFactory::new(['body' => 'body'])->createMany(2, ['title' => 'title']);
 
         $this->assertCount(2, $objects);
         $this->assertSame('title', $objects[0]->getTitle());
+        $this->assertSame('body', $objects[1]->getBody());
     }
 
     /**
