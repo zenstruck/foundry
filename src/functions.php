@@ -7,7 +7,7 @@ use Faker;
 /**
  * @see Factory::__construct()
  *
- * @template TObject as object
+ * @template TObject of object
  * @psalm-param class-string<TObject> $class
  * @psalm-return AnonymousFactory<TObject>
  */

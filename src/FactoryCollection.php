@@ -3,7 +3,7 @@
 namespace Zenstruck\Foundry;
 
 /**
- * @template TObject as object
+ * @template TObject of object
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */

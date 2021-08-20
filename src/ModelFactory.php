@@ -4,10 +4,7 @@ namespace Zenstruck\Foundry;
 
 /**
  * @template TModel of object
- * @template-extends Factory<TModel>
- *
- * @method static Proxy[]|object[] createMany(int $number, array|callable $attributes = [])
- * @psalm-method static list<Proxy<TModel>> createMany(int $number, array|callable $attributes = [])
+ * @extends Factory<TModel>
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
@@ -18,11 +15,13 @@ abstract class ModelFactory extends Factory
         parent::__construct(static::getClass());
     }
 
-    public static function __callStatic(string $name, array $arguments)
+    /**
+     * @return list<TModel&Proxy<TModel>>
+     * @psalm-return list<Proxy<TModel>>
+     */
+    public static function createMany(): array
     {
-        if ('createMany' !== $name) {
-            throw new \BadMethodCallException(\sprintf('Call to undefined static method "%s::%s".', static::class, $name));
-        }
+        $arguments = \func_get_args();
 
         return static::new()->many($arguments[0])->create($arguments[1] ?? []);
     }
@@ -66,8 +65,7 @@ abstract class ModelFactory extends Factory
     /**
      * A shortcut to create a single model without states.
      *
-     * @return Proxy|object
-     *
+     * @return Proxy<TModel>&TModel
      * @psalm-return Proxy<TModel>
      */
     final public static function createOne(array $attributes = []): Proxy
@@ -79,8 +77,7 @@ abstract class ModelFactory extends Factory
      * Try and find existing object for the given $attributes. If not found,
      * instantiate and persist.
      *
-     * @return Proxy|object
-     *
+     * @return Proxy<TModel>&TModel
      * @psalm-return Proxy<TModel>
      */
     final public static function findOrCreate(array $attributes): Proxy
@@ -94,6 +91,9 @@ abstract class ModelFactory extends Factory
 
     /**
      * @see RepositoryProxy::first()
+     *
+     * @return Proxy<TModel>&TModel
+     * @psalm-return Proxy<TModel>
      *
      * @throws \RuntimeException If no entities exist
      */
@@ -109,6 +109,9 @@ abstract class ModelFactory extends Factory
     /**
      * @see RepositoryProxy::last()
      *
+     * @return Proxy<TModel>&TModel
+     * @psalm-return Proxy<TModel>
+     *
      * @throws \RuntimeException If no entities exist
      */
     final public static function last(string $sortedField = 'id'): Proxy
@@ -122,6 +125,9 @@ abstract class ModelFactory extends Factory
 
     /**
      * @see RepositoryProxy::random()
+     *
+     * @return Proxy<TModel>&TModel
+     * @psalm-return Proxy<TModel>
      */
     final public static function random(array $attributes = []): Proxy
     {
@@ -131,8 +137,7 @@ abstract class ModelFactory extends Factory
     /**
      * Fetch one random object and create a new object if none exists.
      *
-     * @return Proxy|object
-     *
+     * @return Proxy<TModel>&TModel
      * @psalm-return Proxy<TModel>
      */
     final public static function randomOrCreate(array $attributes = []): Proxy
@@ -146,6 +151,9 @@ abstract class ModelFactory extends Factory
 
     /**
      * @see RepositoryProxy::randomSet()
+     *
+     * @return list<TModel&Proxy<TModel>>
+     * @psalm-return list<Proxy<TModel>>
      */
     final public static function randomSet(int $number, array $attributes = []): array
     {
@@ -154,6 +162,9 @@ abstract class ModelFactory extends Factory
 
     /**
      * @see RepositoryProxy::randomRange()
+     *
+     * @return list<TModel&Proxy<TModel>>
+     * @psalm-return list<Proxy<TModel>>
      */
     final public static function randomRange(int $min, int $max, array $attributes = []): array
     {
@@ -178,6 +189,9 @@ abstract class ModelFactory extends Factory
 
     /**
      * @see RepositoryProxy::findAll()
+     *
+     * @return list<TModel&Proxy<TModel>>
+     * @psalm-return list<Proxy<TModel>>
      */
     final public static function all(): array
     {
@@ -186,6 +200,9 @@ abstract class ModelFactory extends Factory
 
     /**
      * @see RepositoryProxy::find()
+     *
+     * @return Proxy<TModel>&TModel
+     * @psalm-return Proxy<TModel>
      *
      * @throws \RuntimeException If no entity found
      */
@@ -200,6 +217,9 @@ abstract class ModelFactory extends Factory
 
     /**
      * @see RepositoryProxy::findBy()
+     *
+     * @return list<TModel&Proxy<TModel>>
+     * @psalm-return list<Proxy<TModel>>
      */
     final public static function findBy(array $attributes): array
     {
