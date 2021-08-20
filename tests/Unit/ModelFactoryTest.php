@@ -3,6 +3,7 @@
 namespace Zenstruck\Foundry\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 
@@ -11,7 +12,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
  */
 final class ModelFactoryTest extends TestCase
 {
-    use Factories;
+    use ExpectDeprecationTrait, Factories;
 
     /**
      * @test
@@ -46,6 +47,8 @@ final class ModelFactoryTest extends TestCase
      */
     public function can_instantiate_many_legacy(): void
     {
+        $this->expectDeprecation(\sprintf('Since zenstruck/foundry 1.7: Calling instance method "%1$s::createMany()" is deprecated and will be removed in 2.0, use the static "%1$s:createMany()" method instead.', PostFactory::class));
+
         $objects = PostFactory::new(['body' => 'body'])->createMany(2, ['title' => 'title']);
 
         $this->assertCount(2, $objects);
