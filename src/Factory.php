@@ -5,7 +5,7 @@ namespace Zenstruck\Foundry;
 use Faker;
 
 /**
- * @template TObject as object
+ * @template TObject of object
  * @abstract
  *
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -68,8 +68,7 @@ class Factory
     /**
      * @param array|callable $attributes
      *
-     * @return Proxy|object
-     *
+     * @return Proxy<TObject>&TObject
      * @psalm-return Proxy<TObject>
      */
     final public function create($attributes = []): Proxy
@@ -119,7 +118,7 @@ class Factory
     /**
      * @see FactoryCollection::__construct()
      *
-     * @psalm-return FactoryCollection<TObject>
+     * @return FactoryCollection<TObject>
      */
     final public function many(int $min, ?int $max = null): FactoryCollection
     {

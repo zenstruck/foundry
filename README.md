@@ -196,6 +196,8 @@ use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
 
 /**
+ * @extends ModelFactory<Post>
+ *
  * @method static Post|Proxy createOne(array $attributes = [])
  * @method static Post[]|Proxy[] createMany(int $number, $attributes = [])
  * @method static Post|Proxy find($criteria)
@@ -209,7 +211,7 @@ use Zenstruck\Foundry\Proxy;
  * @method static Post[]|Proxy[] randomSet(int $number, array $attributes = []))
  * @method static Post[]|Proxy[] randomRange(int $min, int $max, array $attributes = []))
  * @method static PostRepository|RepositoryProxy repository()
- * @method Post|Proxy create($attributes = [])
+ * @method Post|Proxy create(array|callable $attributes = [])
  */
 final class PostFactory extends ModelFactory
 {

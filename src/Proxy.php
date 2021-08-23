@@ -87,7 +87,7 @@ final class Proxy
     /**
      * @internal
      *
-     * @template TObject as object
+     * @template TObject of object
      * @psalm-param TObject $object
      * @psalm-return Proxy<TObject>
      */
@@ -105,7 +105,7 @@ final class Proxy
     }
 
     /**
-     * @psalm-return TProxiedObject
+     * @return TProxiedObject
      */
     public function object(): object
     {
