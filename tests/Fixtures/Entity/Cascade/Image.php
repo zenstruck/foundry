@@ -18,11 +18,6 @@ class Image
     private $id;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $prePersistedId;
-
-    /**
      * @ORM\Column(type="string", length=255)
      */
     private $path;

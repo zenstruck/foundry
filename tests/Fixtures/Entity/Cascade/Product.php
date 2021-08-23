@@ -61,16 +61,6 @@ class Product
         return $this->id;
     }
 
-    public function getPrePersistedId(): ?int
-    {
-        return $this->prePersistedId;
-    }
-
-    public function setPrePersistedId(?int $prePersistedId): void
-    {
-        $this->prePersistedId = $prePersistedId;
-    }
-
     public function getName(): ?string
     {
         return $this->name;
