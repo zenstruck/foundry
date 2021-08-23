@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Foundry;
 
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Faker;
 
 /**
@@ -26,6 +27,9 @@ class Factory
 
     /** @var bool */
     private $persist = true;
+
+    /** @var bool */
+    private $cascadePersist = false;
 
     /** @var array<array|callable> */
     private $attributeSet = [];
@@ -104,7 +108,7 @@ class Factory
 
         $proxy = new Proxy($object);
 
-        if (!$this->isPersisting()) {
+        if (!$this->isPersisting() || true === $this->cascadePersist) {
             return $proxy;
         }
 
@@ -301,6 +305,12 @@ class Factory
             $value = $value->withoutPersisting();
         }
 
+        // Check if the attribute is cascade persist
+        if (self::configuration()->hasManagerRegistry()) {
+            $relationField = $this->relationshipField($value);
+            $value->cascadePersist = $this->hasCascadePersist($value, $relationField);
+        }
+
         return $value->create()->object();
     }
 
@@ -315,7 +325,10 @@ class Factory
 
     private function normalizeCollection(FactoryCollection $collection): array
     {
-        if ($this->isPersisting() && $field = $this->inverseRelationshipField($collection->factory())) {
+        $field = $this->inverseRelationshipField($collection->factory());
+        $cascadePersist = $this->hasCascadePersist($collection->factory(), $field);
+
+        if ($this->isPersisting() && $field && false === $cascadePersist) {
             $this->afterPersist[] = static function(Proxy $proxy) use ($collection, $field) {
                 $collection->create([$field => $proxy]);
                 $proxy->refresh();
@@ -325,7 +338,38 @@ class Factory
             return [];
         }
 
-        return $collection->all();
+        return \array_map(
+            function(self $factory) {
+                $factory->cascadePersist = $this->cascadePersist;
+
+                return $factory;
+            },
+            $collection->all()
+        );
+    }
+
+    private function relationshipField(self $factory): ?string
+    {
+        $factoryClass = $this->class;
+        $relationClass = $factory->class;
+
+        // Check inversedBy side ($this is the owner of the relation)
+        $factoryClassMetadata = self::configuration()->objectManagerFor($factoryClass)->getMetadataFactory()->getMetadataFor($factoryClass);
+        foreach ($factoryClassMetadata->getAssociationNames() as $field) {
+            if (!$factoryClassMetadata->isAssociationInverseSide($field) && $factoryClassMetadata->getAssociationTargetClass($field) === $relationClass) {
+                return $field;
+            }
+        }
+
+        // Check mappedBy side ($factory is the owner of the relation)
+        $relationClassMetadata = self::configuration()->objectManagerFor($relationClass)->getClassMetadata($relationClass);
+        foreach ($relationClassMetadata->getAssociationNames() as $field) {
+            if (($relationClassMetadata->isSingleValuedAssociation($field) || $relationClassMetadata->isCollectionValuedAssociation($field)) && $relationClassMetadata->getAssociationTargetClass($field) === $factoryClass) {
+                return $field;
+            }
+        }
+
+        return null; // no relationship found
     }
 
     private function inverseRelationshipField(self $factory): ?string
@@ -341,6 +385,35 @@ class Factory
         }
 
         return null; // no relationship found
+    }
+
+    private function hasCascadePersist(self $factory, ?string $field): bool
+    {
+        if (null === $field) {
+            return false;
+        }
+
+        $factoryClass = $this->class;
+        $relationClass = $factory->class;
+        $classMetadataFactory = self::configuration()->objectManagerFor($factoryClass)->getMetadataFactory()->getMetadataFor($factoryClass);
+        $relationClassMetadata = self::configuration()->objectManagerFor($relationClass)->getClassMetadata($relationClass);
+
+        if (!$relationClassMetadata instanceof ClassMetadataInfo || !$classMetadataFactory instanceof ClassMetadataInfo) {
+            return false;
+        }
+
+        if ($relationClassMetadata->hasAssociation($field)) {
+            $inversedBy = $relationClassMetadata->getAssociationMapping($field)['inversedBy'];
+            if (null === $inversedBy) {
+                return false;
+            }
+
+            $cascadeMetadata = $classMetadataFactory->getAssociationMapping($inversedBy)['cascade'] ?? [];
+        } else {
+            $cascadeMetadata = $classMetadataFactory->getAssociationMapping($field)['cascade'] ?? [];
+        }
+
+        return \in_array('persist', $cascadeMetadata, true);
     }
 
     private function isPersisting(): bool
