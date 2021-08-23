@@ -20,6 +20,7 @@
         "zenstruck/callback": "^1.1"
     },
     "require-dev": {
+        "bamarni/composer-bin-plugin": "^1.4",
         "dama/doctrine-test-bundle": "^6.0",
         "doctrine/doctrine-bundle": "^2.0",
         "doctrine/doctrine-migrations-bundle": "^2.2|^3.0",
@@ -49,6 +50,9 @@
     "extra": {
         "branch-alias": {
             "dev-master": "1.x-dev"
+        },
+        "bamarni-bin": {
+            "target-directory": "bin/tools"
         }
     }
 }

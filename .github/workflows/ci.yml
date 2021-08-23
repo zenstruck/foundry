@@ -278,6 +278,27 @@ jobs:
       - name: Validate composer.json
         run: composer validate --strict --no-check-lock
 
+  build-docs:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2.3.3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+          coverage: none
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v1
+        with:
+          composer-options: --prefer-dist
+
+      - name: Build docs
+        run: bin/build-docs
+
   cs-check:
     name: PHP Coding Standards
     runs-on: ubuntu-latest
