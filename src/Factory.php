@@ -394,17 +394,17 @@ class Factory
             return false;
         }
 
-        $collectionClass = $factory->class;
         $factoryClass = $this->class;
-        $collectionMetadata = self::configuration()->objectManagerFor($collectionClass)->getClassMetadata($collectionClass);
+        $relationClass = $factory->class;
         $classMetadataFactory = self::configuration()->objectManagerFor($factoryClass)->getMetadataFactory()->getMetadataFor($factoryClass);
+        $relationClassMetadata = self::configuration()->objectManagerFor($relationClass)->getClassMetadata($relationClass);
 
-        if (!$collectionMetadata instanceof ClassMetadataInfo || !$classMetadataFactory instanceof ClassMetadataInfo) {
+        if (!$relationClassMetadata instanceof ClassMetadataInfo || !$classMetadataFactory instanceof ClassMetadataInfo) {
             return false;
         }
 
-        if ($collectionMetadata->hasAssociation($field)) {
-            $inversedBy = $collectionMetadata->getAssociationMapping($field)['inversedBy'];
+        if ($relationClassMetadata->hasAssociation($field)) {
+            $inversedBy = $relationClassMetadata->getAssociationMapping($field)['inversedBy'];
             if (null === $inversedBy) {
                 return false;
             }
