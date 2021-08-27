@@ -199,8 +199,8 @@ use Zenstruck\Foundry\Proxy;
  * @extends ModelFactory<Post>
  *
  * @method static Post|Proxy createOne(array $attributes = [])
- * @method static Post[]|Proxy[] createMany(int $number, $attributes = [])
- * @method static Post|Proxy find($criteria)
+ * @method static Post[]|Proxy[] createMany(int $number, array|callable $attributes = [])
+ * @method static Post|Proxy find(object|array|mixed $criteria)
  * @method static Post|Proxy findOrCreate(array $attributes)
  * @method static Post|Proxy first(string $sortedField = 'id')
  * @method static Post|Proxy last(string $sortedField = 'id')
@@ -244,7 +244,25 @@ final class PostFactory extends ModelFactory
 }
 ```
 
-**TIP**: Using `make:factory --test` will generate the factory in `tests/Factory`!
+**TIPS**:
+1. Using `make:factory --test` will generate the factory in `tests/Factory`.
+2. PhpStorm 2021.2+ has support for
+   [_generics_ annotations](https://blog.jetbrains.com/phpstorm/2021/07/phpstorm-2021-2-release/#generics),
+   with it, your factory's annotations can be reduced to the following and still have the same
+   auto-completion support:
+    ```php
+    /**
+     * @extends ModelFactory<Post>
+     *
+     * @method static Post[]|Proxy[] createMany(int $number, array|callable $attributes = [])
+     * @method static PostRepository|RepositoryProxy repository()
+     * @method Post|Proxy create(array|callable $attributes = [])
+     */
+    final class PostFactory extends ModelFactory
+    {
+        // ...
+    }
+    ```
 
 In the `getDefaults()`, you can return an array of all default values that any new object
 should have. [Faker](#faker) is available to easily get random data:
