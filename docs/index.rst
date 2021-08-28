@@ -587,7 +587,7 @@ Doctrine Relationships
 
 Assuming your entites follow the
 `best practices for Doctrine Relationships <https://symfony.com/doc/current/doctrine/associations.html>`_ and you are
-using the `default instantiator <Instantiator>`_, Foundry *just works* with doctrine relationships. There are some
+using the :ref:`default instantiator <instantiation>`, Foundry *just works* with doctrine relationships. There are some
 nuances with the different relationships and how entities are created. The following tries to document these for
 each relationship type.
 
@@ -1059,7 +1059,7 @@ speed. When this bundle is enabled, the database is dropped/created and migrated
 
 .. tip::
 
-    If your tests `are not persisting <Without Persisting>`_ the objects they create, these test traits are not
+    If your tests :ref:`are not persisting <without-persisting>` the objects they create, these test traits are not
     required.
 
 By default, ``ResetDatabase`` resets the default configured connection's database and default configured object manager's
@@ -1286,7 +1286,8 @@ If you have an initial database state you want for all tests, you can set this i
         CategoryFactory::createOne(['name' => 'symfony']);
     });
 
-To avoid your bootstrap file from becoming too complex, it is best to wrap your global state into a `Story <Stories>`_:
+To avoid your bootstrap file from becoming too complex, it is best to wrap your global state into a
+:ref:`Story <stories>`:
 
 .. code-block:: php
 
@@ -1304,7 +1305,7 @@ To avoid your bootstrap file from becoming too complex, it is best to wrap your 
 
 .. note::
 
-    The `ResetDatabase <Enable Foundry in your TestCase>`_ trait is required when using global state.
+    The :ref:`ResetDatabase <enable-foundry-in-your-testcase>` trait is required when using global state.
 
 PHPUnit Data Providers
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -1555,7 +1556,7 @@ Use the new story in your tests, dev fixtures, or even other stories:
 .. note::
 
     Objects persisted in stories are cleared after each test (unless it is a
-    `Global State Story <Global State>`_).
+    :ref:`Global State Story <global-state>`).
 
 Stories as Services
 ~~~~~~~~~~~~~~~~~~~
@@ -1633,7 +1634,7 @@ Later, you can access the story's state when creating other fixtures:
 
 .. note::
 
-    Story state is cleared after each test (unless it is a `Global State Story <Global State>`_).
+    Story state is cleared after each test (unless it is a :ref:`Global State Story <global-state>`).
 
 Bundle Configuration
 --------------------
