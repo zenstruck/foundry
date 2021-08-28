@@ -121,7 +121,7 @@ final class Proxy
             $om->getUnitOfWork()->computeChangeSet($om->getClassMetadata($this->class), $this->object);
 
             if (!empty($om->getUnitOfWork()->getEntityChangeSet($this->object))) {
-                throw new \RuntimeException(\sprintf('Cannot auto refresh "%s" as there are unsaved changes. Be sure to call ->save() or disable auto refreshing (see https://github.com/zenstruck/foundry#auto-refresh for details).', $this->class));
+                throw new \RuntimeException(\sprintf('Cannot auto refresh "%s" as there are unsaved changes. Be sure to call ->save() or disable auto refreshing (see https://symfony.com/bundles/foundry/current/index.html#auto-refresh for details).', $this->class));
             }
         }
 
