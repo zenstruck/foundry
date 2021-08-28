@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1b3a2879362bad3142ca4f13e7499cd9",
+    "content-hash": "75a235ecb91072c57bb0a2aa3f596196",
     "packages": [
         {
             "name": "doctrine/event-manager",
@@ -347,16 +347,16 @@
         },
         {
             "name": "symfony-tools/docs-builder",
-            "version": "v0.17.0",
+            "version": "dev-theme",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony-tools/docs-builder.git",
-                "reference": "554351e3f8b96af9dd892c4a5acade59479ade7a"
+                "url": "https://github.com/wouterj/docs-builder.git",
+                "reference": "9fb87655586b9a4c7a84a8825e65d84dc36e0a4b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony-tools/docs-builder/zipball/554351e3f8b96af9dd892c4a5acade59479ade7a",
-                "reference": "554351e3f8b96af9dd892c4a5acade59479ade7a",
+                "url": "https://api.github.com/repos/wouterj/docs-builder/zipball/9fb87655586b9a4c7a84a8825e65d84dc36e0a4b",
+                "reference": "9fb87655586b9a4c7a84a8825e65d84dc36e0a4b",
                 "shasum": ""
             },
             "require": {
@@ -383,16 +383,19 @@
                     "SymfonyDocsBuilder\\": "src"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "SymfonyDocsBuilder\\Tests\\": "tests"
+                }
+            },
             "license": [
                 "MIT"
             ],
             "description": "The build system for Symfony's documentation",
             "support": {
-                "issues": "https://github.com/symfony-tools/docs-builder/issues",
-                "source": "https://github.com/symfony-tools/docs-builder/tree/v0.17.0"
+                "source": "https://github.com/wouterj/docs-builder/tree/theme"
             },
-            "time": "2021-07-15T07:27:21+00:00"
+            "time": "2021-08-22T11:49:29+00:00"
         },
         {
             "name": "symfony/console",
@@ -1719,7 +1722,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "symfony-tools/docs-builder": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
