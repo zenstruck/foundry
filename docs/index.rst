@@ -4,7 +4,7 @@ Foundry
 Installation
 ------------
 
-.. code-block:: bash
+.. code-block:: terminal
 
     $ composer require zenstruck/foundry --dev
 
@@ -114,7 +114,7 @@ Generate
 
 Create a model factory for one of your entities with the maker command:
 
-.. code-block:: bash
+.. code-block:: terminal
 
     $ bin/console make:factory
 
@@ -414,16 +414,14 @@ This library provides a wrapper for `FakerPHP <https://fakerphp.github.io/>`_ to
 
     You can register your own ``Faker\Generator``:
 
-    .. configuration-block::
+    .. code-block:: yaml
 
-        .. code-block:: yaml
-
-            # config/packages/dev/zenstruck_foundry.yaml (see Bundle Configuration section about sharing this in the test environment)
-            zenstruck_foundry:
-                faker:
-                    locale: fr_FR # set the locale
-                    # or
-                    service: my_faker # use your own instance of Faker\Generator for complete control
+        # config/packages/dev/zenstruck_foundry.yaml (see Bundle Configuration section about sharing this in the test environment)
+        zenstruck_foundry:
+            faker:
+                locale: fr_FR # set the locale
+                # or
+                service: my_faker # use your own instance of Faker\Generator for complete control
 
 Events / Hooks
 ~~~~~~~~~~~~~~
@@ -557,18 +555,16 @@ You can customize the instantiator in several ways:
 You can customize the instantiator globally for all your factories (can still be overruled by factory instance
 instantiators):
 
-.. configuration-block::
+.. code-block:: yaml
 
-        .. code-block:: yaml
-
-            # config/packages/dev/zenstruck_foundry.yaml (see Bundle Configuration section about sharing this in the test environment)
-            zenstruck_foundry:
-                instantiator:
-                    without_constructor: true # always instantiate objects without calling the constructor
-                    allow_extra_attributes: true # always ignore extra attributes
-                    always_force_properties: true # always "force set" properties
-                    # or
-                    service: my_instantiator # your own invokable service for complete control
+    # config/packages/dev/zenstruck_foundry.yaml (see Bundle Configuration section about sharing this in the test environment)
+    zenstruck_foundry:
+        instantiator:
+            without_constructor: true # always instantiate objects without calling the constructor
+            allow_extra_attributes: true # always ignore extra attributes
+            always_force_properties: true # always "force set" properties
+            # or
+            service: my_instantiator # your own invokable service for complete control
 
 Immutable
 ~~~~~~~~~
@@ -596,7 +592,7 @@ nuances with the different relationships and how entities are created. The follo
 each relationship type.
 
 Many-to-One
-^^^^^^^^^^^
+...........
 
 The following assumes the ``Comment`` entity has a many-to-one relationship with ``Post``:
 
@@ -660,7 +656,7 @@ The following assumes the ``Comment`` entity has a many-to-one relationship with
         }
 
 One-to-Many
-^^^^^^^^^^^
+...........
 
 The following assumes the ``Post`` entity has a one-to-many relationship with ``Comment``:
 
@@ -679,7 +675,7 @@ The following assumes the ``Post`` entity has a one-to-many relationship with ``
     PostFactory::createMany(6, ['comments' => CommentFactory::new()->many(0, 10)]);
 
 Many-to-Many
-^^^^^^^^^^^^
+............
 
 The following assumes the ``Post`` entity has a many-to-many relationship with ``Tag``:
 
@@ -1108,7 +1104,7 @@ to have `Active Record <https://en.wikipedia.org/wiki/Active_record_pattern>`_ *
     $post->repository(); // repository proxy wrapping PostRepository (see Repository Proxy section below)
 
 Force Setting
-^^^^^^^^^^^^^
+.............
 
 Object proxies have helper methods to access non-public properties of the object they wrap:
 
@@ -1121,7 +1117,7 @@ Object proxies have helper methods to access non-public properties of the object
     $post->forceGet('createdAt');
 
 Auto-Refresh
-^^^^^^^^^^^^
+............
 
 Object proxies have the option to enable *auto refreshing* that removes the need to call ``->refresh()`` before calling
 methods on the underlying object. When auto-refresh is enabled, most calls to proxy objects first refresh the wrapped
@@ -1352,7 +1348,7 @@ Performance
 The following are possible options to improve the speed of your test suite.
 
 DAMADoctrineTestBundle
-^^^^^^^^^^^^^^^^^^^^^^
+......................
 
 This library integrates seamlessly with `DAMADoctrineTestBundle <https://github.com/dmaicher/doctrine-test-bundle>`_ to
 wrap each test in a transaction which dramatically reduces test time. This library's test suite runs 5x faster with
@@ -1368,58 +1364,56 @@ accordingly. Your database is still reset before running your test suite but the
     test suite is run. This could further improve test speed if you have a complex global state.
 
 Miscellaneous
-^^^^^^^^^^^^^
+.............
 
 1. Disable debug mode when running tests. In your ``.env.test`` file, you can set ``APP_DEBUG=0`` to have your tests
-run without debug mode. This can speed up your tests considerably. You will need to ensure you cache is cleared before
-running the test suite. The best place to do this is in your ``tests/bootstrap.php``:
+   run without debug mode. This can speed up your tests considerably. You will need to ensure you cache is cleared
+   before running the test suite. The best place to do this is in your ``tests/bootstrap.php``:
 
-    .. code-block:: php
+   .. code-block:: php
 
-        // tests/bootstrap.php
-        // ...
-        if (false === (bool) $_SERVER['APP_DEBUG']) {
-            // ensure fresh cache
-            (new Symfony\Component\Filesystem\Filesystem())->remove(__DIR__.'/../var/cache/test');
-        }
+       // tests/bootstrap.php
+       // ...
+       if (false === (bool) $_SERVER['APP_DEBUG']) {
+           // ensure fresh cache
+           (new Symfony\Component\Filesystem\Filesystem())->remove(__DIR__.'/../var/cache/test');
+       }
 
 2. Reduce password encoder *work factor*. If you have a lot of tests that work with encoded passwords, this will cause
-these tests to be unnecessarily slow. You can improve the speed by reducing the *work factor* of your encoder:
+   these tests to be unnecessarily slow. You can improve the speed by reducing the *work factor* of your encoder:
 
-    .. configuration-block::
+   .. code-block:: yaml
 
-        .. code-block:: yaml
-
-            # config/packages/test/security.yaml
-            encoders:
-                # use your user class name here
-                App\Entity\User:
-                    # This should be the same value as in config/packages/security.yaml
-                    algorithm: auto
-                    cost: 4 # Lowest possible value for bcrypt
-                    time_cost: 3 # Lowest possible value for argon
-                    memory_cost: 10 # Lowest possible value for argon
+       # config/packages/test/security.yaml
+       encoders:
+           # use your user class name here
+           App\Entity\User:
+               # This should be the same value as in config/packages/security.yaml
+               algorithm: auto
+               cost: 4 # Lowest possible value for bcrypt
+               time_cost: 3 # Lowest possible value for argon
+               memory_cost: 10 # Lowest possible value for argon
 
 3. Pre-encode user passwords with a known value via ``bin/console security:encode-password`` and set this in
-``ModelFactory::getDefaults()``. Add the known value as a ``const`` on your factory:
+   ``ModelFactory::getDefaults()``. Add the known value as a ``const`` on your factory:
 
-    .. code-block:: php
+   .. code-block:: php
 
-        class UserFactory extends ModelFactory
-        {
-            public const DEFAULT_PASSWORD = '1234'; // the password used to create the pre-encoded version below
+       class UserFactory extends ModelFactory
+       {
+           public const DEFAULT_PASSWORD = '1234'; // the password used to create the pre-encoded version below
 
-            protected function getDefaults(): array
-            {
-                return [
-                    // ...
-                    'password' => '$argon2id$v=19$m=65536,t=4,p=1$pLFF3D2gnvDmxMuuqH4BrA$3vKfv0cw+6EaNspq9btVAYc+jCOqrmWRstInB2fRPeQ',
-                ];
-            }
-        }
+           protected function getDefaults(): array
+           {
+               return [
+                   // ...
+                   'password' => '$argon2id$v=19$m=65536,t=4,p=1$pLFF3D2gnvDmxMuuqH4BrA$3vKfv0cw+6EaNspq9btVAYc+jCOqrmWRstInB2fRPeQ',
+               ];
+           }
+       }
 
-    Now, in your tests, when you need access to the unencoded password for a user created with ``UserFactory``, use
-    ``UserFactory::DEFAULT_PASSWORD``.
+   Now, in your tests, when you need access to the unencoded password for a user created with ``UserFactory``, use
+   ``UserFactory::DEFAULT_PASSWORD``.
 
 Non-Kernel Tests
 ~~~~~~~~~~~~~~~~
@@ -1506,7 +1500,7 @@ Stories can be loaded in your fixtures and in your tests, they can also depend o
 
 Create a story using the maker command:
 
-.. code-block:: bash
+.. code-block:: terminal
 
     $ bin/console make:story Post
 
