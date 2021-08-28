@@ -510,6 +510,8 @@ You can override your model factory's ``initialize()`` method to add default sta
 
     Be sure to chain the states/hooks off of ``$this`` because factories are `Immutable`_.
 
+.. _instantiation:
+
 Instantiation
 ~~~~~~~~~~~~~
 
@@ -849,6 +851,8 @@ Foundry can be used to create factories for entities that you don't have model f
     $entity = create(Post::class, ['field' => 'value']);
     $entities = create_many(Post::class, 5, ['field' => 'value']);
 
+.. _without-persisting:
+
 Without Persisting
 ~~~~~~~~~~~~~~~~~~
 
@@ -1001,6 +1005,8 @@ Let's look at an example:
             'body' => 'My comment',
         ]);
     }
+
+.. _enable-foundry-in-your-testcase:
 
 Enable Foundry in your TestCase
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1271,6 +1277,8 @@ Both object proxy's and your ModelFactory's have helpful PHPUnit assertions:
     PostFactory::assert()->exists(['title' => 'My Title']);
     PostFactory::assert()->notExists(['title' => 'My Title']);
 
+.. _global-state:
+
 Global State
 ~~~~~~~~~~~~
 
@@ -1491,6 +1499,8 @@ Using without the Bundle
 The provided bundle is not strictly required to use Foundry for tests. You can have all your factories, stories, and
 configuration live in your ``tests/`` directory. You can configure foundry with
 `Test-Only Configuration`_.
+
+.. _stories:
 
 Stories
 -------
