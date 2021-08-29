@@ -1,0 +1,6 @@
+branches: ['master']
+maintained_branches: ['master']
+current_branch: "master"
+dev_branch: "master"
+doc_dir: 'docs/'
+dev_branch_alias: '1.x'

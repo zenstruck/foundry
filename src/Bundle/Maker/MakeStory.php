@@ -75,7 +75,7 @@ final class MakeStory extends AbstractMaker
 
         $io->text([
             'Next: Open your story class and start customizing it.',
-            'Find the documentation at https://github.com/zenstruck/foundry#stories',
+            'Find the documentation at https://symfony.com/bundles/foundry/current/index.html#stories',
         ]);
     }
 

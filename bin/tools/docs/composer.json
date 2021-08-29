@@ -1,0 +1,11 @@
+{
+    "require": {
+        "symfony-tools/docs-builder": "dev-theme"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/wouterj/docs-builder"
+        }
+    ]
+}
