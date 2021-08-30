@@ -57,20 +57,20 @@ final class CategoryFactory extends ModelFactory
     {
         parent::__construct();
 
-        // TODO inject services if required (https://symfony.com/bundles/foundry/current/index.html#factories-as-services)
+        // TODO inject services if required (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services)
     }
 
     protected function getDefaults(): array
     {
         return [
-            // TODO add your default values here (https://symfony.com/bundles/foundry/current/index.html#model-factories)
+            // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
             'name' => self::faker()->text(),
         ];
     }
 
     protected function initialize(): self
     {
-        // see https://symfony.com/bundles/foundry/current/index.html#initialization
+        // see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
         return \$this
             // ->afterInstantiate(function(Category \$category) {})
         ;
@@ -135,20 +135,20 @@ final class TagFactory extends ModelFactory
     {
         parent::__construct();
 
-        // TODO inject services if required (https://symfony.com/bundles/foundry/current/index.html#factories-as-services)
+        // TODO inject services if required (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services)
     }
 
     protected function getDefaults(): array
     {
         return [
-            // TODO add your default values here (https://symfony.com/bundles/foundry/current/index.html#model-factories)
+            // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
             'name' => self::faker()->text(),
         ];
     }
 
     protected function initialize(): self
     {
-        // see https://symfony.com/bundles/foundry/current/index.html#initialization
+        // see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
         return \$this
             // ->afterInstantiate(function(Tag \$tag) {})
         ;
@@ -209,20 +209,20 @@ final class CategoryFactory extends ModelFactory
     {
         parent::__construct();
 
-        // TODO inject services if required (https://symfony.com/bundles/foundry/current/index.html#factories-as-services)
+        // TODO inject services if required (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services)
     }
 
     protected function getDefaults(): array
     {
         return [
-            // TODO add your default values here (https://symfony.com/bundles/foundry/current/index.html#model-factories)
+            // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
             'name' => self::faker()->text(),
         ];
     }
 
     protected function initialize(): self
     {
-        // see https://symfony.com/bundles/foundry/current/index.html#initialization
+        // see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
         return \$this
             // ->afterInstantiate(function(Category \$category) {})
         ;
@@ -287,20 +287,20 @@ final class TagFactory extends ModelFactory
     {
         parent::__construct();
 
-        // TODO inject services if required (https://symfony.com/bundles/foundry/current/index.html#factories-as-services)
+        // TODO inject services if required (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services)
     }
 
     protected function getDefaults(): array
     {
         return [
-            // TODO add your default values here (https://symfony.com/bundles/foundry/current/index.html#model-factories)
+            // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
             'name' => self::faker()->text(),
         ];
     }
 
     protected function initialize(): self
     {
-        // see https://symfony.com/bundles/foundry/current/index.html#initialization
+        // see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
         return \$this
             // ->afterInstantiate(function(Tag \$tag) {})
         ;

@@ -9,7 +9,7 @@ Installation
     $ composer require zenstruck/foundry --dev
 
 To use the ``make:*`` commands from this bundle, ensure
-`Symfony MakerBundle <https://symfony.com/doc/current/bundles/SymfonyMakerBundle/index.html>`_ is installed.
+`Symfony MakerBundle <https://symfony.com/bundles/SymfonyMakerBundle/current/index.html>`_ is installed.
 
 *If not using Symfony Flex, be sure to enable the bundle in your **test**/**dev** environments.*
 
@@ -913,7 +913,7 @@ Now, after creating objects using this factory, you'd have to call ``->save()`` 
 Using with DoctrineFixturesBundle
 ---------------------------------
 
-Foundry works out of the box with `DoctrineFixturesBundle <https://symfony.com/doc/master/bundles/DoctrineFixturesBundle/index.html>`_.
+Foundry works out of the box with `DoctrineFixturesBundle <https://symfony.com/bundles/DoctrineFixturesBundle/current/index.html>`_.
 You can simply use your factories and stories right within your fixture files:
 
 .. code-block:: php
