@@ -42,4 +42,9 @@ class Contact
     {
         return $this->address;
     }
+
+    public function setAddress(Address $address): void
+    {
+        $this->address = $address;
+    }
 }

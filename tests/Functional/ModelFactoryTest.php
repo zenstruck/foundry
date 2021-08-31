@@ -7,8 +7,10 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\AddressFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CommentFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\ContactFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithInvalidInitialize;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithNullInitialize;
@@ -439,5 +441,31 @@ final class ModelFactoryTest extends KernelTestCase
         $this->assertCount(2, $categories);
         $this->assertSame('name2', $categories[0]->getName());
         $this->assertSame('name2', $categories[1]->getName());
+    }
+
+    /**
+     * @test
+     */
+    public function embeddables_are_never_persisted(): void
+    {
+        $object1 = AddressFactory::createOne();
+        $object2 = AddressFactory::createOne(['value' => 'another address']);
+
+        $this->assertSame('Some address', $object1->getValue());
+        $this->assertSame('another address', $object2->getValue());
+    }
+
+    /**
+     * @test
+     */
+    public function factory_with_embeddable(): void
+    {
+        ContactFactory::repository()->assert()->empty();
+
+        $object = ContactFactory::createOne();
+
+        ContactFactory::repository()->assert()->count(1);
+        $this->assertSame('Sally', $object->getName());
+        $this->assertSame('Some address', $object->getAddress()->getValue());
     }
 }
