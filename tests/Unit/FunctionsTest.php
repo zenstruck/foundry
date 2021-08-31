@@ -65,7 +65,6 @@ final class FunctionsTest extends TestCase
     {
         $registry = $this->createMock(ManagerRegistry::class);
         $registry
-            ->expects($this->exactly(2))
             ->method('getManagerForClass')
             ->with(Category::class)
             ->willReturn($this->createMock(ObjectManager::class))
@@ -85,7 +84,6 @@ final class FunctionsTest extends TestCase
     {
         $registry = $this->createMock(ManagerRegistry::class);
         $registry
-            ->expects($this->exactly(6))
             ->method('getManagerForClass')
             ->with(Category::class)
             ->willReturn($this->createMock(ObjectManager::class))

@@ -355,14 +355,21 @@ class Factory
 
         // Check inversedBy side ($this is the owner of the relation)
         $factoryClassMetadata = self::configuration()->objectManagerFor($factoryClass)->getMetadataFactory()->getMetadataFor($factoryClass);
+
         foreach ($factoryClassMetadata->getAssociationNames() as $field) {
             if (!$factoryClassMetadata->isAssociationInverseSide($field) && $factoryClassMetadata->getAssociationTargetClass($field) === $relationClass) {
                 return $field;
             }
         }
 
-        // Check mappedBy side ($factory is the owner of the relation)
-        $relationClassMetadata = self::configuration()->objectManagerFor($relationClass)->getClassMetadata($relationClass);
+        try {
+            // Check mappedBy side ($factory is the owner of the relation)
+            $relationClassMetadata = self::configuration()->objectManagerFor($relationClass)->getClassMetadata($relationClass);
+        } catch (\RuntimeException $e) {
+            // relation not managed - could be embeddable
+            return null;
+        }
+
         foreach ($relationClassMetadata->getAssociationNames() as $field) {
             if (($relationClassMetadata->isSingleValuedAssociation($field) || $relationClassMetadata->isCollectionValuedAssociation($field)) && $relationClassMetadata->getAssociationTargetClass($field) === $factoryClass) {
                 return $field;
@@ -418,6 +425,17 @@ class Factory
 
     private function isPersisting(): bool
     {
-        return self::configuration()->hasManagerRegistry() ? $this->persist : false;
+        if (!$this->persist || !self::configuration()->hasManagerRegistry()) {
+            return false;
+        }
+
+        try {
+            self::configuration()->objectManagerFor($this->class);
+
+            return true;
+        } catch (\RuntimeException $e) {
+            // entity not managed (perhaps Embeddable)
+            return false;
+        }
     }
 }
