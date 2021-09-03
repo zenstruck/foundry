@@ -325,17 +325,19 @@ class Factory
 
     private function normalizeCollection(FactoryCollection $collection): array
     {
-        $field = $this->inverseRelationshipField($collection->factory());
-        $cascadePersist = $this->hasCascadePersist($collection->factory(), $field);
+        if ($this->isPersisting()) {
+            $field = $this->inverseRelationshipField($collection->factory());
+            $cascadePersist = $this->hasCascadePersist($collection->factory(), $field);
 
-        if ($this->isPersisting() && $field && false === $cascadePersist) {
-            $this->afterPersist[] = static function(Proxy $proxy) use ($collection, $field) {
-                $collection->create([$field => $proxy]);
-                $proxy->refresh();
-            };
+            if ($field && false === $cascadePersist) {
+                $this->afterPersist[] = static function(Proxy $proxy) use ($collection, $field) {
+                    $collection->create([$field => $proxy]);
+                    $proxy->refresh();
+                };
 
-            // creation delegated to afterPersist event - return empty array here
-            return [];
+                // creation delegated to afterPersist event - return empty array here
+                return [];
+            }
         }
 
         return \array_map(
