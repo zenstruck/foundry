@@ -29,7 +29,7 @@
         "psalm/plugin-symfony": "^1.5|^2.0",
         "symfony/framework-bundle": "^4.4|^5.0",
         "symfony/maker-bundle": "^1.30",
-        "symfony/phpunit-bridge": "^5.2",
+        "symfony/phpunit-bridge": "^5.3",
         "vimeo/psalm": "^3.18|^4.0"
     },
     "config": {
@@ -54,5 +54,7 @@
         "bamarni-bin": {
             "target-directory": "bin/tools"
         }
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

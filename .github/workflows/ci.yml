@@ -8,7 +8,7 @@ on:
 
 jobs:
   tests:
-    name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - ${{ matrix.versions }}
+    name: PHP ${{ matrix.php }}, SF ${{ matrix.symfony }} - ${{ matrix.stability }}
     runs-on: ubuntu-latest
     services:
       mysql:
@@ -28,15 +28,15 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     strategy:
       matrix:
-        php: [7.2, 7.3, 7.4, 8.0]
-        stability: ['@stable']
+        php: [7.4, 8.0]
+        symfony: [4.4.*, 5.3.*, 5.4.*]
         versions: [highest]
         include:
           - php: 7.2
-            stability: '@stable'
+            symfony: '*'
             versions: lowest
 #          - php: 8.0
-#            stability: '@dev'
+#            symfony: 6.0.*
 #            versions: highest
     steps:
       - name: Checkout code
@@ -51,16 +51,15 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: pgsql, sqlite
           coverage: none
-
-      - name: Set minimum-stability to dev
-        run: composer config minimum-stability dev
-        if: ${{ matrix.stability == '@dev' }}
+          tools: flex
 
       - name: Install dependencies
         uses: ramsey/composer-install@v1
         with:
           dependency-versions: ${{ matrix.versions }}
           composer-options: --prefer-dist
+        env:
+          SYMFONY_REQUIRE: ${{ matrix.symfony }}
 
       - name: 'Test: MySQL'
         run: vendor/bin/simple-phpunit -v
