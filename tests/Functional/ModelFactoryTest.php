@@ -23,7 +23,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\UserFactory;
  */
 final class ModelFactoryTest extends KernelTestCase
 {
-    use Factories, ResetDatabase;
+    use ContainerBC, Factories, ResetDatabase;
 
     /**
      * @test
@@ -309,7 +309,7 @@ final class ModelFactoryTest extends KernelTestCase
     {
         $category = CategoryFactory::createOne(['name' => 'My Category']);
 
-        self::$container->get(EntityManagerInterface::class)->clear();
+        self::container()->get(EntityManagerInterface::class)->clear();
 
         $post = PostFactory::createOne(['category' => $category]);
 
@@ -323,7 +323,7 @@ final class ModelFactoryTest extends KernelTestCase
     {
         $category = CategoryFactory::createOne(['name' => 'My Category'])->object();
 
-        self::$container->get(EntityManagerInterface::class)->clear();
+        self::container()->get(EntityManagerInterface::class)->clear();
 
         $post = PostFactory::createOne(['category' => $category]);
 
