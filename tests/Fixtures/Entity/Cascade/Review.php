@@ -23,7 +23,7 @@ class Review
     private $product;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(name="ranking", type="integer")
      */
     private $rank;
 
