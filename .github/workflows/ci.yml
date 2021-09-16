@@ -333,5 +333,8 @@ jobs:
         with:
           composer-options: --prefer-dist
 
+      - name: Install Psalm
+        run: composer bin psalm install
+
       - name: Run static analysis
         run: vendor/bin/psalm --output-format=github
