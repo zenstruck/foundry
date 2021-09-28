@@ -3,8 +3,10 @@
 namespace Zenstruck\Foundry\Tests\Functional;
 
 use Doctrine\Common\Proxy\Proxy as DoctrineProxy;
+use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Assert;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
@@ -45,6 +47,33 @@ final class RepositoryProxyTest extends KernelTestCase
         $repository->assert()->countGreaterThanOrEqual(2);
         $repository->assert()->countLessThan(3);
         $repository->assert()->countLessThanOrEqual(2);
+        $repository->assert()->exists([]);
+        $repository->assert()->notExists(['name' => 'invalid']);
+
+        Assert::that(function() use ($repository) { $repository->assert()->empty(); })
+            ->throws(AssertionFailedError::class, \sprintf('Expected %s repository to be empty but it has 2 items.', Category::class))
+        ;
+        Assert::that(function() use ($repository) { $repository->assert()->count(1); })
+            ->throws(AssertionFailedError::class, \sprintf('Expected count of %s repository (2) to be 1.', Category::class))
+        ;
+        Assert::that(function() use ($repository) { $repository->assert()->countGreaterThan(2); })
+            ->throws(AssertionFailedError::class, \sprintf('Expected count of %s repository (2) to be greater than 2.', Category::class))
+        ;
+        Assert::that(function() use ($repository) { $repository->assert()->countGreaterThanOrEqual(3); })
+            ->throws(AssertionFailedError::class, \sprintf('Expected count of %s repository (2) to be greater than or equal to 3.', Category::class))
+        ;
+        Assert::that(function() use ($repository) { $repository->assert()->countLessThan(2); })
+            ->throws(AssertionFailedError::class, \sprintf('Expected count of %s repository (2) to be less than 2.', Category::class))
+        ;
+        Assert::that(function() use ($repository) { $repository->assert()->countLessThanOrEqual(1); })
+            ->throws(AssertionFailedError::class, \sprintf('Expected count of %s repository (2) to be less than or equal to 1.', Category::class))
+        ;
+        Assert::that(function() use ($repository) { $repository->assert()->exists(['name' => 'invalid-name']); })
+            ->throws(AssertionFailedError::class, \sprintf('Expected %s to exist but it does not.', Category::class))
+        ;
+        Assert::that(function() use ($repository) { $repository->assert()->notExists([]); })
+            ->throws(AssertionFailedError::class, \sprintf('Expected %s to not exist but it does.', Category::class))
+        ;
     }
 
     /**

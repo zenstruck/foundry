@@ -2,7 +2,7 @@
 
 namespace Zenstruck\Foundry;
 
-use PHPUnit\Framework\Assert;
+use Zenstruck\Assert;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -16,42 +16,52 @@ final class RepositoryAssertions
         $this->repository = $repository;
     }
 
-    public function empty(string $message = ''): self
+    public function empty(string $message = 'Expected {entity} repository to be empty but it has {actual} items.'): self
     {
         return $this->count(0, $message);
     }
 
-    public function count(int $expectedCount, string $message = ''): self
+    public function count(int $expectedCount, string $message = 'Expected count of {entity} repository ({actual}) to be {expected}.'): self
     {
-        Assert::assertSame($expectedCount, $this->repository->count(), $message);
+        Assert::that($this->repository)
+            ->hasCount($expectedCount, $message, ['entity' => $this->repository->getClassName()])
+        ;
 
         return $this;
     }
 
-    public function countGreaterThan(int $expected, string $message = ''): self
+    public function countGreaterThan(int $expected, string $message = 'Expected count of {entity} repository ({actual}) to be greater than {expected}.'): self
     {
-        Assert::assertGreaterThan($expected, $this->repository->count(), $message);
+        Assert::that($this->repository->count())
+            ->isGreaterThan($expected, $message, ['entity' => $this->repository->getClassName()])
+        ;
 
         return $this;
     }
 
-    public function countGreaterThanOrEqual(int $expected, string $message = ''): self
+    public function countGreaterThanOrEqual(int $expected, string $message = 'Expected count of {entity} repository ({actual}) to be greater than or equal to {expected}.'): self
     {
-        Assert::assertGreaterThanOrEqual($expected, $this->repository->count(), $message);
+        Assert::that($this->repository->count())
+            ->isGreaterThanOrEqualTo($expected, $message, ['entity' => $this->repository->getClassName()])
+        ;
 
         return $this;
     }
 
-    public function countLessThan(int $expected, string $message = ''): self
+    public function countLessThan(int $expected, string $message = 'Expected count of {entity} repository ({actual}) to be less than {expected}.'): self
     {
-        Assert::assertLessThan($expected, $this->repository->count(), $message);
+        Assert::that($this->repository->count())
+            ->isLessThan($expected, $message, ['entity' => $this->repository->getClassName()])
+        ;
 
         return $this;
     }
 
-    public function countLessThanOrEqual(int $expected, string $message = ''): self
+    public function countLessThanOrEqual(int $expected, string $message = 'Expected count of {entity} repository ({actual}) to be less than or equal to {expected}.'): self
     {
-        Assert::assertLessThanOrEqual($expected, $this->repository->count(), $message);
+        Assert::that($this->repository->count())
+            ->isLessThanOrEqualTo($expected, $message, ['entity' => $this->repository->getClassName()])
+        ;
 
         return $this;
     }
@@ -59,9 +69,12 @@ final class RepositoryAssertions
     /**
      * @param object|array|mixed $criteria
      */
-    public function exists($criteria, string $message = ''): self
+    public function exists($criteria, string $message = 'Expected {entity} to exist but it does not.'): self
     {
-        Assert::assertNotNull($this->repository->find($criteria), $message);
+        Assert::that($this->repository->find($criteria))->isNotEmpty($message, [
+            'entity' => $this->repository->getClassName(),
+            'criteria' => $criteria,
+        ]);
 
         return $this;
     }
@@ -69,9 +82,12 @@ final class RepositoryAssertions
     /**
      * @param object|array|mixed $criteria
      */
-    public function notExists($criteria, string $message = ''): self
+    public function notExists($criteria, string $message = 'Expected {entity} to not exist but it does.'): self
     {
-        Assert::assertNull($this->repository->find($criteria), $message);
+        Assert::that($this->repository->find($criteria))->isEmpty($message, [
+            'entity' => $this->repository->getClassName(),
+            'criteria' => $criteria,
+        ]);
 
         return $this;
     }

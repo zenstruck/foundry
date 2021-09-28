@@ -4,7 +4,7 @@ namespace Zenstruck\Foundry;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
-use PHPUnit\Framework\Assert;
+use Zenstruck\Assert;
 use Zenstruck\Callback;
 use Zenstruck\Callback\Parameter;
 
@@ -242,16 +242,16 @@ final class Proxy
         return $this;
     }
 
-    public function assertPersisted(string $message = 'The object is not persisted.'): self
+    public function assertPersisted(string $message = '{entity} is not persisted.'): self
     {
-        Assert::assertNotNull($this->fetchObject(), $message);
+        Assert::that($this->fetchObject())->isNotEmpty($message, ['entity' => $this->class]);
 
         return $this;
     }
 
-    public function assertNotPersisted(string $message = 'The object is persisted but it should not be.'): self
+    public function assertNotPersisted(string $message = '{entity} is persisted but it should not be.'): self
     {
-        Assert::assertNull($this->fetchObject(), $message);
+        Assert::that($this->fetchObject())->isEmpty($message, ['entity' => $this->class]);
 
         return $this;
     }
