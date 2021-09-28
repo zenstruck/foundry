@@ -8,7 +8,7 @@ on:
 
 jobs:
   tests:
-    name: PHP ${{ matrix.php }}, SF ${{ matrix.symfony }} - ${{ matrix.stability }}
+    name: PHP ${{ matrix.php }}, SF ${{ matrix.symfony }} - ${{ matrix.versions }}
     runs-on: ubuntu-latest
     services:
       mysql:
