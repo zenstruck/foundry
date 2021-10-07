@@ -8,7 +8,7 @@ on:
 
 jobs:
   tests:
-    name: PHP ${{ matrix.php }}, SF ${{ matrix.symfony }} - ${{ matrix.versions }}
+    name: PHP ${{ matrix.php }}, SF ${{ matrix.symfony }} - ${{ matrix.deps }}
     runs-on: ubuntu-latest
     services:
       mysql:
@@ -30,14 +30,14 @@ jobs:
       matrix:
         php: [7.4, 8.0]
         symfony: [4.4.*, 5.3.*, 5.4.*]
-        versions: [highest]
+        deps: [highest]
         include:
           - php: 7.2
             symfony: '*'
-            versions: lowest
+            deps: lowest
 #          - php: 8.0
 #            symfony: 6.0.*
-#            versions: highest
+#            deps: highest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2.3.3
@@ -56,7 +56,7 @@ jobs:
       - name: Install dependencies
         uses: ramsey/composer-install@v1
         with:
-          dependency-versions: ${{ matrix.versions }}
+          dependency-versions: ${{ matrix.deps }}
           composer-options: --prefer-dist
         env:
           SYMFONY_REQUIRE: ${{ matrix.symfony }}
@@ -262,20 +262,7 @@ jobs:
           file: ./*.clover
 
   composer-validate:
-    name: Validate composer.json
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2.3.3
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.4
-          coverage: none
-
-      - name: Validate composer.json
-        run: composer validate --strict --no-check-lock
+    uses: zenstruck/.github/.github/workflows/php-composer-validate.yml@main
 
   build-docs:
     name: Build Documentation
@@ -299,21 +286,7 @@ jobs:
         run: bin/build-docs
 
   cs-check:
-    name: PHP Coding Standards
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2.3.3
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.4
-          coverage: none
-          tools: php-cs-fixer
-
-      - name: Check CS
-        run: php-cs-fixer fix --dry-run --diff
+    uses: zenstruck/.github/.github/workflows/php-cs-fixer.yml@main
 
   static-analysis:
     name: Psalm Static Analysis
