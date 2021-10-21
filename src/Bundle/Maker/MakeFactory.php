@@ -198,7 +198,7 @@ final class MakeFactory extends AbstractMaker
 
         foreach ($metadata->fieldMappings as $property) {
             // ignore identifiers and nullable fields
-            if ($property['nullable'] || \in_array($property['fieldName'], $ids, true)) {
+            if (($property['nullable'] ?? false) || \in_array($property['fieldName'], $ids, true)) {
                 continue;
             }
 
