@@ -85,14 +85,12 @@ jobs:
 
       - name: 'Test: MySQL, DoctrineMigrationsBundle'
         run: vendor/bin/simple-phpunit -v
-        if: matrix.php < 8.0
         env:
           FOUNDRY_RESET_MODE: migrate
           DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Test: MySQL, DoctrineMigrationsBundle, DAMABundle'
         run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
-        if: matrix.php < 8.0
         env:
           FOUNDRY_RESET_MODE: migrate
           DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
