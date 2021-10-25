@@ -22,4 +22,9 @@ final class CascadeVariantFactory extends ModelFactory
             'product' => CascadeProductFactory::new(),
         ];
     }
+
+    protected function initialize(): self
+    {
+        return $this->disableCascadePersist();
+    }
 }

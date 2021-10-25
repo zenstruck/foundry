@@ -31,6 +31,9 @@ class Factory
     /** @var bool */
     private $cascadePersist = false;
 
+    /** @var bool */
+    private $disableCascadePersist = false;
+
     /** @var array<array|callable> */
     private $attributeSet = [];
 
@@ -127,6 +130,17 @@ class Factory
     final public function many(int $min, ?int $max = null): FactoryCollection
     {
         return new FactoryCollection($this, $min, $max);
+    }
+
+    /**
+     * @return static
+     */
+    public function disableCascadePersist(): self
+    {
+        $cloned = clone $this;
+        $cloned->disableCascadePersist = true;
+
+        return $cloned;
     }
 
     /**
@@ -398,7 +412,7 @@ class Factory
 
     private function hasCascadePersist(self $factory, ?string $field): bool
     {
-        if (null === $field) {
+        if ($factory->disableCascadePersist || null === $field) {
             return false;
         }
 
