@@ -13,6 +13,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Product;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Review;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Tag;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Variant;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\CascadeProductCommentFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CascadeProductFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CascadeVariantFactory;
 use function Zenstruck\Foundry\factory;
@@ -148,6 +149,24 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
 
         foreach (CascadeVariantFactory::all() as $variant) {
             $this->assertSame($variant->getProduct()->getId(), $product->getId());
+        }
+
+        CascadeProductFactory::assert()->count(1);
+    }
+
+    /**
+     * @test
+     */
+    public function default_not_created_when_cascading_2(): void
+    {
+        $product = CascadeProductFactory::createOne([
+            'comments' => CascadeProductCommentFactory::new()->many(5),
+        ]);
+
+        CascadeProductCommentFactory::assert()->count(5);
+
+        foreach (CascadeProductCommentFactory::all() as $comment) {
+            $this->assertSame($comment->getProduct()->getId(), $product->getId());
         }
 
         CascadeProductFactory::assert()->count(1);
