@@ -309,15 +309,6 @@ class Factory
         if (self::configuration()->hasManagerRegistry()) {
             $relationField = $this->relationshipField($value);
             $value->cascadePersist = $this->hasCascadePersist($value, $relationField);
-
-            if ($value->cascadePersist) {
-                // prevent relationship's factory from creating extra entity
-                $value = $value->beforeInstantiate(function(array $attributes) use ($relationField) {
-                    unset($attributes[$relationField]);
-
-                    return $attributes;
-                });
-            }
         }
 
         return $value->create()->object();
