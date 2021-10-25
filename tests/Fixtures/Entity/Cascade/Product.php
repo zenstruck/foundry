@@ -35,11 +35,6 @@ class Product
     private $variants;
 
     /**
-     * @ORM\OneToMany(targetEntity=ProductComment::class, mappedBy="product", cascade={"persist"})
-     */
-    private $comments;
-
-    /**
      * @ORM\ManyToMany(targetEntity=Category::class, mappedBy="products", cascade={"persist"})
      */
     private $categories;
@@ -59,7 +54,6 @@ class Product
         $this->variants = new ArrayCollection();
         $this->categories = new ArrayCollection();
         $this->tags = new ArrayCollection();
-        $this->comments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -114,25 +108,6 @@ class Product
     {
         if ($this->variants->contains($variant)) {
             $this->variants->removeElement($variant);
-        }
-    }
-
-    public function getComments(): Collection
-    {
-        return $this->comments;
-    }
-
-    public function addComment(ProductComment $comment): void
-    {
-        if (!$this->comments->contains($comment)) {
-            $this->comments[] = $comment;
-        }
-    }
-
-    public function removeComment(ProductComment $comment): void
-    {
-        if ($this->comments->contains($comment)) {
-            $this->comments->removeElement($comment);
         }
     }
 
