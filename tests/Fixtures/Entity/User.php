@@ -22,6 +22,11 @@ class User
      */
     private $name;
 
+    /**
+     * @ORM\OneToOne(targetEntity=Role::class, mappedBy="user")
+     */
+    private $role;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -37,5 +42,19 @@ class User
         $this->name = $name;
 
         return $this;
+    }
+
+    public function setRole(Role $role)
+    {
+        $this->role = $role;
+
+        if ($role->getUser() !== $this) {
+            $role->setUser($this);
+        }
+    }
+
+    public function getRole()
+    {
+        return $this->role;
     }
 }

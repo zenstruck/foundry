@@ -9,7 +9,9 @@ use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Role;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\User;
 use function Zenstruck\Foundry\create;
 use function Zenstruck\Foundry\factory;
 
@@ -108,6 +110,32 @@ final class FactoryTest extends KernelTestCase
         $this->assertCount(2, $posts);
         $this->assertContains('Post A', $posts);
         $this->assertContains('Post B', $posts);
+    }
+
+    /**
+     * @test
+     */
+    public function one_to_one_relationship(): void
+    {
+        $role = factory(Role::class)->create([
+            'name' => 'some role',
+            'user' => factory(User::class, ['name' => 'user1']),
+        ]);
+
+        $this->assertSame($role->getId(), $role->getUser()->getRole()->getId());
+    }
+
+    /**
+     * @test
+     */
+    public function one_to_one_reverse_relationship(): void
+    {
+        $user = factory(User::class)->create([
+            'name' => 'user1',
+            'role' => factory(Role::class, ['name' => 'some role']),
+        ]);
+
+        $this->assertSame($user->getId(), $user->getRole()->getUser()->getId());
     }
 
     /**
