@@ -53,7 +53,7 @@ foreach ($defaultProperties as $fieldname => $type) {
     {
         // see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
         return $this
-            // ->afterInstantiate(function(<?= $entity->getShortName() ?> $<?= \lcfirst($entity->getShortName()) ?>) {})
+            // ->afterInstantiate(function(<?= $entity->getShortName() ?> $<?= \lcfirst($entity->getShortName()) ?>): void {})
         ;
     }
 
