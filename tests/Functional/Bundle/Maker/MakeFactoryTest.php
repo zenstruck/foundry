@@ -72,7 +72,7 @@ final class CategoryFactory extends ModelFactory
     {
         // see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
         return \$this
-            // ->afterInstantiate(function(Category \$category) {})
+            // ->afterInstantiate(function(Category \$category): void {})
         ;
     }
 
@@ -150,7 +150,7 @@ final class TagFactory extends ModelFactory
     {
         // see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
         return \$this
-            // ->afterInstantiate(function(Tag \$tag) {})
+            // ->afterInstantiate(function(Tag \$tag): void {})
         ;
     }
 
@@ -224,7 +224,7 @@ final class CategoryFactory extends ModelFactory
     {
         // see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
         return \$this
-            // ->afterInstantiate(function(Category \$category) {})
+            // ->afterInstantiate(function(Category \$category): void {})
         ;
     }
 
@@ -302,7 +302,7 @@ final class TagFactory extends ModelFactory
     {
         // see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
         return \$this
-            // ->afterInstantiate(function(Tag \$tag) {})
+            // ->afterInstantiate(function(Tag \$tag): void {})
         ;
     }
 
