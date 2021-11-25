@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
+use Zenstruck\Foundry\Tests\Fixtures\Event\CommentEventSubscriber;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\AddressFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CommentFactory;
@@ -467,5 +468,35 @@ final class ModelFactoryTest extends KernelTestCase
         ContactFactory::repository()->assert()->count(1);
         $this->assertSame('Sally', $object->getName());
         $this->assertSame('Some address', $object->getAddress()->getValue());
+    }
+
+    /**
+     * @test
+     */
+    public function doctrine_events_still_fired(): void
+    {
+        $comment = CommentFactory::new()->create([
+            'body' => CommentEventSubscriber::COMMENT_BODY,
+        ]);
+
+        $this->assertSame(CommentEventSubscriber::NEW_COMMENT_BODY, $comment->getBody());
+    }
+
+    /**
+     * @test
+     */
+    public function disable_doctrine_events_lifecycle(): void
+    {
+        $comment = CommentFactory::new()->withoutDoctrineEvents()->create([
+            'body' => CommentEventSubscriber::COMMENT_BODY,
+        ]);
+
+        $this->assertSame(CommentEventSubscriber::COMMENT_BODY, $comment->getBody());
+
+        $comment2 = CommentFactory::new()->create([
+            'body' => CommentEventSubscriber::COMMENT_BODY,
+        ]);
+
+        $this->assertSame(CommentEventSubscriber::NEW_COMMENT_BODY, $comment2->getBody());
     }
 }

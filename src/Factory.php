@@ -29,6 +29,12 @@ class Factory
     private $persist = true;
 
     /** @var bool */
+    private $doctrineEvents = true;
+
+    /** @var string|null */
+    private $doctrineEventTypeName = null;
+
+    /** @var bool */
     private $cascadePersist = false;
 
     /** @var array<array|callable> */
@@ -112,7 +118,17 @@ class Factory
             return $proxy;
         }
 
-        return $proxy->save()->withoutAutoRefresh(function(Proxy $proxy) use ($attributes) {
+        if (false === $this->doctrineEvents) {
+            $proxy->disableDoctrineEvents($this->doctrineEventTypeName);
+        }
+
+        $proxy->save();
+
+        if (false === $this->doctrineEvents) {
+            $this->resetDoctrineEvents($proxy);
+        }
+
+        return $proxy->withoutAutoRefresh(function(Proxy $proxy) use ($attributes) {
             foreach ($this->afterPersist as $callback) {
                 $proxy->executeCallback($callback, $attributes);
             }
@@ -136,6 +152,18 @@ class Factory
     {
         $cloned = clone $this;
         $cloned->persist = false;
+
+        return $cloned;
+    }
+
+    /**
+     * @return static
+     */
+    public function withoutDoctrineEvents(?string $eventTypeName = null): self
+    {
+        $cloned = clone $this;
+        $cloned->doctrineEvents = false;
+        $cloned->doctrineEventTypeName = $eventTypeName;
 
         return $cloned;
     }
@@ -439,5 +467,12 @@ class Factory
             // entity not managed (perhaps Embeddable)
             return false;
         }
+    }
+
+    private function resetDoctrineEvents(Proxy $proxy)
+    {
+        $this->doctrineEvents = true;
+        $this->doctrineEventTypeName = null;
+        $proxy->resetDoctrineEvents();
     }
 }

@@ -241,6 +241,7 @@ final class FactoryTest extends TestCase
 
         $this->assertNotSame(\spl_object_id($factory->withAttributes([])), $objectId);
         $this->assertNotSame(\spl_object_id($factory->withoutPersisting()), $objectId);
+        $this->assertNotSame(\spl_object_id($factory->withoutDoctrineEvents()), $objectId);
         $this->assertNotSame(\spl_object_id($factory->instantiateWith(function() {})), $objectId);
         $this->assertNotSame(\spl_object_id($factory->beforeInstantiate(function() {})), $objectId);
         $this->assertNotSame(\spl_object_id($factory->afterInstantiate(function() {})), $objectId);

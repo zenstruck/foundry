@@ -12,6 +12,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
+use Zenstruck\Foundry\Tests\Fixtures\Event\CommentEventSubscriber;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryServiceFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\ServiceStory;
@@ -57,6 +58,11 @@ class Kernel extends BaseKernel
         $c->register(CategoryServiceFactory::class)
             ->setAutoconfigured(true)
             ->setAutowired(true)
+        ;
+        $c->register(CommentEventSubscriber::class)
+            ->setAutoconfigured(true)
+            ->setAutowired(true)
+            ->addTag('doctrine.event_subscriber', ['connection' => 'default'])
         ;
 
         $c->loadFromExtension('framework', [
