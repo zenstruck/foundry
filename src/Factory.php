@@ -2,6 +2,8 @@
 
 namespace Zenstruck\Foundry;
 
+use Doctrine\Bundle\DoctrineBundle\EventSubscriber\EventSubscriberInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Faker;
 
@@ -33,6 +35,9 @@ class Factory
 
     /** @var string|null */
     private $doctrineEventTypeName = null;
+
+    /** @var array */
+    private $disabledDoctrineEvents = [];
 
     /** @var bool */
     private $cascadePersist = false;
@@ -119,13 +124,13 @@ class Factory
         }
 
         if (false === $this->doctrineEvents) {
-            $proxy->disableDoctrineEvents($this->doctrineEventTypeName);
+            $this->disableDoctrineEvents();
         }
 
         $proxy->save();
 
         if (false === $this->doctrineEvents) {
-            $this->resetDoctrineEvents($proxy);
+            $this->resetDoctrineEvents();
         }
 
         return $proxy->withoutAutoRefresh(function(Proxy $proxy) use ($attributes) {
@@ -469,10 +474,43 @@ class Factory
         }
     }
 
-    private function resetDoctrineEvents(Proxy $proxy)
+    private function resetDoctrineEvents(): void
     {
         $this->doctrineEvents = true;
         $this->doctrineEventTypeName = null;
-        $proxy->resetDoctrineEvents();
+
+        /** @var EntityManagerInterface $manager */
+        $manager = self::configuration()->objectManagerFor($this->class);
+
+        foreach ($this->disabledDoctrineEvents as $type => $listenersByType) {
+            foreach ($listenersByType as $listener) {
+                if ($listener instanceof EventSubscriberInterface) {
+                    $manager->getConnection()->getEventManager()->addEventSubscriber($listener);
+
+                    continue;
+                }
+
+                $manager->getConnection()->getEventManager()->addEventListener($type, $listener);
+            }
+        }
+    }
+
+    private function disableDoctrineEvents(): void
+    {
+        /** @var EntityManagerInterface $manager */
+        $manager = self::configuration()->objectManagerFor($this->class);
+
+        $this->disabledDoctrineEvents = $manager->getConnection()->getEventManager()->getListeners($this->doctrineEventTypeName);
+        foreach ($this->disabledDoctrineEvents as $type => $listenersByType) {
+            foreach ($listenersByType as $listener) {
+                if ($listener instanceof EventSubscriberInterface) {
+                    $manager->getConnection()->getEventManager()->removeEventSubscriber($listener);
+
+                    continue;
+                }
+
+                $manager->getConnection()->getEventManager()->removeEventListener($type, $listener);
+            }
+        }
     }
 }

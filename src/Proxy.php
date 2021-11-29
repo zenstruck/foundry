@@ -2,7 +2,6 @@
 
 namespace Zenstruck\Foundry;
 
-use Doctrine\Bundle\DoctrineBundle\EventSubscriber\EventSubscriberInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
 use Zenstruck\Assert;
@@ -34,9 +33,6 @@ final class Proxy
 
     /** @var bool */
     private $persisted = false;
-
-    /** @var array */
-    private $doctrineEvents = [];
 
     /**
      * @internal
@@ -222,47 +218,6 @@ final class Proxy
     public function disableAutoRefresh(): self
     {
         $this->autoRefresh = false;
-
-        return $this;
-    }
-
-    public function disableDoctrineEvents(?string $eventTypeName = null): self
-    {
-        /** @var EntityManagerInterface $manager */
-        $manager = $this->objectManager();
-
-        $this->doctrineEvents = $manager->getConnection()->getEventManager()->getListeners($eventTypeName);
-        foreach ($this->doctrineEvents as $type => $listenersByType) {
-            foreach ($listenersByType as $listener) {
-                if ($listener instanceof EventSubscriberInterface) {
-                    $manager->getConnection()->getEventManager()->removeEventSubscriber($listener);
-
-                    continue;
-                }
-
-                $manager->getConnection()->getEventManager()->removeEventListener($type, $listener);
-            }
-        }
-
-        return $this;
-    }
-
-    public function resetDoctrineEvents(): self
-    {
-        /** @var EntityManagerInterface $manager */
-        $manager = $this->objectManager();
-
-        foreach ($this->doctrineEvents as $type => $listenersByType) {
-            foreach ($listenersByType as $listener) {
-                if ($listener instanceof EventSubscriberInterface) {
-                    $manager->getConnection()->getEventManager()->addEventSubscriber($listener);
-
-                    continue;
-                }
-
-                $manager->getConnection()->getEventManager()->addEventListener($type, $listener);
-            }
-        }
 
         return $this;
     }
