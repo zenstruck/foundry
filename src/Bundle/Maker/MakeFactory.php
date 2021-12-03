@@ -98,6 +98,11 @@ final class MakeFactory extends AbstractMaker
             $io->newLine();
         }
 
+        if (!$input->getOption('all-fields')) {
+            $io->text('// Note: pass <fg=yellow>--all-fields</> if you want to generate default values for all entity fields, not only required fields');
+            $io->newLine();
+        }
+
         $argument = $command->getDefinition()->getArgument('entity');
         $entity = $io->choice($argument->getDescription(), $this->entityChoices());
 
