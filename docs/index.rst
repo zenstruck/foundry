@@ -232,6 +232,11 @@ should have. `Faker`_ is available to easily get random data:
     It is best to have ``getDefaults()`` return the attributes to persist a valid object
     (all non-nullable fields).
 
+.. tip::
+
+    Using ``make:factory --all-fields`` will generate default values for all fields of the entity,
+    not only non-nullable fields.
+
 Using your Factory
 ~~~~~~~~~~~~~~~~~~
 
