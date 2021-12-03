@@ -81,6 +81,7 @@ final class MakeFactory extends AbstractMaker
             ->addArgument('entity', InputArgument::OPTIONAL, 'Entity class to create a factory for')
             ->addOption('namespace', null, InputOption::VALUE_REQUIRED, 'Customize the namespace for generated factories', 'Factory')
             ->addOption('test', null, InputOption::VALUE_NONE, 'Create in <fg=yellow>tests/</> instead of <fg=yellow>src/</>')
+            ->addOption('all-fields', null, InputOption::VALUE_NONE, 'Create defaults for all entity fields, not only required fields')
         ;
 
         $inputConfig->setArgumentAsNonInteractive('entity');
@@ -94,6 +95,11 @@ final class MakeFactory extends AbstractMaker
 
         if (!$input->getOption('test')) {
             $io->text('// Note: pass <fg=yellow>--test</> if you want to generate factories in your <fg=yellow>tests/</> directory');
+            $io->newLine();
+        }
+
+        if (!$input->getOption('all-fields')) {
+            $io->text('// Note: pass <fg=yellow>--all-fields</> if you want to generate default values for all fields, not only required fields');
             $io->newLine();
         }
 
@@ -144,7 +150,7 @@ final class MakeFactory extends AbstractMaker
             __DIR__.'/../Resources/skeleton/Factory.tpl.php',
             [
                 'entity' => $entity,
-                'defaultProperties' => $this->defaultPropertiesFor($entity->getName()),
+                'defaultProperties' => $this->defaultPropertiesFor($entity->getName(), $input->getOption('all-fields')),
                 'repository' => $repository,
             ]
         );
@@ -185,7 +191,7 @@ final class MakeFactory extends AbstractMaker
         return $choices;
     }
 
-    private function defaultPropertiesFor(string $class): iterable
+    private function defaultPropertiesFor(string $class, bool $allFields): iterable
     {
         $em = $this->managerRegistry->getManagerForClass($class);
 
@@ -198,7 +204,7 @@ final class MakeFactory extends AbstractMaker
 
         foreach ($metadata->fieldMappings as $property) {
             // ignore identifiers and nullable fields
-            if (($property['nullable'] ?? false) || \in_array($property['fieldName'], $ids, true)) {
+            if ((!$allFields && ($property['nullable'] ?? false)) || \in_array($property['fieldName'], $ids, true)) {
                 continue;
             }
 
