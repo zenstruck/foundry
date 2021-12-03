@@ -99,7 +99,7 @@ final class MakeFactory extends AbstractMaker
         }
 
         if (!$input->getOption('all-fields')) {
-            $io->text('// Note: pass <fg=yellow>--all-fields</> if you want to generate default values for all entity fields, not only required fields');
+            $io->text('// Note: pass <fg=yellow>--all-fields</> if you want to generate default values for all fields, not only required fields');
             $io->newLine();
         }
 
