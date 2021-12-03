@@ -193,6 +193,11 @@ This command will generate a ``PostFactory`` class that looks like this:
 
 .. tip::
 
+    Using ``make:factory --all-fields`` will generate default values for all fields of the entity,
+    not only required fields.
+
+.. tip::
+
     PhpStorm 2021.2+ has support for
     `generics annotations <https://blog.jetbrains.com/phpstorm/2021/07/phpstorm-2021-2-release/#generics>`_,
     with it, your factory's annotations can be reduced to the following and still have the same auto-completion
