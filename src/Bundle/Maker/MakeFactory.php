@@ -206,7 +206,6 @@ final class MakeFactory extends AbstractMaker
         // TODO class exist dont relay on fix namespaces
         // TODO write some tests
         // TODO test with kind of possible relations
-        // TODO change code to only work with 1-1/n-1 relationships 
         // If Factory exist for related entities populate too with auto defaults
         $relatedEntities = $metadata->associationMappings;
         foreach ($relatedEntities as $item) {
@@ -216,7 +215,7 @@ final class MakeFactory extends AbstractMaker
 
                 $factory = ucfirst($fieldName).'Factory';
 
-                if (class_exists('App\Tests\Factory\\'.$factory) || class_exists('App\Factory\\'.$factory) ) {
+                if (class_exists('App\Tests\Factory\\'.$factory) || class_exists('App\Factory\\'.$factory)) {
                     yield $fieldName => ucfirst($fieldName).'Factory::createOne(),';
                 }
             }
