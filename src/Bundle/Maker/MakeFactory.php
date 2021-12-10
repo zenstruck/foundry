@@ -201,6 +201,26 @@ final class MakeFactory extends AbstractMaker
 
         $metadata = $em->getClassMetadata($class);
         $ids = $metadata->getIdentifierFieldNames();
+        
+        // TODO cleanup the code
+        // TODO class exist dont relay on fix namespaces
+        // TODO write some tests
+        // TODO test with kind of possible relations
+        // TODO change code to only work with 1-1/n-1 relationships 
+        // If Factory exist for related entities populate too with auto defaults
+        $relatedEntities = $metadata->associationMappings;
+        foreach ($relatedEntities as $item) {
+            $joinedColumns = $item['joinColumns'];
+            if (false === $joinedColumns[0]['nullable']) {
+                $fieldName = $item['fieldName'];
+
+                $factory = ucfirst($fieldName).'Factory';
+
+                if (class_exists('App\Tests\Factory\\'.$factory) || class_exists('App\Factory\\'.$factory) ) {
+                    yield $fieldName => ucfirst($fieldName).'Factory::createOne(),';
+                }
+            }
+        }
 
         foreach ($metadata->fieldMappings as $property) {
             // ignore identifiers and nullable fields
