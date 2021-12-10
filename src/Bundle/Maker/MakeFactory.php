@@ -221,10 +221,12 @@ final class MakeFactory extends AbstractMaker
             if (false === $joinedColumns[0]['nullable']) {
                 $fieldName = $item['fieldName'];
 
-                $factory = \ucfirst($fieldName).'Factory';
+                $targetEntityArray = explode('\\', $item['targetEntity']);
+                $targetEntity = end($targetEntityArray);
+                $factory = \ucfirst($targetEntity).'Factory';
 
                 if (\class_exists('App\Tests\Factory\\'.$factory) || \class_exists('App\Factory\\'.$factory)) {
-                    yield $fieldName => \ucfirst($fieldName).'Factory::createOne(),';
+                    yield $targetEntity => \ucfirst($targetEntity).'Factory::createOne(),';
                 }
             }
         }
