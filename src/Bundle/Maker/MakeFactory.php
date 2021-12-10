@@ -201,7 +201,7 @@ final class MakeFactory extends AbstractMaker
 
         $metadata = $em->getClassMetadata($class);
         $ids = $metadata->getIdentifierFieldNames();
-        
+
         // TODO cleanup the code
         // TODO class exist dont relay on fix namespaces
         // TODO write some tests
@@ -213,10 +213,10 @@ final class MakeFactory extends AbstractMaker
             if (false === $joinedColumns[0]['nullable']) {
                 $fieldName = $item['fieldName'];
 
-                $factory = ucfirst($fieldName).'Factory';
+                $factory = \ucfirst($fieldName).'Factory';
 
                 if (\class_exists('App\Tests\Factory\\'.$factory) || \class_exists('App\Factory\\'.$factory)) {
-                    yield $fieldName => ucfirst($fieldName).'Factory::createOne(),';
+                    yield $fieldName => \ucfirst($fieldName).'Factory::createOne(),';
                 }
             }
         }
