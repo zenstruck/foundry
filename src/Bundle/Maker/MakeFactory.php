@@ -217,17 +217,19 @@ final class MakeFactory extends AbstractMaker
                 continue;
             }
             
+            if (true === $joinedColumns[0]['nullable']) {
+                continue;
+            }
+            
             $joinedColumns = $item['joinColumns'];
-            if (false === $joinedColumns[0]['nullable']) {
-                $fieldName = $item['fieldName'];
+            $fieldName = $item['fieldName'];
 
-                $targetEntityArray = explode('\\', $item['targetEntity']);
-                $targetEntity = end($targetEntityArray);
-                $factory = \ucfirst($targetEntity).'Factory';
+            $targetEntityArray = explode('\\', $item['targetEntity']);
+            $targetEntity = end($targetEntityArray);
+            $factory = \ucfirst($targetEntity).'Factory';
 
-                if (\class_exists('App\Tests\Factory\\'.$factory) || \class_exists('App\Factory\\'.$factory)) {
-                    yield $targetEntity => \ucfirst($targetEntity).'Factory::createOne(),';
-                }
+            if (\class_exists('App\Tests\Factory\\'.$factory) || \class_exists('App\Factory\\'.$factory)) {
+                yield $targetEntity => \ucfirst($targetEntity).'Factory::createOne(),';
             }
         }
 
