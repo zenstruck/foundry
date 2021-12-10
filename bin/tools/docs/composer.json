@@ -1,0 +1,5 @@
+{
+    "require": {
+        "symfony-tools/docs-builder": "^0.18.0"
+    }
+}

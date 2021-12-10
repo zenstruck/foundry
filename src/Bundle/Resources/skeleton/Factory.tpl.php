@@ -10,9 +10,11 @@ use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
 
 /**
+ * @extends ModelFactory<<?= $entity->getShortName() ?>>
+ *
  * @method static <?= $entity->getShortName() ?>|Proxy createOne(array $attributes = [])
- * @method static <?= $entity->getShortName() ?>[]|Proxy[] createMany(int $number, $attributes = [])
- * @method static <?= $entity->getShortName() ?>|Proxy find($criteria)
+ * @method static <?= $entity->getShortName() ?>[]|Proxy[] createMany(int $number, array|callable $attributes = [])
+ * @method static <?= $entity->getShortName() ?>|Proxy find(object|array|mixed $criteria)
  * @method static <?= $entity->getShortName() ?>|Proxy findOrCreate(array $attributes)
  * @method static <?= $entity->getShortName() ?>|Proxy first(string $sortedField = 'id')
  * @method static <?= $entity->getShortName() ?>|Proxy last(string $sortedField = 'id')
@@ -24,7 +26,7 @@ use Zenstruck\Foundry\Proxy;
  * @method static <?= $entity->getShortName() ?>[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
 <?php if ($repository): ?> * @method static <?= $repository->getShortName() ?>|RepositoryProxy repository()
 <?php endif ?>
- * @method <?= $entity->getShortName() ?>|Proxy create($attributes = [])
+ * @method <?= $entity->getShortName() ?>|Proxy create(array|callable $attributes = [])
  */
 final class <?= $class_name ?> extends ModelFactory
 {
@@ -32,13 +34,13 @@ final class <?= $class_name ?> extends ModelFactory
     {
         parent::__construct();
 
-        // TODO inject services if required (https://github.com/zenstruck/foundry#factories-as-services)
+        // TODO inject services if required (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services)
     }
 
     protected function getDefaults(): array
     {
         return [
-            // TODO add your default values here (https://github.com/zenstruck/foundry#model-factories)
+            // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
 <?php
 foreach ($defaultProperties as $fieldname => $type) {
         echo "            '".$fieldname."' => ".$type."\n";
@@ -49,9 +51,9 @@ foreach ($defaultProperties as $fieldname => $type) {
 
     protected function initialize(): self
     {
-        // see https://github.com/zenstruck/foundry#initialization
+        // see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
         return $this
-            // ->afterInstantiate(function(<?= $entity->getShortName() ?> $<?= \lcfirst($entity->getShortName()) ?>) {})
+            // ->afterInstantiate(function(<?= $entity->getShortName() ?> $<?= \lcfirst($entity->getShortName()) ?>): void {})
         ;
     }
 

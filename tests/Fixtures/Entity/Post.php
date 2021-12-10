@@ -79,6 +79,11 @@ class Post
         return $this->title;
     }
 
+    public function getId()
+    {
+        return $this->id;
+    }
+
     public function getTitle(): ?string
     {
         return $this->title;

@@ -26,7 +26,7 @@ final class Instantiator
     /** @var bool */
     private $alwaysForceProperties = false;
 
-    /** @var array */
+    /** @var string[] */
     private $forceProperties = [];
 
     public function __invoke(array $attributes, string $class): object
@@ -35,7 +35,7 @@ final class Instantiator
 
         foreach ($attributes as $attribute => $value) {
             if (0 === \mb_strpos($attribute, 'optional:')) {
-                trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using "optional:" attribute prefixes is deprecated, use Instantiator::allowExtraAttributes() instead (https://github.com/zenstruck/foundry#instantiation).');
+                trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using "optional:" attribute prefixes is deprecated, use Instantiator::allowExtraAttributes() instead (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#instantiation).');
                 continue;
             }
 
@@ -56,7 +56,7 @@ final class Instantiator
             }
 
             if (0 === \mb_strpos($attribute, 'force:')) {
-                trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using "force:" property prefixes is deprecated, use Instantiator::alwaysForceProperties() instead (https://github.com/zenstruck/foundry#instantiation).');
+                trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using "force:" property prefixes is deprecated, use Instantiator::alwaysForceProperties() instead (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#instantiation).');
 
                 self::forceSet($object, \mb_substr($attribute, 6), $value);
 

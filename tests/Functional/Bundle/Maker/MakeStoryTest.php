@@ -34,7 +34,7 @@ final class FooBarStory extends Story
 {
     public function build(): void
     {
-        // TODO build your story here (https://github.com/zenstruck/foundry#stories)
+        // TODO build your story here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#stories)
     }
 }
 
@@ -70,7 +70,7 @@ final class FooBarStory extends Story
 {
     public function build(): void
     {
-        // TODO build your story here (https://github.com/zenstruck/foundry#stories)
+        // TODO build your story here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#stories)
     }
 }
 
@@ -103,7 +103,7 @@ final class FooBarStory extends Story
 {
     public function build(): void
     {
-        // TODO build your story here (https://github.com/zenstruck/foundry#stories)
+        // TODO build your story here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#stories)
     }
 }
 
@@ -139,7 +139,7 @@ final class FooBarStory extends Story
 {
     public function build(): void
     {
-        // TODO build your story here (https://github.com/zenstruck/foundry#stories)
+        // TODO build your story here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#stories)
     }
 }
 

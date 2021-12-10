@@ -254,7 +254,6 @@ final class FactoryTest extends TestCase
     {
         $registry = $this->createMock(ManagerRegistry::class);
         $registry
-            ->expects($this->exactly(2))
             ->method('getManagerForClass')
             ->with(Post::class)
             ->willReturn($this->createMock(ObjectManager::class))
@@ -278,7 +277,6 @@ final class FactoryTest extends TestCase
 
         $registry = $this->createMock(ManagerRegistry::class);
         $registry
-            ->expects($this->exactly(6))
             ->method('getManagerForClass')
             ->with(Post::class)
             ->willReturn($this->createMock(ObjectManager::class))
@@ -304,7 +302,6 @@ final class FactoryTest extends TestCase
     {
         $registry = $this->createMock(ManagerRegistry::class);
         $registry
-            ->expects($this->exactly(2)) // once for persisting, once for each afterPersist event
             ->method('getManagerForClass')
             ->with(Post::class)
             ->willReturn($this->createMock(ObjectManager::class))

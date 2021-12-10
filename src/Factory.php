@@ -2,10 +2,11 @@
 
 namespace Zenstruck\Foundry;
 
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Faker;
 
 /**
- * @template TObject as object
+ * @template TObject of object
  * @abstract
  *
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -26,6 +27,9 @@ class Factory
 
     /** @var bool */
     private $persist = true;
+
+    /** @var bool */
+    private $cascadePersist = false;
 
     /** @var array<array|callable> */
     private $attributeSet = [];
@@ -68,8 +72,7 @@ class Factory
     /**
      * @param array|callable $attributes
      *
-     * @return Proxy|object
-     *
+     * @return Proxy<TObject>&TObject
      * @psalm-return Proxy<TObject>
      */
     final public function create($attributes = []): Proxy
@@ -105,7 +108,7 @@ class Factory
 
         $proxy = new Proxy($object);
 
-        if (!$this->isPersisting()) {
+        if (!$this->isPersisting() || true === $this->cascadePersist) {
             return $proxy;
         }
 
@@ -119,7 +122,7 @@ class Factory
     /**
      * @see FactoryCollection::__construct()
      *
-     * @psalm-return FactoryCollection<TObject>
+     * @return FactoryCollection<TObject>
      */
     final public function many(int $min, ?int $max = null): FactoryCollection
     {
@@ -302,6 +305,12 @@ class Factory
             $value = $value->withoutPersisting();
         }
 
+        // Check if the attribute is cascade persist
+        if (self::configuration()->hasManagerRegistry()) {
+            $relationField = $this->relationshipField($value);
+            $value->cascadePersist = $this->hasCascadePersist($value, $relationField);
+        }
+
         return $value->create()->object();
     }
 
@@ -316,17 +325,60 @@ class Factory
 
     private function normalizeCollection(FactoryCollection $collection): array
     {
-        if ($this->isPersisting() && $field = $this->inverseRelationshipField($collection->factory())) {
-            $this->afterPersist[] = static function(Proxy $proxy) use ($collection, $field) {
-                $collection->create([$field => $proxy]);
-                $proxy->refresh();
-            };
+        if ($this->isPersisting()) {
+            $field = $this->inverseRelationshipField($collection->factory());
+            $cascadePersist = $this->hasCascadePersist($collection->factory(), $field);
 
-            // creation delegated to afterPersist event - return empty array here
-            return [];
+            if ($field && false === $cascadePersist) {
+                $this->afterPersist[] = static function(Proxy $proxy) use ($collection, $field) {
+                    $collection->create([$field => $proxy]);
+                    $proxy->refresh();
+                };
+
+                // creation delegated to afterPersist event - return empty array here
+                return [];
+            }
         }
 
-        return $collection->all();
+        return \array_map(
+            function(self $factory) {
+                $factory->cascadePersist = $this->cascadePersist;
+
+                return $factory;
+            },
+            $collection->all()
+        );
+    }
+
+    private function relationshipField(self $factory): ?string
+    {
+        $factoryClass = $this->class;
+        $relationClass = $factory->class;
+
+        // Check inversedBy side ($this is the owner of the relation)
+        $factoryClassMetadata = self::configuration()->objectManagerFor($factoryClass)->getMetadataFactory()->getMetadataFor($factoryClass);
+
+        foreach ($factoryClassMetadata->getAssociationNames() as $field) {
+            if (!$factoryClassMetadata->isAssociationInverseSide($field) && $factoryClassMetadata->getAssociationTargetClass($field) === $relationClass) {
+                return $field;
+            }
+        }
+
+        try {
+            // Check mappedBy side ($factory is the owner of the relation)
+            $relationClassMetadata = self::configuration()->objectManagerFor($relationClass)->getClassMetadata($relationClass);
+        } catch (\RuntimeException $e) {
+            // relation not managed - could be embeddable
+            return null;
+        }
+
+        foreach ($relationClassMetadata->getAssociationNames() as $field) {
+            if (($relationClassMetadata->isSingleValuedAssociation($field) || $relationClassMetadata->isCollectionValuedAssociation($field)) && $relationClassMetadata->getAssociationTargetClass($field) === $factoryClass) {
+                return $field;
+            }
+        }
+
+        return null; // no relationship found
     }
 
     private function inverseRelationshipField(self $factory): ?string
@@ -344,8 +396,48 @@ class Factory
         return null; // no relationship found
     }
 
+    private function hasCascadePersist(self $factory, ?string $field): bool
+    {
+        if (null === $field) {
+            return false;
+        }
+
+        $factoryClass = $this->class;
+        $relationClass = $factory->class;
+        $classMetadataFactory = self::configuration()->objectManagerFor($factoryClass)->getMetadataFactory()->getMetadataFor($factoryClass);
+        $relationClassMetadata = self::configuration()->objectManagerFor($relationClass)->getClassMetadata($relationClass);
+
+        if (!$relationClassMetadata instanceof ClassMetadataInfo || !$classMetadataFactory instanceof ClassMetadataInfo) {
+            return false;
+        }
+
+        if ($relationClassMetadata->hasAssociation($field)) {
+            $inversedBy = $relationClassMetadata->getAssociationMapping($field)['inversedBy'];
+            if (null === $inversedBy) {
+                return false;
+            }
+
+            $cascadeMetadata = $classMetadataFactory->getAssociationMapping($inversedBy)['cascade'] ?? [];
+        } else {
+            $cascadeMetadata = $classMetadataFactory->getAssociationMapping($field)['cascade'] ?? [];
+        }
+
+        return \in_array('persist', $cascadeMetadata, true);
+    }
+
     private function isPersisting(): bool
     {
-        return self::configuration()->hasManagerRegistry() ? $this->persist : false;
+        if (!$this->persist || !self::configuration()->hasManagerRegistry()) {
+            return false;
+        }
+
+        try {
+            self::configuration()->objectManagerFor($this->class);
+
+            return true;
+        } catch (\RuntimeException $e) {
+            // entity not managed (perhaps Embeddable)
+            return false;
+        }
     }
 }
