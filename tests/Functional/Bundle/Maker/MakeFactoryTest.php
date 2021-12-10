@@ -65,6 +65,7 @@ final class CategoryFactory extends ModelFactory
         return [
             // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
             'name' => self::faker()->text(),
+            'post' => PostFactory::createOne(),
         ];
     }
 
@@ -143,6 +144,7 @@ final class TagFactory extends ModelFactory
         return [
             // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
             'name' => self::faker()->text(),
+            'post' => PostFactory::createOne(),
         ];
     }
 
@@ -217,6 +219,7 @@ final class CategoryFactory extends ModelFactory
         return [
             // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
             'name' => self::faker()->text(),
+            'post' => PostFactory::createOne(),
         ];
     }
 
@@ -295,6 +298,7 @@ final class TagFactory extends ModelFactory
         return [
             // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
             'name' => self::faker()->text(),
+            'post' => PostFactory::createOne(),
         ];
     }
 
