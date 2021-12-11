@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 use Symfony\Component\Console\Tester\CommandTester;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Foo;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
 
 /**
@@ -13,6 +14,81 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
  */
 final class MakeFactoryTest extends MakerTestCase
 {
+    /**
+     * @test
+     */
+    public function can_create_factory_with_relation_defaults(): void
+    {
+        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
+
+        $this->assertFileDoesNotExist(self::tempFile('src/Factory/FooFactory.php'));
+
+        $tester->execute(['entity' => Foo::class]);
+
+        $this->assertFileExists(self::tempFile('src/Factory/FooFactory.php'));
+        $this->assertSame(<<<EOF
+<?php
+
+namespace App\\Factory;
+
+use Zenstruck\\Foundry\\Tests\\Fixtures\\Entity\\Foo;
+use Zenstruck\\Foundry\\ModelFactory;
+use Zenstruck\\Foundry\\Proxy;
+
+/**
+ * @extends ModelFactory<Foo>
+ *
+ * @method static Foo|Proxy createOne(array \$attributes = [])
+ * @method static Foo[]|Proxy[] createMany(int \$number, array|callable \$attributes = [])
+ * @method static Foo|Proxy find(object|array|mixed \$criteria)
+ * @method static Foo|Proxy findOrCreate(array \$attributes)
+ * @method static Foo|Proxy first(string \$sortedField = 'id')
+ * @method static Foo|Proxy last(string \$sortedField = 'id')
+ * @method static Foo|Proxy random(array \$attributes = [])
+ * @method static Foo|Proxy randomOrCreate(array \$attributes = [])
+ * @method static Foo[]|Proxy[] all()
+ * @method static Foo[]|Proxy[] findBy(array \$attributes)
+ * @method static Foo[]|Proxy[] randomSet(int \$number, array \$attributes = [])
+ * @method static Foo[]|Proxy[] randomRange(int \$min, int \$max, array \$attributes = [])
+ * @method Foo|Proxy create(array|callable \$attributes = [])
+ */
+final class FooFactory extends ModelFactory
+{
+    public function __construct()
+    {
+        parent::__construct();
+
+        // TODO inject services if required (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services)
+    }
+
+    protected function getDefaults(): array
+    {
+        return [
+            // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
+            'oneToOne' => BarFactory::createOne(),
+            'manyToOne' => BarFactory::createOne(),
+        ];
+    }
+
+    protected function initialize(): self
+    {
+        // see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
+        return \$this
+            // ->afterInstantiate(function(Foo \$foo): void {})
+        ;
+    }
+
+    protected static function getClass(): string
+    {
+        return Foo::class;
+    }
+}
+
+EOF
+            , \file_get_contents(self::tempFile('src/Factory/FooFactory.php'))
+        );
+    }
+
     /**
      * @test
      */
@@ -65,7 +141,6 @@ final class CategoryFactory extends ModelFactory
         return [
             // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
             'name' => self::faker()->text(),
-            'post' => PostFactory::createOne(),
         ];
     }
 
@@ -144,7 +219,6 @@ final class TagFactory extends ModelFactory
         return [
             // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
             'name' => self::faker()->text(),
-            'post' => PostFactory::createOne(),
         ];
     }
 
@@ -219,7 +293,6 @@ final class CategoryFactory extends ModelFactory
         return [
             // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
             'name' => self::faker()->text(),
-            'post' => PostFactory::createOne(),
         ];
     }
 
@@ -298,7 +371,6 @@ final class TagFactory extends ModelFactory
         return [
             // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
             'name' => self::faker()->text(),
-            'post' => PostFactory::createOne(),
         ];
     }
 
