@@ -8,5 +8,4 @@
 /.phpunit.result.cache
 /tests/Fixtures/tmp
 /var/
-/.idea/
 /docs/output/
