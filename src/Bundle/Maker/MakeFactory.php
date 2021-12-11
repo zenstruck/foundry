@@ -233,7 +233,7 @@ final class MakeFactory extends AbstractMaker
             $factory = \ucfirst($targetEntity).'Factory';
 
             if ($this->isFactory($factory)) {
-                yield \lcfirst($fieldName) => \ucfirst($targetEntity).'Factory::createOne(),';
+                yield \lcfirst($fieldName) => \ucfirst($targetEntity).'Factory::new(),';
             }
         }
 

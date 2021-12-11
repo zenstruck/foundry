@@ -65,8 +65,8 @@ final class FooFactory extends ModelFactory
     {
         return [
             // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
-            'oneToOne' => BarFactory::createOne(),
-            'manyToOne' => BarFactory::createOne(),
+            'oneToOne' => BarFactory::new(),
+            'manyToOne' => BarFactory::new(),
         ];
     }
 
