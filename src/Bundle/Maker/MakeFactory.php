@@ -256,15 +256,12 @@ final class MakeFactory extends AbstractMaker
 
     private function isFactory($factory)
     {
+        // Quickfix on Github CI - TODO
+        if (\class_exists('Zenstruck\Foundry\Tests\Fixtures\Factories\\' . $factory)) {
+            return true;
+        }
+
         $dirs = [];
-
-        if (\is_dir('Zenstruck')) {
-            $dirs[] = 'Zenstruck/';
-        }
-
-        if (\is_dir('Foundry')) {
-            $dirs[] = 'Foundry/';
-        }
 
         if (\is_dir('src')) {
             $dirs[] = 'src/';
