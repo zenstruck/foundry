@@ -2,13 +2,16 @@
 
 namespace Zenstruck\Foundry\Tests\Functional;
 
+use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Assert;
 use Zenstruck\Foundry\AnonymousFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Contact;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 
@@ -17,16 +20,30 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
  */
 final class ProxyTest extends KernelTestCase
 {
-    use Factories, ResetDatabase;
+    use ContainerBC, Factories, ResetDatabase;
 
     /**
      * @test
      */
     public function can_assert_persisted(): void
     {
-        $post = PostFactory::createOne();
+        PostFactory::createOne()->assertPersisted();
 
-        $post->assertPersisted();
+        Assert::that(function() { PostFactory::new()->withoutPersisting()->create()->assertPersisted(); })
+            ->throws(AssertionFailedError::class, \sprintf('%s is not persisted.', Post::class))
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function can_assert_not_persisted(): void
+    {
+        PostFactory::new()->withoutPersisting()->create()->assertNotPersisted();
+
+        Assert::that(function() { PostFactory::createOne()->assertNotPersisted(); })
+            ->throws(AssertionFailedError::class, \sprintf('%s is persisted but it should not be.', Post::class))
+        ;
     }
 
     /**
@@ -89,7 +106,7 @@ final class ProxyTest extends KernelTestCase
     {
         $post = PostFactory::createOne(['title' => 'my title']);
 
-        self::$container->get('doctrine')->getManager()->clear();
+        self::container()->get('doctrine')->getManager()->clear();
 
         $this->assertSame('my title', $post->refresh()->getTitle());
     }
@@ -101,7 +118,7 @@ final class ProxyTest extends KernelTestCase
     {
         $post = PostFactory::createOne();
 
-        self::$container->get('doctrine')->getManager()->clear();
+        self::container()->get('doctrine')->getManager()->clear();
 
         PostFactory::repository()->truncate();
 

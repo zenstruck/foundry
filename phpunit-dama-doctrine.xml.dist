@@ -25,6 +25,9 @@
     <filter>
         <whitelist>
             <directory>./src/</directory>
+            <exclude>
+                <directory>./src/Bundle/Resources/</directory>
+            </exclude>
         </whitelist>
     </filter>
 

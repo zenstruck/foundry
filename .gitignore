@@ -2,9 +2,11 @@
 /phpunit.xml
 /phpunit-dama-doctrine.xml
 /vendor/
+/bin/tools/*/vendor/
 /build/
 /.php-cs-fixer.cache
 /.phpunit.result.cache
 /tests/Fixtures/tmp
 /var/
 /.idea/
+/docs/output/

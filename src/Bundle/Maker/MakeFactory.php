@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Foundry\Bundle\Maker;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
@@ -13,7 +14,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Zenstruck\Foundry\Bundle\Extractor\Property;
 use Zenstruck\Foundry\ModelFactory;
 
 /**
@@ -21,18 +21,39 @@ use Zenstruck\Foundry\ModelFactory;
  */
 final class MakeFactory extends AbstractMaker
 {
+    private const ORM_DEFAULTS = [
+        'ARRAY' => '[],',
+        'ASCII_STRING' => 'self::faker()->text(),',
+        'BIGINT' => 'self::faker()->randomNumber(),',
+        'BLOB' => 'self::faker()->text(),',
+        'BOOLEAN' => 'self::faker()->boolean(),',
+        'DATE' => 'self::faker()->datetime(),',
+        'DATE_MUTABLE' => 'self::faker()->datetime(),',
+        'DATE_IMMUTABLE' => 'self::faker()->datetime(),',
+        'DATETIME_MUTABLE' => 'self::faker()->datetime(),',
+        'DATETIME_IMMUTABLE' => 'self::faker()->datetime(),',
+        'DATETIMETZ_MUTABLE' => 'self::faker()->datetime(),',
+        'DATETIMETZ_IMMUTABLE' => 'self::faker()->datetime(),',
+        'DECIMAL' => 'self::faker()->randomFloat(),',
+        'FLOAT' => 'self::faker()->randomFloat(),',
+        'INTEGER' => 'self::faker()->randomNumber(),',
+        'JSON' => '[],',
+        'JSON_ARRAY' => '[],',
+        'SIMPLE_ARRAY' => '[],',
+        'SMALLINT' => 'self::faker()->randomNumber(1, 32767),',
+        'STRING' => 'self::faker()->text(),',
+        'TEXT' => 'self::faker()->text(),',
+        'TIME_MUTABLE' => 'self::faker()->datetime(),',
+        'TIME_IMMUTABLE' => 'self::faker()->datetime(),',
+    ];
+
     /** @var ManagerRegistry */
     private $managerRegistry;
 
     /** @var string[] */
     private $entitiesWithFactories;
 
-    /**
-     * @var Property
-     */
-    private $propertyExtractor;
-
-    public function __construct(ManagerRegistry $managerRegistry, \Traversable $factories, Property $propertyExtractor)
+    public function __construct(ManagerRegistry $managerRegistry, \Traversable $factories)
     {
         $this->managerRegistry = $managerRegistry;
         $this->entitiesWithFactories = \array_map(
@@ -41,7 +62,6 @@ final class MakeFactory extends AbstractMaker
             },
             \iterator_to_array($factories)
         );
-        $this->propertyExtractor = $propertyExtractor;
     }
 
     public static function getCommandName(): string
@@ -61,6 +81,7 @@ final class MakeFactory extends AbstractMaker
             ->addArgument('entity', InputArgument::OPTIONAL, 'Entity class to create a factory for')
             ->addOption('namespace', null, InputOption::VALUE_REQUIRED, 'Customize the namespace for generated factories', 'Factory')
             ->addOption('test', null, InputOption::VALUE_NONE, 'Create in <fg=yellow>tests/</> instead of <fg=yellow>src/</>')
+            ->addOption('all-fields', null, InputOption::VALUE_NONE, 'Create defaults for all entity fields, not only required fields')
         ;
 
         $inputConfig->setArgumentAsNonInteractive('entity');
@@ -74,6 +95,11 @@ final class MakeFactory extends AbstractMaker
 
         if (!$input->getOption('test')) {
             $io->text('// Note: pass <fg=yellow>--test</> if you want to generate factories in your <fg=yellow>tests/</> directory');
+            $io->newLine();
+        }
+
+        if (!$input->getOption('all-fields')) {
+            $io->text('// Note: pass <fg=yellow>--all-fields</> if you want to generate default values for all fields, not only required fields');
             $io->newLine();
         }
 
@@ -119,14 +145,12 @@ final class MakeFactory extends AbstractMaker
             $repository = null;
         }
 
-        $defaultProperties = $this->getProperties($entity);
-
         $generator->generateClass(
             $factory->getFullName(),
             __DIR__.'/../Resources/skeleton/Factory.tpl.php',
             [
                 'entity' => $entity,
-                'defaultProperties' => $defaultProperties,
+                'defaultProperties' => $this->defaultPropertiesFor($entity->getName(), $input->getOption('all-fields')),
                 'repository' => $repository,
             ]
         );
@@ -137,7 +161,7 @@ final class MakeFactory extends AbstractMaker
 
         $io->text([
             'Next: Open your new factory and set default values/states.',
-            'Find the documentation at https://github.com/zenstruck/foundry#model-factories',
+            'Find the documentation at https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories',
         ]);
     }
 
@@ -167,10 +191,62 @@ final class MakeFactory extends AbstractMaker
         return $choices;
     }
 
-    private function getProperties($classname)
+    private function defaultPropertiesFor(string $class, bool $allFields): iterable
     {
-        $properties = $this->propertyExtractor->getFakerMethodFromDoctrineFieldMappings($classname);
+        $em = $this->managerRegistry->getManagerForClass($class);
 
-        return $properties;
+        if (!$em instanceof EntityManagerInterface) {
+            return [];
+        }
+
+        $metadata = $em->getClassMetadata($class);
+        $ids = $metadata->getIdentifierFieldNames();
+
+        // TODO cleanup the code
+        // TODO class exist dont relay on fix namespaces
+        // TODO write some tests
+        // TODO test with kind of possible relations
+        // If Factory exist for related entities populate too with auto defaults
+        $relatedEntities = $metadata->associationMappings;
+        foreach ($relatedEntities as $item) {
+            if (!array_key_exists('joinColumns', $item)) {
+                continue;
+            }
+
+            if (array_key_exists('joinTable', $item)) {
+                continue;
+            }
+            
+            if (true === $joinedColumns[0]['nullable']) {
+                continue;
+            }
+            
+            $joinedColumns = $item['joinColumns'];
+            $fieldName = $item['fieldName'];
+
+            $targetEntityArray = explode('\\', $item['targetEntity']);
+            $targetEntity = end($targetEntityArray);
+            $factory = \ucfirst($targetEntity).'Factory';
+
+            if (\class_exists('App\Tests\Factory\\'.$factory) || \class_exists('App\Factory\\'.$factory)) {
+                yield $targetEntity => \ucfirst($targetEntity).'Factory::createOne(),';
+            }
+        }
+
+        foreach ($metadata->fieldMappings as $property) {
+            // ignore identifiers and nullable fields
+            if ((!$allFields && ($property['nullable'] ?? false)) || \in_array($property['fieldName'], $ids, true)) {
+                continue;
+            }
+
+            $type = \mb_strtoupper($property['type']);
+            $value = "null, // TODO add {$type} ORM type manually";
+
+            if (\array_key_exists($type, self::ORM_DEFAULTS)) {
+                $value = self::ORM_DEFAULTS[$type];
+            }
+
+            yield $property['fieldName'] => $value;
+        }
     }
 }

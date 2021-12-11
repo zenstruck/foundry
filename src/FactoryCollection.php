@@ -3,7 +3,7 @@
 namespace Zenstruck\Foundry;
 
 /**
- * @template TObject as object
+ * @template TObject of object
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
@@ -37,7 +37,7 @@ final class FactoryCollection
     /**
      * @param array|callable $attributes
      *
-     * @return Proxy[]|object[]
+     * @return list<TObject&Proxy<TObject>>
      *
      * @psalm-suppress InvalidReturnType
      * @psalm-return list<Proxy<TObject>>

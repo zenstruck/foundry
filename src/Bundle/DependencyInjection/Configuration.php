@@ -17,7 +17,7 @@ final class Configuration implements ConfigurationInterface
         $treeBuilder->getRootNode()
             ->children()
                 ->booleanNode('auto_refresh_proxies')
-                    ->info('Whether to auto-refresh proxies by default (https://github.com/zenstruck/foundry#auto-refresh)')
+                    ->info('Whether to auto-refresh proxies by default (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#auto-refresh)')
                     ->defaultNull()
                 ->end()
                 ->arrayNode('faker')

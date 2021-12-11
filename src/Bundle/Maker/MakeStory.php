@@ -51,7 +51,7 @@ final class MakeStory extends AbstractMaker
         }
 
         $argument = $command->getDefinition()->getArgument('name');
-        $value = $io->ask($argument->getDescription(), $argument->getDefault(), [Validator::class, 'notBlank']);
+        $value = $io->ask($argument->getDescription(), null, [Validator::class, 'notBlank']);
         $input->setArgument($argument->getName(), $value);
     }
 
@@ -75,7 +75,7 @@ final class MakeStory extends AbstractMaker
 
         $io->text([
             'Next: Open your story class and start customizing it.',
-            'Find the documentation at https://github.com/zenstruck/foundry#stories',
+            'Find the documentation at https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#stories',
         ]);
     }
 

@@ -3,8 +3,10 @@
 namespace Zenstruck\Foundry\Tests\Functional;
 
 use Doctrine\Common\Proxy\Proxy as DoctrineProxy;
+use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Assert;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
@@ -31,11 +33,63 @@ final class RepositoryProxyTest extends KernelTestCase
 
     /**
      * @test
-     * @group legacy
      */
     public function assertions(): void
     {
         $repository = repository(Category::class);
+
+        $repository->assert()->empty();
+
+        CategoryFactory::createMany(2);
+
+        $repository->assert()->count(2);
+        $repository->assert()->countGreaterThan(1);
+        $repository->assert()->countGreaterThanOrEqual(2);
+        $repository->assert()->countLessThan(3);
+        $repository->assert()->countLessThanOrEqual(2);
+        $repository->assert()->exists([]);
+        $repository->assert()->notExists(['name' => 'invalid']);
+
+        Assert::that(function() use ($repository) { $repository->assert()->empty(); })
+            ->throws(AssertionFailedError::class, \sprintf('Expected %s repository to be empty but it has 2 items.', Category::class))
+        ;
+        Assert::that(function() use ($repository) { $repository->assert()->count(1); })
+            ->throws(AssertionFailedError::class, \sprintf('Expected count of %s repository (2) to be 1.', Category::class))
+        ;
+        Assert::that(function() use ($repository) { $repository->assert()->countGreaterThan(2); })
+            ->throws(AssertionFailedError::class, \sprintf('Expected count of %s repository (2) to be greater than 2.', Category::class))
+        ;
+        Assert::that(function() use ($repository) { $repository->assert()->countGreaterThanOrEqual(3); })
+            ->throws(AssertionFailedError::class, \sprintf('Expected count of %s repository (2) to be greater than or equal to 3.', Category::class))
+        ;
+        Assert::that(function() use ($repository) { $repository->assert()->countLessThan(2); })
+            ->throws(AssertionFailedError::class, \sprintf('Expected count of %s repository (2) to be less than 2.', Category::class))
+        ;
+        Assert::that(function() use ($repository) { $repository->assert()->countLessThanOrEqual(1); })
+            ->throws(AssertionFailedError::class, \sprintf('Expected count of %s repository (2) to be less than or equal to 1.', Category::class))
+        ;
+        Assert::that(function() use ($repository) { $repository->assert()->exists(['name' => 'invalid-name']); })
+            ->throws(AssertionFailedError::class, \sprintf('Expected %s to exist but it does not.', Category::class))
+        ;
+        Assert::that(function() use ($repository) { $repository->assert()->notExists([]); })
+            ->throws(AssertionFailedError::class, \sprintf('Expected %s to not exist but it does.', Category::class))
+        ;
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    public function assertions_legacy(): void
+    {
+        $repository = repository(Category::class);
+
+        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryProxy::assertEmpty() is deprecated, use RepositoryProxy::assert()->empty().');
+        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryProxy::assertCount() is deprecated, use RepositoryProxy::assert()->count().');
+        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryProxy::assertCountGreaterThan() is deprecated, use RepositoryProxy::assert()->countGreaterThan().');
+        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryProxy::assertCountGreaterThanOrEqual() is deprecated, use RepositoryProxy::assert()->countGreaterThanOrEqual().');
+        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryProxy::assertCountLessThan() is deprecated, use RepositoryProxy::assert()->countLessThan().');
+        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryProxy::assertCountLessThanOrEqual() is deprecated, use RepositoryProxy::assert()->countLessThanOrEqual().');
 
         $repository->assertEmpty();
 

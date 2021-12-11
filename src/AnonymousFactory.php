@@ -22,8 +22,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
      * Try and find existing object for the given $attributes. If not found,
      * instantiate and persist.
      *
-     * @return Proxy|object
-     *
+     * @return Proxy&TModel
      * @psalm-return Proxy<TModel>
      */
     public function findOrCreate(array $attributes): Proxy
@@ -74,8 +73,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     /**
      * Fetch one random object and create a new object if none exists.
      *
-     * @return Proxy|object
-     *
+     * @return Proxy&TModel
      * @psalm-return Proxy<TModel>
      */
     public function randomOrCreate(array $attributes = []): Proxy

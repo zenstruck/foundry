@@ -8,7 +8,7 @@ on:
 
 jobs:
   tests:
-    name: PHP ${{ matrix.php }} - ${{ matrix.stability }} - ${{ matrix.versions }}
+    name: PHP ${{ matrix.php }}, SF ${{ matrix.symfony }} - ${{ matrix.deps }}
     runs-on: ubuntu-latest
     services:
       mysql:
@@ -28,16 +28,20 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     strategy:
       matrix:
-        php: [7.2, 7.3, 7.4, 8.0]
-        stability: ['@stable']
-        versions: [highest]
+        php: [7.4, 8.0, 8.1]
+        symfony: [4.4.*, 5.3.*, 5.4.*]
+        deps: [highest]
         include:
           - php: 7.2
-            stability: '@stable'
+            symfony: '*'
+            deps: lowest
             versions: lowest
-#          - php: 8.0
-#            stability: '@dev'
-#            versions: highest
+          - php: 8.0
+            symfony: 6.0.*
+            deps: highest
+          - php: 8.1
+            symfony: 6.0.*
+            deps: highest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2.3.3
@@ -51,16 +55,15 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: pgsql, sqlite
           coverage: none
-
-      - name: Set minimum-stability to dev
-        run: composer config minimum-stability dev
-        if: ${{ matrix.stability == '@dev' }}
+          tools: flex
 
       - name: Install dependencies
         uses: ramsey/composer-install@v1
         with:
-          dependency-versions: ${{ matrix.versions }}
+          dependency-versions: ${{ matrix.deps }}
           composer-options: --prefer-dist
+        env:
+          SYMFONY_REQUIRE: ${{ matrix.symfony }}
 
       - name: 'Test: MySQL'
         run: vendor/bin/simple-phpunit -v
@@ -263,7 +266,10 @@ jobs:
           file: ./*.clover
 
   composer-validate:
-    name: Validate composer.json
+    uses: zenstruck/.github/.github/workflows/php-composer-validate.yml@main
+
+  build-docs:
+    name: Build Documentation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -275,25 +281,16 @@ jobs:
           php-version: 7.4
           coverage: none
 
-      - name: Validate composer.json
-        run: composer validate --strict --no-check-lock
+      - name: Install dependencies
+        uses: ramsey/composer-install@v1
+        with:
+          composer-options: --prefer-dist
+
+      - name: Build docs
+        run: bin/build-docs
 
   cs-check:
-    name: PHP Coding Standards
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2.3.3
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.4
-          coverage: none
-          tools: php-cs-fixer
-
-      - name: Check CS
-        run: php-cs-fixer fix --dry-run --diff
+    uses: zenstruck/.github/.github/workflows/php-cs-fixer.yml@main
 
   static-analysis:
     name: Psalm Static Analysis
@@ -312,6 +309,9 @@ jobs:
         uses: ramsey/composer-install@v1
         with:
           composer-options: --prefer-dist
+
+      - name: Install Psalm
+        run: composer bin psalm install
 
       - name: Run static analysis
         run: vendor/bin/psalm --output-format=github

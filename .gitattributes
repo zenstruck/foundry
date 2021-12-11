@@ -2,11 +2,13 @@
 
 /.github                        export-ignore
 /tests                          export-ignore
+/bin                            export-ignore
 /.codecov.yml                   export-ignore
 /.gitattributes                 export-ignore
 /.gitignore                     export-ignore
 /.php-cs-fixer.dist.php         export-ignore
 /.scrutinizer.yml               export-ignore
+/.symfony.bundle.yaml           export-ignore
 /phpunit.xml.dist               export-ignore
 /phpunit-dama-doctrine.xml.dist export-ignore
 /psalm.xml                      export-ignore

@@ -35,9 +35,11 @@ use Zenstruck\\Foundry\\ModelFactory;
 use Zenstruck\\Foundry\\Proxy;
 
 /**
+ * @extends ModelFactory<Category>
+ *
  * @method static Category|Proxy createOne(array \$attributes = [])
- * @method static Category[]|Proxy[] createMany(int \$number, \$attributes = [])
- * @method static Category|Proxy find(\$criteria)
+ * @method static Category[]|Proxy[] createMany(int \$number, array|callable \$attributes = [])
+ * @method static Category|Proxy find(object|array|mixed \$criteria)
  * @method static Category|Proxy findOrCreate(array \$attributes)
  * @method static Category|Proxy first(string \$sortedField = 'id')
  * @method static Category|Proxy last(string \$sortedField = 'id')
@@ -47,7 +49,7 @@ use Zenstruck\\Foundry\\Proxy;
  * @method static Category[]|Proxy[] findBy(array \$attributes)
  * @method static Category[]|Proxy[] randomSet(int \$number, array \$attributes = [])
  * @method static Category[]|Proxy[] randomRange(int \$min, int \$max, array \$attributes = [])
- * @method Category|Proxy create(\$attributes = [])
+ * @method Category|Proxy create(array|callable \$attributes = [])
  */
 final class CategoryFactory extends ModelFactory
 {
@@ -55,22 +57,23 @@ final class CategoryFactory extends ModelFactory
     {
         parent::__construct();
 
-        // TODO inject services if required (https://github.com/zenstruck/foundry#factories-as-services)
+        // TODO inject services if required (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services)
     }
 
     protected function getDefaults(): array
     {
         return [
-            // TODO add your default values here (https://github.com/zenstruck/foundry#model-factories)
+            // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
             'name' => self::faker()->text(),
+            'post' => PostFactory::createOne(),
         ];
     }
 
     protected function initialize(): self
     {
-        // see https://github.com/zenstruck/foundry#initialization
+        // see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
         return \$this
-            // ->afterInstantiate(function(Category \$category) {})
+            // ->afterInstantiate(function(Category \$category): void {})
         ;
     }
 
@@ -111,9 +114,11 @@ use Zenstruck\\Foundry\\ModelFactory;
 use Zenstruck\\Foundry\\Proxy;
 
 /**
+ * @extends ModelFactory<Tag>
+ *
  * @method static Tag|Proxy createOne(array \$attributes = [])
- * @method static Tag[]|Proxy[] createMany(int \$number, \$attributes = [])
- * @method static Tag|Proxy find(\$criteria)
+ * @method static Tag[]|Proxy[] createMany(int \$number, array|callable \$attributes = [])
+ * @method static Tag|Proxy find(object|array|mixed \$criteria)
  * @method static Tag|Proxy findOrCreate(array \$attributes)
  * @method static Tag|Proxy first(string \$sortedField = 'id')
  * @method static Tag|Proxy last(string \$sortedField = 'id')
@@ -123,7 +128,7 @@ use Zenstruck\\Foundry\\Proxy;
  * @method static Tag[]|Proxy[] findBy(array \$attributes)
  * @method static Tag[]|Proxy[] randomSet(int \$number, array \$attributes = [])
  * @method static Tag[]|Proxy[] randomRange(int \$min, int \$max, array \$attributes = [])
- * @method Tag|Proxy create(\$attributes = [])
+ * @method Tag|Proxy create(array|callable \$attributes = [])
  */
 final class TagFactory extends ModelFactory
 {
@@ -131,22 +136,23 @@ final class TagFactory extends ModelFactory
     {
         parent::__construct();
 
-        // TODO inject services if required (https://github.com/zenstruck/foundry#factories-as-services)
+        // TODO inject services if required (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services)
     }
 
     protected function getDefaults(): array
     {
         return [
-            // TODO add your default values here (https://github.com/zenstruck/foundry#model-factories)
+            // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
             'name' => self::faker()->text(),
+            'post' => PostFactory::createOne(),
         ];
     }
 
     protected function initialize(): self
     {
-        // see https://github.com/zenstruck/foundry#initialization
+        // see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
         return \$this
-            // ->afterInstantiate(function(Tag \$tag) {})
+            // ->afterInstantiate(function(Tag \$tag): void {})
         ;
     }
 
@@ -183,9 +189,11 @@ use Zenstruck\\Foundry\\ModelFactory;
 use Zenstruck\\Foundry\\Proxy;
 
 /**
+ * @extends ModelFactory<Category>
+ *
  * @method static Category|Proxy createOne(array \$attributes = [])
- * @method static Category[]|Proxy[] createMany(int \$number, \$attributes = [])
- * @method static Category|Proxy find(\$criteria)
+ * @method static Category[]|Proxy[] createMany(int \$number, array|callable \$attributes = [])
+ * @method static Category|Proxy find(object|array|mixed \$criteria)
  * @method static Category|Proxy findOrCreate(array \$attributes)
  * @method static Category|Proxy first(string \$sortedField = 'id')
  * @method static Category|Proxy last(string \$sortedField = 'id')
@@ -195,7 +203,7 @@ use Zenstruck\\Foundry\\Proxy;
  * @method static Category[]|Proxy[] findBy(array \$attributes)
  * @method static Category[]|Proxy[] randomSet(int \$number, array \$attributes = [])
  * @method static Category[]|Proxy[] randomRange(int \$min, int \$max, array \$attributes = [])
- * @method Category|Proxy create(\$attributes = [])
+ * @method Category|Proxy create(array|callable \$attributes = [])
  */
 final class CategoryFactory extends ModelFactory
 {
@@ -203,22 +211,23 @@ final class CategoryFactory extends ModelFactory
     {
         parent::__construct();
 
-        // TODO inject services if required (https://github.com/zenstruck/foundry#factories-as-services)
+        // TODO inject services if required (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services)
     }
 
     protected function getDefaults(): array
     {
         return [
-            // TODO add your default values here (https://github.com/zenstruck/foundry#model-factories)
+            // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
             'name' => self::faker()->text(),
+            'post' => PostFactory::createOne(),
         ];
     }
 
     protected function initialize(): self
     {
-        // see https://github.com/zenstruck/foundry#initialization
+        // see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
         return \$this
-            // ->afterInstantiate(function(Category \$category) {})
+            // ->afterInstantiate(function(Category \$category): void {})
         ;
     }
 
@@ -259,9 +268,11 @@ use Zenstruck\\Foundry\\ModelFactory;
 use Zenstruck\\Foundry\\Proxy;
 
 /**
+ * @extends ModelFactory<Tag>
+ *
  * @method static Tag|Proxy createOne(array \$attributes = [])
- * @method static Tag[]|Proxy[] createMany(int \$number, \$attributes = [])
- * @method static Tag|Proxy find(\$criteria)
+ * @method static Tag[]|Proxy[] createMany(int \$number, array|callable \$attributes = [])
+ * @method static Tag|Proxy find(object|array|mixed \$criteria)
  * @method static Tag|Proxy findOrCreate(array \$attributes)
  * @method static Tag|Proxy first(string \$sortedField = 'id')
  * @method static Tag|Proxy last(string \$sortedField = 'id')
@@ -271,7 +282,7 @@ use Zenstruck\\Foundry\\Proxy;
  * @method static Tag[]|Proxy[] findBy(array \$attributes)
  * @method static Tag[]|Proxy[] randomSet(int \$number, array \$attributes = [])
  * @method static Tag[]|Proxy[] randomRange(int \$min, int \$max, array \$attributes = [])
- * @method Tag|Proxy create(\$attributes = [])
+ * @method Tag|Proxy create(array|callable \$attributes = [])
  */
 final class TagFactory extends ModelFactory
 {
@@ -279,22 +290,23 @@ final class TagFactory extends ModelFactory
     {
         parent::__construct();
 
-        // TODO inject services if required (https://github.com/zenstruck/foundry#factories-as-services)
+        // TODO inject services if required (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services)
     }
 
     protected function getDefaults(): array
     {
         return [
-            // TODO add your default values here (https://github.com/zenstruck/foundry#model-factories)
+            // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
             'name' => self::faker()->text(),
+            'post' => PostFactory::createOne(),
         ];
     }
 
     protected function initialize(): self
     {
-        // see https://github.com/zenstruck/foundry#initialization
+        // see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
         return \$this
-            // ->afterInstantiate(function(Tag \$tag) {})
+            // ->afterInstantiate(function(Tag \$tag): void {})
         ;
     }
 

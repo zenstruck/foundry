@@ -26,92 +26,47 @@ final class RepositoryProxyTest extends TestCase
 
     public static function objectRepositoryWithoutFindOneByOrderBy(): iterable
     {
-        yield [new RepositoryProxy(new class() implements ObjectRepository {
-            public function find($id)
-            {
-            }
-
-            public function findAll()
-            {
-            }
-
-            public function findBy(array $criteria, ?array $orderBy = null, $limit = null, $offset = null)
-            {
-            }
-
-            public function findOneBy(array $criteria)
-            {
-            }
-
-            public function getClassName()
+        yield [new RepositoryProxy(new class() extends RepositoryStub {
+            public function findOneBy(array $criteria): ?object
             {
             }
         })];
 
-        yield [new RepositoryProxy(new class() implements ObjectRepository {
-            public function find($id)
-            {
-            }
-
-            public function findAll()
-            {
-            }
-
-            public function findBy(array $criteria, ?array $orderBy = null, $limit = null, $offset = null)
-            {
-            }
-
-            public function findOneBy(array $criteria, ?array $foo = null)
-            {
-            }
-
-            public function getClassName()
+        yield [new RepositoryProxy(new class() extends RepositoryStub {
+            public function findOneBy(array $criteria, ?array $foo = null): ?object
             {
             }
         })];
 
-        yield [new RepositoryProxy(new class() implements ObjectRepository {
-            public function find($id)
-            {
-            }
-
-            public function findAll()
-            {
-            }
-
-            public function findBy(array $criteria, ?array $orderBy = null, $limit = null, $offset = null)
-            {
-            }
-
-            public function findOneBy(array $criteria, $orderBy = null)
-            {
-            }
-
-            public function getClassName()
+        yield [new RepositoryProxy(new class() extends RepositoryStub {
+            public function findOneBy(array $criteria, $orderBy = null): ?object
             {
             }
         })];
 
-        yield [new RepositoryProxy(new class() implements ObjectRepository {
-            public function find($id)
-            {
-            }
-
-            public function findAll()
-            {
-            }
-
-            public function findBy(array $criteria, ?array $orderBy = null, $limit = null, $offset = null)
-            {
-            }
-
-            public function findOneBy(array $criteria, ?string $orderBy = null)
-            {
-            }
-
-            public function getClassName()
+        yield [new RepositoryProxy(new class() extends RepositoryStub {
+            public function findOneBy(array $criteria, ?string $orderBy = null): ?object
             {
             }
         })];
+    }
+}
+
+abstract class RepositoryStub implements ObjectRepository
+{
+    public function find($id): ?object
+    {
+    }
+
+    public function findAll(): array
+    {
+    }
+
+    public function findBy(array $criteria, ?array $orderBy = null, $limit = null, $offset = null): array
+    {
+    }
+
+    public function getClassName(): string
+    {
     }
 }

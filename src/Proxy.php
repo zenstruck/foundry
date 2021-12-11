@@ -4,7 +4,7 @@ namespace Zenstruck\Foundry;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
-use PHPUnit\Framework\Assert;
+use Zenstruck\Assert;
 use Zenstruck\Callback;
 use Zenstruck\Callback\Parameter;
 
@@ -87,7 +87,7 @@ final class Proxy
     /**
      * @internal
      *
-     * @template TObject as object
+     * @template TObject of object
      * @psalm-param TObject $object
      * @psalm-return Proxy<TObject>
      */
@@ -105,7 +105,7 @@ final class Proxy
     }
 
     /**
-     * @psalm-return TProxiedObject
+     * @return TProxiedObject
      */
     public function object(): object
     {
@@ -121,7 +121,7 @@ final class Proxy
             $om->getUnitOfWork()->computeChangeSet($om->getClassMetadata($this->class), $this->object);
 
             if (!empty($om->getUnitOfWork()->getEntityChangeSet($this->object))) {
-                throw new \RuntimeException(\sprintf('Cannot auto refresh "%s" as there are unsaved changes. Be sure to call ->save() or disable auto refreshing (see https://github.com/zenstruck/foundry#auto-refresh for details).', $this->class));
+                throw new \RuntimeException(\sprintf('Cannot auto refresh "%s" as there are unsaved changes. Be sure to call ->save() or disable auto refreshing (see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#auto-refresh for details).', $this->class));
             }
         }
 
@@ -242,16 +242,16 @@ final class Proxy
         return $this;
     }
 
-    public function assertPersisted(string $message = 'The object is not persisted.'): self
+    public function assertPersisted(string $message = '{entity} is not persisted.'): self
     {
-        Assert::assertNotNull($this->fetchObject(), $message);
+        Assert::that($this->fetchObject())->isNotEmpty($message, ['entity' => $this->class]);
 
         return $this;
     }
 
-    public function assertNotPersisted(string $message = 'The object is persisted but it should not be.'): self
+    public function assertNotPersisted(string $message = '{entity} is persisted but it should not be.'): self
     {
-        Assert::assertNull($this->fetchObject(), $message);
+        Assert::that($this->fetchObject())->isEmpty($message, ['entity' => $this->class]);
 
         return $this;
     }

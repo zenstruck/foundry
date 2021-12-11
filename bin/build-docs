@@ -1,0 +1,4 @@
+#!/bin/sh
+
+composer bin docs install
+bin/tools/docs/vendor/symfony-tools/docs-builder/bin/console build:docs --fail-on-errors docs/ docs/output/
