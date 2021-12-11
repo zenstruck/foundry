@@ -257,7 +257,7 @@ final class MakeFactory extends AbstractMaker
     private function isFactory($factory)
     {
         // Quickfix on Github CI - TODO
-        if (\class_exists('Zenstruck\Foundry\Tests\Fixtures\Factories\\' . $factory)) {
+        if (\class_exists('Zenstruck\Foundry\Tests\Fixtures\Factories\\'.$factory)) {
             return true;
         }
 
