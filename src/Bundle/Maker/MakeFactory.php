@@ -209,15 +209,18 @@ final class MakeFactory extends AbstractMaker
         // If Factory exist for related entities populate too with auto defaults
         $relatedEntities = $metadata->associationMappings;
         foreach ($relatedEntities as $item) {
+            // if joinColumns is not written entity is default nullable ($nullable = true;)
+            // @see vendor/doctrine/orm/lib/Doctrine/ORM/Mapping/JoinColumn.php LINE 28
             if (!\array_key_exists('joinColumns', $item)) {
                 continue;
             }
 
+            // if this key is available its a ManyToMany relation but its optional, Key must not be present to be ManyToMany
             if (\array_key_exists('joinTable', $item)) {
                 continue;
             }
 
-            if (true === $joinedColumns[0]['nullable']) {
+            if (true === $item['joinColumns'][0]['nullable']) {
                 continue;
             }
 
@@ -228,8 +231,10 @@ final class MakeFactory extends AbstractMaker
             $targetEntity = \end($targetEntityArray);
             $factory = \ucfirst($targetEntity).'Factory';
 
-            if (\class_exists('App\Tests\Factory\\'.$factory) || \class_exists('App\Factory\\'.$factory)) {
-                yield \ucfirst($fieldName) => \ucfirst($targetEntity).'Factory::createOne(),';
+            if (\class_exists('App\Tests\Factory\\'.$factory) ||
+                \class_exists('App\Factory\\'.$factory) ||
+                \class_exists('Zenstruck\Foundry\Tests\Fixtures\Factories\\'.$factory)) {
+                yield \lcfirst($fieldName) => \ucfirst($targetEntity).'Factory::createOne(),';
             }
         }
 
