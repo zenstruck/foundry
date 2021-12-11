@@ -14,6 +14,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Finder\Finder;
 use Zenstruck\Foundry\ModelFactory;
 
 /**
@@ -231,9 +232,7 @@ final class MakeFactory extends AbstractMaker
             $targetEntity = \end($targetEntityArray);
             $factory = \ucfirst($targetEntity).'Factory';
 
-            if (\class_exists('App\Tests\Factory\\'.$factory) ||
-                \class_exists('App\Factory\\'.$factory) ||
-                \class_exists('Zenstruck\Foundry\Tests\Fixtures\Factories\\'.$factory)) {
+            if ($this->isFactory($factory)) {
                 yield \lcfirst($fieldName) => \ucfirst($targetEntity).'Factory::createOne(),';
             }
         }
@@ -253,5 +252,26 @@ final class MakeFactory extends AbstractMaker
 
             yield $property['fieldName'] => $value;
         }
+    }
+
+    private function isFactory($factory)
+    {
+        $dirs = [];
+        if (\is_dir('src')) {
+            $dirs[] = 'src/';
+        }
+
+        if (\is_dir('Tests')) {
+            $dirs[] = 'Tests/';
+        }
+
+        $finder = new Finder();
+        $finder->in($dirs)->files()->name($factory.'.php');
+
+        if (\count(\iterator_to_array($finder)) > 0) {
+            return true;
+        }
+
+        return false;
     }
 }
