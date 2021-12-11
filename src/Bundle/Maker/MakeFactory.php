@@ -258,11 +258,19 @@ final class MakeFactory extends AbstractMaker
     {
         $dirs = [];
         if (\is_dir('src')) {
+            $dirs[] = 'app/';
+        }
+
+        if (\is_dir('src')) {
             $dirs[] = 'src/';
         }
 
         if (\is_dir('Tests')) {
             $dirs[] = 'Tests/';
+        }
+
+        if (\is_dir('tests')) {
+            $dirs[] = 'tests/';
         }
 
         $finder = new Finder();
