@@ -209,23 +209,23 @@ final class MakeFactory extends AbstractMaker
         // If Factory exist for related entities populate too with auto defaults
         $relatedEntities = $metadata->associationMappings;
         foreach ($relatedEntities as $item) {
-            if (!array_key_exists('joinColumns', $item)) {
+            if (!\array_key_exists('joinColumns', $item)) {
                 continue;
             }
 
-            if (array_key_exists('joinTable', $item)) {
+            if (\array_key_exists('joinTable', $item)) {
                 continue;
             }
-            
+
             if (true === $joinedColumns[0]['nullable']) {
                 continue;
             }
-            
+
             $joinedColumns = $item['joinColumns'];
             $fieldName = $item['fieldName'];
 
-            $targetEntityArray = explode('\\', $item['targetEntity']);
-            $targetEntity = end($targetEntityArray);
+            $targetEntityArray = \explode('\\', $item['targetEntity']);
+            $targetEntity = \end($targetEntityArray);
             $factory = \ucfirst($targetEntity).'Factory';
 
             if (\class_exists('App\Tests\Factory\\'.$factory) || \class_exists('App\Factory\\'.$factory)) {
