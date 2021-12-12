@@ -231,7 +231,7 @@ final class MakeFactory extends AbstractMaker
             $factory = \end($factory);
             $factory = \ucfirst($factory).'Factory';
 
-            if ($this->isFactory($factory)) {
+            if ($this->hasFactory($factory)) {
                 yield \lcfirst($fieldName) => \ucfirst($factory).'::new(),';
             }
         }
@@ -253,7 +253,7 @@ final class MakeFactory extends AbstractMaker
         }
     }
 
-    private function isFactory($factory)
+    private function hasFactory($factory)
     {
         // Quickfix on Github CI - TODO
         if (\class_exists('Zenstruck\Foundry\Tests\Fixtures\Factories\\'.$factory)) {
