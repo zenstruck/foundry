@@ -227,12 +227,12 @@ final class MakeFactory extends AbstractMaker
 
             $fieldName = $item['fieldName'];
 
-            $targetEntityArray = \explode('\\', $item['targetEntity']);
-            $targetEntity = \end($targetEntityArray);
-            $factory = \ucfirst($targetEntity).'Factory';
+            $factory = \explode('\\', $item['targetEntity']);
+            $factory = \end($factory);
+            $factory = \ucfirst($factory).'Factory';
 
             if ($this->isFactory($factory)) {
-                yield \lcfirst($fieldName) => \ucfirst($targetEntity).'Factory::new(),';
+                yield \lcfirst($fieldName) => \ucfirst($factory).'::new(),';
             }
         }
 
