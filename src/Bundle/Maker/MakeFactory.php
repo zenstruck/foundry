@@ -203,10 +203,6 @@ final class MakeFactory extends AbstractMaker
         $metadata = $em->getClassMetadata($class);
         $ids = $metadata->getIdentifierFieldNames();
 
-        // TODO cleanup the code
-        // TODO class exist dont relay on fix namespaces
-        // TODO write some tests
-        // TODO test with kind of possible relations
         // If Factory exist for related entities populate too with auto defaults
         $relatedEntities = $metadata->associationMappings;
         foreach ($relatedEntities as $item) {
@@ -229,6 +225,7 @@ final class MakeFactory extends AbstractMaker
             if ($this->hasFactory($factory)) {
                 yield \lcfirst($fieldName) => \ucfirst($factory).'::new(),';
             }
+            // TODO ELSE: ask user to create missing factory?
         }
 
         foreach ($metadata->fieldMappings as $property) {
@@ -250,7 +247,7 @@ final class MakeFactory extends AbstractMaker
 
     private function hasFactory($factory)
     {
-        // Quickfix on Github CI - TODO
+        // Github CI
         if (\class_exists('Zenstruck\Foundry\Tests\Fixtures\Factories\\'.$factory)) {
             return true;
         }
@@ -261,8 +258,8 @@ final class MakeFactory extends AbstractMaker
             $dirs[] = 'src/';
         }
 
-        if (\is_dir('Tests')) {
-            $dirs[] = 'Tests/';
+        if (\is_dir('tests')) {
+            $dirs[] = 'tests/';
         }
 
         $finder = new Finder();
