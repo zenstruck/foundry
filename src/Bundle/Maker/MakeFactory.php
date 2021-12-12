@@ -151,7 +151,7 @@ final class MakeFactory extends AbstractMaker
             __DIR__.'/../Resources/skeleton/Factory.tpl.php',
             [
                 'entity' => $entity,
-                'defaultProperties' => $this->defaultPropertiesFor($entity->getName(), $input->getOption('all-fields')),
+                'defaultProperties' => $this->defaultPropertiesFor($entity->getName(), $input->getOption('all-fields'), $io),
                 'repository' => $repository,
             ]
         );
@@ -192,7 +192,7 @@ final class MakeFactory extends AbstractMaker
         return $choices;
     }
 
-    private function defaultPropertiesFor(string $class, bool $allFields): iterable
+    private function defaultPropertiesFor(string $class, bool $allFields, ConsoleStyle $io): iterable
     {
         $em = $this->managerRegistry->getManagerForClass($class);
 
@@ -228,8 +228,18 @@ final class MakeFactory extends AbstractMaker
 
             if ($this->hasFactory($factory)) {
                 yield \lcfirst($fieldName) => \ucfirst($factory).'::new(),';
+            } else {
+                // TODO ELSE: ask user to create missing factory?
+                $io->text('// Note: <fg=yellow>'.$factory.'</> is missing.');
+                $io->newLine();
+                $question = $io->ask('Do you want create this Factory too?', 'yes|no');
+                if ('yes' === $question) {
+                    $io->text('// Note: <fg=yellow>'.$factory.'</> will be created');
+                    $io->newLine();
+
+                    // TODO create ...
+                }
             }
-            // TODO ELSE: ask user to create missing factory?
         }
 
         foreach ($metadata->fieldMappings as $property) {
