@@ -225,7 +225,6 @@ final class MakeFactory extends AbstractMaker
                 continue;
             }
 
-            $joinedColumns = $item['joinColumns'];
             $fieldName = $item['fieldName'];
 
             $targetEntityArray = \explode('\\', $item['targetEntity']);
