@@ -212,6 +212,10 @@ final class MakeFactory extends AbstractMaker
                 continue;
             }
 
+            if (!\array_key_exists('nullable', $item['joinColumns'][0])) {
+                continue;
+            }
+
             if (true === $item['joinColumns'][0]['nullable']) {
                 continue;
             }
