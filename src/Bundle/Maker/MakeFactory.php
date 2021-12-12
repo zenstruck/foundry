@@ -216,11 +216,6 @@ final class MakeFactory extends AbstractMaker
                 continue;
             }
 
-            // if this key is available its a ManyToMany relation but its optional, Key must not be present to be ManyToMany
-            if (\array_key_exists('joinTable', $item)) {
-                continue;
-            }
-
             if (true === $item['joinColumns'][0]['nullable']) {
                 continue;
             }
