@@ -228,18 +228,8 @@ final class MakeFactory extends AbstractMaker
 
             if ($this->hasFactory($factory)) {
                 yield \lcfirst($fieldName) => \ucfirst($factory).'::new(),';
-            } else {
-                // TODO ELSE: ask user to create missing factory?
-                $io->text('// Note: <fg=yellow>'.$factory.'</> is missing.');
-                $io->newLine();
-                $question = $io->ask('Do you want create this Factory too?', 'yes|no');
-                if ('yes' === $question) {
-                    $io->text('// Note: <fg=yellow>'.$factory.'</> will be created');
-                    $io->newLine();
-
-                    // TODO create ...
-                }
             }
+            // TODO ELSE: ask user to create missing factory?
         }
 
         foreach ($metadata->fieldMappings as $property) {
