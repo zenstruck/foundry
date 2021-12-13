@@ -40,7 +40,7 @@ final class MakeFactory extends AbstractMaker
         'JSON' => '[],',
         'JSON_ARRAY' => '[],',
         'SIMPLE_ARRAY' => '[],',
-        'SMALLINT' => 'self::faker()->randomNumber(1, 32767),',
+        'SMALLINT' => 'self::faker()->numberBetween(1, 32767),',
         'STRING' => 'self::faker()->text(),',
         'TEXT' => 'self::faker()->text(),',
         'TIME_MUTABLE' => 'self::faker()->datetime(),',
