@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Finder\Finder;
+use Zenstruck\Foundry\Bundle\Helpers\ExistingFactories;
 use Zenstruck\Foundry\ModelFactory;
 
 /**
@@ -151,7 +152,7 @@ final class MakeFactory extends AbstractMaker
             __DIR__.'/../Resources/skeleton/Factory.tpl.php',
             [
                 'entity' => $entity,
-                'defaultProperties' => $this->defaultPropertiesFor($entity->getName(), $input->getOption('all-fields'), $io),
+                'defaultProperties' => $this->defaultPropertiesFor($entity->getName(), $input->getOption('all-fields')),
                 'repository' => $repository,
             ]
         );
@@ -192,7 +193,7 @@ final class MakeFactory extends AbstractMaker
         return $choices;
     }
 
-    private function defaultPropertiesFor(string $class, bool $allFields, ConsoleStyle $io): iterable
+    private function defaultPropertiesFor(string $class, bool $allFields): iterable
     {
         $em = $this->managerRegistry->getManagerForClass($class);
 
