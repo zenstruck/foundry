@@ -248,7 +248,10 @@ final class MakeFactory extends AbstractMaker
         }
     }
 
-    private function hasFactory($entity, $array)
+    /**
+     * @return false|int[]|string[]
+     */
+    private function hasFactory(string $entity, array $array)
     {
         foreach ($array as $item) {
             if (\in_array($entity, $item, true)) {
