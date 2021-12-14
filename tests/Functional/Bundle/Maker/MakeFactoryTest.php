@@ -65,8 +65,8 @@ final class FooFactory extends ModelFactory
     {
         return [
             // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
-            'oneToOne' => Zenstruck\Foundry\Tests\Fixtures\Entity\CategoryFactory::new(),
-            'manyToOne' => Zenstruck\Foundry\Tests\Fixtures\Entity\CategoryFactory::new(),
+            'oneToOne' => Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory::new(),
+            'manyToOne' => Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory::new(),
         ];
     }
 

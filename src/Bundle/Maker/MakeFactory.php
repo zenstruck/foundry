@@ -221,9 +221,13 @@ final class MakeFactory extends AbstractMaker
 
             $fieldName = $item['fieldName'];
 
-            if (\array_map([$this, 'in_array'], [$item['targetEntity']], $this->entitiesWithFactories)) {
-                yield \lcfirst($fieldName) => $item['targetEntity'].'Factory'.'::new(),';
+            $factoryFqcn = $this->hasFactory($item['targetEntity'], $this->entitiesWithFactories);
+            if (false === $factoryFqcn) {
+                continue;
             }
+
+            yield \lcfirst($fieldName) => $factoryFqcn[0].'::new(),';
+
             // TODO ELSE: ask user to create missing factory?
         }
 
@@ -244,10 +248,12 @@ final class MakeFactory extends AbstractMaker
         }
     }
 
-    private function in_array($entity, $array)
+    private function hasFactory($entity, $array)
     {
-        if (\in_array($entity, $array, true)) {
-            return true;
+        foreach ($array as $item) {
+            if (\in_array($entity, $item, true)) {
+                return \array_keys($item, $entity);
+            }
         }
 
         return false;
