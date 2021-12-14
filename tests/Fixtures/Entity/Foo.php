@@ -49,6 +49,11 @@ class Foo
     private $manyToOneNullable;
 
     /**
+     * @ORM\ManyToOne(targetEntity=Category::class)
+     */
+    private $manyToOneNullableDefault;
+
+    /**
      * @ORM\ManyToMany(targetEntity=Category::class)
      */
     private $manyToMany;
