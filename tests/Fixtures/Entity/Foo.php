@@ -35,4 +35,9 @@ class Foo
      * @ORM\JoinColumn(nullable=false)
      */
     private $manyToOne;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Category::class)
+     */
+    private $manyToMany;
 }
