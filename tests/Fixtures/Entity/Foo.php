@@ -26,6 +26,12 @@ class Foo
     private $oneToOne;
 
     /**
+     * @ORM\OneToOne(targetEntity=Category::class, cascade={"persist", "remove"})
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $oneToOneNullable;
+
+    /**
      * @ORM\OneToMany(targetEntity=Category::class, mappedBy="foo")
      */
     private $oneToMany;
