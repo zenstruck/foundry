@@ -14,8 +14,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Finder\Finder;
-use Zenstruck\Foundry\Bundle\Helpers\ExistingFactories;
 use Zenstruck\Foundry\ModelFactory;
 
 /**
@@ -60,7 +58,7 @@ final class MakeFactory extends AbstractMaker
         $this->managerRegistry = $managerRegistry;
         $this->entitiesWithFactories = \array_map(
             static function(ModelFactory $factory) {
-                return $factory::getEntityClass();
+                return [\get_class($factory) => $factory::getEntityClass()];
             },
             \iterator_to_array($factories)
         );
@@ -223,12 +221,8 @@ final class MakeFactory extends AbstractMaker
 
             $fieldName = $item['fieldName'];
 
-            $targetEntity = \explode('\\', $item['targetEntity']);
-            $targetEntity = \end($targetEntity);
-            $factory = \ucfirst($targetEntity).'Factory';
-
-            if ($this->hasFactory($factory)) {
-                yield \lcfirst($fieldName) => \ucfirst($factory).'::new(),';
+            if (\array_map([$this, 'in_array'], [$item['targetEntity']], $this->entitiesWithFactories)) {
+                yield \lcfirst($fieldName) => $item['targetEntity'].'Factory'.'::new(),';
             }
             // TODO ELSE: ask user to create missing factory?
         }
@@ -250,27 +244,9 @@ final class MakeFactory extends AbstractMaker
         }
     }
 
-    private function hasFactory($factory)
+    private function in_array($entity, $array)
     {
-        // Github CI
-        if (\class_exists('Zenstruck\Foundry\Tests\Fixtures\Factories\\'.$factory)) {
-            return true;
-        }
-
-        $dirs = [];
-
-        if (\is_dir('src')) {
-            $dirs[] = 'src/';
-        }
-
-        if (\is_dir('tests')) {
-            $dirs[] = 'tests/';
-        }
-
-        $finder = new Finder();
-        $finder->in($dirs)->files()->name($factory.'.php');
-
-        if (\count(\iterator_to_array($finder)) > 0) {
+        if (\in_array($entity, $array, true)) {
             return true;
         }
 

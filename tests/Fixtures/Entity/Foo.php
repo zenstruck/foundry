@@ -20,24 +20,24 @@ class Foo
     private $id;
 
     /**
-     * @ORM\OneToOne(targetEntity=Bar::class, cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity=Category::class, cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $oneToOne;
 
     /**
-     * @ORM\OneToMany(targetEntity=Bar::class, mappedBy="foo")
+     * @ORM\OneToMany(targetEntity=Category::class, mappedBy="foo")
      */
     private $oneToMany;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Bar::class)
+     * @ORM\ManyToOne(targetEntity=Category::class)
      * @ORM\JoinColumn(nullable=false)
      */
     private $manyToOne;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Bar::class)
+     * @ORM\ManyToMany(targetEntity=Category::class)
      */
     private $manyToMany;
 
@@ -52,12 +52,12 @@ class Foo
         return $this->id;
     }
 
-    public function getOneToOne(): ?Bar
+    public function getOneToOne(): ?Category
     {
         return $this->oneToOne;
     }
 
-    public function setOneToOne(Bar $oneToOne): self
+    public function setOneToOne(Category $oneToOne): self
     {
         $this->oneToOne = $oneToOne;
 
@@ -65,14 +65,14 @@ class Foo
     }
 
     /**
-     * @return Collection|Bar[]
+     * @return Collection|Category[]
      */
     public function getOneToMany(): Collection
     {
         return $this->oneToMany;
     }
 
-    public function addOneToMany(Bar $oneToMany): self
+    public function addOneToMany(Category $oneToMany): self
     {
         if (!$this->oneToMany->contains($oneToMany)) {
             $this->oneToMany[] = $oneToMany;
@@ -82,7 +82,7 @@ class Foo
         return $this;
     }
 
-    public function removeOneToMany(Bar $oneToMany): self
+    public function removeOneToMany(Category $oneToMany): self
     {
         if ($this->oneToMany->removeElement($oneToMany)) {
             // set the owning side to null (unless already changed)
@@ -94,12 +94,12 @@ class Foo
         return $this;
     }
 
-    public function getManyToOne(): ?Bar
+    public function getManyToOne(): ?Category
     {
         return $this->manyToOne;
     }
 
-    public function setManyToOne(?Bar $manyToOne): self
+    public function setManyToOne(?Category $manyToOne): self
     {
         $this->manyToOne = $manyToOne;
 
@@ -107,14 +107,14 @@ class Foo
     }
 
     /**
-     * @return Collection|Bar[]
+     * @return Collection|Category[]
      */
     public function getManyToMany(): Collection
     {
         return $this->manyToMany;
     }
 
-    public function addManyToMany(Bar $manyToMany): self
+    public function addManyToMany(Category $manyToMany): self
     {
         if (!$this->manyToMany->contains($manyToMany)) {
             $this->manyToMany[] = $manyToMany;
@@ -123,7 +123,7 @@ class Foo
         return $this;
     }
 
-    public function removeManyToMany(Bar $manyToMany): self
+    public function removeManyToMany(Category $manyToMany): self
     {
         $this->manyToMany->removeElement($manyToMany);
 
