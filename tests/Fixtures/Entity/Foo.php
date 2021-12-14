@@ -43,6 +43,12 @@ class Foo
     private $manyToOne;
 
     /**
+     * @ORM\ManyToOne(targetEntity=Category::class)
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $manyToOneNullable;
+
+    /**
      * @ORM\ManyToMany(targetEntity=Category::class)
      */
     private $manyToMany;
