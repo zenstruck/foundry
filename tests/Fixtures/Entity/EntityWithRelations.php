@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  * @ORM\Table(name="foos")
  */
-class Foo
+class EntityWithRelations
 {
     /**
      * @ORM\Id

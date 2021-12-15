@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 use Symfony\Component\Console\Tester\CommandTester;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
-use Zenstruck\Foundry\Tests\Fixtures\Entity\Foo;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\EntityWithRelations;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
 
 /**
@@ -23,7 +23,7 @@ final class MakeFactoryTest extends MakerTestCase
 
         $this->assertFileDoesNotExist(self::tempFile('src/Factory/FooFactory.php'));
 
-        $tester->execute(['entity' => Foo::class]);
+        $tester->execute(['entity' => EntityWithRelations::class]);
 
         $this->assertFileExists(self::tempFile('src/Factory/FooFactory.php'));
         $this->assertSame(<<<EOF
