@@ -21,38 +21,38 @@ final class MakeFactoryTest extends MakerTestCase
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
 
-        $this->assertFileDoesNotExist(self::tempFile('src/Factory/FooFactory.php'));
+        $this->assertFileDoesNotExist(self::tempFile('src/Factory/EntityWithRelations.php'));
 
         $tester->execute(['entity' => EntityWithRelations::class]);
 
-        $this->assertFileExists(self::tempFile('src/Factory/FooFactory.php'));
+        $this->assertFileExists(self::tempFile('src/Factory/EntityWithRelations.php'));
         $this->assertSame(<<<EOF
 <?php
 
 namespace App\\Factory;
 
-use Zenstruck\\Foundry\\Tests\\Fixtures\\Entity\\Foo;
+use Zenstruck\\Foundry\\Tests\\Fixtures\\Entity\\EntityWithRelations;
 use Zenstruck\\Foundry\\ModelFactory;
 use Zenstruck\\Foundry\\Proxy;
 
 /**
- * @extends ModelFactory<Foo>
+ * @extends ModelFactory<EntityWithRelations>
  *
- * @method static Foo|Proxy createOne(array \$attributes = [])
- * @method static Foo[]|Proxy[] createMany(int \$number, array|callable \$attributes = [])
- * @method static Foo|Proxy find(object|array|mixed \$criteria)
- * @method static Foo|Proxy findOrCreate(array \$attributes)
- * @method static Foo|Proxy first(string \$sortedField = 'id')
- * @method static Foo|Proxy last(string \$sortedField = 'id')
- * @method static Foo|Proxy random(array \$attributes = [])
- * @method static Foo|Proxy randomOrCreate(array \$attributes = [])
- * @method static Foo[]|Proxy[] all()
- * @method static Foo[]|Proxy[] findBy(array \$attributes)
- * @method static Foo[]|Proxy[] randomSet(int \$number, array \$attributes = [])
- * @method static Foo[]|Proxy[] randomRange(int \$min, int \$max, array \$attributes = [])
- * @method Foo|Proxy create(array|callable \$attributes = [])
+ * @method static EntityWithRelations|Proxy createOne(array \$attributes = [])
+ * @method static EntityWithRelations[]|Proxy[] createMany(int \$number, array|callable \$attributes = [])
+ * @method static EntityWithRelations|Proxy find(object|array|mixed \$criteria)
+ * @method static EntityWithRelations|Proxy findOrCreate(array \$attributes)
+ * @method static EntityWithRelations|Proxy first(string \$sortedField = 'id')
+ * @method static EntityWithRelations|Proxy last(string \$sortedField = 'id')
+ * @method static EntityWithRelations|Proxy random(array \$attributes = [])
+ * @method static EntityWithRelations|Proxy randomOrCreate(array \$attributes = [])
+ * @method static EntityWithRelations[]|Proxy[] all()
+ * @method static EntityWithRelations[]|Proxy[] findBy(array \$attributes)
+ * @method static EntityWithRelations[]|Proxy[] randomSet(int \$number, array \$attributes = [])
+ * @method static EntityWithRelations[]|Proxy[] randomRange(int \$min, int \$max, array \$attributes = [])
+ * @method EntityWithRelations|Proxy create(array|callable \$attributes = [])
  */
-final class FooFactory extends ModelFactory
+final class EntityWithRelationsFactory extends ModelFactory
 {
     public function __construct()
     {
@@ -74,18 +74,18 @@ final class FooFactory extends ModelFactory
     {
         // see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
         return \$this
-            // ->afterInstantiate(function(Foo \$foo): void {})
+            // ->afterInstantiate(function(EntityWithRelations \$entityWithRelations): void {})
         ;
     }
 
     protected static function getClass(): string
     {
-        return Foo::class;
+        return EntityWithRelations::class;
     }
 }
 
 EOF
-            , \file_get_contents(self::tempFile('src/Factory/FooFactory.php'))
+            , \file_get_contents(self::tempFile('src/Factory/EntityWithRelationsFactory.php'))
         );
     }
 
