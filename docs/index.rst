@@ -554,7 +554,7 @@ You can customize the instantiator in several ways:
         ->instantiateWith((new Instantiator())->withoutConstructor()->allowExtraAttributes()->alwaysForceProperties())
 
         // the instantiator is just a callable, you can provide your own
-        ->instantiateWith(function(array $attibutes, string $class): object {
+        ->instantiateWith(function(array $attributes, string $class): object {
             return new Post(); // ... your own logic
         })
     ;
@@ -592,7 +592,7 @@ Factory's are immutable:
 Doctrine Relationships
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Assuming your entites follow the
+Assuming your entities follow the
 `best practices for Doctrine Relationships <https://symfony.com/doc/current/doctrine/associations.html>`_ and you are
 using the :ref:`default instantiator <instantiation>`, Foundry *just works* with doctrine relationships. There are some
 nuances with the different relationships and how entities are created. The following tries to document these for
@@ -1262,7 +1262,7 @@ This library provides a *Repository Proxy* that wraps your object repositories t
 Assertions
 ~~~~~~~~~~
 
-Both object proxy's and your ModelFactory's have helpful PHPUnit assertions:
+Both object proxies and your ModelFactory have helpful PHPUnit assertions:
 
 .. code-block:: php
 
@@ -1348,7 +1348,7 @@ It is possible to use factories in
 
 .. note::
 
-    Be sure your data provider returns only instances of ``ModelFactory`` and you do not try and call ``->create()`` on them.
+    Be sure your data provider returns only instances of ``ModelFactory`` and you do not try to call ``->create()`` on them.
     Data providers are computed early in the phpunit process before Foundry is booted.
 
 .. note::
