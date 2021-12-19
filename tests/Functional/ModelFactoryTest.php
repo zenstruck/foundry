@@ -7,7 +7,9 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
+use Zenstruck\Foundry\Tests\Fixtures\Event\CommentEventListener;
 use Zenstruck\Foundry\Tests\Fixtures\Event\CommentEventSubscriber;
+use Zenstruck\Foundry\Tests\Fixtures\Event\PostEventSubscriber;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\AddressFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CommentFactory;
@@ -475,11 +477,15 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function doctrine_events_still_fired(): void
     {
-        $comment = CommentFactory::new()->create([
+        $commentSubscriber = CommentFactory::new()->create([
             'body' => CommentEventSubscriber::COMMENT_BODY,
         ]);
+        $commentListener = CommentFactory::new()->create([
+            'body' => CommentEventListener::COMMENT_BODY,
+        ]);
 
-        $this->assertSame(CommentEventSubscriber::NEW_COMMENT_BODY, $comment->getBody());
+        $this->assertSame(CommentEventSubscriber::NEW_COMMENT_BODY, $commentSubscriber->getBody());
+        $this->assertSame(CommentEventListener::NEW_COMMENT_BODY, $commentListener->getBody());
     }
 
     /**
@@ -487,16 +493,48 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function disable_doctrine_events_lifecycle(): void
     {
-        $comment = CommentFactory::new()->withoutDoctrineEvents()->create([
+        $commentSubscriber = CommentFactory::new()->withoutDoctrineEvents()->create([
             'body' => CommentEventSubscriber::COMMENT_BODY,
         ]);
-
-        $this->assertSame(CommentEventSubscriber::COMMENT_BODY, $comment->getBody());
-
-        $comment2 = CommentFactory::new()->create([
-            'body' => CommentEventSubscriber::COMMENT_BODY,
+        $commentListener = CommentFactory::new()->withoutDoctrineEvents()->create([
+            'body' => CommentEventListener::COMMENT_BODY,
         ]);
 
-        $this->assertSame(CommentEventSubscriber::NEW_COMMENT_BODY, $comment2->getBody());
+        $this->assertSame(CommentEventSubscriber::COMMENT_BODY, $commentSubscriber->getBody());
+        $this->assertSame(CommentEventListener::COMMENT_BODY, $commentListener->getBody());
+
+        $commentSubscriber2 = CommentFactory::new()->create([
+            'body' => CommentEventSubscriber::COMMENT_BODY,
+        ]);
+        $commentListener2 = CommentFactory::new()->create([
+            'body' => CommentEventListener::COMMENT_BODY,
+        ]);
+
+        $this->assertSame(CommentEventSubscriber::NEW_COMMENT_BODY, $commentSubscriber2->getBody());
+        $this->assertSame(CommentEventListener::NEW_COMMENT_BODY, $commentListener2->getBody());
+    }
+
+    /**
+     * @test
+     */
+    public function disable_doctrine_events_lifecycle_for_sub_factories(): void
+    {
+        $tag1 = TagFactory::new()
+            ->withoutDoctrineEvents()
+            ->create(['posts' => PostFactory::new(['title' => PostEventSubscriber::TITLE_VALUE])->many(4)])
+        ;
+        $this->assertSame(PostEventSubscriber::TITLE_VALUE, $tag1->getPosts()[0]->getTitle());
+
+        $tag2 = TagFactory::new()
+            ->create(['posts' => PostFactory::new(['title' => PostEventSubscriber::TITLE_VALUE])->many(4)])
+        ;
+        $this->assertSame(PostEventSubscriber::NEW_TITLE_VALUE, $tag2->getPosts()[0]->getTitle());
+
+        $posts = PostFactory::createMany(4, ['title' => PostEventSubscriber::TITLE_VALUE]);
+        $tag3 = TagFactory::new()
+            ->withoutDoctrineEvents()
+            ->create(['posts' => $posts])
+        ;
+        $this->assertSame(PostEventSubscriber::NEW_TITLE_VALUE, $tag3->getPosts()[0]->getTitle());
     }
 }

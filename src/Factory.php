@@ -2,10 +2,11 @@
 
 namespace Zenstruck\Foundry;
 
-use Doctrine\Bundle\DoctrineBundle\EventSubscriber\EventSubscriberInterface;
+use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Faker;
+use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
 
 /**
  * @template TObject of object
@@ -338,6 +339,11 @@ class Factory
             $value = $value->withoutPersisting();
         }
 
+        if (false === $this->doctrineEvents) {
+            // ensure attribute Factory's doctrine events are also not fired
+            $value = $value->withoutDoctrineEvents();
+        }
+
         // Check if the attribute is cascade persist
         if (self::configuration()->hasManagerRegistry()) {
             $relationField = $this->relationshipField($value);
@@ -481,16 +487,18 @@ class Factory
 
         /** @var EntityManagerInterface $manager */
         $manager = self::configuration()->objectManagerFor($this->class);
+        /** @var ContainerAwareEventManager $eventManager */
+        $eventManager = $manager->getConnection()->getEventManager();
 
         foreach ($this->disabledDoctrineEvents as $type => $listenersByType) {
             foreach ($listenersByType as $listener) {
-                if ($listener instanceof EventSubscriberInterface) {
-                    $manager->getConnection()->getEventManager()->addEventSubscriber($listener);
+                if ($listener instanceof EventSubscriber) {
+                    $eventManager->addEventSubscriber($listener);
 
                     continue;
                 }
 
-                $manager->getConnection()->getEventManager()->addEventListener($type, $listener);
+                $eventManager->addEventListener($type, $listener);
             }
         }
     }
@@ -499,17 +507,27 @@ class Factory
     {
         /** @var EntityManagerInterface $manager */
         $manager = self::configuration()->objectManagerFor($this->class);
+        /** @var ContainerAwareEventManager $eventManager */
+        $eventManager = $manager->getConnection()->getEventManager();
 
         $this->disabledDoctrineEvents = $manager->getConnection()->getEventManager()->getListeners($this->doctrineEventTypeName);
         foreach ($this->disabledDoctrineEvents as $type => $listenersByType) {
-            foreach ($listenersByType as $listener) {
-                if ($listener instanceof EventSubscriberInterface) {
+            foreach ($listenersByType as $name => $listener) {
+                if ($listener instanceof EventSubscriber) {
                     $manager->getConnection()->getEventManager()->removeEventSubscriber($listener);
 
                     continue;
                 }
 
-                $manager->getConnection()->getEventManager()->removeEventListener($type, $listener);
+                if (false === \mb_strpos($name, '_service_')) {
+                    // Handle listeners with hash as name, ex: '000000001f7b9da2000000001c719ccc'
+                    $eventManager->removeEventListener($type, $listener);
+                } else {
+                    // Handle listeners with name like:
+                    // '_service_Zenstruck\Foundry\Tests\Fixtures\Event\CommentEventListener'
+                    // '_service_doctrine.orm.default_listeners.attach_entity_listeners'
+                    $eventManager->removeEventListener($type, \str_replace('_service_', '', $name));
+                }
             }
         }
     }

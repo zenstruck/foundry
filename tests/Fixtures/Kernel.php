@@ -12,7 +12,9 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
+use Zenstruck\Foundry\Tests\Fixtures\Event\CommentEventListener;
 use Zenstruck\Foundry\Tests\Fixtures\Event\CommentEventSubscriber;
+use Zenstruck\Foundry\Tests\Fixtures\Event\PostEventSubscriber;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryServiceFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\ServiceStory;
@@ -60,6 +62,16 @@ class Kernel extends BaseKernel
             ->setAutowired(true)
         ;
         $c->register(CommentEventSubscriber::class)
+            ->setAutoconfigured(true)
+            ->setAutowired(true)
+            ->addTag('doctrine.event_subscriber', ['connection' => 'default'])
+        ;
+        $c->register(CommentEventListener::class)
+            ->setAutoconfigured(true)
+            ->setAutowired(true)
+            ->addTag('doctrine.event_listener', ['event' => 'prePersist'])
+        ;
+        $c->register(PostEventSubscriber::class)
             ->setAutoconfigured(true)
             ->setAutowired(true)
             ->addTag('doctrine.event_subscriber', ['connection' => 'default'])
