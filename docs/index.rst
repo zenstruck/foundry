@@ -400,6 +400,11 @@ instantiation.
     $posts[1]->getPublishedAt(); // \DateTime('last week')
     $posts[1]->getCreatedAt(); // random \DateTime (different than above)
 
+.. note::
+
+    Attributes passed to the ``create*`` methods are merged with any attributes set via ``getDefaults()``
+    and ``withAttributes()``.
+
 Faker
 ~~~~~
 
