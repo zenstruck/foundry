@@ -128,9 +128,7 @@ class Factory
             return $proxy;
         }
 
-        $proxy->save();
-
-        $proxy->withoutAutoRefresh(function(Proxy $proxy) use ($attributes) {
+        $proxy->save()->withoutAutoRefresh(function(Proxy $proxy) use ($attributes) {
             foreach ($this->afterPersist as $callback) {
                 $proxy->executeCallback($callback, $attributes);
             }
