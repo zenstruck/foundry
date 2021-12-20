@@ -187,6 +187,13 @@ This command will generate a ``PostFactory`` class that looks like this:
         }
     }
 
+.. caution::
+
+    Do not set fields in ``ModelFactory::getDefaults()`` that depend on values of fields that are only available
+    in your fixtures in ``ModelFactory::create``. We call the setter method of the default fields first, before
+    setting the values supplied in ``ModelFactory::create``. In this instance, add entries for the dependent
+    fields below the field(s) upon which they depend in ``ModelFactory::create``.
+
 .. tip::
 
     Using ``make:factory --test`` will generate the factory in ``tests/Factory``.
