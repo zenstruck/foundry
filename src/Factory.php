@@ -89,6 +89,10 @@ class Factory
      */
     final public function create($attributes = []): Proxy
     {
+        if (false === $this->doctrineEvents) {
+            $this->disableDoctrineEvents();
+        }
+
         // merge the factory attribute set with the passed attributes
         $attributeSet = \array_merge($this->attributeSet, [$attributes]);
 
@@ -124,21 +128,19 @@ class Factory
             return $proxy;
         }
 
-        if (false === $this->doctrineEvents) {
-            $this->disableDoctrineEvents();
-        }
-
         $proxy->save();
+
+        $proxy->withoutAutoRefresh(function(Proxy $proxy) use ($attributes) {
+            foreach ($this->afterPersist as $callback) {
+                $proxy->executeCallback($callback, $attributes);
+            }
+        });
 
         if (false === $this->doctrineEvents) {
             $this->resetDoctrineEvents();
         }
 
-        return $proxy->withoutAutoRefresh(function(Proxy $proxy) use ($attributes) {
-            foreach ($this->afterPersist as $callback) {
-                $proxy->executeCallback($callback, $attributes);
-            }
-        });
+        return $proxy;
     }
 
     /**
@@ -339,11 +341,6 @@ class Factory
             $value = $value->withoutPersisting();
         }
 
-        if (false === $this->doctrineEvents) {
-            // ensure attribute Factory's doctrine events are also not fired
-            $value = $value->withoutDoctrineEvents();
-        }
-
         // Check if the attribute is cascade persist
         if (self::configuration()->hasManagerRegistry()) {
             $relationField = $this->relationshipField($value);
@@ -523,9 +520,8 @@ class Factory
                     // Handle listeners with hash as name, ex: '000000001f7b9da2000000001c719ccc'
                     $eventManager->removeEventListener($type, $listener);
                 } else {
-                    // Handle listeners with name like:
-                    // '_service_Zenstruck\Foundry\Tests\Fixtures\Event\CommentEventListener'
-                    // '_service_doctrine.orm.default_listeners.attach_entity_listeners'
+                    // Symfony\Bridge\Doctrine\ContainerAwareEventManager allows container service id's to be registered as event listeners
+                    // these are prefixed with "_service_"
                     $eventManager->removeEventListener($type, \str_replace('_service_', '', $name));
                 }
             }
