@@ -187,11 +187,6 @@ This command will generate a ``PostFactory`` class that looks like this:
         }
     }
 
-.. note::
-
-    Attributes passed to the ``create*`` methods are merged with any attributes set via ``getDefaults()``
-    and ``withAttributes()``.
-
 .. tip::
 
     Using ``make:factory --test`` will generate the factory in ``tests/Factory``.
@@ -404,6 +399,11 @@ instantiation.
     $posts[1]->getCategory(); // random Category (different than above)
     $posts[1]->getPublishedAt(); // \DateTime('last week')
     $posts[1]->getCreatedAt(); // random \DateTime (different than above)
+
+.. note::
+
+    Attributes passed to the ``create*`` methods are merged with any attributes set via ``getDefaults()``
+    and ``withAttributes()``.
 
 Faker
 ~~~~~
