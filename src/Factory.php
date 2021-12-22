@@ -31,14 +31,11 @@ class Factory
     /** @var bool */
     private $persist = true;
 
-    /** @var bool */
-    private $doctrineEvents = true;
-
-    /** @var string|null */
-    private $doctrineEventTypeName = null;
-
     /** @var array */
     private $disabledDoctrineEvents = [];
+
+    /** @var array */
+    private $doctrineEventsToDisable = [];
 
     /** @var bool */
     private $cascadePersist = false;
@@ -89,7 +86,7 @@ class Factory
      */
     final public function create($attributes = []): Proxy
     {
-        if (false === $this->doctrineEvents) {
+        if (!empty($this->doctrineEventsToDisable)) {
             $this->disableDoctrineEvents();
         }
 
@@ -134,7 +131,7 @@ class Factory
             }
         });
 
-        if (false === $this->doctrineEvents) {
+        if (!empty($this->doctrineEventsToDisable)) {
             $this->resetDoctrineEvents();
         }
 
@@ -165,11 +162,10 @@ class Factory
     /**
      * @return static
      */
-    public function withoutDoctrineEvents(?string $eventTypeName = null): self
+    public function withoutDoctrineEvent(string $eventClass): self
     {
         $cloned = clone $this;
-        $cloned->doctrineEvents = false;
-        $cloned->doctrineEventTypeName = $eventTypeName;
+        $cloned->doctrineEventsToDisable[] = $eventClass;
 
         return $cloned;
     }
@@ -477,9 +473,6 @@ class Factory
 
     private function resetDoctrineEvents(): void
     {
-        $this->doctrineEvents = true;
-        $this->doctrineEventTypeName = null;
-
         /** @var EntityManagerInterface $manager */
         $manager = self::configuration()->objectManagerFor($this->class);
         /** @var ContainerAwareEventManager $eventManager */
@@ -496,6 +489,9 @@ class Factory
                 $eventManager->addEventListener($type, $listener);
             }
         }
+
+        $this->doctrineEventsToDisable = [];
+        $this->disabledDoctrineEvents = [];
     }
 
     private function disableDoctrineEvents(): void
@@ -505,9 +501,14 @@ class Factory
         /** @var ContainerAwareEventManager $eventManager */
         $eventManager = $manager->getConnection()->getEventManager();
 
-        $this->disabledDoctrineEvents = $manager->getConnection()->getEventManager()->getListeners($this->doctrineEventTypeName);
-        foreach ($this->disabledDoctrineEvents as $type => $listenersByType) {
+        $listeners = $manager->getConnection()->getEventManager()->getListeners();
+        foreach ($listeners as $type => $listenersByType) {
             foreach ($listenersByType as $name => $listener) {
+                if (!\in_array(\get_class($listener), $this->doctrineEventsToDisable)) {
+                    continue;
+                }
+                $this->disabledDoctrineEvents[$type][$name] = $listener;
+
                 if ($listener instanceof EventSubscriber) {
                     $manager->getConnection()->getEventManager()->removeEventSubscriber($listener);
 

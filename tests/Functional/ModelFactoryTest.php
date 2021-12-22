@@ -493,12 +493,20 @@ final class ModelFactoryTest extends KernelTestCase
      */
     public function disable_doctrine_events_lifecycle(): void
     {
-        $commentSubscriber = CommentFactory::new()->withoutDoctrineEvents()->create([
-            'body' => CommentEventSubscriber::COMMENT_BODY,
-        ]);
-        $commentListener = CommentFactory::new()->withoutDoctrineEvents()->create([
-            'body' => CommentEventListener::COMMENT_BODY,
-        ]);
+        $commentSubscriber = CommentFactory::new()
+            ->withoutDoctrineEvent(CommentEventSubscriber::class)
+            ->withoutDoctrineEvent(CommentEventListener::class)
+            ->create([
+                'body' => CommentEventSubscriber::COMMENT_BODY,
+                ])
+        ;
+        $commentListener = CommentFactory::new()
+            ->withoutDoctrineEvent(CommentEventSubscriber::class)
+            ->withoutDoctrineEvent(CommentEventListener::class)
+            ->create([
+                'body' => CommentEventListener::COMMENT_BODY,
+                ])
+        ;
 
         $this->assertSame(CommentEventSubscriber::COMMENT_BODY, $commentSubscriber->getBody());
         $this->assertSame(CommentEventListener::COMMENT_BODY, $commentListener->getBody());
@@ -520,7 +528,7 @@ final class ModelFactoryTest extends KernelTestCase
     public function disable_doctrine_events_lifecycle_for_sub_factories(): void
     {
         $tag1 = TagFactory::new()
-            ->withoutDoctrineEvents()
+            ->withoutDoctrineEvent(PostEventSubscriber::class)
             ->create(['posts' => PostFactory::new(['title' => PostEventSubscriber::TITLE_VALUE])->many(4)])
         ;
         $this->assertSame(PostEventSubscriber::TITLE_VALUE, $tag1->getPosts()[0]->getTitle());
@@ -532,7 +540,7 @@ final class ModelFactoryTest extends KernelTestCase
 
         $posts = PostFactory::createMany(4, ['title' => PostEventSubscriber::TITLE_VALUE]);
         $tag3 = TagFactory::new()
-            ->withoutDoctrineEvents()
+            ->withoutDoctrineEvent(PostEventSubscriber::class)
             ->create(['posts' => $posts])
         ;
         $this->assertSame(PostEventSubscriber::NEW_TITLE_VALUE, $tag3->getPosts()[0]->getTitle());

@@ -14,6 +14,7 @@ use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
+use Zenstruck\Foundry\Tests\Fixtures\Event\CommentEventSubscriber;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -241,7 +242,7 @@ final class FactoryTest extends TestCase
 
         $this->assertNotSame(\spl_object_id($factory->withAttributes([])), $objectId);
         $this->assertNotSame(\spl_object_id($factory->withoutPersisting()), $objectId);
-        $this->assertNotSame(\spl_object_id($factory->withoutDoctrineEvents()), $objectId);
+        $this->assertNotSame(\spl_object_id($factory->withoutDoctrineEvent(CommentEventSubscriber::class)), $objectId);
         $this->assertNotSame(\spl_object_id($factory->instantiateWith(function() {})), $objectId);
         $this->assertNotSame(\spl_object_id($factory->beforeInstantiate(function() {})), $objectId);
         $this->assertNotSame(\spl_object_id($factory->afterInstantiate(function() {})), $objectId);
