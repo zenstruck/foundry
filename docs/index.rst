@@ -456,7 +456,7 @@ they were added.
             // $attributes contains the attributes used to instantiate the object and any extras
         })
         ->afterPersist(function(Proxy $proxy, array $attributes) {
-            /* @var Post $object */
+            /* @var Post $proxy */
             // this event is only called if the object was persisted
             // $proxy is a Proxy wrapping the persisted object
             // $attributes contains the attributes used to instantiate the object and any extras
