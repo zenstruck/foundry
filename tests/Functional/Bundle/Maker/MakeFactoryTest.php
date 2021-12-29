@@ -21,11 +21,11 @@ final class MakeFactoryTest extends MakerTestCase
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
 
-        $this->assertFileDoesNotExist(self::tempFile('src/Factory/EntityWithRelations.php'));
+        $this->assertFileDoesNotExist(self::tempFile('src/Factory/EntityWithRelationsFactory.php'));
 
         $tester->execute(['entity' => EntityWithRelations::class]);
 
-        $this->assertFileExists(self::tempFile('src/Factory/EntityWithRelations.php'));
+        $this->assertFileExists(self::tempFile('src/Factory/EntityWithRelationsFactory.php'));
         $this->assertSame(<<<EOF
 <?php
 
