@@ -7,8 +7,8 @@ namespace Zenstruck\Foundry;
  */
 abstract class Story
 {
-    /** @var array<string, Proxy> */
-    private $objects = [];
+    /** @var array<string, mixed> */
+    private $state = [];
 
     final public function __call(string $method, array $arguments)
     {
@@ -31,35 +31,37 @@ abstract class Story
     /**
      * @return static
      */
-    final public function add(string $name, object $object): self
+    final public function add(string $name, $state): self
     {
-        // ensure factories are persisted
-        if ($object instanceof Factory) {
-            $object = $object->create();
+        if (\is_object($state)) {
+            // ensure factories are persisted
+            if ($state instanceof Factory) {
+                $state = $state->create();
+            }
+
+            // ensure objects are proxied
+            if (!$state instanceof Proxy) {
+                $state = new Proxy($state);
+            }
+
+            // ensure proxies are persisted
+            if (!$state->isPersisted()) {
+                $state->save();
+            }
         }
 
-        // ensure objects are proxied
-        if (!$object instanceof Proxy) {
-            $object = new Proxy($object);
-        }
-
-        // ensure proxies are persisted
-        if (!$object->isPersisted()) {
-            $object->save();
-        }
-
-        $this->objects[$name] = $object;
+        $this->state[$name] = $state;
 
         return $this;
     }
 
     final public function get(string $name): Proxy
     {
-        if (!\array_key_exists($name, $this->objects)) {
+        if (!\array_key_exists($name, $this->state)) {
             throw new \InvalidArgumentException(\sprintf('"%s" was not registered. Did you forget to call "%s::add()"?', $name, static::class));
         }
 
-        return $this->objects[$name];
+        return $this->state[$name];
     }
 
     abstract public function build(): void;
