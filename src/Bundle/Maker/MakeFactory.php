@@ -58,7 +58,7 @@ final class MakeFactory extends AbstractMaker
         $this->managerRegistry = $managerRegistry;
         $this->entitiesWithFactories = \array_map(
             static function(ModelFactory $factory) {
-                return [\get_class($factory) => $factory::getEntityClass()];
+                return \get_class($factory).':'.$factory::getEntityClass();
             },
             \iterator_to_array($factories)
         );
@@ -226,7 +226,7 @@ final class MakeFactory extends AbstractMaker
                 continue;
             }
 
-            yield \lcfirst($fieldName) => $factoryFqcn[0].'::new(),';
+            yield \lcfirst($fieldName) => $factoryFqcn.'::new(),';
 
             // TODO ELSE: ask user to create missing factory?
         }
@@ -249,13 +249,14 @@ final class MakeFactory extends AbstractMaker
     }
 
     /**
-     * @return false|int[]|string[]
+     * @return false|int[]|string
      */
     private function hasFactory(string $entity, array $array)
     {
         foreach ($array as $item) {
-            if (\in_array($entity, $item, true)) {
-                return \array_keys($item, $entity);
+            $array = \explode(':', $item);
+            if (\in_array($entity, $array, true)) {
+                return $array[0];
             }
         }
 
