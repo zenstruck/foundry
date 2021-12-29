@@ -18,7 +18,7 @@ $post = PostFactory::new() // Create the factory for Post objects
 ```
 
 The factories can be used inside [DoctrineFixturesBundle](https://symfony.com/bundles/DoctrineFixturesBundle/current/index.html)
-to load fixtures or inside your tests, [where it has even more features](#using-in-your-tests).
+to load fixtures or inside your tests, [where it has even more features](https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#using-in-your-tests).
 
 Want to watch a screencast 🎥 about it? Check out https://symfonycasts.com/foundry
 
