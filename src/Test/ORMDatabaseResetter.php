@@ -23,25 +23,7 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
 
     public function resetDatabase(): void
     {
-        foreach ($this->connectionsToReset() as $connection) {
-            $dropParams = ['--connection' => $connection, '--force' => true];
-
-            if ('sqlite' !== $this->registry->getConnection($connection)->getDatabasePlatform()->getName()) {
-                // sqlite does not support "--if-exists" (ref: https://github.com/doctrine/dbal/pull/2402)
-                $dropParams['--if-exists'] = true;
-            }
-
-            $this->runCommand($this->application, 'doctrine:database:drop', $dropParams);
-
-            $this->runCommand(
-                $this->application,
-                'doctrine:database:create',
-                [
-                    '--connection' => $connection,
-                ]
-            );
-        }
-
+        $this->dropAndResetDatabase();
         $this->createSchema();
     }
 
@@ -78,7 +60,7 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
     private function dropSchema(): void
     {
         if (self::isResetUsingMigrations()) {
-            $this->resetDatabase();
+            $this->dropAndResetDatabase();
 
             return;
         }
@@ -90,6 +72,28 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
                 [
                     '--em' => $manager,
                     '--force' => true,
+                ]
+            );
+        }
+    }
+
+    private function dropAndResetDatabase(): void
+    {
+        foreach ($this->connectionsToReset() as $connection) {
+            $dropParams = ['--connection' => $connection, '--force' => true];
+
+            if ('sqlite' !== $this->registry->getConnection($connection)->getDatabasePlatform()->getName()) {
+                // sqlite does not support "--if-exists" (ref: https://github.com/doctrine/dbal/pull/2402)
+                $dropParams['--if-exists'] = true;
+            }
+
+            $this->runCommand($this->application, 'doctrine:database:drop', $dropParams);
+
+            $this->runCommand(
+                $this->application,
+                'doctrine:database:create',
+                [
+                    '--connection' => $connection,
                 ]
             );
         }
