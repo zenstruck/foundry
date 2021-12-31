@@ -9,7 +9,7 @@ use Psr\Container\ContainerInterface;
  */
 trait ContainerBC
 {
-    private static function container(): ContainerInterface
+    protected static function container(): ContainerInterface
     {
         if (!\method_exists(static::class, 'getContainer')) {
             if (!static::$booted) {
