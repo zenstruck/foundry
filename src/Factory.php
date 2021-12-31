@@ -3,6 +3,7 @@
 namespace Zenstruck\Foundry;
 
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
 use Faker;
 
 /**
@@ -432,12 +433,16 @@ class Factory
         }
 
         try {
-            self::configuration()->objectManagerFor($this->class);
-
-            return true;
+            $classMetadata = self::configuration()->objectManagerFor($this->class)->getClassMetadata($this->class);
         } catch (\RuntimeException $e) {
             // entity not managed (perhaps Embeddable)
             return false;
         }
+
+        if ($classMetadata instanceof ODMClassMetadata && $classMetadata->isEmbeddedDocument) {
+            return false;
+        }
+
+        return true;
     }
 }
