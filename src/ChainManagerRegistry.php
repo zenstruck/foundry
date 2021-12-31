@@ -62,47 +62,47 @@ final class ChainManagerRegistry implements ManagerRegistry
         );
     }
 
-    public function getDefaultConnectionName()
+    public function getDefaultConnectionName(): string
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
-    public function getConnection($name = null)
+    public function getConnection($name = null): object
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
-    public function getConnections()
+    public function getConnections(): array
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
-    public function getConnectionNames()
+    public function getConnectionNames(): array
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
-    public function getDefaultManagerName()
+    public function getDefaultManagerName(): string
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
-    public function getManager($name = null)
+    public function getManager($name = null): ObjectManager
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
-    public function resetManager($name = null)
+    public function resetManager($name = null): ObjectManager
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
-    public function getAliasNamespace($alias)
+    public function getAliasNamespace($alias): string
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
-    public function getManagerNames()
+    public function getManagerNames(): array
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
