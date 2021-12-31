@@ -33,7 +33,11 @@
     },
     "config": {
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "bamarni/composer-bin-plugin": true
+        }
     },
     "autoload": {
         "psr-4": { "Zenstruck\\Foundry\\": "src/" },

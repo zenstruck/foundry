@@ -2,5 +2,10 @@
     "require": {
         "vimeo/psalm": "^4.10",
         "psalm/plugin-symfony": "^3.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true
+        }
     }
 }
