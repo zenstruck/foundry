@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Foundry;
 
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
 use Faker;
 
 /**
@@ -346,6 +347,16 @@ class Factory
 
     private function isPersisting(): bool
     {
-        return self::configuration()->hasManagerRegistry() ? $this->persist : false;
+        if (!self::configuration()->hasManagerRegistry() || !$this->persist) {
+            return false;
+        }
+
+        $classMetadata = self::configuration()->objectManagerFor($this->class)->getClassMetadata($this->class);
+
+        if ($classMetadata instanceof ODMClassMetadata && $classMetadata->isEmbeddedDocument) {
+            return false;
+        }
+
+        return true;
     }
 }
