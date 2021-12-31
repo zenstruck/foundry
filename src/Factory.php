@@ -3,6 +3,7 @@
 namespace Zenstruck\Foundry;
 
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Faker;
 
@@ -358,6 +359,10 @@ class Factory
 
         // Check inversedBy side ($this is the owner of the relation)
         $factoryClassMetadata = self::configuration()->objectManagerFor($factoryClass)->getMetadataFactory()->getMetadataFor($factoryClass);
+
+        if (!$factoryClassMetadata instanceof ORMClassMetadata) {
+            return null;
+        }
 
         foreach ($factoryClassMetadata->getAssociationNames() as $field) {
             if (!$factoryClassMetadata->isAssociationInverseSide($field) && $factoryClassMetadata->getAssociationTargetClass($field) === $relationClass) {
