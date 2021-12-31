@@ -2,8 +2,8 @@
 
 namespace Zenstruck\Foundry;
 
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Faker;
 
 /**

@@ -20,7 +20,7 @@ final class FactoryTest extends KernelTestCase
 {
     use Factories, ResetDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         if (false === \getenv('DATABASE_URL')) {
             self::markTestSkipped('doctrine/orm not enabled.');

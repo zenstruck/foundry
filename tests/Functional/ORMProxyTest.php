@@ -13,7 +13,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
  */
 final class ORMProxyTest extends ProxyTest
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         if (false === \getenv('DATABASE_URL')) {
             self::markTestSkipped('doctrine/orm not enabled.');
