@@ -314,4 +314,4 @@ jobs:
         run: composer bin psalm install
 
       - name: Run static analysis
-        run: vendor/bin/psalm --output-format=github
+        run: bin/tools/psalm/vendor/vimeo/psalm/psalm --output-format=github
