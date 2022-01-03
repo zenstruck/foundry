@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Foundry\Tests\Functional;
 
+use Zenstruck\Foundry\Tests\Fixtures\Document\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\PostFactory;
 
 /**
@@ -19,6 +20,11 @@ final class ODMProxyTest extends ProxyTest
     protected function postFactoryClass(): string
     {
         return PostFactory::class;
+    }
+
+    protected function postClass(): string
+    {
+        return Post::class;
     }
 
     protected function registryServiceId(): string

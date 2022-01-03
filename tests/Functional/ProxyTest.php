@@ -8,7 +8,6 @@ use Zenstruck\Assert;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
-use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -25,7 +24,7 @@ abstract class ProxyTest extends KernelTestCase
         $this->postFactoryClass()::createOne()->assertPersisted();
 
         Assert::that(function() { $this->postFactoryClass()::new()->withoutPersisting()->create()->assertPersisted(); })
-            ->throws(AssertionFailedError::class, \sprintf('%s is not persisted.', Post::class))
+            ->throws(AssertionFailedError::class, \sprintf('%s is not persisted.', $this->postClass()))
         ;
     }
 
@@ -37,7 +36,7 @@ abstract class ProxyTest extends KernelTestCase
         $this->postFactoryClass()::new()->withoutPersisting()->create()->assertNotPersisted();
 
         Assert::that(function() { $this->postFactoryClass()::createOne()->assertNotPersisted(); })
-            ->throws(AssertionFailedError::class, \sprintf('%s is persisted but it should not be.', Post::class))
+            ->throws(AssertionFailedError::class, \sprintf('%s is persisted but it should not be.', $this->postClass()))
         ;
     }
 
@@ -283,6 +282,8 @@ abstract class ProxyTest extends KernelTestCase
     }
 
     abstract protected function postFactoryClass(): string;
+
+    abstract protected function postClass(): string;
 
     abstract protected function registryServiceId(): string;
 }
