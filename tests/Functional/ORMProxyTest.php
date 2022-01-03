@@ -5,6 +5,7 @@ namespace Zenstruck\Foundry\Tests\Functional;
 use Zenstruck\Foundry\AnonymousFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Contact;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 
@@ -72,6 +73,11 @@ final class ORMProxyTest extends ProxyTest
     protected function postFactoryClass(): string
     {
         return PostFactory::class;
+    }
+
+    protected function postClass(): string
+    {
+        return Post::class;
     }
 
     protected function registryServiceId(): string

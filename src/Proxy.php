@@ -279,9 +279,16 @@ final class Proxy
      */
     private function fetchObject(): ?object
     {
-        $id = $this->objectManager()->getClassMetadata($this->class)->getIdentifierValues($this->object);
+        $objectManager = $this->objectManager();
 
-        return empty($id) ? null : $this->objectManager()->find($this->class, $id);
+        if ($objectManager instanceof DocumentManager) {
+            // mongo cannot have multi fields identifiers
+            $id = $objectManager->getClassMetadata($this->class)->getIdentifierValue($this->object);
+        } else {
+            $id = $objectManager->getClassMetadata($this->class)->getIdentifierValues($this->object);
+        }
+
+        return empty($id) ? null : $objectManager->find($this->class, $id);
     }
 
     private function objectManager(): ObjectManager

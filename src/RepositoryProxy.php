@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Foundry;
 
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ObjectRepository;
@@ -188,6 +189,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
      */
     public function truncate(): void
     {
+        /** @var DocumentManager $om */
         $om = Factory::configuration()->objectManagerFor($this->getClassName());
 
         if ($om instanceof EntityManagerInterface) {
@@ -196,12 +198,9 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
             return;
         }
 
-        // todo: use a better way to truncate mongo collections
-        foreach ($this as $proxy) {
-            $om->remove($proxy->object());
+        if ($om instanceof DocumentManager) {
+            $om->getDocumentCollection($this->getClassName())->deleteMany([]);
         }
-
-        $om->flush();
     }
 
     /**
