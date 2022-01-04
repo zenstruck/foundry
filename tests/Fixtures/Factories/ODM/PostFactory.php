@@ -2,8 +2,11 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories\ODM;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Document\Comment;
 use Zenstruck\Foundry\Tests\Fixtures\Document\Post;
+use Zenstruck\Foundry\Tests\Fixtures\Document\User;
 
 class PostFactory extends ModelFactory
 {
@@ -11,6 +14,18 @@ class PostFactory extends ModelFactory
     {
         return $this->addState(function() {
             return ['published_at' => self::faker()->dateTime()];
+        });
+    }
+
+    public function withComments(): self
+    {
+        return $this->addState(function() {
+            return [
+                'comments' => new ArrayCollection([
+                    new Comment(new User('user'), 'body'),
+                    new Comment(new User('user'), 'body'),
+                ]),
+            ];
         });
     }
 
@@ -24,6 +39,7 @@ class PostFactory extends ModelFactory
         return [
             'title' => self::faker()->sentence(),
             'body' => self::faker()->sentence(),
+            'user' => new User('user'),
         ];
     }
 }
