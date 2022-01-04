@@ -20,6 +20,10 @@ $post = PostFactory::new() // Create the factory for Post objects
 The factories can be used inside [DoctrineFixturesBundle](https://symfony.com/bundles/DoctrineFixturesBundle/current/index.html)
 to load fixtures or inside your tests, [where it has even more features](https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#using-in-your-tests).
 
+Foundry supports `doctrine/orm` (with [doctrine/doctrine-bundle](https://github.com/doctrine/doctrinebundle)),
+`doctrine/mongodb-odm` (with [doctrine/mongodb-odm-bundle](https://github.com/doctrine/DoctrineMongoDBBundle))
+or a combination of these.
+
 Want to watch a screencast 🎥 about it? Check out https://symfonycasts.com/foundry
 
 **[Read the Documentation](https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html)**
