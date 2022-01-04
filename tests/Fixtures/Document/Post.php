@@ -12,12 +12,6 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 class Post
 {
     /**
-     * @MongoDB\EmbedMany(
-     *     targetDocument=Comment::class
-     * )
-     */
-    protected $comments;
-    /**
      * @MongoDB\Id
      */
     private $id;
@@ -52,13 +46,28 @@ class Post
      */
     private $publishedAt;
 
-    public function __construct(string $title, string $body, ?string $shortDescription = null)
+    /**
+     * @MongoDB\EmbedMany(
+     *     targetDocument=Comment::class
+     * )
+     */
+    private $comments;
+
+    /**
+     * @MongoDB\EmbedOne(
+     *     targetDocument=User::class
+     * )
+     */
+    private $user;
+
+    public function __construct(string $title, string $body, User $user, ?string $shortDescription = null)
     {
         $this->title = $title;
         $this->body = $body;
         $this->shortDescription = $shortDescription;
         $this->createdAt = new \DateTime('now');
         $this->comments = new ArrayCollection();
+        $this->user = $user;
     }
 
     public function __toString(): string
@@ -74,6 +83,11 @@ class Post
     public function getBody(): ?string
     {
         return $this->body;
+    }
+
+    public function getUser(): User
+    {
+        return $this->user;
     }
 
     public function getShortDescription(): ?string

@@ -282,8 +282,10 @@ final class Proxy
         $objectManager = $this->objectManager();
 
         if ($objectManager instanceof DocumentManager) {
-            // mongo cannot have multi fields identifiers
-            $id = $objectManager->getClassMetadata($this->class)->getIdentifierValue($this->object);
+            $classMetadata = $objectManager->getClassMetadata($this->class);
+            if (!$classMetadata->isEmbeddedDocument) {
+                $id = $classMetadata->getIdentifierValue($this->object);
+            }
         } else {
             $id = $objectManager->getClassMetadata($this->class)->getIdentifierValues($this->object);
         }

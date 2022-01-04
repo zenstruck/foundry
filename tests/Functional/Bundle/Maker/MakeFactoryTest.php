@@ -420,12 +420,12 @@ EOF
 
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
 
-        $this->assertFileDoesNotExist(self::tempFile("src/Factory/$file.php"));
+        $this->assertFileDoesNotExist(self::tempFile("src/Factory/{$file}.php"));
 
         $tester->setInputs([$class]);
         $tester->execute([]);
 
-        $this->assertFileExists(self::tempFile("src/Factory/$file.php"));
+        $this->assertFileExists(self::tempFile("src/Factory/{$file}.php"));
     }
 
     public function documentProvider(): iterable

@@ -6,6 +6,7 @@ use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\Document\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Document\Comment;
 use Zenstruck\Foundry\Tests\Fixtures\Document\Post;
+use Zenstruck\Foundry\Tests\Fixtures\Document\User;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\CommentFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\PostFactory;
@@ -27,13 +28,14 @@ final class ODMModelFactoryTest extends ModelFactoryTest
      */
     public function can_use_factory_for_embedded_object(): void
     {
-        $proxyObject = CommentFactory::createOne(['user' => 'some user', 'body' => 'some body']);
+        $proxyObject = CommentFactory::createOne(['user' => new User('some user'), 'body' => 'some body']);
         self::assertInstanceOf(Proxy::class, $proxyObject);
         self::assertFalse($proxyObject->isPersisted());
 
         $comment = $proxyObject->object();
         self::assertInstanceOf(Comment::class, $comment);
-        self::assertSame('some user', $comment->getUser());
+        self::assertEquals(new User('some user'), $comment->getUser());
+        self::assertSame('some body', $comment->getBody());
     }
 
     /**
@@ -53,6 +55,17 @@ final class ODMModelFactoryTest extends ModelFactoryTest
         self::assertInstanceOf(Post::class, $post);
         self::assertCount(4, $post->getComments());
         self::assertContainsOnlyInstancesOf(Comment::class, $post->getComments());
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_one_with_nested_embedded(): void
+    {
+        PostFactory::new()->withComments()->create(['title' => 'foo']);
+
+        $posts = PostFactory::findBy(['title' => 'foo']);
+        self::assertCount(1, $posts);
     }
 
     protected function categoryClass(): string
