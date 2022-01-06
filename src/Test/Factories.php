@@ -34,8 +34,9 @@ trait Factories
                     static::bootKernel();
                 }
 
-                return static::$kernel->getContainer()->get('doctrine');
-            })
+                return TestState::initializeChainManagerRegistry(static::$kernel->getContainer());
+            }
+            )
         );
 
         $kernel->shutdown();

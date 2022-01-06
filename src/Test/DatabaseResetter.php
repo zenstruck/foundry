@@ -3,10 +3,7 @@
 namespace Zenstruck\Foundry\Test;
 
 use DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Factory;
 
@@ -36,92 +33,57 @@ final class DatabaseResetter
 
     public static function resetDatabase(KernelInterface $kernel): void
     {
-        $application = self::createApplication($kernel);
-        $registry = $kernel->getContainer()->get('doctrine');
+        if (!$kernel->getContainer()->has('doctrine')) {
+            return;
+        }
 
-        self::dropAndCreateDatabase($application, $registry);
-        self::createSchema($application, $registry);
+        $application = self::createApplication($kernel);
+        $databaseResetter = new ORMDatabaseResetter($application, $kernel->getContainer()->get('doctrine'));
+
+        $databaseResetter->resetDatabase();
+
+        self::bootFoundry($kernel);
 
         self::$hasBeenReset = true;
     }
 
     public static function resetSchema(KernelInterface $kernel): void
     {
-        $application = self::createApplication($kernel);
-        $registry = $kernel->getContainer()->get('doctrine');
-
-        self::dropSchema($application, $registry);
-        self::createSchema($application, $registry);
-    }
-
-    private static function isResetUsingMigrations(): bool
-    {
-        return 'migrate' === ($_SERVER['FOUNDRY_RESET_MODE'] ?? 'schema');
-    }
-
-    private static function dropAndCreateDatabase(Application $application, ManagerRegistry $registry): void
-    {
-        foreach (self::connectionsToReset($registry) as $connection) {
-            $dropParams = ['--connection' => $connection, '--force' => true];
-
-            if ('sqlite' !== $registry->getConnection($connection)->getDatabasePlatform()->getName()) {
-                // sqlite does not support "--if-exists" (ref: https://github.com/doctrine/dbal/pull/2402)
-                $dropParams['--if-exists'] = true;
-            }
-
-            self::runCommand($application, 'doctrine:database:drop', $dropParams);
-
-            self::runCommand($application, 'doctrine:database:create', [
-                '--connection' => $connection,
-            ]);
-        }
-    }
-
-    private static function createSchema(Application $application, ManagerRegistry $registry): void
-    {
-        if (self::isResetUsingMigrations()) {
-            self::runCommand($application, 'doctrine:migrations:migrate', ['-n' => true]);
-        } else {
-            foreach (self::objectManagersToReset($registry) as $manager) {
-                self::runCommand($application, 'doctrine:schema:create', [
-                    '--em' => $manager,
-                ]);
-            }
+        foreach (self::schemaResetters($kernel) as $databaseResetter) {
+            $databaseResetter->resetSchema();
         }
 
-        if (!Factory::isBooted()) {
-            TestState::bootFromContainer($application->getKernel()->getContainer());
-        }
-
-        TestState::flushGlobalState();
-    }
-
-    private static function dropSchema(Application $application, ManagerRegistry $registry): void
-    {
-        if (self::isResetUsingMigrations()) {
-            self::dropAndCreateDatabase($application, $registry);
-
+        if (self::isDAMADoctrineTestBundleEnabled()) {
             return;
         }
 
-        foreach (self::objectManagersToReset($registry) as $manager) {
-            self::runCommand($application, 'doctrine:schema:drop', [
-                '--em' => $manager,
-                '--force' => true,
-            ]);
-        }
+        self::bootFoundry($kernel);
     }
 
-    private static function runCommand(Application $application, string $command, array $parameters = []): void
+    /** @retrun array<SchemaResetterInterface> */
+    private static function schemaResetters(KernelInterface $kernel): array
     {
-        $exit = $application->run(
-            new ArrayInput(\array_merge(['command' => $command], $parameters)),
-            $output = new BufferedOutput()
-        );
+        $application = self::createApplication($kernel);
+        $databaseResetters = [];
 
-        if (0 !== $exit) {
-            throw new \RuntimeException(\sprintf('Error running "%s": %s', $command, $output->fetch()));
+        if ($kernel->getContainer()->has('doctrine')) {
+            $databaseResetters[] = new ORMDatabaseResetter($application, $kernel->getContainer()->get('doctrine'));
         }
+
+        if ($kernel->getContainer()->has('doctrine_mongodb')) {
+            $databaseResetters[] = new ODMSchemaResetter($application, $kernel->getContainer()->get('doctrine_mongodb'));
+        }
+
+        return $databaseResetters;
+    }
+
+    private static function bootFoundry(KernelInterface $kernel): void
+    {
+        if (!Factory::isBooted()) {
+            TestState::bootFromContainer($kernel->getContainer());
+        }
+
+        TestState::flushGlobalState();
     }
 
     private static function createApplication(KernelInterface $kernel): Application
@@ -130,23 +92,5 @@ final class DatabaseResetter
         $application->setAutoExit(false);
 
         return $application;
-    }
-
-    private static function connectionsToReset(ManagerRegistry $registry): array
-    {
-        if (isset($_SERVER['FOUNDRY_RESET_CONNECTIONS'])) {
-            return \explode(',', $_SERVER['FOUNDRY_RESET_CONNECTIONS']);
-        }
-
-        return [$registry->getDefaultConnectionName()];
-    }
-
-    private static function objectManagersToReset(ManagerRegistry $registry): array
-    {
-        if (isset($_SERVER['FOUNDRY_RESET_OBJECT_MANAGERS'])) {
-            return \explode(',', $_SERVER['FOUNDRY_RESET_OBJECT_MANAGERS']);
-        }
-
-        return [$registry->getDefaultManagerName()];
     }
 }

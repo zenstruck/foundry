@@ -17,6 +17,13 @@ final class StoryTest extends KernelTestCase
 {
     use Factories, ResetDatabase;
 
+    protected function setUp(): void
+    {
+        if (false === \getenv('DATABASE_URL')) {
+            self::markTestSkipped('doctrine/orm not enabled.');
+        }
+    }
+
     /**
      * @test
      */

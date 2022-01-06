@@ -5,6 +5,8 @@ namespace Zenstruck\Foundry\Tests\Functional\Bundle\Maker;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 use Symfony\Component\Console\Tester\CommandTester;
+use Zenstruck\Foundry\Tests\Fixtures\Document\Comment;
+use Zenstruck\Foundry\Tests\Fixtures\Document\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
 
@@ -404,5 +406,31 @@ EOF
 
         $this->assertFileExists($expectedFile);
         $this->assertStringContainsString('namespace App\\Tests\\My\\Namespace;', \file_get_contents($expectedFile));
+    }
+
+    /**
+     * @test
+     * @dataProvider documentProvider
+     */
+    public function can_create_factory_for_odm(string $class, string $file): void
+    {
+        if (false === \getenv('MONGO_URL')) {
+            self::markTestSkipped('doctrine/odm not enabled.');
+        }
+
+        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
+
+        $this->assertFileDoesNotExist(self::tempFile("src/Factory/{$file}.php"));
+
+        $tester->setInputs([$class]);
+        $tester->execute([]);
+
+        $this->assertFileExists(self::tempFile("src/Factory/{$file}.php"));
+    }
+
+    public function documentProvider(): iterable
+    {
+        yield 'document' => [Post::class, 'PostFactory'];
+        yield 'embedded document' => [Comment::class, 'CommentFactory'];
     }
 }

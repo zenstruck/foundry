@@ -1,6 +1,10 @@
 Foundry
 =======
 
+Foundry supports ``doctrine/orm`` (with `doctrine/doctrine-bundle <https://github.com/doctrine/doctrinebundle>`_),
+``doctrine/mongodb-odm`` (with `doctrine/mongodb-odm-bundle <https://github.com/doctrine/DoctrineMongoDBBundle>`_)
+or a combination of these.
+
 Installation
 ------------
 
@@ -1381,6 +1385,11 @@ accordingly. Your database is still reset before running your test suite but the
 
     If using `Global State`_, it is persisted to the database (not in a transaction) before your
     test suite is run. This could further improve test speed if you have a complex global state.
+
+.. caution::
+
+    Using `Global State`_ that creates both ORM and ODM factories when using DAMADoctrineTestBundle
+    is not supported.
 
 Miscellaneous
 .............
