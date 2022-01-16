@@ -347,6 +347,9 @@ jobs:
 
   cs-check:
     uses: zenstruck/.github/.github/workflows/php-cs-fixer.yml@main
+    with:
+      php: 7.2
+      version: 3.4
 
   static-analysis:
     name: Psalm Static Analysis
