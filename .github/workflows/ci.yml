@@ -11,13 +11,6 @@ jobs:
     name: PHP ${{ matrix.php }}, SF ${{ matrix.symfony }} - ${{ matrix.deps }}
     runs-on: ubuntu-latest
     services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ROOT_PASSWORD: 1234
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
       postgres:
         image: postgres:11
         env:
@@ -47,11 +40,15 @@ jobs:
             symfony: 6.0.*
             deps: highest
     steps:
+      - name: Start MySQL
+        env:
+          MYSQL_PWD: root
+        run: |
+          sudo systemctl start mysql.service
+          mysql -uroot -e "STATUS"
+
       - name: Checkout code
         uses: actions/checkout@v2.3.3
-
-      - name: Verify MySQL version
-        run: mysql --host 127.0.0.1 -uroot -p1234 -e "STATUS"
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -72,36 +69,36 @@ jobs:
       - name: 'Test: MySQL'
         run: vendor/bin/simple-phpunit -v
         env:
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Test: MySQL, FoundryBundle'
         run: vendor/bin/simple-phpunit -v
         env:
           USE_FOUNDRY_BUNDLE: 1
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Test: MySQL, DAMABundle'
         run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
         env:
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Test: MySQL, FoundryBundle, DAMABundle'
         run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
         env:
           USE_FOUNDRY_BUNDLE: 1
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Test: MySQL, DoctrineMigrationsBundle'
         run: vendor/bin/simple-phpunit -v
         env:
           FOUNDRY_RESET_MODE: migrate
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Test: MySQL, DoctrineMigrationsBundle, DAMABundle'
         run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
         env:
           FOUNDRY_RESET_MODE: migrate
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Test: PostgreSQL'
         run: vendor/bin/simple-phpunit -v
@@ -150,20 +147,20 @@ jobs:
       - name: 'Test: MySQL, Mongo'
         run: vendor/bin/simple-phpunit -v
         env:
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
           MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
 
       - name: 'Test: MySQL, Mongo, FoundryBundle'
         run: vendor/bin/simple-phpunit -v
         env:
           USE_FOUNDRY_BUNDLE: 1
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
           MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
 
       - name: 'Test: MySQL, Mongo, DAMABundle'
         run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
         env:
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
           MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
 
       - name: 'Test: Mongo standalone'
@@ -175,13 +172,6 @@ jobs:
     name: Code Coverage
     runs-on: ubuntu-latest
     services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ROOT_PASSWORD: 1234
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
       postgres:
         image: postgres:11
         env:
@@ -195,11 +185,15 @@ jobs:
         ports:
           - 27017:27017
     steps:
+      - name: Start MySQL
+        env:
+          MYSQL_PWD: root
+        run: |
+          sudo systemctl start mysql.service
+          mysql -uroot -e "STATUS"
+
       - name: Checkout code
         uses: actions/checkout@v2.3.3
-
-      - name: Verify MySQL version
-        run: mysql --host 127.0.0.1 -uroot -p1234 -e "STATUS"
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -217,36 +211,36 @@ jobs:
       - name: 'Coverage: MySQL'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql.clover
         env:
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Coverage: MySQL, FoundryBundle'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-foundry.clover
         env:
           USE_FOUNDRY_BUNDLE: 1
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Coverage: MySQL, DAMABundle'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-dama.clover --configuration phpunit-dama-doctrine.xml.dist
         env:
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Coverage: MySQL, FoundryBundle, DAMABundle'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-foundry-dama.clover --configuration phpunit-dama-doctrine.xml.dist
         env:
           USE_FOUNDRY_BUNDLE: 1
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Test: MySQL, DoctrineMigrationsBundle'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-migrations.clover
         env:
           FOUNDRY_RESET_MODE: migrate
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Test: MySQL, DoctrineMigrationsBundle, DAMABundle'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-migrations-dama.clover --configuration phpunit-dama-doctrine.xml.dist
         env:
           FOUNDRY_RESET_MODE: migrate
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Coverage: PostgreSQL'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=postgres.clover
@@ -295,20 +289,20 @@ jobs:
       - name: 'Test: MySQL, Mongo'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-mongo.clover
         env:
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
           MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
 
       - name: 'Test: MySQL, Mongo, FoundryBundle'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-mongo-foundry.clover
         env:
           USE_FOUNDRY_BUNDLE: 1
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
           MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
 
       - name: 'Test: MySQL, Mongo, DAMABundle'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-mongo-dama.clover --configuration phpunit-dama-doctrine.xml.dist
         env:
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
           MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
 
       - name: 'Test: Mongo standalone'
