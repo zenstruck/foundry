@@ -104,7 +104,7 @@ final class MakeFactory extends AbstractMaker
         }
 
         $entity_argument = $command->getDefinition()->getArgument('entity');
-        $choices = array_merge($this->entityChoices(), ['All']);
+        $choices = \array_merge($this->entityChoices(), ['All']);
         $entity = $io->choice($entity_argument->getDescription(), $choices);
 
         $input->setArgument('entity', $entity);
@@ -115,7 +115,7 @@ final class MakeFactory extends AbstractMaker
         $class_or_all = $input->getArgument('entity');
         switch ($class_or_all) {
             case 'All':
-                foreach($this->entityChoices() as $class) {
+                foreach ($this->entityChoices() as $class) {
                     $this->generateEntity($class, $input, $io, $generator);
                 }
                 break;
@@ -125,10 +125,16 @@ final class MakeFactory extends AbstractMaker
         }
     }
 
+    public function configureDependencies(DependencyBuilder $dependencies): void
+    {
+        // noop
+    }
+
     /**
      * Generates a single entity factory.
      */
-    private function generateEntity(string $class, InputInterface $input, ConsoleStyle $io, Generator $generator) {
+    private function generateEntity(string $class, InputInterface $input, ConsoleStyle $io, Generator $generator)
+    {
         if (!\class_exists($class)) {
             $class = $generator->createClassNameDetails($class, 'Entity\\')->getFullName();
         }
@@ -179,11 +185,6 @@ final class MakeFactory extends AbstractMaker
             'Next: Open your new factory and set default values/states.',
             'Find the documentation at https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories',
         ]);
-    }
-
-    public function configureDependencies(DependencyBuilder $dependencies): void
-    {
-        // noop
     }
 
     private function entityChoices(): array
