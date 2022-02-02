@@ -103,16 +103,32 @@ final class MakeFactory extends AbstractMaker
             $io->newLine();
         }
 
-        $argument = $command->getDefinition()->getArgument('entity');
-        $entity = $io->choice($argument->getDescription(), $this->entityChoices());
+        $entity_argument = $command->getDefinition()->getArgument('entity');
+        $choices = array_merge($this->entityChoices(), ['All']);
+        $entity = $io->choice($entity_argument->getDescription(), $choices);
 
         $input->setArgument('entity', $entity);
     }
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
-        $class = $input->getArgument('entity');
+        $class_or_all = $input->getArgument('entity');
+        switch ($class_or_all) {
+            case 'All':
+                foreach($this->entityChoices() as $class) {
+                    $this->generateEntity($class, $input, $io, $generator);
+                }
+                break;
+            default:
+                $this->generateEntity($class_or_all, $input, $io, $generator);
+                break;
+        }
+    }
 
+    /**
+     * Generates a single entity factory.
+     */
+    private function generateEntity(string $class, InputInterface $input, ConsoleStyle $io, Generator $generator) {
         if (!\class_exists($class)) {
             $class = $generator->createClassNameDetails($class, 'Entity\\')->getFullName();
         }
@@ -185,7 +201,7 @@ final class MakeFactory extends AbstractMaker
         \sort($choices);
 
         if (empty($choices)) {
-            throw new RuntimeCommandException('No entities or documents found.');
+            throw new RuntimeCommandException('No entities or documents found, or none left to make factories for.');
         }
 
         return $choices;
