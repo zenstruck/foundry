@@ -74,6 +74,11 @@ final class MakeFactory extends AbstractMaker
         return 'Creates a Foundry model factory for a Doctrine entity class';
     }
 
+    public function configureDependencies(DependencyBuilder $dependencies): void
+    {
+        // noop
+    }
+
     public function configureCommand(Command $command, InputConfiguration $inputConfig): void
     {
         $command
@@ -174,11 +179,6 @@ final class MakeFactory extends AbstractMaker
             'Next: Open your new factory and set default values/states.',
             'Find the documentation at https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories',
         ]);
-    }
-
-    public function configureDependencies(DependencyBuilder $dependencies): void
-    {
-        // noop
     }
 
     private function entityChoices(): array
