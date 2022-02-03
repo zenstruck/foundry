@@ -74,6 +74,11 @@ final class MakeFactory extends AbstractMaker
         return 'Creates a Foundry model factory for a Doctrine entity class';
     }
 
+    public function configureDependencies(DependencyBuilder $dependencies): void
+    {
+        // noop
+    }
+
     public function configureCommand(Command $command, InputConfiguration $inputConfig): void
     {
         $command
@@ -104,15 +109,26 @@ final class MakeFactory extends AbstractMaker
         }
 
         $argument = $command->getDefinition()->getArgument('entity');
-        $entity = $io->choice($argument->getDescription(), $this->entityChoices());
+        $entity = $io->choice($argument->getDescription(), \array_merge($this->entityChoices(), ['All']));
 
         $input->setArgument('entity', $entity);
     }
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
-        $class = $input->getArgument('entity');
+        $entity = $input->getArgument('entity');
+        $classes = 'All' === $entity ? $this->entityChoices() : [$entity];
 
+        foreach ($classes as $class) {
+            $this->generateFactory($class, $input, $io, $generator);
+        }
+    }
+
+    /**
+     * Generates a single entity factory.
+     */
+    private function generateFactory(string $class, InputInterface $input, ConsoleStyle $io, Generator $generator)
+    {
         if (!\class_exists($class)) {
             $class = $generator->createClassNameDetails($class, 'Entity\\')->getFullName();
         }
@@ -165,11 +181,6 @@ final class MakeFactory extends AbstractMaker
         ]);
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
-    {
-        // noop
-    }
-
     private function entityChoices(): array
     {
         $choices = [];
@@ -188,7 +199,7 @@ final class MakeFactory extends AbstractMaker
         \sort($choices);
 
         if (empty($choices)) {
-            throw new RuntimeCommandException('No entities or documents found.');
+            throw new RuntimeCommandException('No entities or documents found, or none left to make factories for.');
         }
 
         return $choices;

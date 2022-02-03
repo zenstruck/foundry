@@ -410,6 +410,29 @@ EOF
 
     /**
      * @test
+     */
+    public function can_create_factory_with_all_interactively(): void
+    {
+        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
+
+        $this->assertFileDoesNotExist(self::tempFile('src/Factory/CategoryFactory.php'));
+        $this->assertFileDoesNotExist(self::tempFile('src/Factory/PostFactory.php'));
+
+        $tester->setInputs(['All']);
+
+        try {
+            $tester->execute([]);
+        } catch (RuntimeCommandException $e) {
+            // todo find a better solution
+            // because we have fixtures with the same name, the maker will fail when creating the duplicate
+        }
+
+        $this->assertFileExists(self::tempFile('src/Factory/CategoryFactory.php'));
+        $this->assertFileExists(self::tempFile('src/Factory/PostFactory.php'));
+    }
+
+    /**
+     * @test
      * @dataProvider documentProvider
      */
     public function can_create_factory_for_odm(string $class, string $file): void
