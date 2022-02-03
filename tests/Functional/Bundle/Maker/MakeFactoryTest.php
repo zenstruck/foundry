@@ -416,7 +416,7 @@ EOF
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
 
         $this->assertFileDoesNotExist(self::tempFile('src/Factory/CategoryFactory.php'));
-        $this->assertFileDoesNotExist(self::tempFile('src/Factory/TagFactory.php'));
+        $this->assertFileDoesNotExist(self::tempFile('src/Factory/PostFactory.php'));
 
         $tester->setInputs(['All']);
 
@@ -428,7 +428,7 @@ EOF
         }
 
         $this->assertFileExists(self::tempFile('src/Factory/CategoryFactory.php'));
-        $this->assertFileExists(self::tempFile('src/Factory/TagFactory.php'));
+        $this->assertFileExists(self::tempFile('src/Factory/PostFactory.php'));
     }
 
     /**
