@@ -176,6 +176,9 @@ final class MakeFactory extends AbstractMaker
 
         foreach ($this->managerRegistry->getManagers() as $manager) {
             foreach ($manager->getMetadataFactory()->getAllMetadata() as $metadata) {
+                if ($metadata->getReflectionClass()->isAbstract()) {
+                    continue;
+                }
                 if (!\in_array($metadata->getName(), $this->entitiesWithFactories, true)) {
                     $choices[] = $metadata->getName();
                 }
