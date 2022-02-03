@@ -103,37 +103,26 @@ final class MakeFactory extends AbstractMaker
             $io->newLine();
         }
 
-        $entity_argument = $command->getDefinition()->getArgument('entity');
-        $choices = \array_merge($this->entityChoices(), ['All']);
-        $entity = $io->choice($entity_argument->getDescription(), $choices);
+        $argument = $command->getDefinition()->getArgument('entity');
+        $entity = $io->choice($argument->getDescription(), \array_merge($this->entityChoices(), ['All']));
 
         $input->setArgument('entity', $entity);
     }
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
-        $class_or_all = $input->getArgument('entity');
-        switch ($class_or_all) {
-            case 'All':
-                foreach ($this->entityChoices() as $class) {
-                    $this->generateEntity($class, $input, $io, $generator);
-                }
-                break;
-            default:
-                $this->generateEntity($class_or_all, $input, $io, $generator);
-                break;
-        }
-    }
+        $entity = $input->getArgument('entity');
+        $classes = 'All' === $entity ? $this->entityChoices() : [$entity];
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
-    {
-        // noop
+        foreach ($classes as $class) {
+            $this->generateFactory($class, $input, $io, $generator);
+        }
     }
 
     /**
      * Generates a single entity factory.
      */
-    private function generateEntity(string $class, InputInterface $input, ConsoleStyle $io, Generator $generator)
+    private function generateFactory(string $class, InputInterface $input, ConsoleStyle $io, Generator $generator)
     {
         if (!\class_exists($class)) {
             $class = $generator->createClassNameDetails($class, 'Entity\\')->getFullName();
@@ -185,6 +174,11 @@ final class MakeFactory extends AbstractMaker
             'Next: Open your new factory and set default values/states.',
             'Find the documentation at https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories',
         ]);
+    }
+
+    public function configureDependencies(DependencyBuilder $dependencies): void
+    {
+        // noop
     }
 
     private function entityChoices(): array
