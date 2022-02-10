@@ -6,7 +6,9 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Stories\CategoryPoolStory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\CategoryStory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\PostStory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\ServiceStory;
@@ -100,6 +102,95 @@ final class StoryTest extends KernelTestCase
     {
         $this->expectDeprecation('Since zenstruck\foundry 1.17.0: Using Story::add() is deprecated, use Story::addState().');
 
-        CategoryStory::load()->add('foo', 'bar');
+        CategoryFactory::assert()->empty();
+
+        CategoryStory::load()->add('foo', CategoryFactory::new());
+
+        CategoryFactory::assert()->count(3);
+    }
+
+    /**
+     * @test
+     */
+    public function can_get_random_object_from_pool(): void
+    {
+        $ids = [];
+
+        while (5 !== \count(\array_unique($ids))) {
+            $ids[] = CategoryPoolStory::getRandom('pool-name')->getId();
+        }
+
+        $this->assertCount(5, \array_unique($ids));
+    }
+
+    /**
+     * @test
+     */
+    public function can_get_random_object_set_from_pool(): void
+    {
+        $objects = CategoryPoolStory::getRandomSet('pool-name', 3);
+
+        $this->assertCount(3, $objects);
+        $this->assertCount(3, \array_unique(\array_map(static function($category) { return $category->getId(); }, $objects)));
+    }
+
+    /**
+     * @test
+     */
+    public function can_get_random_object_range_from_pool(): void
+    {
+        $counts = [];
+
+        while (4 !== \count(\array_unique($counts))) {
+            $counts[] = \count(CategoryPoolStory::getRandomRange('pool-name', 0, 3));
+        }
+
+        $this->assertCount(4, \array_unique($counts));
+        $this->assertContains(0, $counts);
+        $this->assertContains(1, $counts);
+        $this->assertContains(2, $counts);
+        $this->assertContains(3, $counts);
+        $this->assertNotContains(4, $counts);
+        $this->assertNotContains(5, $counts);
+    }
+
+    /**
+     * @test
+     */
+    public function random_set_number_must_be_positive(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        CategoryPoolStory::getRandomSet('pool-name', 0);
+    }
+
+    /**
+     * @test
+     */
+    public function random_range_min_must_be_zero_or_greater(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        CategoryPoolStory::getRandomRange('pool-name', -1, 25);
+    }
+
+    /**
+     * @test
+     */
+    public function random_range_min_must_be_less_than_max(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        CategoryPoolStory::getRandomRange('pool-name', 50, 25);
+    }
+
+    /**
+     * @test
+     */
+    public function random_range_more_than_available(): void
+    {
+        $this->expectException(\RuntimeException::class);
+
+        CategoryPoolStory::getRandomRange('pool-name', 0, 100);
     }
 }
