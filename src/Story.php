@@ -7,8 +7,8 @@ namespace Zenstruck\Foundry;
  */
 abstract class Story
 {
-    /** @var array<string, mixed> */
-    private $state = [];
+    /** @var array<string, Proxy> */
+    private $objects = [];
 
     final public function __call(string $method, array $arguments)
     {
@@ -31,44 +31,57 @@ abstract class Story
     /**
      * @return static
      */
-    final public function add(string $name, $state): self
+    final public function add(string $name, object $object): self
     {
         trigger_deprecation('zenstruck\foundry', '1.17.0', 'Using Story::add() is deprecated, use Story::addState().');
 
-        return $this->addState($name, $state);
+        return $this->addState($name, $object);
     }
 
     final public function get(string $name): Proxy
     {
-        if (!\array_key_exists($name, $this->state)) {
+        if (!\array_key_exists($name, $this->objects)) {
             throw new \InvalidArgumentException(\sprintf('"%s" was not registered. Did you forget to call "%s::add()"?', $name, static::class));
         }
 
-        return $this->state[$name];
+        return $this->objects[$name];
     }
 
     abstract public function build(): void;
 
-    final protected function addState(string $name, $state): self
+    final protected function addState(string $name, object $object): self
     {
-        if (\is_object($state)) {
-            // ensure factories are persisted
-            if ($state instanceof Factory) {
-                $state = $state->create();
-            }
-
-            // ensure objects are proxied
-            if (!$state instanceof Proxy) {
-                $state = new Proxy($state);
-            }
-
-            // ensure proxies are persisted
-            if (!$state->isPersisted()) {
-                $state->save();
-            }
+        // ensure factories are persisted
+        if ($object instanceof Factory) {
+            $object = $object->create();
         }
 
-        $this->state[$name] = $state;
+        // ensure objects are proxied
+        if (!$object instanceof Proxy) {
+            $object = new Proxy($object);
+        }
+
+        // ensure proxies are persisted
+        if (!$object->isPersisted()) {
+            $object->save();
+        }
+
+        // ensure factories are persisted
+        if ($object instanceof Factory) {
+            $object = $object->create();
+        }
+
+        // ensure objects are proxied
+        if (!$object instanceof Proxy) {
+            $object = new Proxy($object);
+        }
+
+        // ensure proxies are persisted
+        if (!$object->isPersisted()) {
+            $object->save();
+        }
+
+        $this->objects[$name] = $object;
 
         return $this;
     }
