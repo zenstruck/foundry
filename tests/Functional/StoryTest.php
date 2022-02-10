@@ -60,11 +60,30 @@ final class StoryTest extends KernelTestCase
     /**
      * @test
      */
+    public function can_access_managed_proxies_static_get(): void
+    {
+        $this->assertSame('php', CategoryStory::get('php')->getName());
+    }
+
+    /**
+     * @test
+     */
     public function cannot_access_invalid_object(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        CategoryStory::load()->get('invalid');
+        CategoryStory::get('invalid');
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    public function can_access_managed_proxies_instance_get(): void
+    {
+        $this->expectDeprecation(\sprintf('Since zenstruck/foundry 1.24: Calling instance method "%1$s::get()" is deprecated and will be removed in 2.0, use the static "%1$s::get()" method instead.', CategoryStory::class));
+
+        $this->assertSame('php', CategoryStory::load()->get('php')->getName());
     }
 
     /**

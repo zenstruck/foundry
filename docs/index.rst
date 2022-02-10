@@ -1789,9 +1789,7 @@ Later, you can access the story's state when creating other fixtures:
 
 .. code-block:: php
 
-    PostFactory::createOne([
-        'category' => CategoryStory::load()->get('php') // Category Proxy
-    ]);
+    PostFactory::createOne(['category' => CategoryStory::get('php')]);
 
     // or use the magic method (functionally equivalent to above)
     PostFactory::createOne(['category' => CategoryStory::php()]);
