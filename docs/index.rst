@@ -735,7 +735,7 @@ Factories as Services
 ~~~~~~~~~~~~~~~~~~~~~
 
 If your factories require dependencies, you can define them as a service. The following example demonstrates a very
-common use-case: encoding a password with the ``UserPasswordEncoderInterface`` service.
+common use-case: encoding a password with the ``UserPasswordHasherInterface`` service.
 
 .. code-block:: php
 
@@ -744,18 +744,18 @@ common use-case: encoding a password with the ``UserPasswordEncoderInterface`` s
     namespace App\Factory;
 
     use App\Entity\User;
-    use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+    use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
     use Zenstruck\Foundry\ModelFactory;
 
     final class UserFactory extends ModelFactory
     {
-        private $passwordEncoder;
+        private $passwordHasher;
 
-        public function __construct(UserPasswordEncoderInterface $passwordEncoder)
+        public function __construct(UserPasswordHasherInterface $passwordHasher)
         {
             parent::__construct();
 
-            $this->passwordEncoder = $passwordEncoder;
+            $this->passwordHasher = $passwordHasher;
         }
 
         protected function getDefaults(): array
@@ -770,7 +770,7 @@ common use-case: encoding a password with the ``UserPasswordEncoderInterface`` s
         {
             return $this
                 ->afterInstantiate(function(User $user) {
-                    $user->setPassword($this->passwordEncoder->encodePassword($user, $user->getPassword()));
+                    $user->setPassword($this->passwordHasher->hashPassword($user, $user->getPassword()));
                 })
             ;
         }
