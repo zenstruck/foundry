@@ -33,6 +33,24 @@ abstract class Story
      */
     final public function add(string $name, $state): self
     {
+        trigger_deprecation('zenstruck\foundry', '1.17.0', 'Using Story::add() is deprecated, use Story::addState().');
+
+        return $this->addState($name, $state);
+    }
+
+    final public function get(string $name): Proxy
+    {
+        if (!\array_key_exists($name, $this->state)) {
+            throw new \InvalidArgumentException(\sprintf('"%s" was not registered. Did you forget to call "%s::add()"?', $name, static::class));
+        }
+
+        return $this->state[$name];
+    }
+
+    abstract public function build(): void;
+
+    final protected function addState(string $name, $state): self
+    {
         if (\is_object($state)) {
             // ensure factories are persisted
             if ($state instanceof Factory) {
@@ -54,15 +72,4 @@ abstract class Story
 
         return $this;
     }
-
-    final public function get(string $name): Proxy
-    {
-        if (!\array_key_exists($name, $this->state)) {
-            throw new \InvalidArgumentException(\sprintf('"%s" was not registered. Did you forget to call "%s::add()"?', $name, static::class));
-        }
-
-        return $this->state[$name];
-    }
-
-    abstract public function build(): void;
 }

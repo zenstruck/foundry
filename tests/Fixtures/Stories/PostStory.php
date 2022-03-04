@@ -12,17 +12,17 @@ final class PostStory extends Story
 {
     public function build(): void
     {
-        $this->add('postA', PostFactory::new()->create([
+        $this->addState('postA', PostFactory::new()->create([
             'title' => 'Post A',
             'category' => CategoryStory::php(),
         ]));
 
-        $this->add('postB', PostFactory::new()->create([
+        $this->addState('postB', PostFactory::new()->create([
             'title' => 'Post B',
             'category' => CategoryStory::php(),
         ])->object());
 
-        $this->add('postC', PostFactory::new([
+        $this->addState('postC', PostFactory::new([
             'title' => 'Post C',
             'category' => CategoryStory::symfony(),
         ]));

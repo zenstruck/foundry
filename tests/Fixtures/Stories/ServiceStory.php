@@ -21,6 +21,6 @@ final class ServiceStory extends Story
 
     public function build(): void
     {
-        $this->add('post', PostFactory::new()->create(['title' => $this->service->name]));
+        $this->addState('post', PostFactory::new()->create(['title' => $this->service->name]));
     }
 }

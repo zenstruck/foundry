@@ -1645,10 +1645,10 @@ Another feature of *stories* is the ability for them to *remember* the objects t
     {
         public function build(): void
         {
-            $this->add('php', CategoryFactory::createOne(['name' => 'php']));
+            $this->addState('php', CategoryFactory::createOne(['name' => 'php']));
 
             // factories are created when added as state
-            $this->add('symfony', CategoryFactory::new(['name' => 'symfony']));
+            $this->addState('symfony', CategoryFactory::new(['name' => 'symfony']));
         }
     }
 
