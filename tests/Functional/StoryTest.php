@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Foundry\Tests\Functional;
 
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
@@ -15,7 +16,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Stories\ServiceStory;
  */
 final class StoryTest extends KernelTestCase
 {
-    use Factories, ResetDatabase;
+    use ExpectDeprecationTrait, Factories, ResetDatabase;
 
     protected function setUp(): void
     {
@@ -89,5 +90,16 @@ final class StoryTest extends KernelTestCase
         $this->expectExceptionMessage('Stories with dependencies (Story services) cannot be used without the foundry bundle.');
 
         ServiceStory::load();
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    public function calling_add_is_deprecated(): void
+    {
+        $this->expectDeprecation('Since zenstruck\foundry 1.17.0: Using Story::add() is deprecated, use Story::addState().');
+
+        CategoryStory::load()->add('foo', 'bar');
     }
 }
