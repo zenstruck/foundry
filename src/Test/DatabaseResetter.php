@@ -5,7 +5,6 @@ namespace Zenstruck\Foundry\Test;
 use DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Zenstruck\Foundry\Factory;
 
 /**
  * @internal
@@ -42,7 +41,7 @@ final class DatabaseResetter
 
         $databaseResetter->resetDatabase();
 
-        self::bootFoundry($kernel);
+        self::flushGlobalState($kernel);
 
         self::$hasBeenReset = true;
     }
@@ -57,7 +56,7 @@ final class DatabaseResetter
             return;
         }
 
-        self::bootFoundry($kernel);
+        self::flushGlobalState($kernel);
     }
 
     /** @retrun array<SchemaResetterInterface> */
@@ -77,11 +76,9 @@ final class DatabaseResetter
         return $databaseResetters;
     }
 
-    private static function bootFoundry(KernelInterface $kernel): void
+    private static function flushGlobalState(KernelInterface $kernel): void
     {
-        if (!Factory::isBooted()) {
-            TestState::bootFromContainer($kernel->getContainer());
-        }
+        TestState::bootFromContainer($kernel->getContainer());
 
         TestState::flushGlobalState();
     }
