@@ -865,6 +865,22 @@ Foundry can be used to create factories for entities that you don't have model f
     $entity = create(Post::class, ['field' => 'value']);
     $entities = create_many(Post::class, 5, ['field' => 'value']);
 
+Delay Flush
+~~~~~~~~~~~
+
+When creating/persisting many factories at once, it can be improve performance
+to instantiate them all without saving to the database, then flush them all at
+once. To do this, wrap the operations in a ``Factory::delayFlush()`` callback:
+
+.. code-block:: php
+
+    use Zenstruck\Foundry\Factory;
+
+    Factory::delayFlush(function() {
+        CategoryFactory::createMany(100); // instantiated/persisted but not flushed
+        TagFactory::createMany(200); // instantiated/persisted but not flushed
+    }); // single flush
+
 .. _without-persisting:
 
 Without Persisting
