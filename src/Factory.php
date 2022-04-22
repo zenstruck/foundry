@@ -449,7 +449,13 @@ class Factory
             return false;
         }
 
+        if ($classMetadata instanceof ORMClassMetadata && $classMetadata->isEmbeddedClass) {
+            // embedded entity
+            return false;
+        }
+
         if ($classMetadata instanceof ODMClassMetadata && $classMetadata->isEmbeddedDocument) {
+            // embedded document
             return false;
         }
 
