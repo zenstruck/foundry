@@ -195,21 +195,30 @@ This command will generate a ``PostFactory`` class that looks like this:
 
     Using ``make:factory --test`` will generate the factory in ``tests/Factory``.
 
-.. tip::
+.. note::
 
-    PhpStorm 2021.2+ has support for
-    `generics annotations <https://blog.jetbrains.com/phpstorm/2021/07/phpstorm-2021-2-release/#generics>`_,
-    with it, your factory's annotations can be reduced to the following and still have the same auto-completion
-    support:
+    The generated ``@method`` docblocks above enable autocompletion with PhpStorm but
+    cause errors with PHPStan. To support PHPStan for your factory's, you need to *also*
+    add the following dockblocks:
 
     .. code-block:: php
 
         /**
-         * @extends ModelFactory<Post>
+         * ...
          *
-         * @method static Post[]|Proxy[] createMany(int $number, array|callable $attributes = [])
-         * @method static PostRepository|RepositoryProxy repository()
-         * @method Post|Proxy create(array|callable $attributes = [])
+         * @phpstan-method static Post&Proxy createOne(array $attributes = [])
+         * @phpstan-method static Post[]&Proxy[] createMany(int $number, array|callable $attributes = [])
+         * @phpstan-method static Post&Proxy find(object|array|mixed $criteria)
+         * @phpstan-method static Post&Proxy findOrCreate(array $attributes)
+         * @phpstan-method static Post&Proxy first(string $sortedField = 'id')
+         * @phpstan-method static Post&Proxy last(string $sortedField = 'id')
+         * @phpstan-method static Post&Proxy random(array $attributes = [])
+         * @phpstan-method static Post&Proxy randomOrCreate(array $attributes = [])
+         * @phpstan-method static Post[]&Proxy[] all()
+         * @phpstan-method static Post[]&Proxy[] findBy(array $attributes)
+         * @phpstan-method static Post[]&Proxy[] randomSet(int $number, array $attributes = [])
+         * @phpstan-method static Post[]&Proxy[] randomRange(int $min, int $max, array $attributes = [])
+         * @phpstan-method Post&Proxy create(array|callable $attributes = [])
          */
         final class PostFactory extends ModelFactory
         {
