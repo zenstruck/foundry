@@ -62,7 +62,13 @@ final class LazyManagerRegistry implements ManagerRegistry
 
     public function getAliasNamespace($alias): string
     {
-        return $this->inner()->getAliasNamespace($alias);
+        $inner = $this->inner();
+
+        if (\method_exists($inner, 'getAliasNamespace')) {
+            return $inner->getAliasNamespace($alias);
+        }
+
+        throw new \BadMethodCallException('Method removed in doctrine/persistence v3.');
     }
 
     public function getManagerNames(): array
