@@ -515,6 +515,32 @@ final class InstantiatorTest extends TestCase
             'propF' => 'F',
         ], InstantiatorDummy::class);
     }
+
+    /**
+     * @test
+     */
+    public function can_set_variadic_constructor_attributes(): void
+    {
+        $object = (new Instantiator())([
+            'propA' => 'A',
+            'propB' => ['B', 'C', 'D'],
+        ], VariadicInstantiatorDummy::class);
+
+        $this->assertSame('constructor A', $object->getPropA());
+        $this->assertSame(['B', 'C', 'D'], $object->getPropB());
+    }
+
+    /**
+     * @test
+     */
+    public function missing_variadic_argument_thtrows(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing constructor argument "propB" for "Zenstruck\Foundry\Tests\Unit\VariadicInstantiatorDummy".');
+        $object = (new Instantiator())([
+            'propA' => 'A',
+        ], VariadicInstantiatorDummy::class);
+    }
 }
 
 class InstantiatorDummy
@@ -585,5 +611,27 @@ class PrivateConstructorInstantiatorDummy extends InstantiatorDummy
     private function __construct()
     {
         parent::__construct('B', 'C');
+    }
+}
+
+class VariadicInstantiatorDummy
+{
+    private $propA;
+    private $propB;
+
+    public function __construct($propA, ...$propB)
+    {
+        $this->propA = 'constructor '.$propA;
+        $this->propB = $propB;
+    }
+
+    public function getPropA()
+    {
+        return $this->propA;
+    }
+
+    public function getPropB()
+    {
+        return $this->propB;
     }
 }

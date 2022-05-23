@@ -260,7 +260,11 @@ final class Instantiator
             $name = self::attributeNameForParameter($parameter, $attributes);
 
             if (\array_key_exists($name, $attributes)) {
-                $arguments[] = $attributes[$name];
+                if ($parameter->isVariadic()) {
+                    $arguments = \array_merge($arguments, $attributes[$name]);
+                } else {
+                    $arguments[] = $attributes[$name];
+                }
             } elseif ($parameter->isDefaultValueAvailable()) {
                 $arguments[] = $parameter->getDefaultValue();
             } else {
