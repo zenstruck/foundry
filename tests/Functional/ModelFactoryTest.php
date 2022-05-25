@@ -277,6 +277,24 @@ abstract class ModelFactoryTest extends KernelTestCase
         $this->assertSame('name2', $categories[1]->getName());
     }
 
+    /**
+     * @test
+     */
+    public function resave_after_persist_events(): void
+    {
+        $categoryFactoryClass = $this->categoryFactoryClass();
+
+        $categoryFactoryClass::new()
+            ->afterPersist(function($category) {
+                $category->setName('new');
+            })
+            ->create(['name' => 'original'])
+        ;
+
+        $categoryFactoryClass::assert()->exists(['name' => 'new']);
+        $categoryFactoryClass::assert()->notExists(['name' => 'original']);
+    }
+
     abstract protected function categoryClass(): string;
 
     abstract protected function categoryFactoryClass(): string;
