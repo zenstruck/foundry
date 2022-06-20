@@ -1731,6 +1731,7 @@ Objects can be fetched from pools in your tests, fixtures or other stories:
     ProvinceStory::getRandom('be'); // random Province|Proxy from "be" pool
     ProvinceStory::getRandomSet('be', 3); // 3 random Province|Proxy's from "be" pool
     ProvinceStory::getRandomRange('be', 1, 4); // between 1 and 4 random Province|Proxy's from "be" pool
+    ProvinceStory::getPool('be'); // all Province|Proxy's from "be" pool
 
 Bundle Configuration
 --------------------

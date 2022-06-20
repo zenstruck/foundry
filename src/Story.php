@@ -32,6 +32,16 @@ abstract class Story
     }
 
     /**
+     * Get all the items in a pool.
+     *
+     * @return Proxy[]
+     */
+    final public static function getPool(string $pool): array
+    {
+        return static::load()->pools[$pool] ?? [];
+    }
+
+    /**
      * Get a random item from a pool.
      */
     final public static function getRandom(string $pool): Proxy
@@ -68,8 +78,7 @@ abstract class Story
             throw new \InvalidArgumentException(\sprintf('$max (%d) cannot be less than $min (%d).', $max, $min));
         }
 
-        $story = static::load();
-        $values = $story->pools[$pool] ?? [];
+        $values = static::getPool($pool);
 
         \shuffle($values);
 
