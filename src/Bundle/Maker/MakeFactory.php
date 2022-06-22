@@ -29,11 +29,11 @@ final class MakeFactory extends AbstractMaker
         'BOOLEAN' => 'self::faker()->boolean(),',
         'DATE' => 'self::faker()->datetime(),',
         'DATE_MUTABLE' => 'self::faker()->datetime(),',
-        'DATE_IMMUTABLE' => 'self::faker()->datetime(),',
+        'DATE_IMMUTABLE' => '\DateTimeImmutable::createFromMutable(self::faker()->datetime()),',
         'DATETIME_MUTABLE' => 'self::faker()->datetime(),',
-        'DATETIME_IMMUTABLE' => 'self::faker()->datetime(),',
+        'DATETIME_IMMUTABLE' => '\DateTimeImmutable::createFromMutable(self::faker()->datetime()),',
         'DATETIMETZ_MUTABLE' => 'self::faker()->datetime(),',
-        'DATETIMETZ_IMMUTABLE' => 'self::faker()->datetime(),',
+        'DATETIMETZ_IMMUTABLE' => '\DateTimeImmutable::createFromMutable(self::faker()->datetime()),',
         'DECIMAL' => 'self::faker()->randomFloat(),',
         'FLOAT' => 'self::faker()->randomFloat(),',
         'INTEGER' => 'self::faker()->randomNumber(),',
@@ -44,7 +44,7 @@ final class MakeFactory extends AbstractMaker
         'STRING' => 'self::faker()->text(),',
         'TEXT' => 'self::faker()->text(),',
         'TIME_MUTABLE' => 'self::faker()->datetime(),',
-        'TIME_IMMUTABLE' => 'self::faker()->datetime(),',
+        'TIME_IMMUTABLE' => '\DateTimeImmutable::createFromMutable(self::faker()->datetime()),',
     ];
 
     /** @var ManagerRegistry */
