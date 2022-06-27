@@ -56,6 +56,16 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
     /**
      * @test
      */
+    public function custom_faker_seed(): void
+    {
+        $this->load(['faker' => ['seed' => 1234]]);
+
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('zenstruck_foundry.faker', 'seed', [1234]);
+    }
+
+    /**
+     * @test
+     */
     public function custom_faker_service(): void
     {
         $this->load(['faker' => ['service' => 'my_faker']]);
@@ -74,6 +84,17 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
         $this->expectExceptionMessage('Invalid configuration for path "zenstruck_foundry.faker": Cannot set faker locale when using custom service.');
 
         $this->load(['faker' => ['service' => 'my_faker', 'locale' => 'fr_FR']]);
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_set_faker_seed_and_service(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid configuration for path "zenstruck_foundry.faker": Cannot set faker seed when using custom service.');
+
+        $this->load(['faker' => ['service' => 'my_faker', 'seed' => 1234]]);
     }
 
     /**
