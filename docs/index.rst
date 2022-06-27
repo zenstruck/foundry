@@ -441,11 +441,12 @@ random data for your factories:
 
     .. code-block:: yaml
 
-        # config/packages/dev/zenstruck_foundry.yaml (see Bundle Configuration section about sharing this in the test environment)
-        zenstruck_foundry:
-            faker:
-                locale: fr_FR # set the locale
-                seed: 5678 # set the
+        # config/packages/zenstruck_foundry.yaml
+        when@dev: # see Bundle Configuration section about sharing this in the test environment
+            zenstruck_foundry:
+                faker:
+                    locale: fr_FR # set the locale
+                    seed: 5678 # set the
 
 .. note::
 
@@ -453,10 +454,11 @@ random data for your factories:
 
     .. code-block:: yaml
 
-        # config/packages/dev/zenstruck_foundry.yaml (see Bundle Configuration section about sharing this in the test environment)
-        zenstruck_foundry:
-            faker:
-                service: my_faker # service id for your own instance of Faker\Generator
+        # config/packages/zenstruck_foundry.yaml
+        when@dev: # see Bundle Configuration section about sharing this in the test environment
+            zenstruck_foundry:
+                faker:
+                    service: my_faker # service id for your own instance of Faker\Generator
 
 Events / Hooks
 ~~~~~~~~~~~~~~
@@ -594,14 +596,15 @@ instantiators):
 
 .. code-block:: yaml
 
-    # config/packages/dev/zenstruck_foundry.yaml (see Bundle Configuration section about sharing this in the test environment)
-    zenstruck_foundry:
-        instantiator:
-            without_constructor: true # always instantiate objects without calling the constructor
-            allow_extra_attributes: true # always ignore extra attributes
-            always_force_properties: true # always "force set" properties
-            # or
-            service: my_instantiator # your own invokable service for complete control
+    # config/packages/zenstruck_foundry.yaml
+    when@dev: # see Bundle Configuration section about sharing this in the test environment
+        zenstruck_foundry:
+            instantiator:
+                without_constructor: true # always instantiate objects without calling the constructor
+                allow_extra_attributes: true # always ignore extra attributes
+                always_force_properties: true # always "force set" properties
+                # or
+                service: my_instantiator # your own invokable service for complete control
 
 Immutable
 ~~~~~~~~~
@@ -1258,9 +1261,10 @@ Without auto-refreshing enabled, the above call to ``$post->getTitle()`` would r
 
         .. code-block:: yaml
 
-            # config/packages/dev/zenstruck_foundry.yaml (see Bundle Configuration section about sharing this in the test environment)
-            zenstruck_foundry:
-                auto_refresh_proxies: true/false
+            # config/packages/zenstruck_foundry.yaml
+            when@dev: # see Bundle Configuration section about sharing this in the test environment
+                zenstruck_foundry:
+                    auto_refresh_proxies: true/false
 
 Repository Proxy
 ~~~~~~~~~~~~~~~~
@@ -1749,23 +1753,20 @@ Bundle Configuration
 --------------------
 
 Since the bundle is intended to be used in your *dev* and *test* environments, you'll want the configuration
-for each environment to match. The easiest way to do this is have your *test* config, import *dev*. This
-way, there is just one place to set your config.
+for each environment to match. The easiest way to do this is to use *YAML anchors* with ``when@dev``/``when@test``.
+This way, there is just one place to set your config.
 
 .. configuration-block::
 
     .. code-block:: yaml
 
-        # config/packages/dev/zenstruck_foundry.yaml
+        # config/packages/zenstruck_foundry.yaml
 
-        zenstruck_foundry:
-            # ...
+        when@dev: &dev
+            zenstruck_foundry:
+                # ... put all your config here
 
-        # config/packages/test/zenstruck_foundry.yaml
-
-        # just import the dev config
-        imports:
-            - { resource: ../dev/zenstruck_foundry.yaml }
+        when@test: *dev # "copies" the config from above
 
 Full Default Bundle Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
