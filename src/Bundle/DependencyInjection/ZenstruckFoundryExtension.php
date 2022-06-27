@@ -55,8 +55,14 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
             return;
         }
 
+        $definition = $container->getDefinition('zenstruck_foundry.faker');
+
         if ($config['locale']) {
-            $container->getDefinition('zenstruck_foundry.faker')->addArgument($config['locale']);
+            $definition->addArgument($config['locale']);
+        }
+
+        if ($config['seed']) {
+            $definition->addMethodCall('seed', [$config['seed']]);
         }
     }
 

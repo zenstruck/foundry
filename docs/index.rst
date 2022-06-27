@@ -421,7 +421,8 @@ instantiation.
 Faker
 ~~~~~
 
-This library provides a wrapper for `FakerPHP <https://fakerphp.github.io/>`_ to help with generating random data for your factories:
+This library provides a wrapper for `FakerPHP <https://fakerphp.github.io/>`_ to help with generating
+random data for your factories:
 
 .. code-block:: php
 
@@ -435,7 +436,8 @@ This library provides a wrapper for `FakerPHP <https://fakerphp.github.io/>`_ to
 
 .. note::
 
-    You can register your own ``Faker\Generator``:
+    You can customize Faker's `locale <https://fakerphp.github.io/#localization>`_ and random
+    `seed <https://fakerphp.github.io/#seeding-the-generator>`_:
 
     .. code-block:: yaml
 
@@ -443,8 +445,18 @@ This library provides a wrapper for `FakerPHP <https://fakerphp.github.io/>`_ to
         zenstruck_foundry:
             faker:
                 locale: fr_FR # set the locale
-                # or
-                service: my_faker # use your own instance of Faker\Generator for complete control
+                seed: 5678 # set the
+
+.. note::
+
+    For full control, you can register your own ``Faker\Generator`` service:
+
+    .. code-block:: yaml
+
+        # config/packages/dev/zenstruck_foundry.yaml (see Bundle Configuration section about sharing this in the test environment)
+        zenstruck_foundry:
+            faker:
+                service: my_faker # service id for your own instance of Faker\Generator
 
 Events / Hooks
 ~~~~~~~~~~~~~~
@@ -1773,6 +1785,9 @@ Full Default Bundle Configuration
                 # Change the default faker locale.
                 locale:               null # Example: fr_FR
 
+                # Random number generator seed to produce the same fake values every run
+                seed:                 null # Example: 1234
+
                 # Customize the faker service.
                 service:              null # Example: my_faker
 
@@ -1803,6 +1818,9 @@ Full Default Bundle Configuration
 
                 // Change the default faker locale.
                 'locale' => null,
+
+                // Random number generator seed to produce the same fake values every run
+                'seed' => null,
 
                 // Customize the faker service.
                 'service' => null
