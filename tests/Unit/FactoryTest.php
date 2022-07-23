@@ -6,7 +6,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Faker;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\AnonymousFactory;
 use Zenstruck\Foundry\Factory;
@@ -20,7 +19,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
  */
 final class FactoryTest extends TestCase
 {
-    use ExpectDeprecationTrait, Factories;
+    use Factories;
 
     /**
      * @test
@@ -46,8 +45,6 @@ final class FactoryTest extends TestCase
      */
     public function can_instantiate_many_objects_legacy(): void
     {
-        $this->expectDeprecation('Since zenstruck/foundry 1.7: Calling instance method "'.Factory::class.'::createMany()" is deprecated and will be removed in 2.0, use the static "'.Factory::class.':createMany()" method instead.');
-
         $attributeArray = ['title' => 'title', 'body' => 'body'];
         $attributeCallback = static function(Faker\Generator $faker) {
             return ['title' => 'title', 'body' => 'body'];
@@ -273,8 +270,6 @@ final class FactoryTest extends TestCase
      */
     public function can_create_many_objects_legacy(): void
     {
-        $this->expectDeprecation('Since zenstruck/foundry 1.7: Calling instance method "'.Factory::class.'::createMany()" is deprecated and will be removed in 2.0, use the static "'.Factory::class.':createMany()" method instead.');
-
         $registry = $this->createMock(ManagerRegistry::class);
         $registry
             ->method('getManagerForClass')
