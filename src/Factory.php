@@ -66,7 +66,7 @@ class Factory
             throw new \BadMethodCallException(\sprintf('Call to undefined method "%s::%s".', static::class, $name));
         }
 
-        trigger_deprecation('zenstruck/foundry', '1.7', 'Calling instance method "%1$s::createMany()" is deprecated and will be removed in 2.0, use the static "%1$s:createMany()" method instead.', static::class);
+        trigger_deprecation('zenstruck/foundry', '1.7', 'Calling instance method "%1$s::createMany()" is deprecated and will be removed in 2.0, use e.g. "%1$s::new()->stateAdapter()->many(%2$d)->create()" instead.', static::class, $arguments[0]);
 
         return $this->many($arguments[0])->create($arguments[1] ?? []);
     }

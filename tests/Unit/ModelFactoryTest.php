@@ -50,7 +50,7 @@ final class ModelFactoryTest extends TestCase
      */
     public function can_instantiate_many_legacy(): void
     {
-        $this->expectDeprecation(\sprintf('Since zenstruck/foundry 1.7: Calling instance method "%1$s::createMany()" is deprecated and will be removed in 2.0, use the static "%1$s:createMany()" method instead.', PostFactory::class));
+        $this->expectDeprecation(\sprintf('Since zenstruck/foundry 1.7: Calling instance method "%1$s::createMany()" is deprecated and will be removed in 2.0, use e.g. "%1$s::new()->stateAdapter()->many(2)->create()" instead.', PostFactory::class));
 
         $objects = PostFactory::new(['body' => 'body'])->createMany(2, ['title' => 'title']);
 
