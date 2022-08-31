@@ -1143,7 +1143,7 @@ to have `Active Record <https://en.wikipedia.org/wiki/Active_record_pattern>`_ *
 
     use App\Factory\PostFactory;
 
-    $post = PostFactory::createOne()->create(['title' => 'My Title']); // instance of Zenstruck\Foundry\Proxy
+    $post = PostFactory::createOne(['title' => 'My Title']); // instance of Zenstruck\Foundry\Proxy
 
     // get the wrapped object
     $realPost = $post->object(); // instance of Post
