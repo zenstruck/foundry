@@ -446,7 +446,7 @@ random data for your factories:
             zenstruck_foundry:
                 faker:
                     locale: fr_FR # set the locale
-                    seed: 5678 # set the
+                    seed: 5678 # set the random number generator seed
 
 .. note::
 
