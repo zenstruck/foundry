@@ -14,6 +14,7 @@ use Zenstruck\Foundry\Proxy;
  *
  * @method static <?= $entity->getShortName() ?>|Proxy createOne(array $attributes = [])
  * @method static <?= $entity->getShortName() ?>[]|Proxy[] createMany(int $number, array|callable $attributes = [])
+ * @method static <?= $entity->getShortName() ?>[]|Proxy[] createSequence(array|callable $sequence)
  * @method static <?= $entity->getShortName() ?>|Proxy find(object|array|mixed $criteria)
  * @method static <?= $entity->getShortName() ?>|Proxy findOrCreate(array $attributes)
  * @method static <?= $entity->getShortName() ?>|Proxy first(string $sortedField = 'id')

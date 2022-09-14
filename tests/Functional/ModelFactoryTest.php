@@ -3,6 +3,8 @@
 namespace Zenstruck\Foundry\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
@@ -293,6 +295,75 @@ abstract class ModelFactoryTest extends KernelTestCase
 
         $categoryFactoryClass::assert()->exists(['name' => 'new']);
         $categoryFactoryClass::assert()->notExists(['name' => 'original']);
+    }
+
+    /**
+     * @test
+     * @dataProvider sequenceProvider
+     */
+    public function can_create_sequence($sequence): void
+    {
+        $categoryFactoryClass = $this->categoryFactoryClass();
+        $categoryFactoryClass::createSequence($sequence);
+
+        $categoryFactoryClass::assert()->exists(['name' => 'foo']);
+        $categoryFactoryClass::assert()->exists(['name' => 'bar']);
+    }
+
+    public function sequenceProvider(): iterable
+    {
+        yield 'with array of attributes' => [
+            [['name' => 'foo'], ['name' => 'bar']],
+        ];
+
+        yield 'with a callable which returns an array of attributes' => [
+            static function(): array {
+                return [['name' => 'foo'], ['name' => 'bar']];
+            },
+        ];
+
+        yield 'with a callable which yields attributes' => [
+            static function(): \Generator {
+                yield ['name' => 'foo'];
+                yield ['name' => 'bar'];
+            },
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider factoryCollectionAsDataProvider
+     */
+    public function can_use_factory_collection_as_data_provider(FactoryCollection $factoryCollection): void
+    {
+        $factoryCollection->create();
+        $factoryCollection->factory()::assert()->exists(['name' => 'foo']);
+    }
+
+    public function factoryCollectionAsDataProvider(): iterable
+    {
+        $categoryFactoryClass = $this->categoryFactoryClass();
+
+        yield [$categoryFactoryClass::new(['name' => 'foo'])->many(1)];
+        yield [$categoryFactoryClass::new()->sequence([['name' => 'foo']])];
+    }
+
+    /**
+     * @test
+     * @dataProvider dataProviderYieldedFromFactoryCollection
+     */
+    public function can_yield_data_provider_from_factory_collection(Factory $factory): void
+    {
+        $factory->create();
+        $factory::assert()->exists(['name' => 'foo']);
+    }
+
+    public function dataProviderYieldedFromFactoryCollection(): iterable
+    {
+        $categoryFactoryClass = $this->categoryFactoryClass();
+
+        yield from $categoryFactoryClass::new(['name' => 'foo'])->many(1)->asDataProvider();
+        yield from $categoryFactoryClass::new()->sequence([['name' => 'foo']])->asDataProvider();
     }
 
     abstract protected function categoryClass(): string;

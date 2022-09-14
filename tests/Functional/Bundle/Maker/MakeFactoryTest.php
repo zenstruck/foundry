@@ -41,6 +41,7 @@ use Zenstruck\\Foundry\\Proxy;
  *
  * @method static Category|Proxy createOne(array \$attributes = [])
  * @method static Category[]|Proxy[] createMany(int \$number, array|callable \$attributes = [])
+ * @method static Category[]|Proxy[] createSequence(array|callable \$sequence)
  * @method static Category|Proxy find(object|array|mixed \$criteria)
  * @method static Category|Proxy findOrCreate(array \$attributes)
  * @method static Category|Proxy first(string \$sortedField = 'id')
@@ -119,6 +120,7 @@ use Zenstruck\\Foundry\\Proxy;
  *
  * @method static Tag|Proxy createOne(array \$attributes = [])
  * @method static Tag[]|Proxy[] createMany(int \$number, array|callable \$attributes = [])
+ * @method static Tag[]|Proxy[] createSequence(array|callable \$sequence)
  * @method static Tag|Proxy find(object|array|mixed \$criteria)
  * @method static Tag|Proxy findOrCreate(array \$attributes)
  * @method static Tag|Proxy first(string \$sortedField = 'id')
@@ -193,6 +195,7 @@ use Zenstruck\\Foundry\\Proxy;
  *
  * @method static Category|Proxy createOne(array \$attributes = [])
  * @method static Category[]|Proxy[] createMany(int \$number, array|callable \$attributes = [])
+ * @method static Category[]|Proxy[] createSequence(array|callable \$sequence)
  * @method static Category|Proxy find(object|array|mixed \$criteria)
  * @method static Category|Proxy findOrCreate(array \$attributes)
  * @method static Category|Proxy first(string \$sortedField = 'id')
@@ -271,6 +274,7 @@ use Zenstruck\\Foundry\\Proxy;
  *
  * @method static Tag|Proxy createOne(array \$attributes = [])
  * @method static Tag[]|Proxy[] createMany(int \$number, array|callable \$attributes = [])
+ * @method static Tag[]|Proxy[] createSequence(array|callable \$sequence)
  * @method static Tag|Proxy find(object|array|mixed \$criteria)
  * @method static Tag|Proxy findOrCreate(array \$attributes)
  * @method static Tag|Proxy first(string \$sortedField = 'id')

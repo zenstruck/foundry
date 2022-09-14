@@ -131,13 +131,31 @@ class Factory
     }
 
     /**
-     * @see FactoryCollection::__construct()
+     * @param int|null $max If set, when created, the collection will be a random size between $min and $max
      *
      * @return FactoryCollection<TObject>
      */
     final public function many(int $min, ?int $max = null): FactoryCollection
     {
-        return new FactoryCollection($this, $min, $max);
+        if (!$max) {
+            return FactoryCollection::set($this, $min);
+        }
+
+        return FactoryCollection::range($this, $min, $max);
+    }
+
+    /**
+     * @param iterable<array<string, mixed>>|callable(): iterable<array<string, mixed>> $sequence
+     *
+     * @return FactoryCollection<TObject>
+     */
+    final public function sequence($sequence): FactoryCollection
+    {
+        if (\is_callable($sequence)) {
+            $sequence = $sequence();
+        }
+
+        return FactoryCollection::sequence($this, $sequence);
     }
 
     /**

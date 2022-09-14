@@ -148,6 +148,7 @@ This command will generate a ``PostFactory`` class that looks like this:
      *
      * @method static Post|Proxy createOne(array $attributes = [])
      * @method static Post[]|Proxy[] createMany(int $number, array|callable $attributes = [])
+     * @method static Post[]&Proxy[] createSequence(array|callable $sequence)
      * @method static Post|Proxy find(object|array|mixed $criteria)
      * @method static Post|Proxy findOrCreate(array $attributes)
      * @method static Post|Proxy first(string $sortedField = 'id')
@@ -208,6 +209,7 @@ This command will generate a ``PostFactory`` class that looks like this:
          *
          * @phpstan-method static Post&Proxy createOne(array $attributes = [])
          * @phpstan-method static Post[]&Proxy[] createMany(int $number, array|callable $attributes = [])
+         * @phpstan-method static Post[]&Proxy[] createSequence(array|callable $sequence)
          * @phpstan-method static Post&Proxy find(object|array|mixed $criteria)
          * @phpstan-method static Post&Proxy findOrCreate(array $attributes)
          * @phpstan-method static Post&Proxy first(string $sortedField = 'id')
@@ -417,6 +419,43 @@ instantiation.
 
     Attributes passed to the ``create*`` methods are merged with any attributes set via ``getDefaults()``
     and ``withAttributes()``.
+
+
+Sequences
+~~~~~~~~~
+
+Sequences help to create different objects in one call:
+
+.. code-block:: php
+
+    use App\Factory\PostFactory;
+
+    // create/persist 2 posts based on a sequence of attributes
+    PostFactory::createSequence(
+        [
+            ['name' => 'title 1'],
+            ['name' => 'title 2'],
+        ]
+    );
+
+    // create 10 posts using a sequence callback with an incremental index
+    PostFactory::createSequence(
+        function() {
+            foreach (range(1, 10) as $i) {
+                yield ['name' => "title $i"];
+            }
+        }
+    );
+
+    // sequences could also be used with a factory with states
+    $posts = PostFactory::new()
+        ->unpublished()
+        ->sequence(
+            [
+                ['name' => 'title 1'],
+                ['name' => 'title 2'],
+            ]
+        )->create();
 
 Faker
 ~~~~~
@@ -1405,6 +1444,72 @@ It is possible to use factories in
 
     For the same reason as above, it is not possible to use `Factories as Services`_ with required
     constructor arguments (the container is not yet available).
+
+.. tip::
+
+    ``ModelFactory::new()->many()`` and ``ModelFactory::new()->sequence()`` return a special ``FactoryCollection`` object
+    which can be used to generate data providers:
+
+    .. code-block:: php
+
+        use App\Factory\PostFactory;
+
+        /**
+         * @dataProvider postDataProvider
+         */
+        public function test_post_via_data_provider(PostFactory $factory): void
+        {
+            $factory->create();
+
+            // ...
+        }
+
+        public static function postDataProvider(): iterable
+        {
+            yield from PostFactory::new()->sequence(
+                [
+                    ['title' => 'foo'],
+                    ['title' => 'bar'],
+                ]
+            )->asDataProvider();
+        }
+
+    The ``FactoryCollection`` could also be passed directly to the test case in order to have several objects available in the same test:
+
+    .. code-block:: php
+
+        use App\Factory\PostFactory;
+
+        /**
+         * @dataProvider postDataProvider
+         */
+        public function test_post_via_data_provider(FactoryCollection $factoryCollection): void
+        {
+            $factoryCollection->create();
+
+            // ...
+        }
+
+        public static function postDataProvider(): iterable
+        {
+            // 3 posts will be created for the first test case
+            yield PostFactory::new()->sequence(
+                [
+                    ['title' => 'foo 1'],
+                    ['title' => 'bar 1'],
+                    ['title' => 'baz 1'],
+                ]
+            );
+
+            // 2 posts will be created for the second test case
+            yield PostFactory::new()->sequence(
+                [
+                    ['title' => 'foo 2'],
+                    ['title' => 'bar 2'],
+                ]
+            );
+        }
+
 
 Performance
 ~~~~~~~~~~~

@@ -20,7 +20,7 @@ final class FactoryCollectionTest extends TestCase
      */
     public function can_create_with_static_size(): void
     {
-        $collection = new FactoryCollection(factory(Category::class), 2);
+        $collection = FactoryCollection::set(factory(Category::class), 2);
 
         $this->assertCount(2, $collection->create());
         $this->assertCount(2, $collection->create());
@@ -34,7 +34,7 @@ final class FactoryCollectionTest extends TestCase
      */
     public function can_create_with_random_range(): void
     {
-        $collection = new FactoryCollection(factory(Category::class), 0, 3);
+        $collection = FactoryCollection::range(factory(Category::class), 0, 3);
         $counts = [];
 
         while (4 !== \count(\array_unique($counts))) {
@@ -58,6 +58,19 @@ final class FactoryCollectionTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Min must be less than max.');
 
-        new FactoryCollection(factory(Category::class), 4, 3);
+        FactoryCollection::range(factory(Category::class), 4, 3);
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_with_sequence(): void
+    {
+        $collection = FactoryCollection::sequence(factory(Category::class), [['name' => 'foo'], ['name' => 'bar']]);
+
+        $categories = $collection->create();
+        $this->assertCount(2, $categories);
+        $this->assertSame('foo', $categories[0]->getName());
+        $this->assertSame('bar', $categories[1]->getName());
     }
 }
