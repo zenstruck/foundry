@@ -15,6 +15,8 @@ use Faker;
  */
 class Factory
 {
+    private const NULL_VALUE = '__null_value';
+
     /** @var Configuration|null */
     private static $configuration;
 
@@ -96,7 +98,11 @@ class Factory
         // filter each attribute to convert proxies and factories to objects
         $mappedAttributes = [];
         foreach ($attributes as $name => $value) {
-            $mappedAttributes[$name] = $this->normalizeAttribute($value, $name);
+            $normalizedAttribute = $this->normalizeAttribute($value, $name);
+            if (self::NULL_VALUE === $normalizedAttribute) {
+                $normalizedAttribute = null;
+            }
+            $mappedAttributes[$name] = $normalizedAttribute;
         }
         $attributes = $mappedAttributes;
 
@@ -321,11 +327,16 @@ class Factory
 
         if (\is_array($value)) {
             // possible OneToMany/ManyToMany relationship
-            return \array_map(
+            return \array_filter(
+                \array_map(
+                    function($value) use ($name) {
+                        return $this->normalizeAttribute($value, $name);
+                    },
+                    $value
+                ),
                 function($value) {
-                    return $this->normalizeAttribute($value);
-                },
-                $value
+                    return self::NULL_VALUE !== $value;
+                }
             );
         }
 
@@ -340,8 +351,27 @@ class Factory
 
         // Check if the attribute is cascade persist
         if (self::configuration()->hasManagerRegistry()) {
-            $relationField = $this->relationshipField($name, $value);
-            $value->cascadePersist = $this->hasCascadePersist($value, $relationField);
+            $ownedRelationshipField = $this->ownedRelationshipField($name, $value);
+
+            if (null !== $ownedRelationshipField) {
+                $cascadePersist = $this->hasCascadePersist(null, $ownedRelationshipField);
+            } else {
+                $isCollection = false;
+                $relationshipField = $this->inverseRelationshipField($name, $value, $isCollection);
+                $cascadePersist = $this->hasCascadePersist($value, $relationshipField);
+
+                if ($this->isPersisting() && null !== $relationshipField && false === $cascadePersist) {
+                    $this->afterPersist[] = static function(Proxy $proxy) use ($value, $relationshipField, $isCollection) {
+                        $value->create([$relationshipField => $isCollection ? [$proxy] : $proxy]);
+                        $proxy->refresh();
+                    };
+
+                    // creation delegated to afterPersist event - return null here
+                    return self::NULL_VALUE;
+                }
+            }
+
+            $value->cascadePersist = $cascadePersist;
         }
 
         return $value->create()->object();
@@ -356,10 +386,10 @@ class Factory
         }
     }
 
-    private function normalizeCollection(?string $fieldName, FactoryCollection $collection): array
+    private function normalizeCollection(?string $relationName, FactoryCollection $collection): array
     {
         if ($this->isPersisting()) {
-            $field = $this->inverseRelationshipField($fieldName, $collection->factory());
+            $field = $this->inverseCollectionRelationshipField($relationName, $collection->factory());
             $cascadePersist = $this->hasCascadePersist($collection->factory(), $field);
 
             if ($field && false === $cascadePersist) {
@@ -383,7 +413,7 @@ class Factory
         );
     }
 
-    private function relationshipField(?string $relationName, self $factory): ?string
+    private function ownedRelationshipField(?string $relationName, self $factory): ?string
     {
         $factoryClass = $this->class;
         $relationClass = $factory->class;
@@ -395,37 +425,20 @@ class Factory
             return null;
         }
 
-        try {
-            // Check mappedBy side ($factory is the owner of the relation)
-            $relationClassMetadata = self::configuration()->objectManagerFor($relationClass)->getClassMetadata($relationClass);
-        } catch (\RuntimeException $e) {
-            // relation not managed - could be embeddable
-            $relationClassMetadata = null;
-        }
-
-        if (null !== $relationName && $factoryClassMetadata->hasAssociation($relationName) && \is_a($factory->class, $factoryClassMetadata->getAssociationTargetclass($relationName), true)) {
-            if ($factoryClassMetadata->isAssociationInverseSide($relationName)) {
-                $mappedBy = $factoryClassMetadata->getAssociationMappedByTargetField($relationName);
-                if (null !== $relationClassMetadata && $relationClassMetadata->hasAssociation($mappedBy) && ($relationClassMetadata->isSingleValuedAssociation($mappedBy) || $relationClassMetadata->isCollectionValuedAssociation($mappedBy)) && \is_a($factoryClass, $relationClassMetadata->getAssociationTargetClass($mappedBy), true)) {
-                    return $mappedBy;
-                }
-            } else {
+        if (null !== $relationName && $factoryClassMetadata->hasAssociation($relationName)) {
+            if (\is_a($factory->class, $factoryClassMetadata->getAssociationTargetclass($relationName), true) && !$factoryClassMetadata->isAssociationInverseSide($relationName)) {
                 return $relationName;
             }
+        } else {
+            $relationName = null;
         }
 
         foreach ($factoryClassMetadata->getAssociationNames() as $field) {
-            if (!$factoryClassMetadata->isAssociationInverseSide($field) && $factoryClassMetadata->getAssociationTargetClass($field) === $relationClass) {
-                return $field;
-            }
-        }
-
-        if (null === $relationClassMetadata) {
-            return null;
-        }
-
-        foreach ($relationClassMetadata->getAssociationNames() as $field) {
-            if (($relationClassMetadata->isSingleValuedAssociation($field) || $relationClassMetadata->isCollectionValuedAssociation($field)) && $relationClassMetadata->getAssociationTargetClass($field) === $factoryClass) {
+            if (
+                !$factoryClassMetadata->isAssociationInverseSide($field)
+                && \is_a($relationClass, $factoryClassMetadata->getAssociationTargetClass($field), true)
+                && (null === $relationName || ($factoryClassMetadata->getAssociationMapping($field)['inversedBy'] ?? null) === $relationName)
+            ) {
                 return $field;
             }
         }
@@ -433,22 +446,75 @@ class Factory
         return null; // no relationship found
     }
 
-    private function inverseRelationshipField(?string $relationName, self $factory): ?string
+    private function inverseRelationshipField(?string $relationName, self $factory, ?bool &$isCollectionValuedRelation): ?string
+    {
+        $factoryClass = $this->class;
+        $relationClass = $factory->class;
+
+        // Check inversedBy side ($this is the owner of the relation)
+        $factoryClassMetadata = self::configuration()->objectManagerFor($factoryClass)->getMetadataFactory()->getMetadataFor($factoryClass);
+
+        if (!$factoryClassMetadata instanceof ORMClassMetadata) {
+            return null;
+        }
+
+        if ($factoryClassMetadata->hasAssociation($relationName)) {
+            $relationName = $factoryClassMetadata->getAssociationMappedByTargetField($relationName) ?? null;
+        } else {
+            $relationName = null;
+        }
+
+        try {
+            // Check mappedBy side ($factory is the owner of the relation)
+            $relationClassMetadata = self::configuration()->objectManagerFor($relationClass)->getClassMetadata($relationClass);
+        } catch (\RuntimeException $e) {
+            // relation not managed - could be embeddable
+            return null;
+        }
+
+        $isCollectionValuedRelation = false;
+        foreach ($relationClassMetadata->getAssociationNames() as $field) {
+            if (
+                ($relationClassMetadata->isSingleValuedAssociation($field) || $relationClassMetadata->isCollectionValuedAssociation($field))
+                && \is_a($factoryClass, $relationClassMetadata->getAssociationTargetClass($field), true)
+                && (null === $relationName || !$relationClassMetadata instanceof ORMClassMetadata || $field === $relationName)
+            ) {
+                $isCollectionValuedRelation = $relationClassMetadata->isCollectionValuedAssociation($field);
+
+                return $field;
+            }
+        }
+
+        return null; // no relationship found
+    }
+
+    private function inverseCollectionRelationshipField(?string $relationName, self $factory): ?string
     {
         $factoryClass = $this->class;
         $collectionClass = $factory->class;
         $factoryClassMetadata = self::configuration()->objectManagerFor($factoryClass)->getMetadataFactory()->getMetadataFor($factoryClass);
         $collectionMetadata = self::configuration()->objectManagerFor($collectionClass)->getClassMetadata($collectionClass);
 
-        if (null !== $relationName && $factoryClassMetadata instanceof ORMClassMetadata && $factoryClassMetadata->hasAssociation($relationName) && \is_a($factory->class, $factoryClassMetadata->getAssociationTargetclass($relationName), true) && null !== $mappedBy = $factoryClassMetadata->getAssociationMappedByTargetField($relationName)) {
-            if ($collectionMetadata->isSingleValuedAssociation($mappedBy)) {
+        if (null !== $relationName && $factoryClassMetadata instanceof ORMClassMetadata && $factoryClassMetadata->hasAssociation($relationName)) {
+            $mappedBy = $factoryClassMetadata->getAssociationMappedByTargetField($relationName);
+            if (
+                \is_a($factory->class, $factoryClassMetadata->getAssociationTargetclass($relationName), true)
+                && null !== $mappedBy
+                && $collectionMetadata->isSingleValuedAssociation($mappedBy)
+            ) {
                 return $mappedBy;
             }
+        } else {
+            $relationName = null;
         }
 
         foreach ($collectionMetadata->getAssociationNames() as $field) {
             // ensure 1-n and associated class matches
-            if ($collectionMetadata->isSingleValuedAssociation($field) && $collectionMetadata->getAssociationTargetClass($field) === $this->class) {
+            if (
+                $collectionMetadata->isSingleValuedAssociation($field)
+                && \is_a($this->class, $collectionMetadata->getAssociationTargetClass($field), true)
+                && (!$collectionMetadata instanceof ORMClassMetadata || null === $relationName || ($collectionMetadata->getAssociationMapping($field)['inversedBy'] ?? null) === $relationName)
+            ) {
                 return $field;
             }
         }
@@ -456,22 +522,22 @@ class Factory
         return null; // no relationship found
     }
 
-    private function hasCascadePersist(self $factory, ?string $field): bool
+    private function hasCascadePersist(?self $factory, ?string $field): bool
     {
         if (null === $field) {
             return false;
         }
 
         $factoryClass = $this->class;
-        $relationClass = $factory->class;
+        $relationClass = $factory->class ?? null;
         $classMetadataFactory = self::configuration()->objectManagerFor($factoryClass)->getMetadataFactory()->getMetadataFor($factoryClass);
-        $relationClassMetadata = self::configuration()->objectManagerFor($relationClass)->getClassMetadata($relationClass);
+        $relationClassMetadata = null !== $relationClass ? self::configuration()->objectManagerFor($relationClass)->getClassMetadata($relationClass) : null;
 
-        if (!$relationClassMetadata instanceof ClassMetadataInfo || !$classMetadataFactory instanceof ClassMetadataInfo) {
+        if (!$classMetadataFactory instanceof ClassMetadataInfo) {
             return false;
         }
 
-        if ($relationClassMetadata->hasAssociation($field)) {
+        if ($relationClassMetadata instanceof ClassMetadataInfo && $relationClassMetadata->hasAssociation($field)) {
             $inversedBy = $relationClassMetadata->getAssociationMapping($field)['inversedBy'];
             if (null === $inversedBy) {
                 return false;

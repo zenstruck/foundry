@@ -8,6 +8,9 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass="Zenstruck\Foundry\Tests\Fixtures\Repository\PostRepository")
  * @ORM\Table(name="posts")
+ * @ORM\InheritanceType(value="SINGLE_TABLE")
+ * @ORM\DiscriminatorColumn(name="type")
+ * @ORM\DiscriminatorMap({"simple": Post::class, "specific": SpecificPost::class})
  */
 class Post
 {
@@ -96,6 +99,16 @@ class Post
      */
     private $lessRelevantRelatedToPost;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Post::class, inversedBy="relatedToPosts")
+     */
+    private $relatedPosts;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Post::class, mappedBy="relatedPosts")
+     */
+    private $relatedToPosts;
+
     public function __construct(string $title, string $body, ?string $shortDescription = null)
     {
         $this->title = $title;
@@ -105,6 +118,8 @@ class Post
         $this->tags = new ArrayCollection();
         $this->secondaryTags = new ArrayCollection();
         $this->comments = new ArrayCollection();
+        $this->relatedPosts = new ArrayCollection();
+        $this->relatedToPosts = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -185,6 +200,46 @@ class Post
     public function setPublishedAt(\DateTime $timestamp)
     {
         $this->publishedAt = $timestamp;
+    }
+
+    public function getRelatedPosts()
+    {
+        return $this->relatedPosts;
+    }
+
+    public function addRelatedPost(self $relatedPost)
+    {
+        if (!$this->relatedPosts->contains($relatedPost)) {
+            $this->relatedPosts[] = $relatedPost;
+        }
+    }
+
+    public function removeRelatedPost(self $relatedPost)
+    {
+        if ($this->relatedPosts->contains($relatedPost)) {
+            $this->relatedPosts->removeElement($relatedPost);
+        }
+    }
+
+    public function getRelatedToPosts()
+    {
+        return $this->relatedToPosts;
+    }
+
+    public function addRelatedToPost(self $relatedToPost)
+    {
+        if (!$this->relatedToPosts->contains($relatedToPost)) {
+            $this->relatedToPosts[] = $relatedToPost;
+            $relatedToPost->addRelatedPost($this);
+        }
+    }
+
+    public function removeRelatedToPost(self $relatedToPost)
+    {
+        if ($this->relatedToPosts->contains($relatedToPost)) {
+            $this->relatedToPosts->removeElement($relatedToPost);
+            $relatedToPost->removeRelatedPost($this);
+        }
     }
 
     public function getTags()

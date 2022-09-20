@@ -12,6 +12,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithInvalidInitialize;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithNullInitialize;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithValidInitialize;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\SpecificPostFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\TagFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\UserFactory;
 
@@ -92,6 +93,19 @@ final class ORMModelFactoryTest extends ModelFactoryTest
     /**
      * @test
      */
+    public function inverse_one_to_many_relationship_without_cascade(): void
+    {
+        UserFactory::createOne([
+            'comments' => [CommentFactory::new()],
+        ]);
+
+        UserFactory::assert()->count(1);
+        CommentFactory::assert()->count(1);
+    }
+
+    /**
+     * @test
+     */
     public function many_to_one_with_two_relationships_same_entity(): void
     {
         $post = PostFactory::createOne([
@@ -105,6 +119,62 @@ final class ORMModelFactoryTest extends ModelFactoryTest
         $this->assertSame('bar', $secondaryCategory->getName());
         PostFactory::assert()->count(1);
         CategoryFactory::assert()->count(2);
+    }
+
+    /**
+     * @test
+     */
+    public function one_to_one_relationship_polymorphic(): void
+    {
+        SpecificPostFactory::createOne([
+            'mostRelevantRelatedPost' => SpecificPostFactory::new(),
+        ]);
+
+        SpecificPostFactory::assert()->count(2);
+        PostFactory::assert()->count(2); // 2 specific
+    }
+
+    /**
+     * @test
+     */
+    public function inverse_one_to_one_relationship_polymorphic(): void
+    {
+        SpecificPostFactory::createOne([
+            'mostRelevantRelatedToPost' => SpecificPostFactory::new(),
+        ]);
+
+        SpecificPostFactory::assert()->count(2);
+        PostFactory::assert()->count(2); // 2 specific
+    }
+
+    /**
+     * @test
+     */
+    public function one_to_many_polymorphic_with_nested_collection_relationship(): void
+    {
+        $post = SpecificPostFactory::createOne([
+            'comments' => CommentFactory::new()->many(4),
+        ]);
+
+        $this->assertCount(4, $post->getComments());
+        CommentFactory::assert()->count(4);
+        SpecificPostFactory::assert()->count(1);
+        PostFactory::assert()->count(1); // 1 specific
+    }
+
+    /**
+     * @test
+     */
+    public function one_to_many_with_nested_collection_relationship_polymorphic(): void
+    {
+        $category = CategoryFactory::createOne([
+            'posts' => SpecificPostFactory::new()->many(3),
+        ]);
+
+        $this->assertCount(3, $category->getPosts());
+        CategoryFactory::assert()->count(1);
+        SpecificPostFactory::assert()->count(3);
+        PostFactory::assert()->count(3); // 3 specific
     }
 
     /**
@@ -127,6 +197,21 @@ final class ORMModelFactoryTest extends ModelFactoryTest
     /**
      * @test
      */
+    public function one_to_many_with_nested_collection_relationship_polymorphic_mixed(): void
+    {
+        $category = CategoryFactory::createOne([
+            'posts' => [PostFactory::new(), SpecificPostFactory::new()],
+        ]);
+
+        $this->assertCount(2, $category->getPosts());
+        CategoryFactory::assert()->count(1);
+        SpecificPostFactory::assert()->count(1);
+        PostFactory::assert()->count(2); // 2 posts with the specific ones
+    }
+
+    /**
+     * @test
+     */
     public function inverse_one_to_one_with_two_relationships_same_entity(): void
     {
         $post = PostFactory::createOne([
@@ -139,6 +224,22 @@ final class ORMModelFactoryTest extends ModelFactoryTest
         $this->assertSame('foo', $mostRelevantRelatedToPost->getTitle());
         $this->assertSame('bar', $lessRelevantRelatedToPost->getTitle());
         PostFactory::assert()->count(3);
+    }
+
+    /**
+     * @test
+     */
+    public function many_to_one_relationship_polymorphic(): void
+    {
+        $user = UserFactory::createOne();
+        CommentFactory::createOne([
+            'user' => $user,
+            'post' => SpecificPostFactory::new(),
+        ]);
+
+        CommentFactory::assert()->count(1);
+        SpecificPostFactory::assert()->count(1);
+        PostFactory::assert()->count(1);
     }
 
     /**
@@ -191,6 +292,34 @@ final class ORMModelFactoryTest extends ModelFactoryTest
     /**
      * @test
      */
+    public function many_to_many_with_nested_collection_relationship_polymorphic(): void
+    {
+        $post = SpecificPostFactory::createOne([
+            'relatedPosts' => SpecificPostFactory::new()->many(3),
+        ]);
+
+        $this->assertCount(3, $post->getRelatedPosts());
+        SpecificPostFactory::assert()->count(4);
+        PostFactory::assert()->count(4); // 4 posts with the specific ones
+    }
+
+    /**
+     * @test
+     */
+    public function many_to_many_with_nested_collection_relationship_polymorphic_mixed(): void
+    {
+        $post = SpecificPostFactory::createOne([
+            'relatedPosts' => [PostFactory::new(), SpecificPostFactory::new()],
+        ]);
+
+        $this->assertCount(2, $post->getRelatedPosts());
+        SpecificPostFactory::assert()->count(2);
+        PostFactory::assert()->count(3); // 3 posts with the specific ones
+    }
+
+    /**
+     * @test
+     */
     public function inverse_many_to_many_with_nested_collection_relationship(): void
     {
         $tag = TagFactory::createOne([
@@ -216,6 +345,34 @@ final class ORMModelFactoryTest extends ModelFactoryTest
         $this->assertCount(3, $tag->getSecondaryPosts());
         TagFactory::assert()->count(3); // 1 created by this test and 2 in global state
         PostFactory::assert()->count(6);
+    }
+
+    /**
+     * @test
+     */
+    public function inverse_many_to_many_with_nested_collection_relationship_polymorphic(): void
+    {
+        $post = SpecificPostFactory::createOne([
+            'relatedToPosts' => SpecificPostFactory::new()->many(3),
+        ]);
+
+        $this->assertCount(3, $post->getRelatedToPosts());
+        SpecificPostFactory::assert()->count(4);
+        PostFactory::assert()->count(4); // 4 posts with the specific ones
+    }
+
+    /**
+     * @test
+     */
+    public function inverse_many_to_many_with_nested_collection_relationship_polymorphic_mixed(): void
+    {
+        $post = SpecificPostFactory::createOne([
+            'relatedToPosts' => [PostFactory::new(), SpecificPostFactory::new()],
+        ]);
+
+        $this->assertCount(2, $post->getRelatedToPosts());
+        SpecificPostFactory::assert()->count(2);
+        PostFactory::assert()->count(3); // 3 posts with the specific ones
     }
 
     /**
