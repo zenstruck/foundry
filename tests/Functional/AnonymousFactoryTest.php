@@ -277,5 +277,21 @@ abstract class AnonymousFactoryTest extends KernelTestCase
         $this->assertSame('name2', $categories[1]->getName());
     }
 
+    /**
+     * @test
+     */
+    public function can_create_sequence(): void
+    {
+        $factory = AnonymousFactory::new($this->categoryClass());
+
+        $factory->sequence([['name' => 'foo'], ['name' => 'bar']])->create();
+
+        $categories = $factory->all();
+
+        $this->assertCount(2, $categories);
+        $this->assertSame('foo', $categories[0]->getName());
+        $this->assertSame('bar', $categories[1]->getName());
+    }
+
     abstract protected function categoryClass(): string;
 }

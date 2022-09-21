@@ -75,6 +75,19 @@ abstract class ModelFactory extends Factory
     }
 
     /**
+     * A shortcut to create multiple models, based on a sequence, without states.
+     *
+     * @param iterable<array<string, mixed>>|callable(): iterable<array<string, mixed>> $sequence
+     *
+     * @return list<TModel&Proxy<TModel>>
+     * @psalm-return list<Proxy<TModel>>
+     */
+    final public static function createSequence($sequence): array
+    {
+        return static::new()->sequence($sequence)->create();
+    }
+
+    /**
      * Try and find existing object for the given $attributes. If not found,
      * instantiate and persist.
      *
