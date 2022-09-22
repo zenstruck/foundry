@@ -63,9 +63,22 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "scripts": {
-        "auto-scripts": {
-            "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd"
-        }
+        "build:docs": [
+            "composer bin docs install",
+            "bin/tools/docs/vendor/symfony-tools/docs-builder/bin/console build:docs --fail-on-errors docs/ docs/output/"
+        ],
+        "build:fixcs": "echo TODO",
+        "build:sca": "echo TODO",
+        "test:full": [
+            "DATABASE_URL=mysql://root:root@127.0.0.1:33061/foundry MONGO_URL=mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb USE_FOUNDRY_BUNDLE=1 vendor/bin/simple-phpunit --configuration phpunit-dama-doctrine.xml.dist"
+        ],
+        "test:fast": "DATABASE_URL=sqlite:///%kernel.cache_dir%/app.db vendor/bin/simple-phpunit --configuration phpunit-dama-doctrine.xml.dist"
+    },
+    "scripts-descriptions": {
+        "build:docs": "Build documentation",
+        "build:fixcs": "Run php-cs-fixer",
+        "build:sca": "Run static code analysis",
+        "test": "Run all tests (requires docker-compose)",
+        "test:fast": "Run tests with sqlite"
     }
 }

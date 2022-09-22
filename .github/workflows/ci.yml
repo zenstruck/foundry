@@ -346,7 +346,7 @@ jobs:
           composer-options: --prefer-dist
 
       - name: Build docs
-        run: bin/build-docs
+        run: composer build:docs
 
   cs-check:
     uses: zenstruck/.github/.github/workflows/php-cs-fixer.yml@main

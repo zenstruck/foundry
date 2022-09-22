@@ -12,4 +12,3 @@
 /phpunit.xml.dist               export-ignore
 /phpunit-dama-doctrine.xml.dist export-ignore
 /psalm.xml                      export-ignore
-/run-tests                      export-ignore
