@@ -76,6 +76,74 @@ final class ORMModelFactoryTest extends ModelFactoryTest
     /**
      * @test
      */
+    public function one_to_many_with_two_relationships_same_entity(): void
+    {
+        $category = CategoryFactory::createOne([
+            'posts' => PostFactory::new()->many(4),
+            'secondaryPosts' => PostFactory::new()->many(4),
+        ]);
+
+        $this->assertCount(4, $category->getPosts());
+        $this->assertCount(4, $category->getSecondaryPosts());
+        PostFactory::assert()->count(8);
+        CategoryFactory::assert()->count(1);
+    }
+
+    /**
+     * @test
+     */
+    public function many_to_one_with_two_relationships_same_entity(): void
+    {
+        $post = PostFactory::createOne([
+            'category' => CategoryFactory::new(['name' => 'foo']),
+            'secondaryCategory' => CategoryFactory::new(['name' => 'bar']),
+        ]);
+
+        $this->assertNotNull($category = $post->getCategory());
+        $this->assertNotNull($secondaryCategory = $post->getSecondaryCategory());
+        $this->assertSame('foo', $category->getName());
+        $this->assertSame('bar', $secondaryCategory->getName());
+        PostFactory::assert()->count(1);
+        CategoryFactory::assert()->count(2);
+    }
+
+    /**
+     * @test
+     */
+    public function one_to_one_with_two_relationships_same_entity(): void
+    {
+        $post = PostFactory::createOne([
+            'mostRelevantRelatedPost' => PostFactory::new(['title' => 'foo']),
+            'lessRelevantRelatedPost' => PostFactory::new(['title' => 'bar']),
+        ]);
+
+        $this->assertNotNull($mostRelevantRelatedPost = $post->getMostRelevantRelatedPost());
+        $this->assertNotNull($lessRelevantRelatedPost = $post->getLessRelevantRelatedPost());
+        $this->assertSame('foo', $mostRelevantRelatedPost->getTitle());
+        $this->assertSame('bar', $lessRelevantRelatedPost->getTitle());
+        PostFactory::assert()->count(3);
+    }
+
+    /**
+     * @test
+     */
+    public function inverse_one_to_one_with_two_relationships_same_entity(): void
+    {
+        $post = PostFactory::createOne([
+            'mostRelevantRelatedToPost' => PostFactory::new(['title' => 'foo']),
+            'lessRelevantRelatedToPost' => PostFactory::new(['title' => 'bar']),
+        ]);
+
+        $this->assertNotNull($mostRelevantRelatedToPost = $post->getMostRelevantRelatedToPost());
+        $this->assertNotNull($lessRelevantRelatedToPost = $post->getLessRelevantRelatedToPost());
+        $this->assertSame('foo', $mostRelevantRelatedToPost->getTitle());
+        $this->assertSame('bar', $lessRelevantRelatedToPost->getTitle());
+        PostFactory::assert()->count(3);
+    }
+
+    /**
+     * @test
+     */
     public function create_multiple_one_to_many_with_nested_collection_relationship(): void
     {
         $user = UserFactory::createOne();
@@ -107,6 +175,22 @@ final class ORMModelFactoryTest extends ModelFactoryTest
     /**
      * @test
      */
+    public function many_to_many_with_two_relationships_same_entity(): void
+    {
+        $post = PostFactory::createOne([
+            'tags' => TagFactory::new()->many(3),
+            'secondaryTags' => TagFactory::new()->many(3),
+        ]);
+
+        $this->assertCount(3, $post->getTags());
+        $this->assertCount(3, $post->getSecondaryTags());
+        TagFactory::assert()->count(8); // 3 created by this test and 2 in global state
+        PostFactory::assert()->count(1);
+    }
+
+    /**
+     * @test
+     */
     public function inverse_many_to_many_with_nested_collection_relationship(): void
     {
         $tag = TagFactory::createOne([
@@ -116,6 +200,22 @@ final class ORMModelFactoryTest extends ModelFactoryTest
         $this->assertCount(3, $tag->getPosts());
         TagFactory::assert()->count(3); // 1 created by this test and 2 in global state
         PostFactory::assert()->count(3);
+    }
+
+    /**
+     * @test
+     */
+    public function inverse_many_to_many_with_two_relationships_same_entity(): void
+    {
+        $tag = TagFactory::createOne([
+            'posts' => PostFactory::new()->many(3),
+            'secondaryPosts' => PostFactory::new()->many(3),
+        ]);
+
+        $this->assertCount(3, $tag->getPosts());
+        $this->assertCount(3, $tag->getSecondaryPosts());
+        TagFactory::assert()->count(3); // 1 created by this test and 2 in global state
+        PostFactory::assert()->count(6);
     }
 
     /**
