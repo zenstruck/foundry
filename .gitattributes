@@ -9,6 +9,9 @@
 /.php-cs-fixer.dist.php         export-ignore
 /.scrutinizer.yml               export-ignore
 /.symfony.bundle.yaml           export-ignore
+/docker                         export-ignore
+/docker-compose.yaml            export-ignore
+/Makefile                       export-ignore
 /phpunit.xml.dist               export-ignore
 /phpunit-dama-doctrine.xml.dist export-ignore
 /psalm.xml                      export-ignore
