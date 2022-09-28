@@ -28,9 +28,15 @@ class Category
      */
     private $posts;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Post::class, mappedBy="secondaryCategory")
+     */
+    private $secondaryPosts;
+
     public function __construct()
     {
         $this->posts = new ArrayCollection();
+        $this->secondaryPosts = new ArrayCollection();
     }
 
     public function getId()
@@ -68,6 +74,30 @@ class Category
             // set the owning side to null (unless already changed)
             if ($post->getCategory() === $this) {
                 $post->setCategory(null);
+            }
+        }
+    }
+
+    public function getSecondaryPosts()
+    {
+        return $this->posts;
+    }
+
+    public function addSecondaryPost(Post $secondaryPost)
+    {
+        if (!$this->secondaryPosts->contains($secondaryPost)) {
+            $this->secondaryPosts[] = $secondaryPost;
+            $secondaryPost->setCategory($this);
+        }
+    }
+
+    public function removeSecondaryPost(Post $secondaryPost)
+    {
+        if ($this->secondaryPosts->contains($secondaryPost)) {
+            $this->secondaryPosts->removeElement($secondaryPost);
+            // set the owning side to null (unless already changed)
+            if ($secondaryPost->getCategory() === $this) {
+                $secondaryPost->setCategory(null);
             }
         }
     }

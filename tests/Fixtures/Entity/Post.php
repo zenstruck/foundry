@@ -55,14 +55,46 @@ class Post
     private $category;
 
     /**
+     * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="secondaryPosts")
+     * @ORM\JoinColumn(name="secondary_category_id")
+     */
+    private $secondaryCategory;
+
+    /**
      * @ORM\ManyToMany(targetEntity=Tag::class, inversedBy="posts")
      */
     private $tags;
 
     /**
+     * @ORM\ManyToMany(targetEntity=Tag::class, inversedBy="secondaryPosts")
+     * @ORM\JoinTable(name="post_tag_secondary")
+     */
+    private $secondaryTags;
+
+    /**
      * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="post")
      */
     private $comments;
+
+    /**
+     * @ORM\OneToOne(targetEntity=Post::class, inversedBy="mostRelevantRelatedToPost")
+     */
+    private $mostRelevantRelatedPost;
+
+    /**
+     * @ORM\OneToOne(targetEntity=Post::class, mappedBy="mostRelevantRelatedPost")
+     */
+    private $mostRelevantRelatedToPost;
+
+    /**
+     * @ORM\OneToOne(targetEntity=Post::class, inversedBy="lessRelevantRelatedToPost")
+     */
+    private $lessRelevantRelatedPost;
+
+    /**
+     * @ORM\OneToOne(targetEntity=Post::class, mappedBy="lessRelevantRelatedPost")
+     */
+    private $lessRelevantRelatedToPost;
 
     public function __construct(string $title, string $body, ?string $shortDescription = null)
     {
@@ -71,6 +103,7 @@ class Post
         $this->shortDescription = $shortDescription;
         $this->createdAt = new \DateTime('now');
         $this->tags = new ArrayCollection();
+        $this->secondaryTags = new ArrayCollection();
         $this->comments = new ArrayCollection();
     }
 
@@ -134,6 +167,16 @@ class Post
         $this->category = $category;
     }
 
+    public function getSecondaryCategory(): ?Category
+    {
+        return $this->secondaryCategory;
+    }
+
+    public function setSecondaryCategory(?Category $secondaryCategory)
+    {
+        $this->secondaryCategory = $secondaryCategory;
+    }
+
     public function isPublished(): bool
     {
         return null !== $this->publishedAt;
@@ -157,6 +200,25 @@ class Post
     }
 
     public function removeTag(Tag $tag)
+    {
+        if ($this->tags->contains($tag)) {
+            $this->tags->removeElement($tag);
+        }
+    }
+
+    public function getSecondaryTags()
+    {
+        return $this->secondaryTags;
+    }
+
+    public function addSecondaryTag(Tag $secondaryTag)
+    {
+        if (!$this->secondaryTags->contains($secondaryTag)) {
+            $this->secondaryTags[] = $secondaryTag;
+        }
+    }
+
+    public function removeSecondaryTag(Tag $tag)
     {
         if ($this->tags->contains($tag)) {
             $this->tags->removeElement($tag);
@@ -189,5 +251,45 @@ class Post
         }
 
         return $this;
+    }
+
+    public function getMostRelevantRelatedPost(): ?self
+    {
+        return $this->mostRelevantRelatedPost;
+    }
+
+    public function setMostRelevantRelatedPost(?self $mostRelevantRelatedPost)
+    {
+        $this->mostRelevantRelatedPost = $mostRelevantRelatedPost;
+    }
+
+    public function getMostRelevantRelatedToPost(): ?self
+    {
+        return $this->mostRelevantRelatedToPost;
+    }
+
+    public function setMostRelevantRelatedToPost(?self $mostRelevantRelatedToPost)
+    {
+        $this->mostRelevantRelatedToPost = $mostRelevantRelatedToPost;
+    }
+
+    public function getLessRelevantRelatedPost(): ?self
+    {
+        return $this->lessRelevantRelatedPost;
+    }
+
+    public function setLessRelevantRelatedPost(?self $lessRelevantRelatedPost)
+    {
+        $this->lessRelevantRelatedPost = $lessRelevantRelatedPost;
+    }
+
+    public function getLessRelevantRelatedToPost(): ?self
+    {
+        return $this->lessRelevantRelatedToPost;
+    }
+
+    public function setLessRelevantRelatedToPost(?self $lessRelevantRelatedToPost)
+    {
+        $this->lessRelevantRelatedToPost = $lessRelevantRelatedToPost;
     }
 }

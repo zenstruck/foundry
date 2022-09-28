@@ -28,9 +28,15 @@ class Tag
      */
     private $posts;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Post::class, mappedBy="secondaryTags")
+     */
+    private $secondaryPosts;
+
     public function __construct()
     {
         $this->posts = new ArrayCollection();
+        $this->secondaryPosts = new ArrayCollection();
     }
 
     public function getName(): ?string
@@ -61,6 +67,27 @@ class Tag
         if ($this->posts->contains($post)) {
             $this->posts->removeElement($post);
             $post->removeTag($this);
+        }
+    }
+
+    public function getSecondaryPosts()
+    {
+        return $this->secondaryPosts;
+    }
+
+    public function addSecondaryPost(Post $secondaryPost)
+    {
+        if (!$this->secondaryPosts->contains($secondaryPost)) {
+            $this->secondaryPosts[] = $secondaryPost;
+            $secondaryPost->addTag($this);
+        }
+    }
+
+    public function removeSecondaryPost(Post $secondaryPost)
+    {
+        if ($this->secondaryPosts->contains($secondaryPost)) {
+            $this->secondaryPosts->removeElement($secondaryPost);
+            $secondaryPost->removeTag($this);
         }
     }
 }
