@@ -296,4 +296,111 @@ December 7th, 2020 - [v1.5.0...v1.6.0](https://github.com/zenstruck/foundry/comp
 
 ## [v1.5.0](https://github.com/zenstruck/foundry/releases/tag/v1.5.0)
 
-November 10th, 2020 - _[Initial Release](https://github.com/zenstruck/foundry/commits/v1.5.0)_
+November 10th, 2020 - [v1.4.0...v1.5.0](https://github.com/zenstruck/foundry/compare/v1.4.0...v1.5.0)
+
+* 3b36c9f [minor] deprecate using snake/kebab-cased attributes (#81) by @kbond
+* 3ecd4f6 [minor] set min version of symfony/maker-bundle to 1.13.0 (#81) by @kbond
+* 3c0e149 [minor] swap phpunit for phpunit-bridge mark deprecated tests (#81) by @kbond
+* 4292d02 [bug] fix typo (#81) by @kbond
+* de1fb41 [minor] trigger deprecations for other deprecated code (#81) by @kbond
+* 5134347 [minor] deprecate "optional:" & "force:" attribute prefixes (#81) by @kbond
+* def8ebc [feature] define extra attributes/forced properties on Instantiator (#81) by @kbond
+* da504e0 [bug] boolean nodes should default to false instead of null (#83) by @kbond
+* c376fef [minor] sort available entities (#80) by @wouterj
+* d3a32cf [minor] add static return annotations (#79) by @micheh
+* 77a3583 [minor] run test suite on PostgreSQL (#51) by @kbond
+* 8db03c8 [minor] change faker lib used (#70) by @kbond
+* 188eb63 [minor] disable dependabot by @kbond
+* ea8fefe [minor] bump actions/cache from v1 to v2.1.2 (#69) by @dependabot[bot], dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+* bd5249d [minor] update shivammathur/setup-php requirement to 2.7.0 (#68) by @dependabot[bot], dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+* 800fae7 [minor] update actions/checkout requirement to v2.3.3 (#67) by @dependabot[bot], dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+* 0252e90 [minor] add dependabot for github actions by @kbond
+* 537b2fd [bug] RepositoryProxy::findOneBy() with $orderBy checks inner repo (#66) by @kbond
+* 9302855 [minor] RepositoryProxy::truncate() compatible with any ObjectManager (#66) by @kbond
+* 9fe12e5 [minor] have RepositoryProxy implement \Countable & \IteratorAggregate (#66) by @kbond
+* 1c43645 [feature] improve RespositoryProxy::first() and add last() (#64) by @mpiot
+* f9418ac [bug] add $orderBy param to RepositoryProxy::findOneBy() (#63) by @mpiot
+
+## [v1.4.0](https://github.com/zenstruck/foundry/releases/tag/v1.4.0)
+
+October 20th, 2020 - [v1.3.0...v1.4.0](https://github.com/zenstruck/foundry/compare/v1.3.0...v1.4.0)
+
+* d5cab62 [doc] fixes (#59) by @kbond
+* 4eb546c [doc] document non-Kernel testing (#59) by @kbond
+* c8040f7 [doc] document using in PHPUnit data providers (#59) by @kbond
+* fce3610 [minor] throw helpful exception if creating service factories w/o boot (#59) by @kbond
+* a904e41 [minor] throw helpful exception if using service factories w/o bundle (#59) by @kbond
+* 1efc502 [minor] throw helpful exception if using service stories without bundle (#59) by @kbond
+* a5d4154 [feature] remove ->withoutPersisting() requirement in pure unit tests (#59) by @kbond
+* aef9123 [feature] allow Factories trait to be used in pure units tests (#59) by @kbond
+* 732e616 [minor] deprecate TestState::withoutBundle() (#59) by @kbond
+* d2c8b47 [bug] ensure Foundry is "shutdown" after each test (#59) by @kbond
+* f3cc0c3 [bug] allow model factories to be created in dataProviders (#59) by @kbond
+* b80d778 [doc] adding a link to SymfonyCasts (#60) by @weaverryan
+* e37f492 [minor] add script to run all test configurations locally by @kbond
+
+## [v1.3.0](https://github.com/zenstruck/foundry/releases/tag/v1.3.0)
+
+October 14th, 2020 - [v1.2.1...v1.3.0](https://github.com/zenstruck/foundry/compare/v1.2.1...v1.3.0)
+
+* fd433b1 [feature] allow factories to be defined as services (#53) by @kbond
+* e686a08 [minor] remove dead debug code (#57) by @kbond
+* aaf6ab4 [bug] fix typo in Factory stub (fixes #52) (#57) by @kbond
+
+## [v1.2.1](https://github.com/zenstruck/foundry/releases/tag/v1.2.1)
+
+October 12th, 2020 - [v1.2.0...v1.2.1](https://github.com/zenstruck/foundry/compare/v1.2.0...v1.2.1)
+
+* ecf674a [doc] note that the ResetDatabase trait is required for global state by @kbond
+* b748615 [minor] ensure coverage jobs use dama bundle (#48) by @kbond
+* d4e3a2e [bug] sqlite does not support --if-exists (fixes #46) (#48) by @kbond
+* 1138cf0 [minor] add sqlite tests (#48) by @kbond
+* 91a6032 [minor] adjust github actions to use DATABASE_URL env var (#48) by @kbond
+
+## [v1.2.0](https://github.com/zenstruck/foundry/releases/tag/v1.2.0)
+
+October 8th, 2020 - [v1.1.4...v1.2.0](https://github.com/zenstruck/foundry/compare/v1.1.4...v1.2.0)
+
+* e7b8481 [feature] add FactoryCollection object to help with relationships (#38) by @kbond
+
+## [v1.1.4](https://github.com/zenstruck/foundry/releases/tag/v1.1.4)
+
+October 7th, 2020 - [v1.1.3...v1.1.4](https://github.com/zenstruck/foundry/compare/v1.1.3...v1.1.4)
+
+* 60e6881 [bug] allow RepositoryProxy::proxyResult() to handle doctrine proxies (#43) by @kbond
+
+## [v1.1.3](https://github.com/zenstruck/foundry/releases/tag/v1.1.3)
+
+September 28th, 2020 - [v1.1.2...v1.1.3](https://github.com/zenstruck/foundry/compare/v1.1.2...v1.1.3)
+
+* 118186d [bug] ensure all attributes passed to afterPersist events (fixes #31) (#40) by @kbond
+* f054e3c [bug] allow array callables in Proxy::executeCallback() (#39) by @kbond
+
+## [v1.1.2](https://github.com/zenstruck/foundry/releases/tag/v1.1.2)
+
+September 8th, 2020 - [v1.1.1...v1.1.2](https://github.com/zenstruck/foundry/compare/v1.1.1...v1.1.2)
+
+* fb5b4ff [minor] run php-cs-fixer self-update (#33) by @kbond
+* d734536 [minor] allow doctrine/persistence v2 (#33) by @kbond
+
+## [v1.1.1](https://github.com/zenstruck/foundry/releases/tag/v1.1.1)
+
+July 24th, 2020 - [v1.1.0...v1.1.1](https://github.com/zenstruck/foundry/compare/v1.1.0...v1.1.1)
+
+* 91af450 [doc] better document without persisting usage (closes #22) (#27) by @kbond
+* 03bce0d [minor] improve "foundry not booted" exception message (closes #24) (#28) by @kbond
+* 2d7bc47 [doc] fix test example (closes #25) (#26) by @kbond
+* 0a4fa3a Update README.md (#23) by @kbond
+* 576858a [doc] fix typo (#20) by @jdreesen
+* 331716a [doc] add packagist version badge by @kbond
+
+## [v1.1.0](https://github.com/zenstruck/foundry/releases/tag/v1.1.0)
+
+July 11th, 2020 - [v1.0.0...v1.1.0](https://github.com/zenstruck/foundry/compare/v1.0.0...v1.1.0)
+
+* 7d91e42 [minor] change composer "type" by @kbond
+* c01374a [BC BREAK] moved bundle to src root so it can be auto-configured by flex by @kbond
+
+## [v1.0.0](https://github.com/zenstruck/foundry/releases/tag/v1.0.0)
+
+July 10th, 2020 - _[Initial Release](https://github.com/zenstruck/foundry/commits/v1.0.0)_
