@@ -19,7 +19,7 @@ jobs:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
       postgres:
-        image: postgres:11
+        image: postgres:14
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: 1234
@@ -30,6 +30,7 @@ jobs:
         image: mongo:4
         ports:
           - 27017:27017
+    continue-on-error: true
     strategy:
       matrix:
         php: [7.4, 8.0, 8.1]
@@ -109,24 +110,24 @@ jobs:
       - name: 'Test: PostgreSQL'
         run: vendor/bin/simple-phpunit -v
         env:
-          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8
+          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8&serverVersion=14
 
       - name: 'Test: PostgreSQL, FoundryBundle'
         run: vendor/bin/simple-phpunit -v
         env:
           USE_FOUNDRY_BUNDLE: 1
-          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8
+          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8&serverVersion=14
 
-#      - name: 'Test: PostgreSQL, DAMABundle'
-#        run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
-#        env:
-#          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8
+      - name: 'Test: PostgreSQL, DAMABundle'
+        run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
+        env:
+          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8&serverVersion=14
 
-#      - name: 'Test: PostgreSQL, FoundryBundle, DAMABundle'
-#        run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
-#        env:
-#          USE_FOUNDRY_BUNDLE: 1
-#          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8
+      - name: 'Test: PostgreSQL, FoundryBundle, DAMABundle'
+        run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
+        env:
+          USE_FOUNDRY_BUNDLE: 1
+          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8&serverVersion=14
 
       - name: 'Test: SQLite'
         run: vendor/bin/simple-phpunit -v
@@ -186,7 +187,7 @@ jobs:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
       postgres:
-        image: postgres:11
+        image: postgres:14
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: 1234
@@ -254,24 +255,24 @@ jobs:
       - name: 'Coverage: PostgreSQL'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=postgres.clover
         env:
-          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8
+          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8&serverVersion=14
 
       - name: 'Coverage: PostgreSQL, FoundryBundle'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=postgres-foundry.clover
         env:
           USE_FOUNDRY_BUNDLE: 1
-          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8
+          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8&serverVersion=14
 
-#      - name: 'Coverage: PostgreSQL, DAMABundle'
-#        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=postgres-dama.clover --configuration phpunit-dama-doctrine.xml.dist
-#        env:
-#          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8
+      - name: 'Coverage: PostgreSQL, DAMABundle'
+        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=postgres-dama.clover --configuration phpunit-dama-doctrine.xml.dist
+        env:
+          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8&serverVersion=14
 
-#      - name: 'Coverage: PostgreSQL, FoundryBundle, DAMABundle'
-#        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=postgres-foundry-dama.clover --configuration phpunit-dama-doctrine.xml.dist
-#        env:
-#          USE_FOUNDRY_BUNDLE: 1
-#          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8
+      - name: 'Coverage: PostgreSQL, FoundryBundle, DAMABundle'
+        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=postgres-foundry-dama.clover --configuration phpunit-dama-doctrine.xml.dist
+        env:
+          USE_FOUNDRY_BUNDLE: 1
+          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8&serverVersion=14
 
       - name: 'Coverage: SQLite'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=sqlite.clover
