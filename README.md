@@ -27,6 +27,73 @@ Want to watch a screencast 🎥 about it? Check out https://symfonycasts.com/fou
 
 **[Read the Documentation](https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html)**
 
+## How to contribute
+
+The test suite of this library needs one or more database, and static analysis needs to be ran on the smaller PHP version
+supported (currently PHP 7.2), then it comes with a full docker stack.
+
+### Install docker
+
+You must [install docker](https://docs.docker.com/engine/install/) and [install docker-compose](https://docs.docker.com/compose/install/)
+at first before running the tests.
+
+### Run tests
+
+The library is shipped with a `Makefile` to run tests.
+Each target will build and start the docker stack and install composer only if needed.
+
+```shell
+$ make help
+validate                       Run fixcs, sca and full test suite
+test-full                      Run full PHPunit (MySQL + Mongo)
+test-fast                      Run PHPunit with SQLite
+test-mysql                     Run PHPunit with mysql
+test-postgresql                Run PHPunit with postgreSQL
+test-mongo                     Run PHPunit with Mongo
+fixcs                          Run PHP CS-Fixer
+sca                            Run Psalm
+docker-start                   Build and run containers
+docker-stop                    Stop containers
+docker-purge                   Purge containers
+composer                       Run composer command
+clear                          Start from a fresh install (needed if vendors have already been installed with another php version)
+```
+
+You can run each `test-*` target with a special argument `filter`:
+```shell
+$ make test-mysql filter=FactoryTest
+```
+
+which will use PHPUnit's `--filter` option.
+
+### Change docker's ports
+
+You can create a `.env` file to change the ports used by docker:
+```dotenv
+MYSQL_PORT=3307
+POSTGRES_PORT=5434
+MONGO_PORT=27018
+```
+
+### Execute commands in php container
+
+You can execute any command into the php container using docker compose:
+```shell
+$ docker-compose exec php [you commmand] # or "docker compose" depending on your docker compose version
+```
+
+### Using xdebug with PhpStorm
+
+The php container is shipped with xdebug activated. You can use step by step debugging session with PhpStorm: you should
+create a server called `FOUNDRY` in your PHP Remote Debug, with the IDE key `xdebug_foundry`
+
+![PhpStorm with xdebug](docs/phpstorm-xdebug-config.png)
+
+### Run tests without docker
+
+If for any reason docker is not available on your computer, the target `make test-fast` will run tests with your local
+php version, and sqlite will be used as database. Results may differ from the CI!
+
 ## Credit
 
 The [AAA](https://www.thephilocoder.com/unit-testing-aaa-pattern/) style of testing was first introduced to me by

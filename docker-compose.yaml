@@ -1,0 +1,69 @@
+version: '3.9'
+
+services:
+    php:
+        container_name: foundry_php
+        build:
+            context: .
+            dockerfile: ./docker/Dockerfile
+        depends_on:
+            mysql:
+                condition: service_healthy
+            postgres:
+                condition: service_healthy
+            mongo:
+                condition: service_healthy
+        volumes:
+            - .:/app
+        working_dir: /app
+        environment:
+            PHP_IDE_CONFIG: "serverName=FOUNDRY"
+
+    mysql:
+        container_name: foundry_mysql
+        image: mysql
+        command: --default-authentication-plugin=mysql_native_password
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: zenstruck_foundry
+        ports:
+            - ${MYSQL_PORT:-3306}:3306
+        healthcheck:
+            test: 'mysql -u root -proot -D zenstruck_foundry -e "SELECT 1"'
+            timeout: 120s
+            retries: 60
+            interval: 2s
+
+    postgres:
+        container_name: foundry_postgres
+        image: postgres:13
+        environment:
+            POSTGRES_DB: zenstruck_foundry
+            POSTGRES_PASSWORD: root
+            POSTGRES_USER: root
+        ports:
+            - ${POSTGRES_PORT:-5432}:5432
+        healthcheck:
+            test: /usr/bin/pg_isready
+            timeout: 10s
+            retries: 10
+
+    mongo:
+        container_name: foundry_mongo
+        image: mongo:4.4
+        tmpfs:
+            - /data
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=admin
+            - MONGO_INITDB_ROOT_PASSWORD=admin
+            - MONGO_INITDB_DATABASE=mongo
+            - MONGO_NON_ROOT_USERNAME=mongo
+            - MONGO_NON_ROOT_PASSWORD=mongo
+        ports:
+            - ${MONGO_PORT:-27017}:27017
+        volumes:
+            - ./docker/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+        healthcheck:
+            test: echo 'db.runCommand("ping").ok' | mongo mongo:27017/test --quiet
+            timeout: 10s
+            retries: 10
