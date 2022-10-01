@@ -9,3 +9,4 @@
 /tests/Fixtures/tmp
 /var/
 /docs/output/
+/.env
