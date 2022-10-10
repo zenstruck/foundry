@@ -44,7 +44,7 @@ Each target will build and start the docker stack and install composer only if n
 
 ```shell
 $ make help
-validate                       Run fixcs, sca and full test suite
+validate                       Run fixcs, sca, full test suite and validate migrations
 test-full                      Run full PHPunit (MySQL + Mongo)
 test-fast                      Run PHPunit with SQLite
 test-mysql                     Run PHPunit with mysql
@@ -52,6 +52,9 @@ test-postgresql                Run PHPunit with postgreSQL
 test-mongo                     Run PHPunit with Mongo
 fixcs                          Run PHP CS-Fixer
 sca                            Run Psalm
+database-generate-migration    Generate new migration based on mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
+database-validate-mapping      Validate mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
+database-drop-schema           Drop database schema
 docker-start                   Build and run containers
 docker-stop                    Stop containers
 docker-purge                   Purge containers
@@ -93,6 +96,10 @@ create a server called `FOUNDRY` in your PHP Remote Debug, with the IDE key `xde
 
 If for any reason docker is not available on your computer, the target `make test-fast` will run tests with your local
 php version, and sqlite will be used as database. Results may differ from the CI!
+
+## Migrations
+
+Whenever an entity in the fixtures is added or updated a migration must be generated with `make migrations-generate`
 
 ## Credit
 
