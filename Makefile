@@ -41,7 +41,7 @@ endif
 help:
 	@fgrep -h "###" $(MAKEFILE_LIST) | fgrep -v fgrep | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-validate: fixcs sca test-full ### Run fixcs, sca and full test suite
+validate: fixcs sca test-full database-validate-mapping ### Run fixcs, sca, full test suite and validate migrations
 
 test-full: docker-start vendor ### Run full PHPunit (MySQL + Mongo)
 	@$(eval filter ?= '.')
@@ -78,6 +78,20 @@ sca: docker-start bin/tools/psalm/vendor ### Run Psalm
 
 bin/tools/psalm/vendor: vendor bin/tools/psalm/composer.json bin/tools/psalm/composer.lock
 	@${DOCKER_PHP} composer bin psalm update
+
+database-generate-migration: docker-start vendor ### Generate new migration based on mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
+	@${DC_EXEC} -e DATABASE_URL=${MYSQL_URL} php vendor/bin/doctrine-migrations migrations:migrate --no-interaction --allow-no-migration # first, let's load into db existing migrations
+	@${DC_EXEC} -e DATABASE_URL=${MYSQL_URL} php vendor/bin/doctrine-migrations migrations:diff --no-interaction
+	@${DC_EXEC} -e DATABASE_URL=${MYSQL_URL} php vendor/bin/doctrine-migrations migrations:migrate --no-interaction # load the new migration
+
+database-validate-mapping: docker-start vendor database-drop-schema ### Validate mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
+	@${DC_EXEC} -e DATABASE_URL=${MYSQL_URL} php vendor/bin/doctrine-migrations migrations:migrate --no-interaction --allow-no-migration
+	@${DC_EXEC} -e DATABASE_URL=${MYSQL_URL} php bin/doctrine orm:validate-schema
+
+database-drop-schema: docker-start vendor ### Drop database schema
+	@${DC_EXEC} -e DATABASE_URL=${MYSQL_URL} php bin/doctrine orm:schema-tool:drop --force
+	@${DC_EXEC} -e DATABASE_URL=${MYSQL_URL} php vendor/bin/doctrine-migrations migrations:sync-metadata-storage # prevents the next command to fail if migrations table does not exist
+	@${DC_EXEC} -e DATABASE_URL=${MYSQL_URL} php bin/doctrine dbal:run-sql "TRUNCATE doctrine_migration_versions" --quiet
 
 vendor: composer.json $(wildcard composer.lock)
 	@${DOCKER_PHP} composer update

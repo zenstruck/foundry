@@ -398,17 +398,8 @@ jobs:
 
   docker-stack:
     name: CI with docker stack
-    strategy:
-      matrix:
-        os:
-          - ubuntu-latest
-          # - macos-latest
-          # - windows-latest
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
-      - uses: docker-practice/actions-setup-docker@master
-        if: ${{ matrix.os == 'macos-latest' }}
-
       - name: Checkout code
         uses: actions/checkout@v2.3.3
 

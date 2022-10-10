@@ -1,0 +1,14 @@
+#!/usr/bin/env php
+<?php
+
+require 'vendor/autoload.php';
+
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\ORMSetup;
+use Doctrine\ORM\Tools\Console\ConsoleRunner;
+use Doctrine\ORM\Tools\Console\EntityManagerProvider\SingleManagerProvider;
+
+$ORMconfig = ORMSetup::createAnnotationMetadataConfiguration(['/app/tests/Fixtures/Entity'], true);
+$entityManager = EntityManager::create(['memory' => true, 'url' => getenv('DATABASE_URL')], $ORMconfig);
+
+ConsoleRunner::run(new SingleManagerProvider($entityManager));
