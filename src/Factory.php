@@ -307,7 +307,7 @@ class Factory
      */
     private static function normalizeAttributes($attributes): array
     {
-        return \is_callable($attributes) ? $attributes(self::faker()) : $attributes;
+        return \is_callable($attributes) ? $attributes() : $attributes;
     }
 
     /**

@@ -73,12 +73,14 @@ final class FactoryCollection implements \IteratorAggregate
      */
     public function create($attributes = []): array
     {
-        return \array_map(
-            static function(Factory $factory) use ($attributes) {
-                return $factory->create($attributes);
-            },
-            $this->all()
-        );
+        $objects = [];
+        foreach ($this->all() as $i => $factory) {
+            $objects[] = $factory->create(
+                \is_callable($attributes) ? $attributes($i + 1) : $attributes
+            );
+        }
+
+        return $objects;
     }
 
     /**
