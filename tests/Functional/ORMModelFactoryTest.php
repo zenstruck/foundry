@@ -12,8 +12,11 @@
 namespace Zenstruck\Foundry\Tests\Functional;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Zenstruck\Foundry\Instantiator;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\AddressFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\CascadeRichCommentFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\CascadeRichPostFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CommentFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ContactFactory;
@@ -21,6 +24,8 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithInvalidInitialize;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithNullInitialize;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithValidInitialize;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\RichCommentFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\RichPostFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\SpecificPostFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\TagFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\UserFactory;
@@ -538,6 +543,102 @@ final class ORMModelFactoryTest extends ModelFactoryTest
         PostFactory::assert()->count(4);
         PostFactory::assert()->count(2, ['category' => $category]);
         self::assertSame(2, PostFactory::count(['category' => $category]));
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_factories_for_rich_domain_models(): void
+    {
+        $post = RichPostFactory::createOne([
+            'comments' => RichCommentFactory::new()->many(5),
+        ]);
+
+        RichPostFactory::assert()->count(1);
+        RichCommentFactory::assert()->count(5);
+        $this->assertCount(5, $post->getComments());
+
+        foreach (RichCommentFactory::all() as $comment) {
+            $this->assertSame($post->object(), $comment->getPost());
+        }
+
+        $post->removeComment(RichCommentFactory::first()->object());
+        $post->save();
+
+        RichPostFactory::assert()->count(1);
+        RichCommentFactory::assert()->count(4);
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_factories_for_rich_domain_models_using_force(): void
+    {
+        $post = RichPostFactory::new()->instantiateWith((new Instantiator())->alwaysForceProperties())->create([
+            'comments' => RichCommentFactory::new()->many(5),
+        ]);
+
+        RichPostFactory::assert()->count(1);
+        RichCommentFactory::assert()->count(5);
+        $this->assertCount(5, $post->getComments());
+
+        foreach (RichCommentFactory::all() as $comment) {
+            $this->assertSame($post->object(), $comment->getPost());
+        }
+
+        $post->removeComment(RichCommentFactory::first()->object());
+        $post->save();
+
+        RichPostFactory::assert()->count(1);
+        RichCommentFactory::assert()->count(4);
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_factories_for_cascade_rich_domain_models(): void
+    {
+        $post = CascadeRichPostFactory::createOne([
+            'comments' => CascadeRichCommentFactory::new()->many(5),
+        ]);
+
+        CascadeRichPostFactory::assert()->count(1);
+        CascadeRichCommentFactory::assert()->count(5);
+        $this->assertCount(5, $post->getComments());
+
+        foreach (CascadeRichCommentFactory::all() as $comment) {
+            $this->assertSame($post->object(), $comment->getPost());
+        }
+
+        $post->removeComment(CascadeRichCommentFactory::first()->object());
+        $post->save();
+
+        CascadeRichPostFactory::assert()->count(1);
+        CascadeRichCommentFactory::assert()->count(4);
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_factories_for_cascade_rich_domain_models_using_force(): void
+    {
+        $post = CascadeRichPostFactory::new()->instantiateWith((new Instantiator())->alwaysForceProperties())->create([
+            'comments' => CascadeRichCommentFactory::new()->many(5),
+        ]);
+
+        CascadeRichPostFactory::assert()->count(1);
+        CascadeRichCommentFactory::assert()->count(5);
+        $this->assertCount(5, $post->getComments());
+
+        foreach (CascadeRichCommentFactory::all() as $comment) {
+            $this->assertSame($post->object(), $comment->getPost());
+        }
+
+        $post->removeComment(CascadeRichCommentFactory::first()->object());
+        $post->save();
+
+        CascadeRichPostFactory::assert()->count(1);
+        CascadeRichCommentFactory::assert()->count(4);
     }
 
     protected function categoryClass(): string
