@@ -53,9 +53,6 @@
         }
     },
     "extra": {
-        "branch-alias": {
-            "dev-master": "1.x-dev"
-        },
         "bamarni-bin": {
             "target-directory": "bin/tools"
         }
