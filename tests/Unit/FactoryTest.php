@@ -27,7 +27,7 @@ final class FactoryTest extends TestCase
     public function can_instantiate_object(): void
     {
         $attributeArray = ['title' => 'title', 'body' => 'body'];
-        $attributeCallback = static function(Faker\Generator $faker) {
+        $attributeCallback = static function() {
             return ['title' => 'title', 'body' => 'body'];
         };
 
@@ -46,7 +46,7 @@ final class FactoryTest extends TestCase
     public function can_instantiate_many_objects_legacy(): void
     {
         $attributeArray = ['title' => 'title', 'body' => 'body'];
-        $attributeCallback = static function(Faker\Generator $faker) {
+        $attributeCallback = static function() {
             return ['title' => 'title', 'body' => 'body'];
         };
 

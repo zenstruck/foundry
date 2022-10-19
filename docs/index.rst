@@ -278,6 +278,14 @@ Using your Factory
     PostFactory::createMany(5); // returns Post[]|Proxy[]
     PostFactory::createMany(5, ['title' => 'My Title']);
 
+    // Create 5 posts with incremental title
+    PostFactory::createMany(
+        5,
+        static function(int $i) {
+            return ['title' => "Title $i"]; // "Title 1", "Title 2", ... "Title 5"
+        }
+    );
+
     // find a persisted object for the given attributes, if not found, create with the attributes
     PostFactory::findOrCreate(['title' => 'My Title']); // returns Post|Proxy
 

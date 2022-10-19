@@ -71,13 +71,13 @@ fixcs: docker-start bin/tools/cs-fixer/vendor ### Run PHP CS-Fixer
 	@${DOCKER_PHP} bin/tools/cs-fixer/vendor/friendsofphp/php-cs-fixer/php-cs-fixer --no-interaction --diff -v fix
 
 bin/tools/cs-fixer/vendor: vendor bin/tools/cs-fixer/composer.json bin/tools/cs-fixer/composer.lock
-	@${DOCKER_PHP} composer bin cs-fixer update
+	@${DOCKER_PHP} composer bin cs-fixer install
 
 sca: docker-start bin/tools/psalm/vendor ### Run Psalm
 	@${DOCKER_PHP} bin/tools/psalm/vendor/vimeo/psalm/psalm --config=./psalm.xml
 
 bin/tools/psalm/vendor: vendor bin/tools/psalm/composer.json bin/tools/psalm/composer.lock
-	@${DOCKER_PHP} composer bin psalm update
+	@${DOCKER_PHP} composer bin psalm install
 
 database-generate-migration: docker-start vendor ### Generate new migration based on mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
 	@${DC_EXEC} -e DATABASE_URL=${MYSQL_URL} php vendor/bin/doctrine-migrations migrations:migrate --no-interaction --allow-no-migration # first, let's load into db existing migrations
