@@ -332,6 +332,22 @@ abstract class ModelFactoryTest extends KernelTestCase
 
     /**
      * @test
+     */
+    public function can_create_many_objects_with_index(): void
+    {
+        $categoryFactoryClass = $this->categoryFactoryClass();
+        $categoryFactoryClass::createMany(2, static function(int $i) {
+            return [
+                'name' => "foo {$i}",
+            ];
+        });
+
+        $categoryFactoryClass::assert()->exists(['name' => 'foo 1']);
+        $categoryFactoryClass::assert()->exists(['name' => 'foo 2']);
+    }
+
+    /**
+     * @test
      * @dataProvider factoryCollectionAsDataProvider
      */
     public function can_use_factory_collection_as_data_provider(FactoryCollection $factoryCollection): void
