@@ -43,7 +43,7 @@ class Kernel extends BaseKernel
             yield new DAMADoctrineTestBundle();
         }
 
-        if ('migrate' === \getenv('FOUNDRY_RESET_MODE')) {
+        if (\getenv('USE_MIGRATIONS')) {
             yield new DoctrineMigrationsBundle();
         }
 
@@ -96,12 +96,16 @@ class Kernel extends BaseKernel
         }
 
         if (\getenv('USE_FOUNDRY_BUNDLE')) {
-            $c->loadFromExtension('zenstruck_foundry', [
-                'auto_refresh_proxies' => false,
-            ]);
+            $foundryConfig = ['auto_refresh_proxies' => false];
+
+            if (\getenv('DATABASE_URL') && \getenv('USE_MIGRATIONS')) {
+                $foundryConfig['database_resetter'] = ['orm' => ['reset_mode' => 'migrate']];
+            }
+
+            $c->loadFromExtension('zenstruck_foundry', $foundryConfig);
         }
 
-        if ('migrate' === \getenv('FOUNDRY_RESET_MODE')) {
+        if (\getenv('USE_MIGRATIONS')) {
             $c->loadFromExtension('doctrine_migrations', [
                 'migrations_paths' => [
                     'Zenstruck\Foundry\Tests\Fixtures\Migrations' => '%kernel.project_dir%/tests/Fixtures/Migrations',

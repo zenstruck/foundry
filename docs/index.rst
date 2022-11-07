@@ -1154,10 +1154,10 @@ this for you.
 Before the first test using the ``ResetDatabase`` trait, it drops (if exists) and creates the test database.
 Then, by default, before each test, it resets the schema using ``doctrine:schema:drop``/``doctrine:schema:create``.
 
-Alternatively, you can have it run your migrations instead by setting the env variable ``FOUNDRY_RESET_MODE=migrate``
-(in your ``.env.test``). When using this *mode*, before each test, the database is dropped/created and your migrations
-run (via ``doctrine:migrations:migrate``). This mode can really make your test suite slow (especially if you have a lot
-of migrations). It is highly recommended to use `DamaDoctrineTestBundle`_ to improve the
+Alternatively, you can have it run your migrations instead by modifying the ``reset_mode`` option in configuration file.
+When using this *mode*, before each test, the database is dropped/created and your migrations run (via
+``doctrine:migrations:migrate``). This mode can really make your test suite slow (especially if you have a lot of
+migrations). It is highly recommended to use `DamaDoctrineTestBundle`_ to improve the
 speed. When this bundle is enabled, the database is dropped/created and migrated only once for the suite.
 
 .. tip::
@@ -1170,15 +1170,28 @@ speed. When this bundle is enabled, the database is dropped/created and migrated
     required.
 
 By default, ``ResetDatabase`` resets the default configured connection's database and default configured object manager's
-schema. To customize the connection's and object manager's to be reset (or reset multiple connections/managers), set the
-following environment variables:
+schema. To customize the connection's and object manager's to be reset (or reset multiple connections/managers), use the
+bundle's configuration:
 
-.. code-block:: bash
+.. configuration-block::
 
-    # .env.test
+    .. code-block:: yaml
 
-    FOUNDRY_RESET_CONNECTIONS=connection1,connection2
-    FOUNDRY_RESET_OBJECT_MANAGERS=manager1,manager2
+        # config/packages/zenstruck_foundry.yaml
+        when@dev: # see Bundle Configuration section about sharing this in the test environment
+            zenstruck_foundry:
+                orm:
+                    connections:
+                        - orm_connection_1
+                        - orm_connection_2
+                    object_managers:
+                        - orm_object_manager_1
+                        - orm_object_manager_2
+                    reset_mode: schema
+                odm:
+                    object_managers:
+                        - odm_object_manager_1
+                        - odm_object_manager_2
 
 Object Proxy
 ~~~~~~~~~~~~
@@ -1920,6 +1933,27 @@ Full Default Bundle Configuration
                 # Customize the instantiator service.
                 service:              null # Example: my_instantiator
 
+            # Configure the database reset mechanism
+            database_resetter:
+
+                # Config related to ORM
+                orm:
+
+                    # Connections to reset. If empty, the default connection is used.
+                    connections: []
+
+                    # Object managers to reset. If empty, the default manager is used.
+                    object_managers: []
+
+                    # Whether to use doctrine:schema:update or migrations when resetting schema.
+                    reset_mode: schema # "schema" or "migration"
+
+                # Config related to ODM
+                odm:
+
+                    # Object managers to reset. If empty, the default manager is used.
+                    object_managers: []
+
     .. code-block:: php
 
         $config->extension('zenstruck_foundry', [
@@ -1954,5 +1988,30 @@ Full Default Bundle Configuration
 
                 // Customize the instantiator service.
                 'service' => null
+            ]
+
+            // Configure the database reset mechanism
+            'database_resetter' => [
+
+                // Config related to ORM
+                'orm' => [
+
+                    // Connections to reset. If empty, the default connection is used.
+                    'connections' => [],
+
+                    // Whether or not to allow extra attributes.
+                    'object_managers' => false,
+
+                    // Whether to use doctrine:schema:update or migrations when resetting schema.
+                    'reset_mode' => 'schema', // 'schema' or 'migration'
+                ],
+
+                // Config related to ODM
+                'odm' => [
+
+                    // Whether or not to allow extra attributes.
+                    'object_managers' => false,
+                ],
+
             ]
         ]);

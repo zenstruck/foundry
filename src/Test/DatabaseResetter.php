@@ -4,7 +4,9 @@ namespace Zenstruck\Foundry\Test;
 
 use DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
 
 /**
@@ -19,10 +21,6 @@ final class DatabaseResetter
 
     public static function hasBeenReset(): bool
     {
-        if (isset($_SERVER['FOUNDRY_DISABLE_DATABASE_RESET'])) {
-            return true;
-        }
-
         return self::$hasBeenReset;
     }
 
@@ -37,8 +35,7 @@ final class DatabaseResetter
             return;
         }
 
-        $application = self::createApplication($kernel);
-        $databaseResetter = new ORMDatabaseResetter($application, $kernel->getContainer()->get('doctrine'));
+        $databaseResetter = self::createORMDatabaseResetter(self::createApplication($kernel), $kernel);
 
         $databaseResetter->resetDatabase();
 
@@ -60,18 +57,18 @@ final class DatabaseResetter
         self::bootFoundry($kernel);
     }
 
-    /** @retrun array<SchemaResetterInterface> */
+    /** @return array<AbstractSchemaResetter> */
     private static function schemaResetters(KernelInterface $kernel): array
     {
         $application = self::createApplication($kernel);
         $databaseResetters = [];
 
         if ($kernel->getContainer()->has('doctrine')) {
-            $databaseResetters[] = new ORMDatabaseResetter($application, $kernel->getContainer()->get('doctrine'));
+            $databaseResetters[] = self::createORMDatabaseResetter($application, $kernel);
         }
 
         if ($kernel->getContainer()->has('doctrine_mongodb')) {
-            $databaseResetters[] = new ODMSchemaResetter($application, $kernel->getContainer()->get('doctrine_mongodb'));
+            $databaseResetters[] = self::createODMSchemaResetter($application, $kernel);
         }
 
         return $databaseResetters;
@@ -92,5 +89,42 @@ final class DatabaseResetter
         $application->setAutoExit(false);
 
         return $application;
+    }
+
+    private static function createORMDatabaseResetter(Application $application, KernelInterface $kernel): ORMDatabaseResetter
+    {
+        $container = $kernel->getContainer();
+        $configuration = self::getConfiguration($container);
+
+        return new ORMDatabaseResetter(
+            $application,
+            $container->get('doctrine'),
+            $configuration ? $configuration->getOrmConnectionsToReset() : [],
+            $configuration ? $configuration->getOrmObjectManagersToReset() : [],
+            $configuration ? $configuration->getOrmResetMode() : 'schema'
+        );
+    }
+
+    private static function createODMSchemaResetter(Application $application, KernelInterface $kernel): ODMSchemaResetter
+    {
+        $container = $kernel->getContainer();
+        $configuration = self::getConfiguration($container);
+
+        return new ODMSchemaResetter(
+            $application,
+            $container->get('doctrine_mongodb'),
+            $configuration ? $configuration->getOdmObjectManagersToReset() : []
+        );
+    }
+
+    private static function getConfiguration(ContainerInterface $container): ?Configuration
+    {
+        if ($container->has(Configuration::class)) {
+            return $container->get(Configuration::class);
+        }
+
+        trigger_deprecation('zenstruck\foundry', '1.23', 'Usage of foundry without the bundle is deprecated and will not be possible anymore in 2.0.');
+
+        return null;
     }
 }

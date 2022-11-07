@@ -2,6 +2,8 @@
 
 namespace Zenstruck\Foundry\Bundle\DependencyInjection;
 
+use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -34,6 +36,7 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
 
         $this->configureFaker($mergedConfig['faker'], $container);
         $this->configureDefaultInstantiator($mergedConfig['instantiator'], $container);
+        $this->configureDatabaseResetter($mergedConfig['database_resetter'], $container);
 
         if (true === $mergedConfig['auto_refresh_proxies']) {
             $container->getDefinition(Configuration::class)->addMethodCall('enableDefaultProxyAutoRefresh');
@@ -87,5 +90,39 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
         if ($config['always_force_properties']) {
             $definition->addMethodCall('alwaysForceProperties');
         }
+    }
+
+    private function configureDatabaseResetter(array $config, ContainerBuilder $container): void
+    {
+        $configurationDefinition = $container->getDefinition(Configuration::class);
+
+        if (false === $config['enabled']) {
+            $configurationDefinition->addMethodCall('disableDatabaseReset');
+        }
+
+        if (isset($config['orm']) && !self::isBundleLoaded($container, DoctrineBundle::class)) {
+            throw new \InvalidArgumentException('doctrine/doctrine-bundle should be enabled to use config under "database_resetter.orm".');
+        }
+
+        if (isset($config['odm']) && !self::isBundleLoaded($container, DoctrineMongoDBBundle::class)) {
+            throw new \InvalidArgumentException('doctrine/mongodb-odm-bundle should be enabled to use config under "database_resetter.odm".');
+        }
+
+        $configurationDefinition->setArgument('$ormConnectionsToReset', $config['orm']['connections'] ?? []);
+        $configurationDefinition->setArgument('$ormObjectManagersToReset', $config['orm']['object_managers'] ?? []);
+        $configurationDefinition->setArgument('$ormResetMode', $config['orm']['reset_mode'] ?? 'schema');
+        $configurationDefinition->setArgument('$odmObjectManagersToReset', $config['odm']['object_managers'] ?? []);
+    }
+
+    /**
+     * @psalm-suppress UndefinedDocblockClass
+     */
+    private static function isBundleLoaded(ContainerBuilder $container, string $bundleName): bool
+    {
+        return \in_array(
+            $bundleName,
+            \is_array($bundles = $container->getParameter('kernel.bundles')) ? $bundles : [],
+            true
+        );
     }
 }

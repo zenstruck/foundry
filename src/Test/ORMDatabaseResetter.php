@@ -14,11 +14,29 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
     private $application;
     /** @var ManagerRegistry */
     private $registry;
+    /** @var list<string> */
+    private $connectionsToReset;
+    /** @var list<string> */
+    private $objectManagersToReset;
+    /** @var string */
+    private $resetMode;
 
-    public function __construct(Application $application, ManagerRegistry $registry)
+    /**
+     * @param list<string> $connectionsToReset
+     * @param list<string> $objectManagersToReset
+     */
+    public function __construct(Application $application, ManagerRegistry $registry, array $connectionsToReset, array $objectManagersToReset, string $resetMode)
     {
         $this->application = $application;
         $this->registry = $registry;
+
+        self::validateObjectsToReset('connection', \array_keys($registry->getConnectionNames()), $connectionsToReset);
+        $this->connectionsToReset = $connectionsToReset;
+
+        self::validateObjectsToReset('object manager', \array_keys($registry->getManagerNames()), $objectManagersToReset);
+        $this->objectManagersToReset = $objectManagersToReset;
+
+        $this->resetMode = $resetMode;
     }
 
     public function resetDatabase(): void
@@ -40,7 +58,7 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
 
     private function createSchema(): void
     {
-        if (self::isResetUsingMigrations()) {
+        if ($this->isResetUsingMigrations()) {
             $this->runCommand($this->application, 'doctrine:migrations:migrate', ['-n' => true]);
 
             return;
@@ -59,7 +77,7 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
 
     private function dropSchema(): void
     {
-        if (self::isResetUsingMigrations()) {
+        if ($this->isResetUsingMigrations()) {
             $this->dropAndResetDatabase();
 
             return;
@@ -103,24 +121,34 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
     private function connectionsToReset(): array
     {
         if (isset($_SERVER['FOUNDRY_RESET_CONNECTIONS'])) {
+            trigger_deprecation('zenstruck\foundry', '1.23', 'Usage of environment variable "FOUNDRY_RESET_CONNECTIONS" is deprecated. Please use bundle configuration: "database_resetter.orm.connections: true".');
+
             return \explode(',', $_SERVER['FOUNDRY_RESET_CONNECTIONS']);
         }
 
-        return [$this->registry->getDefaultConnectionName()];
+        return $this->connectionsToReset ?: [$this->registry->getDefaultConnectionName()];
     }
 
     /** @return list<string> */
     private function objectManagersToReset(): array
     {
         if (isset($_SERVER['FOUNDRY_RESET_OBJECT_MANAGERS'])) {
+            trigger_deprecation('zenstruck\foundry', '1.23', 'Usage of environment variable "FOUNDRY_RESET_OBJECT_MANAGERS" is deprecated. Please use bundle configuration: "database_resetter.orm.object_managers: true".');
+
             return \explode(',', $_SERVER['FOUNDRY_RESET_OBJECT_MANAGERS']);
         }
 
-        return [$this->registry->getDefaultManagerName()];
+        return $this->objectManagersToReset ?: [$this->registry->getDefaultManagerName()];
     }
 
-    private static function isResetUsingMigrations(): bool
+    private function isResetUsingMigrations(): bool
     {
-        return 'migrate' === ($_SERVER['FOUNDRY_RESET_MODE'] ?? 'schema');
+        if (isset($_SERVER['FOUNDRY_RESET_MODE'])) {
+            trigger_deprecation('zenstruck\foundry', '1.23', 'Usage of environment variable "FOUNDRY_RESET_MODE" is deprecated. Please use bundle configuration: "database_resetter.orm.reset_mode: true".');
+
+            return 'migrate' === $_SERVER['FOUNDRY_RESET_MODE'];
+        }
+
+        return 'migrate' === $this->resetMode;
     }
 }

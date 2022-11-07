@@ -11,6 +11,10 @@
         </service>
 
         <service id="Zenstruck\Foundry\Configuration" public="true">
+            <argument></argument> <!-- $ormConnectionsToReset -->
+            <argument></argument> <!-- $ormObjectManagersToReset -->
+            <argument></argument> <!-- $ormResetMode -->
+            <argument></argument> <!-- $odmObjectManagersToReset -->
             <call method="setManagerRegistry">
                 <argument type="service" id="Zenstruck\Foundry\ChainManagerRegistry" />
             </call>

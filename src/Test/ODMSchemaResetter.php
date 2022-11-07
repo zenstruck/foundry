@@ -14,11 +14,16 @@ final class ODMSchemaResetter extends AbstractSchemaResetter
     private $application;
     /** @var ManagerRegistry */
     private $registry;
+    /** @var list<string> */
+    private $objectManagersToReset;
 
-    public function __construct(Application $application, ManagerRegistry $registry)
+    public function __construct(Application $application, ManagerRegistry $registry, array $objectManagersToReset)
     {
         $this->application = $application;
         $this->registry = $registry;
+
+        self::validateObjectsToReset('object manager', \array_keys($registry->getManagerNames()), $objectManagersToReset);
+        $this->objectManagersToReset = $objectManagersToReset;
     }
 
     public function resetSchema(): void
@@ -48,6 +53,6 @@ final class ODMSchemaResetter extends AbstractSchemaResetter
     /** @return list<string> */
     private function objectManagersToReset(): array
     {
-        return [$this->registry->getDefaultManagerName()];
+        return $this->objectManagersToReset ?: [$this->registry->getDefaultManagerName()];
     }
 }
