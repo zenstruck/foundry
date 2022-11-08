@@ -35,12 +35,32 @@ final class Configuration
     /** @var bool */
     private $flushEnabled = true;
 
-    public function __construct()
+    /** @var bool */
+    private $databaseResetEnabled = true;
+
+    /** @var list<string> */
+    private $ormConnectionsToReset;
+
+    /** @var list<string> */
+    private $ormObjectManagersToReset;
+
+    /** @var string */
+    private $ormResetMode;
+
+    /** @var list<string> */
+    private $odmObjectManagersToReset;
+
+    public function __construct(array $ormConnectionsToReset, array $ormObjectManagersToReset, string $ormResetMode, array $odmObjectManagersToReset)
     {
         $this->stories = new StoryManager([]);
         $this->factories = new ModelFactoryManager([]);
         $this->faker = Faker\Factory::create();
         $this->instantiator = new Instantiator();
+
+        $this->ormConnectionsToReset = $ormConnectionsToReset;
+        $this->ormObjectManagersToReset = $ormObjectManagersToReset;
+        $this->ormResetMode = $ormResetMode;
+        $this->odmObjectManagersToReset = $odmObjectManagersToReset;
     }
 
     public function stories(): StoryManager
@@ -132,6 +152,18 @@ final class Configuration
         return $this->flushEnabled;
     }
 
+    public function disableDatabaseReset(): self
+    {
+        $this->databaseResetEnabled = false;
+
+        return $this;
+    }
+
+    public function isDatabaseResetEnabled(): bool
+    {
+        return $this->databaseResetEnabled;
+    }
+
     public function delayFlush(callable $callback): void
     {
         $this->flushEnabled = false;
@@ -185,6 +217,26 @@ final class Configuration
     public function hasManagerRegistry(): bool
     {
         return null !== $this->managerRegistry;
+    }
+
+    public function getOrmConnectionsToReset(): array
+    {
+        return $this->ormConnectionsToReset;
+    }
+
+    public function getOrmObjectManagersToReset(): array
+    {
+        return $this->ormObjectManagersToReset;
+    }
+
+    public function getOrmResetMode(): string
+    {
+        return $this->ormResetMode;
+    }
+
+    public function getOdmObjectManagersToReset(): array
+    {
+        return $this->odmObjectManagersToReset;
     }
 
     private function managerRegistry(): ManagerRegistry

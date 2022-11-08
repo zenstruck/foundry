@@ -73,7 +73,7 @@ final class TestState
 
     public static function bootFoundry(?Configuration $configuration = null): void
     {
-        $configuration = $configuration ?? new Configuration();
+        $configuration = $configuration ?? new Configuration([], [], 'schema', []);
 
         if (self::$instantiator) {
             $configuration->setInstantiator(self::$instantiator);
@@ -121,7 +121,7 @@ final class TestState
             return;
         }
 
-        $configuration = new Configuration();
+        $configuration = new Configuration([], [], 'schema', []);
 
         try {
             $configuration->setManagerRegistry(self::initializeChainManagerRegistry($container));

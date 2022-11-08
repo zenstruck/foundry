@@ -4,6 +4,9 @@ namespace Zenstruck\Foundry\Test;
 
 use DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Zenstruck\Foundry\Configuration;
 
 /**
  * @mixin KernelTestCase
@@ -18,23 +21,22 @@ trait ResetDatabase
      */
     public static function _resetDatabase(): void
     {
-        if (DatabaseResetter::hasBeenReset()) {
-            return;
-        }
-
         if (!\is_subclass_of(static::class, KernelTestCase::class)) {
             throw new \RuntimeException(\sprintf('The "%s" trait can only be used on TestCases that extend "%s".', __TRAIT__, KernelTestCase::class));
         }
 
         if ($isDAMADoctrineTestBundleEnabled = DatabaseResetter::isDAMADoctrineTestBundleEnabled()) {
             // disable static connections for this operation
+            // :warning: the kernel should not be booted before calling this!
             StaticDriver::setKeepStaticConnections(false);
         }
 
         $kernel = static::createKernel();
         $kernel->boot();
 
-        DatabaseResetter::resetDatabase($kernel);
+        if (self::shouldReset($kernel)) {
+            DatabaseResetter::resetDatabase($kernel);
+        }
 
         if ($isDAMADoctrineTestBundleEnabled) {
             // re-enable static connections
@@ -60,5 +62,33 @@ trait ResetDatabase
         DatabaseResetter::resetSchema($kernel);
 
         $kernel->shutdown();
+    }
+
+    private static function shouldReset(KernelInterface $kernel): bool
+    {
+        if (isset($_SERVER['FOUNDRY_DISABLE_DATABASE_RESET'])) {
+            trigger_deprecation('zenstruck\foundry', '1.23', 'Usage of environment variable "FOUNDRY_DISABLE_DATABASE_RESET" is deprecated. Please use bundle configuration: "database_resetter.disabled: true".');
+
+            return false;
+        }
+
+        $configuration = self::getConfiguration($kernel->getContainer());
+
+        if ($configuration && !$configuration->isDatabaseResetEnabled()) {
+            return false;
+        }
+
+        return !DatabaseResetter::hasBeenReset();
+    }
+
+    private static function getConfiguration(ContainerInterface $container): ?Configuration
+    {
+        if ($container->has(Configuration::class)) {
+            return $container->get(Configuration::class);
+        }
+
+        trigger_deprecation('zenstruck\foundry', '1.23', 'Usage of foundry without the bundle is deprecated and will not be possible anymore in 2.0.');
+
+        return null;
     }
 }
