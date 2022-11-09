@@ -68,6 +68,8 @@ final class TestState
 
     public static function addGlobalState(callable $callback): void
     {
+        trigger_deprecation('zenstruck\foundry', '1.23', 'Usage of TestState::addGlobalState() is deprecated. Please use bundle configuration under "global_state" key.');
+
         self::$globalStates[] = $callback;
     }
 
@@ -103,7 +105,7 @@ final class TestState
      */
     public static function bootFactory(Configuration $configuration): Configuration
     {
-        trigger_deprecation('zenstruck\foundry', '1.4.0', 'TestState::bootFactory() is deprecated, use TestState::bootFoundry().');
+        trigger_deprecation('zenstruck/foundry', '1.4.0', 'TestState::bootFactory() is deprecated, use TestState::bootFoundry().');
 
         self::bootFoundry($configuration);
 
@@ -158,12 +160,18 @@ final class TestState
     /**
      * @internal
      */
-    public static function flushGlobalState(): void
+    public static function flushGlobalState(?GlobalStateRegistry $globalStateRegistry): void
     {
         StoryManager::globalReset();
 
         foreach (self::$globalStates as $callback) {
             $callback();
+        }
+
+        if ($globalStateRegistry) {
+            foreach ($globalStateRegistry->getGlobalStates() as $callback) {
+                $callback();
+            }
         }
 
         StoryManager::setGlobalState();

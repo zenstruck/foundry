@@ -76,11 +76,15 @@ final class DatabaseResetter
 
     private static function bootFoundry(KernelInterface $kernel): void
     {
+        $container = $kernel->getContainer();
+
         if (!Factory::isBooted()) {
-            TestState::bootFromContainer($kernel->getContainer());
+            TestState::bootFromContainer($container);
         }
 
-        TestState::flushGlobalState();
+        TestState::flushGlobalState(
+            $container->has(GlobalStateRegistry::class) ? $container->get(GlobalStateRegistry::class) : null
+        );
     }
 
     private static function createApplication(KernelInterface $kernel): Application

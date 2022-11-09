@@ -34,6 +34,12 @@ trait ResetDatabase
         $kernel = static::createKernel();
         $kernel->boot();
 
+        try {
+            $kernel->getBundle('ZenstruckFoundryBundle');
+        } catch (\InvalidArgumentException $exception) {
+            trigger_deprecation('zenstruck\foundry', '1.23', 'Usage of ResetDatabase trait without Foundry bundle is deprecated and will create an error in 2.0.');
+        }
+
         if (self::shouldReset($kernel)) {
             DatabaseResetter::resetDatabase($kernel);
         }

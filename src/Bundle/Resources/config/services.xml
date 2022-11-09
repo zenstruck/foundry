@@ -53,5 +53,8 @@
         <service id="Zenstruck\Foundry\ChainManagerRegistry">
             <argument/> <!-- list<ManagerRegistry> set by compiler pass -->
         </service>
+
+        <service id="Zenstruck\Foundry\Test\GlobalStateRegistry" public="true">
+        </service>
     </services>
 </container>

@@ -1397,29 +1397,21 @@ Both object proxies and your ModelFactory have helpful PHPUnit assertions:
 Global State
 ~~~~~~~~~~~~
 
-If you have an initial database state you want for all tests, you can set this in your ``tests/bootstrap.php``:
+If you have an initial database state you want for all tests, you can set this in the config of the bundle. Accepted
+values are: stories as service, "global" stories and invokable services.
 
-.. code-block:: php
+.. configuration-block::
 
-    // tests/bootstrap.php
-    // ...
+    .. code-block:: yaml
 
-    Zenstruck\Foundry\Test\TestState::addGlobalState(function () {
-        CategoryFactory::createOne(['name' => 'php']);
-        CategoryFactory::createOne(['name' => 'symfony']);
-    });
-
-To avoid your bootstrap file from becoming too complex, it is best to wrap your global state into a
-:ref:`Story <stories>`:
-
-.. code-block:: php
-
-    // tests/bootstrap.php
-    // ...
-
-    Zenstruck\Foundry\Test\TestState::addGlobalState(function () {
-        GlobalStory::load();
-    });
+        # config/packages/zenstruck_foundry.yaml
+        when@test: # see Bundle Configuration section about sharing this in the test environment
+            zenstruck_foundry:
+                global_state:
+                    - App\Stories\StoryThatIsAService
+                    - App\Stories\GlobalStory
+                    - invokable.service # just a service with ::invoke()
+                    - ...
 
 .. note::
 
@@ -1954,6 +1946,9 @@ Full Default Bundle Configuration
                     # Object managers to reset. If empty, the default manager is used.
                     object_managers: []
 
+            # Add global state.
+            global_state: []
+
     .. code-block:: php
 
         $config->extension('zenstruck_foundry', [
@@ -2012,6 +2007,9 @@ Full Default Bundle Configuration
                     // Whether or not to allow extra attributes.
                     'object_managers' => false,
                 ],
+
+                // Add global state
+                'global_state' => []
 
             ]
         ]);

@@ -15,7 +15,11 @@ use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryServiceFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Stories\ODMTagStory;
+use Zenstruck\Foundry\Tests\Fixtures\Stories\ODMTagStoryAsAService;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\ServiceStory;
+use Zenstruck\Foundry\Tests\Fixtures\Stories\TagStory;
+use Zenstruck\Foundry\Tests\Fixtures\Stories\TagStoryAsInvokableService;
 use Zenstruck\Foundry\ZenstruckFoundryBundle;
 
 /**
@@ -55,6 +59,7 @@ class Kernel extends BaseKernel
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
     {
         $c->register(Service::class);
+        $c->register(TagStoryAsInvokableService::class);
         $c->register(ServiceStory::class)
             ->setAutoconfigured(true)
             ->setAutowired(true)
@@ -97,10 +102,23 @@ class Kernel extends BaseKernel
 
         if (\getenv('USE_FOUNDRY_BUNDLE')) {
             $foundryConfig = ['auto_refresh_proxies' => false];
+            $globalState = [];
 
-            if (\getenv('DATABASE_URL') && \getenv('USE_MIGRATIONS')) {
-                $foundryConfig['database_resetter'] = ['orm' => ['reset_mode' => 'migrate']];
+            if (\getenv('DATABASE_URL')) {
+                $globalState[] = TagStory::class;
+                $globalState[] = TagStoryAsInvokableService::class;
+
+                if (\getenv('USE_MIGRATIONS')) {
+                    $foundryConfig['database_resetter'] = ['orm' => ['reset_mode' => 'migrate']];
+                }
             }
+
+            if (\getenv('MONGO_URL') && !\getenv('USE_DAMA_DOCTRINE_TEST_BUNDLE')) {
+                $globalState[] = ODMTagStory::class;
+                $globalState[] = ODMTagStoryAsAService::class;
+            }
+
+            $foundryConfig['global_state'] = $globalState;
 
             $c->loadFromExtension('zenstruck_foundry', $foundryConfig);
         }
