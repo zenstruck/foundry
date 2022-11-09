@@ -126,6 +126,10 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('global_state')
+                    ->scalarPrototype()->end()
+                    ->info('Array of stories that should be used as global state.')
+                ->end()
             ->end()
         ;
 

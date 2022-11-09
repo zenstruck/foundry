@@ -3,12 +3,9 @@
 namespace Zenstruck\Foundry\Tests\Fixtures\Stories;
 
 use Zenstruck\Foundry\Story;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\TagFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\TagFactory;
 
-/**
- * @author Kevin Bond <kevinbond@gmail.com>
- */
-final class TagStory extends Story
+final class ODMTagStory extends Story
 {
     public function build(): void
     {

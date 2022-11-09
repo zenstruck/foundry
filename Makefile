@@ -65,7 +65,7 @@ test-postgresql: docker-start vendor ### Run PHPunit with postgreSQL
 
 test-mongo: docker-start vendor ### Run PHPunit with Mongo
 	@$(eval filter ?= '.')
-	@${DC_EXEC} -e MONGO_URL=${MONGO_URL} php vendor/bin/simple-phpunit --configuration phpunit.xml.dist --filter=$(filter)
+	@${DC_EXEC} -e USE_FOUNDRY_BUNDLE=1 -e MONGO_URL=${MONGO_URL} php vendor/bin/simple-phpunit --configuration phpunit.xml.dist --filter=$(filter)
 
 fixcs: docker-start bin/tools/cs-fixer/vendor ### Run PHP CS-Fixer
 	@${DOCKER_PHP} bin/tools/cs-fixer/vendor/friendsofphp/php-cs-fixer/php-cs-fixer --no-interaction --diff -v fix

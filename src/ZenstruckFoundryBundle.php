@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Zenstruck\Foundry\Bundle\DependencyInjection\ChainManagerRegistryPass;
+use Zenstruck\Foundry\Bundle\DependencyInjection\GlobalStatePass;
 use Zenstruck\Foundry\Bundle\DependencyInjection\ZenstruckFoundryExtension;
 
 /**
@@ -27,6 +28,7 @@ final class ZenstruckFoundryBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new ChainManagerRegistryPass());
+        $container->addCompilerPass(new GlobalStatePass());
     }
 
     protected function createContainerExtension(): ?ExtensionInterface
