@@ -18,6 +18,10 @@ abstract class MakerTestCase extends KernelTestCase
         if (!\getenv('USE_FOUNDRY_BUNDLE')) {
             $this->markTestSkipped('ZenstruckFoundryBundle not enabled.');
         }
+
+        if (!\getenv('DOCTRINE_URL') && !\getenv('MONGO_URL')) {
+            $this->markTestSkipped('Generating factories for classes not managed by doctrine is not supported.');
+        }
     }
 
     /**

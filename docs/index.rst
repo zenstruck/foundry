@@ -1609,9 +1609,7 @@ Foundry can be used in standard PHPUnit unit tests (TestCase's that just extend 
 ``Symfony\Bundle\FrameworkBundle\Test\KernelTestCase``). These tests still require using the ``Factories`` trait to boot
 Foundry but will not have doctrine available. Factories created in these tests will not be persisted (calling
 ``->withoutPersisting()`` is not necessary). Because the bundle is not available in these tests,
-any bundle configuration you have will not be picked up. You will need to add
-`Test-Only Configuration`_. Unfortunately, this may mean duplicating your bundle configuration
-here.
+any bundle configuration you have will not be picked up.
 
 .. code-block:: php
 
@@ -1631,6 +1629,21 @@ here.
         }
     }
 
+You will need to configure manually Foundry. Unfortunately, this may mean duplicating your bundle configuration here.
+
+.. code-block:: php
+
+    // tests/bootstrap.php
+    // ...
+
+    Zenstruck\Foundry\Test\TestState::configure(
+        instantiator: (new Zenstruck\Foundry\Instantiator())
+            ->withoutConstructor()
+            ->allowExtraAttributes()
+            ->alwaysForceProperties(),
+        faker: Faker\Factory::create('fr_FR')
+    );
+
 .. note::
 
     `Factories as Services`_ and `Stories as Services`_ with required
@@ -1638,45 +1651,15 @@ here.
     The easiest work-around is to make the test an instance of ``Symfony\Bundle\FrameworkBundle\Test\KernelTestCase`` so the
     container is available.
 
-Test-Only Configuration
-~~~~~~~~~~~~~~~~~~~~~~~
+Using in Unit Tests
+~~~~~~~~~~~~~~~~~~~
 
-Foundry can be configured statically, with pure PHP, in your ``tests/bootstrap.php``. This is useful if you have a mix
-of Kernel and `non-Kernel tests`_ or if `Using Without the Bundle`_:
+When using foundry in unit tests, by using ``PHPUnit\Framework\TestCase``, Foundry simply creates the object instancies
+but does not try to persist them (this is also true for any object not managed by Doctrine).
 
-.. code-block:: php
+You can still configure Foundry statically:
 
-    // tests/bootstrap.php
-    // ...
 
-    // configure a default instantiator
-    Zenstruck\Foundry\Test\TestState::setInstantiator(
-        (new Zenstruck\Foundry\Instantiator())
-            ->withoutConstructor()
-            ->allowExtraAttributes()
-            ->alwaysForceProperties()
-    );
-
-    // configure a custom faker
-    Zenstruck\Foundry\Test\TestState::setFaker(Faker\Factory::create('fr_FR'));
-
-    // enable auto-refreshing "globally"
-    Zenstruck\Foundry\Test\TestState::enableDefaultProxyAutoRefresh();
-
-    // disable auto-refreshing "globally"
-    Zenstruck\Foundry\Test\TestState::disableDefaultProxyAutoRefresh();
-
-.. note::
-
-    If using `bundle configuration`_ as well, *test-only configuration* will override the
-    bundle configuration.
-
-Using without the Bundle
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-The provided bundle is not strictly required to use Foundry for tests. You can have all your factories, stories, and
-configuration live in your ``tests/`` directory. You can configure foundry with
-`Test-Only Configuration`_.
 
 .. _stories:
 

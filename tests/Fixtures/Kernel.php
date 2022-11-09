@@ -29,11 +29,27 @@ class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
 
+    /** @var string|null */
+    private $databaseUrl;
+    /** @var string|null */
+    private $mongoUrl;
+
+    public function __construct(
+        bool $useDatabase = true
+    ) {
+        if ($useDatabase) {
+            $this->databaseUrl = \getenv('DATABASE_URL') ?: null;
+            $this->mongoUrl = \getenv('MONGO_URL') ?: null;
+        }
+
+        parent::__construct('test', true);
+    }
+
     public function registerBundles(): iterable
     {
         yield new FrameworkBundle();
 
-        if (\getenv('DATABASE_URL')) {
+        if ($this->databaseUrl) {
             yield new DoctrineBundle();
         }
 
@@ -51,9 +67,17 @@ class Kernel extends BaseKernel
             yield new DoctrineMigrationsBundle();
         }
 
-        if (\getenv('MONGO_URL')) {
+        if ($this->mongoUrl) {
             yield new DoctrineMongoDBBundle();
         }
+    }
+
+    public function getCacheDir(): string
+    {
+        return \sprintf(
+            "{$this->getProjectDir()}/var/cache/test/%s",
+            \md5(\json_encode([$this->databaseUrl, $this->mongoUrl]))
+        );
     }
 
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
@@ -78,7 +102,7 @@ class Kernel extends BaseKernel
             'test' => true,
         ]);
 
-        if (\getenv('DATABASE_URL')) {
+        if ($this->databaseUrl) {
             $c->loadFromExtension(
                 'doctrine',
                 [
@@ -104,7 +128,7 @@ class Kernel extends BaseKernel
             $foundryConfig = ['auto_refresh_proxies' => false];
             $globalState = [];
 
-            if (\getenv('DATABASE_URL')) {
+            if ($this->databaseUrl) {
                 $globalState[] = TagStory::class;
                 $globalState[] = TagStoryAsInvokableService::class;
 
@@ -113,7 +137,7 @@ class Kernel extends BaseKernel
                 }
             }
 
-            if (\getenv('MONGO_URL') && !\getenv('USE_DAMA_DOCTRINE_TEST_BUNDLE')) {
+            if ($this->mongoUrl && !\getenv('USE_DAMA_DOCTRINE_TEST_BUNDLE')) {
                 $globalState[] = ODMTagStory::class;
                 $globalState[] = ODMTagStoryAsAService::class;
             }
@@ -131,7 +155,7 @@ class Kernel extends BaseKernel
             ]);
         }
 
-        if (\getenv('MONGO_URL')) {
+        if ($this->mongoUrl) {
             $c->loadFromExtension('doctrine_mongodb', [
                 'connections' => [
                     'default' => ['server' => '%env(resolve:MONGO_URL)%'],

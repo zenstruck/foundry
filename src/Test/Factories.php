@@ -19,7 +19,7 @@ trait Factories
     public static function _setUpFactories(): void
     {
         if (!\is_subclass_of(static::class, KernelTestCase::class)) {
-            TestState::bootFoundry();
+            TestState::bootFoundryForUnitTest();
 
             return;
         }

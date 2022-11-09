@@ -9,6 +9,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Zenstruck\Foundry\ChainManagerRegistry;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\Instantiator;
 use Zenstruck\Foundry\StoryManager;
 
 /**
@@ -28,23 +29,43 @@ final class TestState
     /** @var callable[] */
     private static $globalStates = [];
 
+    /**
+     * @deprecated Use TestState::configure()
+     */
     public static function setInstantiator(callable $instantiator): void
     {
+        trigger_deprecation('zenstruck\foundry', '1.23', 'Usage of TestState::setInstantiator() is deprecated. Please use TestState::configure().');
+
         self::$instantiator = $instantiator;
     }
 
+    /**
+     * @deprecated Use TestState::configure()
+     */
     public static function setFaker(Faker\Generator $faker): void
     {
+        trigger_deprecation('zenstruck\foundry', '1.23', 'Usage of TestState::setFaker() is deprecated. Please use TestState::configure().');
+
         self::$faker = $faker;
     }
 
+    /**
+     * @deprecated Use bundle configuration
+     */
     public static function enableDefaultProxyAutoRefresh(): void
     {
+        trigger_deprecation('zenstruck\foundry', '1.23', 'Usage of TestState::enableDefaultProxyAutoRefresh() is deprecated. Please use bundle configuration under "auto_refresh_proxies" key.');
+
         self::$defaultProxyAutoRefresh = true;
     }
 
+    /**
+     * @deprecated Use bundle configuration
+     */
     public static function disableDefaultProxyAutoRefresh(): void
     {
+        trigger_deprecation('zenstruck\foundry', '1.23', 'Usage of TestState::disableDefaultProxyAutoRefresh() is deprecated. Please use bundle configuration under "auto_refresh_proxies" key.');
+
         self::$defaultProxyAutoRefresh = false;
     }
 
@@ -66,6 +87,9 @@ final class TestState
         trigger_deprecation('zenstruck\foundry', '1.4.0', 'TestState::withoutBundle() is deprecated, the bundle is now auto-detected.');
     }
 
+    /**
+     * @deprecated Use bundle configuration under "global_state" key
+     */
     public static function addGlobalState(callable $callback): void
     {
         trigger_deprecation('zenstruck\foundry', '1.23', 'Usage of TestState::addGlobalState() is deprecated. Please use bundle configuration under "global_state" key.');
@@ -73,9 +97,12 @@ final class TestState
         self::$globalStates[] = $callback;
     }
 
-    public static function bootFoundry(?Configuration $configuration = null): void
+    /**
+     * @internal
+     */
+    public static function bootFoundryForUnitTest(): void
     {
-        $configuration = $configuration ?? new Configuration([], [], 'schema', []);
+        $configuration = new Configuration([], [], 'schema', []);
 
         if (self::$instantiator) {
             $configuration->setInstantiator(self::$instantiator);
@@ -91,9 +118,20 @@ final class TestState
             $configuration->disableDefaultProxyAutoRefresh();
         }
 
+        self::bootFoundry($configuration);
+    }
+
+    /**
+     * @internal
+     */
+    public static function bootFoundry(Configuration $configuration): void
+    {
         Factory::boot($configuration);
     }
 
+    /**
+     * @internal
+     */
     public static function shutdownFoundry(): void
     {
         Factory::shutdown();
@@ -123,6 +161,8 @@ final class TestState
             return;
         }
 
+        trigger_deprecation('zenstruck\foundry', '1.23', 'Usage of foundry without the bundle is deprecated and will not be possible anymore in 2.0.');
+
         $configuration = new Configuration([], [], 'schema', []);
 
         try {
@@ -150,10 +190,6 @@ final class TestState
             $managerRegistries[] = $container->get('doctrine_mongodb');
         }
 
-        if (0 === \count($managerRegistries)) {
-            throw new \LogicException('Neither doctrine/orm nor doctrine/mongodb-odm are present.');
-        }
-
         return new ChainManagerRegistry($managerRegistries);
     }
 
@@ -175,5 +211,11 @@ final class TestState
         }
 
         StoryManager::setGlobalState();
+    }
+
+    public static function configure(?Instantiator $instantiator = null, ?Faker\Generator $faker = null): void
+    {
+        self::$instantiator = $instantiator;
+        self::$faker = $faker;
     }
 }
