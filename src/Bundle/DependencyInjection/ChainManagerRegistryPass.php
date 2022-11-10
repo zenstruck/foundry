@@ -25,10 +25,6 @@ final class ChainManagerRegistryPass implements CompilerPassInterface
             $managerRegistries[] = new Reference('doctrine_mongodb');
         }
 
-        if (0 === \count($managerRegistries)) {
-            throw new \LogicException('Neither doctrine/orm nor mongodb-odm are present.');
-        }
-
         $container->getDefinition(ChainManagerRegistry::class)
             ->setArgument('$managerRegistries', $managerRegistries)
         ;

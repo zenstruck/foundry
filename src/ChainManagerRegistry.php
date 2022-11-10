@@ -18,10 +18,6 @@ final class ChainManagerRegistry implements ManagerRegistry
     /** @param list<ManagerRegistry> $managerRegistries */
     public function __construct(array $managerRegistries)
     {
-        if (0 === \count($managerRegistries)) {
-            throw new \InvalidArgumentException('no manager registry provided');
-        }
-
         $this->managerRegistries = $managerRegistries;
     }
 

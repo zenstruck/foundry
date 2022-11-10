@@ -75,7 +75,6 @@ jobs:
       - name: 'Test: MySQL'
         run: vendor/bin/simple-phpunit -v
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&max[self]=99999
           DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Test: MySQL, FoundryBundle'
@@ -87,7 +86,6 @@ jobs:
       - name: 'Test: MySQL, DAMABundle'
         run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&max[self]=99999
           DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Test: MySQL, FoundryBundle, DAMABundle'
@@ -99,21 +97,18 @@ jobs:
       - name: 'Test: MySQL, DoctrineMigrationsBundle'
         run: vendor/bin/simple-phpunit -v
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&max[self]=99999
           USE_MIGRATIONS: 1
           DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Test: MySQL, DoctrineMigrationsBundle, DAMABundle'
         run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&max[self]=99999
           USE_MIGRATIONS: 1
           DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Test: PostgreSQL'
         run: vendor/bin/simple-phpunit -v
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&max[self]=99999
           DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8
 
       - name: 'Test: PostgreSQL, FoundryBundle'
@@ -136,7 +131,6 @@ jobs:
       - name: 'Test: SQLite'
         run: vendor/bin/simple-phpunit -v
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&max[self]=99999
           DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
 
       - name: 'Test: SQLite, FoundryBundle'
@@ -148,20 +142,17 @@ jobs:
       - name: 'Test: SQLite, DAMABundle'
         run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&max[self]=99999
           DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
 
       - name: 'Test: SQLite, FoundryBundle, DAMABundle'
         run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&max[self]=99999
 #          USE_FOUNDRY_BUNDLE: 1
           DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
 
       - name: 'Test: MySQL, Mongo'
         run: vendor/bin/simple-phpunit -v
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&max[self]=99999
           DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
           MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
 
@@ -175,14 +166,12 @@ jobs:
       - name: 'Test: MySQL, Mongo, DAMABundle'
         run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&max[self]=99999
           DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
           MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
 
       - name: 'Test: Mongo standalone'
         run: vendor/bin/simple-phpunit -v
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&max[self]=99999
           MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
 
   code-coverage:
@@ -231,7 +220,6 @@ jobs:
       - name: 'Coverage: MySQL'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql.clover
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&max[self]=99999
           DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Coverage: MySQL, FoundryBundle'
@@ -243,7 +231,6 @@ jobs:
       - name: 'Coverage: MySQL, DAMABundle'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-dama.clover --configuration phpunit-dama-doctrine.xml.dist
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&max[self]=99999
           DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Coverage: MySQL, FoundryBundle, DAMABundle'
@@ -255,21 +242,18 @@ jobs:
       - name: 'Test: MySQL, DoctrineMigrationsBundle'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-migrations.clover
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&max[self]=99999
           USE_MIGRATIONS: 1
           DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Test: MySQL, DoctrineMigrationsBundle, DAMABundle'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-migrations-dama.clover --configuration phpunit-dama-doctrine.xml.dist
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&max[self]=99999
           USE_MIGRATIONS: 1
           DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
 
       - name: 'Coverage: PostgreSQL'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=postgres.clover
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&max[self]=99999
           DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8
 
       - name: 'Coverage: PostgreSQL, FoundryBundle'
@@ -292,7 +276,6 @@ jobs:
       - name: 'Coverage: SQLite'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=sqlite.clover
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&max[self]=99999
           DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
 
       - name: 'Coverage: SQLite, FoundryBundle'
@@ -304,20 +287,17 @@ jobs:
       - name: 'Coverage: SQLite, DAMABundle'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=sqlite-dama.clover --configuration phpunit-dama-doctrine.xml.dist
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&max[self]=99999
           DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
 
       - name: 'Coverage: SQLite, FoundryBundle, DAMABundle'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=sqlite-foundry-dama.clover --configuration phpunit-dama-doctrine.xml.dist
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&max[self]=99999
 #          USE_FOUNDRY_BUNDLE: 1
           DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
 
       - name: 'Test: MySQL, Mongo'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-mongo.clover
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&max[self]=99999
           DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
           MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
 
@@ -331,14 +311,12 @@ jobs:
       - name: 'Test: MySQL, Mongo, DAMABundle'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-mongo-dama.clover --configuration phpunit-dama-doctrine.xml.dist
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&max[self]=99999
           DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
           MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
 
       - name: 'Test: Mongo standalone'
         run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mongo.clover
         env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&max[self]=99999
           MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
 
       - name: Publish coverage report to Codecov
