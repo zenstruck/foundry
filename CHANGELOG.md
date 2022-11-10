@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## [v1.23.0](https://github.com/zenstruck/foundry/releases/tag/v1.23.0)
+
+November 10th, 2022 - [v1.22.1...v1.23.0](https://github.com/zenstruck/foundry/compare/v1.22.1...v1.23.0)
+
+* f43b067 [chore] clean up CI (#324) by @nikophil
+* 3588274 [feature] Allow to use foundry without Doctrine (#323) by @nikophil
+* 7598467 [feature] [remove bundleless usge] configure global state with config (#322) by @nikophil
+* e417945 [feature] [remove bundleless usge] use config instead of environment variables (#320) by @nikophil
+* cada0cf [feature] pass an index to `FactoryCollection` attributes (#318) by @nikophil
+* d120b1c [minor] fix `bamarni/composer-bin-plugin` deprecations (#313) by @kbond
+* a3eefc1 [minor] remove branch alias (#313) by @kbond
+* cf7d75e [minor] remove unneeded bin script (#310) by @kbond
+* cd42774 [feature] add make migrations (#309) by @nikophil
+* cb9a4ec [feature] add a docker stack (#306) by @nikophil
+
 ## [v1.22.1](https://github.com/zenstruck/foundry/releases/tag/v1.22.1)
 
 September 28th, 2022 - [v1.22.0...v1.22.1](https://github.com/zenstruck/foundry/compare/v1.22.0...v1.22.1)
