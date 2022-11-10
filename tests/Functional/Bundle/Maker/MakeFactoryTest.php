@@ -20,6 +20,10 @@ final class MakeFactoryTest extends MakerTestCase
      */
     public function can_create_factory(): void
     {
+        if (!\getenv('USE_ORM')) {
+            self::markTestSkipped('doctrine/orm not enabled.');
+        }
+
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
 
         $this->assertFileDoesNotExist(self::tempFile('src/Factory/CategoryFactory.php'));
@@ -95,6 +99,10 @@ EOF
      */
     public function can_create_factory_interactively(): void
     {
+        if (!\getenv('USE_ORM')) {
+            self::markTestSkipped('doctrine/orm not enabled.');
+        }
+
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
 
         $this->assertFileDoesNotExist(self::tempFile('src/Factory/TagFactory.php'));
@@ -174,6 +182,10 @@ EOF
      */
     public function can_create_factory_in_test_dir(): void
     {
+        if (!\getenv('USE_ORM')) {
+            self::markTestSkipped('doctrine/orm not enabled.');
+        }
+
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
 
         $this->assertFileDoesNotExist(self::tempFile('tests/Factory/CategoryFactory.php'));
@@ -249,6 +261,10 @@ EOF
      */
     public function can_create_factory_in_test_dir_interactively(): void
     {
+        if (!\getenv('USE_ORM')) {
+            self::markTestSkipped('doctrine/orm not enabled.');
+        }
+
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
 
         $this->assertFileDoesNotExist(self::tempFile('tests/Factory/TagFactory.php'));
@@ -349,6 +365,10 @@ EOF
      */
     public function can_customize_namespace(): void
     {
+        if (!\getenv('USE_ORM')) {
+            self::markTestSkipped('doctrine/orm not enabled.');
+        }
+
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
         $expectedFile = self::tempFile('src/My/Namespace/TagFactory.php');
 
@@ -366,6 +386,10 @@ EOF
      */
     public function can_customize_namespace_with_test_flag(): void
     {
+        if (!\getenv('USE_ORM')) {
+            self::markTestSkipped('doctrine/orm not enabled.');
+        }
+
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
         $expectedFile = self::tempFile('tests/My/Namespace/TagFactory.php');
 
@@ -383,6 +407,10 @@ EOF
      */
     public function can_customize_namespace_with_root_namespace_prefix(): void
     {
+        if (!\getenv('USE_ORM')) {
+            self::markTestSkipped('doctrine/orm not enabled.');
+        }
+
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
         $expectedFile = self::tempFile('src/My/Namespace/TagFactory.php');
 
@@ -400,6 +428,10 @@ EOF
      */
     public function can_customize_namespace_with_test_flag_with_root_namespace_prefix(): void
     {
+        if (!\getenv('USE_ORM')) {
+            self::markTestSkipped('doctrine/orm not enabled.');
+        }
+
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
         $expectedFile = self::tempFile('tests/My/Namespace/TagFactory.php');
 
@@ -441,7 +473,7 @@ EOF
      */
     public function can_create_factory_for_odm(string $class, string $file): void
     {
-        if (false === \getenv('MONGO_URL')) {
+        if (!\getenv('USE_ODM')) {
             self::markTestSkipped('doctrine/odm not enabled.');
         }
 

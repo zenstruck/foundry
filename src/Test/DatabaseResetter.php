@@ -105,7 +105,7 @@ final class DatabaseResetter
             $container->get('doctrine'),
             $configuration ? $configuration->getOrmConnectionsToReset() : [],
             $configuration ? $configuration->getOrmObjectManagersToReset() : [],
-            $configuration ? $configuration->getOrmResetMode() : 'schema'
+            $configuration ? $configuration->getOrmResetMode() : ORMDatabaseResetter::RESET_MODE_SCHEMA
         );
     }
 

@@ -4,6 +4,7 @@ namespace Zenstruck\Foundry\Bundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Zenstruck\Foundry\Test\ORMDatabaseResetter;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -111,8 +112,8 @@ final class Configuration implements ConfigurationInterface
                                 ->end()
                                 ->enumNode('reset_mode')
                                     ->info('Whether to use doctrine:schema:update or migrations when resetting schema.')
-                                    ->values(['schema', 'migrate'])
-                                    ->defaultValue('schema')
+                                    ->values([ORMDatabaseResetter::RESET_MODE_SCHEMA, ORMDatabaseResetter::RESET_MODE_MIGRATE])
+                                    ->defaultValue(ORMDatabaseResetter::RESET_MODE_SCHEMA)
                                 ->end()
                             ->end()
                         ->end()

@@ -9,8 +9,6 @@ services:
         depends_on:
             mysql:
                 condition: service_healthy
-            postgres:
-                condition: service_healthy
             mongo:
                 condition: service_healthy
         volumes:
@@ -33,20 +31,6 @@ services:
             timeout: 120s
             retries: 60
             interval: 2s
-
-    postgres:
-        container_name: foundry_postgres
-        image: postgres:13
-        environment:
-            POSTGRES_DB: zenstruck_foundry
-            POSTGRES_PASSWORD: root
-            POSTGRES_USER: root
-        ports:
-            - ${POSTGRES_PORT:-5432}:5432
-        healthcheck:
-            test: /usr/bin/pg_isready
-            timeout: 10s
-            retries: 10
 
     mongo:
         container_name: foundry_mongo

@@ -1,9 +1,7 @@
 .PHONY: $(filter-out vendor bin/tools/psalm/vendor bin/tools/cs-fixer/vendor,$(MAKECMDGOALS))
 
 MYSQL_URL="mysql://root:root@mysql:3306/zenstruck_foundry?charset=utf8"
-POSTGRESQL_URL="postgresql://root:root@postgres:5432/zenstruck_foundry?charset=utf8&serverVersion=13"
 MONGO_URL="mongodb://mongo:mongo@mongo:27017/mongo?compressors=disabled&amp;gssapiServiceName=mongodb&authSource=mongo"
-SQLITE_URL="sqlite://./var/app.db"
 
 ifeq ($(shell docker --help | grep "compose"),)
 	DOCKER_COMPOSE=docker-compose
@@ -13,9 +11,9 @@ endif
 
 INTERACTIVE:=$(shell [ -t 0 ] && echo 1)
 ifdef INTERACTIVE
-	DC_EXEC=$(DOCKER_COMPOSE) exec
+	DC_EXEC=$(DOCKER_COMPOSE) exec -e USE_FOUNDRY_BUNDLE=1 -e DATABASE_URL=${MYSQL_URL} -e MONGO_URL=${MONGO_URL}
 else
-	DC_EXEC=$(DOCKER_COMPOSE) exec -T
+	DC_EXEC=$(DOCKER_COMPOSE) exec -e USE_FOUNDRY_BUNDLE=1 -e DATABASE_URL=${MYSQL_URL} -e MONGO_URL=${MONGO_URL} -T
 endif
 
 DOCKER_PHP=${DC_EXEC} php
@@ -45,27 +43,15 @@ validate: fixcs sca test-full database-validate-mapping ### Run fixcs, sca, full
 
 test-full: docker-start vendor ### Run full PHPunit (MySQL + Mongo)
 	@$(eval filter ?= '.')
-	@${DC_EXEC} -e USE_FOUNDRY_BUNDLE=1 -e DATABASE_URL=${MYSQL_URL} -e MONGO_URL=${MONGO_URL} php vendor/bin/simple-phpunit --configuration phpunit-dama-doctrine.xml.dist --filter=$(filter)
-
-test-fast: docker-start vendor ### Run PHPunit with SQLite
-	@$(eval filter ?= '.')
-ifeq ($(shell which docker),)
-	@DATABASE_URL=${SQLITE_URL} php vendor/bin/simple-phpunit --configuration phpunit-dama-doctrine.xml.dist --filter=$(filter)
-else
-	@${DC_EXEC} -e DATABASE_URL=${SQLITE_URL} php vendor/bin/simple-phpunit --configuration phpunit-dama-doctrine.xml.dist --filter=$(filter)
-endif
+	@${DC_EXEC} -e USE_ORM=1 -e USE_ODM=1 php vendor/bin/simple-phpunit --configuration phpunit-dama-doctrine.xml.dist --filter=$(filter)
 
 test-mysql: docker-start vendor ### Run PHPunit with mysql
 	@$(eval filter ?= '.')
-	@${DC_EXEC} -e DATABASE_URL=${MYSQL_URL} php vendor/bin/simple-phpunit --configuration phpunit-dama-doctrine.xml.dist --filter=$(filter)
-
-test-postgresql: docker-start vendor ### Run PHPunit with postgreSQL
-	@$(eval filter ?= '.')
-	@${DC_EXEC} -e DATABASE_URL=${POSTGRESQL_URL} php vendor/bin/simple-phpunit --configuration phpunit-dama-doctrine.xml.dist --filter=$(filter)
+	@${DC_EXEC} -e USE_ORM=1 php vendor/bin/simple-phpunit --configuration phpunit-dama-doctrine.xml.dist --filter=$(filter)
 
 test-mongo: docker-start vendor ### Run PHPunit with Mongo
 	@$(eval filter ?= '.')
-	@${DC_EXEC} -e USE_FOUNDRY_BUNDLE=1 -e MONGO_URL=${MONGO_URL} php vendor/bin/simple-phpunit --configuration phpunit.xml.dist --filter=$(filter)
+	@${DC_EXEC} -e USE_ODM=1 php vendor/bin/simple-phpunit --configuration phpunit.xml.dist --filter=$(filter)
 
 fixcs: docker-start bin/tools/cs-fixer/vendor ### Run PHP CS-Fixer
 	@${DOCKER_PHP} bin/tools/cs-fixer/vendor/friendsofphp/php-cs-fixer/php-cs-fixer --no-interaction --diff -v fix
@@ -80,18 +66,18 @@ bin/tools/psalm/vendor: vendor bin/tools/psalm/composer.json bin/tools/psalm/com
 	@${DOCKER_PHP} composer bin psalm install
 
 database-generate-migration: docker-start vendor ### Generate new migration based on mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
-	@${DC_EXEC} -e DATABASE_URL=${MYSQL_URL} php vendor/bin/doctrine-migrations migrations:migrate --no-interaction --allow-no-migration # first, let's load into db existing migrations
-	@${DC_EXEC} -e DATABASE_URL=${MYSQL_URL} php vendor/bin/doctrine-migrations migrations:diff --no-interaction
-	@${DC_EXEC} -e DATABASE_URL=${MYSQL_URL} php vendor/bin/doctrine-migrations migrations:migrate --no-interaction # load the new migration
+	@${DOCKER_PHP} vendor/bin/doctrine-migrations migrations:migrate --no-interaction --allow-no-migration # first, let's load into db existing migrations
+	@${DOCKER_PHP} vendor/bin/doctrine-migrations migrations:diff --no-interaction
+	@${DOCKER_PHP} vendor/bin/doctrine-migrations migrations:migrate --no-interaction # load the new migration
 
 database-validate-mapping: docker-start vendor database-drop-schema ### Validate mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
-	@${DC_EXEC} -e DATABASE_URL=${MYSQL_URL} php vendor/bin/doctrine-migrations migrations:migrate --no-interaction --allow-no-migration
-	@${DC_EXEC} -e DATABASE_URL=${MYSQL_URL} php bin/doctrine orm:validate-schema
+	@${DOCKER_PHP} vendor/bin/doctrine-migrations migrations:migrate --no-interaction --allow-no-migration
+	@${DOCKER_PHP} bin/doctrine orm:validate-schema
 
 database-drop-schema: docker-start vendor ### Drop database schema
-	@${DC_EXEC} -e DATABASE_URL=${MYSQL_URL} php bin/doctrine orm:schema-tool:drop --force
-	@${DC_EXEC} -e DATABASE_URL=${MYSQL_URL} php vendor/bin/doctrine-migrations migrations:sync-metadata-storage # prevents the next command to fail if migrations table does not exist
-	@${DC_EXEC} -e DATABASE_URL=${MYSQL_URL} php bin/doctrine dbal:run-sql "TRUNCATE doctrine_migration_versions" --quiet
+	@${DOCKER_PHP} bin/doctrine orm:schema-tool:drop --force
+	@${DOCKER_PHP} vendor/bin/doctrine-migrations migrations:sync-metadata-storage # prevents the next command to fail if migrations table does not exist
+	@${DOCKER_PHP} bin/doctrine dbal:run-sql "TRUNCATE doctrine_migration_versions" --quiet
 
 vendor: composer.json $(wildcard composer.lock)
 	@${DOCKER_PHP} composer update

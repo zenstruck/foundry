@@ -13,6 +13,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
+use Zenstruck\Foundry\Test\ORMDatabaseResetter;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryServiceFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\ODMTagStory;
@@ -29,27 +30,28 @@ class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
 
-    /** @var string|null */
-    private $databaseUrl;
-    /** @var string|null */
-    private $mongoUrl;
+    /** @var bool */
+    private $enableDoctrine = true;
+    /** @var string */
+    private $ormResetMode = ORMDatabaseResetter::RESET_MODE_SCHEMA;
 
-    public function __construct(
-        bool $useDatabase = true
-    ) {
-        if ($useDatabase) {
-            $this->databaseUrl = \getenv('DATABASE_URL') ?: null;
-            $this->mongoUrl = \getenv('MONGO_URL') ?: null;
-        }
+    public static function create(
+        bool $enableDoctrine = true,
+        string $ormResetMode = ORMDatabaseResetter::RESET_MODE_SCHEMA
+    ): self {
+        $kernel = new self('test', true);
 
-        parent::__construct('test', true);
+        $kernel->enableDoctrine = $enableDoctrine;
+        $kernel->ormResetMode = $ormResetMode;
+
+        return $kernel;
     }
 
     public function registerBundles(): iterable
     {
         yield new FrameworkBundle();
 
-        if ($this->databaseUrl) {
+        if ($this->enableDoctrine && \getenv('USE_ORM')) {
             yield new DoctrineBundle();
         }
 
@@ -63,11 +65,11 @@ class Kernel extends BaseKernel
             yield new DAMADoctrineTestBundle();
         }
 
-        if (\getenv('USE_MIGRATIONS')) {
+        if (ORMDatabaseResetter::RESET_MODE_MIGRATE === $this->ormResetMode && $this->enableDoctrine && \getenv('USE_ORM')) {
             yield new DoctrineMigrationsBundle();
         }
 
-        if ($this->mongoUrl) {
+        if ($this->enableDoctrine && \getenv('USE_ODM')) {
             yield new DoctrineMongoDBBundle();
         }
     }
@@ -76,7 +78,7 @@ class Kernel extends BaseKernel
     {
         return \sprintf(
             "{$this->getProjectDir()}/var/cache/test/%s",
-            \md5(\json_encode([$this->databaseUrl, $this->mongoUrl]))
+            \md5(\json_encode([$this->enableDoctrine, $this->ormResetMode]))
         );
     }
 
@@ -102,7 +104,7 @@ class Kernel extends BaseKernel
             'test' => true,
         ]);
 
-        if ($this->databaseUrl) {
+        if ($this->enableDoctrine && \getenv('USE_ORM')) {
             $c->loadFromExtension(
                 'doctrine',
                 [
@@ -128,16 +130,14 @@ class Kernel extends BaseKernel
             $foundryConfig = ['auto_refresh_proxies' => false];
             $globalState = [];
 
-            if ($this->databaseUrl) {
+            if ($this->enableDoctrine && \getenv('USE_ORM')) {
                 $globalState[] = TagStory::class;
                 $globalState[] = TagStoryAsInvokableService::class;
 
-                if (\getenv('USE_MIGRATIONS')) {
-                    $foundryConfig['database_resetter'] = ['orm' => ['reset_mode' => 'migrate']];
-                }
+                $foundryConfig['database_resetter'] = ['orm' => ['reset_mode' => $this->ormResetMode]];
             }
 
-            if ($this->mongoUrl && !\getenv('USE_DAMA_DOCTRINE_TEST_BUNDLE')) {
+            if ($this->enableDoctrine && \getenv('USE_ODM') && !\getenv('USE_DAMA_DOCTRINE_TEST_BUNDLE')) {
                 $globalState[] = ODMTagStory::class;
                 $globalState[] = ODMTagStoryAsAService::class;
             }
@@ -147,7 +147,7 @@ class Kernel extends BaseKernel
             $c->loadFromExtension('zenstruck_foundry', $foundryConfig);
         }
 
-        if (\getenv('USE_MIGRATIONS')) {
+        if (ORMDatabaseResetter::RESET_MODE_MIGRATE === $this->ormResetMode) {
             $c->loadFromExtension('doctrine_migrations', [
                 'migrations_paths' => [
                     'Zenstruck\Foundry\Tests\Fixtures\Migrations' => '%kernel.project_dir%/tests/Fixtures/Migrations',
@@ -155,7 +155,7 @@ class Kernel extends BaseKernel
             ]);
         }
 
-        if ($this->mongoUrl) {
+        if ($this->enableDoctrine && \getenv('USE_ODM')) {
             $c->loadFromExtension('doctrine_mongodb', [
                 'connections' => [
                     'default' => ['server' => '%env(resolve:MONGO_URL)%'],

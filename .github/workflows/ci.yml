@@ -8,8 +8,35 @@ on:
 
 jobs:
   tests:
-    name: PHP ${{ matrix.php }}, SF ${{ matrix.symfony }} - ${{ matrix.deps }}
+    name: PHP ${{ matrix.php }}, SF ${{ matrix.symfony }} - ${{ matrix.deps }} ${{ matrix.use-orm == '1' && '- ORM' || '' }} ${{ matrix.use-odm == '1' && '- ODM' || '' }} ${{ matrix.use-dama == '1' && '- DAMA' || '' }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [7.2, 7.4, 8.0, 8.1]
+        symfony: [4.4.*, 5.4.*, 6.0.*, 6.1.*]
+        deps: [highest]
+        use-orm: [1]
+        use-odm: [1]
+        use-dama: [1]
+        exclude:
+          - {use-orm: 0, use-odm: 0} # tested directly in a test case
+          - {use-orm: 0, use-dama: 1} # cannot happen
+          # conflicts
+          - {php: 7.2, symfony: 6.0.*}
+          - {php: 7.2, symfony: 6.1.*}
+          - {php: 7.4, symfony: 6.0.*}
+          - {php: 7.4, symfony: 6.1.*}
+          - {php: 8.0, symfony: 6.1.*}
+        include:
+          - {php: 7.2, symfony: 4.4.*, use-orm: 1, use-odm: 0, use-dama: 0, deps: lowest}
+          - {php: 7.2, symfony: 4.4.*, use-orm: 1, use-odm: 1, use-dama: 0, deps: lowest}
+          - {php: 7.2, symfony: 4.4.*, use-orm: 0, use-odm: 1, use-dama: 0, deps: lowest}
+          - {php: 8.1, symfony: 6.1.*, use-orm: 1, use-odm: 0, use-dama: 0, deps: highest}
+          - {php: 8.1, symfony: 6.1.*, use-orm: 1, use-odm: 1, use-dama: 0, deps: highest}
+          - {php: 8.1, symfony: 6.1.*, use-orm: 1, use-odm: 0, use-dama: 1, deps: highest}
+          - {php: 8.1, symfony: 6.1.*, use-orm: 0, use-odm: 1, use-dama: 0, deps: highest}
+
     services:
       mysql:
         image: mysql:5.7
@@ -18,37 +45,15 @@ jobs:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-      postgres:
-        image: postgres:11
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: 1234
-        ports:
-          - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
       mongo:
         image: mongo:4
         ports:
           - 27017:27017
-    strategy:
-      matrix:
-        php: [7.4, 8.0, 8.1]
-        symfony: [4.4.*, 5.4.*]
-        deps: [highest]
-        include:
-          - php: 7.2
-            symfony: '*'
-            deps: lowest
-            versions: lowest
-          - php: 8.0
-            symfony: 6.0.*
-            deps: highest
-          - php: 8.1
-            symfony: 6.0.*
-            deps: highest
-          - php: 8.1
-            symfony: 6.1.*
-            deps: highest
+
+    env:
+      DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+      MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2.3.3
@@ -72,107 +77,17 @@ jobs:
         env:
           SYMFONY_REQUIRE: ${{ matrix.symfony }}
 
-      - name: 'Test: MySQL'
-        run: vendor/bin/simple-phpunit -v
-        env:
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+      - name: 'Test'
+        run: |
+          if [ "${{ matrix.use-dama }}" == "1" ]; then
+            CONFIGURATION="--configuration phpunit-dama-doctrine.xml.dist"
+          fi
 
-      - name: 'Test: MySQL, FoundryBundle'
-        run: vendor/bin/simple-phpunit -v
+          vendor/bin/simple-phpunit -v ${CONFIGURATION}
         env:
+          USE_ORM: ${{ matrix.use-orm }}
+          USE_ODM: ${{ matrix.use-odm }}
           USE_FOUNDRY_BUNDLE: 1
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
-
-      - name: 'Test: MySQL, DAMABundle'
-        run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
-        env:
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
-
-      - name: 'Test: MySQL, FoundryBundle, DAMABundle'
-        run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
-        env:
-          USE_FOUNDRY_BUNDLE: 1
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
-
-      - name: 'Test: MySQL, DoctrineMigrationsBundle'
-        run: vendor/bin/simple-phpunit -v
-        env:
-          USE_MIGRATIONS: 1
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
-
-      - name: 'Test: MySQL, DoctrineMigrationsBundle, DAMABundle'
-        run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
-        env:
-          USE_MIGRATIONS: 1
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
-
-      - name: 'Test: PostgreSQL'
-        run: vendor/bin/simple-phpunit -v
-        env:
-          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8
-
-      - name: 'Test: PostgreSQL, FoundryBundle'
-        run: vendor/bin/simple-phpunit -v
-        env:
-          USE_FOUNDRY_BUNDLE: 1
-          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8
-
-#      - name: 'Test: PostgreSQL, DAMABundle'
-#        run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
-#        env:
-#          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8
-
-#      - name: 'Test: PostgreSQL, FoundryBundle, DAMABundle'
-#        run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
-#        env:
-#          USE_FOUNDRY_BUNDLE: 1
-#          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8
-
-      - name: 'Test: SQLite'
-        run: vendor/bin/simple-phpunit -v
-        env:
-          DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
-
-      - name: 'Test: SQLite, FoundryBundle'
-        run: vendor/bin/simple-phpunit -v
-        env:
-          USE_FOUNDRY_BUNDLE: 1
-          DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
-
-      - name: 'Test: SQLite, DAMABundle'
-        run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
-        env:
-          DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
-
-      - name: 'Test: SQLite, FoundryBundle, DAMABundle'
-        run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
-        env:
-#          USE_FOUNDRY_BUNDLE: 1
-          DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
-
-      - name: 'Test: MySQL, Mongo'
-        run: vendor/bin/simple-phpunit -v
-        env:
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
-          MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
-
-      - name: 'Test: MySQL, Mongo, FoundryBundle'
-        run: vendor/bin/simple-phpunit -v
-        env:
-          USE_FOUNDRY_BUNDLE: 1
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
-          MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
-
-      - name: 'Test: MySQL, Mongo, DAMABundle'
-        run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist
-        env:
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
-          MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
-
-      - name: 'Test: Mongo standalone'
-        run: vendor/bin/simple-phpunit -v
-        env:
-          MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
 
   code-coverage:
     name: Code Coverage
@@ -185,18 +100,15 @@ jobs:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-      postgres:
-        image: postgres:11
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: 1234
-        ports:
-          - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
       mongo:
         image: mongo:4
         ports:
           - 27017:27017
+
+    env:
+      DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+      MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2.3.3
@@ -207,7 +119,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.4
+          php-version: 8.0
           extensions: pgsql, sqlite
           coverage: xdebug
           ini-values: xdebug.mode=coverage
@@ -216,108 +128,14 @@ jobs:
         uses: ramsey/composer-install@v1
         with:
           composer-options: --prefer-dist
+          dependency-versions: "highest"
 
-      - name: 'Coverage: MySQL'
-        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql.clover
+      - name: 'Coverage'
+        run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist --coverage-text --coverage-clover=foundry.clover
         env:
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
-
-      - name: 'Coverage: MySQL, FoundryBundle'
-        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-foundry.clover
-        env:
+          USE_ORM: 1
+          USE_ODM: 1
           USE_FOUNDRY_BUNDLE: 1
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
-
-      - name: 'Coverage: MySQL, DAMABundle'
-        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-dama.clover --configuration phpunit-dama-doctrine.xml.dist
-        env:
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
-
-      - name: 'Coverage: MySQL, FoundryBundle, DAMABundle'
-        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-foundry-dama.clover --configuration phpunit-dama-doctrine.xml.dist
-        env:
-          USE_FOUNDRY_BUNDLE: 1
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
-
-      - name: 'Test: MySQL, DoctrineMigrationsBundle'
-        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-migrations.clover
-        env:
-          USE_MIGRATIONS: 1
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
-
-      - name: 'Test: MySQL, DoctrineMigrationsBundle, DAMABundle'
-        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-migrations-dama.clover --configuration phpunit-dama-doctrine.xml.dist
-        env:
-          USE_MIGRATIONS: 1
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
-
-      - name: 'Coverage: PostgreSQL'
-        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=postgres.clover
-        env:
-          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8
-
-      - name: 'Coverage: PostgreSQL, FoundryBundle'
-        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=postgres-foundry.clover
-        env:
-          USE_FOUNDRY_BUNDLE: 1
-          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8
-
-#      - name: 'Coverage: PostgreSQL, DAMABundle'
-#        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=postgres-dama.clover --configuration phpunit-dama-doctrine.xml.dist
-#        env:
-#          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8
-
-#      - name: 'Coverage: PostgreSQL, FoundryBundle, DAMABundle'
-#        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=postgres-foundry-dama.clover --configuration phpunit-dama-doctrine.xml.dist
-#        env:
-#          USE_FOUNDRY_BUNDLE: 1
-#          DATABASE_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry?charset=utf8
-
-      - name: 'Coverage: SQLite'
-        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=sqlite.clover
-        env:
-          DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
-
-      - name: 'Coverage: SQLite, FoundryBundle'
-        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=sqlite-foundry.clover
-        env:
-          USE_FOUNDRY_BUNDLE: 1
-          DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
-
-      - name: 'Coverage: SQLite, DAMABundle'
-        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=sqlite-dama.clover --configuration phpunit-dama-doctrine.xml.dist
-        env:
-          DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
-
-      - name: 'Coverage: SQLite, FoundryBundle, DAMABundle'
-        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=sqlite-foundry-dama.clover --configuration phpunit-dama-doctrine.xml.dist
-        env:
-#          USE_FOUNDRY_BUNDLE: 1
-          DATABASE_URL: sqlite:///%kernel.cache_dir%/app.db
-
-      - name: 'Test: MySQL, Mongo'
-        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-mongo.clover
-        env:
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
-          MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
-
-      - name: 'Test: MySQL, Mongo, FoundryBundle'
-        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-mongo-foundry.clover
-        env:
-          USE_FOUNDRY_BUNDLE: 1
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
-          MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
-
-      - name: 'Test: MySQL, Mongo, DAMABundle'
-        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mysql-mongo-dama.clover --configuration phpunit-dama-doctrine.xml.dist
-        env:
-          DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
-          MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
-
-      - name: 'Test: Mongo standalone'
-        run: vendor/bin/simple-phpunit -v --coverage-text --coverage-clover=mongo.clover
-        env:
-          MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
 
       - name: Publish coverage report to Codecov
         uses: codecov/codecov-action@v1
