@@ -21,10 +21,6 @@ final class WithDoctrineDisabledKernelTest extends KernelTestCase
         if (\getenv('USE_DAMA_DOCTRINE_TEST_BUNDLE')) {
             self::markTestSkipped('dama/doctrine-test-bundle should not be enabled.');
         }
-
-        if (\getenv('USE_MIGRATIONS')) {
-            self::markTestSkipped('Cannot use migrations with doctrine disabled.');
-        }
     }
 
     /**
@@ -43,6 +39,6 @@ final class WithDoctrineDisabledKernelTest extends KernelTestCase
 
     protected static function createKernel(array $options = []): KernelInterface
     {
-        return new Kernel(false);
+        return Kernel::create(false);
     }
 }

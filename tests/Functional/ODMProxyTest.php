@@ -12,7 +12,7 @@ final class ODMProxyTest extends ProxyTest
 {
     protected function setUp(): void
     {
-        if (false === \getenv('MONGO_URL')) {
+        if (!\getenv('USE_ODM')) {
             self::markTestSkipped('doctrine/odm not enabled.');
         }
     }

@@ -14,6 +14,7 @@ use Zenstruck\Foundry\Bundle\Command\StubMakeStory;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Story;
+use Zenstruck\Foundry\Test\ORMDatabaseResetter;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -110,7 +111,7 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
 
         $configurationDefinition->setArgument('$ormConnectionsToReset', $config['orm']['connections'] ?? []);
         $configurationDefinition->setArgument('$ormObjectManagersToReset', $config['orm']['object_managers'] ?? []);
-        $configurationDefinition->setArgument('$ormResetMode', $config['orm']['reset_mode'] ?? 'schema');
+        $configurationDefinition->setArgument('$ormResetMode', $config['orm']['reset_mode'] ?? ORMDatabaseResetter::RESET_MODE_SCHEMA);
         $configurationDefinition->setArgument('$odmObjectManagersToReset', $config['odm']['object_managers'] ?? []);
     }
 

@@ -23,7 +23,7 @@ final class ORMModelFactoryTest extends ModelFactoryTest
 {
     protected function setUp(): void
     {
-        if (false === \getenv('DATABASE_URL')) {
+        if (!\getenv('USE_ORM')) {
             self::markTestSkipped('doctrine/orm not enabled.');
         }
     }

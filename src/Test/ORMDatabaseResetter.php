@@ -10,6 +10,9 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
  */
 final class ORMDatabaseResetter extends AbstractSchemaResetter
 {
+    public const RESET_MODE_SCHEMA = 'schema';
+    public const RESET_MODE_MIGRATE = 'migrate';
+
     /** @var Application */
     private $application;
     /** @var ManagerRegistry */
@@ -146,9 +149,9 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
         if (isset($_SERVER['FOUNDRY_RESET_MODE'])) {
             trigger_deprecation('zenstruck\foundry', '1.23', 'Usage of environment variable "FOUNDRY_RESET_MODE" is deprecated. Please use bundle configuration: "database_resetter.orm.reset_mode: true".');
 
-            return 'migrate' === $_SERVER['FOUNDRY_RESET_MODE'];
+            return self::RESET_MODE_MIGRATE === $_SERVER['FOUNDRY_RESET_MODE'];
         }
 
-        return 'migrate' === $this->resetMode;
+        return self::RESET_MODE_MIGRATE === $this->resetMode;
     }
 }

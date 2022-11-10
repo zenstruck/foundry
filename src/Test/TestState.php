@@ -102,7 +102,7 @@ final class TestState
      */
     public static function bootFoundryForUnitTest(): void
     {
-        $configuration = new Configuration([], [], 'schema', []);
+        $configuration = new Configuration([], [], ORMDatabaseResetter::RESET_MODE_SCHEMA, []);
 
         if (self::$instantiator) {
             $configuration->setInstantiator(self::$instantiator);
@@ -163,7 +163,7 @@ final class TestState
 
         trigger_deprecation('zenstruck\foundry', '1.23', 'Usage of foundry without the bundle is deprecated and will not be possible anymore in 2.0.');
 
-        $configuration = new Configuration([], [], 'schema', []);
+        $configuration = new Configuration([], [], ORMDatabaseResetter::RESET_MODE_SCHEMA, []);
 
         try {
             $configuration->setManagerRegistry(self::initializeChainManagerRegistry($container));
