@@ -11,35 +11,26 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 final class ORMDatabaseResetter extends AbstractSchemaResetter
 {
     public const RESET_MODE_SCHEMA = 'schema';
+
     public const RESET_MODE_MIGRATE = 'migrate';
 
-    /** @var Application */
-    private $application;
-    /** @var ManagerRegistry */
-    private $registry;
     /** @var list<string> */
-    private $connectionsToReset;
+    private array $connectionsToReset = [];
+
     /** @var list<string> */
-    private $objectManagersToReset;
-    /** @var string */
-    private $resetMode;
+    private array $objectManagersToReset = [];
 
     /**
      * @param list<string> $connectionsToReset
      * @param list<string> $objectManagersToReset
      */
-    public function __construct(Application $application, ManagerRegistry $registry, array $connectionsToReset, array $objectManagersToReset, string $resetMode)
+    public function __construct(private Application $application, private ManagerRegistry $registry, array $connectionsToReset, array $objectManagersToReset, private string $resetMode)
     {
-        $this->application = $application;
-        $this->registry = $registry;
-
         self::validateObjectsToReset('connection', \array_keys($registry->getConnectionNames()), $connectionsToReset);
         $this->connectionsToReset = $connectionsToReset;
 
         self::validateObjectsToReset('object manager', \array_keys($registry->getManagerNames()), $objectManagersToReset);
         $this->objectManagersToReset = $objectManagersToReset;
-
-        $this->resetMode = $resetMode;
     }
 
     public function resetDatabase(): void

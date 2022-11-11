@@ -30,11 +30,17 @@ final class LazyManagerRegistry implements ManagerRegistry
         return $this->inner()->getConnection($name);
     }
 
+    /**
+     * @return array<string, object>
+     */
     public function getConnections(): array
     {
         return $this->inner()->getConnections();
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getConnectionNames(): array
     {
         return $this->inner()->getConnectionNames();
@@ -50,6 +56,9 @@ final class LazyManagerRegistry implements ManagerRegistry
         return $this->inner()->getManager($name);
     }
 
+    /**
+     * @return array<string, ObjectManager>
+     */
     public function getManagers(): array
     {
         return $this->inner()->getManagers();
@@ -71,6 +80,9 @@ final class LazyManagerRegistry implements ManagerRegistry
         throw new \BadMethodCallException('Method removed in doctrine/persistence v3.');
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getManagerNames(): array
     {
         return $this->inner()->getManagerNames();

@@ -7,7 +7,6 @@ use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
-use Symfony\Bundle\MakerBundle\Validator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -51,7 +50,7 @@ final class MakeStory extends AbstractMaker
         }
 
         $argument = $command->getDefinition()->getArgument('name');
-        $value = $io->ask($argument->getDescription(), null, [Validator::class, 'notBlank']);
+        $value = $io->ask($argument->getDescription(), null, static fn(?string $value = null): string => \Symfony\Bundle\MakerBundle\Validator::notBlank($value));
         $input->setArgument($argument->getName(), $value);
     }
 

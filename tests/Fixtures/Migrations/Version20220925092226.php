@@ -54,4 +54,9 @@ final class Version20220925092226 extends AbstractMigration
         $this->addSql('DROP INDEX IDX_885DBAFAEA0D7566 ON posts');
         $this->addSql('ALTER TABLE posts DROP secondary_category_id');
     }
+
+    public function isTransactional(): bool
+    {
+        return false;
+    }
 }

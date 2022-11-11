@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 class SpecificPost extends Post
 {
     /**
+     * @var mixed|null
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $specificProperty;
@@ -19,7 +20,7 @@ class SpecificPost extends Post
         return $this->specificProperty;
     }
 
-    public function setSpecificProperty($specificProperty)
+    public function setSpecificProperty($specificProperty): static
     {
         $this->specificProperty = $specificProperty;
 

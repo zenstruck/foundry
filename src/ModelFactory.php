@@ -30,10 +30,8 @@ abstract class ModelFactory extends Factory
     /**
      * @param array|callable|string $defaultAttributes If string, assumes state
      * @param string                ...$states         Optionally pass default states (these must be methods on your ObjectFactory with no arguments)
-     *
-     * @return static
      */
-    final public static function new($defaultAttributes = [], string ...$states): self
+    final public static function new(array|callable|string $defaultAttributes = [], string ...$states): static
     {
         if (\is_string($defaultAttributes)) {
             $states = \array_merge([$defaultAttributes], $states);
@@ -47,7 +45,7 @@ abstract class ModelFactory extends Factory
         }
 
         $factory = $factory
-            ->withAttributes([$factory, 'getDefaults'])
+            ->withAttributes(static fn(): array => $factory->getDefaults())
             ->withAttributes($defaultAttributes)
             ->initialize()
         ;
@@ -82,7 +80,7 @@ abstract class ModelFactory extends Factory
      * @return list<TModel&Proxy<TModel>>
      * @psalm-return list<Proxy<TModel>>
      */
-    final public static function createSequence($sequence): array
+    final public static function createSequence(iterable|callable $sequence): array
     {
         return static::new()->sequence($sequence)->create();
     }
@@ -158,7 +156,7 @@ abstract class ModelFactory extends Factory
     {
         try {
             return static::repository()->random($attributes);
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException) {
             return static::new()->create($attributes);
         }
     }
@@ -267,23 +265,19 @@ abstract class ModelFactory extends Factory
 
     /**
      * Override to add default instantiator and default afterInstantiate/afterPersist events.
-     *
-     * @return static
      */
     protected function initialize()
     {
         return $this;
     }
 
-    /**
-     * @param array|callable $attributes
-     *
-     * @return static
-     */
-    final protected function addState($attributes = []): self
+    final protected function addState(array|callable $attributes = []): static
     {
         return $this->withAttributes($attributes);
     }
 
+    /**
+     * @return mixed[]
+     */
     abstract protected function getDefaults(): array;
 }

@@ -3,6 +3,7 @@
 namespace Zenstruck\Foundry\Tests\Fixtures\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -12,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\DiscriminatorColumn(name="type")
  * @ORM\DiscriminatorMap({"simple": Post::class, "specific": SpecificPost::class})
  */
-class Post
+class Post implements \Stringable
 {
     /**
      * @ORM\Id
@@ -24,90 +25,90 @@ class Post
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $title;
+    private string $title;
 
     /**
      * @ORM\Column(type="text")
      */
-    private $body;
+    private string $body;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $shortDescription;
+    private ?string $shortDescription;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $viewCount = 0;
+    private int $viewCount = 0;
 
     /**
      * @ORM\Column(type="datetime")
      */
-    private $createdAt;
+    private \DateTime $createdAt;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    private $publishedAt;
+    private ?\DateTime $publishedAt = null;
 
     /**
      * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="posts")
      * @ORM\JoinColumn
      */
-    private $category;
+    private ?Category $category = null;
 
     /**
      * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="secondaryPosts")
      * @ORM\JoinColumn(name="secondary_category_id")
      */
-    private $secondaryCategory;
+    private ?Category $secondaryCategory = null;
 
     /**
      * @ORM\ManyToMany(targetEntity=Tag::class, inversedBy="posts")
      */
-    private $tags;
+    private Collection $tags;
 
     /**
      * @ORM\ManyToMany(targetEntity=Tag::class, inversedBy="secondaryPosts")
      * @ORM\JoinTable(name="post_tag_secondary")
      */
-    private $secondaryTags;
+    private Collection $secondaryTags;
 
     /**
      * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="post")
      */
-    private $comments;
+    private Collection $comments;
 
     /**
      * @ORM\OneToOne(targetEntity=Post::class, inversedBy="mostRelevantRelatedToPost")
      */
-    private $mostRelevantRelatedPost;
+    private ?Post $mostRelevantRelatedPost = null;
 
     /**
      * @ORM\OneToOne(targetEntity=Post::class, mappedBy="mostRelevantRelatedPost")
      */
-    private $mostRelevantRelatedToPost;
+    private ?Post $mostRelevantRelatedToPost = null;
 
     /**
      * @ORM\OneToOne(targetEntity=Post::class, inversedBy="lessRelevantRelatedToPost")
      */
-    private $lessRelevantRelatedPost;
+    private ?Post $lessRelevantRelatedPost = null;
 
     /**
      * @ORM\OneToOne(targetEntity=Post::class, mappedBy="lessRelevantRelatedPost")
      */
-    private $lessRelevantRelatedToPost;
+    private ?Post $lessRelevantRelatedToPost = null;
 
     /**
      * @ORM\ManyToMany(targetEntity=Post::class, inversedBy="relatedToPosts")
      */
-    private $relatedPosts;
+    private Collection $relatedPosts;
 
     /**
      * @ORM\ManyToMany(targetEntity=Post::class, mappedBy="relatedPosts")
      */
-    private $relatedToPosts;
+    private Collection $relatedToPosts;
 
     public function __construct(string $title, string $body, ?string $shortDescription = null)
     {
@@ -132,7 +133,7 @@ class Post
         return $this->id;
     }
 
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -142,7 +143,7 @@ class Post
         $this->title = $title;
     }
 
-    public function getBody(): ?string
+    public function getBody(): string
     {
         return $this->body;
     }
@@ -167,7 +168,7 @@ class Post
         $this->viewCount += $amount;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): \DateTime
     {
         return $this->createdAt;
     }
@@ -177,7 +178,7 @@ class Post
         return $this->category;
     }
 
-    public function setCategory(?Category $category)
+    public function setCategory(?Category $category): void
     {
         $this->category = $category;
     }
@@ -187,7 +188,7 @@ class Post
         return $this->secondaryCategory;
     }
 
-    public function setSecondaryCategory(?Category $secondaryCategory)
+    public function setSecondaryCategory(?Category $secondaryCategory): void
     {
         $this->secondaryCategory = $secondaryCategory;
     }
@@ -197,36 +198,36 @@ class Post
         return null !== $this->publishedAt;
     }
 
-    public function setPublishedAt(\DateTime $timestamp)
+    public function setPublishedAt(\DateTime $timestamp): void
     {
         $this->publishedAt = $timestamp;
     }
 
-    public function getRelatedPosts()
+    public function getRelatedPosts(): Collection
     {
         return $this->relatedPosts;
     }
 
-    public function addRelatedPost(self $relatedPost)
+    public function addRelatedPost(self $relatedPost): void
     {
         if (!$this->relatedPosts->contains($relatedPost)) {
             $this->relatedPosts[] = $relatedPost;
         }
     }
 
-    public function removeRelatedPost(self $relatedPost)
+    public function removeRelatedPost(self $relatedPost): void
     {
         if ($this->relatedPosts->contains($relatedPost)) {
             $this->relatedPosts->removeElement($relatedPost);
         }
     }
 
-    public function getRelatedToPosts()
+    public function getRelatedToPosts(): Collection
     {
         return $this->relatedToPosts;
     }
 
-    public function addRelatedToPost(self $relatedToPost)
+    public function addRelatedToPost(self $relatedToPost): void
     {
         if (!$this->relatedToPosts->contains($relatedToPost)) {
             $this->relatedToPosts[] = $relatedToPost;
@@ -234,7 +235,7 @@ class Post
         }
     }
 
-    public function removeRelatedToPost(self $relatedToPost)
+    public function removeRelatedToPost(self $relatedToPost): void
     {
         if ($this->relatedToPosts->contains($relatedToPost)) {
             $this->relatedToPosts->removeElement($relatedToPost);
@@ -242,45 +243,45 @@ class Post
         }
     }
 
-    public function getTags()
+    public function getTags(): Collection
     {
         return $this->tags;
     }
 
-    public function addTag(Tag $tag)
+    public function addTag(Tag $tag): void
     {
         if (!$this->tags->contains($tag)) {
             $this->tags[] = $tag;
         }
     }
 
-    public function removeTag(Tag $tag)
+    public function removeTag(Tag $tag): void
     {
         if ($this->tags->contains($tag)) {
             $this->tags->removeElement($tag);
         }
     }
 
-    public function getSecondaryTags()
+    public function getSecondaryTags(): Collection
     {
         return $this->secondaryTags;
     }
 
-    public function addSecondaryTag(Tag $secondaryTag)
+    public function addSecondaryTag(Tag $secondaryTag): void
     {
         if (!$this->secondaryTags->contains($secondaryTag)) {
             $this->secondaryTags[] = $secondaryTag;
         }
     }
 
-    public function removeSecondaryTag(Tag $tag)
+    public function removeSecondaryTag(Tag $tag): void
     {
         if ($this->tags->contains($tag)) {
             $this->tags->removeElement($tag);
         }
     }
 
-    public function getComments()
+    public function getComments(): Collection
     {
         return $this->comments;
     }
@@ -313,7 +314,7 @@ class Post
         return $this->mostRelevantRelatedPost;
     }
 
-    public function setMostRelevantRelatedPost(?self $mostRelevantRelatedPost)
+    public function setMostRelevantRelatedPost(?self $mostRelevantRelatedPost): void
     {
         $this->mostRelevantRelatedPost = $mostRelevantRelatedPost;
     }
@@ -323,7 +324,7 @@ class Post
         return $this->mostRelevantRelatedToPost;
     }
 
-    public function setMostRelevantRelatedToPost(?self $mostRelevantRelatedToPost)
+    public function setMostRelevantRelatedToPost(?self $mostRelevantRelatedToPost): void
     {
         $this->mostRelevantRelatedToPost = $mostRelevantRelatedToPost;
     }
@@ -333,7 +334,7 @@ class Post
         return $this->lessRelevantRelatedPost;
     }
 
-    public function setLessRelevantRelatedPost(?self $lessRelevantRelatedPost)
+    public function setLessRelevantRelatedPost(?self $lessRelevantRelatedPost): void
     {
         $this->lessRelevantRelatedPost = $lessRelevantRelatedPost;
     }
@@ -343,7 +344,7 @@ class Post
         return $this->lessRelevantRelatedToPost;
     }
 
-    public function setLessRelevantRelatedToPost(?self $lessRelevantRelatedToPost)
+    public function setLessRelevantRelatedToPost(?self $lessRelevantRelatedToPost): void
     {
         $this->lessRelevantRelatedToPost = $lessRelevantRelatedToPost;
     }

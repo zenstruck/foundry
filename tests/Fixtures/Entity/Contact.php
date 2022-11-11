@@ -25,7 +25,7 @@ class Contact
     /**
      * @ORM\Embedded("Address")
      */
-    private $address;
+    private Address $address;
 
     public function __construct($name)
     {

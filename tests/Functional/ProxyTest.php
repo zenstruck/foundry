@@ -23,7 +23,7 @@ abstract class ProxyTest extends KernelTestCase
     {
         $this->postFactoryClass()::createOne()->assertPersisted();
 
-        Assert::that(function() { $this->postFactoryClass()::new()->withoutPersisting()->create()->assertPersisted(); })
+        Assert::that(function(): void { $this->postFactoryClass()::new()->withoutPersisting()->create()->assertPersisted(); })
             ->throws(AssertionFailedError::class, \sprintf('%s is not persisted.', $this->postClass()))
         ;
     }
@@ -35,7 +35,7 @@ abstract class ProxyTest extends KernelTestCase
     {
         $this->postFactoryClass()::new()->withoutPersisting()->create()->assertNotPersisted();
 
-        Assert::that(function() { $this->postFactoryClass()::createOne()->assertNotPersisted(); })
+        Assert::that(function(): void { $this->postFactoryClass()::createOne()->assertNotPersisted(); })
             ->throws(AssertionFailedError::class, \sprintf('%s is persisted but it should not be.', $this->postClass()))
         ;
     }
@@ -215,7 +215,7 @@ abstract class ProxyTest extends KernelTestCase
 
         $post
             ->enableAutoRefresh()
-            ->withoutAutoRefresh(static function(Proxy $proxy) {
+            ->withoutAutoRefresh(static function(Proxy $proxy): void {
                 $proxy
                     ->forceSet('title', 'new title')
                     ->forceSet('body', 'new body')
@@ -239,7 +239,7 @@ abstract class ProxyTest extends KernelTestCase
         $this->assertSame('old body', $post->getBody());
 
         $post
-            ->withoutAutoRefresh(static function(Proxy $proxy) {
+            ->withoutAutoRefresh(static function(Proxy $proxy): void {
                 $proxy
                     ->forceSet('title', 'new title')
                     ->forceSet('body', 'new body')
@@ -265,7 +265,7 @@ abstract class ProxyTest extends KernelTestCase
         $this->assertSame('old body', $post->getBody());
 
         $post
-            ->withoutAutoRefresh(static function(Proxy $proxy) {
+            ->withoutAutoRefresh(static function(Proxy $proxy): void {
                 $proxy
                     ->forceSet('title', 'new title')
                     ->forceSet('body', 'new body')

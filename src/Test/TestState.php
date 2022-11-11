@@ -20,14 +20,12 @@ final class TestState
     /** @var callable|null */
     private static $instantiator;
 
-    /** @var Faker\Generator|null */
-    private static $faker;
+    private static ?\Faker\Generator $faker = null;
 
-    /** @var bool|null */
-    private static $defaultProxyAutoRefresh;
+    private static ?bool $defaultProxyAutoRefresh = null;
 
     /** @var callable[] */
-    private static $globalStates = [];
+    private static array $globalStates = [];
 
     /**
      * @deprecated Use TestState::configure()

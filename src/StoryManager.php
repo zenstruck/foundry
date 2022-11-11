@@ -10,20 +10,16 @@ namespace Zenstruck\Foundry;
 final class StoryManager
 {
     /** @var array<string, Story> */
-    private static $globalInstances = [];
+    private static array $globalInstances = [];
 
     /** @var array<string, Story> */
-    private static $instances = [];
-
-    /** @var Story[] */
-    private $stories;
+    private static array $instances = [];
 
     /**
      * @param Story[] $stories
      */
-    public function __construct(iterable $stories)
+    public function __construct(private iterable $stories)
     {
-        $this->stories = $stories;
     }
 
     public function load(string $class): Story
@@ -55,13 +51,14 @@ final class StoryManager
 
     public static function globalReset(): void
     {
-        self::$globalInstances = self::$instances = [];
+        self::$globalInstances = [];
+        self::$instances = [];
     }
 
     private function getOrCreateStory(string $class): Story
     {
         foreach ($this->stories as $story) {
-            if ($class === \get_class($story)) {
+            if ($class === $story::class) {
                 return $story;
             }
         }

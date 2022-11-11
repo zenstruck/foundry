@@ -537,7 +537,7 @@ final class InstantiatorTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Missing constructor argument "propB" for "Zenstruck\Foundry\Tests\Unit\VariadicInstantiatorDummy".');
-        $object = (new Instantiator())([
+        (new Instantiator())([
             'propA' => 'A',
         ], VariadicInstantiatorDummy::class);
     }
@@ -546,11 +546,16 @@ final class InstantiatorTest extends TestCase
 class InstantiatorDummy
 {
     public $propA;
+
     public $propD;
-    private $propB;
-    private $propC;
+
+    private string $propB;
+
+    private ?string $propC = null;
+
     private $propE;
-    private $propF;
+
+    private ?object $propF = null;
 
     public function __construct($propB, $propC = null)
     {
@@ -566,22 +571,22 @@ class InstantiatorDummy
         return $this->propA;
     }
 
-    public function getPropB()
+    public function getPropB(): string
     {
         return $this->propB;
     }
 
-    public function setPropB($propB)
+    public function setPropB($propB): void
     {
         $this->propB = 'setter '.$propB;
     }
 
-    public function getPropC()
+    public function getPropC(): ?string
     {
         return $this->propC;
     }
 
-    public function setPropC($propC)
+    public function setPropC($propC): void
     {
         $this->propC = 'setter '.$propC;
     }
@@ -591,12 +596,12 @@ class InstantiatorDummy
         return $this->propD;
     }
 
-    public function setPropD($propD)
+    public function setPropD($propD): void
     {
         $this->propD = 'setter '.$propD;
     }
 
-    public function setPropF(object $propF)
+    public function setPropF(object $propF): void
     {
         $this->propF = $propF;
     }
@@ -616,8 +621,9 @@ class PrivateConstructorInstantiatorDummy extends InstantiatorDummy
 
 class VariadicInstantiatorDummy
 {
-    private $propA;
-    private $propB;
+    private string $propA;
+
+    private array $propB;
 
     public function __construct($propA, ...$propB)
     {
@@ -625,12 +631,15 @@ class VariadicInstantiatorDummy
         $this->propB = $propB;
     }
 
-    public function getPropA()
+    public function getPropA(): string
     {
         return $this->propA;
     }
 
-    public function getPropB()
+    /**
+     * @return array<int|string, mixed>
+     */
+    public function getPropB(): array
     {
         return $this->propB;
     }

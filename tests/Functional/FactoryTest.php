@@ -55,9 +55,7 @@ final class FactoryTest extends KernelTestCase
         ]);
 
         $posts = \array_map(
-            static function($post) {
-                return $post->getTitle();
-            },
+            static fn($post) => $post->getTitle(),
             $category->getPosts()->toArray()
         );
 
@@ -81,9 +79,7 @@ final class FactoryTest extends KernelTestCase
         ]);
 
         $tags = \array_map(
-            static function($tag) {
-                return $tag->getName();
-            },
+            static fn($tag) => $tag->getName(),
             $post->getTags()->toArray()
         );
 
@@ -106,9 +102,7 @@ final class FactoryTest extends KernelTestCase
         ]);
 
         $posts = \array_map(
-            static function($post) {
-                return $post->getTitle();
-            },
+            static fn($post) => $post->getTitle(),
             $tag->getPosts()->toArray()
         );
 
@@ -148,13 +142,12 @@ final class FactoryTest extends KernelTestCase
         AnonymousFactory::new(Post::class)->assert()->empty();
         AnonymousFactory::new(Category::class)->assert()->empty();
 
-        AnonymousFactory::delayFlush(function() {
+        AnonymousFactory::delayFlush(static function(): void {
             AnonymousFactory::new(Post::class)->create([
                 'title' => 'title',
                 'body' => 'body',
                 'category' => AnonymousFactory::new(Category::class, ['name' => 'name']),
             ]);
-
             AnonymousFactory::new(Post::class)->assert()->empty();
             AnonymousFactory::new(Category::class)->assert()->empty();
         });
@@ -171,16 +164,14 @@ final class FactoryTest extends KernelTestCase
         AnonymousFactory::new(Post::class)->assert()->empty();
         AnonymousFactory::new(Category::class)->assert()->empty();
 
-        AnonymousFactory::delayFlush(function() {
+        AnonymousFactory::delayFlush(static function(): void {
             $post = AnonymousFactory::new(Post::class)->create([
                 'title' => 'title',
                 'body' => 'body',
                 'category' => AnonymousFactory::new(Category::class, ['name' => 'name']),
             ]);
-
             $post->setTitle('new title');
             $post->setBody('new body');
-
             AnonymousFactory::new(Post::class)->assert()->empty();
             AnonymousFactory::new(Category::class)->assert()->empty();
         });

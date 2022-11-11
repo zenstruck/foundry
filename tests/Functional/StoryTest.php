@@ -131,7 +131,7 @@ final class StoryTest extends KernelTestCase
         $objects = CategoryPoolStory::getRandomSet('pool-name', 3);
 
         $this->assertCount(3, $objects);
-        $this->assertCount(3, \array_unique(\array_map(static function($category) { return $category->getId(); }, $objects)));
+        $this->assertCount(3, \array_unique(\array_map(static fn($category) => $category->getId(), $objects)));
     }
 
     /**

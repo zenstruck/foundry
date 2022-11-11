@@ -14,7 +14,7 @@ final class MakeStoryTest extends MakerTestCase
      * @test
      * @dataProvider storyNameProvider
      */
-    public function can_create_story($name): void
+    public function can_create_story(string $name): void
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:story'));
 
@@ -47,7 +47,7 @@ EOF
      * @test
      * @dataProvider storyNameProvider
      */
-    public function can_create_story_interactively($name): void
+    public function can_create_story_interactively(string $name): void
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:story'));
 
@@ -55,6 +55,7 @@ EOF
 
         $tester->setInputs([$name]);
         $tester->execute([]);
+
         $output = $tester->getDisplay();
 
         $this->assertFileExists(self::tempFile('src/Story/FooBarStory.php'));
@@ -83,7 +84,7 @@ EOF
      * @test
      * @dataProvider storyNameProvider
      */
-    public function can_create_story_in_test_dir($name): void
+    public function can_create_story_in_test_dir(string $name): void
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:story'));
 
@@ -116,7 +117,7 @@ EOF
      * @test
      * @dataProvider storyNameProvider
      */
-    public function can_create_story_in_test_dir_interactively($name): void
+    public function can_create_story_in_test_dir_interactively(string $name): void
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:story'));
 
@@ -124,6 +125,7 @@ EOF
 
         $tester->setInputs([$name]);
         $tester->execute(['--test' => true]);
+
         $output = $tester->getDisplay();
 
         $this->assertFileExists(self::tempFile('tests/Story/FooBarStory.php'));

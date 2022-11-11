@@ -9,11 +9,8 @@ use Zenstruck\Assert;
  */
 final class RepositoryAssertions
 {
-    private $repository;
-
-    public function __construct(RepositoryProxy $repository)
+    public function __construct(private RepositoryProxy $repository)
     {
-        $this->repository = $repository;
     }
 
     public function empty(string $message = 'Expected {entity} repository to be empty but it has {actual} items.'): self

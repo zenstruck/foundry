@@ -47,19 +47,13 @@ final class MakeFactory extends AbstractMaker
         'TIME_IMMUTABLE' => '\DateTimeImmutable::createFromMutable(self::faker()->dateTime()),',
     ];
 
-    /** @var ManagerRegistry */
-    private $managerRegistry;
-
     /** @var string[] */
-    private $entitiesWithFactories;
+    private array $entitiesWithFactories = [];
 
-    public function __construct(ManagerRegistry $managerRegistry, \Traversable $factories)
+    public function __construct(private ManagerRegistry $managerRegistry, \Traversable $factories)
     {
-        $this->managerRegistry = $managerRegistry;
         $this->entitiesWithFactories = \array_map(
-            static function(ModelFactory $factory) {
-                return $factory::getEntityClass();
-            },
+            static fn(ModelFactory $factory): string => $factory::getEntityClass(),
             \iterator_to_array($factories)
         );
     }
@@ -127,7 +121,7 @@ final class MakeFactory extends AbstractMaker
     /**
      * Generates a single entity factory.
      */
-    private function generateFactory(string $class, InputInterface $input, ConsoleStyle $io, Generator $generator)
+    private function generateFactory(string $class, InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
         if (!\class_exists($class)) {
             $class = $generator->createClassNameDetails($class, 'Entity\\')->getFullName();
@@ -181,6 +175,9 @@ final class MakeFactory extends AbstractMaker
         ]);
     }
 
+    /**
+     * @return class-string[]
+     */
     private function entityChoices(): array
     {
         $choices = [];
@@ -190,6 +187,7 @@ final class MakeFactory extends AbstractMaker
                 if ($metadata->getReflectionClass()->isAbstract()) {
                     continue;
                 }
+
                 if (!\in_array($metadata->getName(), $this->entitiesWithFactories, true)) {
                     $choices[] = $metadata->getName();
                 }

@@ -17,42 +17,36 @@ class Factory
 {
     private const NULL_VALUE = '__null_value';
 
-    /** @var Configuration|null */
-    private static $configuration;
+    private static ?Configuration $configuration = null;
 
     /**
-     * @var string
-     * @psalm-var class-string<TObject>
+     * @var class-string<TObject>
      */
-    private $class;
+    private string $class;
 
     /** @var callable|null */
     private $instantiator;
 
-    /** @var bool */
-    private $persist = true;
+    private bool $persist = true;
 
-    /** @var bool */
-    private $cascadePersist = false;
+    private bool $cascadePersist = false;
 
     /** @var array<array|callable> */
-    private $attributeSet = [];
+    private array $attributeSet = [];
 
     /** @var callable[] */
-    private $beforeInstantiate = [];
+    private array $beforeInstantiate = [];
 
     /** @var callable[] */
-    private $afterInstantiate = [];
+    private array $afterInstantiate = [];
 
     /** @var callable[] */
-    private $afterPersist = [];
+    private array $afterPersist = [];
 
     /**
-     * @param array|callable $defaultAttributes
-     *
-     * @psalm-param class-string<TObject> $class
+     * @param class-string<TObject> $class
      */
-    public function __construct(string $class, $defaultAttributes = [])
+    public function __construct(string $class, array|callable $defaultAttributes = [])
     {
         if (self::class === static::class) {
             trigger_deprecation('zenstruck/foundry', '1.9', 'Instantiating "%s" directly is deprecated and this class will be abstract in 2.0, use "%s" instead.', self::class, AnonymousFactory::class);
@@ -85,7 +79,7 @@ class Factory
         $attributeSet = \array_merge($this->attributeSet, [$attributes]);
 
         // normalize each attribute set and collapse
-        $attributes = \array_merge(...\array_map([$this, 'normalizeAttributes'], $attributeSet));
+        $attributes = \array_merge(...\array_map(fn(callable|array $attributes): array => $this::normalizeAttributes($attributes), $attributeSet));
 
         foreach ($this->beforeInstantiate as $callback) {
             $attributes = $callback($attributes);
@@ -102,8 +96,10 @@ class Factory
             if (self::NULL_VALUE === $normalizedAttribute) {
                 $normalizedAttribute = null;
             }
+
             $mappedAttributes[$name] = $normalizedAttribute;
         }
+
         $attributes = $mappedAttributes;
 
         // instantiate the object with the users instantiator or if not set, the default instantiator
@@ -115,13 +111,13 @@ class Factory
 
         $proxy = new Proxy($object);
 
-        if (!$this->isPersisting() || true === $this->cascadePersist) {
+        if (!$this->isPersisting() || $this->cascadePersist) {
             return $proxy;
         }
 
         return $proxy
             ->save()
-            ->withoutAutoRefresh(function(Proxy $proxy) use ($attributes) {
+            ->withoutAutoRefresh(function(Proxy $proxy) use ($attributes): void {
                 if (!$this->afterPersist) {
                     return;
                 }
@@ -154,7 +150,7 @@ class Factory
      *
      * @return FactoryCollection<TObject>
      */
-    final public function sequence($sequence): FactoryCollection
+    final public function sequence(iterable|callable $sequence): FactoryCollection
     {
         if (\is_callable($sequence)) {
             $sequence = $sequence();
@@ -302,20 +298,15 @@ class Factory
         return $this->class;
     }
 
-    /**
-     * @param array|callable $attributes
-     */
-    private static function normalizeAttributes($attributes): array
+    private static function normalizeAttributes(array|callable $attributes): array
     {
         return \is_callable($attributes) ? $attributes() : $attributes;
     }
 
     /**
-     * @param mixed $value
-     *
      * @return mixed
      */
-    private function normalizeAttribute($value, ?string $name = null)
+    private function normalizeAttribute(mixed $value, ?string $name = null)
     {
         if ($value instanceof Proxy) {
             return $value->isPersisted() ? $value->refresh()->object() : $value->object();
@@ -329,14 +320,10 @@ class Factory
             // possible OneToMany/ManyToMany relationship
             return \array_filter(
                 \array_map(
-                    function($value) use ($name) {
-                        return $this->normalizeAttribute($value, $name);
-                    },
+                    fn($value) => $this->normalizeAttribute($value, $name),
                     $value
                 ),
-                function($value) {
-                    return self::NULL_VALUE !== $value;
-                }
+                static fn($value): bool => self::NULL_VALUE !== $value
             );
         }
 
@@ -361,7 +348,7 @@ class Factory
                 $cascadePersist = $this->hasCascadePersist($value, $relationshipField);
 
                 if ($this->isPersisting() && null !== $relationshipField && false === $cascadePersist) {
-                    $this->afterPersist[] = static function(Proxy $proxy) use ($value, $relationshipField, $isCollection) {
+                    $this->afterPersist[] = static function(Proxy $proxy) use ($value, $relationshipField, $isCollection): void {
                         $value->create([$relationshipField => $isCollection ? [$proxy] : $proxy]);
                         $proxy->refresh();
                     };
@@ -381,7 +368,7 @@ class Factory
     {
         try {
             return Proxy::createFromPersisted($object)->refresh()->object();
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException) {
             return $object;
         }
     }
@@ -393,7 +380,7 @@ class Factory
             $cascadePersist = $this->hasCascadePersist($collection->factory(), $field);
 
             if ($field && false === $cascadePersist) {
-                $this->afterPersist[] = static function(Proxy $proxy) use ($collection, $field) {
+                $this->afterPersist[] = static function(Proxy $proxy) use ($collection, $field): void {
                     $collection->create([$field => $proxy]);
                     $proxy->refresh();
                 };
@@ -404,7 +391,7 @@ class Factory
         }
 
         return \array_map(
-            function(self $factory) {
+            function(self $factory): self {
                 $factory->cascadePersist = $this->cascadePersist;
 
                 return $factory;
@@ -467,7 +454,7 @@ class Factory
         try {
             // Check mappedBy side ($factory is the owner of the relation)
             $relationClassMetadata = self::configuration()->objectManagerFor($relationClass)->getClassMetadata($relationClass);
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException) {
             // relation not managed - could be embeddable
             return null;
         }
@@ -559,7 +546,7 @@ class Factory
 
         try {
             $classMetadata = self::configuration()->objectManagerFor($this->class)->getClassMetadata($this->class);
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException) {
             // entity not managed (perhaps Embeddable)
             return false;
         }

@@ -10,11 +10,9 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
  */
 class PostFactory extends ModelFactory
 {
-    public function published(): self
+    public function published(): static
     {
-        return $this->addState(function() {
-            return ['published_at' => self::faker()->dateTime()];
-        });
+        return $this->addState(static fn(): array => ['published_at' => self::faker()->dateTime()]);
     }
 
     protected static function getClass(): string

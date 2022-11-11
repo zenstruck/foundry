@@ -89,7 +89,7 @@ abstract class ModelFactoryTest extends KernelTestCase
         $objects = $categoryFactoryClass::randomSet(3);
 
         $this->assertCount(3, $objects);
-        $this->assertCount(3, \array_unique(\array_map(static function($category) { return $category->getId(); }, $objects)));
+        $this->assertCount(3, \array_unique(\array_map(static fn($category) => $category->getId(), $objects)));
     }
 
     /**
@@ -161,7 +161,7 @@ abstract class ModelFactoryTest extends KernelTestCase
         $categoryFactoryClass = $this->categoryFactoryClass();
 
         $categoryA = $categoryFactoryClass::createOne(['name' => '3']);
-        $categoryB = $categoryFactoryClass::createOne(['name' => '2']);
+        $categoryFactoryClass::createOne(['name' => '2']);
         $categoryC = $categoryFactoryClass::createOne(['name' => '1']);
 
         $this->assertSame($categoryA->getId(), $categoryFactoryClass::first()->getId());
@@ -287,7 +287,7 @@ abstract class ModelFactoryTest extends KernelTestCase
         $categoryFactoryClass = $this->categoryFactoryClass();
 
         $categoryFactoryClass::new()
-            ->afterPersist(function($category) {
+            ->afterPersist(static function($category): void {
                 $category->setName('new');
             })
             ->create(['name' => 'original'])
@@ -301,7 +301,7 @@ abstract class ModelFactoryTest extends KernelTestCase
      * @test
      * @dataProvider sequenceProvider
      */
-    public function can_create_sequence($sequence): void
+    public function can_create_sequence(\Closure|string|array $sequence): void
     {
         $categoryFactoryClass = $this->categoryFactoryClass();
         $categoryFactoryClass::createSequence($sequence);
@@ -317,9 +317,7 @@ abstract class ModelFactoryTest extends KernelTestCase
         ];
 
         yield 'with a callable which returns an array of attributes' => [
-            static function(): array {
-                return [['name' => 'foo'], ['name' => 'bar']];
-            },
+            static fn(): array => [['name' => 'foo'], ['name' => 'bar']],
         ];
 
         yield 'with a callable which yields attributes' => [
@@ -336,11 +334,9 @@ abstract class ModelFactoryTest extends KernelTestCase
     public function can_create_many_objects_with_index(): void
     {
         $categoryFactoryClass = $this->categoryFactoryClass();
-        $categoryFactoryClass::createMany(2, static function(int $i) {
-            return [
-                'name' => "foo {$i}",
-            ];
-        });
+        $categoryFactoryClass::createMany(2, static fn(int $i): array => [
+            'name' => "foo {$i}",
+        ]);
 
         $categoryFactoryClass::assert()->exists(['name' => 'foo 1']);
         $categoryFactoryClass::assert()->exists(['name' => 'foo 2']);

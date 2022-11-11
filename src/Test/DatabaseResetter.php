@@ -16,8 +16,7 @@ use Zenstruck\Foundry\Factory;
  */
 final class DatabaseResetter
 {
-    /** @var bool */
-    private static $hasBeenReset = false;
+    private static bool $hasBeenReset = false;
 
     public static function hasBeenReset(): bool
     {

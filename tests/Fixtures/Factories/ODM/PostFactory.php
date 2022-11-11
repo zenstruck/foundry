@@ -10,23 +10,19 @@ use Zenstruck\Foundry\Tests\Fixtures\Document\User;
 
 class PostFactory extends ModelFactory
 {
-    public function published(): self
+    public function published(): static
     {
-        return $this->addState(function() {
-            return ['published_at' => self::faker()->dateTime()];
-        });
+        return $this->addState(static fn(): array => ['published_at' => self::faker()->dateTime()]);
     }
 
-    public function withComments(): self
+    public function withComments(): static
     {
-        return $this->addState(function() {
-            return [
-                'comments' => new ArrayCollection([
-                    new Comment(new User('user'), 'body'),
-                    new Comment(new User('user'), 'body'),
-                ]),
-            ];
-        });
+        return $this->addState(static fn(): array => [
+            'comments' => new ArrayCollection([
+                new Comment(new User('user'), 'body'),
+                new Comment(new User('user'), 'body'),
+            ]),
+        ]);
     }
 
     protected static function getClass(): string

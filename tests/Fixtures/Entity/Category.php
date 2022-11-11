@@ -3,6 +3,7 @@
 namespace Zenstruck\Foundry\Tests\Fixtures\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -19,19 +20,20 @@ class Category
     private $id;
 
     /**
+     * @var mixed|null
      * @ORM\Column(type="string", length=255)
      */
-    private $name;
+    private ?string $name = null;
 
     /**
      * @ORM\OneToMany(targetEntity=Post::class, mappedBy="category")
      */
-    private $posts;
+    private Collection $posts;
 
     /**
      * @ORM\OneToMany(targetEntity=Post::class, mappedBy="secondaryCategory")
      */
-    private $secondaryPosts;
+    private Collection $secondaryPosts;
 
     public function __construct()
     {
@@ -49,17 +51,17 @@ class Category
         return $this->name;
     }
 
-    public function setName($name)
+    public function setName(?string $name): void
     {
         $this->name = $name;
     }
 
-    public function getPosts()
+    public function getPosts(): Collection
     {
         return $this->posts;
     }
 
-    public function addPost(Post $post)
+    public function addPost(Post $post): void
     {
         if (!$this->posts->contains($post)) {
             $this->posts[] = $post;
@@ -67,7 +69,7 @@ class Category
         }
     }
 
-    public function removePost(Post $post)
+    public function removePost(Post $post): void
     {
         if ($this->posts->contains($post)) {
             $this->posts->removeElement($post);
@@ -78,12 +80,12 @@ class Category
         }
     }
 
-    public function getSecondaryPosts()
+    public function getSecondaryPosts(): Collection
     {
         return $this->posts;
     }
 
-    public function addSecondaryPost(Post $secondaryPost)
+    public function addSecondaryPost(Post $secondaryPost): void
     {
         if (!$this->secondaryPosts->contains($secondaryPost)) {
             $this->secondaryPosts[] = $secondaryPost;
@@ -91,7 +93,7 @@ class Category
         }
     }
 
-    public function removeSecondaryPost(Post $secondaryPost)
+    public function removeSecondaryPost(Post $secondaryPost): void
     {
         if ($this->secondaryPosts->contains($secondaryPost)) {
             $this->secondaryPosts->removeElement($secondaryPost);

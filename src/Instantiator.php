@@ -11,23 +11,18 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
  */
 final class Instantiator
 {
-    /** @var PropertyAccessor|null */
-    private static $propertyAccessor;
+    private static ?PropertyAccessor $propertyAccessor = null;
 
-    /** @var bool */
-    private $withoutConstructor = false;
+    private bool $withoutConstructor = false;
 
-    /** @var bool */
-    private $allowExtraAttributes = false;
+    private bool $allowExtraAttributes = false;
 
-    /** @var array */
-    private $extraAttributes = [];
+    private array $extraAttributes = [];
 
-    /** @var bool */
-    private $alwaysForceProperties = false;
+    private bool $alwaysForceProperties = false;
 
     /** @var string[] */
-    private $forceProperties = [];
+    private array $forceProperties = [];
 
     public function __invoke(array $attributes, string $class): object
     {
@@ -124,11 +119,9 @@ final class Instantiator
     }
 
     /**
-     * @param mixed $value
-     *
      * @throws \InvalidArgumentException if property does not exist for $object
      */
-    public static function forceSet(object $object, string $property, $value): void
+    public static function forceSet(object $object, string $property, mixed $value): void
     {
         self::accessibleProperty($object, $property)->setValue($object, $value);
     }
@@ -172,7 +165,7 @@ final class Instantiator
     {
         try {
             return $class->getProperty($name);
-        } catch (\ReflectionException $e) {
+        } catch (\ReflectionException) {
             if ($class = $class->getParentClass()) {
                 return self::reflectionProperty($class, $name);
             }
@@ -238,9 +231,7 @@ final class Instantiator
         /**
          * @see https://github.com/symfony/symfony/blob/a73523b065221b6b93cd45bf1cc7c59e7eb2dcdf/src/Symfony/Component/String/AbstractUnicodeString.php#L369
          */
-        $string = \preg_replace_callback('/\b./u', static function(array $m): string {
-            return \mb_convert_case($m[0], \MB_CASE_TITLE, 'UTF-8');
-        }, $string, 1);
+        $string = \preg_replace_callback('/\b./u', static fn(array $m): string => \mb_convert_case($m[0], \MB_CASE_TITLE, 'UTF-8'), $string, 1);
 
         return \mb_strtolower(\preg_replace(['/(\p{Lu}+)(\p{Lu}\p{Ll})/u', '/([\p{Ll}0-9])(\p{Lu})/u'], '\1_\2', $string), 'UTF-8');
     }

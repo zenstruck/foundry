@@ -11,13 +11,9 @@ use Zenstruck\Foundry\Tests\Fixtures\Service;
  */
 final class CategoryServiceFactory extends ModelFactory
 {
-    private $service;
-
-    public function __construct(Service $service)
+    public function __construct(private Service $service)
     {
         parent::__construct();
-
-        $this->service = $service;
     }
 
     protected static function getClass(): string
