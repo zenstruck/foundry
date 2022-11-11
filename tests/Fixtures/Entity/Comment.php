@@ -15,34 +15,34 @@ class Comment
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id = null;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="comments")
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
-    private $user;
+    private User $user;
 
     /**
      * @ORM\Column(type="text")
      */
-    private $body;
+    private string $body;
 
     /**
      * @ORM\Column(type="datetime")
      */
-    private $createdAt;
+    private \DateTimeInterface $createdAt;
 
     /**
      * @ORM\ManyToOne(targetEntity=Post::class, inversedBy="comments")
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
-    private $post;
+    private ?Post $post = null;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $approved = false;
+    private bool $approved = false;
 
     public function __construct(User $user, string $body)
     {
@@ -68,7 +68,7 @@ class Comment
         return $this;
     }
 
-    public function getBody(): ?string
+    public function getBody(): string
     {
         return $this->body;
     }
@@ -80,7 +80,7 @@ class Comment
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt(): \DateTime
     {
         return $this->createdAt;
     }
@@ -104,7 +104,7 @@ class Comment
         return $this;
     }
 
-    public function getApproved(): ?bool
+    public function getApproved(): bool
     {
         return $this->approved;
     }

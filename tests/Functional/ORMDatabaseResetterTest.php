@@ -32,6 +32,7 @@ final class ORMDatabaseResetterTest extends KernelTestCase
     {
         $kernel = static::createKernel(['ormResetMode' => $resetMode]);
         $kernel->boot();
+
         $container = $kernel->getContainer();
 
         $application = new Application($kernel);

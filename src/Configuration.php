@@ -14,53 +14,34 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
  */
 final class Configuration
 {
-    /** @var ManagerRegistry|null */
-    private $managerRegistry;
+    private ?ManagerRegistry $managerRegistry = null;
 
-    /** @var StoryManager */
-    private $stories;
+    private StoryManager $stories;
 
-    /** @var ModelFactoryManager */
-    private $factories;
+    private ModelFactoryManager $factories;
 
-    /** @var Faker\Generator */
-    private $faker;
+    private \Faker\Generator $faker;
 
     /** @var callable */
     private $instantiator;
 
-    /** @var bool|null */
-    private $defaultProxyAutoRefresh;
+    private ?bool $defaultProxyAutoRefresh = null;
 
-    /** @var bool */
-    private $flushEnabled = true;
+    private bool $flushEnabled = true;
 
-    /** @var bool */
-    private $databaseResetEnabled = true;
+    private bool $databaseResetEnabled = true;
 
-    /** @var list<string> */
-    private $ormConnectionsToReset;
-
-    /** @var list<string> */
-    private $ormObjectManagersToReset;
-
-    /** @var string */
-    private $ormResetMode;
-
-    /** @var list<string> */
-    private $odmObjectManagersToReset;
-
-    public function __construct(array $ormConnectionsToReset, array $ormObjectManagersToReset, string $ormResetMode, array $odmObjectManagersToReset)
+    /**
+     * @param string[] $ormConnectionsToReset
+     * @param string[] $ormObjectManagersToReset
+     * @param string[] $odmObjectManagersToReset
+     */
+    public function __construct(private array $ormConnectionsToReset, private array $ormObjectManagersToReset, private string $ormResetMode, private array $odmObjectManagersToReset)
     {
         $this->stories = new StoryManager([]);
         $this->factories = new ModelFactoryManager([]);
         $this->faker = Faker\Factory::create();
         $this->instantiator = new Instantiator();
-
-        $this->ormConnectionsToReset = $ormConnectionsToReset;
-        $this->ormObjectManagersToReset = $ormObjectManagersToReset;
-        $this->ormResetMode = $ormResetMode;
-        $this->odmObjectManagersToReset = $odmObjectManagersToReset;
     }
 
     public function stories(): StoryManager
@@ -178,33 +159,28 @@ final class Configuration
     }
 
     /**
-     * @param object|string $objectOrClass
-     *
      * @psalm-suppress InvalidReturnType
      * @psalm-suppress InvalidReturnStatement
      * @template TObject of object
      * @psalm-param Proxy<TObject>|TObject|class-string<TObject> $objectOrClass
      * @psalm-return RepositoryProxy<TObject>
      */
-    public function repositoryFor($objectOrClass): RepositoryProxy
+    public function repositoryFor(object|string $objectOrClass): RepositoryProxy
     {
         if ($objectOrClass instanceof Proxy) {
             $objectOrClass = $objectOrClass->object();
         }
 
         if (!\is_string($objectOrClass)) {
-            $objectOrClass = \get_class($objectOrClass);
+            $objectOrClass = $objectOrClass::class;
         }
 
         return new RepositoryProxy($this->managerRegistry()->getRepository($objectOrClass));
     }
 
-    /**
-     * @param object|string $objectOrClass
-     */
-    public function objectManagerFor($objectOrClass): ObjectManager
+    public function objectManagerFor(object|string $objectOrClass): ObjectManager
     {
-        $class = \is_string($objectOrClass) ? $objectOrClass : \get_class($objectOrClass);
+        $class = \is_string($objectOrClass) ? $objectOrClass : $objectOrClass::class;
 
         if (!$objectManager = $this->managerRegistry()->getManagerForClass($class)) {
             throw new \RuntimeException(\sprintf('No object manager registered for "%s".', $class));
@@ -219,11 +195,17 @@ final class Configuration
         return null !== $this->managerRegistry;
     }
 
+    /**
+     * @return string[]
+     */
     public function getOrmConnectionsToReset(): array
     {
         return $this->ormConnectionsToReset;
     }
 
+    /**
+     * @return string[]
+     */
     public function getOrmObjectManagersToReset(): array
     {
         return $this->ormObjectManagersToReset;
@@ -234,12 +216,15 @@ final class Configuration
         return $this->ormResetMode;
     }
 
+    /**
+     * @return string[]
+     */
     public function getOdmObjectManagersToReset(): array
     {
         return $this->odmObjectManagersToReset;
     }
 
-    private function managerRegistry(): ManagerRegistry
+    private function managerRegistry(): ?ManagerRegistry
     {
         if (!$this->hasManagerRegistry()) {
             /** @psalm-suppress MissingDependency */

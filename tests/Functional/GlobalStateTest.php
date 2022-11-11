@@ -20,8 +20,6 @@ abstract class GlobalStateTest extends KernelTestCase
         if (!\getenv('USE_FOUNDRY_BUNDLE')) {
             $this->markTestSkipped('ZenstruckFoundryBundle not enabled.');
         }
-
-        parent::setUp();
     }
 
     /**

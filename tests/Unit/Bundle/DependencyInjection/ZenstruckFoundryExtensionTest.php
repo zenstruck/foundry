@@ -181,6 +181,9 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'disableDefaultProxyAutoRefresh', []);
     }
 
+    /**
+     * @return ZenstruckFoundryExtension[]
+     */
     protected function getContainerExtensions(): array
     {
         return [new ZenstruckFoundryExtension()];

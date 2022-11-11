@@ -31,8 +31,15 @@
                 <referencedMethod name="DAMA\DoctrineTestBundle\Doctrine\DBAL\AbstractStaticDriver::setKeepStaticConnections" />
 
                 <referencedMethod name="Doctrine\ORM\UnitOfWork::computeChangeSet" />
+
+                <referencedMethod name="Symfony\Bundle\MakerBundle\Validator::notBlank" />
             </errorLevel>
         </InternalMethod>
+        <InternalClass>
+            <errorLevel type="suppress">
+                <referencedClass name="Symfony\Bundle\MakerBundle\Validator" />
+            </errorLevel>
+        </InternalClass>
     </issueHandlers>
 
     <plugins>

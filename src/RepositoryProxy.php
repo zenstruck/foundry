@@ -15,12 +15,11 @@ use Doctrine\Persistence\ObjectRepository;
  */
 final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Countable
 {
-    /** @var ObjectRepository<TProxiedObject>|EntityRepository<TProxiedObject> */
-    private $repository;
-
-    public function __construct(ObjectRepository $repository)
+    /**
+     * @param ObjectRepository<object>|EntityRepository<object> $repository
+     */
+    public function __construct(private ObjectRepository $repository)
     {
-        $this->repository = $repository;
     }
 
     public function __call(string $method, array $arguments)
@@ -289,7 +288,10 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
         }
 
         if (!\is_array($criteria)) {
-            return $this->proxyResult($this->repository->find($criteria));
+            /** @var TProxiedObject|null $result */
+            $result = $this->repository->find($criteria);
+
+            return $this->proxyResult($result);
         }
 
         return $this->findOneBy($criteria);
@@ -326,10 +328,11 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
             $wrappedParams = (new \ReflectionClass($this->repository))->getMethod('findOneBy')->getParameters();
 
             if (!isset($wrappedParams[1]) || 'orderBy' !== $wrappedParams[1]->getName() || !($type = $wrappedParams[1]->getType()) instanceof \ReflectionNamedType || 'array' !== $type->getName()) {
-                throw new \RuntimeException(\sprintf('Wrapped repository\'s (%s) findOneBy method does not have an $orderBy parameter.', \get_class($this->repository)));
+                throw new \RuntimeException(\sprintf('Wrapped repository\'s (%s) findOneBy method does not have an $orderBy parameter.', $this->repository::class));
             }
         }
 
+        /** @var TProxiedObject|null $result */
         $result = $this->repository->findOneBy(self::normalizeCriteria($criteria), $orderBy);
         if (null === $result) {
             return null;
@@ -347,8 +350,6 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
     }
 
     /**
-     * @param mixed $result
-     *
      * @return Proxy|Proxy[]|object|object[]|mixed
      *
      * @psalm-suppress InvalidReturnStatement
@@ -357,7 +358,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
      * @psalm-param TResult|list<TResult> $result
      * @psalm-return ($result is array ? list<Proxy<TResult>> : Proxy<TResult>)
      */
-    private function proxyResult($result)
+    private function proxyResult(mixed $result)
     {
         if (\is_a($result, $this->getClassName())) {
             return Proxy::createFromPersisted($result);
@@ -373,9 +374,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
     private static function normalizeCriteria(array $criteria): array
     {
         return \array_map(
-            function($value) {
-                return $value instanceof Proxy ? $value->object() : $value;
-            },
+            fn($value) => $value instanceof Proxy ? $value->object() : $value,
             $criteria
         );
     }

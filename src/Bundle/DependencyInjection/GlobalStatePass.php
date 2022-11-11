@@ -51,7 +51,7 @@ final class GlobalStatePass implements CompilerPassInterface
 
         $globalStateItemDefinition = $container->getDefinition($globalStateItem);
 
-        return \count($globalStateItemDefinition->getTag('foundry.story')) > 0;
+        return [] !== $globalStateItemDefinition->getTag('foundry.story');
     }
 
     private function isInvokableService(ContainerBuilder $container, string $globalStateItem): bool
@@ -74,6 +74,9 @@ final class GlobalStatePass implements CompilerPassInterface
         return \class_exists($globalStateItem) && \is_a($globalStateItem, Story::class, true);
     }
 
+    /**
+     * @return mixed[]
+     */
     private function getBundleConfiguration(ContainerBuilder $container): array
     {
         return (new Processor())->processConfiguration(new Configuration(), $container->getExtensionConfig('zenstruck_foundry'));

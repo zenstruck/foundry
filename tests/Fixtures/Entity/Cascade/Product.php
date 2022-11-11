@@ -17,37 +17,37 @@ class Product
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id = null;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $name;
+    private ?string $name = null;
 
     /**
      * @ORM\ManyToOne(targetEntity=Brand::class, inversedBy="products", cascade={"persist"})
      */
-    private $brand;
+    private ?Brand $brand = null;
 
     /**
      * @ORM\OneToMany(targetEntity=Variant::class, mappedBy="product", cascade={"persist"})
      */
-    private $variants;
+    private Collection $variants;
 
     /**
      * @ORM\ManyToMany(targetEntity=Category::class, mappedBy="products", cascade={"persist"})
      */
-    private $categories;
+    private Collection $categories;
 
     /**
      * @ORM\ManyToMany(targetEntity=Tag::class, inversedBy="products", cascade={"persist"})
      */
-    private $tags;
+    private Collection $tags;
 
     /**
      * @ORM\OneToOne(targetEntity=Review::class, mappedBy="product", cascade={"persist"})
      */
-    private $review;
+    private ?Review $review = null;
 
     public function __construct()
     {
@@ -71,7 +71,7 @@ class Product
         $this->name = $name;
     }
 
-    public function getBrand(): Brand
+    public function getBrand(): ?Brand
     {
         return $this->brand;
     }
@@ -81,7 +81,7 @@ class Product
         $this->brand = $brand;
     }
 
-    public function getReview(): Review
+    public function getReview(): ?Review
     {
         return $this->review;
     }

@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [7.2, 7.4, 8.0, 8.1]
+        php: [8.0, 8.1]
         symfony: [4.4.*, 5.4.*, 6.0.*, 6.1.*]
         deps: [highest]
         use-orm: [1]
@@ -23,15 +23,11 @@ jobs:
           - {use-orm: 0, use-odm: 0} # tested directly in a test case
           - {use-orm: 0, use-dama: 1} # cannot happen
           # conflicts
-          - {php: 7.2, symfony: 6.0.*}
-          - {php: 7.2, symfony: 6.1.*}
-          - {php: 7.4, symfony: 6.0.*}
-          - {php: 7.4, symfony: 6.1.*}
           - {php: 8.0, symfony: 6.1.*}
         include:
-          - {php: 7.2, symfony: 4.4.*, use-orm: 1, use-odm: 0, use-dama: 0, deps: lowest}
-          - {php: 7.2, symfony: 4.4.*, use-orm: 1, use-odm: 1, use-dama: 0, deps: lowest}
-          - {php: 7.2, symfony: 4.4.*, use-orm: 0, use-odm: 1, use-dama: 0, deps: lowest}
+          - {php: 8.0, symfony: 4.4.*, use-orm: 1, use-odm: 0, use-dama: 0, deps: lowest}
+          - {php: 8.0, symfony: 4.4.*, use-orm: 1, use-odm: 1, use-dama: 0, deps: lowest}
+          - {php: 8.0, symfony: 4.4.*, use-orm: 0, use-odm: 1, use-dama: 0, deps: lowest}
           - {php: 8.1, symfony: 6.1.*, use-orm: 1, use-odm: 0, use-dama: 0, deps: highest}
           - {php: 8.1, symfony: 6.1.*, use-orm: 1, use-odm: 1, use-dama: 0, deps: highest}
           - {php: 8.1, symfony: 6.1.*, use-orm: 1, use-odm: 0, use-dama: 1, deps: highest}
@@ -155,7 +151,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.4
+          php-version: 8.0
           coverage: none
 
       - name: Install dependencies
@@ -176,7 +172,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@2.7.0
         with:
-          php-version: 7.2
+          php-version: 8.0
           coverage: none
 
       - name: Install dependencies
@@ -200,7 +196,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@2.7.0
         with:
-          php-version: 7.2
+          php-version: 8.0
           coverage: none
 
       - name: Install dependencies
@@ -212,7 +208,7 @@ jobs:
         run: composer bin psalm install
 
       - name: Run static analysis
-        run: bin/tools/psalm/vendor/vimeo/psalm/psalm --output-format=github --php-version=7.2
+        run: bin/tools/psalm/vendor/vimeo/psalm/psalm --output-format=github
 
   docker-stack:
     name: CI with docker stack

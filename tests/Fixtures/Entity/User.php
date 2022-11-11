@@ -3,6 +3,7 @@
 namespace Zenstruck\Foundry\Tests\Fixtures\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -16,17 +17,17 @@ class User
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id = null;
 
     /**
      * @ORM\Column(type="string")
      */
-    private $name;
+    private ?string $name = null;
 
     /**
      * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="user", orphanRemoval=true)
      */
-    private $comments;
+    private Collection $comments;
 
     public function __construct()
     {
@@ -50,12 +51,12 @@ class User
         return $this;
     }
 
-    public function getComments()
+    public function getComments(): Collection
     {
         return $this->comments;
     }
 
-    public function addComment(Comment $comment)
+    public function addComment(Comment $comment): void
     {
         if (!$this->comments->contains($comment)) {
             $this->comments[] = $comment;
@@ -63,7 +64,7 @@ class User
         }
     }
 
-    public function removeComment(Comment $comment)
+    public function removeComment(Comment $comment): void
     {
         if ($this->comments->contains($comment)) {
             $this->comments->removeElement($comment);

@@ -12,13 +12,9 @@ use Doctrine\Persistence\ObjectRepository;
  */
 final class ChainManagerRegistry implements ManagerRegistry
 {
-    /** @var list<ManagerRegistry> */
-    private $managerRegistries;
-
     /** @param list<ManagerRegistry> $managerRegistries */
-    public function __construct(array $managerRegistries)
+    public function __construct(private array $managerRegistries)
     {
-        $this->managerRegistries = $managerRegistries;
     }
 
     public function getRepository($persistentObject, $persistentManagerName = null): ObjectRepository
@@ -28,7 +24,7 @@ final class ChainManagerRegistry implements ManagerRegistry
                 if ($repository = $managerRegistry->getRepository($persistentObject, $persistentManagerName)) {
                     return $repository;
                 }
-            } catch (MappingException $exception) {
+            } catch (MappingException) {
                 // the class is not managed by the current manager
             }
         }
@@ -47,58 +43,59 @@ final class ChainManagerRegistry implements ManagerRegistry
         return null;
     }
 
+    /**
+     * @return array<string, ObjectManager>
+     */
     public function getManagers(): array
     {
         return \array_reduce(
             $this->managerRegistries,
-            static function(array $carry, ManagerRegistry $managerRegistry) {
-                return \array_merge($carry, \array_values($managerRegistry->getManagers()));
-            },
+            static fn(array $carry, ManagerRegistry $managerRegistry): array => \array_merge($carry, \array_values($managerRegistry->getManagers())),
             []
         );
     }
 
-    public function getDefaultConnectionName(): string
+    public function getDefaultConnectionName(): void
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
-    public function getConnection($name = null): object
+    public function getConnection($name = null): void
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
-    public function getConnections(): array
+    public function getConnections(): void
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
-    public function getConnectionNames(): array
+    public function getConnectionNames(): void
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
-    public function getDefaultManagerName(): string
+    public function getDefaultManagerName(): void
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
-    public function getManager($name = null): ObjectManager
+    public function getManager($name = null): void
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
-    public function resetManager($name = null): ObjectManager
+    public function resetManager($name = null): void
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
-    public function getAliasNamespace($alias): string
+    public function getAliasNamespace($alias): void
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
-    public function getManagerNames(): array
+    public function getManagerNames(): void
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }

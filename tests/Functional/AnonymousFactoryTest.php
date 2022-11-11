@@ -85,7 +85,7 @@ abstract class AnonymousFactoryTest extends KernelTestCase
         $objects = $factory->randomSet(3);
 
         $this->assertCount(3, $objects);
-        $this->assertCount(3, \array_unique(\array_map(static function($category) { return $category->getId(); }, $objects)));
+        $this->assertCount(3, \array_unique(\array_map(static fn($category) => $category->getId(), $objects)));
     }
 
     /**
@@ -153,7 +153,7 @@ abstract class AnonymousFactoryTest extends KernelTestCase
     {
         $factory = AnonymousFactory::new($this->categoryClass());
         $categoryA = $factory->create(['name' => '3']);
-        $categoryB = $factory->create(['name' => '2']);
+        $factory->create(['name' => '2']);
         $categoryC = $factory->create(['name' => '1']);
 
         $this->assertSame($categoryA->getId(), $factory->first()->getId());
@@ -233,6 +233,7 @@ abstract class AnonymousFactoryTest extends KernelTestCase
 
         $factory->create(['name' => 'first']);
         $factory->create(['name' => 'second']);
+
         $category = $factory->create(['name' => 'third']);
 
         $this->assertSame('second', $factory->find(['name' => 'second'])->getName());

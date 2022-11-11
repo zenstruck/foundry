@@ -109,6 +109,7 @@ EOF
 
         $tester->setInputs([Tag::class]);
         $tester->execute([]);
+
         $output = $tester->getDisplay();
 
         $this->assertStringNotContainsString(Category::class, $output);
@@ -271,6 +272,7 @@ EOF
 
         $tester->setInputs([Tag::class]);
         $tester->execute(['--test' => true]);
+
         $output = $tester->getDisplay();
 
         $this->assertFileExists(self::tempFile('tests/Factory/TagFactory.php'));
@@ -458,7 +460,7 @@ EOF
 
         try {
             $tester->execute([]);
-        } catch (RuntimeCommandException $e) {
+        } catch (RuntimeCommandException) {
             // todo find a better solution
             // because we have fixtures with the same name, the maker will fail when creating the duplicate
         }

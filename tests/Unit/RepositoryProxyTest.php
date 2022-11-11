@@ -27,25 +27,25 @@ final class RepositoryProxyTest extends TestCase
     public static function objectRepositoryWithoutFindOneByOrderBy(): iterable
     {
         yield [new RepositoryProxy(new class() extends RepositoryStub {
-            public function findOneBy(array $criteria): ?object
+            public function findOneBy(array $criteria): void
             {
             }
         })];
 
         yield [new RepositoryProxy(new class() extends RepositoryStub {
-            public function findOneBy(array $criteria, ?array $foo = null): ?object
+            public function findOneBy(array $criteria, ?array $foo = null): void
             {
             }
         })];
 
         yield [new RepositoryProxy(new class() extends RepositoryStub {
-            public function findOneBy(array $criteria, $orderBy = null): ?object
+            public function findOneBy(array $criteria, $orderBy = null): void
             {
             }
         })];
 
         yield [new RepositoryProxy(new class() extends RepositoryStub {
-            public function findOneBy(array $criteria, ?string $orderBy = null): ?object
+            public function findOneBy(array $criteria, ?string $orderBy = null): void
             {
             }
         })];

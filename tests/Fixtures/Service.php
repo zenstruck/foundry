@@ -7,5 +7,5 @@ namespace Zenstruck\Foundry\Tests\Fixtures;
  */
 final class Service
 {
-    public $name = 'From Service';
+    public string $name = 'From Service';
 }

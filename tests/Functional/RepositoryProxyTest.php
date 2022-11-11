@@ -38,28 +38,44 @@ abstract class RepositoryProxyTest extends KernelTestCase
         $repository->assert()->exists([]);
         $repository->assert()->notExists(['name' => 'invalid']);
 
-        Assert::that(function() use ($repository) { $repository->assert()->empty(); })
+        Assert::that(static function() use ($repository): void {
+            $repository->assert()->empty();
+        })
             ->throws(AssertionFailedError::class, \sprintf('Expected %s repository to be empty but it has 2 items.', $this->categoryClass()))
         ;
-        Assert::that(function() use ($repository) { $repository->assert()->count(1); })
+        Assert::that(static function() use ($repository): void {
+            $repository->assert()->count(1);
+        })
             ->throws(AssertionFailedError::class, \sprintf('Expected count of %s repository (2) to be 1.', $this->categoryClass()))
         ;
-        Assert::that(function() use ($repository) { $repository->assert()->countGreaterThan(2); })
+        Assert::that(static function() use ($repository): void {
+            $repository->assert()->countGreaterThan(2);
+        })
             ->throws(AssertionFailedError::class, \sprintf('Expected count of %s repository (2) to be greater than 2.', $this->categoryClass()))
         ;
-        Assert::that(function() use ($repository) { $repository->assert()->countGreaterThanOrEqual(3); })
+        Assert::that(static function() use ($repository): void {
+            $repository->assert()->countGreaterThanOrEqual(3);
+        })
             ->throws(AssertionFailedError::class, \sprintf('Expected count of %s repository (2) to be greater than or equal to 3.', $this->categoryClass()))
         ;
-        Assert::that(function() use ($repository) { $repository->assert()->countLessThan(2); })
+        Assert::that(static function() use ($repository): void {
+            $repository->assert()->countLessThan(2);
+        })
             ->throws(AssertionFailedError::class, \sprintf('Expected count of %s repository (2) to be less than 2.', $this->categoryClass()))
         ;
-        Assert::that(function() use ($repository) { $repository->assert()->countLessThanOrEqual(1); })
+        Assert::that(static function() use ($repository): void {
+            $repository->assert()->countLessThanOrEqual(1);
+        })
             ->throws(AssertionFailedError::class, \sprintf('Expected count of %s repository (2) to be less than or equal to 1.', $this->categoryClass()))
         ;
-        Assert::that(function() use ($repository) { $repository->assert()->exists(['name' => 'invalid-name']); })
+        Assert::that(static function() use ($repository): void {
+            $repository->assert()->exists(['name' => 'invalid-name']);
+        })
             ->throws(AssertionFailedError::class, \sprintf('Expected %s to exist but it does not.', $this->categoryClass()))
         ;
-        Assert::that(function() use ($repository) { $repository->assert()->notExists([]); })
+        Assert::that(static function() use ($repository): void {
+            $repository->assert()->notExists([]);
+        })
             ->throws(AssertionFailedError::class, \sprintf('Expected %s to not exist but it does.', $this->categoryClass()))
         ;
     }
@@ -167,9 +183,7 @@ abstract class RepositoryProxyTest extends KernelTestCase
             3,
             \array_unique(
                 \array_map(
-                    static function($category) {
-                        return $category->getId();
-                    },
+                    static fn($category) => $category->getId(),
                     $objects
                 )
             )
@@ -265,7 +279,7 @@ abstract class RepositoryProxyTest extends KernelTestCase
         $categoryFactoryClass = $this->categoryFactoryClass();
 
         $categoryA = $categoryFactoryClass::createOne(['name' => '3']);
-        $categoryB = $categoryFactoryClass::createOne(['name' => '2']);
+        $categoryFactoryClass::createOne(['name' => '2']);
         $categoryC = $categoryFactoryClass::createOne(['name' => '1']);
         $repository = $categoryFactoryClass::repository();
 

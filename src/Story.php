@@ -8,10 +8,10 @@ namespace Zenstruck\Foundry;
 abstract class Story
 {
     /** @var array<string, Proxy> */
-    private $objects = [];
+    private array $objects = [];
 
     /** @var array<string, Proxy[]> */
-    private $pools = [];
+    private array $pools = [];
 
     final public function __call(string $method, array $arguments)
     {
@@ -91,10 +91,8 @@ abstract class Story
 
     /**
      * @param object|Proxy|Factory $object
-     *
-     * @return static
      */
-    final public function add(string $name, object $object): self
+    final public function add(string $name, object $object): static
     {
         trigger_deprecation('zenstruck\foundry', '1.17.0', 'Using Story::add() is deprecated, use Story::addState().');
 

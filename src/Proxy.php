@@ -15,35 +15,28 @@ use Zenstruck\Callback\Parameter;
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class Proxy
+final class Proxy implements \Stringable
 {
     /**
-     * @var object
-     * @psalm-var TProxiedObject
-     */
-    private $object;
-
-    /**
-     * @var string
      * @psalm-var class-string<TProxiedObject>
      */
-    private $class;
+    private string $class;
 
-    /** @var bool */
-    private $autoRefresh;
+    private bool $autoRefresh;
 
-    /** @var bool */
-    private $persisted = false;
+    private bool $persisted = false;
 
     /**
      * @internal
      *
      * @psalm-param TProxiedObject $object
      */
-    public function __construct(object $object)
+    public function __construct(/**
+     * @psalm-var TProxiedObject
+     */
+    private object $object)
     {
-        $this->object = $object;
-        $this->class = \get_class($object);
+        $this->class = $object::class;
         $this->autoRefresh = Factory::configuration()->defaultProxyAutoRefresh();
     }
 
@@ -153,7 +146,8 @@ final class Proxy
     {
         $this->objectManager()->remove($this->object);
         $this->objectManager()->flush();
-        $this->autoRefresh = $this->persisted = false;
+        $this->autoRefresh = false;
+        $this->persisted = false;
 
         return $this;
     }
@@ -179,10 +173,7 @@ final class Proxy
         return $this;
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function forceSet(string $property, $value): self
+    public function forceSet(string $property, mixed $value): self
     {
         return $this->forceSetAll([$property => $value]);
     }
@@ -272,7 +263,7 @@ final class Proxy
             Parameter::union(
                 Parameter::untyped($this),
                 Parameter::typed(self::class, $this),
-                Parameter::typed($this->class, Parameter::factory(function() { return $this->object(); }))
+                Parameter::typed($this->class, Parameter::factory(fn(): object => $this->object()))
             )->optional(),
             ...$arguments
         );

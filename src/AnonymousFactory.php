@@ -80,13 +80,15 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     {
         try {
             return $this->repository()->random($attributes);
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException) {
             return $this->create($attributes);
         }
     }
 
     /**
      * @see RepositoryProxy::randomSet()
+     *
+     * @return object[]
      */
     public function randomSet(int $number, array $attributes = []): array
     {
@@ -95,6 +97,8 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
 
     /**
      * @see RepositoryProxy::randomRange()
+     *
+     * @return object[]
      */
     public function randomRange(int $min, int $max, array $attributes = []): array
     {
@@ -109,7 +113,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
         return $this->repository()->count();
     }
 
-    public function getIterator(): \Traversable
+    public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->all());
     }
@@ -124,6 +128,8 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
 
     /**
      * @see RepositoryProxy::findAll()
+     *
+     * @return object[]
      */
     public function all(): array
     {
@@ -146,6 +152,8 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
 
     /**
      * @see RepositoryProxy::findBy()
+     *
+     * @return object[]
      */
     public function findBy(array $attributes): array
     {

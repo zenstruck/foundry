@@ -9,7 +9,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 /**
  * @MongoDB\Document(collection="post")
  */
-class Post
+class Post implements \Stringable
 {
     /**
      * @MongoDB\Id
@@ -115,7 +115,7 @@ class Post
         return null !== $this->publishedAt;
     }
 
-    public function setPublishedAt(\DateTime $timestamp)
+    public function setPublishedAt(\DateTime $timestamp): void
     {
         $this->publishedAt = $timestamp;
     }

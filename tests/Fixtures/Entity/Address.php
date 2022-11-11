@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 final class Address
 {
     /**
+     * @var mixed|null
      * @ORM\Column(type="string", nullable=true)
      */
     private $value;
@@ -19,7 +20,7 @@ final class Address
         return $this->value;
     }
 
-    public function setValue($value)
+    public function setValue($value): void
     {
         $this->value = $value;
     }

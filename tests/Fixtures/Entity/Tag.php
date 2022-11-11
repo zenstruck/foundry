@@ -3,6 +3,7 @@
 namespace Zenstruck\Foundry\Tests\Fixtures\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -19,19 +20,20 @@ class Tag
     private $id;
 
     /**
+     * @var mixed|null
      * @ORM\Column(type="string", length=255)
      */
-    private $name;
+    private ?string $name = null;
 
     /**
      * @ORM\ManyToMany(targetEntity=Post::class, mappedBy="tags")
      */
-    private $posts;
+    private Collection $posts;
 
     /**
      * @ORM\ManyToMany(targetEntity=Post::class, mappedBy="secondaryTags")
      */
-    private $secondaryPosts;
+    private Collection $secondaryPosts;
 
     public function __construct()
     {
@@ -44,17 +46,17 @@ class Tag
         return $this->name;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
 
-    public function getPosts()
+    public function getPosts(): Collection
     {
         return $this->posts;
     }
 
-    public function addPost(Post $post)
+    public function addPost(Post $post): void
     {
         if (!$this->posts->contains($post)) {
             $this->posts[] = $post;
@@ -62,7 +64,7 @@ class Tag
         }
     }
 
-    public function removePost(Post $post)
+    public function removePost(Post $post): void
     {
         if ($this->posts->contains($post)) {
             $this->posts->removeElement($post);
@@ -70,12 +72,12 @@ class Tag
         }
     }
 
-    public function getSecondaryPosts()
+    public function getSecondaryPosts(): Collection
     {
         return $this->secondaryPosts;
     }
 
-    public function addSecondaryPost(Post $secondaryPost)
+    public function addSecondaryPost(Post $secondaryPost): void
     {
         if (!$this->secondaryPosts->contains($secondaryPost)) {
             $this->secondaryPosts[] = $secondaryPost;
@@ -83,7 +85,7 @@ class Tag
         }
     }
 
-    public function removeSecondaryPost(Post $secondaryPost)
+    public function removeSecondaryPost(Post $secondaryPost): void
     {
         if ($this->secondaryPosts->contains($secondaryPost)) {
             $this->secondaryPosts->removeElement($secondaryPost);

@@ -30,10 +30,9 @@ class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
 
-    /** @var bool */
-    private $enableDoctrine = true;
-    /** @var string */
-    private $ormResetMode = ORMDatabaseResetter::RESET_MODE_SCHEMA;
+    private bool $enableDoctrine = true;
+
+    private string $ormResetMode = ORMDatabaseResetter::RESET_MODE_SCHEMA;
 
     public static function create(
         bool $enableDoctrine = true,
@@ -78,7 +77,7 @@ class Kernel extends BaseKernel
     {
         return \sprintf(
             "{$this->getProjectDir()}/var/cache/test/%s",
-            \md5(\json_encode([$this->enableDoctrine, $this->ormResetMode]))
+            \md5(\json_encode([$this->enableDoctrine, $this->ormResetMode], \JSON_THROW_ON_ERROR))
         );
     }
 

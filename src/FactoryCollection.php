@@ -9,27 +9,21 @@ namespace Zenstruck\Foundry;
  */
 final class FactoryCollection implements \IteratorAggregate
 {
-    /** @var Factory<TObject> */
-    private $factory;
+    private ?int $min;
 
-    /** @var int */
-    private $min;
-
-    /** @var int */
-    private $max;
-
-    /** @var iterable<array<string, mixed>>|null */
-    private $sequence;
+    private ?int $max;
 
     /**
-     * @param int|null                       $max      If set, when created, the collection will be a random size between $min and $max
-     * @param iterable<array<string, mixed>> $sequence
+     * @param int|null                       $max           If set, when created, the collection will be a random size between $min and $max
+     * @param iterable<array<string, mixed>> $sequence|null $sequence
      *
      * @psalm-param Factory<TObject> $factory
      *
-     * @deprecated using directly FactoryCollection's constructor is deprecated. It will be private in v2. Use named constructors instead.
+     * @param Factory<object> $factory
+     *
+     *@deprecated using directly FactoryCollection's constructor is deprecated. It will be private in v2. Use named constructors instead.
      */
-    public function __construct(Factory $factory, ?int $min = null, ?int $max = null, ?iterable $sequence = null, bool $calledInternally = false)
+    public function __construct(private Factory $factory, ?int $min = null, ?int $max = null, private ?iterable $sequence = null, bool $calledInternally = false)
     {
         if ($max && $min > $max) {
             throw new \InvalidArgumentException('Min must be less than max.');
@@ -39,10 +33,8 @@ final class FactoryCollection implements \IteratorAggregate
             trigger_deprecation('zenstruck/foundry', '1.22.0', "using directly FactoryCollection's constructor is deprecated. It will be private in v2. Use named constructors instead.");
         }
 
-        $this->factory = $factory;
         $this->min = $min;
         $this->max = $max ?? $min;
-        $this->sequence = $sequence;
     }
 
     public static function set(Factory $factory, int $count): self
@@ -64,14 +56,12 @@ final class FactoryCollection implements \IteratorAggregate
     }
 
     /**
-     * @param array|callable $attributes
-     *
      * @return list<TObject&Proxy<TObject>>
      *
      * @psalm-suppress InvalidReturnType
      * @psalm-return list<Proxy<TObject>>
      */
-    public function create($attributes = []): array
+    public function create(array|callable $attributes = []): array
     {
         $objects = [];
         foreach ($this->all() as $i => $factory) {
@@ -93,9 +83,7 @@ final class FactoryCollection implements \IteratorAggregate
         if (!$this->sequence) {
             /** @psalm-suppress TooManyArguments */
             return \array_map(
-                function() {
-                    return clone $this->factory;
-                },
+                fn(): Factory => clone $this->factory,
                 \array_fill(0, \random_int($this->min, $this->max), null)
             );
         }
@@ -113,14 +101,17 @@ final class FactoryCollection implements \IteratorAggregate
         return $this->factory;
     }
 
-    public function getIterator(): \Traversable
+    public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->all());
     }
 
+    /**
+     * @return \Iterator<mixed[]>
+     */
     public function asDataProvider(): iterable
     {
-        foreach ($this as $i => $factory) {
+        foreach ($this as $factory) {
             yield [$factory];
         }
     }

@@ -27,9 +27,7 @@ final class FactoryTest extends TestCase
     public function can_instantiate_object(): void
     {
         $attributeArray = ['title' => 'title', 'body' => 'body'];
-        $attributeCallback = static function() {
-            return ['title' => 'title', 'body' => 'body'];
-        };
+        $attributeCallback = static fn(): array => ['title' => 'title', 'body' => 'body'];
 
         $this->assertSame('title', (new AnonymousFactory(Post::class, $attributeArray))->create()->getTitle());
         $this->assertSame('title', (new AnonymousFactory(Post::class))->create($attributeArray)->getTitle());
@@ -46,9 +44,7 @@ final class FactoryTest extends TestCase
     public function can_instantiate_many_objects_legacy(): void
     {
         $attributeArray = ['title' => 'title', 'body' => 'body'];
-        $attributeCallback = static function() {
-            return ['title' => 'title', 'body' => 'body'];
-        };
+        $attributeCallback = static fn(): array => ['title' => 'title', 'body' => 'body'];
 
         $objects = (new Factory(Post::class, $attributeArray))->createMany(3);
 
@@ -101,7 +97,7 @@ final class FactoryTest extends TestCase
         $attributeArray = ['title' => 'original title', 'body' => 'original body'];
 
         $object = (new AnonymousFactory(Post::class))
-            ->instantiateWith(function(array $attributes, string $class) use ($attributeArray) {
+            ->instantiateWith(function(array $attributes, string $class) use ($attributeArray): Post {
                 $this->assertSame(Post::class, $class);
                 $this->assertSame($attributes, $attributeArray);
 
@@ -122,12 +118,12 @@ final class FactoryTest extends TestCase
         $attributeArray = ['title' => 'original title', 'body' => 'original body'];
 
         $object = (new AnonymousFactory(Post::class))
-            ->beforeInstantiate(function(array $attributes) {
+            ->beforeInstantiate(static function(array $attributes): array {
                 $attributes['title'] = 'title';
 
                 return $attributes;
             })
-            ->beforeInstantiate(function(array $attributes) {
+            ->beforeInstantiate(static function(array $attributes): array {
                 $attributes['body'] = 'body';
 
                 return $attributes;
@@ -147,7 +143,7 @@ final class FactoryTest extends TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Before Instantiate event callback must return an array.');
 
-        (new AnonymousFactory(Post::class))->beforeInstantiate(function() {})->create();
+        (new AnonymousFactory(Post::class))->beforeInstantiate(static function(): void {})->create();
     }
 
     /**
@@ -158,12 +154,12 @@ final class FactoryTest extends TestCase
         $attributesArray = ['title' => 'title', 'body' => 'body'];
 
         $object = (new AnonymousFactory(Post::class))
-            ->afterInstantiate(function(Post $post, array $attributes) use ($attributesArray) {
+            ->afterInstantiate(function(Post $post, array $attributes) use ($attributesArray): void {
                 $this->assertSame($attributesArray, $attributes);
 
                 $post->increaseViewCount();
             })
-            ->afterInstantiate(function(Post $post, array $attributes) use ($attributesArray) {
+            ->afterInstantiate(function(Post $post, array $attributes) use ($attributesArray): void {
                 $this->assertSame($attributesArray, $attributes);
 
                 $post->increaseViewCount();
@@ -190,9 +186,7 @@ final class FactoryTest extends TestCase
      */
     public function can_register_default_instantiator(): void
     {
-        Factory::configuration()->setInstantiator(function() {
-            return new Post('different title', 'different body');
-        });
+        Factory::configuration()->setInstantiator(static fn(): Post => new Post('different title', 'different body'));
 
         $object = (new AnonymousFactory(Post::class, ['title' => 'title', 'body' => 'body']))->create();
 
@@ -238,10 +232,10 @@ final class FactoryTest extends TestCase
 
         $this->assertNotSame(\spl_object_id($factory->withAttributes([])), $objectId);
         $this->assertNotSame(\spl_object_id($factory->withoutPersisting()), $objectId);
-        $this->assertNotSame(\spl_object_id($factory->instantiateWith(function() {})), $objectId);
-        $this->assertNotSame(\spl_object_id($factory->beforeInstantiate(function() {})), $objectId);
-        $this->assertNotSame(\spl_object_id($factory->afterInstantiate(function() {})), $objectId);
-        $this->assertNotSame(\spl_object_id($factory->afterPersist(function() {})), $objectId);
+        $this->assertNotSame(\spl_object_id($factory->instantiateWith(static function(): void {})), $objectId);
+        $this->assertNotSame(\spl_object_id($factory->beforeInstantiate(static function(): void {})), $objectId);
+        $this->assertNotSame(\spl_object_id($factory->afterInstantiate(static function(): void {})), $objectId);
+        $this->assertNotSame(\spl_object_id($factory->afterPersist(static function(): void {})), $objectId);
     }
 
     /**
@@ -308,31 +302,31 @@ final class FactoryTest extends TestCase
         $calls = 0;
 
         $object = (new AnonymousFactory(Post::class, ['shortDescription' => 'short desc']))
-            ->afterPersist(function(Proxy $post, array $attributes) use ($expectedAttributes, &$calls) {
+            ->afterPersist(function(Proxy $post, array $attributes) use ($expectedAttributes, &$calls): void {
                 /* @var Post $post */
                 $this->assertSame($expectedAttributes, $attributes);
 
                 $post->increaseViewCount();
                 ++$calls;
             })
-            ->afterPersist(function(Post $post, array $attributes) use ($expectedAttributes, &$calls) {
+            ->afterPersist(function(Post $post, array $attributes) use ($expectedAttributes, &$calls): void {
                 $this->assertSame($expectedAttributes, $attributes);
 
                 $post->increaseViewCount();
                 ++$calls;
             })
-            ->afterPersist(function(Post $post, array $attributes) use ($expectedAttributes, &$calls) {
+            ->afterPersist(function(Post $post, array $attributes) use ($expectedAttributes, &$calls): void {
                 $this->assertSame($expectedAttributes, $attributes);
 
                 $post->increaseViewCount();
                 ++$calls;
             })
-            ->afterPersist(function($post) use (&$calls) {
+            ->afterPersist(function($post) use (&$calls): void {
                 $this->assertInstanceOf(Proxy::class, $post);
 
                 ++$calls;
             })
-            ->afterPersist(static function() use (&$calls) {
+            ->afterPersist(static function() use (&$calls): void {
                 ++$calls;
             })
             ->create(['title' => 'title', 'body' => 'body'])

@@ -15,17 +15,17 @@ class Review
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id = null;
 
     /**
      * @ORM\OneToOne(targetEntity=Product::class, inversedBy="review")
      */
-    private $product;
+    private ?Product $product = null;
 
     /**
      * @ORM\Column(name="ranking", type="integer")
      */
-    private $rank;
+    private ?int $rank = null;
 
     public function getId(): ?int
     {

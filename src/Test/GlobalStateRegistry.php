@@ -12,13 +12,13 @@ use Zenstruck\Foundry\Story;
 final class GlobalStateRegistry
 {
     /** @var list<Story> */
-    private $storiesAsService = [];
+    private array $storiesAsService = [];
 
     /** @var list<callable> */
-    private $invokableServices = [];
+    private array $invokableServices = [];
 
     /** @var list<class-string<Story>> */
-    private $standaloneStories = [];
+    private array $standaloneStories = [];
 
     public function addStoryAsService(Story $storyAsService): void
     {
@@ -43,20 +43,20 @@ final class GlobalStateRegistry
      */
     public function getGlobalStates(): array
     {
-        return \array_merge(
-            \array_map(
-                static function(Story $story) {
-                    return static function() use ($story) {$story->build(); };
+        return [
+            ...\array_map(
+                static fn(Story $story): \Closure => static function() use ($story): void {
+                    $story->build();
                 },
                 $this->storiesAsService
             ),
-            $this->invokableServices,
-            \array_map(
-                static function(string $storyClassName) {
-                    return static function() use ($storyClassName) {$storyClassName::load(); };
+            ...$this->invokableServices,
+            ...\array_map(
+                static fn(string $storyClassName): \Closure => static function() use ($storyClassName): void {
+                    $storyClassName::load();
                 },
                 $this->standaloneStories
-            )
-        );
+            ),
+        ];
     }
 }

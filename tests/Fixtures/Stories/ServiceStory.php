@@ -11,12 +11,8 @@ use Zenstruck\Foundry\Tests\Fixtures\Service;
  */
 final class ServiceStory extends Story
 {
-    /** @var Service */
-    private $service;
-
-    public function __construct(Service $service)
+    public function __construct(private Service $service)
     {
-        $this->service = $service;
     }
 
     public function build(): void

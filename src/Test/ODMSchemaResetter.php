@@ -10,18 +10,14 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
  */
 final class ODMSchemaResetter extends AbstractSchemaResetter
 {
-    /** @var Application */
-    private $application;
-    /** @var ManagerRegistry */
-    private $registry;
     /** @var list<string> */
-    private $objectManagersToReset;
+    private array $objectManagersToReset = [];
 
-    public function __construct(Application $application, ManagerRegistry $registry, array $objectManagersToReset)
+    /**
+     * @param string[] $objectManagersToReset
+     */
+    public function __construct(private Application $application, private ManagerRegistry $registry, array $objectManagersToReset)
     {
-        $this->application = $application;
-        $this->registry = $registry;
-
         self::validateObjectsToReset('object manager', \array_keys($registry->getManagerNames()), $objectManagersToReset);
         $this->objectManagersToReset = $objectManagersToReset;
     }
@@ -37,7 +33,7 @@ final class ODMSchemaResetter extends AbstractSchemaResetter
                         '--dm' => $manager,
                     ]
                 );
-            } catch (\Exception $e) {
+            } catch (\Exception) {
             }
 
             $this->runCommand(

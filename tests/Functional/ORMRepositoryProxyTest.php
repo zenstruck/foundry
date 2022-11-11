@@ -57,8 +57,8 @@ final class ORMRepositoryProxyTest extends RepositoryProxyTest
      */
     public function proxy_wrapping_orm_entity_manager_can_order_by_in_find_one_by(): void
     {
-        $categoryA = CategoryFactory::createOne();
-        $categoryB = CategoryFactory::createOne();
+        CategoryFactory::createOne();
+        CategoryFactory::createOne();
         $categoryC = CategoryFactory::createOne();
 
         $this->assertSame($categoryC->getId(), CategoryFactory::repository()->findOneBy([], ['id' => 'DESC'])->getId());

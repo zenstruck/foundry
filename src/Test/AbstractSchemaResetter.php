@@ -32,7 +32,7 @@ abstract class AbstractSchemaResetter
     protected static function validateObjectsToReset(string $objectsType, array $availableObjectsToReset, array $candidateObjectsToReset): void
     {
         if ($invalidObjectsToReset = \array_diff($candidateObjectsToReset, $availableObjectsToReset)) {
-            throw new \InvalidArgumentException(\sprintf('Cannot reset %s schema: invalid value "%s" given as %s. Available values are "%s"', ORMDatabaseResetter::class === static::class ? 'ORM' : 'ODM', \json_encode($invalidObjectsToReset), $objectsType, \json_encode($availableObjectsToReset)));
+            throw new \InvalidArgumentException(\sprintf('Cannot reset %s schema: invalid value "%s" given as %s. Available values are "%s"', ORMDatabaseResetter::class === static::class ? 'ORM' : 'ODM', \json_encode($invalidObjectsToReset, \JSON_THROW_ON_ERROR), $objectsType, \json_encode($availableObjectsToReset, \JSON_THROW_ON_ERROR)));
         }
     }
 }
