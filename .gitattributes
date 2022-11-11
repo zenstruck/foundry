@@ -12,7 +12,7 @@
 /docker                         export-ignore
 /docker-compose.yaml            export-ignore
 /Makefile                       export-ignore
+/phpstan.neon                   export-ignore
 /phpunit-dama-doctrine.xml.dist export-ignore
 /phpunit.xml.dist               export-ignore
-/psalm.xml                      export-ignore
 /tests                          export-ignore

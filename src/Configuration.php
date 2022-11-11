@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Foundry;
 
+use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Faker;
@@ -151,7 +152,7 @@ final class Configuration
 
         $callback();
 
-        foreach ($this->managerRegistry()->getManagers() as $manager) {
+        foreach ($this->managerRegistry()?->getManagers() ?? [] as $manager) {
             $manager->flush();
         }
 
@@ -159,11 +160,9 @@ final class Configuration
     }
 
     /**
-     * @psalm-suppress InvalidReturnType
-     * @psalm-suppress InvalidReturnStatement
      * @template TObject of object
-     * @psalm-param Proxy<TObject>|TObject|class-string<TObject> $objectOrClass
-     * @psalm-return RepositoryProxy<TObject>
+     * @phpstan-param Proxy<TObject>|TObject|class-string<TObject> $objectOrClass
+     * @phpstan-return RepositoryProxy<TObject>
      */
     public function repositoryFor(object|string $objectOrClass): RepositoryProxy
     {
@@ -175,21 +174,28 @@ final class Configuration
             $objectOrClass = $objectOrClass::class;
         }
 
-        return new RepositoryProxy($this->managerRegistry()->getRepository($objectOrClass));
+        /** @var EntityRepository<TObject>|null $repository */
+        $repository = $this->managerRegistry()?->getRepository($objectOrClass);
+
+        if (!$repository) {
+            throw new \RuntimeException(\sprintf('No repository registered for "%s".', $objectOrClass));
+        }
+
+        return new RepositoryProxy($repository);
     }
 
     public function objectManagerFor(object|string $objectOrClass): ObjectManager
     {
         $class = \is_string($objectOrClass) ? $objectOrClass : $objectOrClass::class;
 
-        if (!$objectManager = $this->managerRegistry()->getManagerForClass($class)) {
+        if (!$objectManager = $this->managerRegistry()?->getManagerForClass($class)) {
             throw new \RuntimeException(\sprintf('No object manager registered for "%s".', $class));
         }
 
         return $objectManager;
     }
 
-    /** @psalm-assert !null $this->managerRegistry */
+    /** @phpstan-assert !null $this->managerRegistry */
     public function hasManagerRegistry(): bool
     {
         return null !== $this->managerRegistry;
@@ -227,7 +233,6 @@ final class Configuration
     private function managerRegistry(): ?ManagerRegistry
     {
         if (!$this->hasManagerRegistry()) {
-            /** @psalm-suppress MissingDependency */
             throw new \RuntimeException('Foundry was booted without doctrine. Ensure your TestCase extends '.KernelTestCase::class);
         }
 

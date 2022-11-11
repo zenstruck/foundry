@@ -1,4 +1,4 @@
-.PHONY: $(filter-out vendor bin/tools/psalm/vendor bin/tools/cs-fixer/vendor,$(MAKECMDGOALS))
+.PHONY: $(filter-out vendor bin/tools/phpstan/vendor bin/tools/cs-fixer/vendor,$(MAKECMDGOALS))
 
 MYSQL_URL="mysql://root:root@mysql:3306/zenstruck_foundry?charset=utf8"
 MONGO_URL="mongodb://mongo:mongo@mongo:27017/mongo?compressors=disabled&amp;gssapiServiceName=mongodb&authSource=mongo"
@@ -59,11 +59,11 @@ fixcs: docker-start bin/tools/cs-fixer/vendor ### Run PHP CS-Fixer
 bin/tools/cs-fixer/vendor: vendor bin/tools/cs-fixer/composer.json bin/tools/cs-fixer/composer.lock
 	@${DOCKER_PHP} composer bin cs-fixer install
 
-sca: docker-start bin/tools/psalm/vendor ### Run Psalm
-	@${DOCKER_PHP} bin/tools/psalm/vendor/vimeo/psalm/psalm --config=./psalm.xml
+sca: docker-start bin/tools/phpstan/vendor ### Run static analysis
+	@${DOCKER_PHP} bin/tools/phpstan/vendor/phpstan/phpstan/phpstan analyse
 
-bin/tools/psalm/vendor: vendor bin/tools/psalm/composer.json bin/tools/psalm/composer.lock
-	@${DOCKER_PHP} composer bin psalm install
+bin/tools/phpstan/vendor: vendor bin/tools/phpstan/composer.json $(wildcard bin/tools/phpstan/composer.lock)
+	@${DOCKER_PHP} composer bin phpstan install
 
 database-generate-migration: docker-start vendor ### Generate new migration based on mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
 	@${DOCKER_PHP} vendor/bin/doctrine-migrations migrations:migrate --no-interaction --allow-no-migration # first, let's load into db existing migrations
@@ -99,4 +99,4 @@ composer: ### Run composer command
 	@${DC_EXEC} php composer $(ARGS)
 
 clear: ### Start from a fresh install (needed if vendors have already been installed with another php version)
-	rm -rf composer.lock bin/tools/psalm/vendor/ bin/tools/cs-fixer/vendor/ vendor/
+	rm -rf composer.lock bin/tools/phpstan/vendor/ bin/tools/cs-fixer/vendor/ vendor/

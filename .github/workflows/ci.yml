@@ -187,7 +187,7 @@ jobs:
         run: bin/tools/cs-fixer/vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --dry-run --diff
 
   static-analysis:
-    name: Psalm Static Analysis
+    name: Static Analysis
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -204,11 +204,11 @@ jobs:
         with:
           composer-options: --prefer-dist
 
-      - name: Install Psalm
-        run: composer bin psalm install
+      - name: Install PhpStan
+        run: composer bin phpstan install
 
       - name: Run static analysis
-        run: bin/tools/psalm/vendor/vimeo/psalm/psalm --output-format=github
+        run: bin/tools/phpstan/vendor/phpstan/phpstan/phpstan analyse
 
   docker-stack:
     name: CI with docker stack

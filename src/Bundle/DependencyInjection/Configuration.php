@@ -45,7 +45,7 @@ final class Configuration implements ConfigurationInterface
                         ->integerNode('seed')
                             ->defaultNull()
                             ->info('Random number generator seed to produce the same fake values every run')
-                            ->example(1234)
+                            ->example('1234')
                         ->end()
                         ->scalarNode('service')
                             ->defaultNull()

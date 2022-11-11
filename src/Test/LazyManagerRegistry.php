@@ -69,6 +69,9 @@ final class LazyManagerRegistry implements ManagerRegistry
         return $this->inner()->resetManager($name);
     }
 
+    /**
+     * @param string $alias
+     */
     public function getAliasNamespace($alias): string
     {
         $inner = $this->inner();

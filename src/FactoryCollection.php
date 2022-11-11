@@ -17,7 +17,7 @@ final class FactoryCollection implements \IteratorAggregate
      * @param int|null                       $max           If set, when created, the collection will be a random size between $min and $max
      * @param iterable<array<string, mixed>> $sequence|null $sequence
      *
-     * @psalm-param Factory<TObject> $factory
+     * @phpstan-param Factory<TObject> $factory
      *
      * @param Factory<object> $factory
      *
@@ -58,8 +58,7 @@ final class FactoryCollection implements \IteratorAggregate
     /**
      * @return list<TObject&Proxy<TObject>>
      *
-     * @psalm-suppress InvalidReturnType
-     * @psalm-return list<Proxy<TObject>>
+     * @phpstan-return list<Proxy<TObject>>
      */
     public function create(array|callable $attributes = []): array
     {
@@ -76,12 +75,11 @@ final class FactoryCollection implements \IteratorAggregate
     /**
      * @return Factory[]
      *
-     * @psalm-return list<Factory<TObject>>
+     * @phpstan-return list<Factory<TObject>>
      */
     public function all(): array
     {
         if (!$this->sequence) {
-            /** @psalm-suppress TooManyArguments */
             return \array_map(
                 fn(): Factory => clone $this->factory,
                 \array_fill(0, \random_int($this->min, $this->max), null)

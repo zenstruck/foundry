@@ -16,6 +16,9 @@ final class ModelFactoryManager
     {
     }
 
+    /**
+     * @param class-string<ModelFactory> $class
+     */
     public function create(string $class): ModelFactory
     {
         foreach ($this->factories as $factory) {
