@@ -3,6 +3,7 @@
 namespace Zenstruck\Foundry\Tests\Unit;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\MappingException;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
@@ -17,6 +18,8 @@ final class ChainManagerRegistryTest extends TestCase
     public function can_get_repository(): void
     {
         $managerRegistry1 = $this->createMock(ManagerRegistry::class);
+        $managerRegistry1->expects($this->once())->method('getRepository')->willThrowException(new MappingException());
+
         $managerRegistry2 = $this->createMock(ManagerRegistry::class);
 
         $managerRegistry2->expects($this->once())->method('getRepository')->willReturn(
@@ -38,7 +41,10 @@ final class ChainManagerRegistryTest extends TestCase
         $this->expectExceptionMessage("Cannot find repository for class {$class}");
 
         $managerRegistry1 = $this->createMock(ManagerRegistry::class);
+        $managerRegistry1->expects($this->once())->method('getRepository')->willThrowException(new MappingException());
+
         $managerRegistry2 = $this->createMock(ManagerRegistry::class);
+        $managerRegistry2->expects($this->once())->method('getRepository')->willThrowException(new MappingException());
 
         $chainManagerRegistry = new ChainManagerRegistry([$managerRegistry1, $managerRegistry2]);
 

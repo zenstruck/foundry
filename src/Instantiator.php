@@ -5,6 +5,7 @@ namespace Zenstruck\Foundry;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use function Symfony\Component\String\u;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -24,6 +25,9 @@ final class Instantiator
     /** @var string[] */
     private array $forceProperties = [];
 
+    /**
+     * @param class-string $class
+     */
     public function __invoke(array $attributes, string $class): object
     {
         $object = $this->instantiate($class, $attributes);
@@ -207,35 +211,19 @@ final class Instantiator
         return null;
     }
 
-    /**
-     * @see https://github.com/symfony/symfony/blob/a73523b065221b6b93cd45bf1cc7c59e7eb2dcdf/src/Symfony/Component/String/AbstractUnicodeString.php#L156
-     *
-     * @todo use Symfony/String once stable
-     */
     private static function camel(string $string): string
     {
-        return \str_replace(' ', '', \preg_replace_callback('/\b./u', static function($m) use (&$i): string {
-            return 1 === ++$i ? ('İ' === $m[0] ? 'i̇' : \mb_strtolower($m[0], 'UTF-8')) : \mb_convert_case($m[0], \MB_CASE_TITLE, 'UTF-8');
-        }, \preg_replace('/[^\pL0-9]++/u', ' ', $string)));
+        return u($string)->camel();
+    }
+
+    private static function snake(string $string): string
+    {
+        return u($string)->snake();
     }
 
     /**
-     * @see https://github.com/symfony/symfony/blob/a73523b065221b6b93cd45bf1cc7c59e7eb2dcdf/src/Symfony/Component/String/AbstractUnicodeString.php#L361
-     *
-     * @todo use Symfony/String once stable
+     * @param class-string $class
      */
-    private static function snake(string $string): string
-    {
-        $string = self::camel($string);
-
-        /**
-         * @see https://github.com/symfony/symfony/blob/a73523b065221b6b93cd45bf1cc7c59e7eb2dcdf/src/Symfony/Component/String/AbstractUnicodeString.php#L369
-         */
-        $string = \preg_replace_callback('/\b./u', static fn(array $m): string => \mb_convert_case($m[0], \MB_CASE_TITLE, 'UTF-8'), $string, 1);
-
-        return \mb_strtolower(\preg_replace(['/(\p{Lu}+)(\p{Lu}\p{Ll})/u', '/([\p{Ll}0-9])(\p{Lu})/u'], '\1_\2', $string), 'UTF-8');
-    }
-
     private function instantiate(string $class, array &$attributes): object
     {
         $class = new \ReflectionClass($class);
@@ -250,7 +238,7 @@ final class Instantiator
         foreach ($constructor->getParameters() as $parameter) {
             $name = self::attributeNameForParameter($parameter, $attributes);
 
-            if (\array_key_exists($name, $attributes)) {
+            if ($name && \array_key_exists($name, $attributes)) {
                 if ($parameter->isVariadic()) {
                     $arguments = \array_merge($arguments, $attributes[$name]);
                 } else {

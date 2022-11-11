@@ -115,9 +115,6 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
         $configurationDefinition->setArgument('$odmObjectManagersToReset', $config['odm']['object_managers'] ?? []);
     }
 
-    /**
-     * @psalm-suppress UndefinedDocblockClass
-     */
     private static function isBundleLoaded(ContainerBuilder $container, string $bundleName): bool
     {
         return \in_array(

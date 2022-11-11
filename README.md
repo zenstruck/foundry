@@ -51,7 +51,7 @@ test-mysql                     Run PHPunit with mysql
 test-postgresql                Run PHPunit with postgreSQL
 test-mongo                     Run PHPunit with Mongo
 fixcs                          Run PHP CS-Fixer
-sca                            Run Psalm
+sca                            Run static analysis
 database-generate-migration    Generate new migration based on mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
 database-validate-mapping      Validate mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
 database-drop-schema           Drop database schema

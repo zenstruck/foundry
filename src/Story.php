@@ -13,21 +13,19 @@ abstract class Story
     /** @var array<string, Proxy[]> */
     private array $pools = [];
 
-    final public function __call(string $method, array $arguments)
+    final public function __call(string $method, array $arguments): Proxy
     {
         return $this->get($method);
     }
 
-    final public static function __callStatic($name, $arguments)
+    final public static function __callStatic(string $name, array $arguments): Proxy
     {
         return static::load()->get($name);
     }
 
-    /**
-     * @return static
-     */
-    final public static function load(): self
+    final public static function load(): static
     {
+        /** @phpstan-ignore-next-line */
         return Factory::configuration()->stories()->load(static::class);
     }
 
@@ -86,7 +84,7 @@ abstract class Story
             throw new \RuntimeException(\sprintf('At least %d items must be in pool "%s" (%d items found).', $max, $pool, \count($values)));
         }
 
-        return \array_slice($values, 0, \random_int($min, $max));
+        return \array_slice($values, 0, \random_int($min, $max)); // @phpstan-ignore-line
     }
 
     /**

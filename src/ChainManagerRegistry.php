@@ -21,9 +21,7 @@ final class ChainManagerRegistry implements ManagerRegistry
     {
         foreach ($this->managerRegistries as $managerRegistry) {
             try {
-                if ($repository = $managerRegistry->getRepository($persistentObject, $persistentManagerName)) {
-                    return $repository;
-                }
+                return $managerRegistry->getRepository($persistentObject, $persistentManagerName);
             } catch (MappingException) {
                 // the class is not managed by the current manager
             }
@@ -55,47 +53,50 @@ final class ChainManagerRegistry implements ManagerRegistry
         );
     }
 
-    public function getDefaultConnectionName(): void
+    public function getDefaultConnectionName(): string
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
-    public function getConnection($name = null): void
+    public function getConnection($name = null): object
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
-    public function getConnections(): void
+    public function getConnections(): array
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
-    public function getConnectionNames(): void
+    public function getConnectionNames(): array
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
-    public function getDefaultManagerName(): void
+    public function getDefaultManagerName(): string
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
-    public function getManager($name = null): void
+    public function getManager($name = null): ObjectManager
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
-    public function resetManager($name = null): void
+    public function resetManager($name = null): ObjectManager
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
+    /**
+     * @param string $alias
+     */
     public function getAliasNamespace($alias): void
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }
 
-    public function getManagerNames(): void
+    public function getManagerNames(): array
     {
         throw new \BadMethodCallException('Not available in '.self::class);
     }

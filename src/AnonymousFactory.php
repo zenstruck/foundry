@@ -12,8 +12,10 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
 {
     /**
      * @see Factory::__construct()
+     *
+     * @param class-string<TModel> $class
      */
-    public static function new(string $class, $defaultAttributes = []): self
+    public static function new(string $class, array|callable $defaultAttributes = []): self
     {
         return new self($class, $defaultAttributes);
     }
@@ -23,12 +25,12 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
      * instantiate and persist.
      *
      * @return Proxy&TModel
-     * @psalm-return Proxy<TModel>
+     * @phpstan-return Proxy<TModel>
      */
     public function findOrCreate(array $attributes): Proxy
     {
         if ($found = $this->repository()->find($attributes)) {
-            return \is_array($found) ? $found[0] : $found;
+            return $found;
         }
 
         return $this->create($attributes);
@@ -74,7 +76,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
      * Fetch one random object and create a new object if none exists.
      *
      * @return Proxy&TModel
-     * @psalm-return Proxy<TModel>
+     * @phpstan-return Proxy<TModel>
      */
     public function randomOrCreate(array $attributes = []): Proxy
     {
@@ -139,6 +141,8 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     /**
      * @see RepositoryProxy::find()
      *
+     * @phpstan-param Proxy<TModel>|array|mixed $criteria
+     *
      * @throws \RuntimeException If no entity found
      */
     public function find($criteria): Proxy
@@ -166,7 +170,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
-     * @psalm-return RepositoryProxy<TModel>
+     * @phpstan-return RepositoryProxy<TModel>
      */
     public function repository(): RepositoryProxy
     {

@@ -1,0 +1,36 @@
+includes:
+	- phpstan-baseline.neon
+
+parameters:
+    inferPrivatePropertyTypeFromConstructor: true
+    checkMissingIterableValueType: false
+    checkUninitializedProperties: true
+    checkGenericClassInNonGenericObjectType: false
+    paths:
+        - ./src
+    level: 8
+    bootstrapFiles:
+        - ./vendor/autoload.php
+    banned_code:
+        nodes:
+            # enable detection of die/exit
+            -
+                type: Expr_Exit
+                functions: null
+
+            # enable detection of a set of functions
+            -
+                type: Expr_FuncCall
+                functions:
+                    - dd
+                    - debug_backtrace
+                    - dump
+                    - print_r
+                    - var_dump
+    excludePaths:
+        - ./src/Bundle/Resources
+
+    ignoreErrors:
+        -
+            message: '#Unsafe usage of new static\(\).*#'
+            path: ./src/ModelFactory.php

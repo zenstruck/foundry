@@ -4,24 +4,30 @@ namespace Zenstruck\Foundry;
 
 /**
  * @internal
+ * @template T of Story
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class StoryManager
 {
-    /** @var array<string, Story> */
+    /** @var array<string, T> */
     private static array $globalInstances = [];
 
-    /** @var array<string, Story> */
+    /** @var array<string, T> */
     private static array $instances = [];
 
     /**
-     * @param Story[] $stories
+     * @param T[] $stories
      */
     public function __construct(private iterable $stories)
     {
     }
 
+    /**
+     * @param class-string<T> $class
+     *
+     * @return T
+     */
     public function load(string $class): Story
     {
         if (\array_key_exists($class, self::$globalInstances)) {
@@ -55,6 +61,11 @@ final class StoryManager
         self::$instances = [];
     }
 
+    /**
+     * @param class-string<T> $class
+     *
+     * @return T
+     */
     private function getOrCreateStory(string $class): Story
     {
         foreach ($this->stories as $story) {
@@ -65,7 +76,7 @@ final class StoryManager
 
         try {
             return new $class();
-        } catch (\ArgumentCountError $e) {
+        } catch (\ArgumentCountError $e) { // @phpstan-ignore-line
             throw new \RuntimeException('Stories with dependencies (Story services) cannot be used without the foundry bundle.', 0, $e);
         }
     }

@@ -48,6 +48,7 @@ class Factory
      */
     public function __construct(string $class, array|callable $defaultAttributes = [])
     {
+        /** @phpstan-ignore-next-line */
         if (self::class === static::class) {
             trigger_deprecation('zenstruck/foundry', '1.9', 'Instantiating "%s" directly is deprecated and this class will be abstract in 2.0, use "%s" instead.', self::class, AnonymousFactory::class);
         }
@@ -56,7 +57,10 @@ class Factory
         $this->attributeSet[] = $defaultAttributes;
     }
 
-    public function __call(string $name, array $arguments)
+    /**
+     * @phpstan-return list<Proxy<TObject>>
+     */
+    public function __call(string $name, array $arguments): array
     {
         if ('createMany' !== $name) {
             throw new \BadMethodCallException(\sprintf('Call to undefined method "%s::%s".', static::class, $name));
@@ -68,18 +72,16 @@ class Factory
     }
 
     /**
-     * @param array|callable $attributes
-     *
      * @return Proxy<TObject>&TObject
-     * @psalm-return Proxy<TObject>
+     * @phpstan-return Proxy<TObject>
      */
-    final public function create($attributes = []): Proxy
+    final public function create(array|callable $attributes = []): Proxy
     {
         // merge the factory attribute set with the passed attributes
         $attributeSet = \array_merge($this->attributeSet, [$attributes]);
 
         // normalize each attribute set and collapse
-        $attributes = \array_merge(...\array_map(fn(callable|array $attributes): array => $this::normalizeAttributes($attributes), $attributeSet));
+        $attributes = \array_merge(...\array_map(fn(callable|array $attributes): array => $this->normalizeAttributes($attributes), $attributeSet));
 
         foreach ($this->beforeInstantiate as $callback) {
             $attributes = $callback($attributes);
@@ -103,6 +105,7 @@ class Factory
         $attributes = $mappedAttributes;
 
         // instantiate the object with the users instantiator or if not set, the default instantiator
+        /** @var TObject $object */
         $object = ($this->instantiator ?? self::configuration()->instantiator())($attributes, $this->class);
 
         foreach ($this->afterInstantiate as $callback) {
@@ -252,14 +255,12 @@ class Factory
             return;
         }
 
-        self::$configuration->faker()->unique(true); // reset unique
+        self::configuration()->faker()->unique(true); // reset unique
         self::$configuration = null;
     }
 
     /**
      * @internal
-     * @psalm-suppress InvalidNullableReturnType
-     * @psalm-suppress NullableReturnStatement
      */
     final public static function configuration(): Configuration
     {
@@ -267,7 +268,7 @@ class Factory
             throw new \RuntimeException('Foundry is not yet booted. Using in a test: is your Test case using the Factories trait? Using in a fixture: is ZenstruckFoundryBundle enabled for this environment?');
         }
 
-        return self::$configuration;
+        return self::$configuration; // @phpstan-ignore-line
     }
 
     /**
@@ -291,14 +292,14 @@ class Factory
     /**
      * @internal
      *
-     * @psalm-return class-string<TObject>
+     * @phpstan-return class-string<TObject>
      */
     final protected function class(): string
     {
         return $this->class;
     }
 
-    private static function normalizeAttributes(array|callable $attributes): array
+    private function normalizeAttributes(array|callable $attributes): array
     {
         return \is_callable($attributes) ? $attributes() : $attributes;
     }
@@ -446,7 +447,7 @@ class Factory
         }
 
         if ($factoryClassMetadata->hasAssociation($relationName)) {
-            $relationName = $factoryClassMetadata->getAssociationMappedByTargetField($relationName) ?? null;
+            $relationName = $factoryClassMetadata->getAssociationMappedByTargetField($relationName);
         } else {
             $relationName = null;
         }
@@ -463,7 +464,7 @@ class Factory
         foreach ($relationClassMetadata->getAssociationNames() as $field) {
             if (
                 ($relationClassMetadata->isSingleValuedAssociation($field) || $relationClassMetadata->isCollectionValuedAssociation($field))
-                && \is_a($factoryClass, $relationClassMetadata->getAssociationTargetClass($field), true)
+                && ($relationClassMetadata->getAssociationTargetClass($field) && \is_a($factoryClass, $relationClassMetadata->getAssociationTargetClass($field), true))
                 && (null === $relationName || !$relationClassMetadata instanceof ORMClassMetadata || $field === $relationName)
             ) {
                 $isCollectionValuedRelation = $relationClassMetadata->isCollectionValuedAssociation($field);
@@ -499,7 +500,7 @@ class Factory
             // ensure 1-n and associated class matches
             if (
                 $collectionMetadata->isSingleValuedAssociation($field)
-                && \is_a($this->class, $collectionMetadata->getAssociationTargetClass($field), true)
+                && ($collectionMetadata->getAssociationTargetClass($field) && \is_a($this->class, $collectionMetadata->getAssociationTargetClass($field), true))
                 && (!$collectionMetadata instanceof ORMClassMetadata || null === $relationName || ($collectionMetadata->getAssociationMapping($field)['inversedBy'] ?? null) === $relationName)
             ) {
                 return $field;
@@ -530,9 +531,9 @@ class Factory
                 return false;
             }
 
-            $cascadeMetadata = $classMetadataFactory->getAssociationMapping($inversedBy)['cascade'] ?? [];
+            $cascadeMetadata = $classMetadataFactory->getAssociationMapping($inversedBy)['cascade'];
         } else {
-            $cascadeMetadata = $classMetadataFactory->getAssociationMapping($field)['cascade'] ?? [];
+            $cascadeMetadata = $classMetadataFactory->getAssociationMapping($field)['cascade'];
         }
 
         return \in_array('persist', $cascadeMetadata, true);

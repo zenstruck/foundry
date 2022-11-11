@@ -18,7 +18,7 @@ use Zenstruck\Callback\Parameter;
 final class Proxy implements \Stringable
 {
     /**
-     * @psalm-var class-string<TProxiedObject>
+     * @phpstan-var class-string<TProxiedObject>
      */
     private string $class;
 
@@ -29,28 +29,27 @@ final class Proxy implements \Stringable
     /**
      * @internal
      *
-     * @psalm-param TProxiedObject $object
+     * @phpstan-param TProxiedObject $object
      */
-    public function __construct(/**
-     * @psalm-var TProxiedObject
-     */
-    private object $object)
-    {
+    public function __construct(
+        /** @param TProxiedObject $object */
+        private object $object
+    ) {
         $this->class = $object::class;
         $this->autoRefresh = Factory::configuration()->defaultProxyAutoRefresh();
     }
 
-    public function __call(string $method, array $arguments)
+    public function __call(string $method, array $arguments) // @phpstan-ignore-line
     {
         return $this->object()->{$method}(...$arguments);
     }
 
-    public function __get(string $name)
+    public function __get(string $name): mixed
     {
         return $this->object()->{$name};
     }
 
-    public function __set(string $name, $value): void
+    public function __set(string $name, mixed $value): void
     {
         $this->object()->{$name} = $value;
     }
@@ -67,7 +66,9 @@ final class Proxy implements \Stringable
 
     public function __toString(): string
     {
-        if (!\method_exists($this->object, '__toString')) {
+        $object = $this->object();
+
+        if (!\method_exists($object, '__toString')) {
             if (\PHP_VERSION_ID < 70400) {
                 return '(no __toString)';
             }
@@ -75,15 +76,15 @@ final class Proxy implements \Stringable
             throw new \RuntimeException(\sprintf('Proxied object "%s" cannot be converted to a string.', $this->class));
         }
 
-        return $this->object()->__toString();
+        return $object->__toString();
     }
 
     /**
      * @internal
      *
      * @template TObject of object
-     * @psalm-param TObject $object
-     * @psalm-return Proxy<TObject>
+     * @phpstan-param TObject $object
+     * @phpstan-return Proxy<TObject>
      */
     public static function createFromPersisted(object $object): self
     {
@@ -127,7 +128,7 @@ final class Proxy implements \Stringable
     }
 
     /**
-     * @psalm-return static
+     * @phpstan-return static
      */
     public function save(): self
     {
@@ -226,7 +227,7 @@ final class Proxy implements \Stringable
      *
      * @param callable $callback (object|Proxy $object): void
      *
-     * @psalm-return static
+     * @phpstan-return static
      */
     public function withoutAutoRefresh(callable $callback): self
     {
@@ -257,7 +258,7 @@ final class Proxy implements \Stringable
     /**
      * @internal
      */
-    public function executeCallback(callable $callback, ...$arguments): void
+    public function executeCallback(callable $callback, mixed ...$arguments): void
     {
         Callback::createFor($callback)->invoke(
             Parameter::union(
@@ -270,7 +271,7 @@ final class Proxy implements \Stringable
     }
 
     /**
-     * @psalm-return TProxiedObject|null
+     * @phpstan-return TProxiedObject|null
      */
     private function fetchObject(): ?object
     {

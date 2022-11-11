@@ -203,6 +203,9 @@ final class MakeFactory extends AbstractMaker
         return $choices;
     }
 
+    /**
+     * @param class-string $class
+     */
     private function defaultPropertiesFor(string $class, bool $allFields): iterable
     {
         $em = $this->managerRegistry->getManagerForClass($class);
