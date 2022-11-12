@@ -41,19 +41,19 @@ help:
 
 validate: fixcs sca test-full database-validate-mapping ### Run fixcs, sca, full test suite and validate migrations
 
-test-full: docker-start vendor ### Run full PHPunit (MySQL + Mongo)
+test-full: docker-start vendor ### Run full PHPUnit (MySQL + Mongo)
 	@$(eval filter ?= '.')
 	@${DC_EXEC} -e USE_ORM=1 -e USE_ODM=1 php vendor/bin/simple-phpunit --configuration phpunit-dama-doctrine.xml.dist --filter=$(filter)
 
-test-mysql: docker-start vendor ### Run PHPunit with mysql
+test-mysql: docker-start vendor ### Run PHPUnit with MySQL
 	@$(eval filter ?= '.')
 	@${DC_EXEC} -e USE_ORM=1 php vendor/bin/simple-phpunit --configuration phpunit-dama-doctrine.xml.dist --filter=$(filter)
 
-test-mongo: docker-start vendor ### Run PHPunit with Mongo
+test-mongo: docker-start vendor ### Run PHPUnit with Mongo
 	@$(eval filter ?= '.')
 	@${DC_EXEC} -e USE_ODM=1 php vendor/bin/simple-phpunit --configuration phpunit.xml.dist --filter=$(filter)
 
-fixcs: docker-start bin/tools/cs-fixer/vendor ### Run PHP CS-Fixer
+fixcs: docker-start bin/tools/cs-fixer/vendor ### Run PHP-CS-Fixer
 	@${DOCKER_PHP} bin/tools/cs-fixer/vendor/friendsofphp/php-cs-fixer/php-cs-fixer --no-interaction --diff -v fix
 
 bin/tools/cs-fixer/vendor: vendor bin/tools/cs-fixer/composer.json bin/tools/cs-fixer/composer.lock
