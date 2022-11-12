@@ -46,11 +46,11 @@ Each target will build and start the docker stack and install composer only if n
 $ make help
 validate                       Run fixcs, sca, full test suite and validate migrations
 test-full                      Run full PHPunit (MySQL + Mongo)
-test-fast                      Run PHPunit with SQLite
-test-mysql                     Run PHPunit with mysql
-test-postgresql                Run PHPunit with postgreSQL
-test-mongo                     Run PHPunit with Mongo
-fixcs                          Run PHP CS-Fixer
+test-fast                      Run PHPUnit with SQLite
+test-mysql                     Run PHPUnit with MySQL
+test-postgresql                Run PHPUnit with PostgreSQL
+test-mongo                     Run PHPUnit with Mongo
+fixcs                          Run PHP-CS-Fixer
 sca                            Run static analysis
 database-generate-migration    Generate new migration based on mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
 database-validate-mapping      Validate mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
