@@ -1657,10 +1657,6 @@ Using in Unit Tests
 When using foundry in unit tests, by using ``PHPUnit\Framework\TestCase``, Foundry simply creates the object instancies
 but does not try to persist them (this is also true for any object not managed by Doctrine).
 
-You can still configure Foundry statically:
-
-
-
 .. _stories:
 
 Stories
