@@ -217,6 +217,33 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Create cache directory
+        run: mkdir -p var/cache-docker
+
+      - id: cache-docker
+        uses: actions/cache@v3
+        with:
+          path: var/cache-docker
+          key: ${{ hashFiles('docker/*') }}
+
+      - name: Docker build
+        uses: docker/build-push-action@v3
+        if: steps.cache-docker.outputs.cache-hit != 'true'
+        with:
+          context: .
+          file: ./docker/Dockerfile
+          outputs: type=docker,dest=var/cache-docker/php.tar
+          tags: |
+            foundry_php:ci
+          push: false
+
+      - name: Load docker context
+        run: |
+          docker load < var/cache-docker/php.tar
+
       - name: Run test suite with docker
         run: |
           make validate
