@@ -41,4 +41,15 @@ abstract class MakerTestCase extends KernelTestCase
     {
         return \sprintf('%s/%s', self::tempDir(), $path);
     }
+
+    protected function expectedFile(string $file): string
+    {
+        return \sprintf('%s/../../../Fixtures/Maker/%s/%s', __DIR__, $this->getName(), $file);
+    }
+
+    protected function assertFileFromMakerSameAsExpectedFile(string $expectedFile, string $fileFromMaker): void
+    {
+        $this->assertFileExists($fileFromMaker);
+        $this->assertFileEquals($expectedFile, $fileFromMaker);
+    }
 }

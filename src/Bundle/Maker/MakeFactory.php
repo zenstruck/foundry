@@ -50,7 +50,7 @@ final class MakeFactory extends AbstractMaker
     /** @var string[] */
     private array $entitiesWithFactories = [];
 
-    public function __construct(private ManagerRegistry $managerRegistry, \Traversable $factories)
+    public function __construct(private ManagerRegistry $managerRegistry, \Traversable $factories, private string $projectDir)
     {
         $this->entitiesWithFactories = \array_map(
             static fn(ModelFactory $factory): string => $factory::getEntityClass(),
@@ -162,6 +162,7 @@ final class MakeFactory extends AbstractMaker
                 'entity' => $entity,
                 'defaultProperties' => $this->defaultPropertiesFor($entity->getName(), $input->getOption('all-fields')),
                 'repository' => $repository,
+                'phpstanEnabled' => $this->phpstanEnabled(),
             ]
         );
 
@@ -232,5 +233,10 @@ final class MakeFactory extends AbstractMaker
 
             yield $property['fieldName'] => $value;
         }
+    }
+
+    private function phpstanEnabled(): bool
+    {
+        return \file_exists("{$this->projectDir}/vendor/phpstan/phpstan/phpstan");
     }
 }
