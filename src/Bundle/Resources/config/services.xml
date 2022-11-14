@@ -43,6 +43,7 @@
         <service id="Zenstruck\Foundry\Bundle\Maker\MakeFactory">
             <argument type="service" id="Zenstruck\Foundry\ChainManagerRegistry" />
             <argument type="tagged_iterator" tag="foundry.factory" />
+            <argument>%kernel.project_dir%</argument>
             <tag name="maker.command" />
         </service>
 

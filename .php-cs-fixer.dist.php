@@ -3,6 +3,7 @@
 $finder = PhpCsFixer\Finder::create()
     ->in([__DIR__.'/src', __DIR__.'/tests'])
     ->notName('*.tpl.php')
+    ->exclude('Fixtures/Maker')
 ;
 
 $config = new PhpCsFixer\Config();
