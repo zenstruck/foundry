@@ -31,7 +31,8 @@
         "matthiasnoback/symfony-dependency-injection-test": "^4.1",
         "symfony/framework-bundle": "^4.4|^5.0|^6.0",
         "symfony/maker-bundle": "^1.30",
-        "symfony/phpunit-bridge": "^6.0"
+        "symfony/phpunit-bridge": "^6.0",
+        "symfony/translation-contracts": "^3.0"
     },
     "config": {
         "preferred-install": "dist",

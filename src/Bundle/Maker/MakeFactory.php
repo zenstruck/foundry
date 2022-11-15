@@ -2,8 +2,11 @@
 
 namespace Zenstruck\Foundry\Bundle\Maker;
 
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadataInfo as ORMClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
@@ -21,7 +24,7 @@ use Zenstruck\Foundry\ModelFactory;
  */
 final class MakeFactory extends AbstractMaker
 {
-    private const ORM_DEFAULTS = [
+    private const DEFAULTS = [
         'ARRAY' => '[],',
         'ASCII_STRING' => 'self::faker()->text(),',
         'BIGINT' => 'self::faker()->randomNumber(),',
@@ -211,12 +214,15 @@ final class MakeFactory extends AbstractMaker
     {
         $em = $this->managerRegistry->getManagerForClass($class);
 
-        if (!$em instanceof EntityManagerInterface) {
+        if (!$em instanceof ObjectManager) {
             return [];
         }
 
+        /** @var ORMClassMetadata|ODMClassMetadata $metadata */
         $metadata = $em->getClassMetadata($class);
         $ids = $metadata->getIdentifierFieldNames();
+
+        $dbType = $em instanceof EntityManagerInterface ? 'ORM' : 'ODM';
 
         foreach ($metadata->fieldMappings as $property) {
             // ignore identifiers and nullable fields
@@ -225,10 +231,10 @@ final class MakeFactory extends AbstractMaker
             }
 
             $type = \mb_strtoupper($property['type']);
-            $value = "null, // TODO add {$type} ORM type manually";
+            $value = "null, // TODO add {$type} {$dbType} type manually";
 
-            if (\array_key_exists($type, self::ORM_DEFAULTS)) {
-                $value = self::ORM_DEFAULTS[$type];
+            if (\array_key_exists($type, self::DEFAULTS)) {
+                $value = self::DEFAULTS[$type];
             }
 
             yield $property['fieldName'] => $value;
