@@ -4,6 +4,7 @@ namespace Zenstruck\Foundry\Tests\Functional\Bundle\Maker;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -42,14 +43,22 @@ abstract class MakerTestCase extends KernelTestCase
         return \sprintf('%s/%s', self::tempDir(), $path);
     }
 
-    protected function expectedFile(string $file): string
+    protected function expectedFile(): string
     {
-        return \sprintf('%s/../../../Fixtures/Maker/%s/%s', __DIR__, $this->getName(), $file);
+        $path = \sprintf(
+            '%s/../../../Fixtures/Maker/expected/%s.php',
+            __DIR__,
+            (new AsciiSlugger())->slug($this->getName())
+        );
+
+        $this->assertFileExists($path);
+
+        return \realpath($path);
     }
 
-    protected function assertFileFromMakerSameAsExpectedFile(string $expectedFile, string $fileFromMaker): void
+    protected function assertFileFromMakerSameAsExpectedFile(string $fileFromMaker): void
     {
         $this->assertFileExists($fileFromMaker);
-        $this->assertFileEquals($expectedFile, $fileFromMaker);
+        $this->assertFileEquals($this->expectedFile(), $fileFromMaker);
     }
 }

@@ -43,10 +43,7 @@ final class MakeFactoryTest extends MakerTestCase
 
         $tester->execute(['entity' => Category::class]);
 
-        $this->assertFileFromMakerSameAsExpectedFile(
-            $this->expectedFile('CategoryFactory.php'),
-            self::tempFile('src/Factory/CategoryFactory.php')
-        );
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/CategoryFactory.php'));
     }
 
     /**
@@ -70,10 +67,7 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertStringNotContainsString(Category::class, $output);
         $this->assertStringContainsString('Note: pass --test if you want to generate factories in your tests/ directory', $output);
 
-        $this->assertFileFromMakerSameAsExpectedFile(
-            $this->expectedFile('TagFactory.php'),
-            self::tempFile('src/Factory/TagFactory.php')
-        );
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/TagFactory.php'));
     }
 
     /**
@@ -91,10 +85,7 @@ final class MakeFactoryTest extends MakerTestCase
 
         $tester->execute(['entity' => Category::class, '--test' => true]);
 
-        $this->assertFileFromMakerSameAsExpectedFile(
-            $this->expectedFile('CategoryFactory.php'),
-            self::tempFile('tests/Factory/CategoryFactory.php')
-        );
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('tests/Factory/CategoryFactory.php'));
     }
 
     /**
@@ -118,10 +109,7 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertStringNotContainsString(Category::class, $output);
         $this->assertStringNotContainsString('Note: pass --test if you want to generate factories in your tests/ directory', $output);
 
-        $this->assertFileFromMakerSameAsExpectedFile(
-            $this->expectedFile('TagFactory.php'),
-            self::tempFile('tests/Factory/TagFactory.php')
-        );
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('tests/Factory/TagFactory.php'));
     }
 
     /**
@@ -142,10 +130,7 @@ final class MakeFactoryTest extends MakerTestCase
 
         $tester->execute(['entity' => Category::class]);
 
-        $this->assertFileFromMakerSameAsExpectedFile(
-            $this->expectedFile('CategoryFactory.php'),
-            self::tempFile('src/Factory/CategoryFactory.php')
-        );
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/CategoryFactory.php'));
     }
 
     /**
@@ -293,7 +278,7 @@ final class MakeFactoryTest extends MakerTestCase
         $tester->setInputs([$class]);
         $tester->execute([]);
 
-        $this->assertFileExists(self::tempFile("src/Factory/{$file}.php"));
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile("src/Factory/{$file}.php"));
     }
 
     public function documentProvider(): iterable
