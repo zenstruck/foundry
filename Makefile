@@ -4,15 +4,19 @@ MYSQL_URL="mysql://root:root@mysql:3306/zenstruck_foundry?charset=utf8"
 MONGO_URL="mongodb://mongo:mongo@mongo:27017/mongo?compressors=disabled&amp;gssapiServiceName=mongodb&authSource=mongo"
 
 ifeq ($(shell docker --help | grep "compose"),)
-	DOCKER_COMPOSE=docker-compose
+	DOCKER_COMPOSE_BIN=docker-compose
 else
-	DOCKER_COMPOSE=docker compose
+	DOCKER_COMPOSE_BIN=docker compose
 endif
 
 INTERACTIVE:=$(shell [ -t 0 ] && echo 1)
 ifdef INTERACTIVE
+	CI='false'
+	DOCKER_COMPOSE=$(DOCKER_COMPOSE_BIN)
 	DC_EXEC=$(DOCKER_COMPOSE) exec -e USE_FOUNDRY_BUNDLE=1 -e DATABASE_URL=${MYSQL_URL} -e MONGO_URL=${MONGO_URL}
 else
+	CI='true'
+	DOCKER_COMPOSE=$(DOCKER_COMPOSE_BIN) -f docker-compose.yaml -f docker-compose.ci.yaml
 	DC_EXEC=$(DOCKER_COMPOSE) exec -e USE_FOUNDRY_BUNDLE=1 -e DATABASE_URL=${MYSQL_URL} -e MONGO_URL=${MONGO_URL} -T
 endif
 
@@ -84,8 +88,12 @@ vendor: composer.json $(wildcard composer.lock)
 
 docker-start: ### Build and run containers
 ifeq ($(DOCKER_IS_UP),)
+ifeq ($(CI),'false')
 	@$(DOCKER_COMPOSE) build  --build-arg UID="${UID}" --build-arg XDEBUG_HOST="${XDEBUG_HOST}"
 	@$(DOCKER_COMPOSE) up --detach --remove-orphans
+else
+	@$(DOCKER_COMPOSE) up --detach --no-build
+endif
 	@$(DOCKER_COMPOSE) ps
 endif
 
