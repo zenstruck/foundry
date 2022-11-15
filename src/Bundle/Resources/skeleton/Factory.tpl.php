@@ -2,48 +2,53 @@
 
 namespace <?= $namespace; ?>;
 
-use <?= $entity->getName() ?>;
-<?php if ($repository): ?>use <?= $repository->getName() ?>;
+use <?= $object->getName() ?>;
+<?php if ($persisted && $repository): ?>use <?= $repository->getName() ?>;
 use Zenstruck\Foundry\RepositoryProxy;
 <?php endif ?>
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
 
 /**
- * @extends ModelFactory<<?= $entity->getShortName() ?>>
+ * @extends ModelFactory<<?= $object->getShortName() ?>>
  *
- * @method <?= $entity->getShortName() ?>|Proxy create(array|callable $attributes = [])
- * @method static <?= $entity->getShortName() ?>|Proxy createOne(array $attributes = [])
- * @method static <?= $entity->getShortName() ?>|Proxy find(object|array|mixed $criteria)
- * @method static <?= $entity->getShortName() ?>|Proxy findOrCreate(array $attributes)
- * @method static <?= $entity->getShortName() ?>|Proxy first(string $sortedField = 'id')
- * @method static <?= $entity->getShortName() ?>|Proxy last(string $sortedField = 'id')
- * @method static <?= $entity->getShortName() ?>|Proxy random(array $attributes = [])
- * @method static <?= $entity->getShortName() ?>|Proxy randomOrCreate(array $attributes = [])
- * @method static <?= $entity->getShortName() ?>[]|Proxy[] all()
- * @method static <?= $entity->getShortName() ?>[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static <?= $entity->getShortName() ?>[]|Proxy[] createSequence(array|callable $sequence)
- * @method static <?= $entity->getShortName() ?>[]|Proxy[] findBy(array $attributes)
- * @method static <?= $entity->getShortName() ?>[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
- * @method static <?= $entity->getShortName() ?>[]|Proxy[] randomSet(int $number, array $attributes = [])
+ * @method <?= $object->getShortName() ?>|Proxy create(array|callable $attributes = [])
+ * @method static <?= $object->getShortName() ?>|Proxy createOne(array $attributes = [])
+<?php if ($persisted): ?> * @method static <?= $object->getShortName() ?>|Proxy find(object|array|mixed $criteria)
+ * @method static <?= $object->getShortName() ?>|Proxy findOrCreate(array $attributes)
+ * @method static <?= $object->getShortName() ?>|Proxy first(string $sortedField = 'id')
+ * @method static <?= $object->getShortName() ?>|Proxy last(string $sortedField = 'id')
+ * @method static <?= $object->getShortName() ?>|Proxy random(array $attributes = [])
+ * @method static <?= $object->getShortName() ?>|Proxy randomOrCreate(array $attributes = [])
+ * @method static <?= $object->getShortName() ?>[]|Proxy[] all()
+<?php endif ?>
+ * @method static <?= $object->getShortName() ?>[]|Proxy[] createMany(int $number, array|callable $attributes = [])
+ * @method static <?= $object->getShortName() ?>[]|Proxy[] createSequence(array|callable $sequence)
+<?php if ($persisted): ?> * @method static <?= $object->getShortName() ?>[]|Proxy[] findBy(array $attributes)
+ * @method static <?= $object->getShortName() ?>[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
+ * @method static <?= $object->getShortName() ?>[]|Proxy[] randomSet(int $number, array $attributes = [])
 <?php if ($repository): ?> * @method static <?= $repository->getShortName() ?>|RepositoryProxy repository()
 <?php endif ?>
+<?php endif ?>
 <?php if ($phpstanEnabled): ?> *
- * @phpstan-method Proxy<<?= $entity->getShortName() ?>> create(array|callable $attributes = [])
- * @phpstan-method static Proxy<<?= $entity->getShortName() ?>> createOne(array $attributes = [])
- * @phpstan-method static Proxy<<?= $entity->getShortName() ?>> find(object|array|mixed $criteria)
- * @phpstan-method static Proxy<<?= $entity->getShortName() ?>> findOrCreate(array $attributes)
- * @phpstan-method static Proxy<<?= $entity->getShortName() ?>> first(string $sortedField = 'id')
- * @phpstan-method static Proxy<<?= $entity->getShortName() ?>> last(string $sortedField = 'id')
- * @phpstan-method static Proxy<<?= $entity->getShortName() ?>> random(array $attributes = [])
- * @phpstan-method static Proxy<<?= $entity->getShortName() ?>> randomOrCreate(array $attributes = [])
- * @phpstan-method static list<Proxy<<?= $entity->getShortName() ?>>> all()
- * @phpstan-method static list<Proxy<<?= $entity->getShortName() ?>>> createMany(int $number, array|callable $attributes = [])
- * @phpstan-method static list<Proxy<<?= $entity->getShortName() ?>>> createSequence(array|callable $sequence)
- * @phpstan-method static list<Proxy<<?= $entity->getShortName() ?>>> findBy(array $attributes)
- * @phpstan-method static list<Proxy<<?= $entity->getShortName() ?>>> randomRange(int $min, int $max, array $attributes = [])
- * @phpstan-method static list<Proxy<<?= $entity->getShortName() ?>>> randomSet(int $number, array $attributes = [])
+ * @phpstan-method Proxy<<?= $object->getShortName() ?>> create(array|callable $attributes = [])
+ * @phpstan-method static Proxy<<?= $object->getShortName() ?>> createOne(array $attributes = [])
+<?php if ($persisted): ?> * @phpstan-method static Proxy<<?= $object->getShortName() ?>> find(object|array|mixed $criteria)
+ * @phpstan-method static Proxy<<?= $object->getShortName() ?>> findOrCreate(array $attributes)
+ * @phpstan-method static Proxy<<?= $object->getShortName() ?>> first(string $sortedField = 'id')
+ * @phpstan-method static Proxy<<?= $object->getShortName() ?>> last(string $sortedField = 'id')
+ * @phpstan-method static Proxy<<?= $object->getShortName() ?>> random(array $attributes = [])
+ * @phpstan-method static Proxy<<?= $object->getShortName() ?>> randomOrCreate(array $attributes = [])
+ * @phpstan-method static list<Proxy<<?= $object->getShortName() ?>>> all()
+<?php endif ?>
+ * @phpstan-method static list<Proxy<<?= $object->getShortName() ?>>> createMany(int $number, array|callable $attributes = [])
+ * @phpstan-method static list<Proxy<<?= $object->getShortName() ?>>> createSequence(array|callable $sequence)
+<?php if ($persisted): ?>
+ * @phpstan-method static list<Proxy<<?= $object->getShortName() ?>>> findBy(array $attributes)
+ * @phpstan-method static list<Proxy<<?= $object->getShortName() ?>>> randomRange(int $min, int $max, array $attributes = [])
+ * @phpstan-method static list<Proxy<<?= $object->getShortName() ?>>> randomSet(int $number, array $attributes = [])
 <?php if ($repository): ?> * @phpstan-method static RepositoryProxy<<?= $repository->getShortName() ?>> repository()
+<?php endif ?>
 <?php endif ?>
 <?php endif ?>
  */
@@ -81,12 +86,15 @@ foreach ($defaultProperties as $fieldname => $type) {
     protected function initialize(): self
     {
         return $this
-            // ->afterInstantiate(function(<?= $entity->getShortName() ?> $<?= lcfirst($entity->getShortName()) ?>): void {})
+<?php if (!$persisted): ?>
+            ->withoutPersisting()
+<?php endif ?>
+            // ->afterInstantiate(function(<?= $object->getShortName() ?> $<?= lcfirst($object->getShortName()) ?>): void {})
         ;
     }
 
     protected static function getClass(): string
     {
-        return <?= $entity->getShortName() ?>::class;
+        return <?= $object->getShortName() ?>::class;
     }
 }

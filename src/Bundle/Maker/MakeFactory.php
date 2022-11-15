@@ -17,6 +17,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\ModelFactory;
 
 /**
@@ -24,7 +25,7 @@ use Zenstruck\Foundry\ModelFactory;
  */
 final class MakeFactory extends AbstractMaker
 {
-    private const DEFAULTS = [
+    private const DEFAULTS_FOR_PERSISTED = [
         'ARRAY' => '[],',
         'ASCII_STRING' => 'self::faker()->text({length}),',
         'BIGINT' => 'self::faker()->randomNumber(),',
@@ -50,10 +51,20 @@ final class MakeFactory extends AbstractMaker
         'TIME_IMMUTABLE' => '\DateTimeImmutable::createFromMutable(self::faker()->datetime()),',
     ];
 
-    /** @var string[] */
-    private array $entitiesWithFactories = [];
+    private const DEFAULTS_FOR_NOT_PERSISTED = [
+        'array' => '[],',
+        'string' => 'self::faker()->text(),',
+        'int' => 'self::faker()->randomNumber(),',
+        'float' => 'self::faker()->randomFloat(),',
+        'bool' => 'self::faker()->boolean(),',
+        \DateTime::class => 'self::faker()->dateTime(),',
+        \DateTimeImmutable::class => '\DateTimeImmutable::createFromMutable(self::faker()->dateTime()),',
+    ];
 
-    public function __construct(private ManagerRegistry $managerRegistry, \Traversable $factories, private string $projectDir)
+    /** @var string[] */
+    private array $entitiesWithFactories;
+
+    public function __construct(private ManagerRegistry $managerRegistry, \Traversable $factories, private string $projectDir, private KernelInterface $kernel)
     {
         $this->entitiesWithFactories = \array_map(
             static fn(ModelFactory $factory): string => $factory::getEntityClass(),
@@ -68,7 +79,7 @@ final class MakeFactory extends AbstractMaker
 
     public static function getCommandDescription(): string
     {
-        return 'Creates a Foundry model factory for a Doctrine entity class';
+        return 'Creates a Foundry model factory for a Doctrine entity class or a regular object';
     }
 
     public function configureDependencies(DependencyBuilder $dependencies): void
@@ -80,18 +91,26 @@ final class MakeFactory extends AbstractMaker
     {
         $command
             ->setDescription(self::getCommandDescription())
-            ->addArgument('entity', InputArgument::OPTIONAL, 'Entity class to create a factory for')
+            ->addArgument('class', InputArgument::OPTIONAL, 'Entity, Document or class to create a factory for')
             ->addOption('namespace', null, InputOption::VALUE_REQUIRED, 'Customize the namespace for generated factories', 'Factory')
             ->addOption('test', null, InputOption::VALUE_NONE, 'Create in <fg=yellow>tests/</> instead of <fg=yellow>src/</>')
             ->addOption('all-fields', null, InputOption::VALUE_NONE, 'Create defaults for all entity fields, not only required fields')
+            ->addOption('not-persisted', null, InputOption::VALUE_NONE, 'Create a factory for an object not managed by Doctrine')
         ;
 
-        $inputConfig->setArgumentAsNonInteractive('entity');
+        $inputConfig->setArgumentAsNonInteractive('class');
     }
 
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
     {
-        if ($input->getArgument('entity')) {
+        if (!$this->doctrineEnabled() && !$input->getOption('not-persisted')) {
+            $io->text('// Note: Doctrine not enabled: auto-activating <fg=yellow>--not-persisted</> option.');
+            $io->newLine();
+
+            $input->setOption('not-persisted', true);
+        }
+
+        if ($input->getArgument('class')) {
             return;
         }
 
@@ -105,16 +124,30 @@ final class MakeFactory extends AbstractMaker
             $io->newLine();
         }
 
-        $argument = $command->getDefinition()->getArgument('entity');
-        $entity = $io->choice($argument->getDescription(), \array_merge($this->entityChoices(), ['All']));
+        if ($input->getOption('not-persisted')) {
+            $class = $io->ask(
+                'Not persisted class to create a factory for',
+                validator: static function(string $class) {
+                    if (!\class_exists($class)) {
+                        throw new RuntimeCommandException("Given class \"{$class}\" does not exist.");
+                    }
 
-        $input->setArgument('entity', $entity);
+                    return $class;
+                }
+            );
+        } else {
+            $argument = $command->getDefinition()->getArgument('class');
+
+            $class = $io->choice($argument->getDescription(), \array_merge($this->entityChoices(), ['All']));
+        }
+
+        $input->setArgument('class', $class);
     }
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
-        $entity = $input->getArgument('entity');
-        $classes = 'All' === $entity ? $this->entityChoices() : [$entity];
+        $class = $input->getArgument('class');
+        $classes = 'All' === $class ? $this->entityChoices() : [$class];
 
         foreach ($classes as $class) {
             $this->generateFactory($class, $input, $io, $generator);
@@ -131,7 +164,7 @@ final class MakeFactory extends AbstractMaker
         }
 
         if (!\class_exists($class)) {
-            throw new RuntimeCommandException(\sprintf('Entity "%s" not found.', $input->getArgument('entity')));
+            throw new RuntimeCommandException(\sprintf('Class "%s" not found.', $input->getArgument('class')));
         }
 
         $namespace = $input->getOption('namespace');
@@ -148,24 +181,29 @@ final class MakeFactory extends AbstractMaker
             $namespace = 'Tests\\'.$namespace;
         }
 
-        $entity = new \ReflectionClass($class);
-        $factory = $generator->createClassNameDetails($entity->getShortName(), $namespace, 'Factory');
+        $object = new \ReflectionClass($class);
+        $factory = $generator->createClassNameDetails($object->getShortName(), $namespace, 'Factory');
 
-        $repository = new \ReflectionClass($this->managerRegistry->getRepository($entity->getName()));
+        if (!$input->getOption('not-persisted')) {
+            $repository = new \ReflectionClass($this->managerRegistry->getRepository($object->getName()));
 
-        if (0 !== \mb_strpos($repository->getName(), $generator->getRootNamespace())) {
-            // not using a custom repository
-            $repository = null;
+            if (0 !== \mb_strpos($repository->getName(), $generator->getRootNamespace())) {
+                // not using a custom repository
+                $repository = null;
+            }
         }
 
         $generator->generateClass(
             $factory->getFullName(),
             __DIR__.'/../Resources/skeleton/Factory.tpl.php',
             [
-                'entity' => $entity,
-                'defaultProperties' => $this->defaultPropertiesFor($entity->getName(), $input->getOption('all-fields')),
-                'repository' => $repository,
+                'object' => $object,
+                'defaultProperties' => $input->getOption('not-persisted')
+                    ? $this->defaultPropertiesForNotPersistedObject($object->getName(), $input->getOption('all-fields'))
+                    : $this->defaultPropertiesForPersistedObject($object->getName(), $input->getOption('all-fields')),
+                'repository' => $repository ?? null,
                 'phpstanEnabled' => $this->phpstanEnabled(),
+                'persisted' => !$input->getOption('not-persisted'),
             ]
         );
 
@@ -210,7 +248,7 @@ final class MakeFactory extends AbstractMaker
     /**
      * @param class-string $class
      */
-    private function defaultPropertiesFor(string $class, bool $allFields): iterable
+    private function defaultPropertiesForPersistedObject(string $class, bool $allFields): iterable
     {
         $em = $this->managerRegistry->getManagerForClass($class);
 
@@ -234,16 +272,66 @@ final class MakeFactory extends AbstractMaker
             $value = "null, // TODO add {$type} {$dbType} type manually";
             $length = $property['length'] ?? '';
 
-            if (\array_key_exists($type, self::DEFAULTS)) {
-                $value = self::DEFAULTS[$type];
+            if (\array_key_exists($type, self::DEFAULTS_FOR_PERSISTED)) {
+                $value = self::DEFAULTS_FOR_PERSISTED[$type];
             }
 
             yield $property['fieldName'] => \str_replace('{length}', (string) $length, $value);
         }
     }
 
+    /**
+     * @param class-string $class
+     */
+    private function defaultPropertiesForNotPersistedObject(string $class, bool $allFields): iterable
+    {
+        $object = new \ReflectionClass($class);
+
+        foreach ($object->getProperties() as $property) {
+            // ignore identifiers and nullable fields
+            if (!$allFields && ($property->hasDefaultValue() || !$property->hasType() || $property->getType()?->allowsNull())) {
+                continue;
+            }
+
+            $type = null;
+            $reflectionType = $property->getType();
+            if ($reflectionType instanceof \ReflectionNamedType) {
+                $type = $reflectionType->getName();
+            }
+
+            $value = \sprintf('null, // TODO add %svalue manually', $type ? "{$type} " : '');
+
+            if (\array_key_exists($type ?? '', self::DEFAULTS_FOR_NOT_PERSISTED)) {
+                $value = self::DEFAULTS_FOR_NOT_PERSISTED[$type];
+            }
+
+            yield $property->getName() => $value;
+        }
+    }
+
     private function phpstanEnabled(): bool
     {
         return \file_exists("{$this->projectDir}/vendor/phpstan/phpstan/phpstan");
+    }
+
+    private function doctrineEnabled(): bool
+    {
+        try {
+            $this->kernel->getBundle('DoctrineBundle');
+
+            $ormEnabled = true;
+        } catch (\InvalidArgumentException) {
+            $ormEnabled = false;
+        }
+
+        try {
+            $this->kernel->getBundle('DoctrineMongoDBBundle');
+
+            $odmEnabled = true;
+        } catch (\InvalidArgumentException) {
+            $odmEnabled = false;
+        }
+
+        return $ormEnabled || $odmEnabled;
     }
 }
