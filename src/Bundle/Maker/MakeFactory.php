@@ -26,7 +26,7 @@ final class MakeFactory extends AbstractMaker
 {
     private const DEFAULTS = [
         'ARRAY' => '[],',
-        'ASCII_STRING' => 'self::faker()->text(),',
+        'ASCII_STRING' => 'self::faker()->text({length}),',
         'BIGINT' => 'self::faker()->randomNumber(),',
         'BLOB' => 'self::faker()->text(),',
         'BOOLEAN' => 'self::faker()->boolean(),',
@@ -44,10 +44,10 @@ final class MakeFactory extends AbstractMaker
         'JSON_ARRAY' => '[],',
         'SIMPLE_ARRAY' => '[],',
         'SMALLINT' => 'self::faker()->numberBetween(1, 32767),',
-        'STRING' => 'self::faker()->text(),',
-        'TEXT' => 'self::faker()->text(),',
-        'TIME_MUTABLE' => 'self::faker()->dateTime(),',
-        'TIME_IMMUTABLE' => '\DateTimeImmutable::createFromMutable(self::faker()->dateTime()),',
+        'STRING' => 'self::faker()->text({length}),',
+        'TEXT' => 'self::faker()->text({length}),',
+        'TIME_MUTABLE' => 'self::faker()->datetime(),',
+        'TIME_IMMUTABLE' => '\DateTimeImmutable::createFromMutable(self::faker()->datetime()),',
     ];
 
     /** @var string[] */
@@ -232,12 +232,13 @@ final class MakeFactory extends AbstractMaker
 
             $type = \mb_strtoupper($property['type']);
             $value = "null, // TODO add {$type} {$dbType} type manually";
+            $length = $property['length'] ?? '';
 
             if (\array_key_exists($type, self::DEFAULTS)) {
                 $value = self::DEFAULTS[$type];
             }
 
-            yield $property['fieldName'] => $value;
+            yield $property['fieldName'] => \str_replace('{length}', (string) $length, $value);
         }
     }
 
