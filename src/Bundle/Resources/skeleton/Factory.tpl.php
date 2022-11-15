@@ -20,12 +20,12 @@ use Zenstruck\Foundry\Proxy;
  * @method static <?= $entity->getShortName() ?>|Proxy last(string $sortedField = 'id')
  * @method static <?= $entity->getShortName() ?>|Proxy random(array $attributes = [])
  * @method static <?= $entity->getShortName() ?>|Proxy randomOrCreate(array $attributes = [])
- * @method static list<<?= $entity->getShortName() ?>>|list<Proxy> all()
- * @method static list<<?= $entity->getShortName() ?>>|list<Proxy> createMany(int $number, array|callable $attributes = [])
- * @method static list<<?= $entity->getShortName() ?>>|list<Proxy> createSequence(array|callable $sequence)
- * @method static list<<?= $entity->getShortName() ?>>|list<Proxy> findBy(array $attributes)
- * @method static list<<?= $entity->getShortName() ?>>|list<Proxy> randomRange(int $min, int $max, array $attributes = [])
- * @method static list<<?= $entity->getShortName() ?>>|list<Proxy> randomSet(int $number, array $attributes = [])
+ * @method static <?= $entity->getShortName() ?>[]|Proxy[] all()
+ * @method static <?= $entity->getShortName() ?>[]|Proxy[] createMany(int $number, array|callable $attributes = [])
+ * @method static <?= $entity->getShortName() ?>[]|Proxy[] createSequence(array|callable $sequence)
+ * @method static <?= $entity->getShortName() ?>[]|Proxy[] findBy(array $attributes)
+ * @method static <?= $entity->getShortName() ?>[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
+ * @method static <?= $entity->getShortName() ?>[]|Proxy[] randomSet(int $number, array $attributes = [])
 <?php if ($repository): ?> * @method static <?= $repository->getShortName() ?>|RepositoryProxy repository()
 <?php endif ?>
 <?php if ($phpstanEnabled): ?> *

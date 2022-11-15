@@ -17,12 +17,12 @@ use Zenstruck\Foundry\Proxy;
  * @method static Tag|Proxy last(string $sortedField = 'id')
  * @method static Tag|Proxy random(array $attributes = [])
  * @method static Tag|Proxy randomOrCreate(array $attributes = [])
- * @method static list<Tag>|list<Proxy> all()
- * @method static list<Tag>|list<Proxy> createMany(int $number, array|callable $attributes = [])
- * @method static list<Tag>|list<Proxy> createSequence(array|callable $sequence)
- * @method static list<Tag>|list<Proxy> findBy(array $attributes)
- * @method static list<Tag>|list<Proxy> randomRange(int $min, int $max, array $attributes = [])
- * @method static list<Tag>|list<Proxy> randomSet(int $number, array $attributes = [])
+ * @method static Tag[]|Proxy[] all()
+ * @method static Tag[]|Proxy[] createMany(int $number, array|callable $attributes = [])
+ * @method static Tag[]|Proxy[] createSequence(array|callable $sequence)
+ * @method static Tag[]|Proxy[] findBy(array $attributes)
+ * @method static Tag[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
+ * @method static Tag[]|Proxy[] randomSet(int $number, array $attributes = [])
  */
 final class TagFactory extends ModelFactory
 {

@@ -17,12 +17,12 @@ use Zenstruck\Foundry\Proxy;
  * @method static Post|Proxy last(string $sortedField = 'id')
  * @method static Post|Proxy random(array $attributes = [])
  * @method static Post|Proxy randomOrCreate(array $attributes = [])
- * @method static list<Post>|list<Proxy> all()
- * @method static list<Post>|list<Proxy> createMany(int $number, array|callable $attributes = [])
- * @method static list<Post>|list<Proxy> createSequence(array|callable $sequence)
- * @method static list<Post>|list<Proxy> findBy(array $attributes)
- * @method static list<Post>|list<Proxy> randomRange(int $min, int $max, array $attributes = [])
- * @method static list<Post>|list<Proxy> randomSet(int $number, array $attributes = [])
+ * @method static Post[]|Proxy[] all()
+ * @method static Post[]|Proxy[] createMany(int $number, array|callable $attributes = [])
+ * @method static Post[]|Proxy[] createSequence(array|callable $sequence)
+ * @method static Post[]|Proxy[] findBy(array $attributes)
+ * @method static Post[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
+ * @method static Post[]|Proxy[] randomSet(int $number, array $attributes = [])
  */
 final class PostFactory extends ModelFactory
 {
