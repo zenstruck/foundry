@@ -1,6 +1,6 @@
 FROM php:8.0-cli
 
-COPY --from=composer:2.3 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.4 /usr/bin/composer /usr/bin/composer
 
 COPY docker/xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
 ARG XDEBUG_HOST
