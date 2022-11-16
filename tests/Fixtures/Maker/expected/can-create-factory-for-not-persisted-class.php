@@ -34,17 +34,17 @@ final class SomeObjectFactory extends ModelFactory
     protected function getDefaults(): array
     {
         return [
+            'arrayMandatory' => [],
+            'dateTimeImmutableMandatory' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
+            'dateTimeMandatory' => self::faker()->dateTime(),
+            'floatMandatory' => self::faker()->randomFloat(),
+            'intMandatory' => self::faker()->randomNumber(),
             'propertyWithoutType' => null, // TODO add value manually
+            'someMandatoryPropertyWithUnionType' => null, // TODO add value manually
+            'someOtherObjectMandatory' => null, // TODO add Zenstruck\Foundry\Tests\Fixtures\Object\SomeOtherObject value manually
             'stringMandatory' => self::faker()->text(),
             'stringNullable' => self::faker()->text(),
             'stringWithDefault' => self::faker()->text(),
-            'intMandatory' => self::faker()->randomNumber(),
-            'floatMandatory' => self::faker()->randomFloat(),
-            'arrayMandatory' => [],
-            'dateTimeMandatory' => self::faker()->dateTime(),
-            'dateTimeImmutableMandatory' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
-            'someOtherObjectMandatory' => null, // TODO add Zenstruck\Foundry\Tests\Fixtures\Object\SomeOtherObject value manually
-            'someMandatoryPropertyWithUnionType' => null, // TODO add value manually
         ];
     }
 

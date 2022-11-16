@@ -44,10 +44,10 @@ final class CommentFactory extends ModelFactory
     protected function getDefaults(): array
     {
         return [
-            'user' => null, // TODO add ONE ODM type manually
+            'approved' => self::faker()->boolean(),
             'body' => self::faker()->text(),
             'createdAt' => self::faker()->dateTime(),
-            'approved' => self::faker()->boolean(),
+            'user' => null, // TODO add ONE ODM type manually
         ];
     }
 

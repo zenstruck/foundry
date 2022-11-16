@@ -44,12 +44,12 @@ final class PostFactory extends ModelFactory
     protected function getDefaults(): array
     {
         return [
-            'title' => self::faker()->text(),
             'body' => self::faker()->text(),
-            'viewCount' => null, // TODO add INT ODM type manually
-            'createdAt' => self::faker()->dateTime(),
             'comments' => null, // TODO add MANY ODM type manually
+            'createdAt' => self::faker()->dateTime(),
+            'title' => self::faker()->text(),
             'user' => null, // TODO add ONE ODM type manually
+            'viewCount' => null, // TODO add INT ODM type manually
         ];
     }
 
