@@ -49,17 +49,24 @@ use Zenstruck\Foundry\Proxy;
  */
 final class <?= $class_name ?> extends ModelFactory
 {
+    /**
+     * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
+     *
+     * @todo inject services if required
+     */
     public function __construct()
     {
         parent::__construct();
-
-        // TODO inject services if required (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services)
     }
 
+    /**
+     * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
+     *
+     * @todo add your default values here
+     */
     protected function getDefaults(): array
     {
         return [
-            // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
 <?php
 foreach ($defaultProperties as $fieldname => $type) {
         echo "            '".$fieldname."' => ".$type."\n";
@@ -68,9 +75,11 @@ foreach ($defaultProperties as $fieldname => $type) {
         ];
     }
 
+    /**
+     * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
+     */
     protected function initialize(): self
     {
-        // see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
         return $this
             // ->afterInstantiate(function(<?= $entity->getShortName() ?> $<?= lcfirst($entity->getShortName()) ?>): void {})
         ;

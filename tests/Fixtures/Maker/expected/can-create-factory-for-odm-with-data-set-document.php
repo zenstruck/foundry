@@ -26,17 +26,24 @@ use Zenstruck\Foundry\Proxy;
  */
 final class PostFactory extends ModelFactory
 {
+    /**
+     * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
+     *
+     * @todo inject services if required
+     */
     public function __construct()
     {
         parent::__construct();
-
-        // TODO inject services if required (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services)
     }
 
+    /**
+     * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
+     *
+     * @todo add your default values here
+     */
     protected function getDefaults(): array
     {
         return [
-            // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
             'title' => self::faker()->text(),
             'body' => self::faker()->text(),
             'viewCount' => null, // TODO add INT ODM type manually
@@ -46,9 +53,11 @@ final class PostFactory extends ModelFactory
         ];
     }
 
+    /**
+     * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
+     */
     protected function initialize(): self
     {
-        // see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
         return $this
             // ->afterInstantiate(function(Post $post): void {})
         ;
