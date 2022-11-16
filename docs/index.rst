@@ -185,7 +185,7 @@ This command will generate a ``PostFactory`` class that looks like this:
         }
 
         /**
-         * @see hhttps://github.com/zenstruck/foundry#initialization
+         * @see https://github.com/zenstruck/foundry#initialization
          */
         protected function initialize(): self
         {
