@@ -2,9 +2,9 @@
 
 namespace App\Factory;
 
-use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject;
 
 /**
  * @extends ModelFactory<SomeObject>

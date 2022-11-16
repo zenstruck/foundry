@@ -2,9 +2,9 @@
 
 namespace App\Tests\Factory;
 
-use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
 
 /**
  * @extends ModelFactory<Tag>

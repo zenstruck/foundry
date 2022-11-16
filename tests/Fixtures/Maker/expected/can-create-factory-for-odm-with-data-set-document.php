@@ -2,9 +2,9 @@
 
 namespace App\Factory;
 
-use Zenstruck\Foundry\Tests\Fixtures\Document\Post;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Tests\Fixtures\Document\Post;
 
 /**
  * @extends ModelFactory<Post>

@@ -2,12 +2,22 @@
 
 namespace <?= $namespace; ?>;
 
-use <?= $object->getName() ?>;
-<?php if ($persisted && $repository): ?>use <?= $repository->getName() ?>;
-use Zenstruck\Foundry\RepositoryProxy;
-<?php endif ?>
-use Zenstruck\Foundry\ModelFactory;
-use Zenstruck\Foundry\Proxy;
+<?php $uses = array(
+    'use Zenstruck\Foundry\ModelFactory;',
+    'use Zenstruck\Foundry\Proxy;',
+    "use {$object->getName()};",
+);
+
+if ($persisted && $repository) {
+    $uses[] = "use {$repository->getName()};";
+}
+
+sort($uses);
+
+foreach ($uses as $use) {
+    echo "$use\n";
+}
+?>
 
 /**
  * @extends ModelFactory<<?= $object->getShortName() ?>>
