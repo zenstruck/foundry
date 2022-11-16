@@ -164,23 +164,31 @@ This command will generate a ``PostFactory`` class that looks like this:
      */
     final class PostFactory extends ModelFactory
     {
+        /**
+         * @see https://github.com/zenstruck/foundry#factories-as-services
+         *
+         * @todo inject services if required
+         */
         public function __construct()
         {
             parent::__construct();
-
-            // TODO inject services if required (https://github.com/zenstruck/foundry#factories-as-services)
         }
 
+        /**
+         * @see https://github.com/zenstruck/foundry#model-factories
+         *
+         * @todo add your default values here
+         */
         protected function getDefaults(): array
         {
-            return [
-                // TODO add your default values here (https://github.com/zenstruck/foundry#model-factories)
-            ];
+            return [];
         }
 
+        /**
+         * @see hhttps://github.com/zenstruck/foundry#initialization
+         */
         protected function initialize(): self
         {
-            // see https://github.com/zenstruck/foundry#initialization
             return $this
                 // ->afterInstantiate(function(Post $post) {})
             ;
