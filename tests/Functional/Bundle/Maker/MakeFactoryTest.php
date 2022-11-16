@@ -9,6 +9,8 @@ use Zenstruck\Foundry\Tests\Fixtures\Document\Comment;
 use Zenstruck\Foundry\Tests\Fixtures\Document\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
+use Zenstruck\Foundry\Tests\Fixtures\Kernel;
+use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -41,7 +43,7 @@ final class MakeFactoryTest extends MakerTestCase
 
         $this->assertFileDoesNotExist(self::tempFile('src/Factory/CategoryFactory.php'));
 
-        $tester->execute(['entity' => Category::class]);
+        $tester->execute(['class' => Category::class]);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/CategoryFactory.php'));
     }
@@ -83,7 +85,7 @@ final class MakeFactoryTest extends MakerTestCase
 
         $this->assertFileDoesNotExist(self::tempFile('tests/Factory/CategoryFactory.php'));
 
-        $tester->execute(['entity' => Category::class, '--test' => true]);
+        $tester->execute(['class' => Category::class, '--test' => true]);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('tests/Factory/CategoryFactory.php'));
     }
@@ -128,7 +130,7 @@ final class MakeFactoryTest extends MakerTestCase
 
         $this->assertFileDoesNotExist(self::tempFile('src/Factory/CategoryFactory.php'));
 
-        $tester->execute(['entity' => Category::class]);
+        $tester->execute(['class' => Category::class]);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/CategoryFactory.php'));
     }
@@ -143,15 +145,49 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileDoesNotExist(self::tempFile('src/Factory/InvalidFactory.php'));
 
         try {
-            $tester->execute(['entity' => 'Invalid']);
+            $tester->execute(['class' => 'Invalid']);
         } catch (RuntimeCommandException $e) {
-            $this->assertSame('Entity "Invalid" not found.', $e->getMessage());
+            $this->assertSame('Class "Invalid" not found.', $e->getMessage());
             $this->assertFileDoesNotExist(self::tempFile('src/Factory/InvalidFactory.php'));
 
             return;
         }
 
         $this->fail('Exception not thrown.');
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_factory_for_not_persisted_class(): void
+    {
+        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
+
+        $this->assertFileDoesNotExist(self::tempFile('src/Factory/SomeObjectFactory.php'));
+
+        $tester->execute(['class' => SomeObject::class, '--not-persisted' => true, '--all-fields' => true]);
+
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/SomeObjectFactory.php'));
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_factory_for_not_persisted_class_interactively(): void
+    {
+        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
+
+        $this->assertFileDoesNotExist(self::tempFile('src/Factory/SomeObjectFactory.php'));
+
+        $tester->setInputs(['Foo', SomeObject::class]); // "Foo" will generate a validation error
+        $tester->execute(['--not-persisted' => true]);
+
+        $output = $tester->getDisplay();
+
+        $this->assertStringContainsString('Not persisted class to create a factory for:', $output);
+        $this->assertStringContainsString('[ERROR] Given class "Foo" does not exist', $output);
+
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/SomeObjectFactory.php'));
     }
 
     /**
@@ -285,5 +321,28 @@ final class MakeFactoryTest extends MakerTestCase
     {
         yield 'document' => [Post::class, 'PostFactory'];
         yield 'embedded document' => [Comment::class, 'CommentFactory'];
+    }
+
+    /**
+     * @test
+     */
+    public function it_auto_activate_not_persisted_option_if_doctrine_not_enabled(): void
+    {
+        if (\getenv('USE_DAMA_DOCTRINE_TEST_BUNDLE')) {
+            self::markTestSkipped('dama/doctrine-test-bundle should not be enabled.');
+        }
+
+        $kernel = Kernel::create(enableDoctrine: false);
+        $kernel->boot();
+
+        $tester = new CommandTester((new Application($kernel))->find('make:factory'));
+        $this->assertFileDoesNotExist(self::tempFile('src/Factory/CategoryFactory.php'));
+
+        $tester->execute(['class' => Category::class]);
+
+        $output = $tester->getDisplay();
+        $this->assertStringContainsString('Note: Doctrine not enabled: auto-activating --not-persisted option.', $output);
+
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/CategoryFactory.php'));
     }
 }
