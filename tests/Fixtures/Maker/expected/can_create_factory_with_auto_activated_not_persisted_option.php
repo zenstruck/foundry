@@ -2,15 +2,15 @@
 
 namespace App\Factory;
 
-use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 
 /**
  * @extends ModelFactory<Category>
  *
- * @method Category|Proxy create(array|callable $attributes = [])
- * @method static Category|Proxy createOne(array $attributes = [])
+ * @method        Category|Proxy     create(array|callable $attributes = [])
+ * @method static Category|Proxy     createOne(array $attributes = [])
  * @method static Category[]|Proxy[] createMany(int $number, array|callable $attributes = [])
  * @method static Category[]|Proxy[] createSequence(array|callable $sequence)
  */

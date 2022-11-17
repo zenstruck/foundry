@@ -2,24 +2,34 @@
 
 namespace <?= $namespace; ?>;
 
-use <?= $object->getName() ?>;
-<?php if ($persisted && $repository): ?>use <?= $repository->getName() ?>;
-use Zenstruck\Foundry\RepositoryProxy;
-<?php endif ?>
-use Zenstruck\Foundry\ModelFactory;
-use Zenstruck\Foundry\Proxy;
+<?php $uses = array(
+    'use Zenstruck\Foundry\ModelFactory;',
+    'use Zenstruck\Foundry\Proxy;',
+    "use {$object->getName()};",
+);
+
+if ($persisted && $repository) {
+    $uses[] = "use {$repository->getName()};";
+}
+
+sort($uses);
+
+foreach ($uses as $use) {
+    echo "$use\n";
+}
+?>
 
 /**
  * @extends ModelFactory<<?= $object->getShortName() ?>>
  *
- * @method <?= $object->getShortName() ?>|Proxy create(array|callable $attributes = [])
- * @method static <?= $object->getShortName() ?>|Proxy createOne(array $attributes = [])
-<?php if ($persisted): ?> * @method static <?= $object->getShortName() ?>|Proxy find(object|array|mixed $criteria)
- * @method static <?= $object->getShortName() ?>|Proxy findOrCreate(array $attributes)
- * @method static <?= $object->getShortName() ?>|Proxy first(string $sortedField = 'id')
- * @method static <?= $object->getShortName() ?>|Proxy last(string $sortedField = 'id')
- * @method static <?= $object->getShortName() ?>|Proxy random(array $attributes = [])
- * @method static <?= $object->getShortName() ?>|Proxy randomOrCreate(array $attributes = [])
+ * @method        <?= $object->getShortName() ?>|Proxy     create(array|callable $attributes = [])
+ * @method static <?= $object->getShortName() ?>|Proxy     createOne(array $attributes = [])
+<?php if ($persisted): ?> * @method static <?= $object->getShortName() ?>|Proxy     find(object|array|mixed $criteria)
+ * @method static <?= $object->getShortName() ?>|Proxy     findOrCreate(array $attributes)
+ * @method static <?= $object->getShortName() ?>|Proxy     first(string $sortedField = 'id')
+ * @method static <?= $object->getShortName() ?>|Proxy     last(string $sortedField = 'id')
+ * @method static <?= $object->getShortName() ?>|Proxy     random(array $attributes = [])
+ * @method static <?= $object->getShortName() ?>|Proxy     randomOrCreate(array $attributes = [])
  * @method static <?= $object->getShortName() ?>[]|Proxy[] all()
 <?php endif ?>
  * @method static <?= $object->getShortName() ?>[]|Proxy[] createMany(int $number, array|callable $attributes = [])
@@ -31,14 +41,14 @@ use Zenstruck\Foundry\Proxy;
 <?php endif ?>
 <?php endif ?>
 <?php if ($phpstanEnabled): ?> *
- * @phpstan-method Proxy<<?= $object->getShortName() ?>> create(array|callable $attributes = [])
- * @phpstan-method static Proxy<<?= $object->getShortName() ?>> createOne(array $attributes = [])
-<?php if ($persisted): ?> * @phpstan-method static Proxy<<?= $object->getShortName() ?>> find(object|array|mixed $criteria)
- * @phpstan-method static Proxy<<?= $object->getShortName() ?>> findOrCreate(array $attributes)
- * @phpstan-method static Proxy<<?= $object->getShortName() ?>> first(string $sortedField = 'id')
- * @phpstan-method static Proxy<<?= $object->getShortName() ?>> last(string $sortedField = 'id')
- * @phpstan-method static Proxy<<?= $object->getShortName() ?>> random(array $attributes = [])
- * @phpstan-method static Proxy<<?= $object->getShortName() ?>> randomOrCreate(array $attributes = [])
+ * @phpstan-method        Proxy<<?= $object->getShortName() ?>>       create(array|callable $attributes = [])
+ * @phpstan-method static Proxy<<?= $object->getShortName() ?>>       createOne(array $attributes = [])
+<?php if ($persisted): ?> * @phpstan-method static Proxy<<?= $object->getShortName() ?>>       find(object|array|mixed $criteria)
+ * @phpstan-method static Proxy<<?= $object->getShortName() ?>>       findOrCreate(array $attributes)
+ * @phpstan-method static Proxy<<?= $object->getShortName() ?>>       first(string $sortedField = 'id')
+ * @phpstan-method static Proxy<<?= $object->getShortName() ?>>       last(string $sortedField = 'id')
+ * @phpstan-method static Proxy<<?= $object->getShortName() ?>>       random(array $attributes = [])
+ * @phpstan-method static Proxy<<?= $object->getShortName() ?>>       randomOrCreate(array $attributes = [])
  * @phpstan-method static list<Proxy<<?= $object->getShortName() ?>>> all()
 <?php endif ?>
  * @phpstan-method static list<Proxy<<?= $object->getShortName() ?>>> createMany(int $number, array|callable $attributes = [])

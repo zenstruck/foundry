@@ -53,7 +53,7 @@ final class MakeFactory extends AbstractMaker
 
     private const DEFAULTS_FOR_NOT_PERSISTED = [
         'array' => '[],',
-        'string' => 'self::faker()->text(),',
+        'string' => 'self::faker()->sentence(),',
         'int' => 'self::faker()->randomNumber(),',
         'float' => 'self::faker()->randomFloat(),',
         'bool' => 'self::faker()->boolean(),',
@@ -193,14 +193,18 @@ final class MakeFactory extends AbstractMaker
             }
         }
 
+        $defaultValues = $input->getOption('not-persisted')
+            ? $this->defaultPropertiesForNotPersistedObject($object->getName(), $input->getOption('all-fields'))
+            : $this->defaultPropertiesForPersistedObject($object->getName(), $input->getOption('all-fields'));
+        $defaultValues = \iterator_to_array($defaultValues, true);
+        \ksort($defaultValues);
+
         $generator->generateClass(
             $factory->getFullName(),
             __DIR__.'/../Resources/skeleton/Factory.tpl.php',
             [
                 'object' => $object,
-                'defaultProperties' => $input->getOption('not-persisted')
-                    ? $this->defaultPropertiesForNotPersistedObject($object->getName(), $input->getOption('all-fields'))
-                    : $this->defaultPropertiesForPersistedObject($object->getName(), $input->getOption('all-fields')),
+                'defaultProperties' => $defaultValues,
                 'repository' => $repository ?? null,
                 'phpstanEnabled' => $this->phpstanEnabled(),
                 'persisted' => !$input->getOption('not-persisted'),
@@ -247,13 +251,15 @@ final class MakeFactory extends AbstractMaker
 
     /**
      * @param class-string $class
+     *
+     * @return \Generator<string, string>
      */
     private function defaultPropertiesForPersistedObject(string $class, bool $allFields): iterable
     {
         $em = $this->managerRegistry->getManagerForClass($class);
 
         if (!$em instanceof ObjectManager) {
-            return [];
+            return;
         }
 
         /** @var ORMClassMetadata|ODMClassMetadata $metadata */
@@ -282,8 +288,10 @@ final class MakeFactory extends AbstractMaker
 
     /**
      * @param class-string $class
+     *
+     * @return \Generator<string, string>
      */
-    private function defaultPropertiesForNotPersistedObject(string $class, bool $allFields): iterable
+    private function defaultPropertiesForNotPersistedObject(string $class, bool $allFields): \Generator
     {
         $object = new \ReflectionClass($class);
 

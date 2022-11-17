@@ -326,7 +326,7 @@ final class MakeFactoryTest extends MakerTestCase
     /**
      * @test
      */
-    public function it_auto_activate_not_persisted_option_if_doctrine_not_enabled(): void
+    public function can_create_factory_with_auto_activated_not_persisted_option(): void
     {
         if (\getenv('USE_DAMA_DOCTRINE_TEST_BUNDLE')) {
             self::markTestSkipped('dama/doctrine-test-bundle should not be enabled.');

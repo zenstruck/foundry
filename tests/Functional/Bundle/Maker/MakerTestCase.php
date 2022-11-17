@@ -48,7 +48,7 @@ abstract class MakerTestCase extends KernelTestCase
         $path = \sprintf(
             '%s/../../../Fixtures/Maker/expected/%s.php',
             __DIR__,
-            (new AsciiSlugger())->slug($this->getName())
+            (new AsciiSlugger())->slug($this->getName(), '_')
         );
 
         $this->assertFileExists($path);

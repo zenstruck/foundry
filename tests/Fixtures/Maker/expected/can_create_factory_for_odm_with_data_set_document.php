@@ -2,21 +2,21 @@
 
 namespace App\Factory;
 
-use Zenstruck\Foundry\Tests\Fixtures\Document\Post;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Tests\Fixtures\Document\Post;
 
 /**
  * @extends ModelFactory<Post>
  *
- * @method Post|Proxy create(array|callable $attributes = [])
- * @method static Post|Proxy createOne(array $attributes = [])
- * @method static Post|Proxy find(object|array|mixed $criteria)
- * @method static Post|Proxy findOrCreate(array $attributes)
- * @method static Post|Proxy first(string $sortedField = 'id')
- * @method static Post|Proxy last(string $sortedField = 'id')
- * @method static Post|Proxy random(array $attributes = [])
- * @method static Post|Proxy randomOrCreate(array $attributes = [])
+ * @method        Post|Proxy     create(array|callable $attributes = [])
+ * @method static Post|Proxy     createOne(array $attributes = [])
+ * @method static Post|Proxy     find(object|array|mixed $criteria)
+ * @method static Post|Proxy     findOrCreate(array $attributes)
+ * @method static Post|Proxy     first(string $sortedField = 'id')
+ * @method static Post|Proxy     last(string $sortedField = 'id')
+ * @method static Post|Proxy     random(array $attributes = [])
+ * @method static Post|Proxy     randomOrCreate(array $attributes = [])
  * @method static Post[]|Proxy[] all()
  * @method static Post[]|Proxy[] createMany(int $number, array|callable $attributes = [])
  * @method static Post[]|Proxy[] createSequence(array|callable $sequence)
@@ -44,12 +44,12 @@ final class PostFactory extends ModelFactory
     protected function getDefaults(): array
     {
         return [
-            'title' => self::faker()->text(),
             'body' => self::faker()->text(),
-            'viewCount' => null, // TODO add INT ODM type manually
-            'createdAt' => self::faker()->dateTime(),
             'comments' => null, // TODO add MANY ODM type manually
+            'createdAt' => self::faker()->dateTime(),
+            'title' => self::faker()->text(),
             'user' => null, // TODO add ONE ODM type manually
+            'viewCount' => null, // TODO add INT ODM type manually
         ];
     }
 
