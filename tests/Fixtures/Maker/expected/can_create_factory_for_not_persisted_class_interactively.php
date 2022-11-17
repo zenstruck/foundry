@@ -41,7 +41,7 @@ final class SomeObjectFactory extends ModelFactory
             'intMandatory' => self::faker()->randomNumber(),
             'someMandatoryPropertyWithUnionType' => null, // TODO add value manually
             'someOtherObjectMandatory' => null, // TODO add Zenstruck\Foundry\Tests\Fixtures\Object\SomeOtherObject value manually
-            'stringMandatory' => self::faker()->text(),
+            'stringMandatory' => self::faker()->sentence(),
         ];
     }
 

@@ -53,7 +53,7 @@ final class MakeFactory extends AbstractMaker
 
     private const DEFAULTS_FOR_NOT_PERSISTED = [
         'array' => '[],',
-        'string' => 'self::faker()->text(),',
+        'string' => 'self::faker()->sentence(),',
         'int' => 'self::faker()->randomNumber(),',
         'float' => 'self::faker()->randomFloat(),',
         'bool' => 'self::faker()->boolean(),',

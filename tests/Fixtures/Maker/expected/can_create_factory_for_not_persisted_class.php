@@ -42,9 +42,9 @@ final class SomeObjectFactory extends ModelFactory
             'propertyWithoutType' => null, // TODO add value manually
             'someMandatoryPropertyWithUnionType' => null, // TODO add value manually
             'someOtherObjectMandatory' => null, // TODO add Zenstruck\Foundry\Tests\Fixtures\Object\SomeOtherObject value manually
-            'stringMandatory' => self::faker()->text(),
-            'stringNullable' => self::faker()->text(),
-            'stringWithDefault' => self::faker()->text(),
+            'stringMandatory' => self::faker()->sentence(),
+            'stringNullable' => self::faker()->sentence(),
+            'stringWithDefault' => self::faker()->sentence(),
         ];
     }
 
