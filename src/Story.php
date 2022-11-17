@@ -4,6 +4,8 @@ namespace Zenstruck\Foundry;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @method static Proxy get(string $name)
  */
 abstract class Story
 {
@@ -15,12 +17,22 @@ abstract class Story
 
     final public function __call(string $method, array $arguments): Proxy
     {
-        return $this->get($method);
+        if ('get' !== $method) {
+            return $this->getState($method);
+        }
+
+        trigger_deprecation('zenstruck/foundry', '1.24', 'Calling instance method "%1$s::get()" is deprecated and will be removed in 2.0, use the static "%1$s::get()" method instead.', static::class);
+
+        return $this->getState($arguments[0]);
     }
 
     final public static function __callStatic(string $name, array $arguments): Proxy
     {
-        return static::load()->get($name);
+        if ('get' !== $name) {
+            return static::load()->getState($name);
+        }
+
+        return static::load()->getState($arguments[0]);
     }
 
     final public static function load(): static
@@ -97,15 +109,6 @@ abstract class Story
         return $this->addState($name, $object);
     }
 
-    final public function get(string $name): Proxy
-    {
-        if (!\array_key_exists($name, $this->objects)) {
-            throw new \InvalidArgumentException(\sprintf('"%s" was not registered. Did you forget to call "%s::add()"?', $name, static::class));
-        }
-
-        return $this->objects[$name];
-    }
-
     abstract public function build(): void;
 
     /**
@@ -146,6 +149,15 @@ abstract class Story
         }
 
         return $this;
+    }
+
+    private function getState(string $name): Proxy
+    {
+        if (!\array_key_exists($name, $this->objects)) {
+            throw new \InvalidArgumentException(\sprintf('"%s" was not registered. Did you forget to call "%s::add()"?', $name, static::class));
+        }
+
+        return $this->objects[$name];
     }
 
     private static function normalizeObject(object $object): Proxy
