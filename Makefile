@@ -69,7 +69,7 @@ sca: docker-start bin/tools/phpstan/vendor ### Run static analysis
 bin/tools/phpstan/vendor: vendor bin/tools/phpstan/composer.json $(wildcard bin/tools/phpstan/composer.lock)
 	@${DOCKER_PHP} composer bin phpstan install
 
-database-generate-migration: docker-start vendor ### Generate new migration based on mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
+database-generate-migration: docker-start vendor database-drop-schema ### Generate new migration based on mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
 	@${DOCKER_PHP} vendor/bin/doctrine-migrations migrations:migrate --no-interaction --allow-no-migration # first, let's load into db existing migrations
 	@${DOCKER_PHP} vendor/bin/doctrine-migrations migrations:diff --no-interaction
 	@${DOCKER_PHP} vendor/bin/doctrine-migrations migrations:migrate --no-interaction # load the new migration
