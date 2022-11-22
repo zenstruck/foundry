@@ -61,14 +61,21 @@ final class MakeFactory extends AbstractMaker
         \DateTimeImmutable::class => '\DateTimeImmutable::createFromMutable(self::faker()->dateTime()),',
     ];
 
-    /** @var string[] */
+    /** @var array<string, string> */
     private array $entitiesWithFactories;
 
     public function __construct(private ManagerRegistry $managerRegistry, \Traversable $factories, private string $projectDir, private KernelInterface $kernel)
     {
-        $this->entitiesWithFactories = \array_map(
-            static fn(ModelFactory $factory): string => $factory::getEntityClass(),
-            \iterator_to_array($factories)
+        $this->entitiesWithFactories = \array_unique(
+            \array_reduce(
+                \iterator_to_array($factories),
+                static function(array $carry, ModelFactory $factory): array {
+                    $carry[\get_class($factory)] = $factory::getEntityClass();
+
+                    return $carry;
+                },
+                []
+            )
         );
     }
 
@@ -268,6 +275,32 @@ final class MakeFactory extends AbstractMaker
 
         $dbType = $em instanceof EntityManagerInterface ? 'ORM' : 'ODM';
 
+        // If Factory exist for related entities populate too with auto defaults
+        foreach ($metadata->associationMappings as $item) {
+            // if joinColumns is not written entity is default nullable ($nullable = true;)
+            if (!\array_key_exists('joinColumns', $item)) {
+                continue;
+            }
+
+            if (!\array_key_exists('nullable', $item['joinColumns'][0] ?? [])) {
+                continue;
+            }
+
+            if (true === $item['joinColumns'][0]['nullable']) {
+                continue;
+            }
+
+            $fieldName = $item['fieldName'];
+
+            if (!$factoryClass = $this->getFactoryForClass($item['targetEntity'])) {
+                yield \lcfirst($fieldName) => "null, // TODO add {$item['targetEntity']} {$dbType} type manually";
+
+                continue;
+            }
+
+            yield \lcfirst($fieldName) => "\\{$factoryClass}::new(),";
+        }
+
         foreach ($metadata->fieldMappings as $property) {
             // ignore identifiers and nullable fields
             if ((!$allFields && ($property['nullable'] ?? false)) || \in_array($property['fieldName'], $ids, true)) {
@@ -341,5 +374,12 @@ final class MakeFactory extends AbstractMaker
         }
 
         return $ormEnabled || $odmEnabled;
+    }
+
+    private function getFactoryForClass(string $class): ?string
+    {
+        $factories = \array_flip($this->entitiesWithFactories);
+
+        return $factories[$class] ?? null;
     }
 }

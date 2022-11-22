@@ -8,6 +8,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Zenstruck\Foundry\Tests\Fixtures\Document\Comment;
 use Zenstruck\Foundry\Tests\Fixtures\Document\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\EntityWithRelations;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
 use Zenstruck\Foundry\Tests\Fixtures\Kernel;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject;
@@ -344,5 +345,23 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertStringContainsString('Note: Doctrine not enabled: auto-activating --not-persisted option.', $output);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/CategoryFactory.php'));
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_factory_with_relation_defaults(): void
+    {
+        if (!\getenv('USE_ORM')) {
+            self::markTestSkipped('doctrine/orm not enabled.');
+        }
+
+        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
+
+        $this->assertFileDoesNotExist(self::tempFile('src/Factory/EntityWithRelationsFactory.php'));
+
+        $tester->execute(['class' => EntityWithRelations::class]);
+
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/EntityWithRelationsFactory.php'));
     }
 }
