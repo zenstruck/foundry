@@ -6,9 +6,10 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 use Symfony\Component\Console\Tester\CommandTester;
 use Zenstruck\Foundry\Tests\Fixtures\Document\Comment;
-use Zenstruck\Foundry\Tests\Fixtures\Document\Post;
+use Zenstruck\Foundry\Tests\Fixtures\Document\Post as ODMPost;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\EntityWithRelations;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Post as ORMPost;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
 use Zenstruck\Foundry\Tests\Fixtures\Kernel;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject;
@@ -124,8 +125,7 @@ final class MakeFactoryTest extends MakerTestCase
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
-        \mkdir(\dirname(self::PHPSTAN_PATH), 0777, true);
-        \touch(self::PHPSTAN_PATH);
+        $this->emulatePHPStanEnabled();
 
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
 
@@ -134,6 +134,26 @@ final class MakeFactoryTest extends MakerTestCase
         $tester->execute(['class' => Category::class]);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/CategoryFactory.php'));
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_factory_for_entity_with_repository(): void
+    {
+        if (!\getenv('USE_ORM')) {
+            self::markTestSkipped('doctrine/orm not enabled.');
+        }
+
+        $this->emulatePHPStanEnabled();
+
+        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
+
+        $this->assertFileDoesNotExist(self::tempFile('src/Factory/PostFactory.php'));
+
+        $tester->execute(['class' => ORMPost::class]);
+
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/PostFactory.php'));
     }
 
     /**
@@ -320,7 +340,7 @@ final class MakeFactoryTest extends MakerTestCase
 
     public function documentProvider(): iterable
     {
-        yield 'document' => [Post::class, 'PostFactory'];
+        yield 'document' => [ODMPost::class, 'PostFactory'];
         yield 'embedded document' => [Comment::class, 'CommentFactory'];
     }
 
@@ -363,5 +383,11 @@ final class MakeFactoryTest extends MakerTestCase
         $tester->execute(['class' => EntityWithRelations::class]);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/EntityWithRelationsFactory.php'));
+    }
+
+    private function emulatePHPStanEnabled(): void
+    {
+        \mkdir(\dirname(self::PHPSTAN_PATH), 0777, true);
+        \touch(self::PHPSTAN_PATH);
     }
 }

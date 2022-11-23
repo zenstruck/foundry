@@ -175,7 +175,7 @@ final class MakeFactory extends AbstractMaker
             throw new RuntimeCommandException(\sprintf('Class "%s" not found.', $input->getArgument('class')));
         }
 
-        $makeFactoryData = $this->createMakeFactoryData($generator, $class, (bool) $input->getOption('not-persisted'));
+        $makeFactoryData = $this->createMakeFactoryData($generator, $class, !$input->getOption('not-persisted'));
 
         $factory = $generator->createClassNameDetails(
             $makeFactoryData->getObjectShortName(),
@@ -192,8 +192,6 @@ final class MakeFactory extends AbstractMaker
             __DIR__.'/../Resources/skeleton/Factory.tpl.php',
             [
                 'makeFactoryData' => $makeFactoryData,
-                'phpstanEnabled' => $this->phpstanEnabled(),
-                'persisted' => !$input->getOption('not-persisted'),
             ]
         );
 
@@ -358,23 +356,20 @@ final class MakeFactory extends AbstractMaker
     /**
      * @param class-string $class
      */
-    private function createMakeFactoryData(Generator $generator, string $class, bool $notPersisted): MakeFactoryData
+    private function createMakeFactoryData(Generator $generator, string $class, bool $persisted): MakeFactoryData
     {
         $object = new \ReflectionClass($class);
 
-        if (!$notPersisted) {
+        if ($persisted) {
             $repository = new \ReflectionClass($this->managerRegistry->getRepository($object->getName()));
 
-            if (0 !== \mb_strpos($repository->getName(), $generator->getRootNamespace())) {
+            if (\str_starts_with($repository->getName(), 'Doctrine')) {
                 // not using a custom repository
                 $repository = null;
             }
         }
 
-        return new MakeFactoryData(
-            $object,
-            $repository ?? null
-        );
+        return new MakeFactoryData($object, $repository ?? null, $this->phpstanEnabled(), $persisted);
     }
 
     private function guessNamespace(Generator $generator, string $namespace, bool $test): string

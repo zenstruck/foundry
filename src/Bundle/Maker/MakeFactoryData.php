@@ -1,20 +1,24 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Zenstruck\Foundry\Bundle\Maker;
 
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\RepositoryProxy;
 
+/**
+ * @internal
+ */
 final class MakeFactoryData
 {
     /** @var list<string> */
     private array $uses;
     /** @var array<string, string> */
     private array $defaultProperties = [];
+    /** @var non-empty-list<MakeFactoryPHPDocMethod> */
+    private array $methodsInPHPDoc;
 
-    public function __construct(private \ReflectionClass $object, private ?\ReflectionClass $repository)
+    public function __construct(private \ReflectionClass $object, private ?\ReflectionClass $repository, private bool $withPHPStanEnabled, private bool $persisted)
     {
         $this->uses = [
             ModelFactory::class,
@@ -24,7 +28,10 @@ final class MakeFactoryData
 
         if ($repository) {
             $this->uses[] = $repository->getName();
+            $this->uses[] = RepositoryProxy::class;
         }
+
+        $this->methodsInPHPDoc = MakeFactoryPHPDocMethod::createAll($this);
     }
 
     public function getObject(): \ReflectionClass
@@ -48,6 +55,16 @@ final class MakeFactoryData
         return $this->repository?->getShortName();
     }
 
+    public function isPersisted(): bool
+    {
+        return $this->persisted;
+    }
+
+    public function hasPHPStanEnabled(): bool
+    {
+        return $this->withPHPStanEnabled;
+    }
+
     public function addUse(string $use): void
     {
         if (!\in_array($use, $this->uses, true)) {
@@ -55,18 +72,12 @@ final class MakeFactoryData
         }
     }
 
-    public function renderUses(): string
+    public function getUses(): array
     {
         $uses = $this->uses;
         \sort($uses);
 
-        return \implode(
-            "\n",
-            \array_map(
-                static fn(string $use): string => "use {$use};",
-                $uses
-            )
-        )."\n";
+        return $uses;
     }
 
     public function addDefaultProperty(string $propertyName, string $defaultValue): void
@@ -74,20 +85,23 @@ final class MakeFactoryData
         $this->defaultProperties[$propertyName] = $defaultValue;
     }
 
-    public function renderDefaultProperties(): string
+    public function getDefaultProperties(): array
     {
         $defaultProperties = $this->defaultProperties;
         \ksort($defaultProperties);
 
-        $indents = \str_repeat(' ', 12);
+        return $defaultProperties;
+    }
 
-        return \implode(
-            "\n",
-            \array_map(
-                static fn(string $name, string $value): string => "{$indents}'{$name}' => {$value}",
-                \array_keys($defaultProperties),
-                $defaultProperties,
-            )
-        )."\n";
+    /** @return list<MakeFactoryPHPDocMethod> */
+    public function getMethodsPHPDoc(): array
+    {
+        $methodsInPHPDoc = $this->methodsInPHPDoc;
+        \usort(
+            $methodsInPHPDoc,
+            static fn(MakeFactoryPHPDocMethod $m1, MakeFactoryPHPDocMethod $m2) => $m1->sortValue() <=> $m2->sortValue()
+        );
+
+        return $methodsInPHPDoc;
     }
 }
