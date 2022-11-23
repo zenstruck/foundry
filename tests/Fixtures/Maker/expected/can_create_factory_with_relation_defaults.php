@@ -5,6 +5,7 @@ namespace App\Factory;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\EntityWithRelations;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 
 /**
  * @extends ModelFactory<EntityWithRelations>
@@ -44,9 +45,9 @@ final class EntityWithRelationsFactory extends ModelFactory
     protected function getDefaults(): array
     {
         return [
-            'manyToOne' => \Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory::new(),
+            'manyToOne' => CategoryFactory::new(),
             'manyToOneWithNotExistingFactory' => null, // TODO add Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Brand ORM type manually
-            'oneToOne' => \Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory::new(),
+            'oneToOne' => CategoryFactory::new(),
         ];
     }
 
