@@ -61,14 +61,15 @@ final class MakeFactory extends AbstractMaker
         \DateTimeImmutable::class => '\DateTimeImmutable::createFromMutable(self::faker()->dateTime()),',
     ];
 
-    /** @var array<string, string> */
+    /** @var array<class-string, class-string> */
     private array $entitiesWithFactories;
 
     public function __construct(private ManagerRegistry $managerRegistry, \Traversable $factories, private string $projectDir, private KernelInterface $kernel)
     {
+        /** @phpstan-ignore-next-line */
         $this->entitiesWithFactories = \array_unique(
             \array_reduce(
-                \iterator_to_array($factories),
+                \iterator_to_array($factories, preserve_keys: true),
                 static function(array $carry, ModelFactory $factory): array {
                     $carry[\get_class($factory)] = $factory::getEntityClass();
 
@@ -174,47 +175,23 @@ final class MakeFactory extends AbstractMaker
             throw new RuntimeCommandException(\sprintf('Class "%s" not found.', $input->getArgument('class')));
         }
 
-        $namespace = $input->getOption('namespace');
+        $makeFactoryData = $this->createMakeFactoryData($generator, $class, !$input->getOption('not-persisted'));
 
-        // strip maker's root namespace if set
-        if (0 === \mb_strpos($namespace, $generator->getRootNamespace())) {
-            $namespace = \mb_substr($namespace, \mb_strlen($generator->getRootNamespace()));
-        }
+        $factory = $generator->createClassNameDetails(
+            $makeFactoryData->getObjectShortName(),
+            $this->guessNamespace($generator, $input->getOption('namespace'), (bool) $input->getOption('test')),
+            'Factory'
+        );
 
-        $namespace = \trim($namespace, '\\');
-
-        // if creating in tests dir, ensure namespace prefixed with Tests\
-        if ($input->getOption('test') && 0 !== \mb_strpos($namespace, 'Tests\\')) {
-            $namespace = 'Tests\\'.$namespace;
-        }
-
-        $object = new \ReflectionClass($class);
-        $factory = $generator->createClassNameDetails($object->getShortName(), $namespace, 'Factory');
-
-        if (!$input->getOption('not-persisted')) {
-            $repository = new \ReflectionClass($this->managerRegistry->getRepository($object->getName()));
-
-            if (0 !== \mb_strpos($repository->getName(), $generator->getRootNamespace())) {
-                // not using a custom repository
-                $repository = null;
-            }
-        }
-
-        $defaultValues = $input->getOption('not-persisted')
-            ? $this->defaultPropertiesForNotPersistedObject($object->getName(), $input->getOption('all-fields'))
-            : $this->defaultPropertiesForPersistedObject($object->getName(), $input->getOption('all-fields'));
-        $defaultValues = \iterator_to_array($defaultValues, true);
-        \ksort($defaultValues);
+        $input->getOption('not-persisted')
+            ? $this->defaultPropertiesForNotPersistedObject($makeFactoryData, $input->getOption('all-fields'))
+            : $this->defaultPropertiesForPersistedObject($makeFactoryData, $input->getOption('all-fields'));
 
         $generator->generateClass(
             $factory->getFullName(),
             __DIR__.'/../Resources/skeleton/Factory.tpl.php',
             [
-                'object' => $object,
-                'defaultProperties' => $defaultValues,
-                'repository' => $repository ?? null,
-                'phpstanEnabled' => $this->phpstanEnabled(),
-                'persisted' => !$input->getOption('not-persisted'),
+                'makeFactoryData' => $makeFactoryData,
             ]
         );
 
@@ -256,13 +233,10 @@ final class MakeFactory extends AbstractMaker
         return $choices;
     }
 
-    /**
-     * @param class-string $class
-     *
-     * @return \Generator<string, string>
-     */
-    private function defaultPropertiesForPersistedObject(string $class, bool $allFields): iterable
+    private function defaultPropertiesForPersistedObject(MakeFactoryData $makeFactoryData, bool $allFields): void
     {
+        $class = $makeFactoryData->getObjectFullyQualifiedClassName();
+
         $em = $this->managerRegistry->getManagerForClass($class);
 
         if (!$em instanceof ObjectManager) {
@@ -293,12 +267,14 @@ final class MakeFactory extends AbstractMaker
             $fieldName = $item['fieldName'];
 
             if (!$factoryClass = $this->getFactoryForClass($item['targetEntity'])) {
-                yield \lcfirst($fieldName) => "null, // TODO add {$item['targetEntity']} {$dbType} type manually";
+                $makeFactoryData->addDefaultProperty(\lcfirst($fieldName), "null, // TODO add {$item['targetEntity']} {$dbType} type manually");
 
                 continue;
             }
 
-            yield \lcfirst($fieldName) => "\\{$factoryClass}::new(),";
+            $factory = new \ReflectionClass($factoryClass);
+            $makeFactoryData->addUse($factory->getName());
+            $makeFactoryData->addDefaultProperty(\lcfirst($fieldName), "{$factory->getShortName()}::new(),");
         }
 
         foreach ($metadata->fieldMappings as $property) {
@@ -315,20 +291,13 @@ final class MakeFactory extends AbstractMaker
                 $value = self::DEFAULTS_FOR_PERSISTED[$type];
             }
 
-            yield $property['fieldName'] => \str_replace('{length}', (string) $length, $value);
+            $makeFactoryData->addDefaultProperty($property['fieldName'], \str_replace('{length}', (string) $length, $value));
         }
     }
 
-    /**
-     * @param class-string $class
-     *
-     * @return \Generator<string, string>
-     */
-    private function defaultPropertiesForNotPersistedObject(string $class, bool $allFields): \Generator
+    private function defaultPropertiesForNotPersistedObject(MakeFactoryData $makeFactoryData, bool $allFields): void
     {
-        $object = new \ReflectionClass($class);
-
-        foreach ($object->getProperties() as $property) {
+        foreach ($makeFactoryData->getObject()->getProperties() as $property) {
             // ignore identifiers and nullable fields
             if (!$allFields && ($property->hasDefaultValue() || !$property->hasType() || $property->getType()?->allowsNull())) {
                 continue;
@@ -346,7 +315,7 @@ final class MakeFactory extends AbstractMaker
                 $value = self::DEFAULTS_FOR_NOT_PERSISTED[$type];
             }
 
-            yield $property->getName() => $value;
+            $makeFactoryData->addDefaultProperty($property->getName(), $value);
         }
     }
 
@@ -376,10 +345,47 @@ final class MakeFactory extends AbstractMaker
         return $ormEnabled || $odmEnabled;
     }
 
+    /** @return class-string|null */
     private function getFactoryForClass(string $class): ?string
     {
         $factories = \array_flip($this->entitiesWithFactories);
 
         return $factories[$class] ?? null;
+    }
+
+    /**
+     * @param class-string $class
+     */
+    private function createMakeFactoryData(Generator $generator, string $class, bool $persisted): MakeFactoryData
+    {
+        $object = new \ReflectionClass($class);
+
+        if ($persisted) {
+            $repository = new \ReflectionClass($this->managerRegistry->getRepository($object->getName()));
+
+            if (\str_starts_with($repository->getName(), 'Doctrine')) {
+                // not using a custom repository
+                $repository = null;
+            }
+        }
+
+        return new MakeFactoryData($object, $repository ?? null, $this->phpstanEnabled(), $persisted);
+    }
+
+    private function guessNamespace(Generator $generator, string $namespace, bool $test): string
+    {
+        // strip maker's root namespace if set
+        if (0 === \mb_strpos($namespace, $generator->getRootNamespace())) {
+            $namespace = \mb_substr($namespace, \mb_strlen($generator->getRootNamespace()));
+        }
+
+        $namespace = \trim($namespace, '\\');
+
+        // if creating in tests dir, ensure namespace prefixed with Tests\
+        if ($test && 0 !== \mb_strpos($namespace, 'Tests\\')) {
+            $namespace = 'Tests\\'.$namespace;
+        }
+
+        return $namespace;
     }
 }

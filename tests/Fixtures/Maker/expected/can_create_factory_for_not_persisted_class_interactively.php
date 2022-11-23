@@ -9,8 +9,8 @@ use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject;
 /**
  * @extends ModelFactory<SomeObject>
  *
- * @method        SomeObject|Proxy     create(array|callable $attributes = [])
- * @method static SomeObject|Proxy     createOne(array $attributes = [])
+ * @method        SomeObject|Proxy create(array|callable $attributes = [])
+ * @method static SomeObject|Proxy createOne(array $attributes = [])
  * @method static SomeObject[]|Proxy[] createMany(int $number, array|callable $attributes = [])
  * @method static SomeObject[]|Proxy[] createSequence(array|callable $sequence)
  */

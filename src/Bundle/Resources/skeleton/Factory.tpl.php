@@ -1,66 +1,29 @@
-<?= "<?php\n" ?>
+<?php /** @var \Zenstruck\Foundry\Bundle\Maker\MakeFactoryData $makeFactoryData */?><?= "<?php\n" ?>
 
-namespace <?= $namespace; ?>;
+namespace <?= $namespace ?>;
 
-<?php $uses = array(
-    'use Zenstruck\Foundry\ModelFactory;',
-    'use Zenstruck\Foundry\Proxy;',
-    "use {$object->getName()};",
-);
-
-if ($persisted && $repository) {
-    $uses[] = "use {$repository->getName()};";
-}
-
-sort($uses);
-
-foreach ($uses as $use) {
-    echo "$use\n";
+<?php
+foreach ($makeFactoryData->getUses() as $use) {
+    echo "use $use;\n";
 }
 ?>
 
 /**
- * @extends ModelFactory<<?= $object->getShortName() ?>>
+ * @extends ModelFactory<<?= $makeFactoryData->getObjectShortName() ?>>
  *
- * @method        <?= $object->getShortName() ?>|Proxy     create(array|callable $attributes = [])
- * @method static <?= $object->getShortName() ?>|Proxy     createOne(array $attributes = [])
-<?php if ($persisted): ?> * @method static <?= $object->getShortName() ?>|Proxy     find(object|array|mixed $criteria)
- * @method static <?= $object->getShortName() ?>|Proxy     findOrCreate(array $attributes)
- * @method static <?= $object->getShortName() ?>|Proxy     first(string $sortedField = 'id')
- * @method static <?= $object->getShortName() ?>|Proxy     last(string $sortedField = 'id')
- * @method static <?= $object->getShortName() ?>|Proxy     random(array $attributes = [])
- * @method static <?= $object->getShortName() ?>|Proxy     randomOrCreate(array $attributes = [])
- * @method static <?= $object->getShortName() ?>[]|Proxy[] all()
-<?php endif ?>
- * @method static <?= $object->getShortName() ?>[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static <?= $object->getShortName() ?>[]|Proxy[] createSequence(array|callable $sequence)
-<?php if ($persisted): ?> * @method static <?= $object->getShortName() ?>[]|Proxy[] findBy(array $attributes)
- * @method static <?= $object->getShortName() ?>[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
- * @method static <?= $object->getShortName() ?>[]|Proxy[] randomSet(int $number, array $attributes = [])
-<?php if ($repository): ?> * @method static <?= $repository->getShortName() ?>|RepositoryProxy repository()
-<?php endif ?>
-<?php endif ?>
-<?php if ($phpstanEnabled): ?> *
- * @phpstan-method        Proxy<<?= $object->getShortName() ?>>       create(array|callable $attributes = [])
- * @phpstan-method static Proxy<<?= $object->getShortName() ?>>       createOne(array $attributes = [])
-<?php if ($persisted): ?> * @phpstan-method static Proxy<<?= $object->getShortName() ?>>       find(object|array|mixed $criteria)
- * @phpstan-method static Proxy<<?= $object->getShortName() ?>>       findOrCreate(array $attributes)
- * @phpstan-method static Proxy<<?= $object->getShortName() ?>>       first(string $sortedField = 'id')
- * @phpstan-method static Proxy<<?= $object->getShortName() ?>>       last(string $sortedField = 'id')
- * @phpstan-method static Proxy<<?= $object->getShortName() ?>>       random(array $attributes = [])
- * @phpstan-method static Proxy<<?= $object->getShortName() ?>>       randomOrCreate(array $attributes = [])
- * @phpstan-method static list<Proxy<<?= $object->getShortName() ?>>> all()
-<?php endif ?>
- * @phpstan-method static list<Proxy<<?= $object->getShortName() ?>>> createMany(int $number, array|callable $attributes = [])
- * @phpstan-method static list<Proxy<<?= $object->getShortName() ?>>> createSequence(array|callable $sequence)
-<?php if ($persisted): ?>
- * @phpstan-method static list<Proxy<<?= $object->getShortName() ?>>> findBy(array $attributes)
- * @phpstan-method static list<Proxy<<?= $object->getShortName() ?>>> randomRange(int $min, int $max, array $attributes = [])
- * @phpstan-method static list<Proxy<<?= $object->getShortName() ?>>> randomSet(int $number, array $attributes = [])
-<?php if ($repository): ?> * @phpstan-method static RepositoryProxy<<?= $repository->getShortName() ?>> repository()
-<?php endif ?>
-<?php endif ?>
-<?php endif ?>
+<?php
+foreach ($makeFactoryData->getMethodsPHPDoc() as $methodPHPDoc) {
+    echo "{$methodPHPDoc->toString()}\n";
+}
+
+if ($makeFactoryData->hasPHPStanEnabled()) {
+    echo " *\n";
+
+    foreach ($makeFactoryData->getMethodsPHPDoc() as $methodPHPDoc) {
+        echo "{$methodPHPDoc->toString(true)}\n";
+    }
+}
+?>
  */
 final class <?= $class_name ?> extends ModelFactory
 {
@@ -83,8 +46,8 @@ final class <?= $class_name ?> extends ModelFactory
     {
         return [
 <?php
-foreach ($defaultProperties as $fieldname => $type) {
-        echo "            '".$fieldname."' => ".$type."\n";
+foreach ($makeFactoryData->getDefaultProperties() as $propertyName => $value) {
+    echo "            '{$propertyName}' => {$value}\n";
 }
 ?>
         ];
@@ -96,15 +59,15 @@ foreach ($defaultProperties as $fieldname => $type) {
     protected function initialize(): self
     {
         return $this
-<?php if (!$persisted): ?>
+<?php if (!$makeFactoryData->isPersisted()): ?>
             ->withoutPersisting()
 <?php endif ?>
-            // ->afterInstantiate(function(<?= $object->getShortName() ?> $<?= lcfirst($object->getShortName()) ?>): void {})
+            // ->afterInstantiate(function(<?= $makeFactoryData->getObjectShortName() ?> $<?= lcfirst($makeFactoryData->getObjectShortName()) ?>): void {})
         ;
     }
 
     protected static function getClass(): string
     {
-        return <?= $object->getShortName() ?>::class;
+        return <?= $makeFactoryData->getObjectShortName() ?>::class;
     }
 }
