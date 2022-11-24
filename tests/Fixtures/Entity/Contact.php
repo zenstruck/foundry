@@ -23,7 +23,7 @@ class Contact
     private $name;
 
     /**
-     * @ORM\Embedded("Address")
+     * @ORM\Embedded(Address::class)
      */
     private Address $address;
 

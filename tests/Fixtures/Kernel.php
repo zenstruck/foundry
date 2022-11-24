@@ -14,8 +14,12 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 use Zenstruck\Foundry\Test\ORMDatabaseResetter;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\AddressFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryServiceFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\EntityForRelationsFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\CommentFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\UserFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\ODMTagStory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\ODMTagStoryAsAService;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\ServiceStory;
@@ -34,14 +38,18 @@ class Kernel extends BaseKernel
 
     private string $ormResetMode = ORMDatabaseResetter::RESET_MODE_SCHEMA;
 
+    private array $factoriesRegistered = [];
+
     public static function create(
         bool $enableDoctrine = true,
-        string $ormResetMode = ORMDatabaseResetter::RESET_MODE_SCHEMA
+        string $ormResetMode = ORMDatabaseResetter::RESET_MODE_SCHEMA,
+        array $factoriesRegistered = []
     ): self {
         $kernel = new self('test', true);
 
         $kernel->enableDoctrine = $enableDoctrine;
         $kernel->ormResetMode = $ormResetMode;
+        $kernel->factoriesRegistered = $factoriesRegistered;
 
         return $kernel;
     }
@@ -77,7 +85,7 @@ class Kernel extends BaseKernel
     {
         return \sprintf(
             "{$this->getProjectDir()}/var/cache/test/%s",
-            \md5(\json_encode([$this->enableDoctrine, $this->ormResetMode], \JSON_THROW_ON_ERROR))
+            \md5(\json_encode([$this->enableDoctrine, $this->ormResetMode, $this->factoriesRegistered], \JSON_THROW_ON_ERROR))
         );
     }
 
@@ -89,14 +97,13 @@ class Kernel extends BaseKernel
             ->setAutoconfigured(true)
             ->setAutowired(true)
         ;
-        $c->register(CategoryFactory::class)
-            ->setAutoconfigured(true)
-            ->setAutowired(true)
-        ;
-        $c->register(CategoryServiceFactory::class)
-            ->setAutoconfigured(true)
-            ->setAutowired(true)
-        ;
+
+        foreach ($this->factoriesRegistered as $factory) {
+            $c->register($factory)
+                ->setAutoconfigured(true)
+                ->setAutowired(true)
+            ;
+        }
 
         $c->loadFromExtension('framework', [
             'secret' => 'S3CRET',

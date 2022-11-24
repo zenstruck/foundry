@@ -5,6 +5,8 @@ namespace App\Factory;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\Document\Post;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\CommentFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\UserFactory;
 
 /**
  * @extends ModelFactory<Post>
@@ -45,8 +47,12 @@ final class PostFactory extends ModelFactory
     {
         return [
             'body' => self::faker()->text(),
+            'comments' => CommentFactory::new()->many(5),
             'createdAt' => self::faker()->dateTime(),
+            'publishedAt' => self::faker()->dateTime(),
+            'shortDescription' => self::faker()->text(),
             'title' => self::faker()->text(),
+            'user' => UserFactory::new(),
             'viewCount' => self::faker()->randomNumber(),
         ];
     }

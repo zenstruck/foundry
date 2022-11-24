@@ -59,6 +59,6 @@ abstract class MakerTestCase extends KernelTestCase
     protected function assertFileFromMakerSameAsExpectedFile(string $fileFromMaker): void
     {
         $this->assertFileExists($fileFromMaker);
-        $this->assertFileEquals($this->expectedFile(), $fileFromMaker);
+        $this->assertFileEquals($this->expectedFile(), $fileFromMaker, "File \"{$fileFromMaker}\" is different from expected file \"{$this->expectedFile()}\".");
     }
 }

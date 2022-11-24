@@ -57,4 +57,9 @@ class EntityWithRelations
      * @ORM\JoinColumn(nullable=false)
      */
     private $manyToOneWithNotExistingFactory;
+
+    /**
+     * @ORM\OneToMany(targetEntity=EntityForRelations::class, mappedBy="manyToOne")
+     */
+    private $oneToMany;
 }

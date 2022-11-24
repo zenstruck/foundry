@@ -3,10 +3,12 @@
 namespace Zenstruck\Foundry\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryServiceFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Kernel;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -75,5 +77,10 @@ final class ModelFactoryServiceTest extends KernelTestCase
         $this->expectExceptionMessage('Model Factories with dependencies (Model Factory services) cannot be created before foundry is booted.');
 
         CategoryServiceFactory::new();
+    }
+
+    protected static function createKernel(array $options = []): KernelInterface
+    {
+        return Kernel::create(factoriesRegistered: [CategoryServiceFactory::class]);
     }
 }
