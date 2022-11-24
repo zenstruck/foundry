@@ -5,13 +5,12 @@ namespace Zenstruck\Foundry\Bundle\DependencyInjection;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-use Zenstruck\Foundry\ChainManagerRegistry;
 
 final class ChainManagerRegistryPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        if (!$container->hasDefinition(ChainManagerRegistry::class)) {
+        if (!$container->hasDefinition('.zenstruck_foundry.chain_manager_registry')) {
             return;
         }
 
@@ -25,7 +24,7 @@ final class ChainManagerRegistryPass implements CompilerPassInterface
             $managerRegistries[] = new Reference('doctrine_mongodb');
         }
 
-        $container->getDefinition(ChainManagerRegistry::class)
+        $container->getDefinition('.zenstruck_foundry.chain_manager_registry')
             ->setArgument('$managerRegistries', $managerRegistries)
         ;
     }

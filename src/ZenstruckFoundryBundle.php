@@ -19,7 +19,7 @@ final class ZenstruckFoundryBundle extends Bundle
     public function boot(): void
     {
         if (!Factory::isBooted()) {
-            Factory::boot($this->container->get(Configuration::class));
+            Factory::boot($this->container->get('.zenstruck_foundry.configuration'));
         }
     }
 

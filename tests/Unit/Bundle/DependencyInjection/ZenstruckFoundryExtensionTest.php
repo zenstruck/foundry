@@ -6,13 +6,7 @@ use Faker\Generator;
 use Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractExtensionTestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Zenstruck\Foundry\Bundle\DependencyInjection\ZenstruckFoundryExtension;
-use Zenstruck\Foundry\Bundle\Maker\MakeFactory;
-use Zenstruck\Foundry\Bundle\Maker\MakeStory;
-use Zenstruck\Foundry\ChainManagerRegistry;
-use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Instantiator;
-use Zenstruck\Foundry\ModelFactoryManager;
-use Zenstruck\Foundry\StoryManager;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -26,21 +20,21 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
     {
         $this->load();
 
-        $this->assertContainerBuilderHasService(Configuration::class);
-        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'setInstantiator', ['zenstruck_foundry.default_instantiator']);
-        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'setFaker', ['zenstruck_foundry.faker']);
-        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'setManagerRegistry', [ChainManagerRegistry::class]);
-        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'setStoryManager', [StoryManager::class]);
-        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'setModelFactoryManager', [ModelFactoryManager::class]);
-        $this->assertCount(5, $this->container->findDefinition(Configuration::class)->getMethodCalls());
-        $this->assertTrue($this->container->getDefinition(Configuration::class)->isPublic());
-        $this->assertContainerBuilderHasService('zenstruck_foundry.default_instantiator', Instantiator::class);
-        $this->assertEmpty($this->container->getDefinition('zenstruck_foundry.default_instantiator')->getMethodCalls());
-        $this->assertContainerBuilderHasService('zenstruck_foundry.faker', Generator::class);
-        $this->assertEmpty($this->container->getDefinition('zenstruck_foundry.faker')->getArguments());
-        $this->assertContainerBuilderHasService(StoryManager::class);
-        $this->assertContainerBuilderHasServiceDefinitionWithTag(MakeFactory::class, 'maker.command');
-        $this->assertContainerBuilderHasServiceDefinitionWithTag(MakeStory::class, 'maker.command');
+        $this->assertContainerBuilderHasService('.zenstruck_foundry.configuration');
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.configuration', 'setInstantiator', ['.zenstruck_foundry.default_instantiator']);
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.configuration', 'setFaker', ['.zenstruck_foundry.faker']);
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.configuration', 'setManagerRegistry', ['.zenstruck_foundry.chain_manager_registry']);
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.configuration', 'setStoryManager', ['.zenstruck_foundry.story_manager']);
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.configuration', 'setModelFactoryManager', ['.zenstruck_foundry.model_factory_manager']);
+        $this->assertCount(5, $this->container->findDefinition('.zenstruck_foundry.configuration')->getMethodCalls());
+        $this->assertTrue($this->container->getDefinition('.zenstruck_foundry.configuration')->isPublic());
+        $this->assertContainerBuilderHasService('.zenstruck_foundry.default_instantiator', Instantiator::class);
+        $this->assertEmpty($this->container->getDefinition('.zenstruck_foundry.default_instantiator')->getMethodCalls());
+        $this->assertContainerBuilderHasService('.zenstruck_foundry.faker', Generator::class);
+        $this->assertEmpty($this->container->getDefinition('.zenstruck_foundry.faker')->getArguments());
+        $this->assertContainerBuilderHasService('.zenstruck_foundry.story_manager');
+        $this->assertContainerBuilderHasServiceDefinitionWithTag('.zenstruck_foundry.maker.factory', 'maker.command');
+        $this->assertContainerBuilderHasServiceDefinitionWithTag('.zenstruck_foundry.maker.story', 'maker.command');
     }
 
     /**
@@ -50,7 +44,7 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
     {
         $this->load(['faker' => ['locale' => 'fr_FR']]);
 
-        $this->assertContainerBuilderHasServiceDefinitionWithArgument('zenstruck_foundry.faker', 0, 'fr_FR');
+        $this->assertContainerBuilderHasServiceDefinitionWithArgument('.zenstruck_foundry.faker', 0, 'fr_FR');
     }
 
     /**
@@ -60,7 +54,7 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
     {
         $this->load(['faker' => ['seed' => 1234]]);
 
-        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('zenstruck_foundry.faker', 'seed', [1234]);
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.faker', 'seed', [1234]);
     }
 
     /**
@@ -70,9 +64,9 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
     {
         $this->load(['faker' => ['service' => 'my_faker']]);
 
-        $this->assertContainerBuilderHasService(Configuration::class);
-        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'setFaker', ['zenstruck_foundry.faker']);
-        $this->assertContainerBuilderHasAlias('zenstruck_foundry.faker', 'my_faker');
+        $this->assertContainerBuilderHasService('.zenstruck_foundry.configuration');
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.configuration', 'setFaker', ['.zenstruck_foundry.faker']);
+        $this->assertContainerBuilderHasAlias('.zenstruck_foundry.faker', 'my_faker');
     }
 
     /**
@@ -108,9 +102,9 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
             'always_force_properties' => true,
         ]]);
 
-        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('zenstruck_foundry.default_instantiator', 'withoutConstructor');
-        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('zenstruck_foundry.default_instantiator', 'allowExtraAttributes');
-        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('zenstruck_foundry.default_instantiator', 'alwaysForceProperties');
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.default_instantiator', 'withoutConstructor');
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.default_instantiator', 'allowExtraAttributes');
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.default_instantiator', 'alwaysForceProperties');
     }
 
     /**
@@ -120,8 +114,8 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
     {
         $this->load(['instantiator' => ['service' => 'my_instantiator']]);
 
-        $this->assertContainerBuilderHasService(Configuration::class);
-        $this->assertContainerBuilderHasAlias('zenstruck_foundry.default_instantiator', 'my_instantiator');
+        $this->assertContainerBuilderHasService('.zenstruck_foundry.configuration');
+        $this->assertContainerBuilderHasAlias('.zenstruck_foundry.default_instantiator', 'my_instantiator');
     }
 
     /**
@@ -164,9 +158,9 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
     {
         $this->load(['auto_refresh_proxies' => true]);
 
-        $this->assertContainerBuilderHasService(Configuration::class);
-        $this->assertCount(6, $this->container->findDefinition(Configuration::class)->getMethodCalls());
-        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'enableDefaultProxyAutoRefresh', []);
+        $this->assertContainerBuilderHasService('.zenstruck_foundry.configuration');
+        $this->assertCount(6, $this->container->findDefinition('.zenstruck_foundry.configuration')->getMethodCalls());
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.configuration', 'enableDefaultProxyAutoRefresh', []);
     }
 
     /**
@@ -176,9 +170,9 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
     {
         $this->load(['auto_refresh_proxies' => false]);
 
-        $this->assertContainerBuilderHasService(Configuration::class);
-        $this->assertCount(6, $this->container->findDefinition(Configuration::class)->getMethodCalls());
-        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall(Configuration::class, 'disableDefaultProxyAutoRefresh', []);
+        $this->assertContainerBuilderHasService('.zenstruck_foundry.configuration');
+        $this->assertCount(6, $this->container->findDefinition('.zenstruck_foundry.configuration')->getMethodCalls());
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.configuration', 'disableDefaultProxyAutoRefresh', []);
     }
 
     /**

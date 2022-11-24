@@ -89,8 +89,8 @@ trait ResetDatabase
 
     private static function getConfiguration(ContainerInterface $container): ?Configuration
     {
-        if ($container->has(Configuration::class)) {
-            return $container->get(Configuration::class);
+        if ($container->has('.zenstruck_foundry.configuration')) {
+            return $container->get('.zenstruck_foundry.configuration');
         }
 
         trigger_deprecation('zenstruck\foundry', '1.23', 'Usage of foundry without the bundle is deprecated and will not be possible anymore in 2.0.');

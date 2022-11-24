@@ -153,8 +153,8 @@ final class TestState
      */
     public static function bootFromContainer(ContainerInterface $container): void
     {
-        if ($container->has(Configuration::class)) {
-            self::bootFoundry($container->get(Configuration::class));
+        if ($container->has('.zenstruck_foundry.configuration')) {
+            self::bootFoundry($container->get('.zenstruck_foundry.configuration'));
 
             return;
         }

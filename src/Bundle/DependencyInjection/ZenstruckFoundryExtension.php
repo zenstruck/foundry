@@ -11,7 +11,6 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Zenstruck\Foundry\Bundle\Command\StubMakeFactory;
 use Zenstruck\Foundry\Bundle\Command\StubMakeStory;
-use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Story;
 use Zenstruck\Foundry\Test\ORMDatabaseResetter;
@@ -40,26 +39,26 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
         $this->configureDatabaseResetter($mergedConfig['database_resetter'], $container);
 
         if (true === $mergedConfig['auto_refresh_proxies']) {
-            $container->getDefinition(Configuration::class)->addMethodCall('enableDefaultProxyAutoRefresh');
+            $container->getDefinition('.zenstruck_foundry.configuration')->addMethodCall('enableDefaultProxyAutoRefresh');
         } elseif (false === $mergedConfig['auto_refresh_proxies']) {
-            $container->getDefinition(Configuration::class)->addMethodCall('disableDefaultProxyAutoRefresh');
+            $container->getDefinition('.zenstruck_foundry.configuration')->addMethodCall('disableDefaultProxyAutoRefresh');
         }
 
         if (!\class_exists(AbstractMaker::class)) {
-            $container->register(StubMakeFactory::class)->addTag('console.command');
-            $container->register(StubMakeStory::class)->addTag('console.command');
+            $container->register('.zenstruck_foundry.maker.factory_stub', StubMakeFactory::class)->addTag('console.command');
+            $container->register('.zenstruck_foundry.maker.story_stub', StubMakeStory::class)->addTag('console.command');
         }
     }
 
     private function configureFaker(array $config, ContainerBuilder $container): void
     {
         if ($config['service']) {
-            $container->setAlias('zenstruck_foundry.faker', $config['service']);
+            $container->setAlias('.zenstruck_foundry.faker', $config['service']);
 
             return;
         }
 
-        $definition = $container->getDefinition('zenstruck_foundry.faker');
+        $definition = $container->getDefinition('.zenstruck_foundry.faker');
 
         if ($config['locale']) {
             $definition->addArgument($config['locale']);
@@ -73,12 +72,12 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
     private function configureDefaultInstantiator(array $config, ContainerBuilder $container): void
     {
         if ($config['service']) {
-            $container->setAlias('zenstruck_foundry.default_instantiator', $config['service']);
+            $container->setAlias('.zenstruck_foundry.default_instantiator', $config['service']);
 
             return;
         }
 
-        $definition = $container->getDefinition('zenstruck_foundry.default_instantiator');
+        $definition = $container->getDefinition('.zenstruck_foundry.default_instantiator');
 
         if ($config['without_constructor']) {
             $definition->addMethodCall('withoutConstructor');
@@ -95,7 +94,7 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
 
     private function configureDatabaseResetter(array $config, ContainerBuilder $container): void
     {
-        $configurationDefinition = $container->getDefinition(Configuration::class);
+        $configurationDefinition = $container->getDefinition('.zenstruck_foundry.configuration');
 
         if (false === $config['enabled']) {
             $configurationDefinition->addMethodCall('disableDatabaseReset');

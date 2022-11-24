@@ -7,7 +7,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Zenstruck\Foundry\Bundle\DependencyInjection\ChainManagerRegistryPass;
-use Zenstruck\Foundry\ChainManagerRegistry;
 
 class ChainManagerRegistryPassTest extends AbstractCompilerPassTestCase
 {
@@ -16,7 +15,7 @@ class ChainManagerRegistryPassTest extends AbstractCompilerPassTestCase
      */
     public function add_both_odm_and_orm_if_present(): void
     {
-        $this->setDefinition(ChainManagerRegistry::class, new Definition());
+        $this->setDefinition('.zenstruck_foundry.chain_manager_registry', new Definition());
 
         $this->setDefinition('doctrine', new Definition());
         $this->setDefinition('doctrine_mongodb', new Definition());
@@ -24,7 +23,7 @@ class ChainManagerRegistryPassTest extends AbstractCompilerPassTestCase
         $this->compile();
 
         $this->assertContainerBuilderHasServiceDefinitionWithArgument(
-            ChainManagerRegistry::class,
+            '.zenstruck_foundry.chain_manager_registry',
             '$managerRegistries',
             [new Reference('doctrine'), new Reference('doctrine_mongodb')]
         );
@@ -35,14 +34,14 @@ class ChainManagerRegistryPassTest extends AbstractCompilerPassTestCase
      */
     public function only_add_orm(): void
     {
-        $this->setDefinition(ChainManagerRegistry::class, new Definition());
+        $this->setDefinition('.zenstruck_foundry.chain_manager_registry', new Definition());
 
         $this->setDefinition('doctrine', new Definition());
 
         $this->compile();
 
         $this->assertContainerBuilderHasServiceDefinitionWithArgument(
-            ChainManagerRegistry::class,
+            '.zenstruck_foundry.chain_manager_registry',
             '$managerRegistries',
             [new Reference('doctrine')]
         );
