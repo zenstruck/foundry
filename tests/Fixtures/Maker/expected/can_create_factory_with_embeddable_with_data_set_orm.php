@@ -5,7 +5,6 @@ namespace App\Factory;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Contact;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\AddressFactory;
 
 /**
  * @extends ModelFactory<Contact>

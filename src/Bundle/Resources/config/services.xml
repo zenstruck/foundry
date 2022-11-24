@@ -40,48 +40,10 @@
             <argument type="tagged_iterator" tag="foundry.factory" />
         </service>
 
-        <service id=".zenstruck_foundry.maker.factory" class="Zenstruck\Foundry\Bundle\Maker\MakeFactory">
-            <argument type="service" id=".zenstruck_foundry.chain_manager_registry" />
-            <argument type="service" id=".zenstruck_foundry.maker.factory.finder" />
-            <argument type="service" id="kernel" />
-            <argument type="tagged_iterator" tag="foundry.make_factory.default_properties_guesser" />
-            <tag name="maker.command" />
-        </service>
-
-        <service id=".zenstruck_foundry.maker.factory.orm_default_properties_guesser" class="Zenstruck\Foundry\Bundle\Maker\Factory\ORMDefaultPropertiesGuesser">
-            <argument type="service" id=".zenstruck_foundry.chain_manager_registry" />
-            <argument type="service" id=".zenstruck_foundry.maker.factory.finder" />
-            <tag name="foundry.make_factory.default_properties_guesser" />
-        </service>
-
-        <service id=".zenstruck_foundry.maker.factory.odm_default_properties_guesser" class="Zenstruck\Foundry\Bundle\Maker\Factory\ODMDefaultPropertiesGuesser">
-            <argument type="service" id=".zenstruck_foundry.chain_manager_registry" />
-            <argument type="service" id=".zenstruck_foundry.maker.factory.finder" />
-            <tag name="foundry.make_factory.default_properties_guesser" />
-        </service>
-
-        <service id=".zenstruck_foundry.maker.factory.doctrine_scalar_fields_default_properties_guesser" class="\Zenstruck\Foundry\Bundle\Maker\Factory\DoctrineScalarFieldsDefaultPropertiesGuesser">
-            <argument type="service" id=".zenstruck_foundry.chain_manager_registry" />
-            <argument type="service" id=".zenstruck_foundry.maker.factory.finder" />
-            <tag name="foundry.make_factory.default_properties_guesser" />
-        </service>
-
-        <service id=".zenstruck_foundry.maker.factory.object_default_properties_guesser" class="Zenstruck\Foundry\Bundle\Maker\Factory\ObjectDefaultPropertiesGuesser">
-            <tag name="foundry.make_factory.default_properties_guesser" />
-        </service>
-
-        <service id=".zenstruck_foundry.maker.story" class="Zenstruck\Foundry\Bundle\Maker\MakeStory">
-            <tag name="maker.command" />
-        </service>
-
         <service id=".zenstruck_foundry.chain_manager_registry" class="Zenstruck\Foundry\ChainManagerRegistry">
             <argument/> <!-- list<ManagerRegistry> set by compiler pass -->
         </service>
 
         <service id=".zenstruck_foundry.global_state_registry" class="Zenstruck\Foundry\Test\GlobalStateRegistry" public="true" />
-
-        <service id=".zenstruck_foundry.maker.factory.finder" class="Zenstruck\Foundry\Bundle\Maker\Factory\FactoryFinder">
-            <argument type="tagged_iterator" tag="foundry.factory" />
-        </service>
     </services>
 </container>
