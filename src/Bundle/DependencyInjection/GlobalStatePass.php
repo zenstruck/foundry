@@ -6,19 +6,17 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-use Zenstruck\Foundry\Configuration as FoundryConfiguration;
 use Zenstruck\Foundry\Story;
-use Zenstruck\Foundry\Test\GlobalStateRegistry;
 
 final class GlobalStatePass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        if (!$container->hasDefinition(FoundryConfiguration::class)) {
+        if (!$container->hasDefinition('.zenstruck_foundry.configuration')) {
             return;
         }
 
-        $globalStateRegistryDefinition = $container->getDefinition(GlobalStateRegistry::class);
+        $globalStateRegistryDefinition = $container->getDefinition('.zenstruck_foundry.global_state_registry');
 
         foreach ($this->getBundleConfiguration($container)['global_state'] as $globalStateItem) {
             if ($this->isStoryAsService($container, $globalStateItem)) {

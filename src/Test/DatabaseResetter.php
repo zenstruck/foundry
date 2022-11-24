@@ -82,7 +82,7 @@ final class DatabaseResetter
         }
 
         TestState::flushGlobalState(
-            $container->has(GlobalStateRegistry::class) ? $container->get(GlobalStateRegistry::class) : null
+            $container->has('.zenstruck_foundry.global_state_registry') ? $container->get('.zenstruck_foundry.global_state_registry') : null
         );
     }
 
@@ -122,8 +122,8 @@ final class DatabaseResetter
 
     private static function getConfiguration(ContainerInterface $container): ?Configuration
     {
-        if ($container->has(Configuration::class)) {
-            return $container->get(Configuration::class);
+        if ($container->has('.zenstruck_foundry.configuration')) {
+            return $container->get('.zenstruck_foundry.configuration');
         }
 
         trigger_deprecation('zenstruck\foundry', '1.23', 'Usage of foundry without the bundle is deprecated and will not be possible anymore in 2.0.');
