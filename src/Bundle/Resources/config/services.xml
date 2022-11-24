@@ -42,10 +42,20 @@
 
         <service id="Zenstruck\Foundry\Bundle\Maker\MakeFactory">
             <argument type="service" id="Zenstruck\Foundry\ChainManagerRegistry" />
-            <argument type="tagged_iterator" tag="foundry.factory" />
-            <argument>%kernel.project_dir%</argument>
+            <argument type="service" id="Zenstruck\Foundry\Bundle\Maker\Factory\FactoryFinder" />
             <argument type="service" id="kernel" />
+            <argument type="tagged_iterator" tag="foundry.make_factory.default_properties_guesser" />
             <tag name="maker.command" />
+        </service>
+
+        <service id="Zenstruck\Foundry\Bundle\Maker\Factory\DoctrineObjectDefaultPropertiesGuesser">
+            <argument type="service" id="Zenstruck\Foundry\ChainManagerRegistry" />
+            <argument type="service" id="Zenstruck\Foundry\Bundle\Maker\Factory\FactoryFinder" />
+            <tag name="foundry.make_factory.default_properties_guesser" />
+        </service>
+
+        <service id="Zenstruck\Foundry\Bundle\Maker\Factory\ObjectDefaultPropertiesGuesser">
+            <tag name="foundry.make_factory.default_properties_guesser" />
         </service>
 
         <service id="Zenstruck\Foundry\Bundle\Maker\MakeStory">
@@ -57,6 +67,10 @@
         </service>
 
         <service id="Zenstruck\Foundry\Test\GlobalStateRegistry" public="true">
+        </service>
+
+        <service id="Zenstruck\Foundry\Bundle\Maker\Factory\FactoryFinder">
+            <argument type="tagged_iterator" tag="foundry.factory" />
         </service>
     </services>
 </container>

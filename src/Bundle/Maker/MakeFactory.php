@@ -2,11 +2,7 @@
 
 namespace Zenstruck\Foundry\Bundle\Maker;
 
-use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadataInfo as ORMClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\Persistence\ObjectManager;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
@@ -18,66 +14,18 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Bundle\Maker\Factory\DefaultPropertiesGuesser;
+use Zenstruck\Foundry\Bundle\Maker\Factory\FactoryFinder;
+use Zenstruck\Foundry\Bundle\Maker\Factory\MakeFactoryData;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class MakeFactory extends AbstractMaker
 {
-    private const DEFAULTS_FOR_PERSISTED = [
-        'ARRAY' => '[],',
-        'ASCII_STRING' => 'self::faker()->text({length}),',
-        'BIGINT' => 'self::faker()->randomNumber(),',
-        'BLOB' => 'self::faker()->text(),',
-        'BOOLEAN' => 'self::faker()->boolean(),',
-        'DATE' => 'self::faker()->dateTime(),',
-        'DATE_MUTABLE' => 'self::faker()->dateTime(),',
-        'DATE_IMMUTABLE' => '\DateTimeImmutable::createFromMutable(self::faker()->dateTime()),',
-        'DATETIME_MUTABLE' => 'self::faker()->dateTime(),',
-        'DATETIME_IMMUTABLE' => '\DateTimeImmutable::createFromMutable(self::faker()->dateTime()),',
-        'DATETIMETZ_MUTABLE' => 'self::faker()->dateTime(),',
-        'DATETIMETZ_IMMUTABLE' => '\DateTimeImmutable::createFromMutable(self::faker()->dateTime()),',
-        'DECIMAL' => 'self::faker()->randomFloat(),',
-        'FLOAT' => 'self::faker()->randomFloat(),',
-        'INTEGER' => 'self::faker()->randomNumber(),',
-        'JSON' => '[],',
-        'JSON_ARRAY' => '[],',
-        'SIMPLE_ARRAY' => '[],',
-        'SMALLINT' => 'self::faker()->numberBetween(1, 32767),',
-        'STRING' => 'self::faker()->text({length}),',
-        'TEXT' => 'self::faker()->text({length}),',
-        'TIME_MUTABLE' => 'self::faker()->datetime(),',
-        'TIME_IMMUTABLE' => '\DateTimeImmutable::createFromMutable(self::faker()->datetime()),',
-    ];
-
-    private const DEFAULTS_FOR_NOT_PERSISTED = [
-        'array' => '[],',
-        'string' => 'self::faker()->sentence(),',
-        'int' => 'self::faker()->randomNumber(),',
-        'float' => 'self::faker()->randomFloat(),',
-        'bool' => 'self::faker()->boolean(),',
-        \DateTime::class => 'self::faker()->dateTime(),',
-        \DateTimeImmutable::class => '\DateTimeImmutable::createFromMutable(self::faker()->dateTime()),',
-    ];
-
-    /** @var array<class-string, class-string> */
-    private array $entitiesWithFactories;
-
-    public function __construct(private ManagerRegistry $managerRegistry, \Traversable $factories, private string $projectDir, private KernelInterface $kernel)
+    /** @param \Traversable<int, DefaultPropertiesGuesser> $defaultPropertiesGuessers */
+    public function __construct(private ManagerRegistry $managerRegistry, private FactoryFinder $factoryFinder, private KernelInterface $kernel, private \Traversable $defaultPropertiesGuessers)
     {
-        /** @phpstan-ignore-next-line */
-        $this->entitiesWithFactories = \array_unique(
-            \array_reduce(
-                \iterator_to_array($factories, preserve_keys: true),
-                static function(array $carry, ModelFactory $factory): array {
-                    $carry[\get_class($factory)] = $factory::getEntityClass();
-
-                    return $carry;
-                },
-                []
-            )
-        );
     }
 
     public static function getCommandName(): string
@@ -175,7 +123,7 @@ final class MakeFactory extends AbstractMaker
             throw new RuntimeCommandException(\sprintf('Class "%s" not found.', $input->getArgument('class')));
         }
 
-        $makeFactoryData = $this->createMakeFactoryData($generator, $class, !$input->getOption('not-persisted'));
+        $makeFactoryData = $this->createMakeFactoryData($class, !$input->getOption('not-persisted'));
 
         $factory = $generator->createClassNameDetails(
             $makeFactoryData->getObjectShortName(),
@@ -183,9 +131,10 @@ final class MakeFactory extends AbstractMaker
             'Factory'
         );
 
-        $input->getOption('not-persisted')
-            ? $this->defaultPropertiesForNotPersistedObject($makeFactoryData, $input->getOption('all-fields'))
-            : $this->defaultPropertiesForPersistedObject($makeFactoryData, $input->getOption('all-fields'));
+        $this->defaultPropertiesGuesser(!$input->getOption('not-persisted'))(
+            $makeFactoryData,
+            $input->getOption('all-fields')
+        );
 
         $generator->generateClass(
             $factory->getFullName(),
@@ -218,7 +167,7 @@ final class MakeFactory extends AbstractMaker
                     continue;
                 }
 
-                if (!\in_array($metadata->getName(), $this->entitiesWithFactories, true)) {
+                if (!$this->factoryFinder->classHasFactory($metadata->getName())) {
                     $choices[] = $metadata->getName();
                 }
             }
@@ -233,95 +182,9 @@ final class MakeFactory extends AbstractMaker
         return $choices;
     }
 
-    private function defaultPropertiesForPersistedObject(MakeFactoryData $makeFactoryData, bool $allFields): void
-    {
-        $class = $makeFactoryData->getObjectFullyQualifiedClassName();
-
-        $em = $this->managerRegistry->getManagerForClass($class);
-
-        if (!$em instanceof ObjectManager) {
-            return;
-        }
-
-        /** @var ORMClassMetadata|ODMClassMetadata $metadata */
-        $metadata = $em->getClassMetadata($class);
-        $ids = $metadata->getIdentifierFieldNames();
-
-        $dbType = $em instanceof EntityManagerInterface ? 'ORM' : 'ODM';
-
-        // If Factory exist for related entities populate too with auto defaults
-        foreach ($metadata->associationMappings as $item) {
-            // if joinColumns is not written entity is default nullable ($nullable = true;)
-            if (!\array_key_exists('joinColumns', $item)) {
-                continue;
-            }
-
-            if (!\array_key_exists('nullable', $item['joinColumns'][0] ?? [])) {
-                continue;
-            }
-
-            if (true === $item['joinColumns'][0]['nullable']) {
-                continue;
-            }
-
-            $fieldName = $item['fieldName'];
-
-            if (!$factoryClass = $this->getFactoryForClass($item['targetEntity'])) {
-                $makeFactoryData->addDefaultProperty(\lcfirst($fieldName), "null, // TODO add {$item['targetEntity']} {$dbType} type manually");
-
-                continue;
-            }
-
-            $factory = new \ReflectionClass($factoryClass);
-            $makeFactoryData->addUse($factory->getName());
-            $makeFactoryData->addDefaultProperty(\lcfirst($fieldName), "{$factory->getShortName()}::new(),");
-        }
-
-        foreach ($metadata->fieldMappings as $property) {
-            // ignore identifiers and nullable fields
-            if ((!$allFields && ($property['nullable'] ?? false)) || \in_array($property['fieldName'], $ids, true)) {
-                continue;
-            }
-
-            $type = \mb_strtoupper($property['type']);
-            $value = "null, // TODO add {$type} {$dbType} type manually";
-            $length = $property['length'] ?? '';
-
-            if (\array_key_exists($type, self::DEFAULTS_FOR_PERSISTED)) {
-                $value = self::DEFAULTS_FOR_PERSISTED[$type];
-            }
-
-            $makeFactoryData->addDefaultProperty($property['fieldName'], \str_replace('{length}', (string) $length, $value));
-        }
-    }
-
-    private function defaultPropertiesForNotPersistedObject(MakeFactoryData $makeFactoryData, bool $allFields): void
-    {
-        foreach ($makeFactoryData->getObject()->getProperties() as $property) {
-            // ignore identifiers and nullable fields
-            if (!$allFields && ($property->hasDefaultValue() || !$property->hasType() || $property->getType()?->allowsNull())) {
-                continue;
-            }
-
-            $type = null;
-            $reflectionType = $property->getType();
-            if ($reflectionType instanceof \ReflectionNamedType) {
-                $type = $reflectionType->getName();
-            }
-
-            $value = \sprintf('null, // TODO add %svalue manually', $type ? "{$type} " : '');
-
-            if (\array_key_exists($type ?? '', self::DEFAULTS_FOR_NOT_PERSISTED)) {
-                $value = self::DEFAULTS_FOR_NOT_PERSISTED[$type];
-            }
-
-            $makeFactoryData->addDefaultProperty($property->getName(), $value);
-        }
-    }
-
     private function phpstanEnabled(): bool
     {
-        return \file_exists("{$this->projectDir}/vendor/phpstan/phpstan/phpstan");
+        return \file_exists("{$this->kernel->getProjectDir()}/vendor/phpstan/phpstan/phpstan");
     }
 
     private function doctrineEnabled(): bool
@@ -345,18 +208,10 @@ final class MakeFactory extends AbstractMaker
         return $ormEnabled || $odmEnabled;
     }
 
-    /** @return class-string|null */
-    private function getFactoryForClass(string $class): ?string
-    {
-        $factories = \array_flip($this->entitiesWithFactories);
-
-        return $factories[$class] ?? null;
-    }
-
     /**
      * @param class-string $class
      */
-    private function createMakeFactoryData(Generator $generator, string $class, bool $persisted): MakeFactoryData
+    private function createMakeFactoryData(string $class, bool $persisted): MakeFactoryData
     {
         $object = new \ReflectionClass($class);
 
@@ -387,5 +242,16 @@ final class MakeFactory extends AbstractMaker
         }
 
         return $namespace;
+    }
+
+    private function defaultPropertiesGuesser(bool $persisted): DefaultPropertiesGuesser
+    {
+        foreach ($this->defaultPropertiesGuessers as $defaultPropertiesGuesser) {
+            if ($defaultPropertiesGuesser->supports($persisted)) {
+                return $defaultPropertiesGuesser;
+            }
+        }
+
+        throw new \LogicException(\sprintf('Cannot find default properties guesser based ($persisted: %s)', $persisted ? 'true' : 'false'));
     }
 }
