@@ -50,6 +50,18 @@ final class RepositoryProxyTest extends TestCase
             }
         })];
     }
+
+    /**
+     * @test
+     */
+    public function can_get_inner_repository(): void
+    {
+        $inner = $this->createMock(ObjectRepository::class);
+
+        $repository = new RepositoryProxy($inner);
+
+        $this->assertSame($inner, $repository->inner());
+    }
 }
 
 abstract class RepositoryStub implements ObjectRepository
