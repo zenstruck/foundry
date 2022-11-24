@@ -30,6 +30,14 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
         return $this->proxyResult($this->repository->{$method}(...$arguments));
     }
 
+    /**
+     * @return ObjectRepository<TProxiedObject>
+     */
+    public function inner(): ObjectRepository
+    {
+        return $this->repository;
+    }
+
     public function count(): int
     {
         if ($this->repository instanceof EntityRepository) {

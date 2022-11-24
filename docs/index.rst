@@ -1353,6 +1353,7 @@ This library provides a *Repository Proxy* that wraps your object repositories t
     $repository = repository(Post::class);
 
     // helpful methods - all returned object(s) are proxied
+    $repository->inner(); // the real "wrapped" repository
     $repository->count(); // number of rows in the database table
     count($repository); // equivalent to above (RepositoryProxy implements \Countable)
     $repository->first(); // get the first object (assumes an auto-incremented "id" column)
