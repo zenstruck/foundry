@@ -1,4 +1,4 @@
-<?php /** @var \Zenstruck\Foundry\Bundle\Maker\MakeFactoryData $makeFactoryData */?><?= "<?php\n" ?>
+<?php /** @var \Zenstruck\Foundry\Bundle\Maker\Factory\MakeFactoryData $makeFactoryData */?><?= "<?php\n" ?>
 
 namespace <?= $namespace ?>;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Zenstruck\Foundry\Bundle\Maker;
+namespace Zenstruck\Foundry\Bundle\Maker\Factory;
 
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
