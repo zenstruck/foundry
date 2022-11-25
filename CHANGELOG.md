@@ -1,5 +1,39 @@
 # CHANGELOG
 
+## [v1.24.0](https://github.com/zenstruck/foundry/releases/tag/v1.24.0)
+
+November 25th, 2022 - [v1.23.0...v1.24.0](https://github.com/zenstruck/foundry/compare/v1.23.0...v1.24.0)
+
+* f5e9eae minor: use --no-persistence instead of --not-persisted (#365) by @nikophil
+* 730c0d9 chore: rename service ids (#363) by @kbond
+* 19acc72 feat: add `RepositoryProxy::inner()` (#362) by @kbond
+* a003bac refactor(make:factory): split command with DefaultPropertiesGuesser (#357) by @nikophil
+* d8eca88 chore(ci): test on Symfony 6.2 (#359) by @kbond
+* 20ac349 refactor(make:factory): use value object to render template (#354) by @nikophil
+* 4e5f9d9 feat(make:factory): use factories to default non-nullable relationships (#351) by @nikophil, @benblub
+* 8332956 feat: make `Story::get()` static (implies `Story::load()->get()`) (#253) by @kbond
+* b89bcff minor(make:factory): misc enhancements of maker (#345) by @nikophil
+* 3cc95a5 minor: remove php 7.4 related tests (#349) by @nikophil
+* 8a055b0 chore: fix docker cache (#350) by @nikophil
+* 18ea4fb feat(make:factory): create factory for not-persisted objects (#343) by @nikophil
+* 64786fc fix: typo in docs (#348) by @nikophil
+* 1a98fc4 chore: Use composer 2.4 (#346) by @OskarStark
+* 96c4cbe minor(make:factory): Use `@see`/`@todo` annoations (#344) by @OskarStark
+* cbeb2ce fix: adjust docblocks to remove PhpStorm errors (#341) by @kbond
+* cd1e394 fix: use orm limit length in factory (#294) by @MrYamous
+* b1d7ce3 [feature] add default for Mongo properties in (#340) by @nikophil
+* 778607a [chore] use cache for docker CI (#339) by @nikophil
+* c662eb3 [feature] auto add phpstan annotations in make:factory (#338) by @nikophil
+* 2bd046f [docs] sort phpstan-method annotations (#333) by @OskarStark
+* 0460741 [docs] remove obsolete section (#335) by @nikophil
+* 2c34baf [bug] Typos in Makefile (#330) by @OskarStark
+* 65924b2 [bug] typos in docs (#331) by @OskarStark
+* 6b48878 [chore] upgrade ci actions (#329) by @kbond
+* 210faff [chore] use phpstan instead of psalm (#328) by @nikophil
+* 51f1bc0 [refactor] modernize code with rector (#327) by @nikophil
+* 8423b75 [chore] adjust `.symfony.bundle.yaml` for new branch (#325) by @kbond
+* 5a05513 [feature] require php8+ (#327) by @kbond
+
 ## [v1.23.0](https://github.com/zenstruck/foundry/releases/tag/v1.23.0)
 
 November 10th, 2022 - [v1.22.1...v1.23.0](https://github.com/zenstruck/foundry/compare/v1.22.1...v1.23.0)
