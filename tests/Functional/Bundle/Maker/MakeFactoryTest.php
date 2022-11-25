@@ -186,7 +186,7 @@ final class MakeFactoryTest extends MakerTestCase
 
         $this->assertFileDoesNotExist(self::tempFile('src/Factory/SomeObjectFactory.php'));
 
-        $tester->execute(['class' => SomeObject::class, '--not-persisted' => true, '--all-fields' => true]);
+        $tester->execute(['class' => SomeObject::class, '--no-persistence' => true, '--all-fields' => true]);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/SomeObjectFactory.php'));
     }
@@ -201,7 +201,7 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileDoesNotExist(self::tempFile('src/Factory/SomeObjectFactory.php'));
 
         $tester->setInputs(['Foo', SomeObject::class]); // "Foo" will generate a validation error
-        $tester->execute(['--not-persisted' => true]);
+        $tester->execute(['--no-persistence' => true]);
 
         $output = $tester->getDisplay();
 
@@ -362,7 +362,7 @@ final class MakeFactoryTest extends MakerTestCase
         $tester->execute(['class' => Category::class]);
 
         $output = $tester->getDisplay();
-        $this->assertStringContainsString('Note: Doctrine not enabled: auto-activating --not-persisted option.', $output);
+        $this->assertStringContainsString('Note: Doctrine not enabled: auto-activating --no-persistence option.', $output);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/CategoryFactory.php'));
     }
