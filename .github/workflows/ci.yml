@@ -205,7 +205,7 @@ jobs:
         with:
           composer-options: --prefer-dist
 
-      - name: Install PhpStan
+      - name: Install PHPStan
         run: composer bin phpstan install
 
       - name: Run static analysis

@@ -51,7 +51,7 @@ final class MakeFactory extends AbstractMaker
             ->addOption('namespace', null, InputOption::VALUE_REQUIRED, 'Customize the namespace for generated factories', 'Factory')
             ->addOption('test', null, InputOption::VALUE_NONE, 'Create in <fg=yellow>tests/</> instead of <fg=yellow>src/</>')
             ->addOption('all-fields', null, InputOption::VALUE_NONE, 'Create defaults for all entity fields, not only required fields')
-            ->addOption('not-persisted', null, InputOption::VALUE_NONE, 'Create a factory for an object not managed by Doctrine')
+            ->addOption('no-persistence', null, InputOption::VALUE_NONE, 'Create a factory for an object not managed by Doctrine')
         ;
 
         $inputConfig->setArgumentAsNonInteractive('class');
@@ -59,11 +59,11 @@ final class MakeFactory extends AbstractMaker
 
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
     {
-        if (!$this->doctrineEnabled() && !$input->getOption('not-persisted')) {
-            $io->text('// Note: Doctrine not enabled: auto-activating <fg=yellow>--not-persisted</> option.');
+        if (!$this->doctrineEnabled() && !$input->getOption('no-persistence')) {
+            $io->text('// Note: Doctrine not enabled: auto-activating <fg=yellow>--no-persistence</> option.');
             $io->newLine();
 
-            $input->setOption('not-persisted', true);
+            $input->setOption('no-persistence', true);
         }
 
         if ($input->getArgument('class')) {
@@ -80,7 +80,7 @@ final class MakeFactory extends AbstractMaker
             $io->newLine();
         }
 
-        if ($input->getOption('not-persisted')) {
+        if ($input->getOption('no-persistence')) {
             $class = $io->ask(
                 'Not persisted class to create a factory for',
                 validator: static function(string $class) {
@@ -123,7 +123,7 @@ final class MakeFactory extends AbstractMaker
             throw new RuntimeCommandException(\sprintf('Class "%s" not found.', $input->getArgument('class')));
         }
 
-        $makeFactoryData = $this->createMakeFactoryData($class, !$input->getOption('not-persisted'));
+        $makeFactoryData = $this->createMakeFactoryData($class, !$input->getOption('no-persistence'));
 
         $factory = $generator->createClassNameDetails(
             $makeFactoryData->getObjectShortName(),
@@ -131,7 +131,7 @@ final class MakeFactory extends AbstractMaker
             'Factory'
         );
 
-        $this->defaultPropertiesGuesser(!$input->getOption('not-persisted'))(
+        $this->defaultPropertiesGuesser(!$input->getOption('no-persistence'))(
             $makeFactoryData,
             $input->getOption('all-fields')
         );
