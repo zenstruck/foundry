@@ -1418,8 +1418,8 @@ values are: stories as service, "global" stories and invokable services.
         when@test: # see Bundle Configuration section about sharing this in the test environment
             zenstruck_foundry:
                 global_state:
-                    - App\Stories\StoryThatIsAService
-                    - App\Stories\GlobalStory
+                    - App\Story\StoryThatIsAService
+                    - App\Story\GlobalStory
                     - invokable.service # just a service with ::invoke()
                     - ...
 
