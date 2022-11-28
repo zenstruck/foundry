@@ -1919,7 +1919,7 @@ Full Default Bundle Configuration
                     object_managers: []
 
                     # Whether to use doctrine:schema:update or migrations when resetting schema.
-                    reset_mode: schema # "schema" or "migration"
+                    reset_mode: schema # "schema" or "migrate"
 
                 # Config related to ODM
                 odm:
