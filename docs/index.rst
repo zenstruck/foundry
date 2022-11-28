@@ -1189,18 +1189,19 @@ bundle's configuration:
         # config/packages/zenstruck_foundry.yaml
         when@dev: # see Bundle Configuration section about sharing this in the test environment
             zenstruck_foundry:
-                orm:
-                    connections:
-                        - orm_connection_1
-                        - orm_connection_2
-                    object_managers:
-                        - orm_object_manager_1
-                        - orm_object_manager_2
-                    reset_mode: schema
-                odm:
-                    object_managers:
-                        - odm_object_manager_1
-                        - odm_object_manager_2
+                database_resetter:
+                    orm:
+                        connections:
+                            - orm_connection_1
+                            - orm_connection_2
+                        object_managers:
+                            - orm_object_manager_1
+                            - orm_object_manager_2
+                        reset_mode: schema
+                    odm:
+                        object_managers:
+                            - odm_object_manager_1
+                            - odm_object_manager_2
 
 Object Proxy
 ~~~~~~~~~~~~
