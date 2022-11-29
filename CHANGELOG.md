@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## [v1.24.1](https://github.com/zenstruck/foundry/releases/tag/v1.24.1)
+
+November 29th, 2022 - [v1.24.0...v1.24.1](https://github.com/zenstruck/foundry/compare/v1.24.0...v1.24.1)
+
+* 6588804 dependencies: allow symfony/string 5.4 (#369) by @HypeMC
+* 9e5450e docs: fix namespaces in global_state example (#366) by @OskarStark
+* 917aba5 docs: fix onfig value (#368) by @OskarStark
+* 7773f7e docs: fix config key (#367) by @OskarStark
+
 ## [v1.24.0](https://github.com/zenstruck/foundry/releases/tag/v1.24.0)
 
 November 25th, 2022 - [v1.23.0...v1.24.0](https://github.com/zenstruck/foundry/compare/v1.23.0...v1.24.0)
