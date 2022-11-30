@@ -1809,7 +1809,7 @@ Later, you can access the story's state when creating other fixtures:
     Story state is cleared after each test (unless it is a :ref:`Global State Story <global-state>`).
 
 Story Pools
-^^^^^^^^^^^
+~~~~~~~~~~~
 
 Stories can store (as state) *pools* of objects:
 
