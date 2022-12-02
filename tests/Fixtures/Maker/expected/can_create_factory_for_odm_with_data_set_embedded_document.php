@@ -5,6 +5,7 @@ namespace App\Factory;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\Document\Comment;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\UserFactory;
 
 /**
  * @extends ModelFactory<Comment>
@@ -47,7 +48,7 @@ final class CommentFactory extends ModelFactory
             'approved' => self::faker()->boolean(),
             'body' => self::faker()->text(),
             'createdAt' => self::faker()->dateTime(),
-            'user' => null, // TODO add ONE ODM type manually
+            'user' => UserFactory::new(),
         ];
     }
 

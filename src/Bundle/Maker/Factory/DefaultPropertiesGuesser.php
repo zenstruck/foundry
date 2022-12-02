@@ -9,5 +9,5 @@ interface DefaultPropertiesGuesser
 {
     public function __invoke(MakeFactoryData $makeFactoryData, bool $allFields): void;
 
-    public function supports(bool $persisted): bool;
+    public function supports(MakeFactoryData $makeFactoryData): bool;
 }

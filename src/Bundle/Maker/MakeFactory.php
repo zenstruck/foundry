@@ -131,10 +131,11 @@ final class MakeFactory extends AbstractMaker
             'Factory'
         );
 
-        $this->defaultPropertiesGuesser(!$input->getOption('no-persistence'))(
-            $makeFactoryData,
-            $input->getOption('all-fields')
-        );
+        foreach ($this->defaultPropertiesGuessers as $defaultPropertiesGuesser) {
+            if ($defaultPropertiesGuesser->supports($makeFactoryData)) {
+                $defaultPropertiesGuesser($makeFactoryData, $input->getOption('all-fields'));
+            }
+        }
 
         $generator->generateClass(
             $factory->getFullName(),
@@ -242,16 +243,5 @@ final class MakeFactory extends AbstractMaker
         }
 
         return $namespace;
-    }
-
-    private function defaultPropertiesGuesser(bool $persisted): DefaultPropertiesGuesser
-    {
-        foreach ($this->defaultPropertiesGuessers as $defaultPropertiesGuesser) {
-            if ($defaultPropertiesGuesser->supports($persisted)) {
-                return $defaultPropertiesGuesser;
-            }
-        }
-
-        throw new \LogicException(\sprintf('Cannot find default properties guesser based ($persisted: %s)', $persisted ? 'true' : 'false'));
     }
 }

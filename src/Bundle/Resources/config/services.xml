@@ -48,7 +48,19 @@
             <tag name="maker.command" />
         </service>
 
-        <service id=".zenstruck_foundry.maker.factory.doctrine_object_default_properties_guesser" class="Zenstruck\Foundry\Bundle\Maker\Factory\DoctrineObjectDefaultPropertiesGuesser">
+        <service id=".zenstruck_foundry.maker.factory.orm_default_properties_guesser" class="Zenstruck\Foundry\Bundle\Maker\Factory\ORMDefaultPropertiesGuesser">
+            <argument type="service" id=".zenstruck_foundry.chain_manager_registry" />
+            <argument type="service" id=".zenstruck_foundry.maker.factory.finder" />
+            <tag name="foundry.make_factory.default_properties_guesser" />
+        </service>
+
+        <service id=".zenstruck_foundry.maker.factory.odm_default_properties_guesser" class="Zenstruck\Foundry\Bundle\Maker\Factory\ODMDefaultPropertiesGuesser">
+            <argument type="service" id=".zenstruck_foundry.chain_manager_registry" />
+            <argument type="service" id=".zenstruck_foundry.maker.factory.finder" />
+            <tag name="foundry.make_factory.default_properties_guesser" />
+        </service>
+
+        <service id=".zenstruck_foundry.maker.factory.doctrine_scalar_fields_default_properties_guesser" class="\Zenstruck\Foundry\Bundle\Maker\Factory\DoctrineScalarFieldsDefaultPropertiesGuesser">
             <argument type="service" id=".zenstruck_foundry.chain_manager_registry" />
             <argument type="service" id=".zenstruck_foundry.maker.factory.finder" />
             <tag name="foundry.make_factory.default_properties_guesser" />

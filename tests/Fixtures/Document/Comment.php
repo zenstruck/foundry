@@ -14,7 +14,7 @@ class Comment
      *     targetDocument=User::class
      * )
      */
-    private $user;
+    private User $user;
 
     /**
      * @MongoDB\Field(type="string")

@@ -41,8 +41,8 @@ class ObjectDefaultPropertiesGuesser implements DefaultPropertiesGuesser
         }
     }
 
-    public function supports(bool $persisted): bool
+    public function supports(MakeFactoryData $makeFactoryData): bool
     {
-        return false === $persisted;
+        return !$makeFactoryData->isPersisted();
     }
 }

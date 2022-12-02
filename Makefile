@@ -73,6 +73,7 @@ database-generate-migration: docker-start vendor database-drop-schema ### Genera
 	@${DOCKER_PHP} vendor/bin/doctrine-migrations migrations:migrate --no-interaction --allow-no-migration # first, let's load into db existing migrations
 	@${DOCKER_PHP} vendor/bin/doctrine-migrations migrations:diff --no-interaction
 	@${DOCKER_PHP} vendor/bin/doctrine-migrations migrations:migrate --no-interaction # load the new migration
+	@${DOCKER_PHP} bin/doctrine orm:validate-schema
 
 database-validate-mapping: docker-start vendor database-drop-schema ### Validate mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
 	@${DOCKER_PHP} vendor/bin/doctrine-migrations migrations:migrate --no-interaction --allow-no-migration
