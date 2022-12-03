@@ -83,6 +83,12 @@ class Factory
         // normalize each attribute set and collapse
         $attributes = \array_merge(...\array_map(fn(callable|array $attributes): array => $this->normalizeAttributes($attributes), $attributeSet));
 
+        foreach ($attributes as $name => $value) {
+            if ($value instanceof LazyValue) {
+                $attributes[$name] = $value($attributes);
+            }
+        }
+
         foreach ($this->beforeInstantiate as $callback) {
             $attributes = $callback($attributes);
 
