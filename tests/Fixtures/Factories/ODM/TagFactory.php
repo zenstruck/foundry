@@ -3,7 +3,7 @@
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories\ODM;
 
 use Zenstruck\Foundry\ModelFactory;
-use Zenstruck\Foundry\Tests\Fixtures\Document\Tag;
+use Zenstruck\Foundry\Tests\Fixtures\Document\ODMTag;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -12,7 +12,7 @@ final class TagFactory extends ModelFactory
 {
     protected static function getClass(): string
     {
-        return Tag::class;
+        return ODMTag::class;
     }
 
     protected function getDefaults(): array

@@ -4,28 +4,28 @@ namespace App\Factory;
 
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
-use Zenstruck\Foundry\Tests\Fixtures\Document\Comment;
+use Zenstruck\Foundry\Tests\Fixtures\Document\ODMComment;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\UserFactory;
 
 /**
- * @extends ModelFactory<Comment>
+ * @extends ModelFactory<ODMComment>
  *
- * @method        Comment|Proxy create(array|callable $attributes = [])
- * @method static Comment|Proxy createOne(array $attributes = [])
- * @method static Comment|Proxy find(object|array|mixed $criteria)
- * @method static Comment|Proxy findOrCreate(array $attributes)
- * @method static Comment|Proxy first(string $sortedField = 'id')
- * @method static Comment|Proxy last(string $sortedField = 'id')
- * @method static Comment|Proxy random(array $attributes = [])
- * @method static Comment|Proxy randomOrCreate(array $attributes = [])
- * @method static Comment[]|Proxy[] all()
- * @method static Comment[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static Comment[]|Proxy[] createSequence(array|callable $sequence)
- * @method static Comment[]|Proxy[] findBy(array $attributes)
- * @method static Comment[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
- * @method static Comment[]|Proxy[] randomSet(int $number, array $attributes = [])
+ * @method        ODMComment|Proxy create(array|callable $attributes = [])
+ * @method static ODMComment|Proxy createOne(array $attributes = [])
+ * @method static ODMComment|Proxy find(object|array|mixed $criteria)
+ * @method static ODMComment|Proxy findOrCreate(array $attributes)
+ * @method static ODMComment|Proxy first(string $sortedField = 'id')
+ * @method static ODMComment|Proxy last(string $sortedField = 'id')
+ * @method static ODMComment|Proxy random(array $attributes = [])
+ * @method static ODMComment|Proxy randomOrCreate(array $attributes = [])
+ * @method static ODMComment[]|Proxy[] all()
+ * @method static ODMComment[]|Proxy[] createMany(int $number, array|callable $attributes = [])
+ * @method static ODMComment[]|Proxy[] createSequence(array|callable $sequence)
+ * @method static ODMComment[]|Proxy[] findBy(array $attributes)
+ * @method static ODMComment[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
+ * @method static ODMComment[]|Proxy[] randomSet(int $number, array $attributes = [])
  */
-final class CommentFactory extends ModelFactory
+final class ODMCommentFactory extends ModelFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -58,12 +58,12 @@ final class CommentFactory extends ModelFactory
     protected function initialize(): self
     {
         return $this
-            // ->afterInstantiate(function(Comment $comment): void {})
+            // ->afterInstantiate(function(ODMComment $oDMComment): void {})
         ;
     }
 
     protected static function getClass(): string
     {
-        return Comment::class;
+        return ODMComment::class;
     }
 }

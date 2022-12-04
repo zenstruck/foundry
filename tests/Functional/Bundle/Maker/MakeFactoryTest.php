@@ -5,8 +5,8 @@ namespace Zenstruck\Foundry\Tests\Functional\Bundle\Maker;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 use Symfony\Component\Console\Tester\CommandTester;
-use Zenstruck\Foundry\Tests\Fixtures\Document\Comment;
-use Zenstruck\Foundry\Tests\Fixtures\Document\Post as ODMPost;
+use Zenstruck\Foundry\Tests\Fixtures\Document\ODMComment;
+use Zenstruck\Foundry\Tests\Fixtures\Document\ODMPost as ODMPost;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\EntityWithRelations;
@@ -26,6 +26,11 @@ use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject;
 final class MakeFactoryTest extends MakerTestCase
 {
     private const PHPSTAN_PATH = __DIR__.'/../../../../vendor/phpstan/phpstan/phpstan';
+
+    protected function setUp(): void
+    {
+        self::assertDirectoryDoesNotExist(self::tempDir());
+    }
 
     protected function tearDown(): void
     {
@@ -49,8 +54,6 @@ final class MakeFactoryTest extends MakerTestCase
 
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
 
-        $this->assertFileDoesNotExist(self::tempFile('src/Factory/CategoryFactory.php'));
-
         $tester->execute(['class' => Category::class]);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/CategoryFactory.php'));
@@ -69,8 +72,6 @@ final class MakeFactoryTest extends MakerTestCase
         $kernel->boot();
 
         $tester = new CommandTester((new Application($kernel))->find('make:factory'));
-
-        $this->assertFileDoesNotExist(self::tempFile('src/Factory/TagFactory.php'));
 
         $tester->setInputs([Tag::class]);
         $tester->execute([]);
@@ -94,8 +95,6 @@ final class MakeFactoryTest extends MakerTestCase
 
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
 
-        $this->assertFileDoesNotExist(self::tempFile('tests/Factory/CategoryFactory.php'));
-
         $tester->execute(['class' => Category::class, '--test' => true]);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('tests/Factory/CategoryFactory.php'));
@@ -111,8 +110,6 @@ final class MakeFactoryTest extends MakerTestCase
         }
 
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
-
-        $this->assertFileDoesNotExist(self::tempFile('tests/Factory/TagFactory.php'));
 
         $tester->setInputs([Tag::class]);
         $tester->execute(['--test' => true]);
@@ -133,8 +130,6 @@ final class MakeFactoryTest extends MakerTestCase
 
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
 
-        $this->assertFileDoesNotExist(self::tempFile('src/Factory/CategoryFactory.php'));
-
         $tester->execute(['class' => Category::class]);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/CategoryFactory.php'));
@@ -153,8 +148,6 @@ final class MakeFactoryTest extends MakerTestCase
 
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
 
-        $this->assertFileDoesNotExist(self::tempFile('src/Factory/PostFactory.php'));
-
         $tester->execute(['class' => ORMPost::class]);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/PostFactory.php'));
@@ -166,8 +159,6 @@ final class MakeFactoryTest extends MakerTestCase
     public function invalid_entity_throws_exception(): void
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
-
-        $this->assertFileDoesNotExist(self::tempFile('src/Factory/InvalidFactory.php'));
 
         try {
             $tester->execute(['class' => 'Invalid']);
@@ -188,8 +179,6 @@ final class MakeFactoryTest extends MakerTestCase
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
 
-        $this->assertFileDoesNotExist(self::tempFile('src/Factory/SomeObjectFactory.php'));
-
         $tester->execute(['class' => SomeObject::class, '--no-persistence' => true, '--all-fields' => true]);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/SomeObjectFactory.php'));
@@ -201,8 +190,6 @@ final class MakeFactoryTest extends MakerTestCase
     public function can_create_factory_for_not_persisted_class_interactively(): void
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
-
-        $this->assertFileDoesNotExist(self::tempFile('src/Factory/SomeObjectFactory.php'));
 
         $tester->setInputs(['Foo', SomeObject::class]); // "Foo" will generate a validation error
         $tester->execute(['--no-persistence' => true]);
@@ -227,8 +214,6 @@ final class MakeFactoryTest extends MakerTestCase
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
         $expectedFile = self::tempFile('src/My/Namespace/TagFactory.php');
 
-        $this->assertFileDoesNotExist($expectedFile);
-
         $tester->setInputs([Tag::class]);
         $tester->execute(['--namespace' => 'My\\Namespace']);
 
@@ -247,8 +232,6 @@ final class MakeFactoryTest extends MakerTestCase
 
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
         $expectedFile = self::tempFile('tests/My/Namespace/TagFactory.php');
-
-        $this->assertFileDoesNotExist($expectedFile);
 
         $tester->setInputs([Tag::class]);
         $tester->execute(['--namespace' => 'My\\Namespace', '--test' => true]);
@@ -269,8 +252,6 @@ final class MakeFactoryTest extends MakerTestCase
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
         $expectedFile = self::tempFile('src/My/Namespace/TagFactory.php');
 
-        $this->assertFileDoesNotExist($expectedFile);
-
         $tester->setInputs([Tag::class]);
         $tester->execute(['--namespace' => 'App\\My\\Namespace']);
 
@@ -290,8 +271,6 @@ final class MakeFactoryTest extends MakerTestCase
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
         $expectedFile = self::tempFile('tests/My/Namespace/TagFactory.php');
 
-        $this->assertFileDoesNotExist($expectedFile);
-
         $tester->setInputs([Tag::class]);
         $tester->execute(['--namespace' => 'App\\Tests\\My\\Namespace', '--test' => true]);
 
@@ -306,20 +285,24 @@ final class MakeFactoryTest extends MakerTestCase
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
 
-        $this->assertFileDoesNotExist(self::tempFile('src/Factory/CategoryFactory.php'));
-        $this->assertFileDoesNotExist(self::tempFile('src/Factory/TagFactory.php'));
-
         $tester->setInputs(['All']);
 
-        try {
-            $tester->execute([]);
-        } catch (RuntimeCommandException) {
-            // todo find a better solution
-            // because we have fixtures with the same name, the maker will fail when creating the duplicate
+        $tester->execute([]);
+
+        $expectedFactories = [];
+
+        if (\getenv('USE_ORM')) {
+            $expectedFactories = ['BrandFactory', 'CategoryFactory', 'CommentFactory', 'ContactFactory', 'EntityForRelationsFactory', 'UserFactory'];
         }
 
-        $this->assertFileExists(self::tempFile('src/Factory/CategoryFactory.php'));
-        $this->assertFileExists(self::tempFile('src/Factory/TagFactory.php'));
+        if (\getenv('USE_ODM')) {
+            $expectedFactories = [...$expectedFactories, 'ODMCategoryFactory', 'ODMCommentFactory', 'ODMPostFactory', 'ODMTagFactory', 'ODMUserFactory'];
+        }
+
+        self::assertGreaterThan(0, \count($expectedFactories));
+        foreach ($expectedFactories as $expectedFactory) {
+            $this->assertFileExists(self::tempFile("src/Factory/{$expectedFactory}.php"));
+        }
     }
 
     /**
@@ -337,8 +320,6 @@ final class MakeFactoryTest extends MakerTestCase
 
         $tester = new CommandTester((new Application($kernel))->find('make:factory'));
 
-        $this->assertFileDoesNotExist(self::tempFile("src/Factory/{$file}.php"));
-
         $tester->setInputs([$class]);
         $tester->execute([]);
 
@@ -347,8 +328,8 @@ final class MakeFactoryTest extends MakerTestCase
 
     public function documentProvider(): iterable
     {
-        yield 'document' => [ODMPost::class, 'PostFactory'];
-        yield 'embedded document' => [Comment::class, 'CommentFactory'];
+        yield 'document' => [ODMPost::class, 'ODMPostFactory'];
+        yield 'embedded document' => [ODMComment::class, 'ODMCommentFactory'];
     }
 
     /**
@@ -364,7 +345,6 @@ final class MakeFactoryTest extends MakerTestCase
         $kernel->boot();
 
         $tester = new CommandTester((new Application($kernel))->find('make:factory'));
-        $this->assertFileDoesNotExist(self::tempFile('src/Factory/CategoryFactory.php'));
 
         $tester->execute(['class' => Category::class]);
 
@@ -388,8 +368,6 @@ final class MakeFactoryTest extends MakerTestCase
 
         $tester = new CommandTester((new Application($kernel))->find('make:factory'));
 
-        $this->assertFileDoesNotExist(self::tempFile('src/Factory/EntityWithRelationsFactory.php'));
-
         $tester->execute(['class' => EntityWithRelations::class]);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/EntityWithRelationsFactory.php'));
@@ -409,8 +387,6 @@ final class MakeFactoryTest extends MakerTestCase
 
         $tester = new CommandTester((new Application($kernel))->find('make:factory'));
 
-        $this->assertFileDoesNotExist(self::tempFile('src/Factory/EntityWithRelationsFactory.php'));
-
         $tester->execute(['class' => EntityWithRelations::class, '--all-fields' => true]);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/EntityWithRelationsFactory.php'));
@@ -427,8 +403,6 @@ final class MakeFactoryTest extends MakerTestCase
 
         $tester = new CommandTester((new Application($kernel))->find('make:factory'));
 
-        $this->assertFileDoesNotExist(self::tempFile("src/Factory/{$factoryName}.php"));
-
         $tester->execute(['class' => $objectClass, '--all-fields' => true]);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile("src/Factory/{$factoryName}.php"));
@@ -441,7 +415,7 @@ final class MakeFactoryTest extends MakerTestCase
         }
 
         if (\getenv('USE_ODM')) {
-            yield 'odm' => [ODMPost::class, 'PostFactory', [CommentFactory::class, UserFactory::class]];
+            yield 'odm' => [ODMPost::class, 'ODMPostFactory', [CommentFactory::class, UserFactory::class]];
         }
     }
 

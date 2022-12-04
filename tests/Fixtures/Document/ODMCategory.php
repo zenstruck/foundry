@@ -7,7 +7,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 /**
  * @MongoDB\Document(collection="category")
  */
-class Category
+class ODMCategory
 {
     /**
      * @MongoDB\Id

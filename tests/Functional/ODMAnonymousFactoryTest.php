@@ -2,7 +2,7 @@
 
 namespace Zenstruck\Foundry\Tests\Functional;
 
-use Zenstruck\Foundry\Tests\Fixtures\Document\Category;
+use Zenstruck\Foundry\Tests\Fixtures\Document\ODMCategory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -18,6 +18,6 @@ final class ODMAnonymousFactoryTest extends AnonymousFactoryTest
 
     protected function categoryClass(): string
     {
-        return Category::class;
+        return ODMCategory::class;
     }
 }

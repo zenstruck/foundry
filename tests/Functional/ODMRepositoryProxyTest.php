@@ -2,7 +2,7 @@
 
 namespace Zenstruck\Foundry\Tests\Functional;
 
-use Zenstruck\Foundry\Tests\Fixtures\Document\Category;
+use Zenstruck\Foundry\Tests\Fixtures\Document\ODMCategory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\CategoryFactory;
 
 /**
@@ -19,7 +19,7 @@ final class ODMRepositoryProxyTest extends RepositoryProxyTest
 
     protected function categoryClass(): string
     {
-        return Category::class;
+        return ODMCategory::class;
     }
 
     protected function categoryFactoryClass(): string

@@ -5,26 +5,21 @@ namespace Zenstruck\Foundry\Tests\Fixtures\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 /**
- * @MongoDB\Document(collection="tag")
+ * @MongoDB\EmbeddedDocument
  */
-class Tag
+class ODMUser
 {
-    /**
-     * @MongoDB\Id
-     */
-    private $id;
-
     /**
      * @MongoDB\Field(type="string")
      */
-    private $name;
+    private string $name;
 
     public function __construct(string $name)
     {
         $this->name = $name;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }

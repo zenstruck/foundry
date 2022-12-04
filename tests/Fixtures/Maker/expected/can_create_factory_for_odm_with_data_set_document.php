@@ -4,27 +4,27 @@ namespace App\Factory;
 
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
-use Zenstruck\Foundry\Tests\Fixtures\Document\Post;
+use Zenstruck\Foundry\Tests\Fixtures\Document\ODMPost;
 
 /**
- * @extends ModelFactory<Post>
+ * @extends ModelFactory<ODMPost>
  *
- * @method        Post|Proxy create(array|callable $attributes = [])
- * @method static Post|Proxy createOne(array $attributes = [])
- * @method static Post|Proxy find(object|array|mixed $criteria)
- * @method static Post|Proxy findOrCreate(array $attributes)
- * @method static Post|Proxy first(string $sortedField = 'id')
- * @method static Post|Proxy last(string $sortedField = 'id')
- * @method static Post|Proxy random(array $attributes = [])
- * @method static Post|Proxy randomOrCreate(array $attributes = [])
- * @method static Post[]|Proxy[] all()
- * @method static Post[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static Post[]|Proxy[] createSequence(array|callable $sequence)
- * @method static Post[]|Proxy[] findBy(array $attributes)
- * @method static Post[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
- * @method static Post[]|Proxy[] randomSet(int $number, array $attributes = [])
+ * @method        ODMPost|Proxy create(array|callable $attributes = [])
+ * @method static ODMPost|Proxy createOne(array $attributes = [])
+ * @method static ODMPost|Proxy find(object|array|mixed $criteria)
+ * @method static ODMPost|Proxy findOrCreate(array $attributes)
+ * @method static ODMPost|Proxy first(string $sortedField = 'id')
+ * @method static ODMPost|Proxy last(string $sortedField = 'id')
+ * @method static ODMPost|Proxy random(array $attributes = [])
+ * @method static ODMPost|Proxy randomOrCreate(array $attributes = [])
+ * @method static ODMPost[]|Proxy[] all()
+ * @method static ODMPost[]|Proxy[] createMany(int $number, array|callable $attributes = [])
+ * @method static ODMPost[]|Proxy[] createSequence(array|callable $sequence)
+ * @method static ODMPost[]|Proxy[] findBy(array $attributes)
+ * @method static ODMPost[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
+ * @method static ODMPost[]|Proxy[] randomSet(int $number, array $attributes = [])
  */
-final class PostFactory extends ModelFactory
+final class ODMPostFactory extends ModelFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -57,12 +57,12 @@ final class PostFactory extends ModelFactory
     protected function initialize(): self
     {
         return $this
-            // ->afterInstantiate(function(Post $post): void {})
+            // ->afterInstantiate(function(ODMPost $oDMPost): void {})
         ;
     }
 
     protected static function getClass(): string
     {
-        return Post::class;
+        return ODMPost::class;
     }
 }

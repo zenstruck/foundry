@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  * @ORM\Table(name="tag_cascade")
  */
-class Tag
+class ProductTag
 {
     /**
      * @ORM\Id

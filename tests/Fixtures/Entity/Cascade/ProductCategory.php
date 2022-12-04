@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  * @ORM\Table(name="category_cascade")
  */
-class Category
+class ProductCategory
 {
     /**
      * @ORM\Id

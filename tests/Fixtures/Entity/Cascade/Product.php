@@ -35,12 +35,12 @@ class Product
     private Collection $variants;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Category::class, mappedBy="products", cascade={"persist"})
+     * @ORM\ManyToMany(targetEntity=ProductCategory::class, mappedBy="products", cascade={"persist"})
      */
     private Collection $categories;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Tag::class, inversedBy="products", cascade={"persist"})
+     * @ORM\ManyToMany(targetEntity=ProductTag::class, inversedBy="products", cascade={"persist"})
      */
     private Collection $tags;
 
@@ -116,14 +116,14 @@ class Product
         return $this->categories;
     }
 
-    public function addCategory(Category $category): void
+    public function addCategory(ProductCategory $category): void
     {
         if (!$this->categories->contains($category)) {
             $this->categories[] = $category;
         }
     }
 
-    public function removeCategory(Category $category): void
+    public function removeCategory(ProductCategory $category): void
     {
         if ($this->categories->contains($category)) {
             $this->categories->removeElement($category);
@@ -135,14 +135,14 @@ class Product
         return $this->tags;
     }
 
-    public function addTag(Tag $tag): void
+    public function addTag(ProductTag $tag): void
     {
         if (!$this->tags->contains($tag)) {
             $this->tags[] = $tag;
         }
     }
 
-    public function removeTag(Tag $tag): void
+    public function removeTag(ProductTag $tag): void
     {
         if ($this->tags->contains($tag)) {
             $this->tags->removeElement($tag);
