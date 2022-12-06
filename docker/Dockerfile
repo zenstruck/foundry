@@ -47,4 +47,7 @@ RUN addgroup --system --gid ${UID} ${USER} \
     && chown -R ${USER}:${USER} /app
 USER ${USER}
 
+RUN composer global require --no-progress --no-scripts --no-plugins symfony/flex ; \
+    composer global config --no-plugins allow-plugins.symfony/flex true
+
 CMD tail -f /dev/null

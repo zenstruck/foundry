@@ -45,11 +45,7 @@ Each target will build and start the docker stack and install composer only if n
 ```shell
 $ make help
 validate                       Run fixcs, sca, full test suite and validate migrations
-test-full                      Run full PHPunit (MySQL + Mongo)
-test-fast                      Run PHPUnit with SQLite
-test-mysql                     Run PHPUnit with MySQL
-test-postgresql                Run PHPUnit with PostgreSQL
-test-mongo                     Run PHPUnit with Mongo
+test                           Run PHPUnit tests suite
 fixcs                          Run PHP-CS-Fixer
 sca                            Run static analysis
 database-generate-migration    Generate new migration based on mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
@@ -62,16 +58,26 @@ composer                       Run composer command
 clear                          Start from a fresh install (needed if vendors have already been installed with another php version)
 ```
 
-You can run each `test-*` target with a special argument `filter`:
+You can run each `make test` target with a special argument `filter`:
 ```shell
-$ make test-mysql filter=FactoryTest
+$ make test filter=FactoryTest
 ```
 
 which will use PHPUnit's `--filter` option.
 
+#### Run tests in different environments
+
+You can create a `.env` file to change the context in which tests will execute:
+```dotenv
+USE_ORM=1
+USE_ODM=1
+USE_DAMA_DOCTRINE_TEST_BUNDLE=1
+SYMFONY_REQUIRE=6.0.*
+```
+
 ### Change docker's ports
 
-You can create a `.env` file to change the ports used by docker:
+You can also add these variables to the `.env` file to change the ports used by docker:
 ```dotenv
 MYSQL_PORT=3307
 POSTGRES_PORT=5434
@@ -91,11 +97,6 @@ The php container is shipped with xdebug activated. You can use step by step deb
 create a server called `FOUNDRY` in your PHP Remote Debug, with the IDE key `xdebug_foundry`
 
 ![PhpStorm with xdebug](docs/phpstorm-xdebug-config.png)
-
-### Run tests without docker
-
-If for any reason docker is not available on your computer, the target `make test-fast` will run tests with your local
-php version, and sqlite will be used as database. Results may differ from the CI!
 
 ## Migrations
 
