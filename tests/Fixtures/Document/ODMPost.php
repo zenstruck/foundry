@@ -9,7 +9,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 /**
  * @MongoDB\Document(collection="post")
  */
-class Post implements \Stringable
+class ODMPost implements \Stringable
 {
     /**
      * @MongoDB\Id
@@ -48,19 +48,19 @@ class Post implements \Stringable
 
     /**
      * @MongoDB\EmbedMany(
-     *     targetDocument=Comment::class
+     *     targetDocument=ODMComment::class
      * )
      */
     private $comments;
 
     /**
      * @MongoDB\EmbedOne(
-     *     targetDocument=User::class
+     *     targetDocument=ODMUser::class
      * )
      */
     private $user;
 
-    public function __construct(string $title, string $body, User $user, ?string $shortDescription = null)
+    public function __construct(string $title, string $body, ODMUser $user, ?string $shortDescription = null)
     {
         $this->title = $title;
         $this->body = $body;
@@ -85,7 +85,7 @@ class Post implements \Stringable
         return $this->body;
     }
 
-    public function getUser(): User
+    public function getUser(): ODMUser
     {
         return $this->user;
     }
@@ -121,14 +121,14 @@ class Post implements \Stringable
     }
 
     /**
-     * @return Collection<Comment>
+     * @return Collection<ODMComment>
      */
     public function getComments(): Collection
     {
         return $this->comments;
     }
 
-    public function addComment(Comment $comment): self
+    public function addComment(ODMComment $comment): self
     {
         if (!$this->comments->contains($comment)) {
             $this->comments->add($comment);
@@ -137,7 +137,7 @@ class Post implements \Stringable
         return $this;
     }
 
-    public function removeComment(Comment $comment): self
+    public function removeComment(ODMComment $comment): self
     {
         if ($this->comments->contains($comment)) {
             $this->comments->removeElement($comment);

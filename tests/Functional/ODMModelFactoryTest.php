@@ -3,10 +3,10 @@
 namespace Zenstruck\Foundry\Tests\Functional;
 
 use Zenstruck\Foundry\Proxy;
-use Zenstruck\Foundry\Tests\Fixtures\Document\Category;
-use Zenstruck\Foundry\Tests\Fixtures\Document\Comment;
-use Zenstruck\Foundry\Tests\Fixtures\Document\Post;
-use Zenstruck\Foundry\Tests\Fixtures\Document\User;
+use Zenstruck\Foundry\Tests\Fixtures\Document\ODMCategory;
+use Zenstruck\Foundry\Tests\Fixtures\Document\ODMComment;
+use Zenstruck\Foundry\Tests\Fixtures\Document\ODMPost;
+use Zenstruck\Foundry\Tests\Fixtures\Document\ODMUser;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\CommentFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\PostFactory;
@@ -28,13 +28,13 @@ final class ODMModelFactoryTest extends ModelFactoryTest
      */
     public function can_use_factory_for_embedded_object(): void
     {
-        $proxyObject = CommentFactory::createOne(['user' => new User('some user'), 'body' => 'some body']);
+        $proxyObject = CommentFactory::createOne(['user' => new ODMUser('some user'), 'body' => 'some body']);
         self::assertInstanceOf(Proxy::class, $proxyObject);
         self::assertFalse($proxyObject->isPersisted());
 
         $comment = $proxyObject->object();
-        self::assertInstanceOf(Comment::class, $comment);
-        self::assertEquals(new User('some user'), $comment->getUser());
+        self::assertInstanceOf(ODMComment::class, $comment);
+        self::assertEquals(new ODMUser('some user'), $comment->getUser());
         self::assertSame('some body', $comment->getBody());
     }
 
@@ -52,9 +52,9 @@ final class ODMModelFactoryTest extends ModelFactoryTest
         self::assertCount(1, $posts);
 
         $post = $posts[0]->object();
-        self::assertInstanceOf(Post::class, $post);
+        self::assertInstanceOf(ODMPost::class, $post);
         self::assertCount(4, $post->getComments());
-        self::assertContainsOnlyInstancesOf(Comment::class, $post->getComments());
+        self::assertContainsOnlyInstancesOf(ODMComment::class, $post->getComments());
     }
 
     /**
@@ -70,7 +70,7 @@ final class ODMModelFactoryTest extends ModelFactoryTest
 
     protected function categoryClass(): string
     {
-        return Category::class;
+        return ODMCategory::class;
     }
 
     protected function categoryFactoryClass(): string

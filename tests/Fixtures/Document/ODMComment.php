@@ -7,14 +7,14 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 /**
  * @MongoDB\EmbeddedDocument
  */
-class Comment
+class ODMComment
 {
     /**
      * @MongoDB\EmbedOne(
-     *     targetDocument=User::class
+     *     targetDocument=ODMUser::class
      * )
      */
-    private User $user;
+    private ODMUser $user;
 
     /**
      * @MongoDB\Field(type="string")
@@ -31,14 +31,14 @@ class Comment
      */
     private $approved = false;
 
-    public function __construct(User $user, string $body)
+    public function __construct(ODMUser $user, string $body)
     {
         $this->user = $user;
         $this->body = $body;
         $this->createdAt = new \DateTime('now');
     }
 
-    public function getUser(): User
+    public function getUser(): ODMUser
     {
         return $this->user;
     }

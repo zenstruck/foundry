@@ -4,9 +4,9 @@ namespace Zenstruck\Foundry\Tests\Fixtures\Factories\ODM;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Zenstruck\Foundry\ModelFactory;
-use Zenstruck\Foundry\Tests\Fixtures\Document\Comment;
-use Zenstruck\Foundry\Tests\Fixtures\Document\Post;
-use Zenstruck\Foundry\Tests\Fixtures\Document\User;
+use Zenstruck\Foundry\Tests\Fixtures\Document\ODMComment;
+use Zenstruck\Foundry\Tests\Fixtures\Document\ODMPost;
+use Zenstruck\Foundry\Tests\Fixtures\Document\ODMUser;
 
 class PostFactory extends ModelFactory
 {
@@ -19,15 +19,15 @@ class PostFactory extends ModelFactory
     {
         return $this->addState(static fn(): array => [
             'comments' => new ArrayCollection([
-                new Comment(new User('user'), 'body'),
-                new Comment(new User('user'), 'body'),
+                new ODMComment(new ODMUser('user'), 'body'),
+                new ODMComment(new ODMUser('user'), 'body'),
             ]),
         ]);
     }
 
     protected static function getClass(): string
     {
-        return Post::class;
+        return ODMPost::class;
     }
 
     protected function getDefaults(): array
@@ -35,7 +35,7 @@ class PostFactory extends ModelFactory
         return [
             'title' => self::faker()->sentence(),
             'body' => self::faker()->sentence(),
-            'user' => new User('user'),
+            'user' => new ODMUser('user'),
         ];
     }
 }

@@ -7,11 +7,11 @@ use Zenstruck\Foundry\Instantiator;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Brand;
-use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Image;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Product;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\ProductCategory;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\ProductTag;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Review;
-use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Tag;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Variant;
 use function Zenstruck\Foundry\factory;
 
@@ -73,7 +73,7 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
     {
         $product = factory(Product::class, [
             'name' => 'foo',
-            'tags' => [factory(Tag::class, ['name' => 'bar'])],
+            'tags' => [factory(ProductTag::class, ['name' => 'bar'])],
         ])->instantiateWith(function(array $attibutes, string $class): object {
             $this->assertNull($attibutes['tags'][0]->getId());
 
@@ -92,7 +92,7 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
     {
         $product = factory(Product::class, [
             'name' => 'foo',
-            'categories' => [factory(Category::class, ['name' => 'bar'])],
+            'categories' => [factory(ProductCategory::class, ['name' => 'bar'])],
         ])->instantiateWith(function(array $attibutes, string $class): object {
             $this->assertNull($attibutes['categories'][0]->getId());
 
