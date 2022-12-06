@@ -30,13 +30,10 @@ final class ORMDatabaseResetterTest extends KernelTestCase
      */
     public function it_resets_database_correctly(string $resetMode): void
     {
-        $kernel = static::createKernel(['ormResetMode' => $resetMode]);
-        $kernel->boot();
-
-        $container = $kernel->getContainer();
-
-        $application = new Application($kernel);
+        $application = new Application(self::bootKernel(['ormResetMode' => $resetMode]));
         $application->setAutoExit(false);
+
+        $container = self::$kernel->getContainer();
 
         $resetter = new ORMDatabaseResetter($application, $container->get('doctrine'), [], [], $resetMode);
 

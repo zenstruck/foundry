@@ -5,18 +5,20 @@ namespace Zenstruck\Foundry\Tests\Functional\Bundle\Maker;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMComment;
-use Zenstruck\Foundry\Tests\Fixtures\Document\ODMPost as ODMPost;
+use Zenstruck\Foundry\Tests\Fixtures\Document\ODMPost;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Comment;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\EntityWithRelations;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post as ORMPost;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\AddressFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\EntityForRelationsFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\CommentFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\UserFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Kernel;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject;
 
@@ -30,6 +32,8 @@ final class MakeFactoryTest extends MakerTestCase
     protected function setUp(): void
     {
         self::assertDirectoryDoesNotExist(self::tempDir());
+
+        parent::setUp();
     }
 
     protected function tearDown(): void
@@ -52,9 +56,14 @@ final class MakeFactoryTest extends MakerTestCase
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
-        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
+        $tester = $this->makeFactoryCommandTester([PostFactory::class]);
 
         $tester->execute(['class' => Category::class]);
+
+        $output = $tester->getDisplay();
+
+        $this->assertStringNotContainsString(ORMPost::class, $output);
+        $this->assertStringContainsString('Note: pass --test if you want to generate factories in your tests/ directory', $output);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/CategoryFactory.php'));
     }
@@ -68,20 +77,20 @@ final class MakeFactoryTest extends MakerTestCase
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
-        $kernel = Kernel::create(factoriesRegistered: [CategoryFactory::class]);
-        $kernel->boot();
+        $tester = $this->makeFactoryCommandTester();
 
-        $tester = new CommandTester((new Application($kernel))->find('make:factory'));
-
-        $tester->setInputs([Tag::class]);
-        $tester->execute([]);
+        $tester->setInputs([Comment::class, 'no', 'yes']);
+        $tester->execute([], ['interactive' => true]);
 
         $output = $tester->getDisplay();
+        $this->assertStringContainsString(
+            'A factory for class "Zenstruck\Foundry\Tests\Fixtures\Entity\User" is missing for field Comment::$user. Do you want to create it?',
+            $output
+        );
 
-        $this->assertStringNotContainsString(Category::class, $output);
-        $this->assertStringContainsString('Note: pass --test if you want to generate factories in your tests/ directory', $output);
-
-        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/TagFactory.php'));
+        $this->assertFileDoesNotExist(self::tempFile('src/Factory/UserFactory.php'));
+        $this->assertFileExists(self::tempFile('src/Factory/PostFactory.php'));
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/CommentFactory.php'));
     }
 
     /**
@@ -93,7 +102,7 @@ final class MakeFactoryTest extends MakerTestCase
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
-        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
+        $tester = $this->makeFactoryCommandTester();
 
         $tester->execute(['class' => Category::class, '--test' => true]);
 
@@ -109,7 +118,7 @@ final class MakeFactoryTest extends MakerTestCase
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
-        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
+        $tester = $this->makeFactoryCommandTester();
 
         $tester->setInputs([Tag::class]);
         $tester->execute(['--test' => true]);
@@ -128,7 +137,7 @@ final class MakeFactoryTest extends MakerTestCase
 
         $this->emulatePHPStanEnabled();
 
-        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
+        $tester = $this->makeFactoryCommandTester();
 
         $tester->execute(['class' => Category::class]);
 
@@ -146,7 +155,7 @@ final class MakeFactoryTest extends MakerTestCase
 
         $this->emulatePHPStanEnabled();
 
-        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
+        $tester = $this->makeFactoryCommandTester();
 
         $tester->execute(['class' => ORMPost::class]);
 
@@ -158,7 +167,7 @@ final class MakeFactoryTest extends MakerTestCase
      */
     public function invalid_entity_throws_exception(): void
     {
-        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
+        $tester = $this->makeFactoryCommandTester();
 
         try {
             $tester->execute(['class' => 'Invalid']);
@@ -177,7 +186,7 @@ final class MakeFactoryTest extends MakerTestCase
      */
     public function can_create_factory_for_not_persisted_class(): void
     {
-        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
+        $tester = $this->makeFactoryCommandTester();
 
         $tester->execute(['class' => SomeObject::class, '--no-persistence' => true, '--all-fields' => true]);
 
@@ -189,7 +198,7 @@ final class MakeFactoryTest extends MakerTestCase
      */
     public function can_create_factory_for_not_persisted_class_interactively(): void
     {
-        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
+        $tester = $this->makeFactoryCommandTester();
 
         $tester->setInputs(['Foo', SomeObject::class]); // "Foo" will generate a validation error
         $tester->execute(['--no-persistence' => true]);
@@ -211,12 +220,12 @@ final class MakeFactoryTest extends MakerTestCase
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
-        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
-        $expectedFile = self::tempFile('src/My/Namespace/TagFactory.php');
+        $tester = $this->makeFactoryCommandTester();
 
         $tester->setInputs([Tag::class]);
         $tester->execute(['--namespace' => 'My\\Namespace']);
 
+        $expectedFile = self::tempFile('src/My/Namespace/TagFactory.php');
         $this->assertFileExists($expectedFile);
         $this->assertStringContainsString('namespace App\\My\\Namespace;', \file_get_contents($expectedFile));
     }
@@ -230,12 +239,12 @@ final class MakeFactoryTest extends MakerTestCase
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
-        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
-        $expectedFile = self::tempFile('tests/My/Namespace/TagFactory.php');
+        $tester = $this->makeFactoryCommandTester();
 
         $tester->setInputs([Tag::class]);
         $tester->execute(['--namespace' => 'My\\Namespace', '--test' => true]);
 
+        $expectedFile = self::tempFile('tests/My/Namespace/TagFactory.php');
         $this->assertFileExists($expectedFile);
         $this->assertStringContainsString('namespace App\\Tests\\My\\Namespace;', \file_get_contents($expectedFile));
     }
@@ -249,12 +258,12 @@ final class MakeFactoryTest extends MakerTestCase
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
-        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
-        $expectedFile = self::tempFile('src/My/Namespace/TagFactory.php');
+        $tester = $this->makeFactoryCommandTester();
 
         $tester->setInputs([Tag::class]);
         $tester->execute(['--namespace' => 'App\\My\\Namespace']);
 
+        $expectedFile = self::tempFile('src/My/Namespace/TagFactory.php');
         $this->assertFileExists($expectedFile);
         $this->assertStringContainsString('namespace App\\My\\Namespace;', \file_get_contents($expectedFile));
     }
@@ -268,12 +277,12 @@ final class MakeFactoryTest extends MakerTestCase
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
-        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
-        $expectedFile = self::tempFile('tests/My/Namespace/TagFactory.php');
+        $tester = $this->makeFactoryCommandTester();
 
         $tester->setInputs([Tag::class]);
         $tester->execute(['--namespace' => 'App\\Tests\\My\\Namespace', '--test' => true]);
 
+        $expectedFile = self::tempFile('tests/My/Namespace/TagFactory.php');
         $this->assertFileExists($expectedFile);
         $this->assertStringContainsString('namespace App\\Tests\\My\\Namespace;', \file_get_contents($expectedFile));
     }
@@ -283,10 +292,9 @@ final class MakeFactoryTest extends MakerTestCase
      */
     public function can_create_all_factories_for_doctrine_objects(): void
     {
-        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:factory'));
+        $tester = $this->makeFactoryCommandTester();
 
         $tester->setInputs(['All']);
-
         $tester->execute([]);
 
         $expectedFactories = [];
@@ -315,10 +323,7 @@ final class MakeFactoryTest extends MakerTestCase
             self::markTestSkipped('doctrine/odm not enabled.');
         }
 
-        $kernel = Kernel::create(factoriesRegistered: [UserFactory::class]);
-        $kernel->boot();
-
-        $tester = new CommandTester((new Application($kernel))->find('make:factory'));
+        $tester = $this->makeFactoryCommandTester(['factoriesRegistered' => [UserFactory::class]]);
 
         $tester->setInputs([$class]);
         $tester->execute([]);
@@ -341,10 +346,7 @@ final class MakeFactoryTest extends MakerTestCase
             self::markTestSkipped('dama/doctrine-test-bundle should not be enabled.');
         }
 
-        $kernel = Kernel::create(enableDoctrine: false);
-        $kernel->boot();
-
-        $tester = new CommandTester((new Application($kernel))->find('make:factory'));
+        $tester = $this->makeFactoryCommandTester(['enableDoctrine' => false]);
 
         $tester->execute(['class' => Category::class]);
 
@@ -363,10 +365,7 @@ final class MakeFactoryTest extends MakerTestCase
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
-        $kernel = Kernel::create(factoriesRegistered: [CategoryFactory::class]);
-        $kernel->boot();
-
-        $tester = new CommandTester((new Application($kernel))->find('make:factory'));
+        $tester = $this->makeFactoryCommandTester(['factoriesRegistered' => [CategoryFactory::class]]);
 
         $tester->execute(['class' => EntityWithRelations::class]);
 
@@ -382,10 +381,7 @@ final class MakeFactoryTest extends MakerTestCase
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
-        $kernel = Kernel::create(factoriesRegistered: [CategoryFactory::class, EntityForRelationsFactory::class]);
-        $kernel->boot();
-
-        $tester = new CommandTester((new Application($kernel))->find('make:factory'));
+        $tester = $this->makeFactoryCommandTester(['factoriesRegistered' => [CategoryFactory::class, EntityForRelationsFactory::class]]);
 
         $tester->execute(['class' => EntityWithRelations::class, '--all-fields' => true]);
 
@@ -396,32 +392,47 @@ final class MakeFactoryTest extends MakerTestCase
      * @test
      * @dataProvider objectsWithEmbeddableProvider
      */
-    public function can_create_factory_with_embeddable(string $objectClass, string $factoryName, array $factoriesRegistered = []): void
+    public function can_create_factory_with_embeddable(string $objectClass, string $objectFactoryName, string $embeddableObjectFactoryName, array $factoriesRegistered = []): void
     {
-        $kernel = Kernel::create(factoriesRegistered: $factoriesRegistered);
-        $kernel->boot();
-
-        $tester = new CommandTester((new Application($kernel))->find('make:factory'));
+        $tester = $this->makeFactoryCommandTester(['factoriesRegistered' => $factoriesRegistered]);
 
         $tester->execute(['class' => $objectClass, '--all-fields' => true]);
 
-        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile("src/Factory/{$factoryName}.php"));
+        $this->assertFileExists(self::tempFile("src/Factory/{$embeddableObjectFactoryName}.php"));
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile("src/Factory/{$objectFactoryName}.php"));
     }
 
     public function objectsWithEmbeddableProvider(): iterable
     {
         if (\getenv('USE_ORM')) {
-            yield 'orm' => [Contact::class, 'ContactFactory', [AddressFactory::class]];
+            yield 'orm' => [Contact::class, 'ContactFactory', 'AddressFactory'];
         }
 
         if (\getenv('USE_ODM')) {
-            yield 'odm' => [ODMPost::class, 'ODMPostFactory', [CommentFactory::class, UserFactory::class]];
+            yield 'odm' => [ODMPost::class, 'ODMPostFactory', 'ODMUserFactory', [CommentFactory::class]];
         }
+    }
+
+    protected static function createKernel(array $options = []): KernelInterface
+    {
+        return Kernel::create(
+            enableDoctrine: $options['enableDoctrine'] ?? true,
+            factoriesRegistered: $options['factoriesRegistered'] ?? []
+        );
     }
 
     private function emulatePHPStanEnabled(): void
     {
         \mkdir(\dirname(self::PHPSTAN_PATH), 0777, true);
         \touch(self::PHPSTAN_PATH);
+    }
+
+    private function makeFactoryCommandTester(array $factoriesRegistered = []): CommandTester
+    {
+        return new CommandTester(
+            (new Application(
+                self::bootKernel($factoriesRegistered)
+            ))->find('make:factory')
+        );
     }
 }

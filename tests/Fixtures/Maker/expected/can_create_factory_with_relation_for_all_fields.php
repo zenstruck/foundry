@@ -46,7 +46,7 @@ final class EntityWithRelationsFactory extends ModelFactory
     {
         return [
             'manyToOne' => CategoryFactory::new(),
-            'manyToOneWithNotExistingFactory' => null, // TODO add Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Brand type manually
+            'manyToOneWithNotExistingFactory' => BrandFactory::new(),
             'oneToOne' => CategoryFactory::new(),
         ];
     }

@@ -2,6 +2,8 @@
 
 namespace Zenstruck\Foundry\Bundle\Maker\Factory;
 
+use Symfony\Bundle\MakerBundle\Str;
+use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\RepositoryProxy;
@@ -18,7 +20,7 @@ final class MakeFactoryData
     /** @var non-empty-list<MakeFactoryPHPDocMethod> */
     private array $methodsInPHPDoc;
 
-    public function __construct(private \ReflectionClass $object, private ?\ReflectionClass $repository, private bool $withPHPStanEnabled, private bool $persisted)
+    public function __construct(private \ReflectionClass $object, private ClassNameDetails $factoryClassNameDetails, private ?\ReflectionClass $repository, private bool $withPHPStanEnabled, private bool $persisted)
     {
         $this->uses = [
             ModelFactory::class,
@@ -44,6 +46,11 @@ final class MakeFactoryData
         return $this->object->getShortName();
     }
 
+    public function getFactoryClassNameDetails(): ClassNameDetails
+    {
+        return $this->factoryClassNameDetails;
+    }
+
     /** @return class-string */
     public function getObjectFullyQualifiedClassName(): string
     {
@@ -65,8 +72,14 @@ final class MakeFactoryData
         return $this->withPHPStanEnabled;
     }
 
+    /** @param class-string $use */
     public function addUse(string $use): void
     {
+        // prevent to add an un-needed "use"
+        if (Str::getNamespace($this->factoryClassNameDetails->getFullName()) === Str::getNamespace($use)) {
+            return;
+        }
+
         if (!\in_array($use, $this->uses, true)) {
             $this->uses[] = $use;
         }

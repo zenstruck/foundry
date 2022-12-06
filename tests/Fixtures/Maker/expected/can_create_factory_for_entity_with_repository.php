@@ -64,7 +64,7 @@ final class PostFactory extends ModelFactory
     {
         return [
             'body' => self::faker()->text(),
-            'createdAt' => null, // TODO add DATETIME type manually
+            'createdAt' => self::faker()->dateTime(),
             'title' => self::faker()->text(255),
             'viewCount' => self::faker()->randomNumber(),
         ];

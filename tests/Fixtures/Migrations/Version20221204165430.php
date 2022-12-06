@@ -38,24 +38,6 @@ final class Version20221204165430 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE entity_with_relations DROP FOREIGN KEY FK_A9C9EC96FF92FDCA');
-        $this->addSql('ALTER TABLE productcategory_product DROP FOREIGN KEY FK_5BC2A6A2E26A32B1');
-        $this->addSql('ALTER TABLE productcategory_product DROP FOREIGN KEY FK_5BC2A6A24584665A');
-        $this->addSql('ALTER TABLE product_cascade DROP FOREIGN KEY FK_D7FE16D844F5D008');
-        $this->addSql('ALTER TABLE product_producttag DROP FOREIGN KEY FK_B32B4BC24584665A');
-        $this->addSql('ALTER TABLE product_producttag DROP FOREIGN KEY FK_B32B4BC291B6F4D1');
-        $this->addSql('ALTER TABLE review_cascade DROP FOREIGN KEY FK_9DC9B99F4584665A');
-        $this->addSql('ALTER TABLE variant_cascade DROP FOREIGN KEY FK_6982202E4584665A');
-        $this->addSql('ALTER TABLE variant_cascade DROP FOREIGN KEY FK_6982202E3DA5256D');
-        $this->addSql('DROP TABLE brand_cascade');
-        $this->addSql('DROP TABLE category_cascade');
-        $this->addSql('DROP TABLE productcategory_product');
-        $this->addSql('DROP TABLE image_cascade');
-        $this->addSql('DROP TABLE product_cascade');
-        $this->addSql('DROP TABLE product_producttag');
-        $this->addSql('DROP TABLE review_cascade');
-        $this->addSql('DROP TABLE tag_cascade');
-        $this->addSql('DROP TABLE variant_cascade');
     }
 
     public function isTransactional(): bool

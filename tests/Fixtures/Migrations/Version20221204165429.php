@@ -52,38 +52,6 @@ final class Version20221204165429 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE comments DROP FOREIGN KEY FK_5F9E962AA76ED395');
-        $this->addSql('ALTER TABLE comments DROP FOREIGN KEY FK_5F9E962A4B89032C');
-        $this->addSql('ALTER TABLE entity_for_relations DROP FOREIGN KEY FK_C63B81552E3A088A');
-        $this->addSql('ALTER TABLE entity_with_relations DROP FOREIGN KEY FK_A9C9EC969017888C');
-        $this->addSql('ALTER TABLE entity_with_relations DROP FOREIGN KEY FK_A9C9EC96DA2BFB84');
-        $this->addSql('ALTER TABLE entity_with_relations DROP FOREIGN KEY FK_A9C9EC962E3A088A');
-        $this->addSql('ALTER TABLE entity_with_relations DROP FOREIGN KEY FK_A9C9EC968097B86C');
-        $this->addSql('ALTER TABLE entity_with_relations DROP FOREIGN KEY FK_A9C9EC968572C13C');
-        $this->addSql('ALTER TABLE entitywithrelations_category DROP FOREIGN KEY FK_CD6EBFAB337AA4F7');
-        $this->addSql('ALTER TABLE entitywithrelations_category DROP FOREIGN KEY FK_CD6EBFAB12469DE2');
-        $this->addSql('ALTER TABLE posts DROP FOREIGN KEY FK_885DBAFA12469DE2');
-        $this->addSql('ALTER TABLE posts DROP FOREIGN KEY FK_885DBAFAEA0D7566');
-        $this->addSql('ALTER TABLE posts DROP FOREIGN KEY FK_885DBAFAD126F51');
-        $this->addSql('ALTER TABLE posts DROP FOREIGN KEY FK_885DBAFA20DBE482');
-        $this->addSql('ALTER TABLE post_tag DROP FOREIGN KEY FK_5ACE3AF04B89032C');
-        $this->addSql('ALTER TABLE post_tag DROP FOREIGN KEY FK_5ACE3AF0BAD26311');
-        $this->addSql('ALTER TABLE post_tag_secondary DROP FOREIGN KEY FK_1515F0214B89032C');
-        $this->addSql('ALTER TABLE post_tag_secondary DROP FOREIGN KEY FK_1515F021BAD26311');
-        $this->addSql('ALTER TABLE post_post DROP FOREIGN KEY FK_93DF0B866FA89B16');
-        $this->addSql('ALTER TABLE post_post DROP FOREIGN KEY FK_93DF0B86764DCB99');
-        $this->addSql('DROP TABLE categories');
-        $this->addSql('DROP TABLE comments');
-        $this->addSql('DROP TABLE contacts');
-        $this->addSql('DROP TABLE entity_for_relations');
-        $this->addSql('DROP TABLE entity_with_relations');
-        $this->addSql('DROP TABLE entitywithrelations_category');
-        $this->addSql('DROP TABLE posts');
-        $this->addSql('DROP TABLE post_tag');
-        $this->addSql('DROP TABLE post_tag_secondary');
-        $this->addSql('DROP TABLE post_post');
-        $this->addSql('DROP TABLE tags');
-        $this->addSql('DROP TABLE users');
     }
 
     public function isTransactional(): bool

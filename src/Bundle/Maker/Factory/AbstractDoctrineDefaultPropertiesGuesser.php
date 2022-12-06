@@ -1,46 +1,54 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Zenstruck\Foundry\Bundle\Maker\Factory;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
-use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
-/** @internal  */
+/**
+ * @internal
+ */
 abstract class AbstractDoctrineDefaultPropertiesGuesser implements DefaultPropertiesGuesser
 {
-    public function __construct(protected ManagerRegistry $managerRegistry, private FactoryFinder $factoryFinder)
+    public function __construct(protected ManagerRegistry $managerRegistry, private FactoryClassMap $factoryClassMap, private FactoryGenerator $factoryGenerator)
     {
     }
 
     /** @param class-string $fieldClass */
-    protected function addDefaultValueUsingFactory(MakeFactoryData $makeFactoryData, string $fieldName, string $fieldClass, bool $isMultiple = false): void
+    protected function addDefaultValueUsingFactory(SymfonyStyle $io, MakeFactoryData $makeFactoryData, MakeFactoryQuery $makeFactoryQuery, string $fieldName, string $fieldClass): void
     {
-        if (!$factoryClass = $this->factoryFinder->getFactoryForClass($fieldClass)) {
-            $makeFactoryData->addDefaultProperty(\lcfirst($fieldName), "null, // TODO add {$fieldClass} type manually");
+        if (!$factoryClass = $this->factoryClassMap->getFactoryForClass($fieldClass)) {
+            if ($makeFactoryQuery->generateAllFactories() || $io->confirm("A factory for class \"{$fieldClass}\" is missing for field {$makeFactoryData->getObjectShortName()}::\${$fieldName}. Do you want to create it?")) {
+                $factoryClass = $this->factoryGenerator->generateFactory($io, $makeFactoryQuery->withClass($fieldClass));
+            } else {
+                $makeFactoryData->addDefaultProperty(\lcfirst($fieldName), "null, // TODO add {$fieldClass} type manually");
 
-            return;
+                return;
+            }
         }
 
-        $factoryMethod = $isMultiple ? 'new()->many(5)' : 'new()';
+        $makeFactoryData->addUse($factoryClass);
 
-        $factory = new \ReflectionClass($factoryClass);
-        $makeFactoryData->addUse($factory->getName());
-        $makeFactoryData->addDefaultProperty(\lcfirst($fieldName), "{$factory->getShortName()}::{$factoryMethod},");
+        $factoryShortName = \mb_substr($factoryClass, \mb_strrpos($factoryClass, '\\') + 1);
+        $makeFactoryData->addDefaultProperty(\lcfirst($fieldName), "{$factoryShortName}::new(),");
     }
 
     protected function getClassMetadata(MakeFactoryData $makeFactoryData): ClassMetadata
     {
         $class = $makeFactoryData->getObjectFullyQualifiedClassName();
 
-        $em = $this->managerRegistry->getManagerForClass($class);
+        foreach ($this->managerRegistry->getManagers() as $manager) {
+            try {
+                $classMetadata = $manager->getClassMetadata($class);
+            } catch (\Throwable) {
+            }
+        }
 
-        if (!$em instanceof ObjectManager) {
+        if (!isset($classMetadata)) {
             throw new \InvalidArgumentException("\"{$class}\" is not a valid Doctrine class name.");
         }
 
-        return $em->getClassMetadata($class);
+        return $classMetadata;
     }
 }

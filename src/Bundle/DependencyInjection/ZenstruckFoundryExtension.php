@@ -25,6 +25,7 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 
         $loader->load('services.xml');
+        $loader->load('maker.xml');
 
         $container->registerForAutoconfiguration(Story::class)
             ->addTag('foundry.story')

@@ -3,13 +3,14 @@
 namespace Zenstruck\Foundry\Bundle\Maker\Factory;
 
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * @internal
  */
 class ODMDefaultPropertiesGuesser extends AbstractDoctrineDefaultPropertiesGuesser
 {
-    public function __invoke(MakeFactoryData $makeFactoryData, bool $allFields): void
+    public function __invoke(SymfonyStyle $io, MakeFactoryData $makeFactoryData, MakeFactoryQuery $makeFactoryQuery): void
     {
         $metadata = $this->getClassMetadata($makeFactoryData);
 
@@ -24,17 +25,20 @@ class ODMDefaultPropertiesGuesser extends AbstractDoctrineDefaultPropertiesGuess
                 continue;
             }
 
-            $fieldName = $item['fieldName'];
             /** @phpstan-ignore-next-line */
             $isMultiple = ODMClassMetadata::MANY === $item['type'];
-
-            $isNullable = $makeFactoryData->getObject()->getProperty($fieldName)->getType()?->allowsNull() ?? true;
-
-            if (!$allFields && ($isMultiple || $isNullable)) {
+            if ($isMultiple) {
                 continue;
             }
 
-            $this->addDefaultValueUsingFactory($makeFactoryData, $fieldName, $item['targetDocument'], $isMultiple);
+            $fieldName = $item['fieldName'];
+            $isNullable = $makeFactoryData->getObject()->getProperty($fieldName)->getType()?->allowsNull() ?? true;
+
+            if (!$makeFactoryQuery->isAllFields() && $isNullable) {
+                continue;
+            }
+
+            $this->addDefaultValueUsingFactory($io, $makeFactoryData, $makeFactoryQuery, $fieldName, $item['targetDocument']);
         }
     }
 

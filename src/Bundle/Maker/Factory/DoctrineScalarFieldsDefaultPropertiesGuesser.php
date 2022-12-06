@@ -1,11 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Zenstruck\Foundry\Bundle\Maker\Factory;
 
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo as ORMClassMetadata;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * @internal
@@ -21,6 +20,7 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
         'DATE' => 'self::faker()->dateTime(),',
         'DATE_MUTABLE' => 'self::faker()->dateTime(),',
         'DATE_IMMUTABLE' => '\DateTimeImmutable::createFromMutable(self::faker()->dateTime()),',
+        'DATETIME' => 'self::faker()->dateTime(),',
         'DATETIME_MUTABLE' => 'self::faker()->dateTime(),',
         'DATETIME_IMMUTABLE' => '\DateTimeImmutable::createFromMutable(self::faker()->dateTime()),',
         'DATETIMETZ_MUTABLE' => 'self::faker()->dateTime(),',
@@ -39,7 +39,7 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
         'TIME_IMMUTABLE' => '\DateTimeImmutable::createFromMutable(self::faker()->datetime()),',
     ];
 
-    public function __invoke(MakeFactoryData $makeFactoryData, bool $allFields): void
+    public function __invoke(SymfonyStyle $io, MakeFactoryData $makeFactoryData, MakeFactoryQuery $makeFactoryQuery): void
     {
         /** @var ODMClassMetadata|ORMClassMetadata $metadata */
         $metadata = $this->getClassMetadata($makeFactoryData);
@@ -60,7 +60,7 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
             }
 
             // ignore identifiers and nullable fields
-            if ((!$allFields && ($property['nullable'] ?? false)) || \in_array($fieldName, $ids, true)) {
+            if ((!$makeFactoryQuery->isAllFields() && ($property['nullable'] ?? false)) || \in_array($fieldName, $ids, true)) {
                 continue;
             }
 
