@@ -1,6 +1,7 @@
 /composer.lock
 /phpunit.xml
 /phpunit-dama-doctrine.xml
+/behat.yml
 /vendor/
 /bin/tools/*/vendor/
 /build/

@@ -6,6 +6,7 @@ use DAMA\DoctrineTestBundle\DAMADoctrineTestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
+use FriendsOfBehat\SymfonyExtension\Bundle\FriendsOfBehatSymfonyExtensionBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\MakerBundle\MakerBundle;
@@ -79,6 +80,8 @@ class Kernel extends BaseKernel
         if ($this->enableDoctrine && \getenv('USE_ODM')) {
             yield new DoctrineMongoDBBundle();
         }
+
+        yield new FriendsOfBehatSymfonyExtensionBundle();
     }
 
     public function getCacheDir(): string

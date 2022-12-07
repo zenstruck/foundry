@@ -28,6 +28,7 @@
         "doctrine/doctrine-migrations-bundle": "^2.2|^3.0",
         "doctrine/mongodb-odm-bundle": "^3.1|^4.2",
         "doctrine/orm": "^2.7",
+        "friends-of-behat/symfony-extension": "^2.4",
         "matthiasnoback/symfony-dependency-injection-test": "^4.1",
         "symfony/framework-bundle": "^4.4|^5.0|^6.0",
         "symfony/maker-bundle": "^1.30",
@@ -53,6 +54,9 @@
             "App\\": "tests/Fixtures/tmp/src",
             "App\\Tests\\": "tests/Fixtures/tmp/tests"
         }
+    },
+    "suggest": {
+        "friends-of-behat/symfony-extension": "To use the Behat contexts"
     },
     "extra": {
         "bamarni-bin": {

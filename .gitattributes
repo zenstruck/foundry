@@ -15,4 +15,6 @@
 /phpstan.neon                   export-ignore
 /phpunit-dama-doctrine.xml.dist export-ignore
 /phpunit.xml.dist               export-ignore
+/behat.yml.dist                 export-ignore
 /tests                          export-ignore
+/features                       export-ignore

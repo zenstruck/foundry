@@ -1,0 +1,11 @@
+default:
+    suites:
+        default:
+            contexts:
+                - Zenstruck\Foundry\Tests\Behat\TestContext
+                - Zenstruck\Foundry\Test\Behat\FactoriesContext
+    extensions:
+        FriendsOfBehat\SymfonyExtension:
+            kernel:
+                class: Zenstruck\Foundry\Tests\Fixtures\Kernel
+            bootstrap: tests/bootstrap.php
