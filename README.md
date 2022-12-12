@@ -3,6 +3,7 @@
 [![CI Status](https://github.com/zenstruck/foundry/workflows/CI/badge.svg)](https://github.com/zenstruck/foundry/actions?query=workflow%3ACI)
 [![Code Coverage](https://codecov.io/gh/zenstruck/foundry/branch/master/graph/badge.svg?token=77JIFYSUC5)](https://codecov.io/gh/zenstruck/foundry)
 [![Latest Version](https://img.shields.io/packagist/v/zenstruck/foundry.svg)](https://packagist.org/packages/zenstruck/foundry)
+[![Downloads](https://img.shields.io/packagist/dm/zenstruck/foundry)](https://packagist.org/packages/zenstruck/foundry)
 
 Foundry makes creating fixtures data fun again, via an expressive, auto-completable, on-demand fixtures system with
 Symfony and Doctrine:
