@@ -59,12 +59,16 @@ composer                       Run composer command
 clear                          Start from a fresh install (needed if vendors have already been installed with another php version)
 ```
 
-You can run each `make test` target with a special argument `filter`:
+Use double-dash to pass any PHPUnit options or arguments with `make`:
 ```shell
-$ make test filter=FactoryTest
+$ make test -- --filter=FactoryTest
+$ make test -- --stop-on-failure
 ```
 
-which will use PHPUnit's `--filter` option.
+Same syntax is available for composer:
+```shell
+$ make composer -- info symfony/*
+```
 
 #### Run tests in different environments
 
@@ -73,7 +77,8 @@ You can create a `.env` file to change the context in which tests will execute:
 USE_ORM=1
 USE_ODM=1
 USE_DAMA_DOCTRINE_TEST_BUNDLE=1
-SYMFONY_REQUIRE=6.0.*
+SYMFONY_REQUIRE=5.4.* # allowed values: 5.4.* | 6.0.* | 6.1.* | 6.2.*
+PHP_VERSION=8.0 # allowed values: 8.0 | 8.1 | 8.2
 ```
 
 ### Change docker's ports
@@ -89,7 +94,7 @@ MONGO_PORT=27018
 
 You can execute any command into the php container using docker compose:
 ```shell
-$ docker-compose exec php [you commmand] # or "docker compose" depending on your docker compose version
+$ docker-compose exec php [your commmand] # or "docker compose" depending on your compose version
 ```
 
 ### Using xdebug with PhpStorm
