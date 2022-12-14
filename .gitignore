@@ -10,3 +10,4 @@
 /var/
 /docs/output/
 /.env
+/docker/.makefile
