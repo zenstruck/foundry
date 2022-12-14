@@ -205,7 +205,7 @@ final class MakeFactoryTest extends MakerTestCase
 
         $output = $tester->getDisplay();
 
-        $this->assertStringContainsString('Not persisted class to create a factory for:', $output);
+        $this->assertStringContainsString('Not persisted fully qualified class name to create a factory for:', $output);
         $this->assertStringContainsString('[ERROR] Given class "Foo" does not exist', $output);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/SomeObjectFactory.php'));
