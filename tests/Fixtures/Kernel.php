@@ -12,9 +12,12 @@ use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\MakerBundle\MakerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
+use Zenstruck\Foundry\Test\Behat\FactoriesContext;
 use Zenstruck\Foundry\Test\ORMDatabaseResetter;
+use Zenstruck\Foundry\Tests\Behat\TestContext;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\AddressFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryServiceFactory;
@@ -100,6 +103,10 @@ class Kernel extends BaseKernel
             ->setAutoconfigured(true)
             ->setAutowired(true)
         ;
+
+        $c->register(TestContext::class)
+            ->setAutoconfigured(true)
+            ->setAutowired(true);
 
         foreach ($this->factoriesRegistered as $factory) {
             $c->register($factory)

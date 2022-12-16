@@ -16,6 +16,7 @@ use Zenstruck\Foundry\Bundle\Command\StubMakeStory;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Story;
 use Zenstruck\Foundry\Test\Behat\FactoriesContext;
+use Zenstruck\Foundry\Test\Behat\ResetDatabaseContext;
 use Zenstruck\Foundry\Test\ORMDatabaseResetter;
 
 /**
@@ -54,10 +55,8 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
         }
 
         if (self::isBundleLoaded($container, FriendsOfBehatSymfonyExtensionBundle::class)) {
-            $container->register('.zenstruck_foundry.behat.factories_context', FactoriesContext::class)
-                ->addArgument(new Reference('service_container'))
-                ->addTag('fob.context')
-            ;
+            $container->register(FactoriesContext::class)->addArgument(new Reference('service_container'))->setAutoconfigured(true);
+            $container->register(ResetDatabaseContext::class)->setAutowired(true)->setAutoconfigured(true);
         }
     }
 

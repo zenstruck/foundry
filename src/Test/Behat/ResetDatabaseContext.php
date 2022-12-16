@@ -3,7 +3,7 @@
 namespace Zenstruck\Foundry\Test\Behat;
 
 use Behat\Behat\Context\Context;
-use Psr\Container\ContainerInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Test\DatabaseResetter;
 
 /**
@@ -11,23 +11,23 @@ use Zenstruck\Foundry\Test\DatabaseResetter;
  */
 final class ResetDatabaseContext implements Context
 {
-    public function __construct(private ContainerInterface $container)
+    public function __construct(private KernelInterface $kernel)
     {
-    }
-
-    /**
-     * @BeforeSuite
-     */
-    public function resetDatabase(): void
-    {
-        DatabaseResetter::resetDatabase($this->container->get('kernel'));
     }
 
     /**
      * @BeforeScenario
      */
+    public function resetDatabase(): void
+    {
+        DatabaseResetter::resetDatabase($this->kernel);
+    }
+
+    /**
+     * @AfterScenario
+     */
     public function resetSchema(): void
     {
-        DatabaseResetter::resetSchema($this->container->get('kernel'));
+        DatabaseResetter::resetSchema($this->kernel);
     }
 }

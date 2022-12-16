@@ -11,17 +11,18 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 final class TestContext implements Context
 {
     /**
-     * @Given there is :count category
+     * @Given /^(?P<count>\d+) (?:category has|categories have) been created$/
+     * @When /^I create (?P<count>\d+) categor(?:y|ies)$/
      */
-    public function thereIsCategory(int $count): void
+    public function createCategories(int $count): void
     {
         CategoryFactory::createMany($count);
     }
 
     /**
-     * @Then there is :count category in the database
+     * @Then /^there should be (?P<count>\d+) categor(?:y|ies) in the database$/
      */
-    public function thereIsCategoryInTheDatabase(int $count): void
+    public function assertCategoryCount(int $count): void
     {
         CategoryFactory::assert()->count($count);
     }
