@@ -45,9 +45,8 @@ Each target will build and start the docker stack and install composer only if n
 
 ```shell
 $ make help
-validate                       Run fixcs, sca, full test suite and validate migrations
+validate                       Run sca, full test suite and validate migrations
 test                           Run PHPUnit tests suite
-fixcs                          Run PHP-CS-Fixer
 sca                            Run static analysis
 database-generate-migration    Generate new migration based on mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
 database-validate-mapping      Validate mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
