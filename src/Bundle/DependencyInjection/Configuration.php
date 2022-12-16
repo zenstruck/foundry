@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Bundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -25,15 +34,11 @@ final class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->info('Configure faker to be used by your factories.')
                     ->validate()
-                        ->ifTrue(static function(array $v) {
-                            return $v['locale'] && $v['service'];
-                        })
+                        ->ifTrue(static fn(array $v) => $v['locale'] && $v['service'])
                         ->thenInvalid('Cannot set faker locale when using custom service.')
                     ->end()
                     ->validate()
-                        ->ifTrue(static function(array $v) {
-                            return $v['seed'] && $v['service'];
-                        })
+                        ->ifTrue(static fn(array $v) => $v['seed'] && $v['service'])
                         ->thenInvalid('Cannot set faker seed when using custom service.')
                     ->end()
                     ->children()
@@ -58,21 +63,15 @@ final class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->info('Configure the default instantiator used by your factories.')
                     ->validate()
-                        ->ifTrue(static function(array $v) {
-                            return $v['service'] && $v['without_constructor'];
-                        })
+                        ->ifTrue(static fn(array $v) => $v['service'] && $v['without_constructor'])
                         ->thenInvalid('Cannot set "without_constructor" when using custom service.')
                     ->end()
                     ->validate()
-                        ->ifTrue(static function(array $v) {
-                            return $v['service'] && $v['allow_extra_attributes'];
-                        })
+                        ->ifTrue(static fn(array $v) => $v['service'] && $v['allow_extra_attributes'])
                         ->thenInvalid('Cannot set "allow_extra_attributes" when using custom service.')
                     ->end()
                     ->validate()
-                        ->ifTrue(static function(array $v) {
-                            return $v['service'] && $v['always_force_properties'];
-                        })
+                        ->ifTrue(static fn(array $v) => $v['service'] && $v['always_force_properties'])
                         ->thenInvalid('Cannot set "always_force_properties" when using custom service.')
                     ->end()
                     ->children()
