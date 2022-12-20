@@ -154,7 +154,7 @@ abstract class Story
     final protected function getState(string $name): Proxy
     {
         if (!\array_key_exists($name, $this->objects)) {
-            throw new \InvalidArgumentException(\sprintf('"%s" was not registered. Did you forget to call "%s::add()"?', $name, static::class));
+            throw new \InvalidArgumentException(\sprintf('"%s" was not registered. Did you forget to call "%s::addState()"?', $name, static::class));
         }
 
         return $this->objects[$name];
