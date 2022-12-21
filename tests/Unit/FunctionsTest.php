@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Tests\Unit;
 
 use Doctrine\Persistence\ManagerRegistry;
@@ -12,6 +21,7 @@ use Zenstruck\Foundry\RepositoryProxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
+
 use function Zenstruck\Foundry\create;
 use function Zenstruck\Foundry\create_many;
 use function Zenstruck\Foundry\faker;

@@ -1,11 +1,21 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
+
 use function Zenstruck\Foundry\factory;
 
 /**

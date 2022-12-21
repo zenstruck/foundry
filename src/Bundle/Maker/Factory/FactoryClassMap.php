@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Bundle\Maker\Factory;
 
 use Zenstruck\Foundry\ModelFactory;
@@ -22,7 +31,7 @@ final class FactoryClassMap
             \array_reduce(
                 \iterator_to_array($factories, preserve_keys: true),
                 static function(array $carry, ModelFactory $factory): array {
-                    $carry[\get_class($factory)] = $factory::getEntityClass();
+                    $carry[$factory::class] = $factory::getEntityClass();
 
                     return $carry;
                 },

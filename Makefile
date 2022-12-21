@@ -1,4 +1,4 @@
-.PHONY: $(filter-out vendor bin/tools/phpstan/vendor bin/tools/cs-fixer/vendor %,$(MAKECMDGOALS))
+.PHONY: $(filter-out vendor bin/tools/phpstan/vendor %,$(MAKECMDGOALS))
 
 .DEFAULT_GOAL := help
 
@@ -51,18 +51,10 @@ $(eval $(RUN_ARGS):;@:)
 help:
 	@fgrep -h "###" $(MAKEFILE_LIST) | fgrep -v fgrep | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-validate: fixcs sca test database-validate-mapping ### Run fixcs, sca, full test suite and validate migrations
+validate: sca test database-validate-mapping ### Run sca, full test suite and validate migrations
 
 test: vendor ### Run PHPUnit tests suite
 	@${DC_EXEC} -e USE_ORM=${USE_ORM} -e USE_ODM=${USE_ODM} ${PHP} vendor/bin/simple-phpunit --configuration ${PHPUNIT_CONFIG_FILE} $(ARGS)
-
-fixcs: bin/tools/cs-fixer/vendor ### Run PHP-CS-Fixer
-	@${DC_EXEC} -e PHP_CS_FIXER_IGNORE_ENV=1 ${PHP} php -d 'xdebug.mode=off' bin/tools/cs-fixer/vendor/friendsofphp/php-cs-fixer/php-cs-fixer --no-interaction --diff -v fix
-
-bin/tools/cs-fixer/vendor: bin/tools/cs-fixer/composer.json bin/tools/cs-fixer/composer.lock
-	@$(MAKE) --no-print-directory docker-start
-	@$(MAKE) --no-print-directory vendor
-	@$(MAKE) --no-print-directory composer bin cs-fixer install
 
 sca: bin/tools/phpstan/vendor ### Run static analysis
 	@${DOCKER_PHP} php -d 'xdebug.mode=off' bin/tools/phpstan/vendor/phpstan/phpstan/phpstan analyse
@@ -114,7 +106,7 @@ composer: ### Run composer command
 	@${DC_EXEC} ${PHP} php -d 'xdebug.mode=off' /usr/bin/composer $(ARGS)
 
 clear: ### Start from a fresh install (needed if vendors have already been installed with another php version)
-	rm -rf composer.lock bin/tools/phpstan/vendor/ bin/tools/cs-fixer/vendor/ vendor/
+	rm -rf composer.lock bin/tools/phpstan/vendor/ vendor/
 
 %: # black hole to prevent extra args warning
 	@.

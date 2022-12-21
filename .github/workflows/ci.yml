@@ -163,30 +163,6 @@ jobs:
       - name: Build docs
         run: bin/build-docs
 
-  cs-check:
-    name: PHP CS-Fixer check
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.0
-          coverage: none
-
-      - name: Install dependencies
-        uses: ramsey/composer-install@v2
-        with:
-          composer-options: --prefer-dist
-
-      - name: Install PHP CS-Fixer
-        run: composer bin cs-fixer install
-
-      - name: Run PHP CS-Fixer check
-        run: bin/tools/cs-fixer/vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --dry-run --diff
-
   static-analysis:
     name: Static Analysis
     runs-on: ubuntu-latest
@@ -229,7 +205,7 @@ jobs:
 
   push_docker_images:
     name: Push docker images after CI complete on main branch
-    needs: [tests, composer-validate, build-docs, cs-check, static-analysis, test-docker-stack]
+    needs: [tests, composer-validate, build-docs, static-analysis, test-docker-stack]
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/1.x' }}
     strategy:
@@ -251,3 +227,25 @@ jobs:
         run: ./docker/build.sh push ${{ matrix.php }}
         env:
           GITHUB_TOKEN: ${{ secrets.PACKAGE_PUSH_TOKEN }}
+
+  fixcs:
+    name: Run php-cs-fixer
+    needs: sync-with-template
+    if: (github.event_name == 'push' || github.event_name == 'schedule') && !startsWith(github.ref, 'refs/tags')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: zenstruck/.github@php-cs-fixer
+        with:
+          php: 8
+          key: ${{ secrets.GPG_PRIVATE_KEY }}
+          token: ${{ secrets.COMPOSER_TOKEN }}
+
+  sync-with-template:
+    name: Sync meta files
+    if: (github.event_name == 'push' || github.event_name == 'schedule') && !startsWith(github.ref, 'refs/tags')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: zenstruck/.github@sync-with-template
+        with:
+          key: ${{ secrets.GPG_PRIVATE_KEY }}
+          phpcsconfig: false
