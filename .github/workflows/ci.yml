@@ -248,4 +248,5 @@ jobs:
       - uses: zenstruck/.github@sync-with-template
         with:
           key: ${{ secrets.GPG_PRIVATE_KEY }}
+          token: ${{ secrets.COMPOSER_TOKEN }}
           phpcsconfig: false
