@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## [v1.25.0](https://github.com/zenstruck/foundry/releases/tag/v1.25.0)
+
+December 22nd, 2022 - [v1.24.1...v1.25.0](https://github.com/zenstruck/foundry/compare/v1.24.1...v1.25.0)
+
+* b101604 fix: ci by @kbond
+* cc22eac chore: fix cs (#386) by @kbond
+* e0944bb chore(ci): sync meta files and automate cs fixer (#386) by @kbond
+* d970d7a minor: Reference non deprecated method (#387) by @jongotlin
+* 7ab0740 minor(story): make `Story::getState()` protected (#385) by @kbond
+* 9a6f28e chore: availability to chose php version (#376) (#381) by @nikophil
+* aaeb6cf doc: display downloads badge (#380) by @kbond
+* e4d5fcb chore(ci): test on PHP 8.2 (#361) by @kbond
+* 555d547 chore: change test context with .env (#375) by @nikophil
+* 2eb52ed feat(make:factory): auto create missing factories (#372) by @nikophil
+* 6bc81b1 refactor: set all fixtures class name unique (#374) by @nikophil
+* 892ed14 feat(make:factory): improve Doctrine default fields guesser (#364) by @nikophil
+* 7b08360 doc: fix header (#370) by @seb-jean
+
 ## [v1.24.1](https://github.com/zenstruck/foundry/releases/tag/v1.24.1)
 
 November 29th, 2022 - [v1.24.0...v1.24.1](https://github.com/zenstruck/foundry/compare/v1.24.0...v1.24.1)
