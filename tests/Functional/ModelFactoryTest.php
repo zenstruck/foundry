@@ -379,6 +379,26 @@ abstract class ModelFactoryTest extends KernelTestCase
         $factory::assert()->exists(['name' => 'foo']);
     }
 
+    /**
+     * @test
+     */
+    public function can_assert_count_with_criteria(): void
+    {
+        $categoryFactoryClass = $this->categoryFactoryClass();
+
+        $categoryFactoryClass::createMany(2, ['name' => 'foo']);
+        $categoryFactoryClass::createMany(3, ['name' => 'bar']);
+
+        $categoryFactoryClass::assert()->count(2, ['name' => 'foo']);
+        $categoryFactoryClass::assert()->count(3, ['name' => 'bar']);
+        $categoryFactoryClass::assert()->count(0, ['name' => 'baz']);
+
+        $categoryFactoryClass::assert()->countGreaterThan(1, ['name' => 'foo']);
+        $categoryFactoryClass::assert()->countGreaterThanOrEqual(2, ['name' => 'foo']);
+        $categoryFactoryClass::assert()->countLessThan(3, ['name' => 'foo']);
+        $categoryFactoryClass::assert()->countLessThanOrEqual(2, ['name' => 'foo']);
+    }
+
     public function dataProviderYieldedFromFactoryCollection(): iterable
     {
         $categoryFactoryClass = $this->categoryFactoryClass();

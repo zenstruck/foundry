@@ -61,6 +61,16 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
         return \count($this->findAll());
     }
 
+    public function countWithCriteria(array $criteria): int
+    {
+        if ($this->repository instanceof EntityRepository) {
+            // use query to avoid loading all entities
+            return $this->repository->count($criteria);
+        }
+
+        return \count($this->findBy($criteria));
+    }
+
     public function getIterator(): \Traversable
     {
         // TODO: $this->repository is set to ObjectRepository, which is not
