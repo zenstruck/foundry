@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [v1.26.0](https://github.com/zenstruck/foundry/releases/tag/v1.26.0)
+
+December 29th, 2022 - [v1.25.0...v1.26.0](https://github.com/zenstruck/foundry/compare/v1.25.0...v1.26.0)
+
+* 79913c3 feat: create  parameter to RepositoryAssertions::count() methods (#390) by @nikophil
+* 4df0f40 chore: improve makefile (#382) by @nikophil
+* 49da6a0 feat(make:factory): use autocompletion for no persistence classes (#383) by @nikophil
+
 ## [v1.25.0](https://github.com/zenstruck/foundry/releases/tag/v1.25.0)
 
 December 22nd, 2022 - [v1.24.1...v1.25.0](https://github.com/zenstruck/foundry/compare/v1.24.1...v1.25.0)
