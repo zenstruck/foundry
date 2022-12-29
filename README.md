@@ -51,17 +51,19 @@ sca                            Run static analysis
 database-generate-migration    Generate new migration based on mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
 database-validate-mapping      Validate mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
 database-drop-schema           Drop database schema
+composer                       Run composer command
 docker-start                   Build and run containers
 docker-stop                    Stop containers
 docker-purge                   Purge containers
-composer                       Run composer command
-clear                          Start from a fresh install (needed if vendors have already been installed with another php version)
+clear                          Start from a fresh install (use it for troubleshooting)
 ```
 
 Use double-dash to pass any PHPUnit options or arguments with `make`:
 ```shell
-$ make test -- --filter=FactoryTest
 $ make test -- --stop-on-failure
+$ make test -- --filter FactoryTest
+# don't use "=" options value. ie: don't do this:
+$ make test -- --filter=FactoryTest
 ```
 
 Same syntax is available for composer:
@@ -102,6 +104,10 @@ The php container is shipped with xdebug activated. You can use step by step deb
 create a server called `FOUNDRY` in your PHP Remote Debug, with the IDE key `xdebug_foundry`
 
 ![PhpStorm with xdebug](docs/phpstorm-xdebug-config.png)
+
+### Troubleshooting
+
+IF any problem occurs with the docker stack or a `make` target, try to run `make clear`.
 
 ## Migrations
 
