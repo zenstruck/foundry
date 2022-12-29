@@ -198,9 +198,9 @@ abstract class ModelFactory extends Factory
     /**
      * @see RepositoryProxy::count()
      */
-    final public static function count(): int
+    final public static function count(array $criteria = []): int
     {
-        return static::repository()->count();
+        return static::repository()->count($criteria);
     }
 
     /**
