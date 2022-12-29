@@ -18,6 +18,8 @@ use Zenstruck\Assert;
  */
 final class RepositoryAssertions
 {
+    private static string $countWithoutCriteriaDeprecationMessagePattern = 'Passing the message to %s() as second parameter is deprecated. Use third parameter.';
+
     public function __construct(private RepositoryProxy $repository)
     {
     }
@@ -27,45 +29,75 @@ final class RepositoryAssertions
         return $this->count(0, $message);
     }
 
-    public function count(int $expectedCount, string $message = 'Expected count of {entity} repository ({actual}) to be {expected}.'): self
+    public function count(int $expectedCount, array|string $criteria = [], string $message = 'Expected count of {entity} repository ({actual}) to be {expected}.'): self
     {
-        Assert::that($this->repository)
-            ->hasCount($expectedCount, $message, ['entity' => $this->repository->getClassName()])
+        if (is_string($criteria)) {
+            trigger_deprecation('zenstruck/foundry', '1.26', self::$countWithoutCriteriaDeprecationMessagePattern, __METHOD__);
+
+            $message = $criteria;
+        }
+
+        Assert::that($this->repository->count(is_array($criteria) ? $criteria : []))
+            ->is($expectedCount, $message, ['entity' => $this->repository->getClassName()])
         ;
 
         return $this;
     }
 
-    public function countGreaterThan(int $expected, string $message = 'Expected count of {entity} repository ({actual}) to be greater than {expected}.'): self
+    public function countGreaterThan(int $expected, array|string $criteria = [], string $message = 'Expected count of {entity} repository ({actual}) to be greater than {expected}.'): self
     {
-        Assert::that($this->repository->count())
+        if (is_string($criteria)) {
+            trigger_deprecation('zenstruck/foundry', '1.26', self::$countWithoutCriteriaDeprecationMessagePattern, __METHOD__);
+
+            $message = $criteria;
+        }
+
+        Assert::that($this->repository->count(is_array($criteria) ? $criteria : []))
             ->isGreaterThan($expected, $message, ['entity' => $this->repository->getClassName()])
         ;
 
         return $this;
     }
 
-    public function countGreaterThanOrEqual(int $expected, string $message = 'Expected count of {entity} repository ({actual}) to be greater than or equal to {expected}.'): self
+    public function countGreaterThanOrEqual(int $expected, array|string $criteria = [], string $message = 'Expected count of {entity} repository ({actual}) to be greater than or equal to {expected}.'): self
     {
-        Assert::that($this->repository->count())
+        if (is_string($criteria)) {
+            trigger_deprecation('zenstruck/foundry', '1.26', self::$countWithoutCriteriaDeprecationMessagePattern, __METHOD__);
+
+            $message = $criteria;
+        }
+
+        Assert::that($this->repository->count(is_array($criteria) ? $criteria : []))
             ->isGreaterThanOrEqualTo($expected, $message, ['entity' => $this->repository->getClassName()])
         ;
 
         return $this;
     }
 
-    public function countLessThan(int $expected, string $message = 'Expected count of {entity} repository ({actual}) to be less than {expected}.'): self
+    public function countLessThan(int $expected, array|string $criteria = [], string $message = 'Expected count of {entity} repository ({actual}) to be less than {expected}.'): self
     {
-        Assert::that($this->repository->count())
+        if (is_string($criteria)) {
+            trigger_deprecation('zenstruck/foundry', '1.26', self::$countWithoutCriteriaDeprecationMessagePattern, __METHOD__);
+
+            $message = $criteria;
+        }
+
+        Assert::that($this->repository->count(is_array($criteria) ? $criteria : []))
             ->isLessThan($expected, $message, ['entity' => $this->repository->getClassName()])
         ;
 
         return $this;
     }
 
-    public function countLessThanOrEqual(int $expected, string $message = 'Expected count of {entity} repository ({actual}) to be less than or equal to {expected}.'): self
+    public function countLessThanOrEqual(int $expected, array|string $criteria = [], string $message = 'Expected count of {entity} repository ({actual}) to be less than or equal to {expected}.'): self
     {
-        Assert::that($this->repository->count())
+        if (is_string($criteria)) {
+            trigger_deprecation('zenstruck/foundry', '1.26', self::$countWithoutCriteriaDeprecationMessagePattern, __METHOD__);
+
+            $message = $criteria;
+        }
+
+        Assert::that($this->repository->count(is_array($criteria) ? $criteria : []))
             ->isLessThanOrEqualTo($expected, $message, ['entity' => $this->repository->getClassName()])
         ;
 

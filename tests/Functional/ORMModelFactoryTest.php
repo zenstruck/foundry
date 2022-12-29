@@ -526,6 +526,20 @@ final class ORMModelFactoryTest extends ModelFactoryTest
         $this->assertSame('another address', $object2->getValue());
     }
 
+    /**
+     * @test
+     */
+    public function can_count_based_on_a_relationship(): void
+    {
+        $category = CategoryFactory::createOne()->object();
+        PostFactory::createMany(2, ['category' => $category]);
+        PostFactory::createMany(2);
+
+        PostFactory::assert()->count(4);
+        PostFactory::assert()->count(2, ['category' => $category]);
+        self::assertSame(2, PostFactory::count(['category' => $category]));
+    }
+
     protected function categoryClass(): string
     {
         return Category::class;

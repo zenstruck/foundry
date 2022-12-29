@@ -306,6 +306,7 @@ Using your Factory
     PostFactory::truncate(); // empty the database table
 
     PostFactory::count(); // the number of persisted Posts
+    PostFactory::count(['category' => $category); // the number of persisted Posts with the given category
 
     PostFactory::all(); // Post[]|Proxy[] all the persisted Posts
 
@@ -1114,6 +1115,8 @@ Let's look at an example:
             'name' => 'John',
             'body' => 'My comment',
         ]);
+
+        CommentFactory::assert()->count(2, ['post' => $post]); // assert given $post has 2 comments
     }
 
 .. _enable-foundry-in-your-testcase:
