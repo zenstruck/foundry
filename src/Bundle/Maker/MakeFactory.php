@@ -22,10 +22,12 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Bundle\Maker\Factory\FactoryClassMap;
 use Zenstruck\Foundry\Bundle\Maker\Factory\FactoryGenerator;
 use Zenstruck\Foundry\Bundle\Maker\Factory\MakeFactoryQuery;
+use Zenstruck\Foundry\Bundle\Maker\Factory\NoPersistanceObjectsAutoCompleter;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -34,7 +36,7 @@ final class MakeFactory extends AbstractMaker
 {
     private const GENERATE_ALL_FACTORIES = 'All';
 
-    public function __construct(private ManagerRegistry $managerRegistry, private FactoryClassMap $factoryClassMap, private KernelInterface $kernel, private FactoryGenerator $factoryGenerator)
+    public function __construct(private ManagerRegistry $managerRegistry, private FactoryClassMap $factoryClassMap, private KernelInterface $kernel, private FactoryGenerator $factoryGenerator, private NoPersistanceObjectsAutoCompleter $noPersistanceObjectsAutoCompleter)
     {
     }
 
@@ -91,9 +93,9 @@ final class MakeFactory extends AbstractMaker
         }
 
         if ($input->getOption('no-persistence')) {
-            $class = $io->ask(
-                'Not persisted class to create a factory for',
-                validator: static function(string $class) {
+            $question = new Question('Not persisted fully qualified class name to create a factory for');
+            $question->setValidator(
+                static function(string $class) {
                     if (!\class_exists($class)) {
                         throw new RuntimeCommandException("Given class \"{$class}\" does not exist.");
                     }
@@ -101,6 +103,8 @@ final class MakeFactory extends AbstractMaker
                     return $class;
                 }
             );
+            $question->setAutocompleterValues($this->noPersistanceObjectsAutoCompleter->getAutocompleteValues());
+            $class = $io->askQuestion($question);
         } else {
             $argument = $command->getDefinition()->getArgument('class');
 

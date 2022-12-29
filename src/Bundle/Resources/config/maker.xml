@@ -10,6 +10,7 @@
             <argument type="service" id=".zenstruck_foundry.maker.factory.factory_class_map" />
             <argument type="service" id="kernel" />
             <argument type="service" id=".zenstruck_foundry.maker.factory.generator" />
+            <argument type="service" id=".zenstruck_foundry.maker.factory.autoCompleter" />
             <tag name="maker.command" />
         </service>
 
@@ -51,6 +52,10 @@
             <argument type="service" id="kernel" />
             <argument type="tagged_iterator" tag="foundry.make_factory.default_properties_guesser" />
             <argument type="service" id=".zenstruck_foundry.maker.factory.factory_class_map" />
+        </service>
+
+        <service id=".zenstruck_foundry.maker.factory.autoCompleter" class="Zenstruck\Foundry\Bundle\Maker\Factory\NoPersistanceObjectsAutoCompleter">
+            <argument>%kernel.project_dir%</argument>
         </service>
     </services>
 </container>
