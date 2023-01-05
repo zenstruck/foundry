@@ -397,6 +397,8 @@ abstract class ModelFactoryTest extends KernelTestCase
         $categoryFactoryClass::assert()->countGreaterThanOrEqual(2, ['name' => 'foo']);
         $categoryFactoryClass::assert()->countLessThan(3, ['name' => 'foo']);
         $categoryFactoryClass::assert()->countLessThanOrEqual(2, ['name' => 'foo']);
+
+        $categoryFactoryClass::assert()->empty(['name' => 'baz']);
     }
 
     public function dataProviderYieldedFromFactoryCollection(): iterable
