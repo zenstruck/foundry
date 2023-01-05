@@ -24,9 +24,15 @@ final class RepositoryAssertions
     {
     }
 
-    public function empty(string $message = 'Expected {entity} repository to be empty but it has {actual} items.'): self
+    public function empty(array|string $criteria = [], string $message = 'Expected {entity} repository to be empty but it has {actual} items.'): self
     {
-        return $this->count(0, $message);
+        if (\is_string($criteria)) {
+            trigger_deprecation('zenstruck/foundry', '1.26', 'Passing the message to %s() as first parameter is deprecated. Use second parameter.', __METHOD__);
+
+            $message = $criteria;
+        }
+
+        return $this->count(0, \is_array($criteria) ? $criteria : [], $message);
     }
 
     public function count(int $expectedCount, array|string $criteria = [], string $message = 'Expected count of {entity} repository ({actual}) to be {expected}.'): self
