@@ -80,7 +80,7 @@ jobs:
             CONFIGURATION="--configuration phpunit-dama-doctrine.xml.dist"
           fi
 
-          vendor/bin/simple-phpunit -v ${CONFIGURATION}
+          vendor/bin/simple-phpunit ${CONFIGURATION}
         env:
           USE_ORM: ${{ matrix.use-orm }}
           USE_ODM: ${{ matrix.use-odm }}

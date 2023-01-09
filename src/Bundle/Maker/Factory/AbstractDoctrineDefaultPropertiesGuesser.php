@@ -13,6 +13,7 @@ namespace Zenstruck\Foundry\Bundle\Maker\Factory;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
+use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
@@ -39,7 +40,7 @@ abstract class AbstractDoctrineDefaultPropertiesGuesser implements DefaultProper
 
         $makeFactoryData->addUse($factoryClass);
 
-        $factoryShortName = \mb_substr($factoryClass, \mb_strrpos($factoryClass, '\\') + 1);
+        $factoryShortName = Str::getShortClassName($factoryClass);
         $makeFactoryData->addDefaultProperty(\lcfirst($fieldName), "{$factoryShortName}::new(),");
     }
 

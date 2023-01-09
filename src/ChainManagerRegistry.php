@@ -13,6 +13,7 @@ namespace Zenstruck\Foundry;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\MappingException;
+use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 
@@ -31,7 +32,7 @@ final class ChainManagerRegistry implements ManagerRegistry
         foreach ($this->managerRegistries as $managerRegistry) {
             try {
                 return $managerRegistry->getRepository($persistentObject, $persistentManagerName);
-            } catch (MappingException) {
+            } catch (MappingException|ORMMappingException) {
                 // the class is not managed by the current manager
             }
         }

@@ -44,6 +44,12 @@ class ObjectDefaultPropertiesGuesser implements DefaultPropertiesGuesser
 
             $value = \sprintf('null, // TODO add %svalue manually', $type ? "{$type} " : '');
 
+            if (PHP_VERSION_ID >= 80100 && enum_exists($type ?? '')) {
+                $makeFactoryData->addEnumDefaultProperty($property->getName(), $type);
+
+                continue;
+            }
+
             if (\array_key_exists($type ?? '', self::DEFAULTS_FOR_NOT_PERSISTED)) {
                 $value = self::DEFAULTS_FOR_NOT_PERSISTED[$type];
             }

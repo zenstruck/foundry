@@ -13,6 +13,7 @@ namespace Zenstruck\Foundry\Tests\Functional\Bundle\Maker;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
+use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMComment;
@@ -23,6 +24,8 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\EntityWithRelations;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post as ORMPost;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
+use Zenstruck\Foundry\Tests\Fixtures\PHP81\DocumentWithEnum;
+use Zenstruck\Foundry\Tests\Fixtures\PHP81\EntityWithEnum;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\EntityForRelationsFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\CommentFactory;
@@ -420,6 +423,34 @@ final class MakeFactoryTest extends MakerTestCase
         if (\getenv('USE_ODM')) {
             yield 'odm' => [ODMPost::class, 'ODMPostFactory', 'ODMUserFactory', [CommentFactory::class]];
         }
+    }
+
+    /**
+     * @test
+     * @requires PHP 8.1
+     * @dataProvider canCreateFactoryWithDefaultEnumProvider
+     */
+    public function can_create_factory_with_default_enum(string $class, bool $noPersistence = false): void
+    {
+        $tester = $this->makeFactoryCommandTester();
+
+        $tester->execute(['class' => $class, '--no-persistence' => $noPersistence]);
+
+        $factoryClass = Str::getShortClassName($class);
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile("src/Factory/{$factoryClass}Factory.php"));
+    }
+
+    public function canCreateFactoryWithDefaultEnumProvider(): iterable
+    {
+        if (\getenv('USE_ORM')) {
+            yield 'orm' => [EntityWithEnum::class];
+        }
+
+        if (\getenv('USE_ODM')) {
+            yield 'odm' => [DocumentWithEnum::class];
+        }
+
+        yield 'without persistance' => [EntityWithEnum::class, true];
     }
 
     protected static function createKernel(array $options = []): KernelInterface

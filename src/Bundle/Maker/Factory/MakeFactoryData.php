@@ -126,4 +126,23 @@ final class MakeFactoryData
 
         return $methodsInPHPDoc;
     }
+
+    public function addEnumDefaultProperty(string $propertyName, string $enumClass): void
+    {
+        if (PHP_VERSION_ID < 80100) {
+            throw new \LogicException('Cannot add enum for php version inferior than 8.1');
+        }
+
+        if (!enum_exists($enumClass)) {
+            throw new \InvalidArgumentException("Enum of class \"$enumClass\" does not exist.");
+        }
+
+        $this->addUse($enumClass);
+
+        $enumShortClassName = Str::getShortClassName($enumClass);
+        $this->addDefaultProperty(
+            $propertyName,
+            "self::faker()->randomElement({$enumShortClassName}::cases()),"
+        );
+    }
 }

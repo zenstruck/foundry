@@ -8,7 +8,11 @@ use Doctrine\Migrations\DependencyFactory;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMSetup;
 
-$ORMconfig = ORMSetup::createAnnotationMetadataConfiguration(['/app/tests/Fixtures/Entity'], true);
+$entities = ['/app/tests/Fixtures/Entity'];
+if (PHP_VERSION_ID >= 80100) {
+    $entities[] = '/app/tests/Fixtures/PHP81';
+}
+$ORMconfig = ORMSetup::createAnnotationMetadataConfiguration($entities, true);
 $entityManager = EntityManager::create(['memory' => true, 'url' => getenv('DATABASE_URL')], $ORMconfig);
 
 return DependencyFactory::fromEntityManager(
