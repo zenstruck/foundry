@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [v1.27.0](https://github.com/zenstruck/foundry/releases/tag/v1.27.0)
+
+January 9th, 2023 - [v1.26.0...v1.27.0](https://github.com/zenstruck/foundry/compare/v1.26.0...v1.27.0)
+
+* 7b97ac2 feat: add $criteria param to RepositoryAssertions::empty() (#391) by @nikophil
+
 ## [v1.26.0](https://github.com/zenstruck/foundry/releases/tag/v1.26.0)
 
 December 29th, 2022 - [v1.25.0...v1.26.0](https://github.com/zenstruck/foundry/compare/v1.25.0...v1.26.0)
