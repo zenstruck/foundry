@@ -11,9 +11,9 @@
 
 namespace Zenstruck\Foundry;
 
+use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\MappingException;
-use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 

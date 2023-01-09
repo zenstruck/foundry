@@ -24,8 +24,6 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\EntityWithRelations;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post as ORMPost;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
-use Zenstruck\Foundry\Tests\Fixtures\PHP81\DocumentWithEnum;
-use Zenstruck\Foundry\Tests\Fixtures\PHP81\EntityWithEnum;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\EntityForRelationsFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\CommentFactory;
@@ -33,6 +31,8 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\UserFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Kernel;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject;
+use Zenstruck\Foundry\Tests\Fixtures\PHP81\DocumentWithEnum;
+use Zenstruck\Foundry\Tests\Fixtures\PHP81\EntityWithEnum;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

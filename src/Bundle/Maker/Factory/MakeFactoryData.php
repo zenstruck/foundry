@@ -129,12 +129,12 @@ final class MakeFactoryData
 
     public function addEnumDefaultProperty(string $propertyName, string $enumClass): void
     {
-        if (PHP_VERSION_ID < 80100) {
+        if (\PHP_VERSION_ID < 80100) {
             throw new \LogicException('Cannot add enum for php version inferior than 8.1');
         }
 
         if (!enum_exists($enumClass)) {
-            throw new \InvalidArgumentException("Enum of class \"$enumClass\" does not exist.");
+            throw new \InvalidArgumentException("Enum of class \"{$enumClass}\" does not exist.");
         }
 
         $this->addUse($enumClass);
