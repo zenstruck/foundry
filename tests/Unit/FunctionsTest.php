@@ -80,7 +80,7 @@ final class FunctionsTest extends TestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        Factory::configuration()->setManagerRegistry($registry);
+        Factory::configuration()->setManagerRegistry($registry)->enableDefaultProxyAutoRefresh();
 
         $object = create(Category::class);
 
@@ -99,7 +99,7 @@ final class FunctionsTest extends TestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        Factory::configuration()->setManagerRegistry($registry);
+        Factory::configuration()->setManagerRegistry($registry)->enableDefaultProxyAutoRefresh();
 
         $objects = create_many(3, Category::class);
 

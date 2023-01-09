@@ -85,7 +85,7 @@ final class ProxyTest extends TestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        Factory::configuration()->setManagerRegistry($registry);
+        Factory::configuration()->setManagerRegistry($registry)->enableDefaultProxyAutoRefresh();
 
         $category = new Proxy(new Category());
 

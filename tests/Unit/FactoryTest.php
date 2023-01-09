@@ -259,7 +259,7 @@ final class FactoryTest extends TestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        Factory::configuration()->setManagerRegistry($registry);
+        Factory::configuration()->setManagerRegistry($registry)->disableDefaultProxyAutoRefresh();
 
         $object = (new AnonymousFactory(Post::class))->create(['title' => 'title', 'body' => 'body']);
 
@@ -305,7 +305,7 @@ final class FactoryTest extends TestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        Factory::configuration()->setManagerRegistry($registry);
+        Factory::configuration()->setManagerRegistry($registry)->disableDefaultProxyAutoRefresh();
 
         $expectedAttributes = ['shortDescription' => 'short desc', 'title' => 'title', 'body' => 'body'];
         $calls = 0;
