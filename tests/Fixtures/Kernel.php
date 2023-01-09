@@ -111,6 +111,26 @@ class Kernel extends BaseKernel
         ]);
 
         if ($this->enableDoctrine && \getenv('USE_ORM')) {
+            $mappings = [
+                'Test' => [
+                    'is_bundle' => false,
+                    'type' => 'annotation',
+                    'dir' => '%kernel.project_dir%/tests/Fixtures/Entity',
+                    'prefix' => 'Zenstruck\Foundry\Tests\Fixtures\Entity',
+                    'alias' => 'Test',
+                ],
+            ];
+
+            if (PHP_VERSION_ID >= 80100) {
+                $mappings['Test8.1'] = [
+                    'is_bundle' => false,
+                    'type' => 'annotation',
+                    'dir' => '%kernel.project_dir%/tests/Fixtures/PHP81',
+                    'prefix' => 'Zenstruck\Foundry\Tests\Fixtures\PHP81',
+                    'alias' => 'TestPHP81',
+                ];
+            }
+
             $c->loadFromExtension(
                 'doctrine',
                 [
@@ -118,15 +138,7 @@ class Kernel extends BaseKernel
                     'orm' => [
                         'auto_generate_proxy_classes' => true,
                         'auto_mapping' => true,
-                        'mappings' => [
-                            'Test' => [
-                                'is_bundle' => false,
-                                'type' => 'annotation',
-                                'dir' => '%kernel.project_dir%/tests/Fixtures/Entity',
-                                'prefix' => 'Zenstruck\Foundry\Tests\Fixtures\Entity',
-                                'alias' => 'Test',
-                            ],
-                        ],
+                        'mappings' => $mappings
                     ],
                 ]
             );
@@ -162,6 +174,26 @@ class Kernel extends BaseKernel
         }
 
         if ($this->enableDoctrine && \getenv('USE_ODM')) {
+            $mappings = [
+                'Test' => [
+                    'is_bundle' => false,
+                    'type' => 'annotation',
+                    'dir' => '%kernel.project_dir%/tests/Fixtures/Document',
+                    'prefix' => 'Zenstruck\Foundry\Tests\Fixtures\Document',
+                    'alias' => 'Test',
+                ],
+            ];
+
+            if (PHP_VERSION_ID >= 80100) {
+                $mappings['Test8.1'] = [
+                    'is_bundle' => false,
+                    'type' => 'annotation',
+                    'dir' => '%kernel.project_dir%/tests/Fixtures/PHP81',
+                    'prefix' => 'Zenstruck\Foundry\Tests\Fixtures\PHP81',
+                    'alias' => 'TestPHP81',
+                ];
+            }
+
             $c->loadFromExtension('doctrine_mongodb', [
                 'connections' => [
                     'default' => ['server' => '%env(resolve:MONGO_URL)%'],
@@ -170,15 +202,7 @@ class Kernel extends BaseKernel
                 'document_managers' => [
                     'default' => [
                         'auto_mapping' => true,
-                        'mappings' => [
-                            'Test' => [
-                                'is_bundle' => false,
-                                'type' => 'annotation',
-                                'dir' => '%kernel.project_dir%/tests/Fixtures/Document',
-                                'prefix' => 'Zenstruck\Foundry\Tests\Fixtures\Document',
-                                'alias' => 'Test',
-                            ],
-                        ],
+                        'mappings' => $mappings,
                     ],
                 ],
             ]);

@@ -74,6 +74,12 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
             }
 
             $type = \mb_strtoupper($property['type']);
+            if (isset($property['enumType'])) {
+                $makeFactoryData->addEnumDefaultProperty($fieldName, $property['enumType']);
+
+                continue;
+            }
+
             $value = "null, // TODO add {$type} type manually";
             $length = $property['length'] ?? '';
 
