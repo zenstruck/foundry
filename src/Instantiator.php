@@ -35,6 +35,8 @@ final class Instantiator
     /** @var string[] */
     private array $forceProperties = [];
 
+    private ?\ReflectionFunction $factory = null;
+
     /**
      * @param class-string $class
      */
@@ -88,6 +90,25 @@ final class Instantiator
         }
 
         return $object;
+    }
+
+    /**
+     * Instantiate objects using a callable.
+     */
+    public static function factory(callable $callback): self
+    {
+        $instantiator = new self();
+        $instantiator->factory = new \ReflectionFunction($callback instanceof \Closure ? $callback : \Closure::fromCallable($callback));
+
+        return $instantiator;
+    }
+
+    /**
+     * Instantiate objects without calling the constructor.
+     */
+    public static function noConstructor(): self
+    {
+        return (new self())->withoutConstructor();
     }
 
     /**
@@ -239,18 +260,17 @@ final class Instantiator
     /**
      * @param class-string $class
      */
-    private function instantiate(string $class, array &$attributes): object
+    public function instantiate(string $class, array &$attributes = []): object
     {
         $class = new \ReflectionClass($class);
-        $constructor = $class->getConstructor();
 
-        if ($this->withoutConstructor || !$constructor || !$constructor->isPublic()) {
+        if (!$function = $this->instantiatorFunction($class)) {
             return $class->newInstanceWithoutConstructor();
         }
 
         $arguments = [];
 
-        foreach ($constructor->getParameters() as $parameter) {
+        foreach ($function->getParameters() as $parameter) {
             $name = self::attributeNameForParameter($parameter, $attributes);
 
             if ($name && \array_key_exists($name, $attributes)) {
@@ -262,13 +282,38 @@ final class Instantiator
             } elseif ($parameter->isDefaultValueAvailable()) {
                 $arguments[] = $parameter->getDefaultValue();
             } else {
-                throw new \InvalidArgumentException(\sprintf('Missing constructor argument "%s" for "%s".', $parameter->getName(), $class->getName()));
+                throw new \InvalidArgumentException(\sprintf('Missing argument "%s" for "%s".', $parameter->getName(), $class->getName()));
             }
 
             // unset attribute so it isn't used when setting object properties
             unset($attributes[$name]);
         }
 
-        return $class->newInstance(...$arguments);
+        if ($function instanceof \ReflectionMethod) {
+            return $class->newInstance(...$arguments);
+        }
+
+        $object = $function->invoke(...$arguments);
+
+        if (!\is_a($object, $class->name, true)) {
+            throw new \LogicException(\sprintf('Instantiator factory must return "%s" but got "%s".', $class->name, \get_debug_type($object)));
+        }
+
+        return $object;
+    }
+
+    private function instantiatorFunction(\ReflectionClass $class): \ReflectionFunction|\ReflectionMethod|null
+    {
+        if ($this->factory) {
+            return $this->factory;
+        }
+
+        $function = $class->getConstructor();
+
+        if ($this->withoutConstructor || !$function || !$function->isPublic()) {
+            return null;
+        }
+
+        return $function;
     }
 }
