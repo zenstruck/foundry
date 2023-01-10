@@ -95,9 +95,10 @@ final class Instantiator
      */
     public function withoutConstructor(): self
     {
-        $this->withoutConstructor = true;
+        $clone = clone $this;
+        $clone->withoutConstructor = true;
 
-        return $this;
+        return $clone;
     }
 
     /**
@@ -107,13 +108,15 @@ final class Instantiator
      */
     public function allowExtraAttributes(array $attributes = []): self
     {
+        $clone = clone $this;
+
         if (empty($attributes)) {
-            $this->allowExtraAttributes = true;
+            $clone->allowExtraAttributes = true;
         }
 
-        $this->extraAttributes = $attributes;
+        $clone->extraAttributes = $attributes;
 
-        return $this;
+        return $clone;
     }
 
     /**
@@ -123,13 +126,15 @@ final class Instantiator
      */
     public function alwaysForceProperties(array $properties = []): self
     {
+        $clone = clone $this;
+
         if (empty($properties)) {
-            $this->alwaysForceProperties = true;
+            $clone->alwaysForceProperties = true;
         }
 
-        $this->forceProperties = $properties;
+        $clone->forceProperties = $properties;
 
-        return $this;
+        return $clone;
     }
 
     /**

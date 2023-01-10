@@ -90,15 +90,15 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
         $definition = $container->getDefinition('.zenstruck_foundry.default_instantiator');
 
         if ($config['without_constructor']) {
-            $definition->addMethodCall('withoutConstructor');
+            $definition->addMethodCall('withoutConstructor', returnsClone: true);
         }
 
         if ($config['allow_extra_attributes']) {
-            $definition->addMethodCall('allowExtraAttributes');
+            $definition->addMethodCall('allowExtraAttributes', returnsClone: true);
         }
 
         if ($config['always_force_properties']) {
-            $definition->addMethodCall('alwaysForceProperties');
+            $definition->addMethodCall('alwaysForceProperties', returnsClone: true);
         }
     }
 
