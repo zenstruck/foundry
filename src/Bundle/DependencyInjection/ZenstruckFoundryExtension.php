@@ -17,6 +17,7 @@ use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Zenstruck\Foundry\Bundle\Command\StubMakeFactory;
 use Zenstruck\Foundry\Bundle\Command\StubMakeStory;
@@ -46,6 +47,7 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
 
         $this->configureFaker($mergedConfig['faker'], $container);
         $this->configureDefaultInstantiator($mergedConfig['instantiator'], $container);
+        $this->configureDefaultHydrator($mergedConfig['hydrator'], $container);
         $this->configureDatabaseResetter($mergedConfig['database_resetter'], $container);
 
         if (true === $mergedConfig['auto_refresh_proxies']) {
@@ -99,6 +101,23 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
 
         if ($config['always_force_properties']) {
             $definition->addMethodCall('alwaysForceProperties', returnsClone: true);
+        }
+    }
+
+    private function configureDefaultHydrator(array $config, ContainerBuilder $container): void
+    {
+        $definition = $container->getDefinition('.zenstruck_foundry.default_hydrator');
+
+        if ($config['allow_extra_attributes']) {
+            $definition->addMethodCall('allowExtraAttributes', returnsClone: true);
+        }
+
+        if ($config['always_force_properties']) {
+            $definition->addMethodCall('alwaysForceProperties', returnsClone: true);
+        }
+
+        if ($config['service']) {
+            $definition->addMethodCall('using', [new Reference($config['service'])], returnsClone: true);
         }
     }
 

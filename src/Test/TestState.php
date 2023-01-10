@@ -18,6 +18,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Zenstruck\Foundry\ChainManagerRegistry;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\Hydrator;
 use Zenstruck\Foundry\Instantiator;
 use Zenstruck\Foundry\StoryManager;
 
@@ -26,8 +27,11 @@ use Zenstruck\Foundry\StoryManager;
  */
 final class TestState
 {
-    /** @var callable|null */
+    /** @var callable|Instantiator|null */
     private static $instantiator;
+
+    /** @var callable|Hydrator|null */
+    private static $hydrator;
 
     private static ?\Faker\Generator $faker = null;
 
@@ -113,6 +117,10 @@ final class TestState
 
         if (self::$instantiator) {
             $configuration->setInstantiator(self::$instantiator);
+        }
+
+        if (self::$hydrator) {
+            $configuration->setHydrator(self::$hydrator);
         }
 
         if (self::$faker) {
@@ -220,9 +228,13 @@ final class TestState
         StoryManager::setGlobalState();
     }
 
-    public static function configure(?Instantiator $instantiator = null, ?Faker\Generator $faker = null): void
-    {
+    public static function configure(
+        ?Instantiator $instantiator = null,
+        ?Faker\Generator $faker = null,
+        ?Hydrator $hydrator = null,
+    ): void {
         self::$instantiator = $instantiator;
         self::$faker = $faker;
+        self::$hydrator = $hydrator;
     }
 }

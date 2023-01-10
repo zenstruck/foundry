@@ -6,6 +6,11 @@
 
     <services>
         <service id=".zenstruck_foundry.default_instantiator" class="Zenstruck\Foundry\Instantiator" />
+
+        <service id=".zenstruck_foundry.default_hydrator" class="Zenstruck\Foundry\Hydrator">
+            <argument type="service" id="property_accessor" />
+        </service>
+
         <service id=".zenstruck_foundry.faker" class="Faker\Generator">
             <factory class="Faker\Factory" method="create" />
         </service>
@@ -26,6 +31,9 @@
             </call>
             <call method="setInstantiator">
                 <argument type="service" id=".zenstruck_foundry.default_instantiator" />
+            </call>
+            <call method="setHydrator">
+                <argument type="service" id=".zenstruck_foundry.default_hydrator" />
             </call>
             <call method="setFaker">
                 <argument type="service" id=".zenstruck_foundry.faker" />

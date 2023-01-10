@@ -11,10 +11,6 @@
 
 namespace Zenstruck\Foundry;
 
-use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
-
 use function Symfony\Component\String\u;
 
 /**
@@ -22,74 +18,25 @@ use function Symfony\Component\String\u;
  */
 final class Instantiator
 {
-    private static ?PropertyAccessor $propertyAccessor = null;
-
     private bool $withoutConstructor = false;
-
-    private bool $allowExtraAttributes = false;
-
-    private array $extraAttributes = [];
-
-    private bool $alwaysForceProperties = false;
-
-    /** @var string[] */
-    private array $forceProperties = [];
-
     private ?\ReflectionFunction $factory = null;
+    private Hydrator $hydrator;
+    private bool $selfHydrating = false;
+
+    public function __construct()
+    {
+        $this->hydrator = new Hydrator();
+    }
 
     /**
      * @param class-string $class
      */
     public function __invoke(array $attributes, string $class): object
     {
+        // todo deprecation
         $object = $this->instantiate($class, $attributes);
 
-        foreach ($attributes as $attribute => $value) {
-            if (0 === \mb_strpos($attribute, 'optional:')) {
-                trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using "optional:" attribute prefixes is deprecated, use Instantiator::allowExtraAttributes() instead (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#instantiation).');
-                continue;
-            }
-
-            if (\in_array($attribute, $this->extraAttributes, true)) {
-                continue;
-            }
-
-            if ($this->alwaysForceProperties || \in_array($attribute, $this->forceProperties, true)) {
-                try {
-                    self::forceSet($object, $attribute, $value);
-                } catch (\InvalidArgumentException $e) {
-                    if (!$this->allowExtraAttributes) {
-                        throw $e;
-                    }
-                }
-
-                continue;
-            }
-
-            if (0 === \mb_strpos($attribute, 'force:')) {
-                trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using "force:" property prefixes is deprecated, use Instantiator::alwaysForceProperties() instead (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#instantiation).');
-
-                self::forceSet($object, \mb_substr($attribute, 6), $value);
-
-                continue;
-            }
-
-            try {
-                self::propertyAccessor()->setValue($object, $attribute, $value);
-            } catch (NoSuchPropertyException $e) {
-                // see if attribute was snake/kebab cased
-                try {
-                    self::propertyAccessor()->setValue($object, self::camel($attribute), $value);
-                    trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using a differently cased attribute is deprecated, use the same case as the object property instead.');
-                } catch (NoSuchPropertyException $e) {
-                    if (!$this->allowExtraAttributes) {
-                        throw new \InvalidArgumentException(\sprintf('Cannot set attribute "%s" for object "%s" (not public and no setter).', $attribute, $class), 0, $e);
-                    }
-                }
-            }
-        }
-
-        return $object;
+        return ($this->hydrator)($object, $attributes);
     }
 
     /**
@@ -129,13 +76,10 @@ final class Instantiator
      */
     public function allowExtraAttributes(array $attributes = []): self
     {
+        // todo deprecation
         $clone = clone $this;
-
-        if (empty($attributes)) {
-            $clone->allowExtraAttributes = true;
-        }
-
-        $clone->extraAttributes = $attributes;
+        $clone->hydrator = $clone->hydrator->allowExtraAttributes($attributes);
+        $clone->selfHydrating = true;
 
         return $clone;
     }
@@ -147,13 +91,10 @@ final class Instantiator
      */
     public function alwaysForceProperties(array $properties = []): self
     {
+        // todo deprecation
         $clone = clone $this;
-
-        if (empty($properties)) {
-            $clone->alwaysForceProperties = true;
-        }
-
-        $clone->forceProperties = $properties;
+        $clone->hydrator = $clone->hydrator->alwaysForceProperties($properties);
+        $clone->selfHydrating = true;
 
         return $clone;
     }
@@ -163,55 +104,17 @@ final class Instantiator
      */
     public static function forceSet(object $object, string $property, mixed $value): void
     {
-        self::accessibleProperty($object, $property)->setValue($object, $value);
+        // todo deprecation
+        Hydrator::set($object, $property, $value);
     }
 
     /**
-     * @return mixed
+     * @throws \InvalidArgumentException if property does not exist for $object
      */
-    public static function forceGet(object $object, string $property)
+    public static function forceGet(object $object, string $property): mixed
     {
-        return self::accessibleProperty($object, $property)->getValue($object);
-    }
-
-    private static function propertyAccessor(): PropertyAccessor
-    {
-        return self::$propertyAccessor ?: self::$propertyAccessor = PropertyAccess::createPropertyAccessor();
-    }
-
-    private static function accessibleProperty(object $object, string $name): \ReflectionProperty
-    {
-        $class = new \ReflectionClass($object);
-
-        // try fetching first by exact name, if not found, try camel-case
-        $property = self::reflectionProperty($class, $name);
-
-        if (!$property && $property = self::reflectionProperty($class, self::camel($name))) {
-            trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using a differently cased attribute is deprecated, use the same case as the object property instead.');
-        }
-
-        if (!$property) {
-            throw new \InvalidArgumentException(\sprintf('Class "%s" does not have property "%s".', $class->getName(), $name));
-        }
-
-        if (!$property->isPublic()) {
-            $property->setAccessible(true);
-        }
-
-        return $property;
-    }
-
-    private static function reflectionProperty(\ReflectionClass $class, string $name): ?\ReflectionProperty
-    {
-        try {
-            return $class->getProperty($name);
-        } catch (\ReflectionException) {
-            if ($class = $class->getParentClass()) {
-                return self::reflectionProperty($class, $name);
-            }
-        }
-
-        return null;
+        // todo deprecation
+        return Hydrator::get($object, $property);
     }
 
     /**
@@ -247,18 +150,17 @@ final class Instantiator
         return null;
     }
 
-    private static function camel(string $string): string
-    {
-        return u($string)->camel();
-    }
-
     private static function snake(string $string): string
     {
         return u($string)->snake();
     }
 
     /**
-     * @param class-string $class
+     * @template T of object
+     *
+     * @param class-string<T> $class
+     *
+     * @return T
      */
     public function instantiate(string $class, array &$attributes = []): object
     {
@@ -295,11 +197,19 @@ final class Instantiator
 
         $object = $function->invoke(...$arguments);
 
-        if (!\is_a($object, $class->name, true)) {
+        if (!$object instanceof $class->name) {
             throw new \LogicException(\sprintf('Instantiator factory must return "%s" but got "%s".', $class->name, \get_debug_type($object)));
         }
 
         return $object;
+    }
+
+    /**
+     * @internal
+     */
+    public function isSelfHydrating(): bool
+    {
+        return $this->selfHydrating;
     }
 
     private function instantiatorFunction(\ReflectionClass $class): \ReflectionFunction|\ReflectionMethod|null

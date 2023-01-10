@@ -35,6 +35,8 @@ final class Configuration
     /** @var callable */
     private $instantiator;
 
+    private Hydrator $hydrator;
+
     private ?bool $defaultProxyAutoRefresh = null;
 
     private bool $flushEnabled = true;
@@ -52,6 +54,7 @@ final class Configuration
         $this->factories = new ModelFactoryManager([]);
         $this->faker = Faker\Factory::create();
         $this->instantiator = new Instantiator();
+        $this->hydrator = new Hydrator();
     }
 
     public function stories(): StoryManager
@@ -72,6 +75,11 @@ final class Configuration
     public function instantiator(): callable
     {
         return $this->instantiator;
+    }
+
+    public function hydrator(): Hydrator
+    {
+        return $this->hydrator;
     }
 
     public function defaultProxyAutoRefresh(): bool
@@ -99,6 +107,17 @@ final class Configuration
     public function setInstantiator(callable $instantiator): self
     {
         $this->instantiator = $instantiator;
+
+        return $this;
+    }
+
+    public function setHydrator(callable $hydrator): self
+    {
+        if (!$hydrator instanceof Hydrator) {
+            $hydrator = (new Hydrator())->using($hydrator);
+        }
+
+        $this->hydrator = $hydrator;
 
         return $this;
     }
