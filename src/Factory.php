@@ -15,6 +15,7 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Faker;
+use Zenstruck\Callback;
 
 /**
  * @template TObject of object
@@ -35,6 +36,8 @@ class Factory
 
     /** @var callable|null */
     private $instantiator;
+
+    private ?Hydrator $hydrator = null;
 
     private bool $persist = true;
 
@@ -114,8 +117,7 @@ class Factory
         $attributes = $mappedAttributes;
 
         // instantiate the object with the users instantiator or if not set, the default instantiator
-        /** @var TObject $object */
-        $object = ($this->instantiator ?? self::configuration()->instantiator())($attributes, $this->class);
+        $object = $this->instantiateAndHydrate($attributes);
 
         foreach ($this->afterInstantiate as $callback) {
             $callback($object, $attributes);
@@ -235,16 +237,57 @@ class Factory
     }
 
     /**
-     * @param callable $instantiator (array $attributes, string $class): object
+     * @param callable(array,class-string):object $instantiator
+     * @param string $instantiator Public static named constructor for this factory's class
      *
      * @return static
      */
-    final public function instantiateWith(callable $instantiator): self
+    final public function instantiateWith(callable|string $instantiator): self
     {
+        if (\is_string($instantiator) && \method_exists($this->class, $instantiator)) {
+            $instantiator = [$this->class, $instantiator];
+        }
+
         $cloned = clone $this;
-        $cloned->instantiator = $instantiator;
+        $cloned->instantiator = $instantiator; // @phpstan-ignore-line
 
         return $cloned;
+    }
+
+    final public function instantiateWithoutConstructor(): static
+    {
+        $clone = clone $this;
+        $clone->instantiator = Instantiator::noConstructor();
+
+        return $clone;
+    }
+
+    /**
+     * @param callable(TObject,array):TObject $hydrator Custom hydrator callback
+     * @param callable(Hydrator):Hydrator $hydrator Customize the default hydrator
+     * @param int-mask-of<Hydrator::*> $hydrator
+     */
+    final public function hydrateWith(callable|int $hydrator): static
+    {
+        $clone = clone $this;
+        $defaultHydrator = self::configuration()->hydrator();
+
+        if (\is_int($hydrator)) {
+            $clone->hydrator = $defaultHydrator->withMode($hydrator);
+
+            return $clone;
+        }
+
+        if ((Callback::createFor($hydrator)->arguments()[0] ?? null)?->supports(self::class)) {
+            // customizing the hydrator with a callback
+            $clone->hydrator = $hydrator($defaultHydrator);
+
+            return $clone;
+        }
+
+        $this->hydrator = $defaultHydrator;
+
+        return $clone;
     }
 
     /**
@@ -572,5 +615,33 @@ class Factory
         }
 
         return true;
+    }
+
+    /**
+     * @return TObject
+     */
+    private function instantiateAndHydrate(array $attributes): object
+    {
+        $instantiator = $this->instantiator ?? self::configuration()->instantiator();
+
+        if (!$instantiator instanceof Instantiator && !$this->hydrator) {
+            // custom instantiator with no hydrator set, just use instantiator
+            return $instantiator($attributes, $this->class);
+        }
+
+        if ($instantiator instanceof Instantiator && $instantiator->isSelfHydrating()) {
+            // using deprecated instantiator system
+            return $instantiator($attributes, $this->class); // @phpstan-ignore-line
+        }
+
+        $object = match(true) {
+            // using the "new" instantiator system
+            $instantiator instanceof Instantiator => $instantiator->instantiate($this->class, $attributes),
+
+            // using a custom instantiator
+            default => $instantiator($attributes, $this->class),
+        };
+
+        return ($this->hydrator ?? self::configuration()->hydrator())($object, $attributes); // @phpstan-ignore-line
     }
 }

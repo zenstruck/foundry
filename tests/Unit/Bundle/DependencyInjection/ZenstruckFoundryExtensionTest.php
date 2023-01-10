@@ -15,6 +15,7 @@ use Faker\Generator;
 use Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractExtensionTestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Zenstruck\Foundry\Bundle\DependencyInjection\ZenstruckFoundryExtension;
+use Zenstruck\Foundry\Hydrator;
 use Zenstruck\Foundry\Instantiator;
 
 /**
@@ -35,10 +36,12 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.configuration', 'setManagerRegistry', ['.zenstruck_foundry.chain_manager_registry']);
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.configuration', 'setStoryManager', ['.zenstruck_foundry.story_manager']);
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.configuration', 'setModelFactoryManager', ['.zenstruck_foundry.model_factory_manager']);
-        $this->assertCount(5, $this->container->findDefinition('.zenstruck_foundry.configuration')->getMethodCalls());
+        $this->assertCount(6, $this->container->findDefinition('.zenstruck_foundry.configuration')->getMethodCalls());
         $this->assertTrue($this->container->getDefinition('.zenstruck_foundry.configuration')->isPublic());
         $this->assertContainerBuilderHasService('.zenstruck_foundry.default_instantiator', Instantiator::class);
         $this->assertEmpty($this->container->getDefinition('.zenstruck_foundry.default_instantiator')->getMethodCalls());
+        $this->assertContainerBuilderHasService('.zenstruck_foundry.default_hydrator', Hydrator::class);
+        $this->assertEmpty($this->container->getDefinition('.zenstruck_foundry.default_hydrator')->getMethodCalls());
         $this->assertContainerBuilderHasService('.zenstruck_foundry.faker', Generator::class);
         $this->assertEmpty($this->container->getDefinition('.zenstruck_foundry.faker')->getArguments());
         $this->assertContainerBuilderHasService('.zenstruck_foundry.story_manager');
@@ -163,12 +166,37 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
     /**
      * @test
      */
+    public function custom_hydrator_config(): void
+    {
+        $this->load(['hydrator' => [
+            'allow_extra_attributes' => true,
+            'always_force_properties' => true,
+        ]]);
+
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.default_hydrator', 'allowExtraAttributes');
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.default_hydrator', 'alwaysForceProperties');
+    }
+
+    /**
+     * @test
+     */
+    public function custom_hydrator_service(): void
+    {
+        $this->load(['hydrator' => ['service' => 'my_hydrator']]);
+
+        $this->assertContainerBuilderHasService('.zenstruck_foundry.default_hydrator', Hydrator::class);
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.default_hydrator', 'using', ['my_hydrator']);
+    }
+
+    /**
+     * @test
+     */
     public function can_enable_auto_refresh_proxies(): void
     {
         $this->load(['auto_refresh_proxies' => true]);
 
         $this->assertContainerBuilderHasService('.zenstruck_foundry.configuration');
-        $this->assertCount(6, $this->container->findDefinition('.zenstruck_foundry.configuration')->getMethodCalls());
+        $this->assertCount(7, $this->container->findDefinition('.zenstruck_foundry.configuration')->getMethodCalls());
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.configuration', 'enableDefaultProxyAutoRefresh', []);
     }
 
@@ -180,7 +208,7 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
         $this->load(['auto_refresh_proxies' => false]);
 
         $this->assertContainerBuilderHasService('.zenstruck_foundry.configuration');
-        $this->assertCount(6, $this->container->findDefinition('.zenstruck_foundry.configuration')->getMethodCalls());
+        $this->assertCount(7, $this->container->findDefinition('.zenstruck_foundry.configuration')->getMethodCalls());
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.configuration', 'disableDefaultProxyAutoRefresh', []);
     }
 

@@ -123,7 +123,7 @@ final class InstantiatorTest extends TestCase
     public function missing_constructor_argument_throws_exception(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Missing constructor argument "propB" for "Zenstruck\Foundry\Tests\Unit\InstantiatorDummy".');
+        $this->expectExceptionMessage('Missing argument "propB" for "Zenstruck\Foundry\Tests\Unit\InstantiatorDummy".');
 
         (new Instantiator())([], InstantiatorDummy::class);
     }
@@ -545,10 +545,106 @@ final class InstantiatorTest extends TestCase
     public function missing_variadic_argument_thtrows(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Missing constructor argument "propB" for "Zenstruck\Foundry\Tests\Unit\VariadicInstantiatorDummy".');
+        $this->expectExceptionMessage('Missing argument "propB" for "Zenstruck\Foundry\Tests\Unit\VariadicInstantiatorDummy".');
         (new Instantiator())([
             'propA' => 'A',
         ], VariadicInstantiatorDummy::class);
+    }
+
+    /**
+     * @test
+     */
+    public function new_default_instantiate(): void
+    {
+        $attributes = [
+            'propA' => 'valueA',
+            'propB' => 'valueB',
+            'propC' => 'valueC',
+        ];
+
+        $object = (new Instantiator())->instantiate(InstantiatorDummy::class, $attributes);
+
+        $this->assertInstanceOf(InstantiatorDummy::class, $object);
+        $this->assertNull($object->getPropA());
+        $this->assertSame('constructor valueB', $object->getPropB());
+        $this->assertSame('constructor valueC', $object->getPropC());
+        $this->assertSame(['propA' => 'valueA'], $attributes);
+    }
+
+    /**
+     * @test
+     */
+    public function new_instantiate_no_constructor(): void
+    {
+        $attributes = [
+            'propA' => 'valueA',
+            'propB' => 'valueB',
+            'propC' => 'valueC',
+        ];
+
+        $object = Instantiator::noConstructor()->instantiate(InstantiatorDummy::class, $attributes);
+
+        $this->assertInstanceOf(InstantiatorDummy::class, $object);
+        $this->assertNull($object->getPropA());
+        $this->assertNull($object->getPropB());
+        $this->assertNull($object->getPropC());
+        $this->assertSame(['propA' => 'valueA', 'propB' => 'valueB', 'propC' => 'valueC'], $attributes);
+    }
+
+    /**
+     * @test
+     */
+    public function new_instantiate_factory_method(): void
+    {
+        $attributes = [
+            'propA' => 'valueA',
+            'propB' => 'valueB',
+            'propC' => 'valueC',
+        ];
+
+        $object = Instantiator::factory([InstantiatorDummy::class, 'factory'])
+            ->instantiate(InstantiatorDummy::class, $attributes)
+        ;
+
+        $this->assertInstanceOf(InstantiatorDummy::class, $object);
+        $this->assertNull($object->getPropA());
+        $this->assertSame('factory valueB', $object->getPropB());
+        $this->assertNull($object->getPropC());
+        $this->assertSame(['propA' => 'valueA', 'propC' => 'valueC'], $attributes);
+    }
+
+    /**
+     * @test
+     */
+    public function new_instantiate_factory_closure(): void
+    {
+        $attributes = [
+            'propA' => 'valueA',
+            'propB' => 'valueB',
+            'propC' => 'valueC',
+        ];
+
+        $object = Instantiator::factory(fn($propB) => new InstantiatorDummy('callable '.$propB))
+            ->instantiate(InstantiatorDummy::class, $attributes)
+        ;
+
+        $this->assertInstanceOf(InstantiatorDummy::class, $object);
+        $this->assertNull($object->getPropA());
+        $this->assertSame('constructor callable valueB', $object->getPropB());
+        $this->assertNull($object->getPropC());
+        $this->assertSame(['propA' => 'valueA', 'propC' => 'valueC'], $attributes);
+    }
+
+    /**
+     * @test
+     */
+    public function new_instantiate_factory_must_return_same_class(): void
+    {
+        $this->expectException(\LogicException::class);
+
+        Instantiator::factory(fn() => 'foo')
+            ->instantiate(InstantiatorDummy::class)
+        ;
     }
 }
 
@@ -558,7 +654,7 @@ class InstantiatorDummy
 
     public $propD;
 
-    private string $propB;
+    private ?string $propB = null;
 
     private ?string $propC = null;
 
@@ -575,12 +671,20 @@ class InstantiatorDummy
         }
     }
 
+    public static function factory($propB): self
+    {
+        $object = new self($propB);
+        $object->propB = 'factory '.$propB;
+
+        return $object;
+    }
+
     public function getPropA()
     {
         return $this->propA;
     }
 
-    public function getPropB(): string
+    public function getPropB(): ?string
     {
         return $this->propB;
     }

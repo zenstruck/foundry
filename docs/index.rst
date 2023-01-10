@@ -1910,6 +1910,18 @@ Full Default Bundle Configuration
                 # Customize the instantiator service.
                 service:              null # Example: my_instantiator
 
+            # Configure the default hydrator used by your factories.
+            hydrator:
+
+                # Whether or not to allow extra attributes.
+                allow_extra_attributes: false
+
+                # Whether or not to skip setters and force set object properties (public/private/protected) directly.
+                always_force_properties: false
+
+                # Customize the hydrator service.
+                service: null # Example: my_hydrator
+
             # Configure the database reset mechanism
             database_resetter:
 
@@ -1968,7 +1980,20 @@ Full Default Bundle Configuration
 
                 // Customize the instantiator service.
                 'service' => null
-            ]
+            ],
+
+            // Configure the default hydrator used by your factories.
+            'hydrator' => [
+
+                // Whether or not to allow extra attributes.
+                'allow_extra_attributes' => false,
+
+                // Whether or not to skip setters and force set object properties (public/private/protected) directly.
+                'always_force_properties' => false,
+
+                // Customize the hydrator service.
+                'service' => null
+            ],
 
             // Configure the database reset mechanism
             'database_resetter' => [
@@ -1996,5 +2021,5 @@ Full Default Bundle Configuration
                 // Add global state
                 'global_state' => []
 
-            ]
+            ],
         ]);
