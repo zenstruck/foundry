@@ -40,7 +40,7 @@ class Product
     private Collection $categories;
 
     /**
-     * @ORM\ManyToMany(targetEntity=ProductTag::class, inversedBy="products", cascade={"persist"})
+     * @ORM\ManyToMany(targetEntity=Tag::class, inversedBy="products", cascade={"persist"})
      */
     private Collection $tags;
 
@@ -135,14 +135,14 @@ class Product
         return $this->tags;
     }
 
-    public function addTag(ProductTag $tag): void
+    public function addTag(Tag $tag): void
     {
         if (!$this->tags->contains($tag)) {
             $this->tags[] = $tag;
         }
     }
 
-    public function removeTag(ProductTag $tag): void
+    public function removeTag(Tag $tag): void
     {
         if ($this->tags->contains($tag)) {
             $this->tags->removeElement($tag);
