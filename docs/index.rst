@@ -1472,6 +1472,28 @@ It is possible to use factories in
     For the same reason as above, it is not possible to use `Factories as Services`_ with required
     constructor arguments (the container is not yet available).
 
+.. note::
+
+    Still for the same reason, if `Faker`_ is needed along with ``->withAttributes()`` within a data provider, you'll need
+    to pass attributes as a *callable*.
+
+    Given the data provider of the previous example, here is ``PostFactory::published()``
+
+    .. code-block:: php
+
+        public function published(): self
+        {
+            // This won't work in a data provider!
+            // return $this->withAttributes(['published_at' => self::faker()->dateTime()]);
+
+            // use this instead:
+            return $this->withAttributes(
+                static fn() => [
+                    'published_at' => self::faker()->dateTime()
+                ]
+            );
+        }
+
 .. tip::
 
     ``ModelFactory::new()->many()`` and ``ModelFactory::new()->sequence()`` return a special ``FactoryCollection`` object

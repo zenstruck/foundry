@@ -15,6 +15,7 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Faker;
+use Zenstruck\Foundry\Exception\FoundryNotBootedException;
 
 /**
  * @template TObject of object
@@ -270,11 +271,12 @@ class Factory
 
     /**
      * @internal
+     * @throws FoundryNotBootedException
      */
     final public static function configuration(): Configuration
     {
         if (!self::isBooted()) {
-            throw new \RuntimeException('Foundry is not yet booted. Using in a test: is your Test case using the Factories trait? Using in a fixture: is ZenstruckFoundryBundle enabled for this environment?');
+            throw new FoundryNotBootedException();
         }
 
         return self::$configuration; // @phpstan-ignore-line
@@ -290,7 +292,13 @@ class Factory
 
     final public static function faker(): Faker\Generator
     {
-        return self::configuration()->faker();
+        try {
+            return self::configuration()->faker();
+        } catch (FoundryNotBootedException $exception) {
+            throw new \RuntimeException(
+                "Cannot get Foundry's configuration. If using faker in a data provider, consider passing attributes as a callable."
+            );
+        }
     }
 
     final public static function delayFlush(callable $callback): void
