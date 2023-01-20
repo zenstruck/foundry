@@ -27,6 +27,7 @@
         "doctrine/doctrine-bundle": "^2.0",
         "doctrine/doctrine-migrations-bundle": "^2.2|^3.0",
         "doctrine/mongodb-odm-bundle": "^3.1|^4.2",
+        "doctrine/mongodb-odm": "^2.0",
         "doctrine/orm": "^2.7",
         "matthiasnoback/symfony-dependency-injection-test": "^4.1",
         "symfony/framework-bundle": "^4.4|^5.0|^6.0",
