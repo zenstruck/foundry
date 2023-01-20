@@ -13,15 +13,19 @@ namespace Zenstruck\Foundry\Bundle\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
+use FriendsOfBehat\SymfonyExtension\Bundle\FriendsOfBehatSymfonyExtensionBundle;
 use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Zenstruck\Foundry\Bundle\Command\StubMakeFactory;
 use Zenstruck\Foundry\Bundle\Command\StubMakeStory;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Story;
+use Zenstruck\Foundry\Test\Behat\FactoriesContext;
+use Zenstruck\Foundry\Test\Behat\ResetDatabaseContext;
 use Zenstruck\Foundry\Test\ORMDatabaseResetter;
 
 /**
@@ -57,6 +61,11 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
         if (!\class_exists(AbstractMaker::class)) {
             $container->register('.zenstruck_foundry.maker.factory_stub', StubMakeFactory::class)->addTag('console.command');
             $container->register('.zenstruck_foundry.maker.story_stub', StubMakeStory::class)->addTag('console.command');
+        }
+
+        if (self::isBundleLoaded($container, FriendsOfBehatSymfonyExtensionBundle::class)) {
+            $container->register(FactoriesContext::class)->addArgument(new Reference('service_container'))->setAutoconfigured(true);
+            $container->register(ResetDatabaseContext::class)->setAutowired(true)->setAutoconfigured(true);
         }
     }
 
