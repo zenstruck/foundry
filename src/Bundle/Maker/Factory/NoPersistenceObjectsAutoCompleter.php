@@ -11,7 +11,7 @@
 
 namespace Zenstruck\Foundry\Bundle\Maker\Factory;
 
-final class NoPersistanceObjectsAutoCompleter
+final class NoPersistenceObjectsAutoCompleter
 {
     public function __construct(private string $kernelRootDir)
     {
@@ -58,7 +58,7 @@ final class NoPersistanceObjectsAutoCompleter
 
     private function toPSR4(string $rootPath, \SplFileInfo $fileInfo, string $namespacePrefix): string
     {
-        // /app/src/Bundle/Maker/Factory/NoPersistanceObjectsAutoCompleter.php => /Bundle/Maker/Factory/NoPersistanceObjectsAutoCompleter
+        // /app/src/Bundle/Maker/Factory/NoPersistenceObjectsAutoCompleter.php => /Bundle/Maker/Factory/NoPersistenceObjectsAutoCompleter
         $relativeFileNameWithoutExtension = \str_replace([$rootPath, '.php'], ['', ''], $fileInfo->getRealPath());
 
         return $namespacePrefix.\str_replace('/', '\\', $relativeFileNameWithoutExtension);

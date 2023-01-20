@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Foundry\Bundle\Maker\Factory;
 
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataInfo as ORMClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 use Symfony\Bundle\MakerBundle\Generator;
@@ -80,12 +82,21 @@ final class FactoryGenerator
             'Factory'
         );
 
-        if ($makeFactoryQuery->isPersisted()) {
+        if ($persisted = $makeFactoryQuery->isPersisted()) {
             $repository = new \ReflectionClass($this->managerRegistry->getRepository($object->getName()));
 
             if (\str_starts_with($repository->getName(), 'Doctrine')) {
                 // not using a custom repository
                 $repository = null;
+            }
+
+            /** @var ODMClassMetadata|ORMClassMetadata|null $metadata */
+            $metadata = $this->managerRegistry->getManagerForClass($class)?->getClassMetadata($class);
+
+            // Doctrine ORM will not return a metadata for embedded classes but Doctrine ODM will.
+            // We have to remove persisting for both cases.
+            if (!$metadata || $metadata instanceof ODMClassMetadata && $metadata->isEmbeddedDocument) {
+                $persisted = false;
             }
         }
 
@@ -94,7 +105,7 @@ final class FactoryGenerator
             $factory,
             $repository ?? null,
             $this->phpstanEnabled(),
-            $makeFactoryQuery->isPersisted()
+            $persisted
         );
     }
 
