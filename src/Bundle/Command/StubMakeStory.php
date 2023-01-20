@@ -11,7 +11,9 @@
 
 namespace Zenstruck\Foundry\Bundle\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+
+#[AsCommand(name: 'make:story')]
 final class StubMakeStory extends StubCommand
 {
-    protected static $defaultName = 'make:story';
 }

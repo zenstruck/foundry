@@ -11,7 +11,9 @@
 
 namespace Zenstruck\Foundry\Bundle\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+
+#[AsCommand(name: 'make:factory')]
 final class StubMakeFactory extends StubCommand
 {
-    protected static $defaultName = 'make:factory';
 }
