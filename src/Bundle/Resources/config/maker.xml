@@ -6,11 +6,10 @@
 
     <services>
         <service id=".zenstruck_foundry.maker.factory" class="Zenstruck\Foundry\Bundle\Maker\MakeFactory">
-            <argument type="service" id=".zenstruck_foundry.chain_manager_registry" />
-            <argument type="service" id=".zenstruck_foundry.maker.factory.factory_class_map" />
             <argument type="service" id="kernel" />
             <argument type="service" id=".zenstruck_foundry.maker.factory.generator" />
             <argument type="service" id=".zenstruck_foundry.maker.factory.autoCompleter" />
+            <argument type="service" id=".zenstruck_foundry.maker.factory.candidate_classes_extractor" />
             <tag name="maker.command" />
         </service>
 
@@ -36,6 +35,8 @@
         </service>
 
         <service id=".zenstruck_foundry.maker.factory.object_default_properties_guesser" class="Zenstruck\Foundry\Bundle\Maker\Factory\ObjectDefaultPropertiesGuesser">
+            <argument type="service" id=".zenstruck_foundry.maker.factory.factory_class_map" />
+            <argument type="service" id=".zenstruck_foundry.maker.factory.generator" />
             <tag name="foundry.make_factory.default_properties_guesser" />
         </service>
 
@@ -54,8 +55,13 @@
             <argument type="service" id=".zenstruck_foundry.maker.factory.factory_class_map" />
         </service>
 
-        <service id=".zenstruck_foundry.maker.factory.autoCompleter" class="Zenstruck\Foundry\Bundle\Maker\Factory\NoPersistanceObjectsAutoCompleter">
+        <service id=".zenstruck_foundry.maker.factory.autoCompleter" class="Zenstruck\Foundry\Bundle\Maker\Factory\NoPersistenceObjectsAutoCompleter">
             <argument>%kernel.project_dir%</argument>
+        </service>
+
+        <service id=".zenstruck_foundry.maker.factory.candidate_classes_extractor" class="Zenstruck\Foundry\Bundle\Maker\Factory\FactoryCandidatesClassesExtractor">
+            <argument type="service" id=".zenstruck_foundry.chain_manager_registry" />
+            <argument type="service" id=".zenstruck_foundry.maker.factory.factory_class_map" />
         </service>
     </services>
 </container>

@@ -18,6 +18,8 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMComment;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMPost;
+use Zenstruck\Foundry\Tests\Fixtures\Document\ODMUser;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Comment;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Contact;
@@ -91,7 +93,11 @@ final class MakeFactoryTest extends MakerTestCase
 
         $tester = $this->makeFactoryCommandTester();
 
-        $tester->setInputs([Comment::class, 'no', 'yes']);
+        $tester->setInputs([
+            Comment::class, // which class to create a factory for?
+            'no', // should create UserFactory for Comment::$user?
+            'yes', // should create PostFactory for Comment::$post?
+        ]);
         $tester->execute([], ['interactive' => true]);
 
         $output = $tester->getDisplay();
@@ -450,7 +456,24 @@ final class MakeFactoryTest extends MakerTestCase
             yield 'odm' => [DocumentWithEnum::class];
         }
 
-        yield 'without persistance' => [EntityWithEnum::class, true];
+        yield 'without persistence' => [EntityWithEnum::class, true];
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_factory_for_orm_embedded_class(): void
+    {
+        if (!\getenv('USE_ORM')) {
+            self::markTestSkipped('doctrine/odm not enabled.');
+        }
+
+        $tester = $this->makeFactoryCommandTester();
+
+        $tester->execute(['class' => Address::class]);
+
+        $factoryClass = Str::getShortClassName(Address::class);
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile("src/Factory/{$factoryClass}Factory.php"));
     }
 
     protected static function createKernel(array $options = []): KernelInterface

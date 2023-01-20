@@ -16,7 +16,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * @internal
  */
-class ObjectDefaultPropertiesGuesser implements DefaultPropertiesGuesser
+class ObjectDefaultPropertiesGuesser extends AbstractDefaultPropertyGuesser
 {
     private const DEFAULTS_FOR_NOT_PERSISTED = [
         'array' => '[],',
@@ -31,21 +31,22 @@ class ObjectDefaultPropertiesGuesser implements DefaultPropertiesGuesser
     public function __invoke(SymfonyStyle $io, MakeFactoryData $makeFactoryData, MakeFactoryQuery $makeFactoryQuery): void
     {
         foreach ($makeFactoryData->getObject()->getProperties() as $property) {
-            // ignore identifiers and nullable fields
-            if (!$makeFactoryQuery->isAllFields() && ($property->hasDefaultValue() || !$property->hasType() || $property->getType()?->allowsNull())) {
+            if (!$this->shouldAddPropertyToFactory($makeFactoryQuery, $property)) {
                 continue;
             }
 
-            $type = null;
-            $reflectionType = $property->getType();
-            if ($reflectionType instanceof \ReflectionNamedType) {
-                $type = $reflectionType->getName();
-            }
+            $type = $this->getPropertyType($property);
 
             $value = \sprintf('null, // TODO add %svalue manually', $type ? "{$type} " : '');
 
             if (\PHP_VERSION_ID >= 80100 && enum_exists($type ?? '')) {
                 $makeFactoryData->addEnumDefaultProperty($property->getName(), $type);
+
+                continue;
+            }
+
+            if ($type && class_exists($type) && !is_a($type, \DateTimeInterface::class, true)) {
+                $this->addDefaultValueUsingFactory($io, $makeFactoryData, $makeFactoryQuery, $property->getName(), $type);
 
                 continue;
             }
@@ -61,5 +62,54 @@ class ObjectDefaultPropertiesGuesser implements DefaultPropertiesGuesser
     public function supports(MakeFactoryData $makeFactoryData): bool
     {
         return !$makeFactoryData->isPersisted();
+    }
+
+    private function shouldAddPropertyToFactory(MakeFactoryQuery $makeFactoryQuery, \ReflectionProperty $property): bool
+    {
+        // if option "--all-fields" was passed
+        if ($makeFactoryQuery->isAllFields()) {
+            return true;
+        }
+
+        // if property is inside constructor, check if it has a default value
+        if ($constructorParameter = $this->getConstructorParameterForProperty($property)) {
+            return !$constructorParameter->isDefaultValueAvailable();
+        }
+
+        // if the property has a default value, we should not add it to the factory
+        if ($property->hasDefaultValue()) {
+            return false;
+        }
+
+        // if property has type, we need to add it to the factory
+        return $property->hasType();
+    }
+
+    private function getPropertyType(\ReflectionProperty $property): string|null
+    {
+        if (!$property->hasType()) {
+            $type = $this->getConstructorParameterForProperty($property)?->getType();
+        } else {
+            $type = $property->getType();
+        }
+
+        if (!$type instanceof \ReflectionNamedType) {
+            return null;
+        }
+
+        return $type->getName();
+    }
+
+    private function getConstructorParameterForProperty(\ReflectionProperty $property): \ReflectionParameter|null
+    {
+        if ($constructor = $property->getDeclaringClass()->getConstructor()) {
+            foreach ($constructor->getParameters() as $parameter) {
+                if ($parameter->getName() === $property->getName()) {
+                    return $parameter;
+                }
+            }
+        }
+
+        return null;
     }
 }

@@ -4,18 +4,17 @@ namespace App\Factory;
 
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
-use Zenstruck\Foundry\Tests\Fixtures\Document\ODMComment;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\UserFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
 
 /**
- * @extends ModelFactory<ODMComment>
+ * @extends ModelFactory<Address>
  *
- * @method        ODMComment|Proxy create(array|callable $attributes = [])
- * @method static ODMComment|Proxy createOne(array $attributes = [])
- * @method static ODMComment[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static ODMComment[]|Proxy[] createSequence(array|callable $sequence)
+ * @method        Address|Proxy create(array|callable $attributes = [])
+ * @method static Address|Proxy createOne(array $attributes = [])
+ * @method static Address[]|Proxy[] createMany(int $number, array|callable $attributes = [])
+ * @method static Address[]|Proxy[] createSequence(array|callable $sequence)
  */
-final class ODMCommentFactory extends ModelFactory
+final class AddressFactory extends ModelFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -35,8 +34,6 @@ final class ODMCommentFactory extends ModelFactory
     protected function getDefaults(): array
     {
         return [
-            'body' => self::faker()->sentence(),
-            'user' => UserFactory::new(),
         ];
     }
 
@@ -47,12 +44,12 @@ final class ODMCommentFactory extends ModelFactory
     {
         return $this
             ->withoutPersisting()
-            // ->afterInstantiate(function(ODMComment $oDMComment): void {})
+            // ->afterInstantiate(function(Address $address): void {})
         ;
     }
 
     protected static function getClass(): string
     {
-        return ODMComment::class;
+        return Address::class;
     }
 }

@@ -24,10 +24,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Zenstruck\Foundry\Bundle\Maker\Factory\FactoryClassMap;
+use Zenstruck\Foundry\Bundle\Maker\Factory\FactoryCandidatesClassesExtractor;
 use Zenstruck\Foundry\Bundle\Maker\Factory\FactoryGenerator;
 use Zenstruck\Foundry\Bundle\Maker\Factory\MakeFactoryQuery;
-use Zenstruck\Foundry\Bundle\Maker\Factory\NoPersistanceObjectsAutoCompleter;
+use Zenstruck\Foundry\Bundle\Maker\Factory\NoPersistenceObjectsAutoCompleter;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -36,7 +36,7 @@ final class MakeFactory extends AbstractMaker
 {
     private const GENERATE_ALL_FACTORIES = 'All';
 
-    public function __construct(private ManagerRegistry $managerRegistry, private FactoryClassMap $factoryClassMap, private KernelInterface $kernel, private FactoryGenerator $factoryGenerator, private NoPersistanceObjectsAutoCompleter $noPersistanceObjectsAutoCompleter)
+    public function __construct(private KernelInterface $kernel, private FactoryGenerator $factoryGenerator, private NoPersistenceObjectsAutoCompleter $noPersistenceObjectsAutoCompleter, private FactoryCandidatesClassesExtractor $factoryCandidatesClassesExtractor)
     {
     }
 
@@ -103,12 +103,12 @@ final class MakeFactory extends AbstractMaker
                     return $class;
                 }
             );
-            $question->setAutocompleterValues($this->noPersistanceObjectsAutoCompleter->getAutocompleteValues());
+            $question->setAutocompleterValues($this->noPersistenceObjectsAutoCompleter->getAutocompleteValues());
             $class = $io->askQuestion($question);
         } else {
             $argument = $command->getDefinition()->getArgument('class');
 
-            $class = $io->choice($argument->getDescription(), \array_merge($this->entityChoices(), [self::GENERATE_ALL_FACTORIES]));
+            $class = $io->choice($argument->getDescription(), \array_merge($this->factoryCandidatesClassesExtractor->factoryCandidatesClasses(), [self::GENERATE_ALL_FACTORIES]));
         }
 
         $input->setArgument('class', $class);
@@ -118,7 +118,7 @@ final class MakeFactory extends AbstractMaker
     {
         $class = $input->getArgument('class');
         $generateAllFactories = self::GENERATE_ALL_FACTORIES === $class;
-        $classes = $generateAllFactories ? $this->entityChoices() : [$class];
+        $classes = $generateAllFactories ? $this->factoryCandidatesClassesExtractor->factoryCandidatesClasses() : [$class];
 
         foreach ($classes as $class) {
             $this->factoryGenerator->generateFactory(
@@ -134,34 +134,6 @@ final class MakeFactory extends AbstractMaker
             'Next: Open your new factory and set default values/states.',
             'Find the documentation at https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories',
         ]);
-    }
-
-    /**
-     * @return class-string[]
-     */
-    private function entityChoices(): array
-    {
-        $choices = [];
-
-        foreach ($this->managerRegistry->getManagers() as $manager) {
-            foreach ($manager->getMetadataFactory()->getAllMetadata() as $metadata) {
-                if ($metadata->getReflectionClass()->isAbstract()) {
-                    continue;
-                }
-
-                if (!$this->factoryClassMap->classHasFactory($metadata->getName())) {
-                    $choices[] = $metadata->getName();
-                }
-            }
-        }
-
-        \sort($choices);
-
-        if (empty($choices)) {
-            throw new RuntimeCommandException('No entities or documents found, or none left to make factories for.');
-        }
-
-        return $choices;
     }
 
     private function doctrineEnabled(): bool
