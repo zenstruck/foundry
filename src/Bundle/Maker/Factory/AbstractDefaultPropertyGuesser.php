@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Bundle\Maker\Factory;
 
 use Symfony\Bundle\MakerBundle\Str;
@@ -19,8 +28,8 @@ abstract class AbstractDefaultPropertyGuesser implements DefaultPropertiesGuesse
     {
         if (!$factoryClass = $this->factoryClassMap->getFactoryForClass($fieldClass)) {
             if ($makeFactoryQuery->generateAllFactories() || $io->confirm(
-                    "A factory for class \"{$fieldClass}\" is missing for field {$makeFactoryData->getObjectShortName()}::\${$fieldName}. Do you want to create it?"
-                )) {
+                "A factory for class \"{$fieldClass}\" is missing for field {$makeFactoryData->getObjectShortName()}::\${$fieldName}. Do you want to create it?"
+            )) {
                 $factoryClass = $this->factoryGenerator->generateFactory($io, $makeFactoryQuery->withClass($fieldClass));
             } else {
                 $makeFactoryData->addDefaultProperty(\lcfirst($fieldName), "null, // TODO add {$fieldClass} type manually");

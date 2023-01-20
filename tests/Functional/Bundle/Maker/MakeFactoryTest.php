@@ -18,7 +18,6 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMComment;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMPost;
-use Zenstruck\Foundry\Tests\Fixtures\Document\ODMUser;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Comment;

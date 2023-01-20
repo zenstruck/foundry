@@ -45,7 +45,7 @@ class ObjectDefaultPropertiesGuesser extends AbstractDefaultPropertyGuesser
                 continue;
             }
 
-            if ($type && class_exists($type) && !is_a($type, \DateTimeInterface::class, true)) {
+            if ($type && \class_exists($type) && !\is_a($type, \DateTimeInterface::class, true)) {
                 $this->addDefaultValueUsingFactory($io, $makeFactoryData, $makeFactoryQuery, $property->getName(), $type);
 
                 continue;

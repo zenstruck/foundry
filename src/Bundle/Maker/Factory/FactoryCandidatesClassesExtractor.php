@@ -1,10 +1,19 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Bundle\Maker\Factory;
 
 use Doctrine\ORM\Mapping\ClassMetadataInfo as ORMClassMetadata;
-use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 
 /**
@@ -38,7 +47,7 @@ final class FactoryCandidatesClassesExtractor
 
         $choices = [
             ...$choices,
-            ...array_values(array_unique(array_merge(...$embeddedClasses)))
+            ...\array_values(\array_unique(\array_merge(...$embeddedClasses))),
         ];
 
         \sort($choices);
@@ -58,7 +67,7 @@ final class FactoryCandidatesClassesExtractor
         // - Doctrine ORM embedded objects does NOT have metadata classes, so we have to find all embedded classes inside entities
         // - Doctrine ODM embedded objects HAVE metadata classes, so they are already returned by factoryCandidatesClasses()
         return match (true) {
-            $metadata instanceof ORMClassMetadata => array_column($metadata->embeddedClasses, 'class'),
+            $metadata instanceof ORMClassMetadata => \array_column($metadata->embeddedClasses, 'class'),
             default => [],
         };
     }
