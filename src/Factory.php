@@ -295,9 +295,7 @@ class Factory
         try {
             return self::configuration()->faker();
         } catch (FoundryNotBootedException $exception) {
-            throw new \RuntimeException(
-                "Cannot get Foundry's configuration. If using faker in a data provider, consider passing attributes as a callable."
-            );
+            throw new \RuntimeException("Cannot get Foundry's configuration. If using faker in a data provider, consider passing attributes as a callable.");
         }
     }
 
