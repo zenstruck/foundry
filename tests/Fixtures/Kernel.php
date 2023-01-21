@@ -12,14 +12,7 @@ use Symfony\Bundle\MakerBundle\MakerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
-use Symfony\Component\Routing\RouteCollectionBuilder;
 use Zenstruck\Foundry\Test\ORMDatabaseResetter;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\AddressFactory;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryServiceFactory;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\EntityForRelationsFactory;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\CommentFactory;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\UserFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\ODMTagStory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\ODMTagStoryAsAService;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\ServiceStory;
@@ -207,10 +200,5 @@ class Kernel extends BaseKernel
                 ],
             ]);
         }
-    }
-
-    protected function configureRoutes(RouteCollectionBuilder $routes): void
-    {
-        // noop
     }
 }
