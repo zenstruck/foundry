@@ -27,7 +27,7 @@ class Product
     #[ORM\ManyToMany(targetEntity: ProductCategory::class, mappedBy: "products", cascade: ["persist"])]
     private Collection $categories;
 
-    #[ORM\ManyToMany(targetEntity: ProductTag::class, mappedBy: "products", cascade: ["persist"])]
+    #[ORM\ManyToMany(targetEntity: ProductTag::class, inversedBy: "products", cascade: ["persist"])]
     private Collection $tags;
 
     #[ORM\OneToOne(targetEntity: Review::class, mappedBy: "product", cascade: ["persist"])]
