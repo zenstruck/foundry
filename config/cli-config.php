@@ -27,4 +27,3 @@ return DependencyFactory::fromEntityManager(
     ]),
     new ExistingEntityManager($entityManager)
 );
-
