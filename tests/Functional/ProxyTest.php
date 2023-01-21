@@ -23,7 +23,7 @@ use Zenstruck\Foundry\Test\ResetDatabase;
  */
 abstract class ProxyTest extends KernelTestCase
 {
-    use ContainerBC, Factories, ResetDatabase;
+    use Factories, ResetDatabase;
 
     /**
      * @test
@@ -88,7 +88,7 @@ abstract class ProxyTest extends KernelTestCase
     {
         $post = $this->postFactoryClass()::createOne(['title' => 'my title']);
 
-        self::container()->get($this->registryServiceId())->getManager()->clear();
+        self::getContainer()->get($this->registryServiceId())->getManager()->clear();
 
         $this->assertSame('my title', $post->refresh()->getTitle());
     }
@@ -102,7 +102,7 @@ abstract class ProxyTest extends KernelTestCase
 
         $post = $postFactoryClass::createOne();
 
-        self::container()->get($this->registryServiceId())->getManager()->clear();
+        self::getContainer()->get($this->registryServiceId())->getManager()->clear();
 
         $postFactoryClass::repository()->truncate();
 

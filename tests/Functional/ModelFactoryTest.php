@@ -22,7 +22,7 @@ use Zenstruck\Foundry\Test\ResetDatabase;
  */
 abstract class ModelFactoryTest extends KernelTestCase
 {
-    use ContainerBC, Factories, ResetDatabase;
+    use Factories, ResetDatabase;
 
     /**
      * @test
