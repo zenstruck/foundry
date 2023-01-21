@@ -114,7 +114,7 @@ class Kernel extends BaseKernel
             $mappings = [
                 'Test' => [
                     'is_bundle' => false,
-                    'type' => 'annotation',
+                    'type' => 'attribute',
                     'dir' => '%kernel.project_dir%/tests/Fixtures/Entity',
                     'prefix' => 'Zenstruck\Foundry\Tests\Fixtures\Entity',
                     'alias' => 'Test',
@@ -124,7 +124,7 @@ class Kernel extends BaseKernel
             if (PHP_VERSION_ID >= 80100) {
                 $mappings['Test8.1'] = [
                     'is_bundle' => false,
-                    'type' => 'annotation',
+                    'type' => 'attribute',
                     'dir' => '%kernel.project_dir%/tests/Fixtures/PHP81',
                     'prefix' => 'Zenstruck\Foundry\Tests\Fixtures\PHP81',
                     'alias' => 'TestPHP81',
