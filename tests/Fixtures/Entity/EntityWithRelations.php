@@ -36,7 +36,7 @@ class EntityWithRelations
     #[ORM\ManyToMany(targetEntity: Category::class)]
     private $manyToMany;
 
-    #[ORM\ManyToMany(targetEntity: Brand::class)]
+    #[ORM\ManyToOne(targetEntity: Brand::class)]
     #[ORM\JoinColumn(nullable: false)]
     private $manyToOneWithNotExistingFactory;
 
