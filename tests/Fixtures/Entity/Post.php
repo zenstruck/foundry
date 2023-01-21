@@ -48,7 +48,7 @@ class Post implements \Stringable
     #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: "posts")]
     private Collection $tags;
 
-    #[ORM\ManyToOne(targetEntity: Tag::class, inversedBy: "secondaryPosts")]
+    #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: "secondaryPosts")]
     #[ORM\JoinTable(name: "post_tag_secondary")]
     private Collection $secondaryTags;
 
