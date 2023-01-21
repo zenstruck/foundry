@@ -4,31 +4,19 @@ namespace Zenstruck\Foundry\Tests\Fixtures\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
-/**
- * @MongoDB\EmbeddedDocument
- */
+#[MongoDB\EmbeddedDocument]
 class ODMComment
 {
-    /**
-     * @MongoDB\EmbedOne(
-     *     targetDocument=ODMUser::class
-     * )
-     */
+    #[MongoDB\EmbedOne(targetDocument: ODMUser::class)]
     private ODMUser $user;
 
-    /**
-     * @MongoDB\Field(type="string")
-     */
+    #[MongoDB\Field(type: 'string')]
     private $body;
 
-    /**
-     * @MongoDB\Field(type="date")
-     */
+    #[MongoDB\Field(type: 'date')]
     private $createdAt;
 
-    /**
-     * @MongoDB\Field(type="boolean")
-     */
+    #[MongoDB\Field(type: 'boolean')]
     private $approved = false;
 
     public function __construct(ODMUser $user, string $body)

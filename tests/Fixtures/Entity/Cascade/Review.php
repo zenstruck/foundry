@@ -4,27 +4,19 @@ namespace Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="review_cascade")
- */
+#[ORM\Entity]
+#[ORM\Table(name: "review_cascade")]
 class Review
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private ?int $id = null;
 
-    /**
-     * @ORM\OneToOne(targetEntity=Product::class, inversedBy="review")
-     */
+    #[ORM\OneToOne(targetEntity: Product::class, inversedBy: "review")]
     private ?Product $product = null;
 
-    /**
-     * @ORM\Column(name="ranking", type="integer")
-     */
+    #[ORM\Column(name: "ranking", type: "integer")]
     private ?int $rank = null;
 
     public function getId(): ?int

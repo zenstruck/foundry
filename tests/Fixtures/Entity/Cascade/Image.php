@@ -4,22 +4,16 @@ namespace Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="image_cascade")
- */
+#[ORM\Entity]
+#[ORM\Table(name: "image_cascade")]
 class Image
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private ?string $path = null;
 
     public function getId(): ?int

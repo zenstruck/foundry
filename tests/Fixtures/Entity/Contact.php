@@ -4,27 +4,19 @@ namespace Zenstruck\Foundry\Tests\Fixtures\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="contacts")
- */
+#[ORM\Entity]
+#[ORM\Table(name: "contacts")]
 class Contact
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private $id;
 
-    /**
-     * @ORM\Column(type="string")
-     */
+    #[ORM\Column(type: "string")]
     private $name;
 
-    /**
-     * @ORM\Embedded(Address::class)
-     */
+    #[ORM\Embedded(Address::class)]
     private Address $address;
 
     public function __construct($name)
