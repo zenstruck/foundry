@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Bundle\Maker\Factory;
 
+use Zenstruck\Foundry\Bundle\Maker\Factory\Exception\FactoryClassAlreadyExistException;
 use Zenstruck\Foundry\ModelFactory;
 
 /**
@@ -65,9 +66,14 @@ final class FactoryClassMap
     public function addFactoryForClass(string $factoryClass, string $class): void
     {
         if (\array_key_exists($factoryClass, $this->classesWithFactories)) {
-            throw new \InvalidArgumentException("Factory \"{$factoryClass}\" already exists.");
+            throw new FactoryClassAlreadyExistException($factoryClass);
         }
 
         $this->classesWithFactories[$factoryClass] = $class;
+    }
+
+    public function factoryClassExists(string $factoryClass): bool
+    {
+        return \array_key_exists($factoryClass, $this->classesWithFactories);
     }
 }
