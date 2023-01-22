@@ -12,14 +12,7 @@ use Symfony\Bundle\MakerBundle\MakerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
-use Symfony\Component\Routing\RouteCollectionBuilder;
 use Zenstruck\Foundry\Test\ORMDatabaseResetter;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\AddressFactory;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryServiceFactory;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\EntityForRelationsFactory;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\CommentFactory;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\UserFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\ODMTagStory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\ODMTagStoryAsAService;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\ServiceStory;
@@ -114,7 +107,7 @@ class Kernel extends BaseKernel
             $mappings = [
                 'Test' => [
                     'is_bundle' => false,
-                    'type' => 'annotation',
+                    'type' => 'attribute',
                     'dir' => '%kernel.project_dir%/tests/Fixtures/Entity',
                     'prefix' => 'Zenstruck\Foundry\Tests\Fixtures\Entity',
                     'alias' => 'Test',
@@ -124,7 +117,7 @@ class Kernel extends BaseKernel
             if (PHP_VERSION_ID >= 80100) {
                 $mappings['Test8.1'] = [
                     'is_bundle' => false,
-                    'type' => 'annotation',
+                    'type' => 'attribute',
                     'dir' => '%kernel.project_dir%/tests/Fixtures/PHP81',
                     'prefix' => 'Zenstruck\Foundry\Tests\Fixtures\PHP81',
                     'alias' => 'TestPHP81',
@@ -177,7 +170,7 @@ class Kernel extends BaseKernel
             $mappings = [
                 'Test' => [
                     'is_bundle' => false,
-                    'type' => 'annotation',
+                    'type' => 'attribute',
                     'dir' => '%kernel.project_dir%/tests/Fixtures/Document',
                     'prefix' => 'Zenstruck\Foundry\Tests\Fixtures\Document',
                     'alias' => 'Test',
@@ -187,7 +180,7 @@ class Kernel extends BaseKernel
             if (PHP_VERSION_ID >= 80100) {
                 $mappings['Test8.1'] = [
                     'is_bundle' => false,
-                    'type' => 'annotation',
+                    'type' => 'attribute',
                     'dir' => '%kernel.project_dir%/tests/Fixtures/PHP81',
                     'prefix' => 'Zenstruck\Foundry\Tests\Fixtures\PHP81',
                     'alias' => 'TestPHP81',
@@ -207,10 +200,5 @@ class Kernel extends BaseKernel
                 ],
             ]);
         }
-    }
-
-    protected function configureRoutes(RouteCollectionBuilder $routes): void
-    {
-        // noop
     }
 }

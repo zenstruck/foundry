@@ -4,32 +4,22 @@ namespace Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="variant_cascade")
- */
+#[ORM\Entity]
+#[ORM\Table(name: "variant_cascade")]
 class Variant
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private ?string $name = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="variants")
-     */
+    #[ORM\ManyToOne(targetEntity: Product::class, inversedBy: "variants")]
     private ?Product $product = null;
 
-    /**
-     * @ORM\OneToOne(targetEntity=Image::class, cascade={"persist"})
-     */
+    #[ORM\OneToOne(targetEntity: Image::class, cascade: ["persist"])]
     private ?Image $image = null;
 
     public function getId(): ?int

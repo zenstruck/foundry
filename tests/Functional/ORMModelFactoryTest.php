@@ -479,7 +479,7 @@ final class ORMModelFactoryTest extends ModelFactoryTest
     {
         $category = CategoryFactory::createOne(['name' => 'My Category']);
 
-        self::container()->get(EntityManagerInterface::class)->clear();
+        self::getContainer()->get(EntityManagerInterface::class)->clear();
 
         $post = PostFactory::createOne(['category' => $category]);
 
@@ -493,7 +493,7 @@ final class ORMModelFactoryTest extends ModelFactoryTest
     {
         $category = CategoryFactory::createOne(['name' => 'My Category'])->object();
 
-        self::container()->get(EntityManagerInterface::class)->clear();
+        self::getContainer()->get(EntityManagerInterface::class)->clear();
 
         $post = PostFactory::createOne(['category' => $category]);
 

@@ -4,19 +4,13 @@ namespace Zenstruck\Foundry\Tests\Fixtures\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
-/**
- * @MongoDB\Document(collection="tag")
- */
+#[MongoDB\Document(collection: 'tag')]
 class ODMTag
 {
-    /**
-     * @MongoDB\Id
-     */
+    #[MongoDB\Id]
     private $id;
 
-    /**
-     * @MongoDB\Field(type="string")
-     */
+    #[MongoDB\Field(type: 'string')]
     private $name;
 
     public function __construct(string $name)

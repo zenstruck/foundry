@@ -6,58 +6,34 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
-/**
- * @MongoDB\Document(collection="post")
- */
+#[MongoDB\Document(collection: 'post')]
 class ODMPost implements \Stringable
 {
-    /**
-     * @MongoDB\Id
-     */
+    #[MongoDB\Id]
     private $id;
 
-    /**
-     * @MongoDB\Field(type="string")
-     */
+    #[MongoDB\Field(type: 'string')]
     private $title;
 
-    /**
-     * @MongoDB\Field(type="string")
-     */
+    #[MongoDB\Field(type: 'string')]
     private $body;
 
-    /**
-     * @MongoDB\Field(type="string", nullable=true)
-     */
+    #[MongoDB\Field(type: 'string', nullable: true)]
     private $shortDescription;
 
-    /**
-     * @MongoDB\Field(type="int")
-     */
+    #[MongoDB\Field(type: 'int')]
     private $viewCount = 0;
 
-    /**
-     * @MongoDB\Field(type="date")
-     */
+    #[MongoDB\Field(type: 'date')]
     private $createdAt;
 
-    /**
-     * @MongoDB\Field(type="date", nullable=true)
-     */
+    #[MongoDB\Field(type: 'date', nullable: true)]
     private $publishedAt;
 
-    /**
-     * @MongoDB\EmbedMany(
-     *     targetDocument=ODMComment::class
-     * )
-     */
+    #[MongoDB\EmbedMany(targetDocument: ODMComment::class)]
     private $comments;
 
-    /**
-     * @MongoDB\EmbedOne(
-     *     targetDocument=ODMUser::class
-     * )
-     */
+    #[MongoDB\EmbedOne(targetDocument: ODMUser::class)]
     private $user;
 
     public function __construct(string $title, string $body, ODMUser $user, ?string $shortDescription = null)

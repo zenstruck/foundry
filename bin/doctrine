@@ -12,7 +12,7 @@ $entities = ['/app/tests/Fixtures/Entity'];
 if (PHP_VERSION_ID >= 80100) {
     $entities[] = '/app/tests/Fixtures/PHP81';
 }
-$ORMconfig = ORMSetup::createAnnotationMetadataConfiguration($entities, true);
+$ORMconfig = ORMSetup::createAttributeMetadataConfiguration($entities, true);
 $entityManager = EntityManager::create(['memory' => true, 'url' => getenv('DATABASE_URL')], $ORMconfig);
 
 ConsoleRunner::run(new SingleManagerProvider($entityManager));

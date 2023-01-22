@@ -4,15 +4,13 @@ namespace Zenstruck\Foundry\Tests\Fixtures\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Embeddable
- */
+#[ORM\Embeddable]
 final class Address
 {
     /**
      * @var mixed|null
-     * @ORM\Column(type="string", nullable=true)
      */
+    #[ORM\Column(type: "string", nullable: true)]
     private $value;
 
     public function getValue()
