@@ -13,11 +13,18 @@ USE_ODM=1
 USE_DAMA_DOCTRINE_TEST_BUNDLE=1
 SYMFONY_REQUIRE=5.4.*
 PHP_VERSION=8.0
+PREFER_LOWEST=false
 
 # Override test context variables with `.env` file
 ifneq (,$(wildcard .env))
 	include .env
 	export $(shell sed 's/=.*//' .env)
+endif
+
+ifeq (${PREFER_LOWEST},1)
+	COMPOSER_UPDATE_OPTIONS=--prefer-dist --prefer-lowest
+else
+	COMPOSER_UPDATE_OPTIONS=--prefer-dist
 endif
 
 DOCKER_PHP_CONTAINER_FLAG := docker/.makefile/.docker-containers-${PHP_VERSION}
@@ -94,7 +101,7 @@ composer: ### Run composer command
 	@${DOCKER_PHP_WITHOUT_XDEBUG} /usr/bin/composer $(ARGS)
 
 vendor: $(DOCKER_PHP_CONTAINER_FLAG) composer.json $(wildcard composer.lock) $(wildcard .env)
-	@${DC_EXEC} -e SYMFONY_REQUIRE=${SYMFONY_REQUIRE} ${PHP} php -d 'xdebug.mode=off' /usr/bin/composer update --prefer-dist
+	${DC_EXEC} -e SYMFONY_REQUIRE=${SYMFONY_REQUIRE} ${PHP} php -d 'xdebug.mode=off' /usr/bin/composer update ${COMPOSER_UPDATE_OPTIONS}
 	@touch -c $@ composer.json .env composer.lock
 
 .PHONY: docker-start

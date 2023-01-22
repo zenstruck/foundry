@@ -80,6 +80,7 @@ USE_ODM=1
 USE_DAMA_DOCTRINE_TEST_BUNDLE=1
 SYMFONY_REQUIRE=5.4.* # allowed values: 5.4.* | 6.0.* | 6.1.* | 6.2.*
 PHP_VERSION=8.0 # allowed values: 8.0 | 8.1 | 8.2
+PREFER_LOWEST=1 # force composer to request lowest dependencies
 ```
 
 ### Change docker's ports
