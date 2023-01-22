@@ -18,7 +18,10 @@ use Zenstruck\Assert;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
-use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
+use Zenstruck\Foundry\Tests\Fixtures\Document\ODMCategory;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Category as ORMCategory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory as ORMCategoryFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\CategoryFactory as ODMCategoryFactory;
 
 use function Zenstruck\Foundry\repository;
 
@@ -93,7 +96,6 @@ abstract class RepositoryProxyTest extends KernelTestCase
     /**
      * @test
      * @group legacy
-     * @noinspection PhpDeprecationInspection
      */
     public function assertions_legacy(): void
     {
@@ -331,7 +333,6 @@ abstract class RepositoryProxyTest extends KernelTestCase
     /**
      * @test
      * @group legacy
-     * @noinspection PhpDeprecationInspection
      */
     public function can_use_get_count(): void
     {
@@ -346,7 +347,7 @@ abstract class RepositoryProxyTest extends KernelTestCase
 
     /** @return class-string<ODMCategory|ORMCategory> */
     abstract protected function categoryClass(): string;
-    
+
     /** @return class-string<ODMCategoryFactory|ORMCategoryFactory> */
     abstract protected function categoryFactoryClass(): string;
 }
