@@ -1,32 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!-- https://phpunit.de/manual/current/en/appendixes.configuration.html -->
+<!-- https://phpunit.readthedocs.io/en/9.5/configuration.html -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="vendor/bin/.phpunit/phpunit.xsd"
          colors="true"
          bootstrap="tests/bootstrap.php"
          failOnRisky="true"
-         failOnWarning="true"
->
-    <php>
-        <ini name="error_reporting" value="-1" />
-        <env name="KERNEL_CLASS" value="Zenstruck\Foundry\Tests\Fixtures\Kernel" />
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0&amp;max[direct]=0&amp;quiet[]=indirect&amp;quiet[]=other"/>
-        <env name="SHELL_VERBOSITY" value="0"/>
-    </php>
-
-    <testsuites>
-        <testsuite name="Project Test Suite">
-            <directory>./tests/</directory>
-        </testsuite>
-    </testsuites>
-
-    <filter>
-        <whitelist>
-            <directory>./src/</directory>
-            <exclude>
-                <directory>./src/Bundle/Resources/</directory>
-            </exclude>
-        </whitelist>
-    </filter>
+         failOnWarning="true">
+  <coverage>
+    <include>
+      <directory>./src/</directory>
+    </include>
+    <exclude>
+      <directory>./src/Bundle/Resources/</directory>
+    </exclude>
+  </coverage>
+  <php>
+    <ini name="error_reporting" value="-1"/>
+    <env name="KERNEL_CLASS" value="Zenstruck\Foundry\Tests\Fixtures\Kernel"/>
+    <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0&amp;max[direct]=0&amp;quiet[]=indirect&amp;quiet[]=other"/>
+    <env name="SHELL_VERBOSITY" value="0"/>
+  </php>
+  <testsuites>
+    <testsuite name="Project Test Suite">
+      <directory>./tests/</directory>
+    </testsuite>
+  </testsuites>
 </phpunit>
