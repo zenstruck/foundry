@@ -290,7 +290,7 @@ abstract class ProxyTest extends KernelTestCase
         $this->assertSame('another new body', $post->getBody());
     }
 
-    /** @phpstan-return \Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory|\Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\PostFactory */
+    /** @return class-string<ODMPostFactory|ORMPostFactory> */
     abstract protected function postFactoryClass(): string;
 
     abstract protected function postClass(): string;
