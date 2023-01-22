@@ -16,8 +16,11 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo as ORMClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 use Symfony\Bundle\MakerBundle\Generator;
+use Symfony\Bundle\MakerBundle\Str;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Zenstruck\Foundry\Bundle\Maker\Factory\Exception\FactoryClassAlreadyExistException;
 
 /**
  * @internal
@@ -51,7 +54,31 @@ final class FactoryGenerator
         $factoryClass = $makeFactoryData->getFactoryClassNameDetails()->getFullName();
 
         if (!$this->factoryClassMap->classHasFactory($class)) {
-            $this->factoryClassMap->addFactoryForClass($factoryClass, $class);
+            try {
+                $this->factoryClassMap->addFactoryForClass($factoryClass, $class);
+            } catch (FactoryClassAlreadyExistException) {
+                $question = new Question(
+                    \sprintf(
+                        'Class "%s" already exists. Chose another one please (it will be generated in namespace "%s")',
+                        Str::getShortClassName($factoryClass),
+                        Str::getNamespace($factoryClass)
+                    )
+                );
+
+                $question->setValidator(
+                    function(string $newClassName) use ($factoryClass) {
+                        $newFactoryClass = \sprintf('%s\\%s', Str::getNamespace($factoryClass), $newClassName);
+                        if ($this->factoryClassMap->factoryClassExists($newFactoryClass)) {
+                            throw new RuntimeCommandException("Class \"{$newFactoryClass}\" also already exists!");
+                        }
+
+                        return $newFactoryClass;
+                    }
+                );
+                $factoryClass = $io->askQuestion($question);
+
+                $this->factoryClassMap->addFactoryForClass($factoryClass, $class);
+            }
         }
 
         foreach ($this->defaultPropertiesGuessers as $defaultPropertiesGuesser) {

@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMComment;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMPost;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Tag as AnotherTagClass;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Comment;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Contact;
@@ -311,13 +312,18 @@ final class MakeFactoryTest extends MakerTestCase
     {
         $tester = $this->makeFactoryCommandTester();
 
-        $tester->setInputs(['All']);
+        $inputs = ['All']; // which factory to generate?
+        if (\getenv('USE_ORM')) {
+            $inputs[] = 'OtherTagFactory'; // name collision handling (only for ORM, the collision is caused my an ORM class
+        }
+
+        $tester->setInputs($inputs);
         $tester->execute([]);
 
         $expectedFactories = [];
 
         if (\getenv('USE_ORM')) {
-            $expectedFactories = ['BrandFactory', 'CategoryFactory', 'CommentFactory', 'ContactFactory', 'EntityForRelationsFactory', 'UserFactory'];
+            $expectedFactories = ['BrandFactory', 'CategoryFactory', 'CommentFactory', 'ContactFactory', 'EntityForRelationsFactory', 'UserFactory', 'TagFactory', 'OtherTagFactory'];
         }
 
         if (\getenv('USE_ODM')) {
@@ -473,6 +479,33 @@ final class MakeFactoryTest extends MakerTestCase
 
         $factoryClass = Str::getShortClassName(Address::class);
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile("src/Factory/{$factoryClass}Factory.php"));
+    }
+
+    /**
+     * @test
+     */
+    public function it_handles_name_collision(): void
+    {
+        if (!\getenv('USE_ORM')) {
+            self::markTestSkipped('doctrine/orm not enabled.');
+        }
+
+        $tester = $this->makeFactoryCommandTester();
+        $tester->execute(['class' => Tag::class]);
+
+        $tester->setInputs([
+            'TagFactory', // first attempt to change the factory's name, will still break
+            'OtherTagFactory', // second attempt, is OK
+        ]);
+        $tester->execute(['class' => AnotherTagClass::class]);
+
+        $this->assertFileExists(self::tempFile('src/Factory/TagFactory.php'));
+        $this->assertFileExists(self::tempFile('src/Factory/OtherTagFactory.php'));
+
+        $output = $tester->getDisplay();
+
+        $this->assertStringContainsString('Class "TagFactory" already exists', $output);
+        $this->assertStringContainsString('[ERROR] Class "App\Factory\TagFactory" also already exists!', $output);
     }
 
     protected static function createKernel(array $options = []): KernelInterface

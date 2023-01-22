@@ -59,7 +59,7 @@ November 25th, 2022 - [v1.23.0...v1.24.0](https://github.com/zenstruck/foundry/c
 * 18ea4fb feat(make:factory): create factory for not-persisted objects (#343) by @nikophil
 * 64786fc fix: typo in docs (#348) by @nikophil
 * 1a98fc4 chore: Use composer 2.4 (#346) by @OskarStark
-* 96c4cbe minor(make:factory): Use `@see`/`@todo` annoations (#344) by @OskarStark
+* 96c4cbe minor(make:factory): Use `@see`/`@todo` annotations (#344) by @OskarStark
 * cbeb2ce fix: adjust docblocks to remove PhpStorm errors (#341) by @kbond
 * cd1e394 fix: use orm limit length in factory (#294) by @MrYamous
 * b1d7ce3 [feature] add default for Mongo properties in (#340) by @nikophil
