@@ -344,9 +344,9 @@ abstract class RepositoryProxyTest extends KernelTestCase
         $this->assertSame(4, $categoryFactoryClass::repository()->getCount());
     }
 
-    /** @phpstan-return \Zenstruck\Foundry\Tests\Fixtures\Entity\Category|\Zenstruck\Foundry\Tests\Fixtures\Document\ODMCategory */
+    /** @return class-string<ODMCategory|ORMCategory> */
     abstract protected function categoryClass(): string;
-
-    /** @phpstan-return \Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory|\Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\CategoryFactory */
+    
+    /** @return class-string<ODMCategoryFactory|ORMCategoryFactory> */
     abstract protected function categoryFactoryClass(): string;
 }
