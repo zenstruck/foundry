@@ -78,6 +78,7 @@ final class TestState
 
     /**
      * @deprecated Use TestState::enableDefaultProxyAutoRefresh()
+     * @noinspection PhpDeprecationInspection
      */
     public static function alwaysAutoRefreshProxies(): void
     {

@@ -93,6 +93,7 @@ abstract class RepositoryProxyTest extends KernelTestCase
     /**
      * @test
      * @group legacy
+     * @noinspection PhpDeprecationInspection
      */
     public function assertions_legacy(): void
     {
@@ -330,6 +331,7 @@ abstract class RepositoryProxyTest extends KernelTestCase
     /**
      * @test
      * @group legacy
+     * @noinspection PhpDeprecationInspection
      */
     public function can_use_get_count(): void
     {
@@ -342,7 +344,10 @@ abstract class RepositoryProxyTest extends KernelTestCase
         $this->assertSame(4, $categoryFactoryClass::repository()->getCount());
     }
 
+
+    /** @phpstan-return \Zenstruck\Foundry\Tests\Fixtures\Entity\Category|\Zenstruck\Foundry\Tests\Fixtures\Document\ODMCategory */
     abstract protected function categoryClass(): string;
 
+    /** @phpstan-return \Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory|\Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\CategoryFactory */
     abstract protected function categoryFactoryClass(): string;
 }

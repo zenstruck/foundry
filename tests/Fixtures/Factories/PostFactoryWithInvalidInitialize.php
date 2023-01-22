@@ -7,7 +7,7 @@ namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
  */
 final class PostFactoryWithInvalidInitialize extends PostFactory
 {
-    protected function initialize()
+    protected function initialize(): PostFactory|PostFactoryWithInvalidInitialize
     {
         return PostFactory::new();
     }
