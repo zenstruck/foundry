@@ -19,8 +19,8 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Brand;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Image;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Product;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\ProductCategory;
-use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Tag;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Review;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Tag;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Variant;
 
 use function Zenstruck\Foundry\factory;

@@ -58,7 +58,7 @@ final class FactoryGenerator
                 $this->factoryClassMap->addFactoryForClass($factoryClass, $class);
             } catch (FactoryClassAlreadyExistException) {
                 $question = new Question(
-                    sprintf(
+                    \sprintf(
                         'Class "%s" already exists. Chose another one please (it will be generated in namespace "%s")',
                         Str::getShortClassName($factoryClass),
                         Str::getNamespace($factoryClass)
@@ -67,9 +67,9 @@ final class FactoryGenerator
 
                 $question->setValidator(
                     function(string $newClassName) use ($factoryClass) {
-                        $newFactoryClass = sprintf('%s\\%s', Str::getNamespace($factoryClass), $newClassName);
+                        $newFactoryClass = \sprintf('%s\\%s', Str::getNamespace($factoryClass), $newClassName);
                         if ($this->factoryClassMap->factoryClassExists($newFactoryClass)) {
-                            throw new RuntimeCommandException("Class \"$newFactoryClass\" also already exists!");
+                            throw new RuntimeCommandException("Class \"{$newFactoryClass}\" also already exists!");
                         }
 
                         return $newFactoryClass;

@@ -499,8 +499,8 @@ final class MakeFactoryTest extends MakerTestCase
         ]);
         $tester->execute(['class' => AnotherTagClass::class]);
 
-        $this->assertFileExists(self::tempFile("src/Factory/TagFactory.php"));
-        $this->assertFileExists(self::tempFile("src/Factory/OtherTagFactory.php"));
+        $this->assertFileExists(self::tempFile('src/Factory/TagFactory.php'));
+        $this->assertFileExists(self::tempFile('src/Factory/OtherTagFactory.php'));
 
         $output = $tester->getDisplay();
 
