@@ -101,7 +101,7 @@ composer: ### Run composer command
 	@${DOCKER_PHP_WITHOUT_XDEBUG} /usr/bin/composer $(ARGS)
 
 vendor: $(DOCKER_PHP_CONTAINER_FLAG) composer.json $(wildcard composer.lock) $(wildcard .env)
-	${DC_EXEC} -e SYMFONY_REQUIRE=${SYMFONY_REQUIRE} ${PHP} php -d 'xdebug.mode=off' /usr/bin/composer update ${COMPOSER_UPDATE_OPTIONS}
+	@${DC_EXEC} -e SYMFONY_REQUIRE=${SYMFONY_REQUIRE} ${PHP} php -d 'xdebug.mode=off' /usr/bin/composer update ${COMPOSER_UPDATE_OPTIONS}
 	@touch -c $@ composer.json .env composer.lock
 
 .PHONY: docker-start

@@ -186,6 +186,23 @@ This command will generate a ``PostFactory`` class that looks like this:
 
     Using ``make:factory --test`` will generate the factory in ``tests/Factory``.
 
+.. tip::
+
+    You can globally configure which namespace the factories will be generated in:
+
+    .. configuration-block::
+
+        .. code-block:: yaml
+
+            # config/packages/zenstruck_foundry.yaml
+            when@dev: # see Bundle Configuration section about sharing this in the test environment
+                zenstruck_foundry:
+                    make_factory:
+                        default_namespace: 'App\\MyFactories'
+
+    You can override this configuration by using the ``--namespace`` option.
+
+
 .. note::
 
     The generated ``@method`` docblocks above enable autocompletion with PhpStorm but
@@ -1938,6 +1955,12 @@ Full Default Bundle Configuration
             # Add global state.
             global_state: []
 
+            # Configure Foundry's make:factory command
+            make_factory:
+
+                # Namespace to use for make:factory. Is overridden by --namespace option
+                default_namespace: 'Factory'
+
     .. code-block:: php
 
         $config->extension('zenstruck_foundry', [
@@ -1997,8 +2020,15 @@ Full Default Bundle Configuration
                     'object_managers' => false,
                 ],
 
-                // Add global state
-                'global_state' => []
+            ],
 
+            // Add global state
+            'global_state' => [],
+
+            // Configure Foundry's make:factory command
+            'make_factory' => [
+
+                // Namespace to use for make:factory. Is overridden by --namespace option
+                'default_namespace' => 'Factory'
             ]
         ]);

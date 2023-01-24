@@ -23,10 +23,10 @@ final class MakeFactoryQuery
     {
     }
 
-    public static function fromInput(InputInterface $input, string $class, bool $generateAllFactories, Generator $generator): self
+    public static function fromInput(InputInterface $input, string $class, bool $generateAllFactories, Generator $generator, string $defaultNamespace): self
     {
         return new self(
-            namespace: $input->getOption('namespace'),
+            namespace: $defaultNamespace,
             test: (bool) $input->getOption('test'),
             persisted: !$input->getOption('no-persistence'),
             allFields: (bool) $input->getOption('all-fields'),

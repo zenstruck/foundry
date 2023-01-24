@@ -130,6 +130,16 @@ final class Configuration implements ConfigurationInterface
                     ->scalarPrototype()->end()
                     ->info('Array of stories that should be used as global state.')
                 ->end()
+                ->arrayNode('make_factory')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('default_namespace')
+                            ->info('Default namespace where factories will be created by maker.')
+                            ->defaultValue('Factory')
+                            ->cannotBeEmpty()
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ;
 

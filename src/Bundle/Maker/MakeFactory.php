@@ -35,8 +35,13 @@ final class MakeFactory extends AbstractMaker
 {
     private const GENERATE_ALL_FACTORIES = 'All';
 
-    public function __construct(private KernelInterface $kernel, private FactoryGenerator $factoryGenerator, private NoPersistenceObjectsAutoCompleter $noPersistenceObjectsAutoCompleter, private FactoryCandidatesClassesExtractor $factoryCandidatesClassesExtractor)
-    {
+    public function __construct(
+        private KernelInterface $kernel,
+        private FactoryGenerator $factoryGenerator,
+        private NoPersistenceObjectsAutoCompleter $noPersistenceObjectsAutoCompleter,
+        private FactoryCandidatesClassesExtractor $factoryCandidatesClassesExtractor,
+        private string $defaultNamespace
+    ) {
     }
 
     public static function getCommandName(): string
@@ -59,7 +64,7 @@ final class MakeFactory extends AbstractMaker
         $command
             ->setDescription(self::getCommandDescription())
             ->addArgument('class', InputArgument::OPTIONAL, 'Entity, Document or class to create a factory for')
-            ->addOption('namespace', null, InputOption::VALUE_REQUIRED, 'Customize the namespace for generated factories', 'Factory')
+            ->addOption('namespace', null, InputOption::VALUE_REQUIRED, 'Customize the namespace for generated factories')
             ->addOption('test', null, InputOption::VALUE_NONE, 'Create in <fg=yellow>tests/</> instead of <fg=yellow>src/</>')
             ->addOption('all-fields', null, InputOption::VALUE_NONE, 'Create defaults for all entity fields, not only required fields')
             ->addOption('no-persistence', null, InputOption::VALUE_NONE, 'Create a factory for an object not managed by Doctrine')
@@ -122,7 +127,7 @@ final class MakeFactory extends AbstractMaker
         foreach ($classes as $class) {
             $this->factoryGenerator->generateFactory(
                 $io,
-                MakeFactoryQuery::fromInput($input, $class, $generateAllFactories, $generator));
+                MakeFactoryQuery::fromInput($input, $class, $generateAllFactories, $generator, $input->getOption('namespace') ?? $this->defaultNamespace));
         }
 
         $generator->writeChanges();

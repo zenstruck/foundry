@@ -28,8 +28,13 @@ use Zenstruck\Foundry\Bundle\Maker\Factory\Exception\FactoryClassAlreadyExistExc
 final class FactoryGenerator
 {
     /** @param \Traversable<int, DefaultPropertiesGuesser> $defaultPropertiesGuessers */
-    public function __construct(private ManagerRegistry $managerRegistry, private KernelInterface $kernel, private \Traversable $defaultPropertiesGuessers, private FactoryClassMap $factoryClassMap)
-    {
+    public function __construct(
+        private ManagerRegistry $managerRegistry,
+        private KernelInterface $kernel,
+        private \Traversable $defaultPropertiesGuessers,
+        private FactoryClassMap $factoryClassMap,
+        private NamespaceGuesser $namespaceGuesser,
+    ) {
     }
 
     /**
@@ -66,7 +71,7 @@ final class FactoryGenerator
                 );
 
                 $question->setValidator(
-                    function(string $newClassName) use ($factoryClass) {
+                    function (string $newClassName) use ($factoryClass) {
                         $newFactoryClass = \sprintf('%s\\%s', Str::getNamespace($factoryClass), $newClassName);
                         if ($this->factoryClassMap->factoryClassExists($newFactoryClass)) {
                             throw new RuntimeCommandException("Class \"{$newFactoryClass}\" also already exists!");
@@ -105,7 +110,7 @@ final class FactoryGenerator
 
         $factory = $generator->createClassNameDetails(
             $object->getShortName(),
-            $this->guessNamespace($generator, $makeFactoryQuery->getNamespace(), $makeFactoryQuery->isTest()),
+            ($this->namespaceGuesser)($generator, $class, $makeFactoryQuery->getNamespace(), $makeFactoryQuery->isTest()),
             'Factory'
         );
 
@@ -136,22 +141,6 @@ final class FactoryGenerator
         );
     }
 
-    private function guessNamespace(Generator $generator, string $namespace, bool $test): string
-    {
-        // strip maker's root namespace if set
-        if (0 === \mb_strpos($namespace, $generator->getRootNamespace())) {
-            $namespace = \mb_substr($namespace, \mb_strlen($generator->getRootNamespace()));
-        }
-
-        $namespace = \trim($namespace, '\\');
-
-        // if creating in tests dir, ensure namespace prefixed with Tests\
-        if ($test && 0 !== \mb_strpos($namespace, 'Tests\\')) {
-            $namespace = 'Tests\\'.$namespace;
-        }
-
-        return $namespace;
-    }
 
     private function phpstanEnabled(): bool
     {
