@@ -13,4 +13,9 @@ final class PostRepository extends EntityRepository
     {
         return 'from custom method';
     }
+
+    public function returnNestedArray():array
+    {
+        return [['id' => 1]];
+    }
 }

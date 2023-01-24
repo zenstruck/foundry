@@ -379,7 +379,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
     private function proxyResult(mixed $result)
     {
         if (\is_array($result)) {
-            return \array_map(fn(object $o): Proxy => $this->proxyResult($o), $result);
+            return \array_map(fn(mixed $o): mixed => $this->proxyResult($o), $result);
         }
 
         if ($result && \is_a($result, $this->getClassName())) {
@@ -392,7 +392,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
     private static function normalizeCriteria(array $criteria): array
     {
         return \array_map(
-            fn($value) => $value instanceof Proxy ? $value->object() : $value,
+            static fn($value) => $value instanceof Proxy ? $value->object() : $value,
             $criteria
         );
     }
