@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## [v1.28.0](https://github.com/zenstruck/foundry/releases/tag/v1.28.0)
+
+January 24th, 2023 - [v1.27.0...v1.28.0](https://github.com/zenstruck/foundry/compare/v1.27.0...v1.28.0)
+
+* e54c757 fix: remove type in closure in RepositoryProxy::proxyResult() (#410) by @nikophil
+* 6f54bbb chore: easy way to require lowest deps (#407) by @nikophil
+* 0a4b4ec feat: drop support of symfony 4, remove deprecation for console/command (#398) by @Chris53897, @Chris8934
+* 467f62f feat(make:factory): handle name collision (#402) by @nikophil
+* 1c96c86 chore: migrate phpunit config-file for phpunit 9 format (#404) by @Chris53897, @Chris8934
+* aac5aba docs: fix spelling of annotations in CHANGELOG.md (#403) by @Chris53897, @Chris8934
+* 2875dd7 feat(make:factory): list embeddables (#400) by @nikophil
+* 3a40f1a minor: meaningful error for faker in data provider (#399) by @nikophil
+* 48398f1 feat(make:factory): default value for enum types (#393) by @nikophil
+* 6cf06c4 tests: reactivate self deprecations (#392) by @nikophil
+
 ## [v1.27.0](https://github.com/zenstruck/foundry/releases/tag/v1.27.0)
 
 January 9th, 2023 - [v1.26.0...v1.27.0](https://github.com/zenstruck/foundry/compare/v1.26.0...v1.27.0)
