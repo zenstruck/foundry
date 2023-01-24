@@ -71,7 +71,7 @@ final class FactoryGenerator
                 );
 
                 $question->setValidator(
-                    function (string $newClassName) use ($factoryClass) {
+                    function(string $newClassName) use ($factoryClass) {
                         $newFactoryClass = \sprintf('%s\\%s', Str::getNamespace($factoryClass), $newClassName);
                         if ($this->factoryClassMap->factoryClassExists($newFactoryClass)) {
                             throw new RuntimeCommandException("Class \"{$newFactoryClass}\" also already exists!");
@@ -140,7 +140,6 @@ final class FactoryGenerator
             $persisted
         );
     }
-
 
     private function phpstanEnabled(): bool
     {
