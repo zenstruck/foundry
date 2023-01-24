@@ -26,23 +26,18 @@ For the remainder of the documentation, the following sample entities will be us
 
     namespace App\Entity;
 
+    use App\Repository\CategoryRepository;
     use Doctrine\ORM\Mapping as ORM;
 
-    /**
-     * @ORM\Entity(repositoryClass="App\Repository\CategoryRepository")
-     */
+    #[ORM\Entity(repositoryClass: CategoryRepository::class)]
     class Category
     {
-        /**
-         * @ORM\Id()
-         * @ORM\GeneratedValue()
-         * @ORM\Column(type="integer")
-         */
+        #[ORM\Id]
+        #[ORM\GeneratedValue]
+        #[ORM\Column(type: 'string')]
         private $id;
 
-        /**
-         * @ORM\Column(type="string", length=255)
-         */
+        #[ORM\Column(type: 'string', length: 255)]
         private $name;
 
         public function __construct(string $name)
@@ -57,44 +52,31 @@ For the remainder of the documentation, the following sample entities will be us
 
     namespace App\Entity;
 
+    use App\Repository\PostRepository;
     use Doctrine\ORM\Mapping as ORM;
 
-    /**
-     * @ORM\Entity(repositoryClass="App\Repository\PostRepository")
-     */
+    #[ORM\Entity(repositoryClass: PostRepository::class)]
     class Post
     {
-        /**
-         * @ORM\Id()
-         * @ORM\GeneratedValue()
-         * @ORM\Column(type="integer")
-         */
+        #[ORM\Id]
+        #[ORM\GeneratedValue]
+        #[ORM\Column(type: 'string')]
         private $id;
 
-        /**
-         * @ORM\Column(type="string", length=255)
-         */
+        #[ORM\Column(type: 'string', length: 255)]
         private $title;
 
-        /**
-         * @ORM\Column(type="text", nullable=true)
-         */
+        #[ORM\Column(type: 'text', nullable: true)]
         private $body;
 
-        /**
-         * @ORM\Column(type="datetime")
-         */
+        #[ORM\Column(type: 'datetime')]
         private $createdAt;
 
-        /**
-         * @ORM\Column(type="datetime", nullable=true)
-         */
+        #[ORM\Column(type: 'datetime', nullable: true)]
         private $publishedAt;
 
-        /**
-         * @ORM\ManyToOne(targetEntity=Category::class)
-         * @ORM\JoinColumn
-         */
+        #[ORM\ManyToOne(targetEntity: Category::class)]
+        #[ORM\JoinColumn]
         private $category;
 
         public function __construct(string $title)
