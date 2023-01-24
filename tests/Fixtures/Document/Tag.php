@@ -5,7 +5,7 @@ namespace Zenstruck\Foundry\Tests\Fixtures\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 #[MongoDB\Document(collection: 'tag')]
-class ODMTag
+class Tag
 {
     #[MongoDB\Id]
     private $id;

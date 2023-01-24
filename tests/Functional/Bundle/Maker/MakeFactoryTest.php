@@ -19,7 +19,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMComment;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMPost;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
-use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Tag as AnotherTagClass;
+use Zenstruck\Foundry\Tests\Fixtures\Document\Tag as AnotherTagClass;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Brand;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Comment;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Contact;
@@ -125,6 +126,24 @@ final class MakeFactoryTest extends MakerTestCase
         $tester->execute(['class' => Category::class, '--test' => true]);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('tests/Factory/CategoryFactory.php'));
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_factory_in_a_sub_directory(): void
+    {
+        if (!\getenv('USE_ORM')) {
+            self::markTestSkipped('doctrine/orm not enabled.');
+        }
+
+        $tester = $this->makeFactoryCommandTester();
+
+        $tester->execute(['class' => Brand::class]);
+        $this->assertFileExists(self::tempFile('src/Factory/Cascade/BrandFactory.php'));
+
+        $tester->execute(['class' => Brand::class, '--test' => true]);
+        $this->assertFileExists(self::tempFile('tests/Factory/Cascade/BrandFactory.php'));
     }
 
     /**
@@ -323,11 +342,12 @@ final class MakeFactoryTest extends MakerTestCase
         $expectedFactories = [];
 
         if (\getenv('USE_ORM')) {
-            $expectedFactories = ['BrandFactory', 'CategoryFactory', 'CommentFactory', 'ContactFactory', 'EntityForRelationsFactory', 'UserFactory', 'TagFactory', 'OtherTagFactory'];
+            $expectedFactories = ['Cascade/BrandFactory', 'CategoryFactory', 'CommentFactory', 'ContactFactory', 'EntityForRelationsFactory', 'UserFactory', 'TagFactory', 'Cascade/TagFactory'];
         }
 
         if (\getenv('USE_ODM')) {
-            $expectedFactories = [...$expectedFactories, 'ODMCategoryFactory', 'ODMCommentFactory', 'ODMPostFactory', 'ODMTagFactory', 'ODMUserFactory'];
+            $expectedFactories = [...$expectedFactories, 'ODMCategoryFactory', 'ODMCommentFactory', 'ODMPostFactory', 'ODMUserFactory'];
+            $expectedFactories[] = \getenv('USE_ORM') ? 'OtherTagFactory' : 'TagFactory';
         }
 
         self::assertGreaterThan(0, \count($expectedFactories));
@@ -486,8 +506,8 @@ final class MakeFactoryTest extends MakerTestCase
      */
     public function it_handles_name_collision(): void
     {
-        if (!\getenv('USE_ORM')) {
-            self::markTestSkipped('doctrine/orm not enabled.');
+        if (!\getenv('USE_ORM') || !\getenv('USE_ODM')) {
+            self::markTestSkipped('doctrine/odm and doctrine/orm should be enabled enabled.');
         }
 
         $tester = $this->makeFactoryCommandTester();

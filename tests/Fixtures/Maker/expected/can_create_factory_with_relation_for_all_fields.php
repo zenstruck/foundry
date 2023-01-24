@@ -2,6 +2,7 @@
 
 namespace App\Factory;
 
+use App\Factory\Cascade\BrandFactory;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\EntityWithRelations;

@@ -19,7 +19,7 @@ use Zenstruck\Foundry\Bundle\DependencyInjection\GlobalStatePass;
 use Zenstruck\Foundry\Bundle\DependencyInjection\ZenstruckFoundryExtension;
 
 /**
- * Must be at src root to be auto-configured by Symfony Flex.
+ * Must be at src root to be autoconfigured by Symfony Flex.
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
