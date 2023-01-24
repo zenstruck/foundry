@@ -528,11 +528,35 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertStringContainsString('[ERROR] Class "App\Factory\TagFactory" also already exists!', $output);
     }
 
+    /**
+     * @test
+     * @dataProvider itUsesNamespaceFromConfigurationProvider
+     */
+    public function it_uses_default_namespace_from_configuration(string $defaultNamespace): void
+    {
+        if (!\getenv('USE_ORM')) {
+            self::markTestSkipped('doctrine/orm not enabled.');
+        }
+
+        $tester = $this->makeFactoryCommandTester(['defaultMakeFactoryNamespace' => $defaultNamespace]);
+        $tester->execute(['class' => Category::class]);
+
+        $this->assertFileExists(self::tempFile('src/Foundry/CategoryFactory.php'));
+    }
+
+    public function itUsesNamespaceFromConfigurationProvider(): iterable
+    {
+        yield 'without root namespace' => ['Foundry'];
+        yield 'with root namespace' => ['App\\Foundry'];
+        yield 'with trailing backslash' => ['Foundry\\'];
+    }
+
     protected static function createKernel(array $options = []): KernelInterface
     {
         return Kernel::create(
             enableDoctrine: $options['enableDoctrine'] ?? true,
-            factoriesRegistered: $options['factoriesRegistered'] ?? []
+            factoriesRegistered: $options['factoriesRegistered'] ?? [],
+            defaultMakeFactoryNamespace: $options['defaultMakeFactoryNamespace'] ?? null
         );
     }
 

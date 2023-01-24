@@ -32,17 +32,20 @@ class Kernel extends BaseKernel
     private string $ormResetMode = ORMDatabaseResetter::RESET_MODE_SCHEMA;
 
     private array $factoriesRegistered = [];
+    private string|null $defaultMakeFactoryNamespace = null;
 
     public static function create(
         bool $enableDoctrine = true,
         string $ormResetMode = ORMDatabaseResetter::RESET_MODE_SCHEMA,
-        array $factoriesRegistered = []
+        array $factoriesRegistered = [],
+        string|null $defaultMakeFactoryNamespace = null,
     ): self {
         $kernel = new self('test', true);
 
         $kernel->enableDoctrine = $enableDoctrine;
         $kernel->ormResetMode = $ormResetMode;
         $kernel->factoriesRegistered = $factoriesRegistered;
+        $kernel->defaultMakeFactoryNamespace = $defaultMakeFactoryNamespace;
 
         return $kernel;
     }
@@ -78,7 +81,7 @@ class Kernel extends BaseKernel
     {
         return \sprintf(
             "{$this->getProjectDir()}/var/cache/test/%s",
-            \md5(\json_encode([$this->enableDoctrine, $this->ormResetMode, $this->factoriesRegistered], \JSON_THROW_ON_ERROR))
+            \md5(\json_encode([$this->enableDoctrine, $this->ormResetMode, $this->factoriesRegistered, $this->defaultMakeFactoryNamespace], \JSON_THROW_ON_ERROR))
         );
     }
 
@@ -139,6 +142,9 @@ class Kernel extends BaseKernel
 
         if (\getenv('USE_FOUNDRY_BUNDLE')) {
             $foundryConfig = ['auto_refresh_proxies' => false];
+            if ($this->defaultMakeFactoryNamespace) {
+                $foundryConfig['make_factory'] = ['default_namespace' => $this->defaultMakeFactoryNamespace];
+            }
             $globalState = [];
 
             if ($this->enableDoctrine && \getenv('USE_ORM')) {

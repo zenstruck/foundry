@@ -47,6 +47,7 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
         $this->configureFaker($mergedConfig['faker'], $container);
         $this->configureDefaultInstantiator($mergedConfig['instantiator'], $container);
         $this->configureDatabaseResetter($mergedConfig['database_resetter'], $container);
+        $this->configureMakeFactory($mergedConfig['make_factory'], $container);
 
         if (true === $mergedConfig['auto_refresh_proxies']) {
             $container->getDefinition('.zenstruck_foundry.configuration')->addMethodCall('enableDefaultProxyAutoRefresh');
@@ -122,6 +123,12 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
         $configurationDefinition->setArgument('$ormObjectManagersToReset', $config['orm']['object_managers'] ?? []);
         $configurationDefinition->setArgument('$ormResetMode', $config['orm']['reset_mode'] ?? ORMDatabaseResetter::RESET_MODE_SCHEMA);
         $configurationDefinition->setArgument('$odmObjectManagersToReset', $config['odm']['object_managers'] ?? []);
+    }
+
+    private function configureMakeFactory(array $makerConfig, ContainerBuilder $container): void
+    {
+        $makeFactoryDefinition = $container->getDefinition('.zenstruck_foundry.maker.factory');
+        $makeFactoryDefinition->setArgument('$defaultNamespace', $makerConfig['default_namespace']);
     }
 
     private static function isBundleLoaded(ContainerBuilder $container, string $bundleName): bool
