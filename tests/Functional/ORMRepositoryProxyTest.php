@@ -74,6 +74,17 @@ final class ORMRepositoryProxyTest extends RepositoryProxyTest
         $this->assertSame($categoryC->getId(), CategoryFactory::repository()->findOneBy([], ['id' => 'DESC'])->getId());
     }
 
+    /**
+     * @test
+     */
+    public function proxy_repository_can_return_scalars(): void
+    {
+        self::assertSame(
+            [['id' => 1]],
+            PostFactory::repository()->returnNestedArray()
+        );
+    }
+
     protected function categoryClass(): string
     {
         return Category::class;
