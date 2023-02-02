@@ -1828,6 +1828,33 @@ Later, you can access the story's state when creating other fixtures:
     // or use the magic method (functionally equivalent to above)
     PostFactory::createOne(['category' => CategoryStory::php()]);
 
+.. tip::
+
+    Unlike factories, stories are not tied to a specific type, and then they cannot be generic, but you can leverage
+    the magic method and PHPDoc to improve autocompletion and fix static analysis issues with stories:
+
+    .. code-block:: php
+
+        // src/Story/CategoryStory.php
+
+        namespace App\Story;
+
+        use App\Factory\CategoryFactory;
+        use Zenstruck\Foundry\Story;
+
+        /**
+         * @method php(): Category
+         */
+        final class CategoryStory extends Story
+        {
+            public function build(): void
+            {
+                $this->addState('php', CategoryFactory::createOne(['name' => 'php']));
+            }
+        }
+
+    Now your IDE will know ``CategoryStory::php()`` returns an object of type ``Category``.
+
 .. note::
 
     Story state is cleared after each test (unless it is a :ref:`Global State Story <global-state>`).
