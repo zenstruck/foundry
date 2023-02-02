@@ -14,8 +14,10 @@ namespace Zenstruck\Foundry\Bundle\DependencyInjection;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
+use Symfony\Bundle\MakerBundle\MakerBundle;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\FileLoader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Zenstruck\Foundry\Bundle\Command\StubMakeFactory;
@@ -34,7 +36,6 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 
         $loader->load('services.xml');
-        $loader->load('maker.xml');
 
         $container->registerForAutoconfiguration(Story::class)
             ->addTag('foundry.story')
@@ -47,17 +48,12 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
         $this->configureFaker($mergedConfig['faker'], $container);
         $this->configureDefaultInstantiator($mergedConfig['instantiator'], $container);
         $this->configureDatabaseResetter($mergedConfig['database_resetter'], $container);
-        $this->configureMakeFactory($mergedConfig['make_factory'], $container);
+        $this->configureMakeFactory($mergedConfig['make_factory'], $container, $loader);
 
         if (true === $mergedConfig['auto_refresh_proxies']) {
             $container->getDefinition('.zenstruck_foundry.configuration')->addMethodCall('enableDefaultProxyAutoRefresh');
         } elseif (false === $mergedConfig['auto_refresh_proxies']) {
             $container->getDefinition('.zenstruck_foundry.configuration')->addMethodCall('disableDefaultProxyAutoRefresh');
-        }
-
-        if (!\class_exists(AbstractMaker::class)) {
-            $container->register('.zenstruck_foundry.maker.factory_stub', StubMakeFactory::class)->addTag('console.command');
-            $container->register('.zenstruck_foundry.maker.story_stub', StubMakeStory::class)->addTag('console.command');
         }
     }
 
@@ -125,10 +121,17 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
         $configurationDefinition->setArgument('$odmObjectManagersToReset', $config['odm']['object_managers'] ?? []);
     }
 
-    private function configureMakeFactory(array $makerConfig, ContainerBuilder $container): void
+    private function configureMakeFactory(array $makerConfig, ContainerBuilder $container, FileLoader $loader): void
     {
-        $makeFactoryDefinition = $container->getDefinition('.zenstruck_foundry.maker.factory');
-        $makeFactoryDefinition->setArgument('$defaultNamespace', $makerConfig['default_namespace']);
+        if (\class_exists(AbstractMaker::class) && self::isBundleLoaded($container, MakerBundle::class)) {
+            $loader->load('maker.xml');
+
+            $makeFactoryDefinition = $container->getDefinition('.zenstruck_foundry.maker.factory');
+            $makeFactoryDefinition->setArgument('$defaultNamespace', $makerConfig['default_namespace']);
+        } else {
+            $container->register('.zenstruck_foundry.maker.factory_stub', StubMakeFactory::class)->addTag('console.command');
+            $container->register('.zenstruck_foundry.maker.story_stub', StubMakeStory::class)->addTag('console.command');
+        }
     }
 
     private static function isBundleLoaded(ContainerBuilder $container, string $bundleName): bool
