@@ -11,8 +11,11 @@
 
 namespace Zenstruck\Foundry\Tests\Unit\Bundle\DependencyInjection;
 
+use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Faker\Generator;
 use Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractExtensionTestCase;
+use Symfony\Bundle\MakerBundle\MakerBundle;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Zenstruck\Foundry\Bundle\DependencyInjection\ZenstruckFoundryExtension;
 use Zenstruck\Foundry\Instantiator;
@@ -22,6 +25,13 @@ use Zenstruck\Foundry\Instantiator;
  */
 final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->setParameter('kernel.bundles', []);
+    }
+
     /**
      * @test
      */
@@ -42,8 +52,11 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
         $this->assertContainerBuilderHasService('.zenstruck_foundry.faker', Generator::class);
         $this->assertEmpty($this->container->getDefinition('.zenstruck_foundry.faker')->getArguments());
         $this->assertContainerBuilderHasService('.zenstruck_foundry.story_manager');
-        $this->assertContainerBuilderHasServiceDefinitionWithTag('.zenstruck_foundry.maker.factory', 'maker.command');
-        $this->assertContainerBuilderHasServiceDefinitionWithTag('.zenstruck_foundry.maker.story', 'maker.command');
+
+        $this->assertContainerBuilderNotHasService('.zenstruck_foundry.maker.factory');
+        $this->assertContainerBuilderNotHasService('.zenstruck_foundry.maker.story');
+        $this->assertContainerBuilderHasServiceDefinitionWithTag('.zenstruck_foundry.maker.factory_stub', 'console.command');
+        $this->assertContainerBuilderHasServiceDefinitionWithTag('.zenstruck_foundry.maker.story_stub', 'console.command');
     }
 
     /**
@@ -182,6 +195,52 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
         $this->assertContainerBuilderHasService('.zenstruck_foundry.configuration');
         $this->assertCount(6, $this->container->findDefinition('.zenstruck_foundry.configuration')->getMethodCalls());
         $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.configuration', 'disableDefaultProxyAutoRefresh', []);
+    }
+
+    /**
+     * @test
+     */
+    public function it_registers_makers_if_maker_bundle_enabled(): void
+    {
+        $this->setParameter('kernel.bundles', [MakerBundle::class]);
+        $this->load();
+
+        $this->assertContainerBuilderHasServiceDefinitionWithTag('.zenstruck_foundry.maker.factory', 'maker.command');
+        $this->assertContainerBuilderHasServiceDefinitionWithTag('.zenstruck_foundry.maker.story', 'maker.command');
+    }
+
+    /**
+     * @test
+     * @testWith ["orm"]
+     *           ["odm"]
+     */
+    public function cannot_configure_database_resetter_if_doctrine_not_enabled(string $doctrine): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('should be enabled to use config under "database_resetter.%s"', $doctrine));
+
+        $this->load(['database_resetter' => [$doctrine => []]]);
+    }
+
+    /**
+     * @test
+     */
+    public function can_configure_database_resetter_if_doctrine_enabled(): void
+    {
+        $this->setParameter('kernel.bundles', [DoctrineBundle::class, DoctrineMongoDBBundle::class]);
+
+        $this->load([
+            'database_resetter' => [
+                'orm' => ['connections' => ['orm_connection'], 'object_managers' => ['object_manager_orm'], 'reset_mode' => 'migrate'],
+                'odm' => ['object_managers' => ['object_manager_odm']],
+            ],
+        ]);
+
+        $configurationArguments = $this->container->getDefinition('.zenstruck_foundry.configuration')->getArguments();
+        $this->assertSame(['orm_connection'], $configurationArguments['$ormConnectionsToReset']);
+        $this->assertSame(['object_manager_orm'], $configurationArguments['$ormObjectManagersToReset']);
+        $this->assertSame('migrate', $configurationArguments['$ormResetMode']);
+        $this->assertSame(['object_manager_odm'], $configurationArguments['$odmObjectManagersToReset']);
     }
 
     /**
