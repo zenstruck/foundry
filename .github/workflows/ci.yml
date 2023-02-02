@@ -230,7 +230,7 @@ jobs:
   fixcs:
     name: Run php-cs-fixer
     needs: sync-with-template
-    if: (github.event_name == 'push' || github.event_name == 'schedule') && !startsWith(github.ref, 'refs/tags')
+    if: (github.event_name == 'push' || github.event_name == 'schedule') && !startsWith(github.ref, 'refs/tags') && github.repository_owner == 'zenstruck'
     runs-on: ubuntu-latest
     steps:
       - uses: zenstruck/.github@php-cs-fixer
@@ -241,7 +241,7 @@ jobs:
 
   sync-with-template:
     name: Sync meta files
-    if: (github.event_name == 'push' || github.event_name == 'schedule') && !startsWith(github.ref, 'refs/tags')
+    if: (github.event_name == 'push' || github.event_name == 'schedule') && !startsWith(github.ref, 'refs/tags') && github.repository_owner == 'zenstruck'
     runs-on: ubuntu-latest
     steps:
       - uses: zenstruck/.github@sync-with-template
