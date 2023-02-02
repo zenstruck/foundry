@@ -25,7 +25,7 @@ use Zenstruck\Foundry\Instantiator;
  */
 final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -217,7 +217,7 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
     public function cannot_configure_database_resetter_if_doctrine_not_enabled(string $doctrine): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('should be enabled to use config under "database_resetter.%s"', $doctrine));
+        $this->expectExceptionMessage(\sprintf('should be enabled to use config under "database_resetter.%s"', $doctrine));
 
         $this->load(['database_resetter' => [$doctrine => []]]);
     }
