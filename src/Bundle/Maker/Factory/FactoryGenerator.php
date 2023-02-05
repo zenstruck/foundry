@@ -27,6 +27,9 @@ use Zenstruck\Foundry\Bundle\Maker\Factory\Exception\FactoryClassAlreadyExistExc
  */
 final class FactoryGenerator
 {
+    public const PHPSTAN_PATH = '/vendor/phpstan/phpstan/phpstan';
+    public const PSALM_PATH = '/vendor/vimeo/psalm/psalm';
+
     /** @param \Traversable<int, DefaultPropertiesGuesser> $defaultPropertiesGuessers */
     public function __construct(
         private ManagerRegistry $managerRegistry,
@@ -115,13 +118,6 @@ final class FactoryGenerator
         );
 
         if ($persisted = $makeFactoryQuery->isPersisted()) {
-            $repository = new \ReflectionClass($this->managerRegistry->getRepository($object->getName()));
-
-            if (\str_starts_with($repository->getName(), 'Doctrine')) {
-                // not using a custom repository
-                $repository = null;
-            }
-
             /** @var ODMClassMetadata|ORMClassMetadata|null $metadata */
             $metadata = $this->managerRegistry->getManagerForClass($class)?->getClassMetadata($class);
 
@@ -130,19 +126,27 @@ final class FactoryGenerator
             if (!$metadata || $metadata instanceof ODMClassMetadata && $metadata->isEmbeddedDocument) {
                 $persisted = false;
             }
+
+            if ($persisted) {
+                $repository = new \ReflectionClass($this->managerRegistry->getRepository($object->getName()));
+            }
         }
 
         return new MakeFactoryData(
             $object,
             $factory,
             $repository ?? null,
-            $this->phpstanEnabled(),
+            $this->staticAnalysisTool(),
             $persisted
         );
     }
 
-    private function phpstanEnabled(): bool
+    private function staticAnalysisTool(): string
     {
-        return \file_exists("{$this->kernel->getProjectDir()}/vendor/phpstan/phpstan/phpstan");
+        return match(true) {
+            \file_exists($this->kernel->getProjectDir().self::PHPSTAN_PATH) => MakeFactoryData::STATIC_ANALYSIS_TOOL_PHPSTAN,
+            \file_exists($this->kernel->getProjectDir().self::PSALM_PATH) => MakeFactoryData::STATIC_ANALYSIS_TOOL_PSALM,
+            default => MakeFactoryData::STATIC_ANALYSIS_TOOL_NONE,
+        };
     }
 }

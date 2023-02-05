@@ -12,7 +12,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
  * @method        Category|Proxy create(array|callable $attributes = [])
  * @method static Category|Proxy createOne(array $attributes = [])
  * @method static Category[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static Category[]|Proxy[] createSequence(array|callable $sequence)
+ * @method static Category[]|Proxy[] createSequence(iterable|callable $sequence)
  */
 final class CategoryFactory extends ModelFactory
 {

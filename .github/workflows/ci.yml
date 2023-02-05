@@ -186,6 +186,12 @@ jobs:
       - name: Run static analysis
         run: bin/tools/phpstan/vendor/phpstan/phpstan/phpstan analyse
 
+      - name: Install Psalm
+        run: composer bin psalm install
+
+      - name: Run Psalm on factories generated with maker
+        run: bin/tools/psalm/vendor/vimeo/psalm/psalm
+
   test-docker-stack:
     name: CI with docker stack
     runs-on: ubuntu-latest

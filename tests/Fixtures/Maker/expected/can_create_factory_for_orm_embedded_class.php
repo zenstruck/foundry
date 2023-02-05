@@ -12,7 +12,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
  * @method        Address|Proxy create(array|callable $attributes = [])
  * @method static Address|Proxy createOne(array $attributes = [])
  * @method static Address[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static Address[]|Proxy[] createSequence(array|callable $sequence)
+ * @method static Address[]|Proxy[] createSequence(iterable|callable $sequence)
  */
 final class AddressFactory extends ModelFactory
 {

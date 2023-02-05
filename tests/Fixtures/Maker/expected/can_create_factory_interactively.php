@@ -2,8 +2,10 @@
 
 namespace App\Factory;
 
+use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\RepositoryProxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Comment;
 
 /**
@@ -17,9 +19,10 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Comment;
  * @method static Comment|Proxy last(string $sortedField = 'id')
  * @method static Comment|Proxy random(array $attributes = [])
  * @method static Comment|Proxy randomOrCreate(array $attributes = [])
+ * @method static EntityRepository|RepositoryProxy repository()
  * @method static Comment[]|Proxy[] all()
  * @method static Comment[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static Comment[]|Proxy[] createSequence(array|callable $sequence)
+ * @method static Comment[]|Proxy[] createSequence(iterable|callable $sequence)
  * @method static Comment[]|Proxy[] findBy(array $attributes)
  * @method static Comment[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
  * @method static Comment[]|Proxy[] randomSet(int $number, array $attributes = [])

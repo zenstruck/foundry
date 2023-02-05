@@ -13,7 +13,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\UserFactory;
  * @method        ODMComment|Proxy create(array|callable $attributes = [])
  * @method static ODMComment|Proxy createOne(array $attributes = [])
  * @method static ODMComment[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static ODMComment[]|Proxy[] createSequence(array|callable $sequence)
+ * @method static ODMComment[]|Proxy[] createSequence(iterable|callable $sequence)
  */
 final class ODMCommentFactory extends ModelFactory
 {

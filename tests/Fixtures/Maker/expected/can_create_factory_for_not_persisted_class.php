@@ -12,7 +12,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject;
  * @method        SomeObject|Proxy create(array|callable $attributes = [])
  * @method static SomeObject|Proxy createOne(array $attributes = [])
  * @method static SomeObject[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static SomeObject[]|Proxy[] createSequence(array|callable $sequence)
+ * @method static SomeObject[]|Proxy[] createSequence(iterable|callable $sequence)
  */
 final class SomeObjectFactory extends ModelFactory
 {

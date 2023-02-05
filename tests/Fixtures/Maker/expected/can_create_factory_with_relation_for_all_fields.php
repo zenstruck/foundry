@@ -3,8 +3,10 @@
 namespace App\Factory;
 
 use App\Factory\Cascade\BrandFactory;
+use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\RepositoryProxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\EntityWithRelations;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 
@@ -19,9 +21,10 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
  * @method static EntityWithRelations|Proxy last(string $sortedField = 'id')
  * @method static EntityWithRelations|Proxy random(array $attributes = [])
  * @method static EntityWithRelations|Proxy randomOrCreate(array $attributes = [])
+ * @method static EntityRepository|RepositoryProxy repository()
  * @method static EntityWithRelations[]|Proxy[] all()
  * @method static EntityWithRelations[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static EntityWithRelations[]|Proxy[] createSequence(array|callable $sequence)
+ * @method static EntityWithRelations[]|Proxy[] createSequence(iterable|callable $sequence)
  * @method static EntityWithRelations[]|Proxy[] findBy(array $attributes)
  * @method static EntityWithRelations[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
  * @method static EntityWithRelations[]|Proxy[] randomSet(int $number, array $attributes = [])

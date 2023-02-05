@@ -13,7 +13,7 @@ use Zenstruck\Foundry\Tests\Fixtures\PHP81\SomeEnum;
  * @method        EntityWithEnum|Proxy create(array|callable $attributes = [])
  * @method static EntityWithEnum|Proxy createOne(array $attributes = [])
  * @method static EntityWithEnum[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static EntityWithEnum[]|Proxy[] createSequence(array|callable $sequence)
+ * @method static EntityWithEnum[]|Proxy[] createSequence(iterable|callable $sequence)
  */
 final class EntityWithEnumFactory extends ModelFactory
 {

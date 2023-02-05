@@ -28,7 +28,8 @@ else
 endif
 
 DOCKER_PHP_CONTAINER_FLAG := docker/.makefile/.docker-containers-${PHP_VERSION}
-SCA_BIN := bin/tools/phpstan/vendor/phpstan/phpstan/phpstan
+PHPSTAN_BIN := bin/tools/phpstan/vendor/phpstan/phpstan/phpstan
+PSALM_BIN := bin/tools/psalm/vendor/vimeo/psalm/psalm
 
 ifeq ($(USE_DAMA_DOCTRINE_TEST_BUNDLE),1)
 	PHPUNIT_CONFIG_FILE='phpunit-dama-doctrine.xml.dist'
@@ -64,19 +65,31 @@ help:
 	@fgrep -h "###" $(MAKEFILE_LIST) | fgrep -v fgrep | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: validate
-validate: sca test database-validate-mapping ### Run sca, full test suite and validate migrations
+validate: sca psalm test database-validate-mapping ### Run sca, full test suite and validate migrations
 
 .PHONY: test
 test: vendor ### Run PHPUnit tests suite
 	@${DC_EXEC} -e USE_ORM=${USE_ORM} -e USE_ODM=${USE_ODM} ${PHP} vendor/bin/simple-phpunit --configuration ${PHPUNIT_CONFIG_FILE} $(ARGS)
 
 .PHONY: sca
-sca: $(SCA_BIN) ### Run static analysis
-	@${DOCKER_PHP_WITHOUT_XDEBUG} $(SCA_BIN) analyse
+sca: phpstan ### Run static analysis
 
-$(SCA_BIN): vendor bin/tools/phpstan/composer.json bin/tools/phpstan/composer.lock
+.PHONY: phpstan
+phpstan: $(PHPSTAN_BIN)
+	@${DOCKER_PHP_WITHOUT_XDEBUG} $(PHPSTAN_BIN) analyse
+
+$(PHPSTAN_BIN): vendor bin/tools/phpstan/composer.json bin/tools/phpstan/composer.lock
 	@${DOCKER_PHP_WITHOUT_XDEBUG} /usr/bin/composer bin phpstan install
 	@touch -c $@ bin/tools/phpstan/composer.json bin/tools/phpstan/composer.lock
+
+# Psalm is only used to validate factories generated thanks to make:factory command.
+.PHONY: psalm
+psalm: $(PSALM_BIN)
+	@${DOCKER_PHP_WITHOUT_XDEBUG} $(PSALM_BIN)
+
+$(PSALM_BIN): vendor bin/tools/psalm/composer.json bin/tools/psalm/composer.lock
+	@${DOCKER_PHP_WITHOUT_XDEBUG} /usr/bin/composer bin psalm install
+	@touch -c $@ bin/tools/psalm/composer.json bin/tools/psalm/composer.lock
 
 .PHONY: database-generate-migration
 database-generate-migration: database-drop-schema ### Generate new migration based on mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
@@ -106,7 +119,7 @@ vendor: $(DOCKER_PHP_CONTAINER_FLAG) composer.json $(wildcard composer.lock) $(w
 
 .PHONY: docker-start
 docker-start: ### Build and run containers
-	@rm $(DOCKER_PHP_CONTAINER_FLAG)
+	@rm -f $(DOCKER_PHP_CONTAINER_FLAG)
 	@$(MAKE) --no-print-directory $(DOCKER_PHP_CONTAINER_FLAG)
 
 .PHONY: docker-stop
