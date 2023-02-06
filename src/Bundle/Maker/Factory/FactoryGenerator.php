@@ -143,7 +143,7 @@ final class FactoryGenerator
 
     private function staticAnalysisTool(): string
     {
-        return match(true) {
+        return match (true) {
             \file_exists($this->kernel->getProjectDir().self::PHPSTAN_PATH) => MakeFactoryData::STATIC_ANALYSIS_TOOL_PHPSTAN,
             \file_exists($this->kernel->getProjectDir().self::PSALM_PATH) => MakeFactoryData::STATIC_ANALYSIS_TOOL_PSALM,
             default => MakeFactoryData::STATIC_ANALYSIS_TOOL_NONE,

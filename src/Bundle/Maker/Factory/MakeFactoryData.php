@@ -82,7 +82,7 @@ final class MakeFactoryData
 
     public function hasStaticAnalysisTool(): bool
     {
-        return $this->staticAnalysisTool !== self::STATIC_ANALYSIS_TOOL_NONE;
+        return self::STATIC_ANALYSIS_TOOL_NONE !== $this->staticAnalysisTool;
     }
 
     public function staticAnalysisTool(): string

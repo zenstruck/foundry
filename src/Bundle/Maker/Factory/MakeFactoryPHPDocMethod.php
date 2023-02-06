@@ -54,11 +54,11 @@ final class MakeFactoryPHPDocMethod
 
     public function toString(string|null $staticAnalysisTool = null): string
     {
-        $annotation = $staticAnalysisTool ? "$staticAnalysisTool-method" : 'method';
+        $annotation = $staticAnalysisTool ? "{$staticAnalysisTool}-method" : 'method';
         $static = $this->isStatic ? 'static' : '      ';
 
         if ($this->repository) {
-            $returnType = match((bool) $staticAnalysisTool) {
+            $returnType = match ((bool) $staticAnalysisTool) {
                 false => "{$this->repository}|RepositoryProxy",
                 true => "RepositoryProxy<{$this->objectName}>",
             };
@@ -71,7 +71,6 @@ final class MakeFactoryPHPDocMethod
                 [false, false] => "{$this->objectName}|Proxy",
             };
         }
-
 
         return " * @{$annotation} {$static} {$returnType} {$this->prototype}";
     }

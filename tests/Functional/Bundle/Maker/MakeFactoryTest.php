@@ -57,7 +57,7 @@ final class MakeFactoryTest extends MakerTestCase
     {
         parent::tearDown();
 
-        $removeSCAMock = static function (string $file): void {
+        $removeSCAMock = static function(string $file): void {
             if (\file_exists($file)) {
                 \unlink($file);
                 \rmdir(\dirname($file));
