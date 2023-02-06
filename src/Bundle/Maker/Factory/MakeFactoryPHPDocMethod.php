@@ -16,7 +16,7 @@ namespace Zenstruck\Foundry\Bundle\Maker\Factory;
  */
 final class MakeFactoryPHPDocMethod
 {
-    public function __construct(private string $objectName, private string $prototype, private bool $returnsCollection, private bool $isStatic = true, private bool $isRepository = false)
+    public function __construct(private string $objectName, private string $prototype, private bool $returnsCollection, private bool $isStatic = true, private string|null $repository = null)
     {
     }
 
@@ -29,7 +29,7 @@ final class MakeFactoryPHPDocMethod
         $methods[] = new self($makeFactoryData->getObjectShortName(), 'createOne(array $attributes = [])', returnsCollection: false);
 
         $methods[] = new self($makeFactoryData->getObjectShortName(), 'createMany(int $number, array|callable $attributes = [])', returnsCollection: true);
-        $methods[] = new self($makeFactoryData->getObjectShortName(), 'createSequence(array|callable $sequence)', returnsCollection: true);
+        $methods[] = new self($makeFactoryData->getObjectShortName(), 'createSequence(iterable|callable $sequence)', returnsCollection: true);
 
         if ($makeFactoryData->isPersisted()) {
             $methods[] = new self($makeFactoryData->getObjectShortName(), 'find(object|array|mixed $criteria)', returnsCollection: false);
@@ -45,27 +45,33 @@ final class MakeFactoryPHPDocMethod
             $methods[] = new self($makeFactoryData->getObjectShortName(), 'randomSet(int $number, array $attributes = [])', returnsCollection: true);
 
             if (null !== $makeFactoryData->getRepositoryShortName()) {
-                $methods[] = new self($makeFactoryData->getRepositoryShortName(), 'repository()', returnsCollection: false, isRepository: true);
+                $methods[] = new self($makeFactoryData->getObjectShortName(), 'repository()', returnsCollection: false, repository: $makeFactoryData->getRepositoryShortName());
             }
         }
 
         return $methods;
     }
 
-    public function toString(bool $withPHPStanEnabled = false): string
+    public function toString(string|null $staticAnalysisTool = null): string
     {
-        $annotation = $withPHPStanEnabled ? 'phpstan-method' : 'method';
+        $annotation = $staticAnalysisTool ? "$staticAnalysisTool-method" : 'method';
         $static = $this->isStatic ? 'static' : '      ';
 
-        $proxyType = $this->isRepository ? 'RepositoryProxy' : 'Proxy';
+        if ($this->repository) {
+            $returnType = match((bool) $staticAnalysisTool) {
+                false => "{$this->repository}|RepositoryProxy",
+                true => "RepositoryProxy<{$this->objectName}>",
+            };
+        } else {
+            /** @phpstan-ignore-next-line */
+            $returnType = match ([$this->returnsCollection, (bool) $staticAnalysisTool]) {
+                [true, true] => "list<Proxy<{$this->objectName}>>",
+                [true, false] => "{$this->objectName}[]|Proxy[]",
+                [false, true] => "Proxy<{$this->objectName}>",
+                [false, false] => "{$this->objectName}|Proxy",
+            };
+        }
 
-        /** @phpstan-ignore-next-line */
-        $returnType = match ([$this->returnsCollection, $withPHPStanEnabled]) {
-            [true, true] => "list<{$proxyType}<{$this->objectName}>>",
-            [true, false] => "{$this->objectName}[]|{$proxyType}[]",
-            [false, true] => "{$proxyType}<{$this->objectName}>",
-            [false, false] => "{$this->objectName}|{$proxyType}",
-        };
 
         return " * @{$annotation} {$static} {$returnType} {$this->prototype}";
     }

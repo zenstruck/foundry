@@ -128,21 +128,21 @@ This command will generate a ``PostFactory`` class that looks like this:
     /**
      * @extends ModelFactory<Post>
      *
+     * @method        Post|Proxy create(array|callable $attributes = [])
      * @method static Post|Proxy createOne(array $attributes = [])
-     * @method static Post[]|Proxy[] createMany(int $number, array|callable $attributes = [])
-     * @method static Post[]&Proxy[] createSequence(array|callable $sequence)
      * @method static Post|Proxy find(object|array|mixed $criteria)
      * @method static Post|Proxy findOrCreate(array $attributes)
      * @method static Post|Proxy first(string $sortedField = 'id')
      * @method static Post|Proxy last(string $sortedField = 'id')
      * @method static Post|Proxy random(array $attributes = [])
      * @method static Post|Proxy randomOrCreate(array $attributes = []))
-     * @method static Post[]|Proxy[] all()
-     * @method static Post[]|Proxy[] findBy(array $attributes)
-     * @method static Post[]|Proxy[] randomSet(int $number, array $attributes = []))
-     * @method static Post[]|Proxy[] randomRange(int $min, int $max, array $attributes = []))
      * @method static PostRepository|RepositoryProxy repository()
-     * @method Post|Proxy create(array|callable $attributes = [])
+     * @method static Post[]|Proxy[] all()
+     * @method static Post[]|Proxy[] createMany(int $number, array|callable $attributes = [])
+     * @method static Post[]&Proxy[] createSequence(iterable|callable $sequence)
+     * @method static Post[]|Proxy[] findBy(array $attributes)
+     * @method static Post[]|Proxy[] randomRange(int $min, int $max, array $attributes = []))
+     * @method static Post[]|Proxy[] randomSet(int $number, array $attributes = []))
      */
     final class PostFactory extends ModelFactory
     {
@@ -206,15 +206,15 @@ This command will generate a ``PostFactory`` class that looks like this:
 .. note::
 
     The generated ``@method`` docblocks above enable autocompletion with PhpStorm but
-    cause errors with PHPStan. To support PHPStan for your factory's, you need to *also*
-    add the following dockblocks:
+    cause errors with PHPStan and Psalm. To support PHPStan or Psalm for your factory's, you need to *also*
+    add the following dockblocks (replace ``phpstan-`` prefix by ``psalm-`` accordingly to your static analysis tool):
 
     .. code-block:: php
 
         /**
          * ...
          *
-         * @phpstan-method Proxy<Post> create(array|callable $attributes = [])
+         * @phpstan-method        Proxy<Post> create(array|callable $attributes = [])
          * @phpstan-method static Proxy<Post> createOne(array $attributes = [])
          * @phpstan-method static Proxy<Post> find(object|array|mixed $criteria)
          * @phpstan-method static Proxy<Post> findOrCreate(array $attributes)
@@ -222,13 +222,13 @@ This command will generate a ``PostFactory`` class that looks like this:
          * @phpstan-method static Proxy<Post> last(string $sortedField = 'id')
          * @phpstan-method static Proxy<Post> random(array $attributes = [])
          * @phpstan-method static Proxy<Post> randomOrCreate(array $attributes = [])
+         * @phpstan-method static RepositoryProxy<Post> repository()
          * @phpstan-method static list<Proxy<Post>> all()
          * @phpstan-method static list<Proxy<Post>> createMany(int $number, array|callable $attributes = [])
-         * @phpstan-method static list<Proxy<Post>> createSequence(array|callable $sequence)
+         * @phpstan-method static list<Proxy<Post>> createSequence(iterable|callable $sequence)
          * @phpstan-method static list<Proxy<Post>> findBy(array $attributes)
          * @phpstan-method static list<Proxy<Post>> randomRange(int $min, int $max, array $attributes = [])
          * @phpstan-method static list<Proxy<Post>> randomSet(int $number, array $attributes = [])
-         * @phpstan-method static RepositoryProxy<Post> repository()
          */
         final class PostFactory extends ModelFactory
         {

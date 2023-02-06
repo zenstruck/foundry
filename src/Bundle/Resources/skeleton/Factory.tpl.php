@@ -16,11 +16,11 @@ foreach ($makeFactoryData->getMethodsPHPDoc() as $methodPHPDoc) {
     echo "{$methodPHPDoc->toString()}\n";
 }
 
-if ($makeFactoryData->hasPHPStanEnabled()) {
+if ($makeFactoryData->hasStaticAnalysisTool()) {
     echo " *\n";
 
     foreach ($makeFactoryData->getMethodsPHPDoc() as $methodPHPDoc) {
-        echo "{$methodPHPDoc->toString(true)}\n";
+        echo "{$methodPHPDoc->toString($makeFactoryData->staticAnalysisTool())}\n";
     }
 }
 ?>

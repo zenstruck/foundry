@@ -8,6 +8,10 @@ parameters:
     checkGenericClassInNonGenericObjectType: false
     paths:
         - ./src
+
+        # let's analyse factories generated with maker
+        - ./tests/Fixtures/Maker/expected/can_create_factory_for_entity_with_repository_with_data_set_phpstan.php
+        - ./tests/Fixtures/Maker/expected/can_create_factory_with_static_analysis_annotations_with_data_set_phpstan.php
     level: 8
     bootstrapFiles:
         - ./vendor/autoload.php

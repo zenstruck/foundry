@@ -2,8 +2,10 @@
 
 namespace App\Tests\Factory;
 
+use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\RepositoryProxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
 
 /**
@@ -17,9 +19,10 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
  * @method static Tag|Proxy last(string $sortedField = 'id')
  * @method static Tag|Proxy random(array $attributes = [])
  * @method static Tag|Proxy randomOrCreate(array $attributes = [])
+ * @method static EntityRepository|RepositoryProxy repository()
  * @method static Tag[]|Proxy[] all()
  * @method static Tag[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static Tag[]|Proxy[] createSequence(array|callable $sequence)
+ * @method static Tag[]|Proxy[] createSequence(iterable|callable $sequence)
  * @method static Tag[]|Proxy[] findBy(array $attributes)
  * @method static Tag[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
  * @method static Tag[]|Proxy[] randomSet(int $number, array $attributes = [])

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<psalm
+    errorLevel="1"
+    resolveFromConfigFile="true"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config bin/tools/psalm/vendor/vimeo/psalm/config.xsd"
+    findUnusedBaselineEntry="true"
+    findUnusedCode="false"
+>
+    <projectFiles>
+        <file name="tests/Fixtures/Maker/expected/can_create_factory_for_entity_with_repository_with_data_set_psalm.php" />
+        <file name="tests/Fixtures/Maker/expected/can_create_factory_with_static_analysis_annotations_with_data_set_psalm.php" />
+    </projectFiles>
+</psalm>
