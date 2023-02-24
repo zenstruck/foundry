@@ -39,6 +39,8 @@ class Factory
 
     private bool $persist = true;
 
+    private bool $cascadePersist = false;
+
     /** @var array<array|callable> */
     private array $attributeSet = [];
 
@@ -122,7 +124,7 @@ class Factory
 
         $proxy = new Proxy($object);
 
-        if (!$this->isPersisting()) {
+        if (!$this->isPersisting() || $this->cascadePersist) {
             return $proxy;
         }
 
@@ -372,9 +374,7 @@ class Factory
                 }
             }
 
-            if ($cascadePersist) {
-                $value = $value->withoutPersisting();
-            }
+            $value->cascadePersist = $cascadePersist;
         }
 
         return $value->create()->object();
@@ -408,9 +408,7 @@ class Factory
 
         return \array_map(
             function(self $factory): self {
-                if (!$this->isPersisting()) {
-                    $factory = $factory->withoutPersisting();
-                }
+                $factory->cascadePersist = $this->cascadePersist;
 
                 return $factory;
             },

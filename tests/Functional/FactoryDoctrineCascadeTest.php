@@ -47,10 +47,10 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
         $product = factory(Product::class, [
             'name' => 'foo',
             'brand' => factory(Brand::class, ['name' => 'bar']),
-        ])->instantiateWith(function(array $attibutes, string $class): object {
-            $this->assertNull($attibutes['brand']->getId());
+        ])->instantiateWith(function(array $attributes, string $class): object {
+            $this->assertNull($attributes['brand']->getId());
 
-            return (new Instantiator())($attibutes, $class);
+            return (new Instantiator())($attributes, $class);
         })->create();
 
         $this->assertNotNull($product->getBrand()->getId());
@@ -64,11 +64,17 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
     {
         $product = factory(Product::class, [
             'name' => 'foo',
-            'variants' => [factory(Variant::class, ['name' => 'bar'])],
-        ])->instantiateWith(function(array $attibutes, string $class): object {
-            $this->assertNull($attibutes['variants'][0]->getId());
+            'variants' => [
+                factory(Variant::class, [
+                    'name' => 'bar',
+                    // asserts a "sub" relationship without cascade persist is persisted
+                    'image' => factory(Image::class, ['path' => '/some/path']),
+                ]),
+            ],
+        ])->instantiateWith(function(array $attributes, string $class): object {
+            $this->assertNull($attributes['variants'][0]->getId());
 
-            return (new Instantiator())($attibutes, $class);
+            return (new Instantiator())($attributes, $class);
         })->create();
 
         $this->assertCount(1, $product->getVariants());
@@ -84,10 +90,10 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
         $product = factory(Product::class, [
             'name' => 'foo',
             'tags' => [factory(Tag::class, ['name' => 'bar'])],
-        ])->instantiateWith(function(array $attibutes, string $class): object {
-            $this->assertNull($attibutes['tags'][0]->getId());
+        ])->instantiateWith(function(array $attributes, string $class): object {
+            $this->assertNull($attributes['tags'][0]->getId());
 
-            return (new Instantiator())($attibutes, $class);
+            return (new Instantiator())($attributes, $class);
         })->create();
 
         $this->assertCount(1, $product->getTags());
@@ -103,10 +109,10 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
         $product = factory(Product::class, [
             'name' => 'foo',
             'categories' => [factory(ProductCategory::class, ['name' => 'bar'])],
-        ])->instantiateWith(function(array $attibutes, string $class): object {
-            $this->assertNull($attibutes['categories'][0]->getId());
+        ])->instantiateWith(function(array $attributes, string $class): object {
+            $this->assertNull($attributes['categories'][0]->getId());
 
-            return (new Instantiator())($attibutes, $class);
+            return (new Instantiator())($attributes, $class);
         })->create();
 
         $this->assertCount(1, $product->getCategories());
@@ -119,17 +125,17 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
      */
     public function one_to_one_relationship(): void
     {
-        $variant = factory(Variant::class, [
+        $product = factory(Product::class, [
             'name' => 'foo',
-            'image' => factory(Image::class, ['path' => '/path/to/file.extension']),
-        ])->instantiateWith(function(array $attibutes, string $class): object {
-            $this->assertNull($attibutes['image']->getId());
+            'review' => factory(Review::class, ['rank' => 5]),
+        ])->instantiateWith(function(array $attributes, string $class): object {
+            $this->assertNull($attributes['review']->getId());
 
-            return (new Instantiator())($attibutes, $class);
+            return (new Instantiator())($attributes, $class);
         })->create();
 
-        $this->assertNotNull($variant->getImage()->getId());
-        $this->assertSame('/path/to/file.extension', $variant->getImage()->getPath());
+        $this->assertNotNull($product->getReview()->getId());
+        $this->assertSame(5, $product->getReview()->getRank());
     }
 
     /**
@@ -140,10 +146,10 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
         $product = factory(Product::class, [
             'name' => 'foo',
             'review' => factory(Review::class, ['rank' => 4]),
-        ])->instantiateWith(function(array $attibutes, string $class): object {
-            $this->assertNull($attibutes['review']->getId());
+        ])->instantiateWith(function(array $attributes, string $class): object {
+            $this->assertNull($attributes['review']->getId());
 
-            return (new Instantiator())($attibutes, $class);
+            return (new Instantiator())($attributes, $class);
         })->create();
 
         $this->assertNotNull($product->getReview()->getId());
