@@ -15,6 +15,7 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Faker;
+use Zenstruck\Foundry\LazyValue;
 use Zenstruck\Foundry\Exception\FoundryNotBootedException;
 
 /**
@@ -92,6 +93,9 @@ class Factory
 
         // normalize each attribute set and collapse
         $attributes = \array_merge(...\array_map(fn(callable|array $attributes): array => $this->normalizeAttributes($attributes), $attributeSet));
+
+        // execute "lazy" values
+        $attributes = LazyValue::normalizeArray($attributes);
 
         foreach ($this->beforeInstantiate as $callback) {
             $attributes = $callback($attributes);

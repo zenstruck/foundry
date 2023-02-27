@@ -17,11 +17,13 @@ use Faker;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\AnonymousFactory;
+use Zenstruck\Foundry\LazyValue;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
+use function Zenstruck\Foundry\lazy;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -37,6 +39,7 @@ final class FactoryTest extends TestCase
     {
         $attributeArray = ['title' => 'title', 'body' => 'body'];
         $attributeCallback = static fn(): array => ['title' => 'title', 'body' => 'body'];
+        $attributeArrayWithLazyValue = ['title' => lazy(fn() => 'title'), 'body' => 'body'];
 
         $this->assertSame('title', (new AnonymousFactory(Post::class, $attributeArray))->create()->getTitle());
         $this->assertSame('title', (new AnonymousFactory(Post::class))->create($attributeArray)->getTitle());
@@ -44,6 +47,41 @@ final class FactoryTest extends TestCase
         $this->assertSame('title', (new AnonymousFactory(Post::class, $attributeCallback))->create()->getTitle());
         $this->assertSame('title', (new AnonymousFactory(Post::class))->create($attributeCallback)->getTitle());
         $this->assertSame('title', (new AnonymousFactory(Post::class))->withAttributes($attributeCallback)->create()->getTitle());
+        $this->assertSame('title', (new AnonymousFactory(Post::class, $attributeArrayWithLazyValue))->create()->getTitle());
+        $this->assertSame('title', (new AnonymousFactory(Post::class))->create($attributeArrayWithLazyValue)->getTitle());
+        $this->assertSame('title', (new AnonymousFactory(Post::class))->withAttributes($attributeArrayWithLazyValue)->create()->getTitle());
+    }
+
+    /**
+     * @test
+     */
+    public function lazy_values_are_only_calculated_if_needed(): void
+    {
+        $count = 0;
+        $lazyValue = new LazyValue(function() use (&$count) {
+            ++$count;
+
+            return 'title';
+        });
+        $factory = AnonymousFactory::new(Post::class, ['title' => $lazyValue, 'body' => 'body']);
+
+        $post = $factory
+            ->withAttributes(['title' => $lazyValue])
+            ->withAttributes(['title' => $lazyValue])
+            ->create(['title' => 'title'])
+        ;
+
+        $this->assertSame('title', $post->getTitle());
+        $this->assertSame(0, $count);
+
+        $post = $factory
+            ->withAttributes(['title' => $lazyValue])
+            ->withAttributes(['title' => $lazyValue])
+            ->create(['title' => $lazyValue])
+        ;
+
+        $this->assertSame('title', $post->getTitle());
+        $this->assertSame(1, $count);
     }
 
     /**
