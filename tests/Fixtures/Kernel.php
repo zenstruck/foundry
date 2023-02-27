@@ -93,6 +93,7 @@ class Kernel extends BaseKernel
             ->setAutoconfigured(true)
             ->setAutowired(true)
         ;
+        $c->register(CustomFakerProvider::class)->addTag('foundry.faker_provider');
 
         foreach ($this->factoriesRegistered as $factory) {
             $c->register($factory)
