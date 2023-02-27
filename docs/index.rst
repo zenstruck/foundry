@@ -506,6 +506,17 @@ random data for your factories:
 
 .. note::
 
+    You can register your own *Faker Provider* by tagging any service with ``foundry.faker_provider``.
+    All public methods on this service will be available on Foundry's Faker instance:
+
+    .. code-block:: php
+
+        use function Zenstruck\Foundry\faker;
+
+        faker()->customMethodOnMyService();
+
+.. note::
+
     For full control, you can register your own ``Faker\Generator`` service:
 
     .. code-block:: yaml
