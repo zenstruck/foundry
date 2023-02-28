@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## [v1.29.0](https://github.com/zenstruck/foundry/releases/tag/v1.29.0)
+
+February 28th, 2023 - [v1.28.0...v1.29.0](https://github.com/zenstruck/foundry/compare/v1.28.0...v1.29.0)
+
+* 041b597 feat: add `LazyValue` to calculate attribute values only when needed (#427) by @kbond, @mpdude
+* 5f4f679 feat(bundle): allow registering custom Faker Providers (#425) by @kbond
+* b0bd5cb fix: restore Factory::$cascadePersist (#424) by @nikophil
+* f8db2af minor: remove `Factory::$cascadePersist` (#422) by @nikophil
+* edcd083 fix(doc): return type syntax (#420) by @benblub, @OskarStark
+* bfb1134 feat: validate generate factory with static analysis (#419) by @nikophil
+* a7502e7 docs: show how to document magic methods in stories (#418) by @nikophil
+* bbc3b62 fix(ci): don't run fixcs/sync-with-template on forks (#417) by @kbond
+* c409dc7 minor(ci): drop testing unsupported Symfony versions (6.0/6.1) (#417) by @kbond
+* 626acba fix: foundry should work witout maker bundle (#416) by @nikophil
+* 0ff998a chore: migrate phpunit config-file (dama) for phpunit 9 format (#413) by @Chris53897, @Chris8934
+* 30e0bdb feat(make:factory): match directory/namespace structure (#411) by @nikophil
+* a6d5ead docs: Replace annotations with attributes in docs (#412) by @ker0x
+
 ## [v1.28.0](https://github.com/zenstruck/foundry/releases/tag/v1.28.0)
 
 January 24th, 2023 - [v1.27.0...v1.28.0](https://github.com/zenstruck/foundry/compare/v1.27.0...v1.28.0)
