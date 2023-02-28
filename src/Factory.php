@@ -15,7 +15,6 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Faker;
-use Zenstruck\Foundry\LazyValue;
 use Zenstruck\Foundry\Exception\FoundryNotBootedException;
 
 /**

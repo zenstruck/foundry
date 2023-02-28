@@ -17,12 +17,13 @@ use Faker;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\AnonymousFactory;
-use Zenstruck\Foundry\LazyValue;
 use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\LazyValue;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
+
 use function Zenstruck\Foundry\lazy;
 
 /**

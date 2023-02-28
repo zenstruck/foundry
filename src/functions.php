@@ -12,7 +12,6 @@
 namespace Zenstruck\Foundry;
 
 use Faker;
-use Zenstruck\Foundry\LazyValue;
 
 /**
  * @see Factory::__construct()
