@@ -12,6 +12,7 @@
 namespace Zenstruck\Foundry;
 
 use Faker;
+use Zenstruck\Foundry\LazyValue;
 
 /**
  * @see Factory::__construct()
@@ -103,4 +104,14 @@ function repository(object|string $objectOrClass): RepositoryProxy
 function faker(): Faker\Generator
 {
     return Factory::faker();
+}
+
+/**
+ * @see LazyValue
+ *
+ * @param callable():mixed $factory
+ */
+function lazy(callable $factory): LazyValue
+{
+    return new LazyValue($factory);
 }

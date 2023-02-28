@@ -260,6 +260,30 @@ should have. `Faker`_ is available to easily get random data:
     Using ``make:factory --all-fields`` will generate default values for all fields of the entity,
     not only non-nullable fields.
 
+.. note::
+
+    ``getDefaults()`` is called everytime a factory is instantiated (even if you don't end up
+    creating it. If you have a value for one of your attributes that has side effects (ie
+    creating a file or fetching a random existing entity from another factory), you can wrap
+    the value in a ``LazyValue``. This ensures the value is only calculated when/if it's
+    needed.
+
+    .. code-block:: php
+
+        use Zenstruck\Foundry\Attributes\LazyValue;
+        use function Zenstruck\Foundry\lazy;
+
+        // ...
+
+        protected function getDefaults(): array
+        {
+            return [
+                'category' => new LazyValue(fn() => CategoryFactory::random()),
+
+                'file' => lazy(fn() => create_temp_file()), // or use the lazy() helper function
+            ];
+        }
+
 Using your Factory
 ~~~~~~~~~~~~~~~~~~
 
