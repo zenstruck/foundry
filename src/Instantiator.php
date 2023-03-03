@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Foundry;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -137,6 +139,19 @@ final class Instantiator
      */
     public static function forceSet(object $object, string $property, mixed $value): void
     {
+        $refProp = self::accessibleProperty($object, $property);
+
+        // if value is an array and the property expects a doctrine collection, convert to doctrine collection
+        if (\is_array($value) && $type = $refProp->getType()) {
+            foreach ($type instanceof \ReflectionNamedType ? [$type] : $type->getTypes() as $type) { // @phpstan-ignore-line
+                if (\is_a($type->getName(), Collection::class, true)) {
+                    $value = new ArrayCollection($value);
+
+                    break;
+                }
+            }
+        }
+
         self::accessibleProperty($object, $property)->setValue($object, $value);
     }
 
