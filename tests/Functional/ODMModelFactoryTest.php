@@ -77,6 +77,21 @@ final class ODMModelFactoryTest extends ModelFactoryTest
         self::assertCount(1, $posts);
     }
 
+    /**
+     * @test
+     */
+    public function can_find_or_create_from_embedded_object(): void
+    {
+        $post = PostFactory::findOrCreate(['title' => 'foo', 'user' => new ODMUser('some user')]);
+        self::assertSame('some user', $post->getUser()->getName());
+        PostFactory::assert()->count(1);
+
+        $post2 = PostFactory::findOrCreate(['title' => 'foo', 'user' => new ODMUser('some user')]);
+        PostFactory::assert()->count(1);
+
+        self::assertSame($post->object(), $post2->object());
+    }
+
     protected function categoryClass(): string
     {
         return ODMCategory::class;

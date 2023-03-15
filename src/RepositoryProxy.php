@@ -12,9 +12,14 @@
 namespace Zenstruck\Foundry;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
+use Doctrine\Persistence\Mapping\MappingException;
+use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * @mixin EntityRepository<TProxiedObject>
@@ -206,8 +211,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
      */
     public function truncate(): void
     {
-        /** @var DocumentManager $om */
-        $om = Factory::configuration()->objectManagerFor($this->getClassName());
+        $om = $this->getObjectManager();
 
         if ($om instanceof EntityManagerInterface) {
             $om->createQuery("DELETE {$this->getClassName()} e")->execute();
@@ -311,7 +315,46 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
             return $this->proxyResult($result);
         }
 
-        return $this->findOneBy($criteria);
+        $normalizedCriteria = [];
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        foreach ($criteria as $attributeName => $attributeValue) {
+            if (!is_object($attributeValue)) {
+                $normalizedCriteria[$attributeName] = $attributeValue;
+
+                continue;
+            }
+
+            if ($attributeValue instanceof Factory) {
+                $attributeValue = $attributeValue->withoutPersisting()->create()->object();
+            }
+
+            try {
+                $metadataForAttribute = $this->getObjectManager()->getClassMetadata($attributeValue::class);
+            } catch (MappingException $e) {
+                throw new \InvalidArgumentException('Only embeddable objects can be passed as attributes for "findOrCreate()" method.', previous: $e);
+            }
+
+            $isEmbedded = match($metadataForAttribute::class){
+                ORMClassMetadata::class => $metadataForAttribute->isEmbeddedClass,
+                ODMClassMetadata::class => $metadataForAttribute->isEmbeddedDocument,
+                default => throw new \LogicException(sprintf('Metadata class %s is not supported.', $metadataForAttribute::class))
+            };
+
+            if (!$isEmbedded) {
+                throw new \InvalidArgumentException('Only embeddable objects can be passed as attributes for "findOrCreate()" method.');
+            }
+
+            foreach ($metadataForAttribute->getFieldNames() as $field) {
+                $embeddableFieldValue = $propertyAccessor->getValue($attributeValue, $field);
+                if (is_object($embeddableFieldValue)) {
+                    throw new \InvalidArgumentException('Nested embeddable objects are still not supported in "findOrCreate()" method.');
+                }
+
+                $normalizedCriteria["{$attributeName}.{$field}"] = $embeddableFieldValue;
+            }
+        }
+
+        return $this->findOneBy($normalizedCriteria);
     }
 
     /**
@@ -395,5 +438,10 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
             static fn($value) => $value instanceof Proxy ? $value->object() : $value,
             $criteria
         );
+    }
+
+    private function getObjectManager(): ObjectManager
+    {
+        return Factory::configuration()->objectManagerFor($this->getClassName());
     }
 }

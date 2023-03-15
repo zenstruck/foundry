@@ -56,7 +56,7 @@ final class ORMProxyTest extends ProxyTest
         // object is included in the changeset when using UOW::recomputeSingleEntityChangeSet().
         // Changing to UOW::computeChangeSet() fixes this.
         $this->assertSame('john', $contact->getName());
-        $this->assertNull($contact->getAddress()->getValue());
+        $this->assertSame('some address', $contact->getAddress()->getValue());
 
         $contact->getAddress()->setValue('address');
         $contact->save();

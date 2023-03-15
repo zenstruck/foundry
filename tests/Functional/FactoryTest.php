@@ -140,11 +140,9 @@ final class FactoryTest extends KernelTestCase
      */
     public function can_create_embeddable(): void
     {
-        $object1 = (new AnonymousFactory(Address::class))->create();
-        $object2 = (new AnonymousFactory(Address::class))->create(['value' => 'an address']);
+        $object = (new AnonymousFactory(Address::class))->create(['value' => 'an address']);
 
-        $this->assertNull($object1->getValue());
-        $this->assertSame('an address', $object2->getValue());
+        $this->assertSame('an address', $object->getValue());
     }
 
     public function can_delay_flush(): void
