@@ -158,6 +158,7 @@ class Kernel extends BaseKernel
             if ($this->enableDoctrine && \getenv('USE_ODM') && !\getenv('USE_DAMA_DOCTRINE_TEST_BUNDLE')) {
                 $globalState[] = ODMTagStory::class;
                 $globalState[] = ODMTagStoryAsAService::class;
+                $c->register(ODMTagStoryAsAService::class)->addTag('foundry.story');
             }
 
             $foundryConfig['global_state'] = $globalState;

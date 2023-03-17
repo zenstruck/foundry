@@ -53,7 +53,9 @@ final class GlobalStateRegistry
         return [
             ...\array_map(
                 static fn(Story $story): \Closure => static function() use ($story): void {
-                    $story->build();
+                    // even if we already have access to the instance here,
+                    // let's use ::load() in order to register the service in StoryManager
+                    $story::class::load();
                 },
                 $this->storiesAsService
             ),

@@ -13,6 +13,7 @@ namespace Zenstruck\Foundry\Tests\Functional;
 
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\TagFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\ODMTagStory;
+use Zenstruck\Foundry\Tests\Fixtures\Stories\ODMTagStoryAsAService;
 
 final class ODMGlobalStateTest extends GlobalStateTest
 {
@@ -27,6 +28,16 @@ final class ODMGlobalStateTest extends GlobalStateTest
         }
 
         parent::setUp();
+    }
+
+    /**
+     * @test
+     */
+    public function ensure_global_story_as_a_service_is_not_loaded_again(): void
+    {
+        TagFactory::repository()->assert()->count(1, ['name' => 'design']);
+        ODMTagStoryAsAService::load();
+        TagFactory::repository()->assert()->count(1, ['name' => 'design']);
     }
 
     protected function getTagFactoryClass(): string
