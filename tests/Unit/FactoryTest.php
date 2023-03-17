@@ -394,4 +394,18 @@ final class FactoryTest extends TestCase
 
         (new AnonymousFactory(Post::class))->create(['title' => 'title', 'body' => 'body'])->save();
     }
+
+    /**
+     * @test
+     */
+    public function can_use_arrays_for_attribute_values(): void
+    {
+        $object = new class {
+            public $value;
+        };
+
+        $factory = AnonymousFactory::new($object::class)->create(['value' => ['foo' => 'bar']]);
+
+        $this->assertSame(['foo' => 'bar'], $factory->value);
+    }
 }
