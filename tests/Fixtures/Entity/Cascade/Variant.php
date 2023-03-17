@@ -19,7 +19,7 @@ class Variant
     #[ORM\ManyToOne(targetEntity: Product::class, inversedBy: "variants")]
     private ?Product $product = null;
 
-    #[ORM\OneToOne(targetEntity: Image::class)]
+    #[ORM\OneToOne(targetEntity: Image::class, cascade: ["persist"])]
     private ?Image $image = null;
 
     public function getId(): ?int
