@@ -64,7 +64,7 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
     {
         $brand = factory(Brand::class, [
             'name' => 'brand',
-            'products' => factory(Product::class, ['name' => 'product'])->many(2)
+            'products' => factory(Product::class, ['name' => 'product'])->many(2),
         ])->instantiateWith(function(array $attributes, string $class): object {
 //            $this->assertNull($attributes['products'][0]->getId());
 
@@ -179,7 +179,7 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
             'products' => factory(Product::class, [
                 'name' => 'product',
                 'variants' => factory(Variant::class, ['name' => 'variant'])->many(3),
-            ])->many(2)
+            ])->many(2),
         ])->create();
 
         $this->assertCount(2, $brand->getProducts());

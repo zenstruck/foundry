@@ -16,7 +16,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Faker;
 use Zenstruck\Foundry\Exception\FoundryNotBootedException;
-use Zenstruck\Foundry\Persistence\CollectionInversedRelationshipCascadePersistCallback;
 use Zenstruck\Foundry\Persistence\InversedRelationshipCascadePersistCallback;
 use Zenstruck\Foundry\Persistence\PostPersistCallback;
 
@@ -111,13 +110,13 @@ class Factory
         foreach ($attributes as $name => $value) {
             $normalizedAttribute = $this->normalizeAttribute($value, $name);
 
-            if (is_array($normalizedAttribute)) {
+            if (\is_array($normalizedAttribute)) {
                 $postPersistCallbacks = [
                     ...$postPersistCallbacks,
-                    ...array_values(array_filter($normalizedAttribute, static fn(mixed $attribute): bool => $attribute instanceof PostPersistCallback))
+                    ...\array_values(\array_filter($normalizedAttribute, static fn(mixed $attribute): bool => $attribute instanceof PostPersistCallback)),
                 ];
 
-                $normalizedAttribute = array_values(array_filter($normalizedAttribute, static fn(mixed $attribute): bool => !$attribute instanceof PostPersistCallback));
+                $normalizedAttribute = \array_values(\array_filter($normalizedAttribute, static fn(mixed $attribute): bool => !$attribute instanceof PostPersistCallback));
             }
 
             if ($normalizedAttribute instanceof PostPersistCallback) {
