@@ -62,24 +62,18 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
      */
     public function one_to_many_relationship(): void
     {
-        $product = factory(Product::class, [
-            'name' => 'foo',
-            'variants' => [
-                factory(Variant::class, [
-                    'name' => 'bar',
-                    // asserts a "sub" relationship without cascade persist is persisted
-                    'image' => factory(Image::class, ['path' => '/some/path']),
-                ]),
-            ],
+        $brand = factory(Brand::class, [
+            'name' => 'brand',
+            'products' => factory(Product::class, ['name' => 'product'])->many(2)
         ])->instantiateWith(function(array $attributes, string $class): object {
-            $this->assertNull($attributes['variants'][0]->getId());
+//            $this->assertNull($attributes['products'][0]->getId());
 
             return (new Instantiator())($attributes, $class);
         })->create();
 
-        $this->assertCount(1, $product->getVariants());
-        $this->assertNotNull($product->getVariants()->first()->getId());
-        $this->assertSame('bar', $product->getVariants()->first()->getName());
+        $this->assertCount(2, $brand->getProducts());
+        $this->assertNotNull($brand->getProducts()->first()->getId());
+        $this->assertSame('product', $brand->getProducts()->first()->getName());
     }
 
     /**
@@ -154,5 +148,43 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
 
         $this->assertNotNull($product->getReview()->getId());
         $this->assertSame(4, $product->getReview()->getRank());
+    }
+
+    /**
+     * @test
+     */
+    public function nested_relationship_without_cascade(): void
+    {
+        $product = factory(Product::class, [
+            'name' => 'foo',
+            'variants' => [
+                factory(Variant::class, [
+                    'name' => 'bar',
+                    // asserts a "sub" relationship without cascade persist is persisted
+                    'image' => factory(Image::class, ['path' => '/some/path']),
+                ]),
+            ],
+        ])->create();
+
+        $this->assertSame('/some/path', $product->getVariants()->first()->getImage()->getPath());
+    }
+
+    /**
+     * @test
+     */
+    public function nested_collections_with_cascade(): void
+    {
+        $brand = factory(Brand::class, [
+            'name' => 'brand',
+            'products' => factory(Product::class, [
+                'name' => 'product',
+                'variants' => factory(Variant::class, ['name' => 'variant'])->many(3),
+            ])->many(2)
+        ])->create();
+
+        $this->assertCount(2, $brand->getProducts());
+        foreach ($brand->getProducts() as $product) {
+            $this->assertCount(3, $product->getVariants());
+        }
     }
 }

@@ -18,7 +18,7 @@ class Brand
     #[ORM\Column(type: "string", length: 255)]
     private ?string $name = null;
 
-    #[ORM\OneToMany(targetEntity: Product::class, mappedBy: "brand")]
+    #[ORM\OneToMany(targetEntity: Product::class, mappedBy: "brand", cascade: ["persist"])]
     private Collection $products;
 
     public function __construct()
@@ -44,5 +44,20 @@ class Brand
     public function getProducts(): Collection
     {
         return $this->products;
+    }
+
+    public function addProduct(Product $product): void
+    {
+        if (!$this->products->contains($product)) {
+            $this->products[] = $product;
+            $product->setBrand($this);
+        }
+    }
+
+    public function removeProduct(Product $product): void
+    {
+        if ($this->products->contains($product)) {
+            $this->products->removeElement($product);
+        }
     }
 }

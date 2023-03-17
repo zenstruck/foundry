@@ -21,7 +21,7 @@ class Product
     #[ORM\ManyToOne(targetEntity: Brand::class, inversedBy: "products", cascade: ["persist"])]
     private ?Brand $brand = null;
 
-    #[ORM\OneToMany(targetEntity: Variant::class, mappedBy: "product", cascade: ["persist"])]
+    #[ORM\OneToMany(targetEntity: Variant::class, mappedBy: "product")]
     private Collection $variants;
 
     #[ORM\ManyToMany(targetEntity: ProductCategory::class, mappedBy: "products", cascade: ["persist"])]
