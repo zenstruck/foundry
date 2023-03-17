@@ -44,6 +44,9 @@
             "symfony/flex": true
         }
     },
+    "conflict": {
+        "doctrine/mongodb-odm": "2.5.0"
+    },
     "autoload": {
         "psr-4": { "Zenstruck\\Foundry\\": "src/" },
         "files": ["src/functions.php"]
