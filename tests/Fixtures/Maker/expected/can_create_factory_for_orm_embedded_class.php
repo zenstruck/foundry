@@ -34,6 +34,7 @@ final class AddressFactory extends ModelFactory
     protected function getDefaults(): array
     {
         return [
+            'value' => self::faker()->sentence(),
         ];
     }
 

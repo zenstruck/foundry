@@ -12,6 +12,7 @@
 namespace Zenstruck\Foundry\Tests\Functional;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\AddressFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
@@ -538,6 +539,36 @@ final class ORMModelFactoryTest extends ModelFactoryTest
         PostFactory::assert()->count(4);
         PostFactory::assert()->count(2, ['category' => $category]);
         self::assertSame(2, PostFactory::count(['category' => $category]));
+    }
+
+    /**
+     * @test
+     */
+    public function can_find_or_create_from_embedded_object(): void
+    {
+        $contact = ContactFactory::findOrCreate($attributes = ['name' => 'foo', 'address' => new Address('some address')]);
+        self::assertSame('some address', $contact->getAddress()->getValue());
+        ContactFactory::assert()->count(1);
+
+        $contact2 = ContactFactory::findOrCreate($attributes);
+        ContactFactory::assert()->count(1);
+
+        self::assertSame($contact->object(), $contact2->object());
+    }
+
+    /**
+     * @test
+     */
+    public function can_find_or_create_from_factory_of_embedded_object(): void
+    {
+        $contact = ContactFactory::findOrCreate($attributes = ['name' => 'foo', 'address' => AddressFactory::new(['value' => 'address'])]);
+        self::assertSame('address', $contact->getAddress()->getValue());
+        ContactFactory::assert()->count(1);
+
+        $contact2 = ContactFactory::findOrCreate($attributes);
+        ContactFactory::assert()->count(1);
+
+        self::assertSame($contact->object(), $contact2->object());
     }
 
     protected function categoryClass(): string

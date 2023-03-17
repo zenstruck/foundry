@@ -22,7 +22,7 @@ class Contact
     public function __construct($name)
     {
         $this->name = $name;
-        $this->address = new Address();
+        $this->address = new Address('some address');
     }
 
     public function getName()
