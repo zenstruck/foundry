@@ -318,7 +318,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
         $normalizedCriteria = [];
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
         foreach ($criteria as $attributeName => $attributeValue) {
-            if (!is_object($attributeValue)) {
+            if (!\is_object($attributeValue)) {
                 $normalizedCriteria[$attributeName] = $attributeValue;
 
                 continue;
@@ -334,10 +334,10 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
                 throw new \InvalidArgumentException('Only embeddable objects can be passed as attributes for "findOrCreate()" method.', previous: $e);
             }
 
-            $isEmbedded = match($metadataForAttribute::class){
+            $isEmbedded = match ($metadataForAttribute::class) {
                 ORMClassMetadata::class => $metadataForAttribute->isEmbeddedClass,
                 ODMClassMetadata::class => $metadataForAttribute->isEmbeddedDocument,
-                default => throw new \LogicException(sprintf('Metadata class %s is not supported.', $metadataForAttribute::class))
+                default => throw new \LogicException(\sprintf('Metadata class %s is not supported.', $metadataForAttribute::class))
             };
 
             if (!$isEmbedded) {
@@ -346,7 +346,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
 
             foreach ($metadataForAttribute->getFieldNames() as $field) {
                 $embeddableFieldValue = $propertyAccessor->getValue($attributeValue, $field);
-                if (is_object($embeddableFieldValue)) {
+                if (\is_object($embeddableFieldValue)) {
                     throw new \InvalidArgumentException('Nested embeddable objects are still not supported in "findOrCreate()" method.');
                 }
 

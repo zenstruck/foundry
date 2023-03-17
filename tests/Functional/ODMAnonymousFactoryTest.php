@@ -21,6 +21,13 @@ use Zenstruck\Foundry\Tests\Fixtures\Document\ODMUser;
  */
 final class ODMAnonymousFactoryTest extends AnonymousFactoryTest
 {
+    protected function setUp(): void
+    {
+        if (!\getenv('USE_ODM')) {
+            self::markTestSkipped('doctrine/odm not enabled.');
+        }
+    }
+
     /**
      * @test
      */
@@ -33,13 +40,6 @@ final class ODMAnonymousFactoryTest extends AnonymousFactoryTest
         $factory->assert()->count(1);
         $factory->findOrCreate($attributes);
         $factory->assert()->count(1);
-    }
-
-    protected function setUp(): void
-    {
-        if (!\getenv('USE_ODM')) {
-            self::markTestSkipped('doctrine/odm not enabled.');
-        }
     }
 
     protected function categoryClass(): string

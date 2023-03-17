@@ -21,6 +21,13 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Contact;
  */
 final class ORMAnonymousFactoryTest extends AnonymousFactoryTest
 {
+    protected function setUp(): void
+    {
+        if (!\getenv('USE_ORM')) {
+            self::markTestSkipped('doctrine/orm not enabled.');
+        }
+    }
+
     /**
      * @test
      */
@@ -33,13 +40,6 @@ final class ORMAnonymousFactoryTest extends AnonymousFactoryTest
         $factory->assert()->count(1);
         $factory->findOrCreate($attributes);
         $factory->assert()->count(1);
-    }
-
-    protected function setUp(): void
-    {
-        if (!\getenv('USE_ORM')) {
-            self::markTestSkipped('doctrine/orm not enabled.');
-        }
     }
 
     protected function categoryClass(): string
