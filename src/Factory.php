@@ -116,7 +116,7 @@ class Factory
                     ...\array_values(\array_filter($normalizedAttribute, static fn(mixed $attribute): bool => $attribute instanceof PostPersistCallback)),
                 ];
 
-                $normalizedAttribute = \array_values(\array_filter($normalizedAttribute, static fn(mixed $attribute): bool => !$attribute instanceof PostPersistCallback));
+                $normalizedAttribute = \array_filter($normalizedAttribute, static fn(mixed $attribute): bool => !$attribute instanceof PostPersistCallback);
             }
 
             if ($normalizedAttribute instanceof PostPersistCallback) {
