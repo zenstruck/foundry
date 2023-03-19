@@ -60,7 +60,7 @@ class Factory
     {
         /** @phpstan-ignore-next-line */
         if (self::class === static::class) {
-            trigger_deprecation('zenstruck/foundry', '1.9', 'Instantiating "%s" directly is deprecated and this class will be abstract in 2.0, use "%s" instead.', self::class, AnonymousFactory::class);
+            trigger_deprecation('zenstruck/foundry', '1.9', 'Instantiating "%s" directly is deprecated and this class will be abstract in 2.0, use "anonymous()" function instead.', self::class);
         }
 
         $this->class = $class;

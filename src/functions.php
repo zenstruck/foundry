@@ -20,11 +20,29 @@ use Faker;
  *
  * @param class-string<TObject> $class
  *
+ * @deprecated
+ *
  * @return AnonymousFactory<TObject>
  */
 function factory(string $class, array|callable $defaultAttributes = []): AnonymousFactory
 {
+    trigger_deprecation('zenstruck\foundry', '1.30', 'Usage of "factory()" function is deprecated and will be removed in 2.0. Use the "anonymous()" or "repository()" functions instead.');
+
     return new AnonymousFactory($class, $defaultAttributes);
+}
+
+/**
+ * @see Factory::__construct()
+ *
+ * @template TObject of object
+ *
+ * @param class-string<TObject> $class
+ *
+ * @return Factory<TObject>
+ */
+function anonymous(string $class, array|callable $defaultAttributes = []): Factory
+{
+    return new class($class, $defaultAttributes) extends Factory{};
 }
 
 /**
@@ -38,7 +56,7 @@ function factory(string $class, array|callable $defaultAttributes = []): Anonymo
  */
 function create(string $class, array|callable $attributes = []): Proxy
 {
-    return factory($class)->create($attributes);
+    return anonymous($class)->create($attributes);
 }
 
 /**
@@ -52,7 +70,7 @@ function create(string $class, array|callable $attributes = []): Proxy
  */
 function create_many(int $number, string $class, array|callable $attributes = []): array
 {
-    return factory($class)->many($number)->create($attributes);
+    return anonymous($class)->many($number)->create($attributes);
 }
 
 /**
@@ -66,7 +84,7 @@ function create_many(int $number, string $class, array|callable $attributes = []
  */
 function instantiate(string $class, array|callable $attributes = []): Proxy
 {
-    return factory($class)->withoutPersisting()->create($attributes);
+    return anonymous($class)->withoutPersisting()->create($attributes);
 }
 
 /**
@@ -80,7 +98,7 @@ function instantiate(string $class, array|callable $attributes = []): Proxy
  */
 function instantiate_many(int $number, string $class, array|callable $attributes = []): array
 {
-    return factory($class)->withoutPersisting()->many($number)->create($attributes);
+    return anonymous($class)->withoutPersisting()->many($number)->create($attributes);
 }
 
 /**

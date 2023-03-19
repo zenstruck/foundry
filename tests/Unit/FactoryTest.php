@@ -16,7 +16,6 @@ use Doctrine\Persistence\ObjectManager;
 use Faker;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\AnonymousFactory;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\LazyValue;
 use Zenstruck\Foundry\Proxy;
@@ -24,6 +23,7 @@ use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 
+use function Zenstruck\Foundry\anonymous;
 use function Zenstruck\Foundry\lazy;
 
 /**
@@ -42,15 +42,15 @@ final class FactoryTest extends TestCase
         $attributeCallback = static fn(): array => ['title' => 'title', 'body' => 'body'];
         $attributeArrayWithLazyValue = ['title' => lazy(fn() => 'title'), 'body' => 'body'];
 
-        $this->assertSame('title', (new AnonymousFactory(Post::class, $attributeArray))->create()->getTitle());
-        $this->assertSame('title', (new AnonymousFactory(Post::class))->create($attributeArray)->getTitle());
-        $this->assertSame('title', (new AnonymousFactory(Post::class))->withAttributes($attributeArray)->create()->getTitle());
-        $this->assertSame('title', (new AnonymousFactory(Post::class, $attributeCallback))->create()->getTitle());
-        $this->assertSame('title', (new AnonymousFactory(Post::class))->create($attributeCallback)->getTitle());
-        $this->assertSame('title', (new AnonymousFactory(Post::class))->withAttributes($attributeCallback)->create()->getTitle());
-        $this->assertSame('title', (new AnonymousFactory(Post::class, $attributeArrayWithLazyValue))->create()->getTitle());
-        $this->assertSame('title', (new AnonymousFactory(Post::class))->create($attributeArrayWithLazyValue)->getTitle());
-        $this->assertSame('title', (new AnonymousFactory(Post::class))->withAttributes($attributeArrayWithLazyValue)->create()->getTitle());
+        $this->assertSame('title', anonymous(Post::class, $attributeArray)->create()->getTitle());
+        $this->assertSame('title', anonymous(Post::class)->create($attributeArray)->getTitle());
+        $this->assertSame('title', anonymous(Post::class)->withAttributes($attributeArray)->create()->getTitle());
+        $this->assertSame('title', anonymous(Post::class, $attributeCallback)->create()->getTitle());
+        $this->assertSame('title', anonymous(Post::class)->create($attributeCallback)->getTitle());
+        $this->assertSame('title', anonymous(Post::class)->withAttributes($attributeCallback)->create()->getTitle());
+        $this->assertSame('title', anonymous(Post::class, $attributeArrayWithLazyValue)->create()->getTitle());
+        $this->assertSame('title', anonymous(Post::class)->create($attributeArrayWithLazyValue)->getTitle());
+        $this->assertSame('title', anonymous(Post::class)->withAttributes($attributeArrayWithLazyValue)->create()->getTitle());
     }
 
     /**
@@ -64,7 +64,7 @@ final class FactoryTest extends TestCase
 
             return 'title';
         });
-        $factory = AnonymousFactory::new(Post::class, ['title' => $lazyValue, 'body' => 'body']);
+        $factory = anonymous(Post::class, ['title' => $lazyValue, 'body' => 'body']);
 
         $post = $factory
             ->withAttributes(['title' => $lazyValue])
@@ -144,7 +144,7 @@ final class FactoryTest extends TestCase
     {
         $attributeArray = ['title' => 'original title', 'body' => 'original body'];
 
-        $object = (new AnonymousFactory(Post::class))
+        $object = anonymous(Post::class)
             ->instantiateWith(function(array $attributes, string $class) use ($attributeArray): Post {
                 $this->assertSame(Post::class, $class);
                 $this->assertSame($attributes, $attributeArray);
@@ -165,7 +165,7 @@ final class FactoryTest extends TestCase
     {
         $attributeArray = ['title' => 'original title', 'body' => 'original body'];
 
-        $object = (new AnonymousFactory(Post::class))
+        $object = anonymous(Post::class)
             ->beforeInstantiate(static function(array $attributes): array {
                 $attributes['title'] = 'title';
 
@@ -191,7 +191,7 @@ final class FactoryTest extends TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Before Instantiate event callback must return an array.');
 
-        (new AnonymousFactory(Post::class))->beforeInstantiate(static function(): void {})->create();
+        anonymous(Post::class)->beforeInstantiate(static function(): void {})->create();
     }
 
     /**
@@ -201,7 +201,7 @@ final class FactoryTest extends TestCase
     {
         $attributesArray = ['title' => 'title', 'body' => 'body'];
 
-        $object = (new AnonymousFactory(Post::class))
+        $object = anonymous(Post::class)
             ->afterInstantiate(function(Post $post, array $attributes) use ($attributesArray): void {
                 $this->assertSame($attributesArray, $attributes);
 
@@ -236,7 +236,7 @@ final class FactoryTest extends TestCase
     {
         Factory::configuration()->setInstantiator(static fn(): Post => new Post('different title', 'different body'));
 
-        $object = (new AnonymousFactory(Post::class, ['title' => 'title', 'body' => 'body']))->create();
+        $object = anonymous(Post::class, ['title' => 'title', 'body' => 'body'])->create();
 
         $this->assertSame('different title', $object->getTitle());
         $this->assertSame('different body', $object->getBody());
@@ -247,7 +247,7 @@ final class FactoryTest extends TestCase
      */
     public function instantiating_with_proxy_attribute_normalizes_to_underlying_object(): void
     {
-        $object = (new AnonymousFactory(Post::class))->create([
+        $object = anonymous(Post::class)->create([
             'title' => 'title',
             'body' => 'body',
             'category' => new Proxy(new Category()),
@@ -261,10 +261,10 @@ final class FactoryTest extends TestCase
      */
     public function instantiating_with_factory_attribute_instantiates_the_factory(): void
     {
-        $object = (new AnonymousFactory(Post::class))->create([
+        $object = anonymous(Post::class)->create([
             'title' => 'title',
             'body' => 'body',
-            'category' => new AnonymousFactory(Category::class),
+            'category' => anonymous(Category::class),
         ]);
 
         $this->assertInstanceOf(Category::class, $object->getCategory());
@@ -275,7 +275,7 @@ final class FactoryTest extends TestCase
      */
     public function factory_is_immutable(): void
     {
-        $factory = new AnonymousFactory(Post::class);
+        $factory = anonymous(Post::class);
         $objectId = \spl_object_id($factory);
 
         $this->assertNotSame(\spl_object_id($factory->withAttributes([])), $objectId);
@@ -300,7 +300,7 @@ final class FactoryTest extends TestCase
 
         Factory::configuration()->setManagerRegistry($registry)->disableDefaultProxyAutoRefresh();
 
-        $object = (new AnonymousFactory(Post::class))->create(['title' => 'title', 'body' => 'body']);
+        $object = anonymous(Post::class)->create(['title' => 'title', 'body' => 'body']);
 
         $this->assertInstanceOf(Proxy::class, $object);
         $this->assertSame('title', $object->getTitle());
@@ -349,7 +349,7 @@ final class FactoryTest extends TestCase
         $expectedAttributes = ['shortDescription' => 'short desc', 'title' => 'title', 'body' => 'body'];
         $calls = 0;
 
-        $object = (new AnonymousFactory(Post::class, ['shortDescription' => 'short desc']))
+        $object = anonymous(Post::class, ['shortDescription' => 'short desc'])
             ->afterPersist(function(Proxy $post, array $attributes) use ($expectedAttributes, &$calls): void {
                 /* @var Post $post */
                 $this->assertSame($expectedAttributes, $attributes);
@@ -392,7 +392,7 @@ final class FactoryTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Foundry was booted without doctrine. Ensure your TestCase extends '.KernelTestCase::class);
 
-        (new AnonymousFactory(Post::class))->create(['title' => 'title', 'body' => 'body'])->save();
+        anonymous(Post::class)->create(['title' => 'title', 'body' => 'body'])->save();
     }
 
     /**
@@ -404,7 +404,7 @@ final class FactoryTest extends TestCase
             public $value;
         };
 
-        $factory = AnonymousFactory::new($object::class)->create(['value' => ['foo' => 'bar']]);
+        $factory = anonymous($object::class)->create(['value' => ['foo' => 'bar']]);
 
         $this->assertSame(['foo' => 'bar'], $factory->value);
     }

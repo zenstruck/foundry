@@ -16,7 +16,7 @@ use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 
-use function Zenstruck\Foundry\factory;
+use function Zenstruck\Foundry\anonymous;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -30,7 +30,7 @@ final class FactoryCollectionTest extends TestCase
      */
     public function can_create_with_static_size(): void
     {
-        $collection = FactoryCollection::set(factory(Category::class), 2);
+        $collection = FactoryCollection::set(anonymous(Category::class), 2);
 
         $this->assertCount(2, $collection->create());
         $this->assertCount(2, $collection->create());
@@ -44,7 +44,7 @@ final class FactoryCollectionTest extends TestCase
      */
     public function can_create_with_random_range(): void
     {
-        $collection = FactoryCollection::range(factory(Category::class), 0, 3);
+        $collection = FactoryCollection::range(anonymous(Category::class), 0, 3);
         $counts = [];
 
         while (4 !== \count(\array_unique($counts))) {
@@ -68,7 +68,7 @@ final class FactoryCollectionTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Min must be less than max.');
 
-        FactoryCollection::range(factory(Category::class), 4, 3);
+        FactoryCollection::range(anonymous(Category::class), 4, 3);
     }
 
     /**
@@ -76,7 +76,7 @@ final class FactoryCollectionTest extends TestCase
      */
     public function can_create_with_sequence(): void
     {
-        $collection = FactoryCollection::sequence(factory(Category::class), [['name' => 'foo'], ['name' => 'bar']]);
+        $collection = FactoryCollection::sequence(anonymous(Category::class), [['name' => 'foo'], ['name' => 'bar']]);
 
         $categories = $collection->create();
         $this->assertCount(2, $categories);

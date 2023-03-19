@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\AnonymousFactory;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
+use function Zenstruck\Foundry\factory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -25,6 +26,7 @@ abstract class AnonymousFactoryTest extends KernelTestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_find_or_create(): void
     {
@@ -39,6 +41,22 @@ abstract class AnonymousFactoryTest extends KernelTestCase
 
     /**
      * @test
+     * @group legacy
+     */
+    public function can_create_anonymous_factory_with_function(): void
+    {
+        $factory = factory($this->categoryClass());
+
+        $factory->assert()->count(0);
+        $factory->findOrCreate(['name' => 'php']);
+        $factory->assert()->count(1);
+        $factory->findOrCreate(['name' => 'php']);
+        $factory->assert()->count(1);
+    }
+
+    /**
+     * @test
+     * @group legacy
      */
     public function can_find_random_object(): void
     {
@@ -56,6 +74,7 @@ abstract class AnonymousFactoryTest extends KernelTestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_create_random_object_if_none_exists(): void
     {
@@ -70,6 +89,7 @@ abstract class AnonymousFactoryTest extends KernelTestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_get_or_create_random_object_with_attributes(): void
     {
@@ -85,6 +105,7 @@ abstract class AnonymousFactoryTest extends KernelTestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_find_random_set_of_objects(): void
     {
@@ -99,6 +120,7 @@ abstract class AnonymousFactoryTest extends KernelTestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_find_random_set_of_objects_with_attributes(): void
     {
@@ -115,6 +137,7 @@ abstract class AnonymousFactoryTest extends KernelTestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_find_random_range_of_objects(): void
     {
@@ -138,6 +161,7 @@ abstract class AnonymousFactoryTest extends KernelTestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_find_random_range_of_objects_with_attributes(): void
     {
@@ -157,6 +181,7 @@ abstract class AnonymousFactoryTest extends KernelTestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function first_and_last_return_the_correct_object(): void
     {
@@ -173,6 +198,7 @@ abstract class AnonymousFactoryTest extends KernelTestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function first_throws_exception_if_no_entities_exist(): void
     {
@@ -183,6 +209,7 @@ abstract class AnonymousFactoryTest extends KernelTestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function last_throws_exception_if_no_entities_exist(): void
     {
@@ -193,6 +220,7 @@ abstract class AnonymousFactoryTest extends KernelTestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_count_and_truncate_model_factory(): void
     {
@@ -214,6 +242,7 @@ abstract class AnonymousFactoryTest extends KernelTestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_get_all_entities(): void
     {
@@ -235,6 +264,7 @@ abstract class AnonymousFactoryTest extends KernelTestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_find_entity(): void
     {
@@ -259,6 +289,7 @@ abstract class AnonymousFactoryTest extends KernelTestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function find_throws_exception_if_no_entities_exist(): void
     {
@@ -269,6 +300,7 @@ abstract class AnonymousFactoryTest extends KernelTestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_find_by(): void
     {
@@ -289,6 +321,7 @@ abstract class AnonymousFactoryTest extends KernelTestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_create_sequence(): void
     {
