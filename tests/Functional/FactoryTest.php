@@ -12,7 +12,7 @@
 namespace Zenstruck\Foundry\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\AnonymousFactory;
+use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
@@ -20,8 +20,9 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
 
+use function Zenstruck\Foundry\anonymous;
 use function Zenstruck\Foundry\create;
-use function Zenstruck\Foundry\factory;
+use function Zenstruck\Foundry\repository;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -42,7 +43,7 @@ final class FactoryTest extends KernelTestCase
      */
     public function many_to_one_relationship(): void
     {
-        $categoryFactory = factory(Category::class, ['name' => 'foo']);
+        $categoryFactory = anonymous(Category::class, ['name' => 'foo']);
         $category = create(Category::class, ['name' => 'bar']);
         $postA = create(Post::class, ['title' => 'title', 'body' => 'body', 'category' => $categoryFactory]);
         $postB = create(Post::class, ['title' => 'title', 'body' => 'body', 'category' => $category]);
@@ -59,7 +60,7 @@ final class FactoryTest extends KernelTestCase
         $category = create(Category::class, [
             'name' => 'bar',
             'posts' => [
-                factory(Post::class, ['title' => 'Post A', 'body' => 'body']),
+                anonymous(Post::class, ['title' => 'Post A', 'body' => 'body']),
                 create(Post::class, ['title' => 'Post B', 'body' => 'body']),
             ],
         ]);
@@ -83,7 +84,7 @@ final class FactoryTest extends KernelTestCase
             'title' => 'title',
             'body' => 'body',
             'tags' => [
-                factory(Tag::class, ['name' => 'Tag A']),
+                anonymous(Tag::class, ['name' => 'Tag A']),
                 create(Tag::class, ['name' => 'Tag B']),
             ],
         ]);
@@ -106,7 +107,7 @@ final class FactoryTest extends KernelTestCase
         $tag = create(Tag::class, [
             'name' => 'bar',
             'posts' => [
-                factory(Post::class, ['title' => 'Post A', 'body' => 'body']),
+                anonymous(Post::class, ['title' => 'Post A', 'body' => 'body']),
                 create(Post::class, ['title' => 'Post B', 'body' => 'body']),
             ],
         ]);
@@ -126,10 +127,10 @@ final class FactoryTest extends KernelTestCase
      */
     public function creating_with_factory_attribute_persists_the_factory(): void
     {
-        $object = (new AnonymousFactory(Post::class))->create([
+        $object = anonymous(Post::class)->create([
             'title' => 'title',
             'body' => 'body',
-            'category' => new AnonymousFactory(Category::class, ['name' => 'name']),
+            'category' => anonymous(Category::class, ['name' => 'name']),
         ]);
 
         $this->assertNotNull($object->getCategory()->getId());
@@ -140,28 +141,28 @@ final class FactoryTest extends KernelTestCase
      */
     public function can_create_embeddable(): void
     {
-        $object = (new AnonymousFactory(Address::class))->create(['value' => 'an address']);
+        $object = anonymous(Address::class)->create(['value' => 'an address']);
 
         $this->assertSame('an address', $object->getValue());
     }
 
     public function can_delay_flush(): void
     {
-        AnonymousFactory::new(Post::class)->assert()->empty();
-        AnonymousFactory::new(Category::class)->assert()->empty();
+        repository(Post::class)->assert()->empty();
+        repository(Category::class)->assert()->empty();
 
-        AnonymousFactory::delayFlush(static function(): void {
-            AnonymousFactory::new(Post::class)->create([
+        Factory::delayFlush(static function(): void {
+            anonymous(Post::class)->create([
                 'title' => 'title',
                 'body' => 'body',
-                'category' => AnonymousFactory::new(Category::class, ['name' => 'name']),
+                'category' => anonymous(Category::class, ['name' => 'name']),
             ]);
-            AnonymousFactory::new(Post::class)->assert()->empty();
-            AnonymousFactory::new(Category::class)->assert()->empty();
+            repository(Post::class)->assert()->empty();
+            repository(Category::class)->assert()->empty();
         });
 
-        AnonymousFactory::new(Post::class)->assert()->count(1);
-        AnonymousFactory::new(Category::class)->assert()->count(1);
+        repository(Post::class)->assert()->count(1);
+        repository(Category::class)->assert()->count(1);
     }
 
     /**
@@ -169,22 +170,22 @@ final class FactoryTest extends KernelTestCase
      */
     public function auto_refresh_is_disabled_during_delay_flush(): void
     {
-        AnonymousFactory::new(Post::class)->assert()->empty();
-        AnonymousFactory::new(Category::class)->assert()->empty();
+        repository(Post::class)->assert()->empty();
+        repository(Category::class)->assert()->empty();
 
-        AnonymousFactory::delayFlush(static function(): void {
-            $post = AnonymousFactory::new(Post::class)->create([
+        Factory::delayFlush(static function(): void {
+            $post = anonymous(Post::class)->create([
                 'title' => 'title',
                 'body' => 'body',
-                'category' => AnonymousFactory::new(Category::class, ['name' => 'name']),
+                'category' => anonymous(Category::class, ['name' => 'name']),
             ]);
             $post->setTitle('new title');
             $post->setBody('new body');
-            AnonymousFactory::new(Post::class)->assert()->empty();
-            AnonymousFactory::new(Category::class)->assert()->empty();
+            repository(Post::class)->assert()->empty();
+            repository(Category::class)->assert()->empty();
         });
 
-        AnonymousFactory::new(Post::class)->assert()->count(1);
-        AnonymousFactory::new(Category::class)->assert()->count(1);
+        repository(Post::class)->assert()->count(1);
+        repository(Category::class)->assert()->count(1);
     }
 }

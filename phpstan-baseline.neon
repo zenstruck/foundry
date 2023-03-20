@@ -56,6 +56,6 @@ parameters:
 			path: src/ZenstruckFoundryBundle.php
 
 		-
-			message: "#^Function Zenstruck\\\\Foundry\\\\factory\\(\\) should return Zenstruck\\\\Foundry\\\\AnonymousFactory\\<TObject of object\\> but returns Zenstruck\\\\Foundry\\\\AnonymousFactory\\<object\\>\\.$#"
+			message: "#^Function Zenstruck\\\\Foundry\\\\anonymous\\(\\) should return Zenstruck\\\\Foundry\\\\Factory\\<TObject of object\\> but returns class@anonymous/src/functions\\.php\\:45\\.$#"
 			count: 1
 			path: src/functions.php

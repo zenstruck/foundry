@@ -16,9 +16,18 @@ namespace Zenstruck\Foundry;
  * @template-extends Factory<TModel>
  *
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @deprecated
  */
 final class AnonymousFactory extends Factory implements \Countable, \IteratorAggregate
 {
+    public function __construct(string $class, array|callable $defaultAttributes = [])
+    {
+        trigger_deprecation('zenstruck\foundry', '1.30', 'Class "AnonymousFactory" is deprecated and will be removed in 2.0. Use the "anonymous()" or "repository()" functions instead.');
+
+        parent::__construct($class, $defaultAttributes);
+    }
+
     /**
      * @see Factory::__construct()
      *

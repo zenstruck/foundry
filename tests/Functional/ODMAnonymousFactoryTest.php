@@ -30,6 +30,7 @@ final class ODMAnonymousFactoryTest extends AnonymousFactoryTest
 
     /**
      * @test
+     * @group legacy
      */
     public function can_find_or_create_from_embedded_object()
     {

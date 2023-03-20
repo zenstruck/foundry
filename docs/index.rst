@@ -932,13 +932,12 @@ Foundry can be used to create factories for entities that you don't have model f
 .. code-block:: php
 
     use App\Entity\Post;
-    use Zenstruck\Foundry\AnonymousFactory;
-    use function Zenstruck\Foundry\factory;
+    use function Zenstruck\Foundry\anonymous;
     use function Zenstruck\Foundry\create;
     use function Zenstruck\Foundry\create_many;
+    use function Zenstruck\Foundry\repository;
 
-    $factory = AnonymousFactory::new(Post::class);
-    $factory = factory(Post::class); // alternative to above
+    $factory = anonymous(Post::class);
 
     // has the same API as ModelFactory's
     $factory->create(['field' => 'value']);
@@ -948,45 +947,42 @@ Foundry can be used to create factories for entities that you don't have model f
     $factory->afterInstantiate(function () {});
     $factory->afterPersist(function () {});
 
-    // find a persisted object for the given attributes, if not found, create with the attributes
-    $factory->findOrCreate(['title' => 'My Title']);
+    // in order to access stored data, use `repository()` helper:
+    $repository = repository(Post::class);
 
-    $factory->first(); // get the first object (assumes an auto-incremented "id" column)
-    $factory->first('createdAt'); // assuming "createdAt" is a datetime column, this will return latest object
-    $factory->last(); // get the last object (assumes an auto-incremented "id" column)
-    $factory->last('createdAt'); // assuming "createdAt" is a datetime column, this will return oldest object
+    $repository->first(); // get the first object (assumes an auto-incremented "id" column)
+    $repository->first('createdAt'); // assuming "createdAt" is a datetime column, this will return latest object
+    $repository->last(); // get the last object (assumes an auto-incremented "id" column)
+    $repository->last('createdAt'); // assuming "createdAt" is a datetime column, this will return oldest object
 
-    $factory->truncate(); // empty the database table
-    $factory->count(); // the number of persisted Post's
-    $factory->all(); // Post[]|Proxy[] all the persisted Post's
+    $repository->truncate(); // empty the database table
+    $repository->count(); // the number of persisted Post's
+    $repository->all(); // Post[]|Proxy[] all the persisted Post's
 
-    $factory->findBy(['author' => 'kevin']); // Post[]|Proxy[] matching the filter
+    $repository->findBy(['author' => 'kevin']); // Post[]|Proxy[] matching the filter
 
-    $factory->find(5); // Post|Proxy with the id of 5
-    $factory->find(['title' => 'My First Post']); // Post|Proxy matching the filter
+    $repository->find(5); // Post|Proxy with the id of 5
+    $repository->find(['title' => 'My First Post']); // Post|Proxy matching the filter
 
     // get a random object that has been persisted
-    $factory->random(); // returns Post|Proxy
-    $factory->random(['author' => 'kevin']); // filter by the passed attributes
-
-    // or automatically persist a new random object if none exists
-    $factory->randomOrCreate();
-    $factory->randomOrCreate(['author' => 'kevin']); // filter by or create with the passed attributes
+    $repository->random(); // returns Post|Proxy
+    $repository->random(['author' => 'kevin']); // filter by the passed attributes
 
     // get a random set of objects that have been persisted
-    $factory->randomSet(4); // array containing 4 "Post|Proxy" objects
-    $factory->randomSet(4, ['author' => 'kevin']); // filter by the passed attributes
+    $repository->randomSet(4); // array containing 4 "Post|Proxy" objects
+    $repository->randomSet(4, ['author' => 'kevin']); // filter by the passed attributes
 
     // random range of persisted objects
-    $factory->randomRange(0, 5); // array containing 0-5 "Post|Proxy" objects
-    $factory->randomRange(0, 5, ['author' => 'kevin']); // filter by the passed attributes
-
-    // repository proxy wrapping PostRepository (see Repository Proxy section below)
-    $factory->repository();
+    $repository->randomRange(0, 5); // array containing 0-5 "Post|Proxy" objects
+    $repository->randomRange(0, 5, ['author' => 'kevin']); // filter by the passed attributes
 
     // convenience functions
     $entity = create(Post::class, ['field' => 'value']);
     $entities = create_many(Post::class, 5, ['field' => 'value']);
+
+.. note::
+
+    If your anonymous factory code is getting too complex, this could be a sign you need an explicit model factory class.
 
 Delay Flush
 ~~~~~~~~~~~
@@ -1017,7 +1013,7 @@ in a ``Proxy`` to optionally save later.
 
     use App\Factory\PostFactory;
     use App\Entity\Post;
-    use Zenstruck\Foundry\AnonymousFactory;
+    use Zenstruck\Foundry\anonymous;
     use function Zenstruck\Foundry\instantiate;
     use function Zenstruck\Foundry\instantiate_many;
 
@@ -1030,7 +1026,7 @@ in a ``Proxy`` to optionally save later.
     $posts = PostFactory::new()->withoutPersisting()->many(5)->create(); // returns Post[]|Proxy[]
 
     // anonymous factories:
-    $factory = new AnonymousFactory(Post::class);
+    $factory = anonymous(Post::class);
 
     $entity = $factory->withoutPersisting()->create(['field' => 'value']); // returns Post|Proxy
 
