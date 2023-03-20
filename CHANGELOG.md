@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## [v1.30.0](https://github.com/zenstruck/foundry/releases/tag/v1.30.0)
+
+March 20th, 2023 - [v1.29.0...v1.30.0](https://github.com/zenstruck/foundry/compare/v1.29.0...v1.30.0)
+
+* c5ca551 refactor: deprecate AnonymousFactory class and factory() helper (#436) by @nikophil
+* 837dbf6 fix(global state): register story as service in StoryManager (#434) by @nikophil
+* 230f75e feat: findOrCreate() can use embeddables (#432) by @nikophil
+* cacf9ea minor: add conflict for `doctrine/mongodb-odm` for false deprecation (#435) by @kbond
+* 6cc9541 fix: running `array_values()` on array attribute (#435) by @kbond
+* 083a9b9 bug: add failing test for attribute that is array (#435) by @kbond
+* 0094f09 refactor: simplify atrtibutes normalization (#423) by @nikophil
+* d8a94ce doc: Add introduction to `index.rst` for symfony.com accessibility (#429) by @GromNaN
+
 ## [v1.29.0](https://github.com/zenstruck/foundry/releases/tag/v1.29.0)
 
 February 28th, 2023 - [v1.28.0...v1.29.0](https://github.com/zenstruck/foundry/compare/v1.28.0...v1.29.0)
