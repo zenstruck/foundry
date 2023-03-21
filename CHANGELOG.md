@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [v1.30.1](https://github.com/zenstruck/foundry/releases/tag/v1.30.1)
+
+March 21st, 2023 - [v1.30.0...v1.30.1](https://github.com/zenstruck/foundry/compare/v1.30.0...v1.30.1)
+
+* fba0933 fix: regression from embedded object in findOrCreate function (#438) by @nicolasne, Nicolas Nénon, @kbond
+
 ## [v1.30.0](https://github.com/zenstruck/foundry/releases/tag/v1.30.0)
 
 March 20th, 2023 - [v1.29.0...v1.30.0](https://github.com/zenstruck/foundry/compare/v1.29.0...v1.30.0)
