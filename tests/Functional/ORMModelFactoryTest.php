@@ -14,7 +14,6 @@ namespace Zenstruck\Foundry\Tests\Functional;
 use Doctrine\ORM\EntityManagerInterface;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
-use Zenstruck\Foundry\Tests\Fixtures\Entity\User;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\AddressFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CommentFactory;

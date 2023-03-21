@@ -326,7 +326,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
 
             if ($attributeValue instanceof Factory) {
                 $attributeValue = $attributeValue->withoutPersisting()->create()->object();
-            } else if ($attributeValue instanceof Proxy) {
+            } elseif ($attributeValue instanceof Proxy) {
                 $attributeValue = $attributeValue->object();
             }
 
