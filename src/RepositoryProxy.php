@@ -333,7 +333,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
             try {
                 $metadataForAttribute = $this->getObjectManager()->getClassMetadata($attributeValue::class);
             } catch (MappingException $e) {
-                throw new \InvalidArgumentException('Only embeddable objects can be passed as attributes for "findOrCreate()" method.', previous: $e);
+                throw new \InvalidArgumentException('Only managed objects can be passed as attributes for "findOrCreate()" method.', previous: $e);
             }
 
             $isEmbedded = match ($metadataForAttribute::class) {
