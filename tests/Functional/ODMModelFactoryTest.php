@@ -19,6 +19,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Document\ODMUser;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\CommentFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\PostFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\UserFactory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -87,6 +88,40 @@ final class ODMModelFactoryTest extends ModelFactoryTest
         PostFactory::assert()->count(1);
 
         $post2 = PostFactory::findOrCreate(['title' => 'foo', 'user' => new ODMUser('some user')]);
+        PostFactory::assert()->count(1);
+
+        self::assertSame($post->object(), $post2->object());
+    }
+
+    /**
+     * @test
+     */
+    public function can_find_or_create_from_object(): void
+    {
+        $user = UserFactory::createOne(['name' => 'some user']);
+        $post = PostFactory::findOrCreate($attributes = ['user' => $user->object()]);
+
+        self::assertSame($user->object(), $post->getUser());
+        PostFactory::assert()->count(1);
+
+        $post2 = PostFactory::findOrCreate($attributes);
+        PostFactory::assert()->count(1);
+
+        self::assertSame($post->object(), $post2->object());
+    }
+
+    /**
+     * @test
+     */
+    public function can_find_or_create_from_proxy_of_object(): void
+    {
+        $user = UserFactory::createOne(['name' => 'some user']);
+        $post = PostFactory::findOrCreate($attributes = ['user' => $user]);
+
+        self::assertSame($user->object(), $post->getUser());
+        PostFactory::assert()->count(1);
+
+        $post2 = PostFactory::findOrCreate($attributes);
         PostFactory::assert()->count(1);
 
         self::assertSame($post->object(), $post2->object());

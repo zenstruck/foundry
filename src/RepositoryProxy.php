@@ -326,6 +326,8 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
 
             if ($attributeValue instanceof Factory) {
                 $attributeValue = $attributeValue->withoutPersisting()->create()->object();
+            } else if ($attributeValue instanceof Proxy) {
+                $attributeValue = $attributeValue->object();
             }
 
             try {
@@ -340,8 +342,11 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
                 default => throw new \LogicException(\sprintf('Metadata class %s is not supported.', $metadataForAttribute::class))
             };
 
+            // it's a regular entity
             if (!$isEmbedded) {
-                throw new \InvalidArgumentException('Only embeddable objects can be passed as attributes for "findOrCreate()" method.');
+                $normalizedCriteria[$attributeName] = $attributeValue;
+
+                continue;
             }
 
             foreach ($metadataForAttribute->getFieldNames() as $field) {

@@ -14,6 +14,7 @@ namespace Zenstruck\Foundry\Tests\Functional;
 use Doctrine\ORM\EntityManagerInterface;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\User;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\AddressFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CommentFactory;
@@ -569,6 +570,40 @@ final class ORMModelFactoryTest extends ModelFactoryTest
         ContactFactory::assert()->count(1);
 
         self::assertSame($contact->object(), $contact2->object());
+    }
+
+    /**
+     * @test
+     */
+    public function can_find_or_create_from_object(): void
+    {
+        $user = UserFactory::createOne();
+        $comment = CommentFactory::findOrCreate($attributes = ['user' => $user->object()]);
+
+        self::assertSame($user->object(), $comment->getUser());
+        CommentFactory::assert()->count(1);
+
+        $comment2 = CommentFactory::findOrCreate($attributes);
+        CommentFactory::assert()->count(1);
+
+        self::assertSame($comment->object(), $comment2->object());
+    }
+
+    /**
+     * @test
+     */
+    public function can_find_or_create_from_proxy_of_object(): void
+    {
+        $user = UserFactory::createOne();
+        $comment = CommentFactory::findOrCreate($attributes = ['user' => $user]);
+
+        self::assertSame($user->object(), $comment->getUser());
+        CommentFactory::assert()->count(1);
+
+        $comment2 = CommentFactory::findOrCreate($attributes);
+        CommentFactory::assert()->count(1);
+
+        self::assertSame($comment->object(), $comment2->object());
     }
 
     protected function categoryClass(): string
