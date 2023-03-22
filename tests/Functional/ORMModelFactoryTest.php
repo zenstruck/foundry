@@ -18,6 +18,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\AddressFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CommentFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ContactFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\EntityWithEnumFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithInvalidInitialize;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithNullInitialize;
@@ -25,6 +26,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithValidInitialize;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\SpecificPostFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\TagFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\UserFactory;
+use Zenstruck\Foundry\Tests\Fixtures\PHP81\SomeEnum;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -603,6 +605,21 @@ final class ORMModelFactoryTest extends ModelFactoryTest
         CommentFactory::assert()->count(1);
 
         self::assertSame($comment->object(), $comment2->object());
+    }
+
+    /**
+     * @test
+     * @requires PHP 8.1
+     */
+    public function can_find_or_create_entity_with_enum(): void
+    {
+        $entityWithEnum = EntityWithEnumFactory::findOrCreate($attributes = ['enum' => SomeEnum::VALUE]);
+        EntityWithEnumFactory::assert()->count(1);
+
+        $entityWithEnum2 = EntityWithEnumFactory::findOrCreate($attributes);
+        EntityWithEnumFactory::assert()->count(1);
+
+        self::assertSame($entityWithEnum->object(), $entityWithEnum2->object());
     }
 
     protected function categoryClass(): string
