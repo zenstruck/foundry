@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [v1.30.3](https://github.com/zenstruck/foundry/releases/tag/v1.30.3)
+
+March 22nd, 2023 - [v1.30.2...v1.30.3](https://github.com/zenstruck/foundry/compare/v1.30.2...v1.30.3)
+
+* c31d653 fix(RepositoryProxy::find()): allow not entity object in (#441) by @nikophil
+
 ## [v1.30.2](https://github.com/zenstruck/foundry/releases/tag/v1.30.2)
 
 March 22nd, 2023 - [v1.30.1...v1.30.2](https://github.com/zenstruck/foundry/compare/v1.30.1...v1.30.2)
