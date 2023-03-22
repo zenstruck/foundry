@@ -332,8 +332,10 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
 
             try {
                 $metadataForAttribute = $this->getObjectManager()->getClassMetadata($attributeValue::class);
-            } catch (MappingException $e) {
-                throw new \InvalidArgumentException('Only managed objects can be passed as attributes for "findOrCreate()" method.', previous: $e);
+            } catch (MappingException) {
+                $normalizedCriteria[$attributeName] = $attributeValue;
+
+                continue;
             }
 
             $isEmbedded = match ($metadataForAttribute::class) {
@@ -352,7 +354,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
             foreach ($metadataForAttribute->getFieldNames() as $field) {
                 $embeddableFieldValue = $propertyAccessor->getValue($attributeValue, $field);
                 if (\is_object($embeddableFieldValue)) {
-                    throw new \InvalidArgumentException('Nested embeddable objects are still not supported in "findOrCreate()" method.');
+                    throw new \InvalidArgumentException('Nested embeddable objects are still not supported in "find()" method.');
                 }
 
                 $normalizedCriteria["{$attributeName}.{$field}"] = $embeddableFieldValue;
