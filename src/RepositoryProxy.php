@@ -16,6 +16,7 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
+use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
@@ -332,7 +333,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
 
             try {
                 $metadataForAttribute = $this->getObjectManager()->getClassMetadata($attributeValue::class);
-            } catch (MappingException) {
+            } catch (MappingException|ORMMappingException) {
                 $normalizedCriteria[$attributeName] = $attributeValue;
 
                 continue;
