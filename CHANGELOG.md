@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [v1.30.2](https://github.com/zenstruck/foundry/releases/tag/v1.30.2)
+
+March 22nd, 2023 - [v1.30.1...v1.30.2](https://github.com/zenstruck/foundry/compare/v1.30.1...v1.30.2)
+
+* 2f71013 fix: allow any object passed as find() criteria (#440) by @nikophil
+
 ## [v1.30.1](https://github.com/zenstruck/foundry/releases/tag/v1.30.1)
 
 March 21st, 2023 - [v1.30.0...v1.30.1](https://github.com/zenstruck/foundry/compare/v1.30.0...v1.30.1)
