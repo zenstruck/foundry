@@ -320,9 +320,9 @@ class Factory
         }
     }
 
-    final public static function delayFlush(callable $callback): void
+    final public static function delayFlush(callable $callback): mixed
     {
-        self::configuration()->delayFlush($callback);
+        return self::configuration()->delayFlush($callback);
     }
 
     /**

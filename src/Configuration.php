@@ -155,17 +155,19 @@ final class Configuration
         return $this->databaseResetEnabled;
     }
 
-    public function delayFlush(callable $callback): void
+    public function delayFlush(callable $callback): mixed
     {
         $this->flushEnabled = false;
 
-        $callback();
+        $result = $callback();
 
         foreach ($this->managerRegistry()?->getManagers() ?? [] as $manager) {
             $manager->flush();
         }
 
         $this->flushEnabled = true;
+
+        return $result;
     }
 
     /**
