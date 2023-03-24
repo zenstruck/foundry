@@ -13,6 +13,7 @@ namespace Zenstruck\Foundry\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
@@ -151,15 +152,20 @@ final class FactoryTest extends KernelTestCase
         repository(Post::class)->assert()->empty();
         repository(Category::class)->assert()->empty();
 
-        Factory::delayFlush(static function(): void {
-            anonymous(Post::class)->create([
+        $post = null;
+        $return = Factory::delayFlush(static function() use (&$post): Proxy {
+            $post = anonymous(Post::class)->create([
                 'title' => 'title',
                 'body' => 'body',
                 'category' => anonymous(Category::class, ['name' => 'name']),
             ]);
             repository(Post::class)->assert()->empty();
             repository(Category::class)->assert()->empty();
+
+            return $post;
         });
+
+        $this->assertSame($post, $return);
 
         repository(Post::class)->assert()->count(1);
         repository(Category::class)->assert()->count(1);
@@ -173,7 +179,8 @@ final class FactoryTest extends KernelTestCase
         repository(Post::class)->assert()->empty();
         repository(Category::class)->assert()->empty();
 
-        Factory::delayFlush(static function(): void {
+        $post = null;
+        $return = Factory::delayFlush(static function() use (&$post): Proxy {
             $post = anonymous(Post::class)->create([
                 'title' => 'title',
                 'body' => 'body',
@@ -183,7 +190,11 @@ final class FactoryTest extends KernelTestCase
             $post->setBody('new body');
             repository(Post::class)->assert()->empty();
             repository(Category::class)->assert()->empty();
+
+            return $post;
         });
+
+        $this->assertSame($post, $return);
 
         repository(Post::class)->assert()->count(1);
         repository(Category::class)->assert()->count(1);
