@@ -21,6 +21,9 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
 
+use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject;
+use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObjectFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Object\SomeOtherObject;
 use function Zenstruck\Foundry\anonymous;
 use function Zenstruck\Foundry\create;
 use function Zenstruck\Foundry\repository;
@@ -198,5 +201,15 @@ final class FactoryTest extends KernelTestCase
 
         repository(Post::class)->assert()->count(1);
         repository(Category::class)->assert()->count(1);
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_an_object_not_persisted_with_nested_factory(): void
+    {
+        $notPersistedObject = SomeObjectFactory::new()->create()->object();
+        self::assertInstanceOf(SomeObject::class, $notPersistedObject);
+        self::assertInstanceOf(SomeOtherObject::class, $notPersistedObject->someOtherObjectMandatory);
     }
 }
