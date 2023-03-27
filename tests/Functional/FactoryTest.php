@@ -20,10 +20,10 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
-
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeOtherObject;
+
 use function Zenstruck\Foundry\anonymous;
 use function Zenstruck\Foundry\create;
 use function Zenstruck\Foundry\repository;

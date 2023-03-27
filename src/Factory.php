@@ -14,7 +14,6 @@ namespace Zenstruck\Foundry;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
-use Doctrine\Persistence\Mapping\MappingException as ORMMappingException;
 use Faker;
 use Zenstruck\Foundry\Exception\FoundryNotBootedException;
 use Zenstruck\Foundry\Persistence\InversedRelationshipCascadePersistCallback;
