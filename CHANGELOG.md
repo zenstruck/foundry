@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [v1.31.0](https://github.com/zenstruck/foundry/releases/tag/v1.31.0)
+
+March 27th, 2023 - [v1.30.3...v1.31.0](https://github.com/zenstruck/foundry/compare/v1.30.3...v1.31.0)
+
+* ac35acf fix: nested factories not persisting should not throw error (#444) by @nikophil
+* d346c68 feat: Have delayFlush return the callback's return (#442) by @HypeMC
+
 ## [v1.30.3](https://github.com/zenstruck/foundry/releases/tag/v1.30.3)
 
 March 22nd, 2023 - [v1.30.2...v1.30.3](https://github.com/zenstruck/foundry/compare/v1.30.2...v1.30.3)
