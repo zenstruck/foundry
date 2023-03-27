@@ -14,6 +14,7 @@ namespace Zenstruck\Foundry;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
+use Doctrine\Persistence\Mapping\MappingException as ORMMappingException;
 use Faker;
 use Zenstruck\Foundry\Exception\FoundryNotBootedException;
 use Zenstruck\Foundry\Persistence\InversedRelationshipCascadePersistCallback;
@@ -370,9 +371,15 @@ class Factory
             return $value->create()->object();
         }
 
-        $objectManager = self::configuration()->objectManagerFor($this->class);
+        try {
+            $objectManager = self::configuration()->objectManagerFor($this->class);
 
-        if (!$objectManager instanceof EntityManagerInterface || $objectManager->getClassMetadata($value->class)->isEmbeddedClass) {
+            if (!$objectManager instanceof EntityManagerInterface || $objectManager->getClassMetadata($value->class)->isEmbeddedClass) {
+                // we may deal with ODM document or ORM\Embedded
+                return $value->create()->object();
+            }
+        } catch (\Throwable) {
+            // not persisted object
             return $value->create()->object();
         }
 
