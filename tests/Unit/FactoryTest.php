@@ -151,8 +151,7 @@ final class FactoryTest extends TestCase
 
                 return new Post('title', 'body');
             })
-            ->create($attributeArray)
-        ;
+            ->create($attributeArray);
 
         $this->assertSame('title', $object->getTitle());
         $this->assertSame('body', $object->getBody());
@@ -176,8 +175,7 @@ final class FactoryTest extends TestCase
 
                 return $attributes;
             })
-            ->create($attributeArray)
-        ;
+            ->create($attributeArray);
 
         $this->assertSame('title', $object->getTitle());
         $this->assertSame('body', $object->getBody());
@@ -212,8 +210,7 @@ final class FactoryTest extends TestCase
 
                 $post->increaseViewCount();
             })
-            ->create($attributesArray)
-        ;
+            ->create($attributesArray);
 
         $this->assertSame(2, $object->getViewCount());
     }
@@ -377,8 +374,7 @@ final class FactoryTest extends TestCase
             ->afterPersist(static function() use (&$calls): void {
                 ++$calls;
             })
-            ->create(['title' => 'title', 'body' => 'body'])
-        ;
+            ->create(['title' => 'title', 'body' => 'body']);
 
         $this->assertSame(3, $object->getViewCount());
         $this->assertSame(5, $calls);
