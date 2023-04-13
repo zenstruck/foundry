@@ -1882,7 +1882,7 @@ Later, you can access the story's state when creating other fixtures:
         use Zenstruck\Foundry\Story;
 
         /**
-         * @method Category php()
+         * @method static Category php()
          */
         final class CategoryStory extends Story
         {
@@ -1893,6 +1893,8 @@ Later, you can access the story's state when creating other fixtures:
         }
 
     Now your IDE will know ``CategoryStory::php()`` returns an object of type ``Category``.
+    
+    Using a magic method also does not require a prior ``::load()`` call on the story, it will initialize itself.
 
 .. note::
 
