@@ -110,9 +110,9 @@ function instantiate_many(int $number, string $class, array|callable $attributes
  *
  * @return RepositoryProxy<TObject>
  */
-function repository(object|string $objectOrClass): RepositoryProxy
+function repository(object|string $objectOrClass, string|null $persistentManagerName = null): RepositoryProxy
 {
-    return Factory::configuration()->repositoryFor($objectOrClass);
+    return Factory::configuration()->repositoryFor($objectOrClass, $persistentManagerName);
 }
 
 /**

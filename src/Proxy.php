@@ -207,9 +207,9 @@ final class Proxy implements \Stringable
         return Instantiator::forceGet($this->object(), $property);
     }
 
-    public function repository(): RepositoryProxy
+    public function repository(string|null $persistentManagerName = null): RepositoryProxy
     {
-        return Factory::configuration()->repositoryFor($this->class);
+        return Factory::configuration()->repositoryFor($this->class, $persistentManagerName);
     }
 
     public function enableAutoRefresh(): self

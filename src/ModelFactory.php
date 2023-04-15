@@ -260,9 +260,9 @@ abstract class ModelFactory extends Factory
     /**
      * @phpstan-return RepositoryProxy<TModel>
      */
-    final public static function repository(): RepositoryProxy
+    final public static function repository(string|null $persistentManagerName = null): RepositoryProxy
     {
-        return static::configuration()->repositoryFor(static::getClass());
+        return static::configuration()->repositoryFor(static::getClass(), $persistentManagerName);
     }
 
     /**
