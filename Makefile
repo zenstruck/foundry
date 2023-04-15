@@ -69,6 +69,7 @@ validate: sca psalm test database-validate-mapping ### Run sca, full test suite 
 
 .PHONY: test
 test: vendor ### Run PHPUnit tests suite
+	@$(MAKE) --no-print-directory docker-start-if-not-running
 	@${DC_EXEC} -e USE_ORM=${USE_ORM} -e USE_ODM=${USE_ODM} ${PHP} vendor/bin/simple-phpunit --configuration ${PHPUNIT_CONFIG_FILE} $(ARGS)
 
 .PHONY: sca
@@ -76,18 +77,22 @@ sca: phpstan ### Run static analysis
 
 .PHONY: phpstan
 phpstan: $(PHPSTAN_BIN)
+	@$(MAKE) --no-print-directory docker-start-if-not-running
 	@${DOCKER_PHP_WITHOUT_XDEBUG} $(PHPSTAN_BIN) analyse
 
 $(PHPSTAN_BIN): vendor bin/tools/phpstan/composer.json bin/tools/phpstan/composer.lock
+	@$(MAKE) --no-print-directory docker-start-if-not-running
 	@${DOCKER_PHP_WITHOUT_XDEBUG} /usr/bin/composer bin phpstan install
 	@touch -c $@ bin/tools/phpstan/composer.json bin/tools/phpstan/composer.lock
 
 # Psalm is only used to validate factories generated thanks to make:factory command.
 .PHONY: psalm
 psalm: $(PSALM_BIN)
+	@$(MAKE) --no-print-directory docker-start-if-not-running
 	@${DOCKER_PHP_WITHOUT_XDEBUG} $(PSALM_BIN)
 
 $(PSALM_BIN): vendor bin/tools/psalm/composer.json bin/tools/psalm/composer.lock
+	@$(MAKE) --no-print-directory docker-start-if-not-running
 	@${DOCKER_PHP_WITHOUT_XDEBUG} /usr/bin/composer bin psalm install
 	@touch -c $@ bin/tools/psalm/composer.json bin/tools/psalm/composer.lock
 
@@ -105,22 +110,38 @@ database-validate-mapping: database-drop-schema ### Validate mapping in Zenstruc
 
 .PHONY: database-drop-schema
 database-drop-schema: vendor ### Drop database schema
+	@$(MAKE) --no-print-directory docker-start-if-not-running
 	@${DOCKER_PHP} bin/doctrine orm:schema-tool:drop --force
 	@${DOCKER_PHP} vendor/bin/doctrine-migrations migrations:sync-metadata-storage # prevents the next command to fail if migrations table does not exist
 	@${DOCKER_PHP} bin/doctrine dbal:run-sql "TRUNCATE doctrine_migration_versions" --quiet
 
 .PHONY: composer
 composer: ### Run composer command
+	@$(MAKE) --no-print-directory docker-start-if-not-running
 	@${DOCKER_PHP_WITHOUT_XDEBUG} /usr/bin/composer $(ARGS)
 
 vendor: $(DOCKER_PHP_CONTAINER_FLAG) composer.json $(wildcard composer.lock) $(wildcard .env)
+	@$(MAKE) --no-print-directory docker-start-if-not-running
 	@${DC_EXEC} -e SYMFONY_REQUIRE=${SYMFONY_REQUIRE} ${PHP} php -d 'xdebug.mode=off' /usr/bin/composer update ${COMPOSER_UPDATE_OPTIONS}
 	@touch -c $@ composer.json .env composer.lock
 
+.PHONY: docker-start-if-not-running
+docker-start-if-not-running: ### some xxx
+	@if [ -f "$(DOCKER_PHP_CONTAINER_FLAG)" ] ; then \
+		if $(DOCKER_COMPOSE) ps -a | grep "${PHP}" | grep -q -v 'Up '; then \
+		    $(MAKE) --no-print-directory docker-start; \
+		fi; \
+	fi
+
 .PHONY: docker-start
-docker-start: ### Build and run containers
+docker-build: ### Build and start containers
 	@rm -f $(DOCKER_PHP_CONTAINER_FLAG)
 	@$(MAKE) --no-print-directory $(DOCKER_PHP_CONTAINER_FLAG)
+
+.PHONY: docker-start
+docker-start: ### Start containers
+	@echo -e "\nStarting containers. This could take up to one minute.\n"
+	@$(DOCKER_COMPOSE) up --detach --no-build --remove-orphans mysql mongo "${PHP}";
 
 .PHONY: docker-stop
 docker-stop: ### Stop containers
@@ -133,8 +154,7 @@ docker-purge: docker-stop ### Purge containers
 
 $(DOCKER_PHP_CONTAINER_FLAG):
 	@./docker/build.sh load "${PHP_VERSION}"
-	@echo -e "\nStarting containers. This could take up to one minute.\n"
-	@$(DOCKER_COMPOSE) up --detach --no-build --remove-orphans mysql mongo "${PHP}"
+	@$(MAKE) --no-print-directory docker-start
 	@echo ""
 	@$(DOCKER_COMPOSE) ps
 	@echo ""
