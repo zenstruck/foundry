@@ -2,21 +2,21 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Service;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class CategoryServiceFactory extends ModelFactory
+final class CategoryServiceFactory extends PersistentObjectFactory
 {
     public function __construct(private Service $service)
     {
         parent::__construct();
     }
 
-    protected static function getClass(): string
+    public static function class(): string
     {
         return Category::class;
     }

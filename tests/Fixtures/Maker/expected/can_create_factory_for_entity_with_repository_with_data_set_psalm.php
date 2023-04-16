@@ -2,14 +2,14 @@
 
 namespace App\Factory;
 
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\RepositoryProxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Repository\PostRepository;
 
 /**
- * @extends ModelFactory<Post>
+ * @extends PersistentObjectFactory<Post>
  *
  * @method        Post|Proxy create(array|callable $attributes = [])
  * @method static Post|Proxy createOne(array $attributes = [])
@@ -43,7 +43,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Repository\PostRepository;
  * @psalm-method static list<Proxy<Post>> randomRange(int $min, int $max, array $attributes = [])
  * @psalm-method static list<Proxy<Post>> randomSet(int $number, array $attributes = [])
  */
-final class PostFactory extends ModelFactory
+final class PostFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -80,7 +80,7 @@ final class PostFactory extends ModelFactory
         ;
     }
 
-    protected static function getClass(): string
+    public static function class(): string
     {
         return Post::class;
     }

@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Foundry\Bundle\Maker\Factory;
 
+use Zenstruck\Foundry\AnonymousFactory;
+
 final class NoPersistenceObjectsAutoCompleter
 {
     public function __construct(private string $kernelRootDir)

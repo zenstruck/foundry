@@ -2,19 +2,19 @@
 
 namespace App\Factory;
 
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject;
 
 /**
- * @extends ModelFactory<SomeObject>
+ * @extends PersistentObjectFactory<SomeObject>
  *
  * @method        SomeObject|Proxy create(array|callable $attributes = [])
  * @method static SomeObject|Proxy createOne(array $attributes = [])
  * @method static SomeObject[]|Proxy[] createMany(int $number, array|callable $attributes = [])
  * @method static SomeObject[]|Proxy[] createSequence(iterable|callable $sequence)
  */
-final class SomeObjectFactory extends ModelFactory
+final class SomeObjectFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -45,6 +45,7 @@ final class SomeObjectFactory extends ModelFactory
             'stringMandatory' => self::faker()->sentence(),
             'stringNullable' => self::faker()->sentence(),
             'stringWithDefault' => self::faker()->sentence(),
+            'user' => UserFactory::new(),
         ];
     }
 
@@ -59,7 +60,7 @@ final class SomeObjectFactory extends ModelFactory
         ;
     }
 
-    protected static function getClass(): string
+    public static function class(): string
     {
         return SomeObject::class;
     }

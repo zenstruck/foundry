@@ -15,7 +15,8 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
-use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\BaseFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\RepositoryProxy;
 use Zenstruck\Foundry\Test\Factories;
@@ -80,7 +81,8 @@ final class FunctionsTest extends TestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        Factory::configuration()->setManagerRegistry($registry)->enableDefaultProxyAutoRefresh();
+        BaseFactory::configuration()->enableDefaultProxyAutoRefresh();
+        PersistentObjectFactory::persistenceManager()->setManagerRegistry($registry);
 
         $object = create(Category::class);
 
@@ -99,7 +101,8 @@ final class FunctionsTest extends TestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        Factory::configuration()->setManagerRegistry($registry)->enableDefaultProxyAutoRefresh();
+        BaseFactory::configuration()->enableDefaultProxyAutoRefresh();
+        PersistentObjectFactory::persistenceManager()->setManagerRegistry($registry);
 
         $objects = create_many(3, Category::class);
 
@@ -119,7 +122,7 @@ final class FunctionsTest extends TestCase
             ->willReturn($this->createMock(ObjectRepository::class))
         ;
 
-        Factory::configuration()->setManagerRegistry($registry);
+        PersistentObjectFactory::persistenceManager()->setManagerRegistry($registry);
 
         $this->assertInstanceOf(RepositoryProxy::class, repository(new Category()));
     }

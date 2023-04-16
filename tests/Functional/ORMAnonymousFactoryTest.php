@@ -26,6 +26,8 @@ final class ORMAnonymousFactoryTest extends AnonymousFactoryTest
         if (!\getenv('USE_ORM')) {
             self::markTestSkipped('doctrine/orm not enabled.');
         }
+
+        parent::setUp();
     }
 
     /**

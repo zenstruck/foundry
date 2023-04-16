@@ -26,6 +26,8 @@ final class ODMAnonymousFactoryTest extends AnonymousFactoryTest
         if (!\getenv('USE_ODM')) {
             self::markTestSkipped('doctrine/odm not enabled.');
         }
+
+        parent::setUp();
     }
 
     /**

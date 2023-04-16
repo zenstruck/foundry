@@ -418,9 +418,6 @@ You can use states to make your tests very explicit to improve readability:
         ->create()
     ;
 
-    // states that don't require arguments can be added as strings to PostFactory::new()
-    $post = PostFactory::new('published', 'withViewCount')->create();
-
 Attributes
 ~~~~~~~~~~
 

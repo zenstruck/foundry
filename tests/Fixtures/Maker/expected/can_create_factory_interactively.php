@@ -3,13 +3,13 @@
 namespace App\Factory;
 
 use Doctrine\ORM\EntityRepository;
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\RepositoryProxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Comment;
 
 /**
- * @extends ModelFactory<Comment>
+ * @extends PersistentObjectFactory<Comment>
  *
  * @method        Comment|Proxy create(array|callable $attributes = [])
  * @method static Comment|Proxy createOne(array $attributes = [])
@@ -27,7 +27,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Comment;
  * @method static Comment[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
  * @method static Comment[]|Proxy[] randomSet(int $number, array $attributes = [])
  */
-final class CommentFactory extends ModelFactory
+final class CommentFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -65,7 +65,7 @@ final class CommentFactory extends ModelFactory
         ;
     }
 
-    protected static function getClass(): string
+    public static function class(): string
     {
         return Comment::class;
     }
