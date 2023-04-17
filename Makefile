@@ -126,14 +126,14 @@ vendor: $(DOCKER_PHP_CONTAINER_FLAG) composer.json $(wildcard composer.lock) $(w
 	@touch -c $@ composer.json .env composer.lock
 
 .PHONY: docker-start-if-not-running
-docker-start-if-not-running: ### some xxx
+docker-start-if-not-running:
 	@if [ -f "$(DOCKER_PHP_CONTAINER_FLAG)" ] ; then \
 		if $(DOCKER_COMPOSE) ps -a | grep "${PHP}" | grep -q -v 'Up '; then \
 		    $(MAKE) --no-print-directory docker-start; \
 		fi; \
 	fi
 
-.PHONY: docker-start
+.PHONY: docker-build
 docker-build: ### Build and start containers
 	@rm -f $(DOCKER_PHP_CONTAINER_FLAG)
 	@$(MAKE) --no-print-directory $(DOCKER_PHP_CONTAINER_FLAG)
