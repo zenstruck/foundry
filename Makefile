@@ -68,7 +68,7 @@ help:
 validate: sca psalm test database-validate-mapping ### Run sca, full test suite and validate migrations
 
 .PHONY: test
-test: vendor ### Run PHPUnit tests suite
+test: vendor $(PHPSTAN_BIN) ### Run PHPUnit tests suite
 	@$(MAKE) --no-print-directory docker-start-if-not-running
 	@${DC_EXEC} -e USE_ORM=${USE_ORM} -e USE_ODM=${USE_ODM} ${PHP} vendor/bin/simple-phpunit --configuration ${PHPUNIT_CONFIG_FILE} $(ARGS)
 

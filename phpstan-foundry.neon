@@ -1,0 +1,21 @@
+services:
+    -
+        class: Zenstruck\Foundry\PhpStan\FactoryMethodsTypeResolver
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
+        class: Zenstruck\Foundry\PhpStan\FactoryStaticMethodsTypeResolver
+        tags:
+            - phpstan.broker.dynamicStaticMethodReturnTypeExtension
+    -
+        class: Zenstruck\Foundry\PhpStan\FactoryRepositoryMethodTypeResolver
+        tags:
+            - phpstan.broker.dynamicStaticMethodReturnTypeExtension
+    -
+        class: Zenstruck\Foundry\PhpStan\AnonymousFactoryTypeResolver
+        tags:
+            - phpstan.broker.dynamicFunctionReturnTypeExtension
+    -
+        class: Zenstruck\Foundry\PhpStan\AnonymousHelpersTypeResolver
+        tags:
+            - phpstan.broker.dynamicFunctionReturnTypeExtension

@@ -1,5 +1,6 @@
 includes:
 	- phpstan-baseline.neon
+	- phpstan-foundry.neon
 
 parameters:
     inferPrivatePropertyTypeFromConstructor: true
@@ -33,3 +34,4 @@ parameters:
                     - var_dump
     excludePaths:
         - ./src/Bundle/Resources
+        - ./src/PhpStan

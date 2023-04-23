@@ -11,7 +11,10 @@
 
 namespace Zenstruck\Foundry;
 
+use Doctrine\ODM\MongoDB\Mapping\Annotations\Document;
+use Doctrine\ORM\Mapping\Entity;
 use Faker;
+use Zenstruck\Foundry\Object\ObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
@@ -37,15 +40,20 @@ function factory(string $class, array|\Closure $defaultAttributes = []): Anonymo
  *
  * @param class-string<T> $class
  *
- * @return PersistentObjectFactory<T>
+ * @return (ObjectFactory|PersistentObjectFactory)<T>
  */
-function anonymous(string $class, array|callable $defaultAttributes = []): PersistentObjectFactory
+function anonymous(string $class, array|callable $defaultAttributes = []): ObjectFactory|PersistentObjectFactory
 {
     $anonymousClassName = 'AnonymousFactory'.\str_replace('\\', '', $class);
     $anonymousClassName = \preg_replace('/[^a-zA-Z0-9_]/', '', $anonymousClassName); // sanitize for anonymous classes
 
     if (!\class_exists($anonymousClassName)) { // @phpstan-ignore-line
-        $factoryClass = PersistentObjectFactory::class;
+        $factoryClass = ObjectFactory::class;
+
+        $reflectionClass = new \ReflectionClass($class);
+        if ($reflectionClass->getAttributes(Entity::class) || $reflectionClass->getAttributes(Document::class)) {
+            $factoryClass = PersistentObjectFactory::class;
+        }
 
         $anonymousClassCode = <<<CODE
             /**
@@ -75,13 +83,13 @@ function anonymous(string $class, array|callable $defaultAttributes = []): Persi
 /**
  * @see BaseFactory::create()
  *
- * @return Proxy&T
+ * @return (Proxy&T)|T
  *
  * @template T of object
  * @phpstan-param class-string<T> $class
- * @phpstan-return Proxy<T>
+ * @phpstan-return Proxy<T>|T
  */
-function create(string $class, array|callable $attributes = []): Proxy
+function create(string $class, array|callable $attributes = []): object
 {
     return anonymous($class)->create($attributes);
 }
@@ -93,7 +101,7 @@ function create(string $class, array|callable $attributes = []): Proxy
  *
  * @template T of object
  * @phpstan-param class-string<T> $class
- * @phpstan-return list<Proxy<T>>
+ * @phpstan-return list<Proxy<T>>|list<T>
  */
 function create_many(int $number, string $class, array|callable $attributes = []): array
 {
@@ -107,11 +115,16 @@ function create_many(int $number, string $class, array|callable $attributes = []
  *
  * @template T of object
  * @phpstan-param class-string<T> $class
- * @phpstan-return Proxy<T>
+ * @phpstan-return Proxy<T>|T
  */
-function instantiate(string $class, array|callable $attributes = []): Proxy
+function instantiate(string $class, array|callable $attributes = []): object
 {
-    return anonymous($class)->withoutPersisting()->create($attributes);
+    $anonymousFactory = anonymous($class);
+    if ($anonymousFactory instanceof PersistentObjectFactory) {
+        $anonymousFactory = $anonymousFactory->withoutPersisting();
+    }
+
+    return $anonymousFactory->create($attributes);
 }
 
 /**
@@ -122,11 +135,16 @@ function instantiate(string $class, array|callable $attributes = []): Proxy
  * @template T of object
  *
  * @phpstan-param class-string<T> $class
- * @phpstan-return list<Proxy<T>>
+ * @phpstan-return list<Proxy<T>>|list<T>
  */
 function instantiate_many(int $number, string $class, array|callable $attributes = []): array
 {
-    return anonymous($class)->withoutPersisting()->many($number)->create($attributes);
+    $anonymousFactory = anonymous($class);
+    if ($anonymousFactory instanceof PersistentObjectFactory) {
+        $anonymousFactory = $anonymousFactory->withoutPersisting();
+    }
+
+    return $anonymousFactory->many($number)->create($attributes);
 }
 
 /**
