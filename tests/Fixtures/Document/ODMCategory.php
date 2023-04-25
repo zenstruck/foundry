@@ -32,4 +32,9 @@ class ODMCategory
     {
         $this->name = $name;
     }
+
+    public function updateName(?string $name): void
+    {
+        $this->name = $name;
+    }
 }

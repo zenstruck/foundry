@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Functional;
 
+use App\Factory\ODMCommentFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMCategory;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMComment;
@@ -125,6 +126,16 @@ final class ODMModelFactoryTest extends ModelFactoryTest
         PostFactory::assert()->count(1);
 
         self::assertSame($post->object(), $post2->object());
+    }
+
+    /**
+     * @test
+     */
+    public function can_use_adder_as_attributes(): void
+    {
+        $post = PostFactory::createOne(['addComment' => CommentFactory::new(['body' => 'body'])]);
+        self::assertCount(1, $post->getComments());
+        self::assertSame('body', $post->getComments()[0]->getBody());
     }
 
     protected function categoryClass(): string

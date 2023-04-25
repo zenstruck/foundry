@@ -19,7 +19,7 @@ use Zenstruck\Foundry\Proxy;
 /**
  * @internal
  */
-final class InversedRelationshipCascadePersistCallback implements PostPersistCallback
+final class InversedRelationshipPostPersistCallback implements PostPersistCallback
 {
     public function __construct(
         private Factory $factory,
