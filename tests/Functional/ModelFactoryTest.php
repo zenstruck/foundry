@@ -409,6 +409,17 @@ abstract class ModelFactoryTest extends KernelTestCase
         yield from $categoryFactoryClass::new()->sequence([['name' => 'foo']])->asDataProvider();
     }
 
+    /**
+     * @test
+     */
+    public function can_use_setter_as_attributes(): void
+    {
+        $categoryFactoryClass = $this->categoryFactoryClass();
+
+        $category = $categoryFactoryClass::createOne(['setName' => 'foo']);
+        self::assertSame('foo', $category->getName());
+    }
+
     abstract protected function categoryClass(): string;
 
     abstract protected function categoryFactoryClass(): string;

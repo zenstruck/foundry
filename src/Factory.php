@@ -384,6 +384,10 @@ class Factory
 
         $relationshipMetadata = self::getRelationshipMetadata($objectManager, $this->class, $name);
 
+        if (!$relationshipMetadata) {
+            return $value->create()->object();
+        }
+
         if ($relationshipMetadata['isOwningSide']) {
             $cascadePersist = $relationshipMetadata['cascade'];
         } else {
@@ -441,16 +445,16 @@ class Factory
     /**
      * @param class-string $class
      *
-     * @return array{cascade: bool, inversedField: ?string, inverseIsCollection: bool, isOwningSide: bool}
+     * @return array{cascade: bool, inversedField: ?string, inverseIsCollection: bool, isOwningSide: bool}|null
      */
-    private static function getRelationshipMetadata(EntityManagerInterface $entityManager, string $class, string $relationshipName): array
+    private static function getRelationshipMetadata(EntityManagerInterface $entityManager, string $class, string $relationshipName): array|null
     {
         $metadata = $entityManager->getClassMetadata($class);
 
         $relationshipMetadata = $metadata->associationMappings[$relationshipName] ?? null;
 
         if (!$relationshipMetadata) {
-            throw new \RuntimeException("Field {$class}::\${$relationshipName} does not exist or is not a relationship field.");
+            return null;
         }
 
         return [

@@ -255,6 +255,9 @@ should have. `Faker`_ is available to easily get random data:
             // this means that setTitle() will be called or you can have a $title constructor argument
             'title' => self::faker()->unique()->sentence(),
             'body' => self::faker()->sentence(),
+
+            // even setters or adders can be used, because they are recognized by property-access
+            'setPublishedAt' => new \DateTime(),
         ];
     }
 
@@ -1893,7 +1896,7 @@ Later, you can access the story's state when creating other fixtures:
         }
 
     Now your IDE will know ``CategoryStory::php()`` returns an object of type ``Category``.
-    
+
     Using a magic method also does not require a prior ``::load()`` call on the story, it will initialize itself.
 
 .. note::

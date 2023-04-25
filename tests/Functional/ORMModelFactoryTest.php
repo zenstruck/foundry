@@ -622,6 +622,16 @@ final class ORMModelFactoryTest extends ModelFactoryTest
         self::assertSame($entityWithEnum->object(), $entityWithEnum2->object());
     }
 
+    /**
+     * @test
+     */
+    public function can_use_adder_as_attributes(): void
+    {
+        $category = CategoryFactory::createOne(['addPost' => PostFactory::new(['title' => 'title'])]);
+        self::assertCount(1, $category->getPosts());
+        self::assertSame('title', $category->getPosts()[0]->getTitle());
+    }
+
     protected function categoryClass(): string
     {
         return Category::class;
