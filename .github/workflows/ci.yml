@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         php: [8.0, 8.1, 8.2]
-        symfony: [5.4.*, 6.2.*]
+        symfony: [5.4.*, 6.2.*, 6.3.*]
         deps: [highest]
         use-orm: [1]
         use-odm: [1]
@@ -24,6 +24,7 @@ jobs:
           - {use-orm: 0, use-dama: 1} # cannot happen
           # conflicts
           - {php: 8.0, symfony: 6.2.*}
+          - {php: 8.0, symfony: 6.3.*}
         include:
           - {php: 8.0, symfony: 5.4.*, use-orm: 1, use-odm: 0, use-dama: 0, deps: lowest}
           - {php: 8.0, symfony: 5.4.*, use-orm: 1, use-odm: 1, use-dama: 0, deps: lowest}
