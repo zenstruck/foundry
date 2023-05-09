@@ -20,9 +20,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
+use Zenstruck\Foundry\BaseFactory;
 use Zenstruck\Foundry\Bundle\Command\StubMakeFactory;
 use Zenstruck\Foundry\Bundle\Command\StubMakeStory;
-use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Story;
 use Zenstruck\Foundry\Test\ORMDatabaseResetter;
 
@@ -37,13 +37,8 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
 
         $loader->load('services.xml');
 
-        $container->registerForAutoconfiguration(Story::class)
-            ->addTag('foundry.story')
-        ;
-
-        $container->registerForAutoconfiguration(ModelFactory::class)
-            ->addTag('foundry.factory')
-        ;
+        $container->registerForAutoconfiguration(Story::class)->addTag('foundry.story');
+        $container->registerForAutoconfiguration(BaseFactory::class)->addTag('foundry.factory');
 
         $this->configureFaker($mergedConfig['faker'], $container);
         $this->configureDefaultInstantiator($mergedConfig['instantiator'], $container);

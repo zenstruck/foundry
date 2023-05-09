@@ -2,20 +2,20 @@
 
 namespace App\Factory;
 
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMComment;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\UserFactory;
 
 /**
- * @extends ModelFactory<ODMComment>
+ * @extends PersistentObjectFactory<ODMComment>
  *
  * @method        ODMComment|Proxy create(array|callable $attributes = [])
  * @method static ODMComment|Proxy createOne(array $attributes = [])
  * @method static ODMComment[]|Proxy[] createMany(int $number, array|callable $attributes = [])
  * @method static ODMComment[]|Proxy[] createSequence(iterable|callable $sequence)
  */
-final class ODMCommentFactory extends ModelFactory
+final class ODMCommentFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -51,7 +51,7 @@ final class ODMCommentFactory extends ModelFactory
         ;
     }
 
-    protected static function getClass(): string
+    public static function class(): string
     {
         return ODMComment::class;
     }

@@ -2,12 +2,12 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories\ODM;
 
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMUser;
 
-final class UserFactory extends ModelFactory
+final class UserFactory extends PersistentObjectFactory
 {
-    protected static function getClass(): string
+    public static function class(): string
     {
         return ODMUser::class;
     }

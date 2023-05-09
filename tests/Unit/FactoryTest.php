@@ -13,15 +13,18 @@ namespace Zenstruck\Foundry\Tests\Unit;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
-use Faker;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\BaseFactory;
+use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\FactoryManager;
 use Zenstruck\Foundry\LazyValue;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 
 use function Zenstruck\Foundry\anonymous;
 use function Zenstruck\Foundry\lazy;
@@ -35,22 +38,31 @@ final class FactoryTest extends TestCase
 
     /**
      * @test
+     * @dataProvider attributesProvider
      */
-    public function can_instantiate_object(): void
+    public function can_instantiate_object_with_helper(array|callable $attributes): void
     {
-        $attributeArray = ['title' => 'title', 'body' => 'body'];
-        $attributeCallback = static fn(): array => ['title' => 'title', 'body' => 'body'];
-        $attributeArrayWithLazyValue = ['title' => lazy(fn() => 'title'), 'body' => 'body'];
+        $this->assertSame('title', anonymous(Post::class, $attributes)->create()->getTitle());
+        $this->assertSame('title', anonymous(Post::class)->create($attributes)->getTitle());
+        $this->assertSame('title', anonymous(Post::class)->withAttributes($attributes)->create()->getTitle());
+    }
 
-        $this->assertSame('title', anonymous(Post::class, $attributeArray)->create()->getTitle());
-        $this->assertSame('title', anonymous(Post::class)->create($attributeArray)->getTitle());
-        $this->assertSame('title', anonymous(Post::class)->withAttributes($attributeArray)->create()->getTitle());
-        $this->assertSame('title', anonymous(Post::class, $attributeCallback)->create()->getTitle());
-        $this->assertSame('title', anonymous(Post::class)->create($attributeCallback)->getTitle());
-        $this->assertSame('title', anonymous(Post::class)->withAttributes($attributeCallback)->create()->getTitle());
-        $this->assertSame('title', anonymous(Post::class, $attributeArrayWithLazyValue)->create()->getTitle());
-        $this->assertSame('title', anonymous(Post::class)->create($attributeArrayWithLazyValue)->getTitle());
-        $this->assertSame('title', anonymous(Post::class)->withAttributes($attributeArrayWithLazyValue)->create()->getTitle());
+    /**
+     * @test
+     * @dataProvider attributesProvider
+     */
+    public function can_instantiate_object(array|callable $attributes): void
+    {
+        $this->assertSame('title', PostFactory::new($attributes)->create()->getTitle());
+        $this->assertSame('title', PostFactory::new()->create($attributes)->getTitle());
+        $this->assertSame('title', PostFactory::new()->withAttributes($attributes)->create()->getTitle());
+    }
+
+    public static function attributesProvider(): iterable
+    {
+        yield 'array' => [['title' => 'title', 'body' => 'body']];
+        yield 'callback' => [static fn(): array => ['title' => 'title', 'body' => 'body']];
+        yield 'lazy' => [['title' => lazy(fn() => 'title'), 'body' => 'body']];
     }
 
     /**
@@ -83,58 +95,6 @@ final class FactoryTest extends TestCase
 
         $this->assertSame('title', $post->getTitle());
         $this->assertSame(1, $count);
-    }
-
-    /**
-     * @test
-     * @group legacy
-     */
-    public function can_instantiate_many_objects_legacy(): void
-    {
-        $attributeArray = ['title' => 'title', 'body' => 'body'];
-        $attributeCallback = static fn(): array => ['title' => 'title', 'body' => 'body'];
-
-        $objects = (new Factory(Post::class, $attributeArray))->createMany(3);
-
-        $this->assertCount(3, $objects);
-        $this->assertSame('title', $objects[0]->getTitle());
-        $this->assertSame('title', $objects[1]->getTitle());
-        $this->assertSame('title', $objects[2]->getTitle());
-
-        $objects = (new Factory(Post::class))->createMany(3, $attributeArray);
-
-        $this->assertCount(3, $objects);
-        $this->assertSame('title', $objects[0]->getTitle());
-        $this->assertSame('title', $objects[1]->getTitle());
-        $this->assertSame('title', $objects[2]->getTitle());
-
-        $objects = (new Factory(Post::class))->withAttributes($attributeArray)->createMany(3);
-
-        $this->assertCount(3, $objects);
-        $this->assertSame('title', $objects[0]->getTitle());
-        $this->assertSame('title', $objects[1]->getTitle());
-        $this->assertSame('title', $objects[2]->getTitle());
-
-        $objects = (new Factory(Post::class, $attributeCallback))->createMany(3);
-
-        $this->assertCount(3, $objects);
-        $this->assertSame('title', $objects[0]->getTitle());
-        $this->assertSame('title', $objects[1]->getTitle());
-        $this->assertSame('title', $objects[2]->getTitle());
-
-        $objects = (new Factory(Post::class))->createMany(3, $attributeCallback);
-
-        $this->assertCount(3, $objects);
-        $this->assertSame('title', $objects[0]->getTitle());
-        $this->assertSame('title', $objects[1]->getTitle());
-        $this->assertSame('title', $objects[2]->getTitle());
-
-        $objects = (new Factory(Post::class))->withAttributes($attributeCallback)->createMany(3);
-
-        $this->assertCount(3, $objects);
-        $this->assertSame('title', $objects[0]->getTitle());
-        $this->assertSame('title', $objects[1]->getTitle());
-        $this->assertSame('title', $objects[2]->getTitle());
     }
 
     /**
@@ -218,20 +178,9 @@ final class FactoryTest extends TestCase
     /**
      * @test
      */
-    public function can_register_custom_faker(): void
-    {
-        $defaultFaker = Factory::faker();
-        Factory::configuration()->setFaker(Faker\Factory::create());
-
-        $this->assertNotSame(\spl_object_id(Factory::faker()), \spl_object_id($defaultFaker));
-    }
-
-    /**
-     * @test
-     */
     public function can_register_default_instantiator(): void
     {
-        Factory::configuration()->setInstantiator(static fn(): Post => new Post('different title', 'different body'));
+        BaseFactory::boot(new FactoryManager(instantiator: static fn(): Post => new Post('different title', 'different body')), Configuration::default());
 
         $object = anonymous(Post::class, ['title' => 'title', 'body' => 'body'])->create();
 
@@ -275,7 +224,7 @@ final class FactoryTest extends TestCase
         $factory = anonymous(Post::class);
         $objectId = \spl_object_id($factory);
 
-        $this->assertNotSame(\spl_object_id($factory->withAttributes([])), $objectId);
+        $this->assertSame(\spl_object_id($factory->withAttributes([])), $objectId);
         $this->assertNotSame(\spl_object_id($factory->withoutPersisting()), $objectId);
         $this->assertNotSame(\spl_object_id($factory->instantiateWith(static function(): void {})), $objectId);
         $this->assertNotSame(\spl_object_id($factory->beforeInstantiate(static function(): void {})), $objectId);
@@ -295,38 +244,13 @@ final class FactoryTest extends TestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        Factory::configuration()->setManagerRegistry($registry)->disableDefaultProxyAutoRefresh();
+        BaseFactory::configuration()->disableDefaultProxyAutoRefresh();
+        PersistentObjectFactory::persistenceManager()->setManagerRegistry($registry);
 
         $object = anonymous(Post::class)->create(['title' => 'title', 'body' => 'body']);
 
         $this->assertInstanceOf(Proxy::class, $object);
         $this->assertSame('title', $object->getTitle());
-    }
-
-    /**
-     * @test
-     * @group legacy
-     */
-    public function can_create_many_objects_legacy(): void
-    {
-        $registry = $this->createMock(ManagerRegistry::class);
-        $registry
-            ->method('getManagerForClass')
-            ->with(Post::class)
-            ->willReturn($this->createMock(ObjectManager::class))
-        ;
-
-        Factory::configuration()->setManagerRegistry($registry);
-
-        $objects = (new Factory(Post::class))->createMany(3, ['title' => 'title', 'body' => 'body']);
-
-        $this->assertCount(3, $objects);
-        $this->assertInstanceOf(Proxy::class, $objects[0]);
-        $this->assertInstanceOf(Proxy::class, $objects[1]);
-        $this->assertInstanceOf(Proxy::class, $objects[2]);
-        $this->assertSame('title', $objects[0]->getTitle());
-        $this->assertSame('title', $objects[1]->getTitle());
-        $this->assertSame('title', $objects[2]->getTitle());
     }
 
     /**
@@ -341,7 +265,8 @@ final class FactoryTest extends TestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        Factory::configuration()->setManagerRegistry($registry)->disableDefaultProxyAutoRefresh();
+        BaseFactory::configuration()->disableDefaultProxyAutoRefresh();
+        PersistentObjectFactory::persistenceManager()->setManagerRegistry($registry);
 
         $expectedAttributes = ['shortDescription' => 'short desc', 'title' => 'title', 'body' => 'body'];
         $calls = 0;

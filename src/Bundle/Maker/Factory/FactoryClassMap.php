@@ -12,7 +12,7 @@
 namespace Zenstruck\Foundry\Bundle\Maker\Factory;
 
 use Zenstruck\Foundry\Bundle\Maker\Factory\Exception\FactoryClassAlreadyExistException;
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Object\ObjectFactory;
 
 /**
  * @internal
@@ -24,15 +24,15 @@ final class FactoryClassMap
      */
     private array $classesWithFactories;
 
-    /** @param \Traversable<ModelFactory> $factories */
+    /** @param \Traversable<ObjectFactory> $factories */
     public function __construct(\Traversable $factories)
     {
         /** @phpstan-ignore-next-line */
         $this->classesWithFactories = \array_unique(
             \array_reduce(
                 \iterator_to_array($factories, preserve_keys: true),
-                static function(array $carry, ModelFactory $factory): array {
-                    $carry[$factory::class] = $factory::getEntityClass();
+                static function(array $carry, ObjectFactory $factory): array {
+                    $carry[$factory::class] = $factory::class();
 
                     return $carry;
                 },

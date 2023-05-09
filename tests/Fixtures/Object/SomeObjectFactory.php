@@ -2,18 +2,19 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Object;
 
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Object\ObjectFactory;
 use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\UserFactory;
 
 /**
- * @extends ModelFactory<SomeObject>
+ * @extends ObjectFactory<SomeObject>
  *
  * @method        SomeObject|Proxy create(array|callable $attributes = [])
  * @method static SomeObject|Proxy createOne(array $attributes = [])
  * @method static SomeObject[]|Proxy[] createMany(int $number, array|callable $attributes = [])
  * @method static SomeObject[]|Proxy[] createSequence(iterable|callable $sequence)
  */
-final class SomeObjectFactory extends ModelFactory
+final class SomeObjectFactory extends ObjectFactory
 {
     protected function getDefaults(): array
     {
@@ -28,10 +29,11 @@ final class SomeObjectFactory extends ModelFactory
             'stringMandatory' => self::faker()->sentence(),
             'stringNullable' => self::faker()->sentence(),
             'stringWithDefault' => self::faker()->sentence(),
+            'user' => UserFactory::new()->withoutPersisting(),
         ];
     }
 
-    protected static function getClass(): string
+    public static function class(): string
     {
         return SomeObject::class;
     }

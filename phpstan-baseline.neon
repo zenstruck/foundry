@@ -6,9 +6,14 @@ parameters:
 			path: src/Bundle/DependencyInjection/GlobalStatePass.php
 
 		-
-			message: "#^Parameter \\#1 \\$class of method Doctrine\\\\Persistence\\\\ManagerRegistry\\:\\:getManagerForClass\\(\\) expects class\\-string, string given\\.$#"
+			message: "#^Constructor of class Zenstruck\\\\Foundry\\\\Factory has an unused parameter \\$class\\.$#"
 			count: 1
-			path: src/Configuration.php
+			path: src/Factory.php
+
+		-
+			message: "#^Constructor of class Zenstruck\\\\Foundry\\\\Factory has an unused parameter \\$defaultAttributes\\.$#"
+			count: 1
+			path: src/Factory.php
 
 		-
 			message: "#^Parameter \\#1 \\$min of function random_int expects int, int\\|null given\\.$#"
@@ -19,6 +24,11 @@ parameters:
 			message: "#^Parameter \\#2 \\$max of function random_int expects int, int\\|null given\\.$#"
 			count: 1
 			path: src/FactoryCollection.php
+
+		-
+			message: "#^Method Zenstruck\\\\Foundry\\\\ModelFactory\\:\\:__callStatic\\(\\) should return array\\<int, Zenstruck\\\\Foundry\\\\Proxy\\<TModel of object\\>\\> but returns array\\<int, TModel of object\\>\\.$#"
+			count: 1
+			path: src/ModelFactory.php
 
 		-
 			message: "#^Method Zenstruck\\\\Foundry\\\\RepositoryProxy\\:\\:proxyResult\\(\\) should return array\\<int, Zenstruck\\\\Foundry\\\\Proxy\\<TProxiedObject of object\\>\\>\\|Zenstruck\\\\Foundry\\\\Proxy\\<TProxiedObject of object\\> but returns \\(TProxiedObject of object\\)\\|null\\.$#"
@@ -51,11 +61,26 @@ parameters:
 			path: src/Test/ORMDatabaseResetter.php
 
 		-
-			message: "#^Parameter \\#1 \\$configuration of static method Zenstruck\\\\Foundry\\\\Factory\\<object\\>\\:\\:boot\\(\\) expects Zenstruck\\\\Foundry\\\\Configuration, object\\|null given\\.$#"
+			message: "#^Parameter \\#1 \\$factoryManager of static method Zenstruck\\\\Foundry\\\\BaseFactory\\<mixed\\>\\:\\:boot\\(\\) expects Zenstruck\\\\Foundry\\\\FactoryManager, object\\|null given\\.$#"
 			count: 1
 			path: src/ZenstruckFoundryBundle.php
 
 		-
-			message: "#^Function Zenstruck\\\\Foundry\\\\anonymous\\(\\) should return Zenstruck\\\\Foundry\\\\Factory\\<TObject of object\\> but returns class@anonymous/src/functions\\.php\\:45\\.$#"
+			message: "#^Parameter \\#1 \\$persistenceManager of static method Zenstruck\\\\Foundry\\\\Persistence\\\\PersistentObjectFactory\\<object\\>\\:\\:bootPersistentObjectFactory\\(\\) expects Zenstruck\\\\Foundry\\\\Persistence\\\\PersistenceManager, object\\|null given\\.$#"
+			count: 1
+			path: src/ZenstruckFoundryBundle.php
+
+		-
+			message: "#^Parameter \\#2 \\$configuration of static method Zenstruck\\\\Foundry\\\\BaseFactory\\<mixed\\>\\:\\:boot\\(\\) expects Zenstruck\\\\Foundry\\\\Configuration, object\\|null given\\.$#"
+			count: 1
+			path: src/ZenstruckFoundryBundle.php
+
+		-
+			message: "#^Function Zenstruck\\\\Foundry\\\\create_many\\(\\) should return array\\<int, Zenstruck\\\\Foundry\\\\Proxy\\<T of object\\>\\> but returns array\\<int, T of object\\>\\.$#"
+			count: 1
+			path: src/functions.php
+
+		-
+			message: "#^Function Zenstruck\\\\Foundry\\\\instantiate_many\\(\\) should return array\\<int, Zenstruck\\\\Foundry\\\\Proxy\\<T of object\\>\\> but returns array\\<int, T of object\\>\\.$#"
 			count: 1
 			path: src/functions.php

@@ -3,13 +3,13 @@
 namespace App\Factory;
 
 use Doctrine\ORM\EntityRepository;
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\RepositoryProxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Contact;
 
 /**
- * @extends ModelFactory<Contact>
+ * @extends PersistentObjectFactory<Contact>
  *
  * @method        Contact|Proxy create(array|callable $attributes = [])
  * @method static Contact|Proxy createOne(array $attributes = [])
@@ -27,7 +27,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Contact;
  * @method static Contact[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
  * @method static Contact[]|Proxy[] randomSet(int $number, array $attributes = [])
  */
-final class ContactFactory extends ModelFactory
+final class ContactFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -62,7 +62,7 @@ final class ContactFactory extends ModelFactory
         ;
     }
 
-    protected static function getClass(): string
+    public static function class(): string
     {
         return Contact::class;
     }

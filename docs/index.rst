@@ -415,9 +415,6 @@ You can use states to make your tests very explicit to improve readability:
         ->create()
     ;
 
-    // states that don't require arguments can be added as strings to PostFactory::new()
-    $post = PostFactory::new('published', 'withViewCount')->create();
-
 Attributes
 ~~~~~~~~~~
 
@@ -1893,7 +1890,7 @@ Later, you can access the story's state when creating other fixtures:
         }
 
     Now your IDE will know ``CategoryStory::php()`` returns an object of type ``Category``.
-    
+
     Using a magic method also does not require a prior ``::load()`` call on the story, it will initialize itself.
 
 .. note::

@@ -19,6 +19,9 @@ use function Symfony\Component\String\u;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ * @template T of object
+ *
+ * @phpstan-import-type Parameters from BaseFactory
  */
 final class Instantiator
 {
@@ -36,13 +39,16 @@ final class Instantiator
     private array $forceProperties = [];
 
     /**
-     * @param class-string $class
+     * @param Parameters      $parameters
+     * @param class-string<T> $class
+     *
+     * @return T
      */
-    public function __invoke(array $attributes, string $class): object
+    public function __invoke(array $parameters, string $class): object
     {
-        $object = $this->instantiate($class, $attributes);
+        $object = $this->instantiate($class, $parameters);
 
-        foreach ($attributes as $attribute => $value) {
+        foreach ($parameters as $attribute => $value) {
             if (0 === \mb_strpos($attribute, 'optional:')) {
                 trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using "optional:" attribute prefixes is deprecated, use Instantiator::allowExtraAttributes() instead (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#instantiation).');
                 continue;
@@ -190,20 +196,21 @@ final class Instantiator
 
     /**
      * Check if parameter value was passed as the exact name - if not, try snake-cased, then kebab-cased versions.
+     * @param Parameters $parameters
      */
-    private static function attributeNameForParameter(\ReflectionParameter $parameter, array $attributes): ?string
+    private static function attributeNameForParameter(\ReflectionParameter $parameter, array $parameters): ?string
     {
         // try exact
         $name = $parameter->getName();
 
-        if (\array_key_exists($name, $attributes)) {
+        if (\array_key_exists($name, $parameters)) {
             return $name;
         }
 
         // try snake case
         $name = self::snake($name);
 
-        if (\array_key_exists($name, $attributes)) {
+        if (\array_key_exists($name, $parameters)) {
             trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using a differently cased attribute is deprecated, use the same case as the object property instead.');
 
             return $name;
@@ -212,7 +219,7 @@ final class Instantiator
         // try kebab case
         $name = \str_replace('_', '-', $name);
 
-        if (\array_key_exists($name, $attributes)) {
+        if (\array_key_exists($name, $parameters)) {
             trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using a differently cased attribute is deprecated, use the same case as the object property instead.');
 
             return $name;
@@ -233,8 +240,9 @@ final class Instantiator
 
     /**
      * @param class-string $class
+     * @param Parameters   $parameters
      */
-    private function instantiate(string $class, array &$attributes): object
+    private function instantiate(string $class, array &$parameters): object
     {
         $class = new \ReflectionClass($class);
         $constructor = $class->getConstructor();
@@ -246,13 +254,13 @@ final class Instantiator
         $arguments = [];
 
         foreach ($constructor->getParameters() as $parameter) {
-            $name = self::attributeNameForParameter($parameter, $attributes);
+            $name = self::attributeNameForParameter($parameter, $parameters);
 
-            if ($name && \array_key_exists($name, $attributes)) {
+            if ($name && \array_key_exists($name, $parameters)) {
                 if ($parameter->isVariadic()) {
-                    $arguments = \array_merge($arguments, $attributes[$name]);
+                    $arguments = \array_merge($arguments, $parameters[$name]);
                 } else {
-                    $arguments[] = $attributes[$name];
+                    $arguments[] = $parameters[$name];
                 }
             } elseif ($parameter->isDefaultValueAvailable()) {
                 $arguments[] = $parameter->getDefaultValue();
@@ -261,7 +269,7 @@ final class Instantiator
             }
 
             // unset attribute so it isn't used when setting object properties
-            unset($attributes[$name]);
+            unset($parameters[$name]);
         }
 
         return $class->newInstance(...$arguments);

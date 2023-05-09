@@ -521,7 +521,7 @@ final class MakeFactoryTest extends MakerTestCase
     public function it_handles_name_collision(): void
     {
         if (!\getenv('USE_ORM') || !\getenv('USE_ODM')) {
-            self::markTestSkipped('doctrine/odm and doctrine/orm should be enabled enabled.');
+            self::markTestSkipped('doctrine/odm and doctrine/orm should be enabled.');
         }
 
         $tester = $this->makeFactoryCommandTester();

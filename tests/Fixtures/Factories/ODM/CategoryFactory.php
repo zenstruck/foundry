@@ -2,15 +2,15 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories\ODM;
 
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMCategory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class CategoryFactory extends ModelFactory
+final class CategoryFactory extends PersistentObjectFactory
 {
-    protected static function getClass(): string
+    public static function class(): string
     {
         return ODMCategory::class;
     }

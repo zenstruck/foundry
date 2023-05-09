@@ -47,7 +47,7 @@ abstract class Story
     final public static function load(): static
     {
         /** @phpstan-ignore-next-line */
-        return Factory::configuration()->stories()->load(static::class);
+        return BaseFactory::configuration()->stories()->load(static::class);
     }
 
     /**
@@ -109,7 +109,7 @@ abstract class Story
     }
 
     /**
-     * @param object|Proxy|Factory $object
+     * @param object|Proxy|BaseFactory $object
      */
     final public function add(string $name, object $object): static
     {
@@ -121,7 +121,7 @@ abstract class Story
     abstract public function build(): void;
 
     /**
-     * @param object|Proxy|Factory|object[]|Proxy[]|Factory[]|FactoryCollection $objects
+     * @param object|Proxy|BaseFactory|object[]|Proxy[]|BaseFactory[]|FactoryCollection $objects
      *
      * @return static
      */
@@ -143,7 +143,7 @@ abstract class Story
     }
 
     /**
-     * @param object|Proxy|Factory $object
+     * @param object|Proxy|BaseFactory $object
      *
      * @return static
      */
@@ -172,7 +172,7 @@ abstract class Story
     private static function normalizeObject(object $object): Proxy
     {
         // ensure factories are persisted
-        if ($object instanceof Factory) {
+        if ($object instanceof BaseFactory) {
             $object = $object->create();
         }
 

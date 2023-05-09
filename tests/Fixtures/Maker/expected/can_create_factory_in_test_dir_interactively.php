@@ -3,13 +3,13 @@
 namespace App\Tests\Factory;
 
 use Doctrine\ORM\EntityRepository;
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\RepositoryProxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
 
 /**
- * @extends ModelFactory<Tag>
+ * @extends PersistentObjectFactory<Tag>
  *
  * @method        Tag|Proxy create(array|callable $attributes = [])
  * @method static Tag|Proxy createOne(array $attributes = [])
@@ -27,7 +27,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
  * @method static Tag[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
  * @method static Tag[]|Proxy[] randomSet(int $number, array $attributes = [])
  */
-final class TagFactory extends ModelFactory
+final class TagFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -61,7 +61,7 @@ final class TagFactory extends ModelFactory
         ;
     }
 
-    protected static function getClass(): string
+    public static function class(): string
     {
         return Tag::class;
     }

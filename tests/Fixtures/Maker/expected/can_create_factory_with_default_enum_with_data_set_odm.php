@@ -3,14 +3,14 @@
 namespace App\Factory;
 
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\RepositoryProxy;
 use Zenstruck\Foundry\Tests\Fixtures\PHP81\DocumentWithEnum;
 use Zenstruck\Foundry\Tests\Fixtures\PHP81\SomeEnum;
 
 /**
- * @extends ModelFactory<DocumentWithEnum>
+ * @extends PersistentObjectFactory<DocumentWithEnum>
  *
  * @method        DocumentWithEnum|Proxy create(array|callable $attributes = [])
  * @method static DocumentWithEnum|Proxy createOne(array $attributes = [])
@@ -28,7 +28,7 @@ use Zenstruck\Foundry\Tests\Fixtures\PHP81\SomeEnum;
  * @method static DocumentWithEnum[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
  * @method static DocumentWithEnum[]|Proxy[] randomSet(int $number, array $attributes = [])
  */
-final class DocumentWithEnumFactory extends ModelFactory
+final class DocumentWithEnumFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -62,7 +62,7 @@ final class DocumentWithEnumFactory extends ModelFactory
         ;
     }
 
-    protected static function getClass(): string
+    public static function class(): string
     {
         return DocumentWithEnum::class;
     }

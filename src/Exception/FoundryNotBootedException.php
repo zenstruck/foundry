@@ -16,10 +16,16 @@ namespace Zenstruck\Foundry\Exception;
  */
 final class FoundryNotBootedException extends \RuntimeException
 {
-    public function __construct()
+    /**
+     * @param class-string $baseFactoryClass
+     */
+    public function __construct(string $baseFactoryClass)
     {
         parent::__construct(
-            'Foundry is not yet booted. Using in a test: is your Test case using the Factories trait? Using in a fixture: is ZenstruckFoundryBundle enabled for this environment?'
+            \sprintf(
+                '"%s" is not yet booted. Using in a test: is your Test case using the Factories trait? Using in a fixture: is ZenstruckFoundryBundle enabled for this environment?',
+                $baseFactoryClass
+            )
         );
     }
 }

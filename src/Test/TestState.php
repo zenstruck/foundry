@@ -15,10 +15,13 @@ use Doctrine\Persistence\ManagerRegistry;
 use Faker;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Zenstruck\Foundry\BaseFactory;
 use Zenstruck\Foundry\ChainManagerRegistry;
 use Zenstruck\Foundry\Configuration;
-use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\FactoryManager;
 use Zenstruck\Foundry\Instantiator;
+use Zenstruck\Foundry\Persistence\PersistenceManager;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\StoryManager;
 
 /**
@@ -109,7 +112,7 @@ final class TestState
      */
     public static function bootFoundryForUnitTest(): void
     {
-        $configuration = new Configuration([], [], ORMDatabaseResetter::RESET_MODE_SCHEMA, []);
+        $configuration = Configuration::default();
 
         if (self::$instantiator) {
             $configuration->setInstantiator(self::$instantiator);
@@ -125,15 +128,23 @@ final class TestState
             $configuration->disableDefaultProxyAutoRefresh();
         }
 
-        self::bootFoundry($configuration);
+        self::bootFoundry(
+            $configuration,
+            new FactoryManager(),
+            \class_exists(PersistenceManager::class) ? new PersistenceManager() : null
+        );
     }
 
     /**
      * @internal
      */
-    public static function bootFoundry(Configuration $configuration): void
+    public static function bootFoundry(Configuration $configuration, FactoryManager $factoryManager, PersistenceManager|null $persistenceManager = null): void
     {
-        Factory::boot($configuration);
+        BaseFactory::boot($factoryManager, $configuration);
+
+        if ($persistenceManager) {
+            PersistentObjectFactory::bootPersistentObjectFactory($persistenceManager);
+        }
     }
 
     /**
@@ -141,7 +152,10 @@ final class TestState
      */
     public static function shutdownFoundry(): void
     {
-        Factory::shutdown();
+        BaseFactory::shutdown();
+        if (\class_exists(PersistenceManager::class)) {
+            PersistentObjectFactory::shutdownPersistentObjectFactory();
+        }
         StoryManager::reset();
     }
 
@@ -152,9 +166,9 @@ final class TestState
     {
         trigger_deprecation('zenstruck/foundry', '1.4.0', 'TestState::bootFactory() is deprecated, use TestState::bootFoundry().');
 
-        self::bootFoundry($configuration);
+        self::bootFoundry($configuration, new FactoryManager(), \class_exists(PersistenceManager::class) ? new PersistenceManager() : null);
 
-        return Factory::configuration();
+        return BaseFactory::configuration();
     }
 
     /**
@@ -163,22 +177,28 @@ final class TestState
     public static function bootFromContainer(ContainerInterface $container): void
     {
         if ($container->has('.zenstruck_foundry.configuration')) {
-            self::bootFoundry($container->get('.zenstruck_foundry.configuration'));
+            self::bootFoundry(
+                $container->get('.zenstruck_foundry.configuration'),
+                $container->get('.zenstruck_foundry.factory_manager'),
+                $container->has('.zenstruck_foundry.persistence_manager') ? $container->get('.zenstruck_foundry.persistence_manager') : null
+            );
 
             return;
         }
 
         trigger_deprecation('zenstruck\foundry', '1.23', 'Usage of foundry without the bundle is deprecated and will not be possible anymore in 2.0.');
 
-        $configuration = new Configuration([], [], ORMDatabaseResetter::RESET_MODE_SCHEMA, []);
-
         try {
-            $configuration->setManagerRegistry(self::initializeChainManagerRegistry($container));
+            $managerRegistry = self::initializeChainManagerRegistry($container);
         } catch (NotFoundExceptionInterface $e) {
             throw new \LogicException('Could not boot Foundry, is the DoctrineBundle installed/configured?', 0, $e);
         }
 
-        self::bootFoundry($configuration);
+        self::bootFoundry(
+            Configuration::default()->setManagerRegistry($managerRegistry),
+            new FactoryManager(),
+            \class_exists(PersistenceManager::class) ? (new PersistenceManager())->setManagerRegistry($managerRegistry) : null
+        );
     }
 
     /**

@@ -18,6 +18,7 @@ use Zenstruck\Foundry\Bundle\DependencyInjection\ChainManagerRegistryPass;
 use Zenstruck\Foundry\Bundle\DependencyInjection\GlobalStatePass;
 use Zenstruck\Foundry\Bundle\DependencyInjection\RegisterFakerProvidersPass;
 use Zenstruck\Foundry\Bundle\DependencyInjection\ZenstruckFoundryExtension;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
  * Must be at src root to be autoconfigured by Symfony Flex.
@@ -28,8 +29,15 @@ final class ZenstruckFoundryBundle extends Bundle
 {
     public function boot(): void
     {
-        if (!Factory::isBooted()) {
-            Factory::boot($this->container->get('.zenstruck_foundry.configuration'));
+        if (!BaseFactory::isBooted()) {
+            BaseFactory::boot(
+                $this->container->get('.zenstruck_foundry.factory_manager'),
+                $this->container->get('.zenstruck_foundry.configuration')
+            );
+        }
+
+        if (\class_exists(PersistentObjectFactory::class) && !PersistentObjectFactory::isPersistentObjectFactoryBooted()) {
+            PersistentObjectFactory::bootPersistentObjectFactory($this->container->get('.zenstruck_foundry.persistence_manager'));
         }
     }
 
