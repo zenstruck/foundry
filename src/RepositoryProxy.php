@@ -21,6 +21,7 @@ use Doctrine\Persistence\Mapping\MappingException;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
  * @mixin EntityRepository<TProxiedObject>
@@ -325,7 +326,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
                 continue;
             }
 
-            if ($attributeValue instanceof Factory) {
+            if ($attributeValue instanceof PersistentObjectFactory) {
                 $attributeValue = $attributeValue->withoutPersisting()->create()->object();
             } elseif ($attributeValue instanceof Proxy) {
                 $attributeValue = $attributeValue->object();
@@ -450,6 +451,6 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
 
     private function getObjectManager(): ObjectManager
     {
-        return Factory::configuration()->objectManagerFor($this->getClassName());
+        return PersistentObjectFactory::persistenceManager()->objectManagerFor($this->getClassName());
     }
 }

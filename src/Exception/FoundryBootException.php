@@ -23,10 +23,16 @@ final class FoundryBootException extends \RuntimeException
         parent::__construct($message);
     }
 
-    public static function notBootedYet(): self
+    /**
+     * @param class-string $baseFactoryClass
+     */
+    public static function notBootedYet(string $baseFactoryClass): self
     {
         return new self(
-            'Foundry is not yet booted. Using in a test: is your Test case using the Factories trait? Using in a fixture: is ZenstruckFoundryBundle enabled for this environment?'
+            \sprintf(
+                '"%s" is not yet booted. Using in a test: is your Test case using the Factories trait? Using in a fixture: is ZenstruckFoundryBundle enabled for this environment?',
+                $baseFactoryClass
+            )
         );
     }
 

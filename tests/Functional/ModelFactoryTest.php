@@ -12,7 +12,7 @@
 namespace Zenstruck\Foundry\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\BaseFactory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
@@ -373,7 +373,7 @@ abstract class ModelFactoryTest extends KernelTestCase
      * @test
      * @dataProvider dataProviderYieldedFromFactoryCollection
      */
-    public function can_yield_data_provider_from_factory_collection(Factory $factory): void
+    public function can_yield_data_provider_from_factory_collection(BaseFactory $factory): void
     {
         $factory->create();
         $factory::assert()->exists(['name' => 'foo']);
@@ -423,6 +423,17 @@ abstract class ModelFactoryTest extends KernelTestCase
         // pass random method
         $category = $categoryFactoryClass::createOne(['updateName' => 'another foo']);
         self::assertSame('another foo', $category->getName());
+    }
+
+    /**
+     * @test
+     */
+    public function can_use_setter_as_attributes(): void
+    {
+        $categoryFactoryClass = $this->categoryFactoryClass();
+
+        $category = $categoryFactoryClass::createOne(['setName' => 'foo']);
+        self::assertSame('foo', $category->getName());
     }
 
     abstract protected function categoryClass(): string;

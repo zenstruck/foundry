@@ -12,19 +12,18 @@
 namespace Zenstruck\Foundry;
 
 use Faker;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
- * @see Factory::__construct()
+ * @template T of object
  *
- * @template TObject of object
- *
- * @param class-string<TObject> $class
+ * @param class-string<T> $class
  *
  * @deprecated
  *
- * @return AnonymousFactory<TObject>
+ * @return AnonymousFactory<T>
  */
-function factory(string $class, array|callable $defaultAttributes = []): AnonymousFactory
+function factory(string $class, array|\Closure $defaultAttributes = []): AnonymousFactory
 {
     trigger_deprecation('zenstruck\foundry', '1.30', 'Usage of "factory()" function is deprecated and will be removed in 2.0. Use the "anonymous()" or "repository()" functions instead.');
 
@@ -32,27 +31,55 @@ function factory(string $class, array|callable $defaultAttributes = []): Anonymo
 }
 
 /**
- * @see Factory::__construct()
+ * @see BaseFactory::new()
  *
- * @template TObject of object
+ * @template T of object
  *
- * @param class-string<TObject> $class
+ * @param class-string<T> $class
  *
- * @return Factory<TObject>
+ * @return PersistentObjectFactory<T>
  */
-function anonymous(string $class, array|callable $defaultAttributes = []): Factory
+function anonymous(string $class, array|callable $defaultAttributes = []): PersistentObjectFactory
 {
-    return new class($class, $defaultAttributes) extends Factory {};
+    $anonymousClassName = 'AnonymousFactory'.\str_replace('\\', '', $class);
+    $anonymousClassName = \preg_replace('/[^a-zA-Z0-9_]/', '', $anonymousClassName); // sanitize for anonymous classes
+
+    if (!\class_exists($anonymousClassName)) { // @phpstan-ignore-line
+        $factoryClass = PersistentObjectFactory::class;
+
+        $anonymousClassCode = <<<CODE
+            /**
+             * @internal
+             */
+             final class {$anonymousClassName} extends {$factoryClass}
+             {
+                 public static function class(): string
+                 {
+                     return "{$class}";
+                 }
+
+                 protected function getDefaults(): array
+                 {
+                     return [];
+                 }
+             }
+            CODE;
+
+        // todo: dump class in var/cache?
+        eval($anonymousClassCode); // @phpstan-ignore-line
+    }
+
+    return $anonymousClassName::new($defaultAttributes); // @phpstan-ignore-line
 }
 
 /**
- * @see Factory::create()
+ * @see BaseFactory::create()
  *
- * @return Proxy&TObject
+ * @return Proxy&T
  *
- * @template TObject of object
- * @phpstan-param class-string<TObject> $class
- * @phpstan-return Proxy<TObject>
+ * @template T of object
+ * @phpstan-param class-string<T> $class
+ * @phpstan-return Proxy<T>
  */
 function create(string $class, array|callable $attributes = []): Proxy
 {
@@ -60,13 +87,13 @@ function create(string $class, array|callable $attributes = []): Proxy
 }
 
 /**
- * @see Factory::createMany()
+ * @see BaseFactory::createMany()
  *
  * @return Proxy[]|object[]
  *
- * @template TObject of object
- * @phpstan-param class-string<TObject> $class
- * @phpstan-return list<Proxy<TObject>>
+ * @template T of object
+ * @phpstan-param class-string<T> $class
+ * @phpstan-return list<Proxy<T>>
  */
 function create_many(int $number, string $class, array|callable $attributes = []): array
 {
@@ -76,11 +103,11 @@ function create_many(int $number, string $class, array|callable $attributes = []
 /**
  * Instantiate object without persisting.
  *
- * @return Proxy&TObject "unpersisted" Proxy wrapping the instantiated object
+ * @return Proxy&T "unpersisted" Proxy wrapping the instantiated object
  *
- * @template TObject of object
- * @phpstan-param class-string<TObject> $class
- * @phpstan-return Proxy<TObject>
+ * @template T of object
+ * @phpstan-param class-string<T> $class
+ * @phpstan-return Proxy<T>
  */
 function instantiate(string $class, array|callable $attributes = []): Proxy
 {
@@ -90,11 +117,12 @@ function instantiate(string $class, array|callable $attributes = []): Proxy
 /**
  * Instantiate X objects without persisting.
  *
- * @return Proxy[]|object[] "unpersisted" Proxy's wrapping the instantiated objects
+ * @return Proxy[]&object[] "unpersisted" Proxy's wrapping the instantiated objects
  *
- * @template TObject of object
- * @phpstan-param class-string<TObject> $class
- * @phpstan-return list<Proxy<TObject>>
+ * @template T of object
+ *
+ * @phpstan-param class-string<T> $class
+ * @phpstan-return list<Proxy<T>>
  */
 function instantiate_many(int $number, string $class, array|callable $attributes = []): array
 {
@@ -102,25 +130,29 @@ function instantiate_many(int $number, string $class, array|callable $attributes
 }
 
 /**
- * @see Configuration::repositoryFor()
+ * @see PersistentObjectFactory::repositoryFor()
  *
- * @template TObject of object
+ * @template T of object
  *
- * @param TObject|class-string<TObject> $objectOrClass
+ * @param T|class-string<T> $objectOrClass
  *
- * @return RepositoryProxy<TObject>
+ * @return RepositoryProxy<T>
  */
 function repository(object|string $objectOrClass): RepositoryProxy
 {
-    return Factory::configuration()->repositoryFor($objectOrClass);
+    if (!\class_exists(PersistentObjectFactory::class)) {
+        throw new \LogicException('The "repository()" function can only be used when the "zenstruck/foundry-persistence" package is installed.');
+    }
+
+    return PersistentObjectFactory::persistenceManager()->repositoryFor($objectOrClass);
 }
 
 /**
- * @see Factory::faker()
+ * @see BaseFactory::faker()
  */
 function faker(): Faker\Generator
 {
-    return Factory::faker();
+    return BaseFactory::faker();
 }
 
 /**

@@ -17,6 +17,7 @@ use Doctrine\Persistence\ObjectManager;
 use Zenstruck\Assert;
 use Zenstruck\Callback;
 use Zenstruck\Callback\Parameter;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
  * @template TProxiedObject of object
@@ -45,7 +46,7 @@ final class Proxy implements \Stringable
         private object $object
     ) {
         $this->class = $object::class;
-        $this->autoRefresh = Factory::configuration()->defaultProxyAutoRefresh();
+        $this->autoRefresh = BaseFactory::configuration()->defaultProxyAutoRefresh();
     }
 
     public function __call(string $method, array $arguments) // @phpstan-ignore-line
@@ -113,7 +114,7 @@ final class Proxy implements \Stringable
      */
     public function object(): object
     {
-        if (!$this->autoRefresh || !$this->persisted || !Factory::configuration()->isFlushingEnabled()) {
+        if (!$this->autoRefresh || !$this->persisted || !PersistentObjectFactory::persistenceManager()->isFlushingEnabled()) {
             return $this->object;
         }
 
@@ -143,7 +144,7 @@ final class Proxy implements \Stringable
     {
         $this->objectManager()->persist($this->object);
 
-        if (Factory::configuration()->isFlushingEnabled()) {
+        if (PersistentObjectFactory::persistenceManager()->isFlushingEnabled()) {
             $this->objectManager()->flush();
         }
 
@@ -209,7 +210,7 @@ final class Proxy implements \Stringable
 
     public function repository(): RepositoryProxy
     {
-        return Factory::configuration()->repositoryFor($this->class);
+        return PersistentObjectFactory::persistenceManager()->repositoryFor($this->class);
     }
 
     public function enableAutoRefresh(): self
@@ -300,6 +301,6 @@ final class Proxy implements \Stringable
 
     private function objectManager(): ObjectManager
     {
-        return Factory::configuration()->objectManagerFor($this->class);
+        return PersistentObjectFactory::persistenceManager()->objectManagerFor($this->class);
     }
 }

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Persistence;
 
-use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\BaseFactory;
 use Zenstruck\Foundry\Proxy;
 
 /**
@@ -22,7 +22,7 @@ use Zenstruck\Foundry\Proxy;
 final class InversedRelationshipPostPersistCallback implements PostPersistCallback
 {
     public function __construct(
-        private Factory $factory,
+        private BaseFactory $factory,
         private string $relationshipField,
         private bool $isCollection,
     ) {

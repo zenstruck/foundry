@@ -2,12 +2,12 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\EntityForRelations;
 
-class EntityForRelationsFactory extends ModelFactory
+class EntityForRelationsFactory extends PersistentObjectFactory
 {
-    protected static function getClass(): string
+    public static function class(): string
     {
         return EntityForRelations::class;
     }

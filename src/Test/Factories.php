@@ -13,7 +13,7 @@ namespace Zenstruck\Foundry\Test;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\ChainManagerRegistry;
-use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
  * @mixin KernelTestCase
@@ -38,16 +38,18 @@ trait Factories
         $kernel->boot();
 
         TestState::bootFromContainer($kernel->getContainer());
-        Factory::configuration()->setManagerRegistry(
-            new LazyManagerRegistry(static function(): ChainManagerRegistry {
-                if (!static::$booted) {
-                    static::bootKernel();
-                }
+        if (\class_exists(PersistentObjectFactory::class)) {
+            PersistentObjectFactory::persistenceManager()->setManagerRegistry(
+                new LazyManagerRegistry(static function(): ChainManagerRegistry {
+                    if (!static::$booted) {
+                        static::bootKernel();
+                    }
 
-                return TestState::initializeChainManagerRegistry(static::$kernel->getContainer());
-            }
-            )
-        );
+                    return TestState::initializeChainManagerRegistry(static::$kernel->getContainer());
+                }
+                )
+            );
+        }
 
         $kernel->shutdown();
     }

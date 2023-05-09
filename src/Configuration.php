@@ -11,10 +11,9 @@
 
 namespace Zenstruck\Foundry;
 
-use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\Persistence\ObjectManager;
 use Faker;
+use Zenstruck\Foundry\Test\ORMDatabaseResetter;
 use Zenstruck\Foundry\Exception\FoundryBootException;
 
 /**
@@ -28,16 +27,12 @@ final class Configuration
 
     private StoryManager $stories;
 
-    private ModelFactoryManager $factories;
-
     private \Faker\Generator $faker;
 
     /** @var callable */
     private $instantiator;
 
     private ?bool $defaultProxyAutoRefresh = null;
-
-    private bool $flushEnabled = true;
 
     private bool $databaseResetEnabled = true;
 
@@ -49,19 +44,18 @@ final class Configuration
     public function __construct(private array $ormConnectionsToReset, private array $ormObjectManagersToReset, private string $ormResetMode, private array $odmObjectManagersToReset)
     {
         $this->stories = new StoryManager([]);
-        $this->factories = new ModelFactoryManager([]);
         $this->faker = Faker\Factory::create();
         $this->instantiator = new Instantiator();
+    }
+
+    public static function default(): self
+    {
+        return new self([], [], ORMDatabaseResetter::RESET_MODE_SCHEMA, []);
     }
 
     public function stories(): StoryManager
     {
         return $this->stories;
-    }
-
-    public function factories(): ModelFactoryManager
-    {
-        return $this->factories;
     }
 
     public function faker(): Faker\Generator
@@ -110,13 +104,6 @@ final class Configuration
         return $this;
     }
 
-    public function setModelFactoryManager(ModelFactoryManager $manager): self
-    {
-        $this->factories = $manager;
-
-        return $this;
-    }
-
     public function setFaker(Faker\Generator $faker): self
     {
         $this->faker = $faker;
@@ -138,11 +125,6 @@ final class Configuration
         return $this;
     }
 
-    public function isFlushingEnabled(): bool
-    {
-        return $this->flushEnabled;
-    }
-
     public function disableDatabaseReset(): self
     {
         $this->databaseResetEnabled = false;
@@ -153,57 +135,6 @@ final class Configuration
     public function isDatabaseResetEnabled(): bool
     {
         return $this->databaseResetEnabled;
-    }
-
-    public function delayFlush(callable $callback): mixed
-    {
-        $this->flushEnabled = false;
-
-        $result = $callback();
-
-        foreach ($this->managerRegistry()?->getManagers() ?? [] as $manager) {
-            $manager->flush();
-        }
-
-        $this->flushEnabled = true;
-
-        return $result;
-    }
-
-    /**
-     * @template TObject of object
-     * @phpstan-param Proxy<TObject>|TObject|class-string<TObject> $objectOrClass
-     * @phpstan-return RepositoryProxy<TObject>
-     */
-    public function repositoryFor(object|string $objectOrClass): RepositoryProxy
-    {
-        if ($objectOrClass instanceof Proxy) {
-            $objectOrClass = $objectOrClass->object();
-        }
-
-        if (!\is_string($objectOrClass)) {
-            $objectOrClass = $objectOrClass::class;
-        }
-
-        /** @var EntityRepository<TObject>|null $repository */
-        $repository = $this->managerRegistry()?->getRepository($objectOrClass);
-
-        if (!$repository) {
-            throw new \RuntimeException(\sprintf('No repository registered for "%s".', $objectOrClass));
-        }
-
-        return new RepositoryProxy($repository);
-    }
-
-    public function objectManagerFor(object|string $objectOrClass): ObjectManager
-    {
-        $class = \is_string($objectOrClass) ? $objectOrClass : $objectOrClass::class;
-
-        if (!$objectManager = $this->managerRegistry()?->getManagerForClass($class)) {
-            throw new \RuntimeException(\sprintf('No object manager registered for "%s".', $class));
-        }
-
-        return $objectManager;
     }
 
     /** @phpstan-assert !null $this->managerRegistry */
@@ -239,17 +170,5 @@ final class Configuration
     public function getOdmObjectManagersToReset(): array
     {
         return $this->odmObjectManagersToReset;
-    }
-
-    /**
-     * @throws FoundryBootException
-     */
-    private function managerRegistry(): ?ManagerRegistry
-    {
-        if (!$this->hasManagerRegistry()) {
-            throw FoundryBootException::notBootedWithDoctrine();
-        }
-
-        return $this->managerRegistry;
     }
 }
