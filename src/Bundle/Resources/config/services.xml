@@ -21,9 +21,6 @@
             <call method="setStoryManager">
                 <argument type="service" id=".zenstruck_foundry.story_manager" />
             </call>
-            <call method="setModelFactoryManager">
-                <argument type="service" id=".zenstruck_foundry.model_factory_manager" />
-            </call>
             <call method="setInstantiator">
                 <argument type="service" id=".zenstruck_foundry.default_instantiator" />
             </call>
@@ -36,14 +33,22 @@
             <argument type="tagged_iterator" tag="foundry.story" />
         </service>
 
-        <service id=".zenstruck_foundry.model_factory_manager" class="Zenstruck\Foundry\ModelFactoryManager">
-            <argument type="tagged_iterator" tag="foundry.factory" />
-        </service>
-
         <service id=".zenstruck_foundry.chain_manager_registry" class="Zenstruck\Foundry\ChainManagerRegistry">
             <argument/> <!-- list<ManagerRegistry> set by compiler pass -->
         </service>
 
         <service id=".zenstruck_foundry.global_state_registry" class="Zenstruck\Foundry\Test\GlobalStateRegistry" public="true" />
+
+        <service id=".zenstruck_foundry.factory_manager" class="Zenstruck\Foundry\FactoryManager" public="true">
+            <argument type="tagged_iterator" tag="foundry.factory" />
+            <argument type="service" id=".zenstruck_foundry.default_instantiator" />
+            <argument type="service" id=".zenstruck_foundry.faker" />
+        </service>
+
+        <service id=".zenstruck_foundry.persistence_manager" class="Zenstruck\Foundry\Persistence\PersistenceManager" public="true">
+            <call method="setManagerRegistry">
+                <argument type="service" id=".zenstruck_foundry.chain_manager_registry" />
+            </call>
+        </service>
     </services>
 </container>

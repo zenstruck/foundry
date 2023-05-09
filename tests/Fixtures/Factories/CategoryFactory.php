@@ -3,15 +3,15 @@
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
 use Zenstruck\Foundry\Instantiator;
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class CategoryFactory extends ModelFactory
+final class CategoryFactory extends PersistentObjectFactory
 {
-    protected static function getClass(): string
+    public static function class(): string
     {
         return Category::class;
     }

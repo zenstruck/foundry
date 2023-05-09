@@ -66,7 +66,7 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
             'name' => 'brand',
             'products' => anonymous(Product::class, ['name' => 'product'])->many(2),
         ])->instantiateWith(function(array $attributes, string $class): object {
-            //            $this->assertNull($attributes['products'][0]->getId());
+            $this->assertNull($attributes['products'][0]->getId());
 
             return (new Instantiator())($attributes, $class);
         })->create();

@@ -12,7 +12,7 @@
 namespace Zenstruck\Foundry\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
@@ -20,6 +20,9 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\CommentFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\UserFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeOtherObject;
@@ -156,7 +159,7 @@ final class FactoryTest extends KernelTestCase
         repository(Category::class)->assert()->empty();
 
         $post = null;
-        $return = Factory::delayFlush(static function() use (&$post): Proxy {
+        $return = PersistentObjectFactory::delayFlush(static function() use (&$post): Proxy {
             $post = anonymous(Post::class)->create([
                 'title' => 'title',
                 'body' => 'body',
@@ -183,7 +186,7 @@ final class FactoryTest extends KernelTestCase
         repository(Category::class)->assert()->empty();
 
         $post = null;
-        $return = Factory::delayFlush(static function() use (&$post): Proxy {
+        $return = PersistentObjectFactory::delayFlush(static function() use (&$post): Proxy {
             $post = anonymous(Post::class)->create([
                 'title' => 'title',
                 'body' => 'body',
@@ -208,8 +211,24 @@ final class FactoryTest extends KernelTestCase
      */
     public function can_create_an_object_not_persisted_with_nested_factory(): void
     {
-        $notPersistedObject = SomeObjectFactory::new()->create()->object();
+        $notPersistedObject = SomeObjectFactory::new()->create();
         self::assertInstanceOf(SomeObject::class, $notPersistedObject);
         self::assertInstanceOf(SomeOtherObject::class, $notPersistedObject->someOtherObjectMandatory);
+    }
+
+    /**
+     * @test
+     * @legacy
+     */
+    public function can_use_legacy_factory(): void
+    {
+        $post = PostFactory::createOne([
+            'comments' => CommentFactory::new()->many(4),
+        ]);
+
+        $this->assertCount(4, $post->getComments());
+        PostFactory::assert()->count(1);
+        CommentFactory::assert()->count(4);
+        UserFactory::assert()->count(4);
     }
 }

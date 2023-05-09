@@ -12,7 +12,7 @@
 namespace Zenstruck\Foundry\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\BaseFactory;
 use Zenstruck\Foundry\Test\Factories;
 
 /**
@@ -27,6 +27,6 @@ final class FakerTest extends KernelTestCase
      */
     public function can_use_custom_provider(): void
     {
-        $this->assertSame('custom-value', Factory::faker()->customValue());
+        $this->assertSame('custom-value', BaseFactory::faker()->customValue());
     }
 }

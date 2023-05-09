@@ -2,15 +2,15 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class AddressFactory extends ModelFactory
+final class AddressFactory extends PersistentObjectFactory
 {
-    protected static function getClass(): string
+    public static function class(): string
     {
         return Address::class;
     }

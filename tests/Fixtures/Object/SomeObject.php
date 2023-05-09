@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Object;
 
+use Zenstruck\Foundry\Tests\Fixtures\Entity\User;
+
 final class SomeObject
 {
     public $propertyWithoutType;
@@ -17,4 +19,5 @@ final class SomeObject
     public \DateTimeImmutable $dateTimeImmutableMandatory;
     public SomeOtherObject $someOtherObjectMandatory;
     public SomeOtherObject|SomeObject $someMandatoryPropertyWithUnionType;
+    public User $user;
 }

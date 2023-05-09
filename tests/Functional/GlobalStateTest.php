@@ -12,7 +12,7 @@
 namespace Zenstruck\Foundry\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\BaseFactory;
 use Zenstruck\Foundry\Story;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
@@ -56,7 +56,7 @@ abstract class GlobalStateTest extends KernelTestCase
     }
 
     /**
-     * @return class-string<Factory>
+     * @return class-string<BaseFactory>
      */
     abstract protected function getTagFactoryClass(): string;
 

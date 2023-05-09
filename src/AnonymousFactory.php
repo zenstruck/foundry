@@ -11,29 +11,35 @@
 
 namespace Zenstruck\Foundry;
 
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+
 /**
  * @template TModel of object
- * @template-extends Factory<TModel>
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @deprecated
+ *
+ * @phpstan-import-type SequenceAttributes from BaseFactory
  */
-final class AnonymousFactory extends Factory implements \Countable, \IteratorAggregate
+final class AnonymousFactory implements \Countable, \IteratorAggregate
 {
-    public function __construct(string $class, array|callable $defaultAttributes = [])
+    /**
+     * @param class-string<TModel> $class
+     */
+    public function __construct(private string $class, private array|\Closure $defaultAttributes = [])
     {
-        trigger_deprecation('zenstruck\foundry', '1.30', 'Class "AnonymousFactory" is deprecated and will be removed in 2.0. Use the "anonymous()" or "repository()" functions instead.');
-
-        parent::__construct($class, $defaultAttributes);
+        trigger_deprecation(
+            'zenstruck\foundry',
+            '1.30',
+            'Class "AnonymousFactory" is deprecated and will be removed in 2.0. Use the "anonymous()" or "repository()" functions instead.'
+        );
     }
 
     /**
-     * @see Factory::__construct()
-     *
      * @param class-string<TModel> $class
      */
-    public static function new(string $class, array|callable $defaultAttributes = []): self
+    public static function new(string $class, array|\Closure $defaultAttributes = []): self
     {
         return new self($class, $defaultAttributes);
     }
@@ -55,28 +61,26 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
-     * @see RepositoryProxy::first()
-     *
      * @throws \RuntimeException If no entities exist
+     * @see RepositoryProxy::first()
      */
     public function first(string $sortedField = 'id'): Proxy
     {
         if (null === $proxy = $this->repository()->first($sortedField)) {
-            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', $this->class()));
+            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', $this->class));
         }
 
         return $proxy;
     }
 
     /**
-     * @see RepositoryProxy::last()
-     *
      * @throws \RuntimeException If no entities exist
+     * @see RepositoryProxy::last()
      */
     public function last(string $sortedField = 'id'): Proxy
     {
         if (null === $proxy = $this->repository()->last($sortedField)) {
-            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', $this->class()));
+            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', $this->class));
         }
 
         return $proxy;
@@ -84,6 +88,9 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
 
     /**
      * @see RepositoryProxy::random()
+     *
+     * @return Proxy&TModel
+     * @phpstan-return Proxy<TModel>
      */
     public function random(array $attributes = []): Proxy
     {
@@ -108,7 +115,8 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     /**
      * @see RepositoryProxy::randomSet()
      *
-     * @return object[]
+     * @return list<Proxy&TModel>
+     * @phpstan-return list<Proxy<TModel>>
      */
     public function randomSet(int $number, array $attributes = []): array
     {
@@ -118,7 +126,8 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     /**
      * @see RepositoryProxy::randomRange()
      *
-     * @return object[]
+     * @return list<Proxy&TModel>
+     * @phpstan-return list<Proxy<TModel>>
      */
     public function randomRange(int $min, int $max, array $attributes = []): array
     {
@@ -149,7 +158,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     /**
      * @see RepositoryProxy::findAll()
      *
-     * @return object[]
+     * @return list<Proxy<TModel>>
      */
     public function all(): array
     {
@@ -157,16 +166,18 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
+     * @return Proxy&TModel
+     * @throws \RuntimeException If no entity found
      * @see RepositoryProxy::find()
      *
      * @phpstan-param Proxy<TModel>|array|mixed $criteria
      *
-     * @throws \RuntimeException If no entity found
+     * @phpstan-return Proxy<TModel>
      */
     public function find($criteria): Proxy
     {
         if (null === $proxy = $this->repository()->find($criteria)) {
-            throw new \RuntimeException(\sprintf('Could not find "%s" object.', $this->class()));
+            throw new \RuntimeException(\sprintf('Could not find "%s" object.', $this->class));
         }
 
         return $proxy;
@@ -175,7 +186,8 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     /**
      * @see RepositoryProxy::findBy()
      *
-     * @return object[]
+     * @return list<Proxy&TModel>
+     * @phpstan-return list<Proxy<TModel>>
      */
     public function findBy(array $attributes): array
     {
@@ -188,10 +200,42 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
-     * @phpstan-return RepositoryProxy<TModel>
+     * @return RepositoryProxy<TModel>
      */
     public function repository(): RepositoryProxy
     {
-        return self::configuration()->repositoryFor($this->class());
+        return PersistentObjectFactory::persistenceManager()->repositoryFor($this->class);
+    }
+
+    /**
+     * @return Proxy&TModel
+     * @phpstan-return Proxy<TModel>
+     */
+    public function create(array|callable $attributes = []): mixed
+    {
+        $defaultAttributes = \is_callable($this->defaultAttributes) ? ($this->defaultAttributes)() : $this->defaultAttributes;
+        $attributes = \is_callable($attributes) ? $attributes() : $attributes;
+
+        return create(
+            $this->class,
+            \array_merge($defaultAttributes, $attributes)
+        );
+    }
+
+    /**
+     * @return FactoryCollection<TModel>
+     */
+    public function many(int $min, ?int $max = null): FactoryCollection
+    {
+        return anonymous($this->class, $this->defaultAttributes)->many($min, $max);
+    }
+
+    /**
+     * @param  SequenceAttributes        $sequence
+     * @return FactoryCollection<TModel>
+     */
+    public function sequence(iterable|callable $sequence): FactoryCollection
+    {
+        return anonymous($this->class, $this->defaultAttributes)->sequence($sequence);
     }
 }

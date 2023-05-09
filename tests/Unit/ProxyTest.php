@@ -14,7 +14,8 @@ namespace Zenstruck\Foundry\Tests\Unit;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
-use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\BaseFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
@@ -85,7 +86,8 @@ final class ProxyTest extends TestCase
             ->willReturn($this->createMock(ObjectManager::class))
         ;
 
-        Factory::configuration()->setManagerRegistry($registry)->enableDefaultProxyAutoRefresh();
+        BaseFactory::configuration()->disableDefaultProxyAutoRefresh();
+        PersistentObjectFactory::persistenceManager()->setManagerRegistry($registry);
 
         $category = new Proxy(new Category());
 

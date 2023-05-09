@@ -13,7 +13,7 @@ namespace Zenstruck\Foundry\Bundle\Maker\Factory;
 
 use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\RepositoryProxy;
 
@@ -36,7 +36,7 @@ final class MakeFactoryData
     public function __construct(private \ReflectionClass $object, private ClassNameDetails $factoryClassNameDetails, private ?\ReflectionClass $repository, private string $staticAnalysisTool, private bool $persisted)
     {
         $this->uses = [
-            ModelFactory::class,
+            PersistentObjectFactory::class,
             Proxy::class,
             $object->getName(),
         ];

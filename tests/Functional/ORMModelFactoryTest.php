@@ -83,9 +83,9 @@ final class ORMModelFactoryTest extends ModelFactoryTest
         ]);
 
         $this->assertCount(4, $post->getComments());
-        UserFactory::assert()->count(4);
-        CommentFactory::assert()->count(4);
         PostFactory::assert()->count(1);
+        CommentFactory::assert()->count(4);
+        UserFactory::assert()->count(4);
     }
 
     /**

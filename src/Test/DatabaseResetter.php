@@ -15,8 +15,8 @@ use DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Zenstruck\Foundry\BaseFactory;
 use Zenstruck\Foundry\Configuration;
-use Zenstruck\Foundry\Factory;
 
 /**
  * @internal
@@ -86,7 +86,7 @@ final class DatabaseResetter
     {
         $container = $kernel->getContainer();
 
-        if (!Factory::isBooted()) {
+        if (!BaseFactory::isBooted()) {
             TestState::bootFromContainer($container);
         }
 
