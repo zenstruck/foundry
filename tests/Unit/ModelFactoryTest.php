@@ -116,4 +116,16 @@ final class ModelFactoryTest extends TestCase
         $this->assertNull($post->getId());
         $this->assertCount(3, $post->getTags());
     }
+
+    /**
+     * @test
+     */
+    public function can_call_find_or_create(): void
+    {
+        $post = PostFactory::findOrCreate([
+            'title' => 'foo',
+        ]);
+
+        $this->assertSame('foo', $post->getTitle());
+    }
 }

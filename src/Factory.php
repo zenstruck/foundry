@@ -15,7 +15,7 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Faker;
-use Zenstruck\Foundry\Exception\FoundryNotBootedException;
+use Zenstruck\Foundry\Exception\FoundryBootException;
 use Zenstruck\Foundry\Persistence\InversedRelationshipCascadePersistCallback;
 use Zenstruck\Foundry\Persistence\PostPersistCallback;
 
@@ -291,13 +291,13 @@ class Factory
     }
 
     /**
+     * @throws FoundryBootException
      * @internal
-     * @throws FoundryNotBootedException
      */
     final public static function configuration(): Configuration
     {
         if (!self::isBooted()) {
-            throw new FoundryNotBootedException();
+            throw FoundryBootException::notBootedYet();
         }
 
         return self::$configuration; // @phpstan-ignore-line
@@ -315,7 +315,7 @@ class Factory
     {
         try {
             return self::configuration()->faker();
-        } catch (FoundryNotBootedException $exception) {
+        } catch (FoundryBootException $exception) {
             throw new \RuntimeException("Cannot get Foundry's configuration. If using faker in a data provider, consider passing attributes as a callable.");
         }
     }

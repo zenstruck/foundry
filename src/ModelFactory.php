@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Foundry;
 
+use Zenstruck\Foundry\Exception\FoundryBootException;
+
 /**
  * @template TModel of object
  * @template-extends Factory<TModel>
@@ -106,8 +108,11 @@ abstract class ModelFactory extends Factory
      */
     final public static function findOrCreate(array $attributes): Proxy
     {
-        if ($found = static::repository()->find($attributes)) {
-            return $found;
+        try {
+            if ($found = static::repository()->find($attributes)) {
+                return $found;
+            }
+        } catch (FoundryBootException) {
         }
 
         return static::new()->create($attributes);
