@@ -11,15 +11,29 @@
 
 namespace Zenstruck\Foundry\Exception;
 
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+
 /**
  * @internal
  */
-final class FoundryNotBootedException extends \RuntimeException
+final class FoundryBootException extends \RuntimeException
 {
-    public function __construct()
+    private function __construct(string $message)
     {
-        parent::__construct(
+        parent::__construct($message);
+    }
+
+    public static function notBootedYet(): self
+    {
+        return new self(
             'Foundry is not yet booted. Using in a test: is your Test case using the Factories trait? Using in a fixture: is ZenstruckFoundryBundle enabled for this environment?'
+        );
+    }
+
+    public static function notBootedWithDoctrine(): self
+    {
+        return new self(
+            'Foundry was booted without doctrine. Ensure your TestCase extends '.KernelTestCase::class
         );
     }
 }

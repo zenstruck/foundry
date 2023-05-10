@@ -16,6 +16,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Faker;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Exception\FoundryBootException;
 
 /**
  * @internal
@@ -241,10 +242,13 @@ final class Configuration
         return $this->odmObjectManagersToReset;
     }
 
+    /**
+     * @throws FoundryBootException
+     */
     private function managerRegistry(): ?ManagerRegistry
     {
         if (!$this->hasManagerRegistry()) {
-            throw new \RuntimeException('Foundry was booted without doctrine. Ensure your TestCase extends '.KernelTestCase::class);
+            throw FoundryBootException::notBootedWithDoctrine();
         }
 
         return $this->managerRegistry;
