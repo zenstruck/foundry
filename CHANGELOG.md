@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## [v1.32.0](https://github.com/zenstruck/foundry/releases/tag/v1.32.0)
+
+May 11th, 2023 - [v1.31.0...v1.32.0](https://github.com/zenstruck/foundry/compare/v1.31.0...v1.32.0)
+
+* 27b4d7f feat: allow ModelFactory::findOrCreate() in unit tests (#461) by @nikophil
+* 68c6a5e ci: add Symfony 6.3 to test matrix (#459) by @kbond
+* 912f134 fix: makefile minor fixes (#451) by @nikophil
+* d8fafed minor: improve makefile (#449) by @nikophil
+* 9cce6dc docs: add static ide hint to stories (#448) by @adrianrudnik
+
 ## [v1.31.0](https://github.com/zenstruck/foundry/releases/tag/v1.31.0)
 
 March 27th, 2023 - [v1.30.3...v1.31.0](https://github.com/zenstruck/foundry/compare/v1.30.3...v1.31.0)
