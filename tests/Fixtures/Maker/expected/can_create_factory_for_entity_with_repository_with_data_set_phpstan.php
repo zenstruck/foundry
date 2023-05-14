@@ -35,22 +35,6 @@ use Zenstruck\Foundry\Tests\Fixtures\Repository\PostRepository;
  * @method static Post[]|Proxy[]                 findBy(array $attributes)
  * @method static Post[]|Proxy[]                 randomRange(int $min, int $max, array $attributes = [])
  * @method static Post[]|Proxy[]                 randomSet(int $number, array $attributes = [])
- *
- * @phpstan-method        Proxy<Post> create(array|callable $attributes = [])
- * @phpstan-method static Proxy<Post> createOne(array $attributes = [])
- * @phpstan-method static Proxy<Post> find(object|array|mixed $criteria)
- * @phpstan-method static Proxy<Post> findOrCreate(array $attributes)
- * @phpstan-method static Proxy<Post> first(string $sortedField = 'id')
- * @phpstan-method static Proxy<Post> last(string $sortedField = 'id')
- * @phpstan-method static Proxy<Post> random(array $attributes = [])
- * @phpstan-method static Proxy<Post> randomOrCreate(array $attributes = [])
- * @phpstan-method static RepositoryProxy<Post> repository()
- * @phpstan-method static list<Proxy<Post>> all()
- * @phpstan-method static list<Proxy<Post>> createMany(int $number, array|callable $attributes = [])
- * @phpstan-method static list<Proxy<Post>> createSequence(iterable|callable $sequence)
- * @phpstan-method static list<Proxy<Post>> findBy(array $attributes)
- * @phpstan-method static list<Proxy<Post>> randomRange(int $min, int $max, array $attributes = [])
- * @phpstan-method static list<Proxy<Post>> randomSet(int $number, array $attributes = [])
  */
 final class PostFactory extends PersistentObjectFactory
 {
@@ -62,6 +46,11 @@ final class PostFactory extends PersistentObjectFactory
     public function __construct()
     {
         parent::__construct();
+    }
+
+    public static function class(): string
+    {
+        return Post::class;
     }
 
     /**
@@ -87,10 +76,5 @@ final class PostFactory extends PersistentObjectFactory
         return $this
             // ->afterInstantiate(function(Post $post): void {})
         ;
-    }
-
-    public static function class(): string
-    {
-        return Post::class;
     }
 }

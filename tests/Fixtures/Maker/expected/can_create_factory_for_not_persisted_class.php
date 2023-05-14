@@ -35,6 +35,11 @@ final class SomeObjectFactory extends PersistentObjectFactory
         parent::__construct();
     }
 
+    public static function class(): string
+    {
+        return SomeObject::class;
+    }
+
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      *
@@ -67,10 +72,5 @@ final class SomeObjectFactory extends PersistentObjectFactory
             ->withoutPersisting()
             // ->afterInstantiate(function(SomeObject $someObject): void {})
         ;
-    }
-
-    public static function class(): string
-    {
-        return SomeObject::class;
     }
 }

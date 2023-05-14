@@ -91,6 +91,9 @@ jobs:
 
       - name: 'Test'
         run: |
+          # we need phpstan to be installed in order to run tests on phpstan extension
+          composer bin phpstan install
+
           if [ "${{ matrix.use-dama }}" == "1" ]; then
             CONFIGURATION="--configuration phpunit-dama-doctrine.xml.dist"
           fi
@@ -144,7 +147,11 @@ jobs:
           dependency-versions: "highest"
 
       - name: 'Coverage'
-        run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist --coverage-text --coverage-clover=foundry.clover
+        run: |
+          # we need phpstan to be installed in order to run tests on phpstan extension
+          composer bin phpstan install
+
+          vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist --coverage-text --coverage-clover=foundry.clover
         env:
           USE_ORM: 1
           USE_ODM: 1

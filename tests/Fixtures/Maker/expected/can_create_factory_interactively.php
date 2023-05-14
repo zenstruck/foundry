@@ -48,6 +48,11 @@ final class CommentFactory extends PersistentObjectFactory
         parent::__construct();
     }
 
+    public static function class(): string
+    {
+        return Comment::class;
+    }
+
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      *
@@ -72,10 +77,5 @@ final class CommentFactory extends PersistentObjectFactory
         return $this
             // ->afterInstantiate(function(Comment $comment): void {})
         ;
-    }
-
-    public static function class(): string
-    {
-        return Comment::class;
     }
 }

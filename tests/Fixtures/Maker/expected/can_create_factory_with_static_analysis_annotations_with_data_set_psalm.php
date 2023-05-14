@@ -35,22 +35,6 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
  * @method static Category[]|Proxy[]               findBy(array $attributes)
  * @method static Category[]|Proxy[]               randomRange(int $min, int $max, array $attributes = [])
  * @method static Category[]|Proxy[]               randomSet(int $number, array $attributes = [])
- *
- * @psalm-method        Proxy<Category> create(array|callable $attributes = [])
- * @psalm-method static Proxy<Category> createOne(array $attributes = [])
- * @psalm-method static Proxy<Category> find(object|array|mixed $criteria)
- * @psalm-method static Proxy<Category> findOrCreate(array $attributes)
- * @psalm-method static Proxy<Category> first(string $sortedField = 'id')
- * @psalm-method static Proxy<Category> last(string $sortedField = 'id')
- * @psalm-method static Proxy<Category> random(array $attributes = [])
- * @psalm-method static Proxy<Category> randomOrCreate(array $attributes = [])
- * @psalm-method static RepositoryProxy<Category> repository()
- * @psalm-method static list<Proxy<Category>> all()
- * @psalm-method static list<Proxy<Category>> createMany(int $number, array|callable $attributes = [])
- * @psalm-method static list<Proxy<Category>> createSequence(iterable|callable $sequence)
- * @psalm-method static list<Proxy<Category>> findBy(array $attributes)
- * @psalm-method static list<Proxy<Category>> randomRange(int $min, int $max, array $attributes = [])
- * @psalm-method static list<Proxy<Category>> randomSet(int $number, array $attributes = [])
  */
 final class CategoryFactory extends PersistentObjectFactory
 {
@@ -62,6 +46,11 @@ final class CategoryFactory extends PersistentObjectFactory
     public function __construct()
     {
         parent::__construct();
+    }
+
+    public static function class(): string
+    {
+        return Category::class;
     }
 
     /**
@@ -84,10 +73,5 @@ final class CategoryFactory extends PersistentObjectFactory
         return $this
             // ->afterInstantiate(function(Category $category): void {})
         ;
-    }
-
-    public static function class(): string
-    {
-        return Category::class;
     }
 }

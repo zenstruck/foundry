@@ -18,6 +18,9 @@ class User
     #[ORM\Column(type: "string")]
     private ?string $name = null;
 
+    #[ORM\Column(type: "json")]
+    private array $data = [];
+
     #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: "user", orphanRemoval: true)]
     private Collection $comments;
 
@@ -65,5 +68,15 @@ class User
                 $comment->setUser(null);
             }
         }
+    }
+
+    public function getData(): array
+    {
+        return $this->data;
+    }
+
+    public function setData(array $data): void
+    {
+        $this->data = $data;
     }
 }

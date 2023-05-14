@@ -85,7 +85,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     final public static function persistenceManager(): PersistenceManager
     {
         if (!self::isPersistentObjectFactoryBooted()) {
-            throw FoundryBootException::notBootedWithDoctrine();
+            throw FoundryBootException::notBootedYet(self::class);
         }
 
         return self::$persistenceManager; // @phpstan-ignore-line
@@ -332,8 +332,12 @@ abstract class PersistentObjectFactory extends ObjectFactory
             );
         }
 
-        if (!$value instanceof self) {
+        if (!$value instanceof BaseFactory) {
             return \is_object($value) ? self::normalizeObject($value) : $value;
+        }
+
+        if (!$value instanceof self) {
+            return $value->create();
         }
 
         if (!$this->isPersisting()) {
@@ -354,7 +358,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
             }
         } catch (\Throwable $e) {
             // not persisted object
-            return $value->create()->object();
+            return $value->create();
         }
 
         $relationshipMetadata = self::getRelationshipMetadata($objectManager, static::class(), $name);
