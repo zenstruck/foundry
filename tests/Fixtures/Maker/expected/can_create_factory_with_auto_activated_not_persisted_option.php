@@ -35,6 +35,11 @@ final class CategoryFactory extends PersistentObjectFactory
         parent::__construct();
     }
 
+    public static function class(): string
+    {
+        return Category::class;
+    }
+
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      *
@@ -57,10 +62,5 @@ final class CategoryFactory extends PersistentObjectFactory
             ->withoutPersisting()
             // ->afterInstantiate(function(Category $category): void {})
         ;
-    }
-
-    public static function class(): string
-    {
-        return Category::class;
     }
 }

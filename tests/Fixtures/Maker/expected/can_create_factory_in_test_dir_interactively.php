@@ -48,6 +48,11 @@ final class TagFactory extends PersistentObjectFactory
         parent::__construct();
     }
 
+    public static function class(): string
+    {
+        return Tag::class;
+    }
+
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      *
@@ -68,10 +73,5 @@ final class TagFactory extends PersistentObjectFactory
         return $this
             // ->afterInstantiate(function(Tag $tag): void {})
         ;
-    }
-
-    public static function class(): string
-    {
-        return Tag::class;
     }
 }

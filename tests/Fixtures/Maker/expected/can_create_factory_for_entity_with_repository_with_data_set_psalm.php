@@ -35,22 +35,6 @@ use Zenstruck\Foundry\Tests\Fixtures\Repository\PostRepository;
  * @method static Post[]|Proxy[]                 findBy(array $attributes)
  * @method static Post[]|Proxy[]                 randomRange(int $min, int $max, array $attributes = [])
  * @method static Post[]|Proxy[]                 randomSet(int $number, array $attributes = [])
- *
- * @psalm-method        Proxy<Post> create(array|callable $attributes = [])
- * @psalm-method static Proxy<Post> createOne(array $attributes = [])
- * @psalm-method static Proxy<Post> find(object|array|mixed $criteria)
- * @psalm-method static Proxy<Post> findOrCreate(array $attributes)
- * @psalm-method static Proxy<Post> first(string $sortedField = 'id')
- * @psalm-method static Proxy<Post> last(string $sortedField = 'id')
- * @psalm-method static Proxy<Post> random(array $attributes = [])
- * @psalm-method static Proxy<Post> randomOrCreate(array $attributes = [])
- * @psalm-method static RepositoryProxy<Post> repository()
- * @psalm-method static list<Proxy<Post>> all()
- * @psalm-method static list<Proxy<Post>> createMany(int $number, array|callable $attributes = [])
- * @psalm-method static list<Proxy<Post>> createSequence(iterable|callable $sequence)
- * @psalm-method static list<Proxy<Post>> findBy(array $attributes)
- * @psalm-method static list<Proxy<Post>> randomRange(int $min, int $max, array $attributes = [])
- * @psalm-method static list<Proxy<Post>> randomSet(int $number, array $attributes = [])
  */
 final class PostFactory extends PersistentObjectFactory
 {
@@ -62,6 +46,11 @@ final class PostFactory extends PersistentObjectFactory
     public function __construct()
     {
         parent::__construct();
+    }
+
+    public static function class(): string
+    {
+        return Post::class;
     }
 
     /**
@@ -87,10 +76,5 @@ final class PostFactory extends PersistentObjectFactory
         return $this
             // ->afterInstantiate(function(Post $post): void {})
         ;
-    }
-
-    public static function class(): string
-    {
-        return Post::class;
     }
 }

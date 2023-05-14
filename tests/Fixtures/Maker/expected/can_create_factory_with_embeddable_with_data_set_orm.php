@@ -48,6 +48,11 @@ final class ContactFactory extends PersistentObjectFactory
         parent::__construct();
     }
 
+    public static function class(): string
+    {
+        return Contact::class;
+    }
+
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      *
@@ -69,10 +74,5 @@ final class ContactFactory extends PersistentObjectFactory
         return $this
             // ->afterInstantiate(function(Contact $contact): void {})
         ;
-    }
-
-    public static function class(): string
-    {
-        return Contact::class;
     }
 }

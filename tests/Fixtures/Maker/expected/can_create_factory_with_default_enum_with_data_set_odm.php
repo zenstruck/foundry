@@ -49,6 +49,11 @@ final class DocumentWithEnumFactory extends PersistentObjectFactory
         parent::__construct();
     }
 
+    public static function class(): string
+    {
+        return DocumentWithEnum::class;
+    }
+
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      *
@@ -69,10 +74,5 @@ final class DocumentWithEnumFactory extends PersistentObjectFactory
         return $this
             // ->afterInstantiate(function(DocumentWithEnum $documentWithEnum): void {})
         ;
-    }
-
-    public static function class(): string
-    {
-        return DocumentWithEnum::class;
     }
 }

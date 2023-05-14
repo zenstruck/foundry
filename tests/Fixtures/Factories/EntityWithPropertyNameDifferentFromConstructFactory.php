@@ -2,11 +2,11 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\EntityWithPropertyNameDifferentFromConstruct;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObjectFactory;
 
-final class EntityWithPropertyNameDifferentFromConstructFactory extends ModelFactory
+final class EntityWithPropertyNameDifferentFromConstructFactory extends PersistentObjectFactory
 {
     protected function getDefaults(): array
     {
@@ -18,7 +18,7 @@ final class EntityWithPropertyNameDifferentFromConstructFactory extends ModelFac
         ];
     }
 
-    protected static function getClass(): string
+    public static function class(): string
     {
         return EntityWithPropertyNameDifferentFromConstruct::class;
     }

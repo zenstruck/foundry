@@ -25,6 +25,7 @@ use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\UserFactory;
 
 use function Zenstruck\Foundry\anonymous;
 use function Zenstruck\Foundry\lazy;
@@ -350,12 +351,8 @@ final class FactoryTest extends TestCase
      */
     public function can_use_arrays_for_attribute_values(): void
     {
-        $object = new class() {
-            public $value;
-        };
+        $user = UserFactory::createOne(['data' => ['foo' => 'bar']]);
 
-        $factory = anonymous($object::class)->create(['value' => ['foo' => 'bar']]);
-
-        $this->assertSame(['foo' => 'bar'], $factory->value);
+        $this->assertSame(['foo' => 'bar'], $user->getData());
     }
 }
