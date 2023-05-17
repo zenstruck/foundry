@@ -5,7 +5,7 @@ services:
         container_name: foundry_php8.0
         image: ghcr.io/zenstruck/foundry/php:8.0
         depends_on:
-            mysql:
+            postgres:
                 condition: service_healthy
             mongo:
                 condition: service_healthy
@@ -25,17 +25,19 @@ services:
         container_name: foundry_php8.2
         image: ghcr.io/zenstruck/foundry/php:8.2
 
-    mysql:
-        container_name: foundry_mysql
-        image: mysql
-        command: --default-authentication-plugin=mysql_native_password
+    postgres:
+        container_name: foundry_postgres
+        image: postgres:15
         environment:
-            MYSQL_ROOT_PASSWORD: root
-            MYSQL_DATABASE: zenstruck_foundry
+            POSTGRES_DB: zenstruck_foundry
+            POSTGRES_PASSWORD: zenstruck
+            POSTGRES_USER: zenstruck
+        volumes:
+            - db-data:/var/lib/postgresql/data:rw
         ports:
-            - ${MYSQL_PORT:-3306}:3306
+            - ${PGSQL_PORT:-5432}:5432
         healthcheck:
-            test: 'mysql -u root -proot -D zenstruck_foundry -e "SELECT 1"'
+            test: 'pg_isready -d zenstruck_foundry'
             timeout: 120s
             retries: 60
             interval: 2s
@@ -59,3 +61,6 @@ services:
             test: echo 'db.runCommand("ping").ok' | mongo mongo:27017/test --quiet
             timeout: 10s
             retries: 10
+
+volumes:
+    db-data:

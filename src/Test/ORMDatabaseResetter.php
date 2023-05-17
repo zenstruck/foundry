@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Foundry\Test;
 
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
@@ -101,9 +103,24 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
     private function dropAndResetDatabase(): void
     {
         foreach ($this->connectionsToReset() as $connection) {
+            $databasePlatform = $this->registry->getConnection($connection)->getDatabasePlatform();
+
+            if ($databasePlatform instanceof PostgreSQLPlatform) {
+                // let's drop all connections to the database to be able to drop it
+                $this->runCommand(
+                    $this->application,
+                    'doctrine:query:sql',
+                    [
+                        '--connection' => $connection,
+                        'sql' => 'SELECT pid, pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = current_database() AND pid <> pg_backend_pid()',
+                    ],
+                    canFail: true,
+                );
+            }
+
             $dropParams = ['--connection' => $connection, '--force' => true];
 
-            if ('sqlite' !== $this->registry->getConnection($connection)->getDatabasePlatform()->getName()) {
+            if (!$databasePlatform instanceof SqlitePlatform) {
                 // sqlite does not support "--if-exists" (ref: https://github.com/doctrine/dbal/pull/2402)
                 $dropParams['--if-exists'] = true;
             }

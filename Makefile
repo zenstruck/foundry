@@ -3,7 +3,7 @@
 SHELL=/bin/bash
 
 # DB variables
-MYSQL_URL="mysql://root:root@mysql:3306/zenstruck_foundry?charset=utf8"
+PGSQL_URL="postgresql://zenstruck:zenstruck@postgres:5432/zenstruck_foundry?serverVersion=15"
 MONGO_URL="mongodb://mongo:mongo@mongo:27017/mongo?compressors=disabled&amp;gssapiServiceName=mongodb&authSource=mongo"
 
 # Default test context variables
@@ -47,10 +47,10 @@ endif
 # Create special context for CI
 INTERACTIVE:=$(shell [ -t 0 ] && echo 1)
 ifdef INTERACTIVE
-	DC_EXEC=$(DOCKER_COMPOSE) exec -e USE_FOUNDRY_BUNDLE=${USE_FOUNDRY_BUNDLE} -e DATABASE_URL=${MYSQL_URL} -e MONGO_URL=${MONGO_URL}
+	DC_EXEC=$(DOCKER_COMPOSE) exec -e USE_FOUNDRY_BUNDLE=${USE_FOUNDRY_BUNDLE} -e DATABASE_URL=${PGSQL_URL} -e MONGO_URL=${MONGO_URL}
 else
 	# CI needs to be ran in no-tty mode
-	DC_EXEC=$(DOCKER_COMPOSE) exec -e USE_FOUNDRY_BUNDLE=${USE_FOUNDRY_BUNDLE} -e DATABASE_URL=${MYSQL_URL} -e MONGO_URL=${MONGO_URL} -T
+	DC_EXEC=$(DOCKER_COMPOSE) exec -e USE_FOUNDRY_BUNDLE=${USE_FOUNDRY_BUNDLE} -e DATABASE_URL=${PGSQL_URL} -e MONGO_URL=${MONGO_URL} -T
 endif
 
 PHP=php${PHP_VERSION}
@@ -141,7 +141,7 @@ docker-build: ### Build and start containers
 .PHONY: docker-start
 docker-start: ### Start containers
 	@echo -e "\nStarting containers. This could take up to one minute.\n"
-	@$(DOCKER_COMPOSE) up --detach --no-build --remove-orphans mysql mongo "${PHP}";
+	@$(DOCKER_COMPOSE) up --detach --no-build --remove-orphans postgres mongo "${PHP}";
 
 .PHONY: docker-stop
 docker-stop: ### Stop containers

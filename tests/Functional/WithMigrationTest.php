@@ -28,22 +28,19 @@ final class WithMigrationTest extends KernelTestCase
     /**
      * @test
      */
-    public function it_generates_a_valid_schema(): void
+    public function it_can_use_schema_reset_with_migration(): void
     {
         $kernel = static::bootKernel();
+
+        // assert schema is valid
         $validator = new SchemaValidator($kernel->getContainer()->get('doctrine')->getManager());
         self::assertEmpty(
             $validator->validateMapping(),
             \implode("\n", \array_map(static fn($s): string => \implode("\n", $s), $validator->validateMapping()))
         );
         self::assertTrue($validator->schemaInSyncWithMetadata());
-    }
 
-    /**
-     * @test
-     */
-    public function it_can_use_schema_reset_with_migration(): void
-    {
+        // assert it can be used
         PostFactory::createOne();
         PostFactory::assert()->count(1);
     }
@@ -54,6 +51,10 @@ final class WithMigrationTest extends KernelTestCase
         // but it also calls "static::createKernel()" which we can use to skip test if USE_ORM is false.
         if (!\getenv('USE_ORM')) {
             self::markTestSkipped('doctrine/orm not enabled.');
+        }
+
+        if (!str_starts_with(\getenv('DATABASE_URL'), 'postgres')) {
+            self::markTestSkipped('Can only test migrations with postgresql.');
         }
 
         return Kernel::create(true, ORMDatabaseResetter::RESET_MODE_MIGRATE);

@@ -87,8 +87,7 @@ PREFER_LOWEST=1 # force composer to request lowest dependencies
 
 You can also add these variables to the `.env` file to change the ports used by docker:
 ```dotenv
-MYSQL_PORT=3307
-POSTGRES_PORT=5434
+PGSQL_PORT=5434
 MONGO_PORT=27018
 ```
 

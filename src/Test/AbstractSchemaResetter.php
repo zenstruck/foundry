@@ -22,14 +22,14 @@ abstract class AbstractSchemaResetter
 {
     abstract public function resetSchema(): void;
 
-    protected function runCommand(Application $application, string $command, array $parameters = []): void
+    protected function runCommand(Application $application, string $command, array $parameters = [], bool $canFail = false): void
     {
         $exit = $application->run(
             new ArrayInput(\array_merge(['command' => $command], $parameters)),
             $output = new BufferedOutput()
         );
 
-        if (0 !== $exit) {
+        if (0 !== $exit && !$canFail) {
             throw new \RuntimeException(\sprintf('Error running "%s": %s', $command, $output->fetch()));
         }
     }
