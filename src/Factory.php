@@ -15,7 +15,6 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Faker;
-use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Zenstruck\Foundry\Exception\FoundryBootException;
 use Zenstruck\Foundry\Persistence\InversedRelationshipPostPersistCallback;
 use Zenstruck\Foundry\Persistence\PostPersistCallback;

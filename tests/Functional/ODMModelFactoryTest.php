@@ -11,7 +11,6 @@
 
 namespace Zenstruck\Foundry\Tests\Functional;
 
-use App\Factory\ODMCommentFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMCategory;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMComment;
