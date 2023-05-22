@@ -48,6 +48,11 @@ class Category
         $this->name = $name;
     }
 
+    public function updateName(?string $name): void
+    {
+        $this->name = $name;
+    }
+
     public function getPosts(): Collection
     {
         return $this->posts;

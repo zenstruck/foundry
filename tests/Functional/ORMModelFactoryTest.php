@@ -105,6 +105,22 @@ final class ORMModelFactoryTest extends ModelFactoryTest
     /**
      * @test
      */
+    public function one_to_many_with_two_relationships_same_entity_and_adders(): void
+    {
+        $category = CategoryFactory::createOne([
+            'addPost' => PostFactory::new(),
+            'addSecondaryPost' => PostFactory::new(),
+        ]);
+
+        $this->assertCount(1, $category->getPosts());
+        $this->assertCount(1, $category->getSecondaryPosts());
+        PostFactory::assert()->count(2);
+        CategoryFactory::assert()->count(1);
+    }
+
+    /**
+     * @test
+     */
     public function inverse_one_to_many_relationship_without_cascade(): void
     {
         UserFactory::createOne([
@@ -620,6 +636,44 @@ final class ORMModelFactoryTest extends ModelFactoryTest
         EntityWithEnumFactory::assert()->count(1);
 
         self::assertSame($entityWithEnum->object(), $entityWithEnum2->object());
+    }
+
+    /**
+     * @test
+     * @dataProvider addManyToOneWithExtraAttributes
+     */
+    public function it_adds_many_to_one_with_extra_attributes(string $extraAttributeName): void
+    {
+        $post = PostFactory::createOne([$extraAttributeName => CategoryFactory::new(['name' => 'category name'])]);
+
+        self::assertSame('category name', $post->getCategory()->getName());
+        CategoryFactory::assert()->count(1);
+        PostFactory::assert()->count(1);
+    }
+
+    public static function addManyToOneWithExtraAttributes(): iterable
+    {
+        yield ['extraCategoryBeforeInstantiate'];
+        yield ['extraCategoryAfterInstantiate'];
+    }
+
+    /**
+     * @test
+     * @dataProvider addOneToManyWithExtraAttributes
+     */
+    public function it_adds_one_to_many_with_extra_attributes(string $extraAttributeName): void
+    {
+        $category = CategoryFactory::createOne([$extraAttributeName => PostFactory::createMany(2)]);
+
+        self::assertCount(2, $category->getPosts());
+        CategoryFactory::assert()->count(1);
+        PostFactory::assert()->count(2);
+    }
+
+    public static function addOneToManyWithExtraAttributes(): iterable
+    {
+        yield ['extraPostsBeforeInstantiate'];
+        yield ['extraPostsAfterInstantiate'];
     }
 
     protected function categoryClass(): string
