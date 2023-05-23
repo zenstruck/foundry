@@ -43,33 +43,21 @@ final class Version20230513160346 extends AbstractMigration
         $this->addSql('ALTER TABLE entity_with_relations ADD CONSTRAINT FK_A9C9EC96FF92FDCA FOREIGN KEY (manyToOneWithNotExistingFactory_id) REFERENCES brand_cascade (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE product_tag ADD CONSTRAINT FK_E3A6E39C4584665A FOREIGN KEY (product_id) REFERENCES product_cascade (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE product_tag ADD CONSTRAINT FK_E3A6E39CBAD26311 FOREIGN KEY (tag_id) REFERENCES tag_cascade (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
+
+        $this->addSql('CREATE SEQUENCE entity_with_property_name_different_from_construct_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE TABLE entity_with_property_name_different_from_construct (id INT NOT NULL, entity_id INT DEFAULT NULL, someField VARCHAR(255) NOT NULL, address_value VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE INDEX IDX_AA016C6381257D5D ON entity_with_property_name_different_from_construct (entity_id)');
+        $this->addSql('ALTER TABLE entity_with_property_name_different_from_construct ADD CONSTRAINT FK_AA016C6381257D5D FOREIGN KEY (entity_id) REFERENCES entity_for_relations (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+
+        if (PHP_VERSION_ID < 80100) {
+            return;
+        }
+
+        $this->addSql('CREATE SEQUENCE entity_with_enum_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE TABLE entity_with_enum (id INT NOT NULL, enum VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
     }
 
     public function down(Schema $schema): void
     {
-        // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('DROP SEQUENCE brand_cascade_id_seq CASCADE');
-        $this->addSql('DROP SEQUENCE category_cascade_id_seq CASCADE');
-        $this->addSql('DROP SEQUENCE image_cascade_id_seq CASCADE');
-        $this->addSql('DROP SEQUENCE product_cascade_id_seq CASCADE');
-        $this->addSql('DROP SEQUENCE review_cascade_id_seq CASCADE');
-        $this->addSql('DROP SEQUENCE tag_cascade_id_seq CASCADE');
-        $this->addSql('DROP SEQUENCE variant_cascade_id_seq CASCADE');
-        $this->addSql('ALTER TABLE product_cascade DROP CONSTRAINT FK_D7FE16D844F5D008');
-        $this->addSql('ALTER TABLE review_cascade DROP CONSTRAINT FK_9DC9B99F4584665A');
-        $this->addSql('ALTER TABLE variant_cascade DROP CONSTRAINT FK_6982202E4584665A');
-        $this->addSql('ALTER TABLE variant_cascade DROP CONSTRAINT FK_6982202E3DA5256D');
-        $this->addSql('ALTER TABLE entity_with_relations DROP CONSTRAINT FK_A9C9EC96FF92FDCA');
-        $this->addSql('ALTER TABLE productcategory_product DROP CONSTRAINT FK_5BC2A6A2E26A32B1');
-        $this->addSql('ALTER TABLE productcategory_product DROP CONSTRAINT FK_5BC2A6A24584665A');
-        $this->addSql('ALTER TABLE product_tag DROP CONSTRAINT FK_E3A6E39C4584665A');
-        $this->addSql('ALTER TABLE product_tag DROP CONSTRAINT FK_E3A6E39CBAD26311');
-        $this->addSql('DROP TABLE brand_cascade');
-        $this->addSql('DROP TABLE category_cascade');
-        $this->addSql('DROP TABLE image_cascade');
-        $this->addSql('DROP TABLE product_cascade');
-        $this->addSql('DROP TABLE review_cascade');
-        $this->addSql('DROP TABLE tag_cascade');
-        $this->addSql('DROP TABLE variant_cascade');
     }
 }
