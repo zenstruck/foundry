@@ -32,9 +32,7 @@ RUN set -eux ; \
     pecl clear-cache ; \
     apt-get remove -y $PHPIZE_DEPS zlib1g-dev libcurl4-openssl-dev pkg-config libssl-dev ; \
     rm -rf /var/lib/apt/lists/* ; \
-    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false ; \
-    composer global require --no-progress --no-scripts --no-plugins symfony/flex ; \
-    composer global config --no-plugins allow-plugins.symfony/flex true
+    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false
 
 LABEL org.opencontainers.image.source="https://github.com/zenstruck/foundry"
 
@@ -57,5 +55,8 @@ RUN addgroup --system --gid ${UID} ${USER} ; \
     sed -i "s/%xdebug_host%/${XDEBUG_HOST}/g" /usr/local/etc/php/conf.d/xdebug.ini
 
 USER ${USER}
+
+RUN composer global require --no-progress --no-scripts --no-plugins symfony/flex ; \
+    composer global config --no-plugins allow-plugins.symfony/flex true
 
 CMD tail -f /dev/null

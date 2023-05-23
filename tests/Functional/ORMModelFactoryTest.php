@@ -18,7 +18,9 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\AddressFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CommentFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ContactFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\EntityForRelationsFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\EntityWithEnumFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\EntityWithPropertyNameDifferentFromConstructFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithInvalidInitialize;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactoryWithNullInitialize;
@@ -674,6 +676,16 @@ final class ORMModelFactoryTest extends ModelFactoryTest
     {
         yield ['extraPostsBeforeInstantiate'];
         yield ['extraPostsAfterInstantiate'];
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_create_entity_with_property_name_different_from_constructor_name(): void
+    {
+        EntityWithPropertyNameDifferentFromConstructFactory::createOne();
+        EntityWithPropertyNameDifferentFromConstructFactory::assert()->count(1);
+        EntityForRelationsFactory::assert()->count(1);
     }
 
     protected function categoryClass(): string
