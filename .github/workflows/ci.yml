@@ -8,7 +8,7 @@ on:
 
 jobs:
   tests:
-    name: PHP ${{ matrix.php }}, SF ${{ matrix.symfony }} - ${{ matrix.deps }} ${{ matrix.use-orm == '1' && '- ORM' || '' }} ${{ matrix.use-odm == '1' && '- ODM' || '' }} ${{ matrix.use-dama == '1' && '- DAMA' || '' }}
+    name: PHP ${{ matrix.php }}, SF ${{ matrix.symfony }} - ${{ matrix.deps }} ${{ matrix.use-orm == '1' && (matrix.orm-db == 'postgres' && '- ORM (postgres)' || '- ORM (mysql)') || '' }} ${{ matrix.use-odm == '1' && '- ODM' || '' }} ${{ matrix.use-dama == '1' && '- DAMA' || '' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -19,6 +19,7 @@ jobs:
         use-orm: [1]
         use-odm: [1]
         use-dama: [1]
+        orm-db: [postgres]
         exclude:
           - {use-orm: 0, use-odm: 0} # tested directly in a test case
           - {use-orm: 0, use-dama: 1} # cannot happen
@@ -26,13 +27,15 @@ jobs:
           - {php: 8.0, symfony: 6.2.*}
           - {php: 8.0, symfony: 6.3.*}
         include:
-          - {php: 8.0, symfony: 5.4.*, use-orm: 1, use-odm: 0, use-dama: 0, deps: lowest}
-          - {php: 8.0, symfony: 5.4.*, use-orm: 1, use-odm: 1, use-dama: 0, deps: lowest}
-          - {php: 8.0, symfony: 5.4.*, use-orm: 0, use-odm: 1, use-dama: 0, deps: lowest}
-          - {php: 8.2, symfony: 6.2.*, use-orm: 1, use-odm: 0, use-dama: 0, deps: highest}
-          - {php: 8.2, symfony: 6.2.*, use-orm: 1, use-odm: 1, use-dama: 0, deps: highest}
-          - {php: 8.2, symfony: 6.2.*, use-orm: 1, use-odm: 0, use-dama: 1, deps: highest}
-          - {php: 8.2, symfony: 6.2.*, use-orm: 0, use-odm: 1, use-dama: 0, deps: highest}
+          - {php: 8.0, symfony: 5.4.*, use-orm: 1, use-odm: 0, use-dama: 0, deps: lowest, orm-db: postgres}
+          - {php: 8.0, symfony: 5.4.*, use-orm: 1, use-odm: 1, use-dama: 0, deps: lowest, orm-db: postgres}
+          - {php: 8.0, symfony: 5.4.*, use-orm: 0, use-odm: 1, use-dama: 0, deps: lowest, orm-db: postgres}
+          - {php: 8.2, symfony: 6.2.*, use-orm: 1, use-odm: 0, use-dama: 0, deps: highest, orm-db: postgres}
+          - {php: 8.2, symfony: 6.2.*, use-orm: 1, use-odm: 1, use-dama: 0, deps: highest, orm-db: postgres}
+          - {php: 8.2, symfony: 6.2.*, use-orm: 1, use-odm: 0, use-dama: 1, deps: highest, orm-db: postgres}
+          - {php: 8.2, symfony: 6.2.*, use-orm: 0, use-odm: 1, use-dama: 0, deps: highest, orm-db: postgres}
+          - {php: 8.2, symfony: 6.2.*, use-orm: 1, use-odm: 0, use-dama: 1, deps: highest, orm-db: mysql}
+          - {php: 8.2, symfony: 6.2.*, use-orm: 1, use-odm: 0, use-dama: 0, deps: highest, orm-db: mysql}
 
     services:
       mysql:
@@ -42,13 +45,25 @@ jobs:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: zenstruck_foundry_${{ matrix.use-dama }}_${{ matrix.orm-db }}
+          POSTGRES_PASSWORD: 1234
+        options: --health-cmd pg_isready --health-interval=10s --health-timeout=5s --health-retries=5
+        ports:
+          - 5432:5432
+
       mongo:
         image: mongo:4
         ports:
           - 27017:27017
 
     env:
-      DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+      MYSQL_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+      PGSQL_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry_${{ matrix.use-dama }}_${{ matrix.orm-db }}?charset=utf8&serverVersion=15
       MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
 
     steps:
@@ -85,6 +100,7 @@ jobs:
           USE_ORM: ${{ matrix.use-orm }}
           USE_ODM: ${{ matrix.use-odm }}
           USE_FOUNDRY_BUNDLE: 1
+          DATABASE_URL: ${{ matrix.orm-db == 'postgres' && env.PGSQL_URL || env.MYSQL_URL }}
 
   code-coverage:
     name: Code Coverage
