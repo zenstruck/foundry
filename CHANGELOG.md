@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## [v1.33.0](https://github.com/zenstruck/foundry/releases/tag/v1.33.0)
+
+May 23rd, 2023 - [v1.32.0...v1.33.0](https://github.com/zenstruck/foundry/compare/v1.32.0...v1.33.0)
+
+* 98eca98 tests: can create object with fields name different from construct (#466) by @nikophil
+* b48399d feat: drop all connections before dropping db for postgres (#458) by @nikophil
+* c2719d1 dependencies: bump faker to 1.10 (#464) by @nikophil
+* a5ed31c feat: allow setters as factory attribute (#457) by @nikophil
+
 ## [v1.32.0](https://github.com/zenstruck/foundry/releases/tag/v1.32.0)
 
 May 11th, 2023 - [v1.31.0...v1.32.0](https://github.com/zenstruck/foundry/compare/v1.31.0...v1.32.0)
