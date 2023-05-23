@@ -53,7 +53,7 @@ final class WithMigrationTest extends KernelTestCase
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
-        if (!str_starts_with(\getenv('DATABASE_URL'), 'postgres')) {
+        if (!\str_starts_with(\getenv('DATABASE_URL'), 'postgres')) {
             self::markTestSkipped('Can only test migrations with postgresql.');
         }
 

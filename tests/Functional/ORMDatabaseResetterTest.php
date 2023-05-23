@@ -32,7 +32,7 @@ final class ORMDatabaseResetterTest extends KernelTestCase
             self::markTestSkipped('doctrine/orm is not enabled.');
         }
 
-        if (!str_starts_with(\getenv('DATABASE_URL'), 'postgres')) {
+        if (!\str_starts_with(\getenv('DATABASE_URL'), 'postgres')) {
             self::markTestSkipped('Can only test migrations with postgresql.');
         }
     }
