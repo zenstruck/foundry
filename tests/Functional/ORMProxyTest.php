@@ -48,7 +48,8 @@ final class ORMProxyTest extends ProxyTest
     public function can_autorefresh_entity_with_embedded_object(): void
     {
         $contact = anonymous(Contact::class)->create(['name' => 'john'])
-            ->enableAutoRefresh();
+            ->enableAutoRefresh()
+        ;
 
         $this->assertSame('john', $contact->getName());
 

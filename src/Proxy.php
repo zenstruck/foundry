@@ -125,8 +125,8 @@ final class Proxy implements \Stringable
             $om->getUnitOfWork()->computeChangeSet($om->getClassMetadata($this->class), $this->object);
 
             if (
-                ($om instanceof EntityManagerInterface && !empty($om->getUnitOfWork()->getEntityChangeSet($this->object))) ||
-                ($om instanceof DocumentManager && !empty($om->getUnitOfWork()->getDocumentChangeSet($this->object)))) {
+                ($om instanceof EntityManagerInterface && !empty($om->getUnitOfWork()->getEntityChangeSet($this->object)))
+                || ($om instanceof DocumentManager && !empty($om->getUnitOfWork()->getDocumentChangeSet($this->object)))) {
                 throw new \RuntimeException(\sprintf('Cannot auto refresh "%s" as there are unsaved changes. Be sure to call ->save() or disable auto refreshing (see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#auto-refresh for details).', $this->class));
             }
         }
