@@ -21,7 +21,7 @@ use function Symfony\Component\String\u;
  * @author Kevin Bond <kevinbond@gmail.com>
  * @template T of object
  *
- * @phpstan-import-type Parameters from BaseFactory
+ * @psalm-import-type Parameters from BaseFactory
  */
 final class Instantiator
 {

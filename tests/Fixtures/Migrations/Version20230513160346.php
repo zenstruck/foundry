@@ -48,6 +48,7 @@ final class Version20230513160346 extends AbstractMigration
         $this->addSql('CREATE TABLE entity_with_property_name_different_from_construct (id INT NOT NULL, entity_id INT DEFAULT NULL, someField VARCHAR(255) NOT NULL, address_value VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_AA016C6381257D5D ON entity_with_property_name_different_from_construct (entity_id)');
         $this->addSql('ALTER TABLE entity_with_property_name_different_from_construct ADD CONSTRAINT FK_AA016C6381257D5D FOREIGN KEY (entity_id) REFERENCES entity_for_relations (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE users ADD data JSON NOT NULL;');
 
         if (PHP_VERSION_ID < 80100) {
             return;

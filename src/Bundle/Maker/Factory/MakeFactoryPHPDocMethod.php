@@ -52,27 +52,20 @@ final class MakeFactoryPHPDocMethod
         return $methods;
     }
 
-    public function toString(string|null $staticAnalysisTool = null): string
+    public function toString(): string
     {
-        $annotation = $staticAnalysisTool ? "{$staticAnalysisTool}-method" : 'method';
         $static = $this->isStatic ? 'static' : '      ';
 
         if ($this->repository) {
-            $returnType = match ((bool) $staticAnalysisTool) {
-                false => "{$this->repository}|RepositoryProxy",
-                true => "RepositoryProxy<{$this->objectName}>",
-            };
+            $returnType = "{$this->repository}|RepositoryProxy";
         } else {
-            /** @phpstan-ignore-next-line */
-            $returnType = match ([$this->returnsCollection, (bool) $staticAnalysisTool]) {
-                [true, true] => "list<Proxy<{$this->objectName}>>",
-                [true, false] => "{$this->objectName}[]|Proxy[]",
-                [false, true] => "Proxy<{$this->objectName}>",
-                [false, false] => "{$this->objectName}|Proxy",
+            $returnType = match ($this->returnsCollection) {
+                true => "{$this->objectName}[]|Proxy[]",
+                false => "{$this->objectName}|Proxy",
             };
         }
 
-        return " * @{$annotation} {$static} {$returnType} {$this->prototype}";
+        return " * @method {$static} {$returnType} {$this->prototype}";
     }
 
     public function sortValue(): string

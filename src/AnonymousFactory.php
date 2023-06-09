@@ -20,7 +20,7 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
  *
  * @deprecated
  *
- * @phpstan-import-type SequenceAttributes from BaseFactory
+ * @psalm-import-type SequenceAttributes from BaseFactory
  */
 final class AnonymousFactory implements \Countable, \IteratorAggregate
 {

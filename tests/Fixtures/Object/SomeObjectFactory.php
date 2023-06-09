@@ -3,16 +3,10 @@
 namespace Zenstruck\Foundry\Tests\Fixtures\Object;
 
 use Zenstruck\Foundry\Object\ObjectFactory;
-use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\UserFactory;
 
 /**
  * @extends ObjectFactory<SomeObject>
- *
- * @method        SomeObject|Proxy create(array|callable $attributes = [])
- * @method static SomeObject|Proxy createOne(array $attributes = [])
- * @method static SomeObject[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static SomeObject[]|Proxy[] createSequence(iterable|callable $sequence)
  */
 final class SomeObjectFactory extends ObjectFactory
 {

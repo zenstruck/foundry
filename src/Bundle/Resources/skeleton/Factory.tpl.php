@@ -15,14 +15,6 @@ foreach ($makeFactoryData->getUses() as $use) {
 foreach ($makeFactoryData->getMethodsPHPDoc() as $methodPHPDoc) {
     echo "{$methodPHPDoc->toString()}\n";
 }
-
-//if ($makeFactoryData->hasStaticAnalysisTool()) {
-//    echo " *\n";
-//
-//    foreach ($makeFactoryData->getMethodsPHPDoc() as $methodPHPDoc) {
-//        echo "{$methodPHPDoc->toString($makeFactoryData->staticAnalysisTool())}\n";
-//    }
-//}
 ?>
  */
 final class <?= $class_name ?> extends PersistentObjectFactory

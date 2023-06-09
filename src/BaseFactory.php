@@ -21,11 +21,9 @@ use Zenstruck\Foundry\Exception\FoundryBootException;
  *
  * @template T
  *
- * @method static list<T> createMany(int $number, Attributes $attributes = [])
- *
- * @phpstan-type Parameters array<string,mixed>
- * @phpstan-type Attributes Parameters|(callable():Parameters)
- * @phpstan-type SequenceAttributes iterable<Parameters>|(callable(): iterable<Parameters>)
+ * @psalm-type Parameters = array<string,mixed>
+ * @psalm-type Attributes = Parameters|(callable():Parameters)
+ * @psalm-type SequenceAttributes = iterable<Parameters>|callable(): iterable<Parameters>
  */
 abstract class BaseFactory
 {
@@ -49,15 +47,6 @@ abstract class BaseFactory
         trigger_deprecation('zenstruck/foundry', '1.7', 'Calling instance method "%1$s::createMany()" is deprecated and will be removed in 2.0, use e.g. "%1$s::new()->many(%2$d)->create()" instead.', static::class, $arguments[0]);
 
         return $this->many($arguments[0])->create($arguments[1] ?? []);
-    }
-
-    public static function __callStatic(string $name, array $arguments): array
-    {
-        if ('createMany' !== $name) {
-            throw new \BadMethodCallException(\sprintf('Call to undefined static method "%s::%s".', static::class, $name));
-        }
-
-        return static::new()->many($arguments[0])->create($arguments[1] ?? []);
     }
 
     /**
@@ -116,6 +105,16 @@ abstract class BaseFactory
      * @return T
      */
     abstract public function create(array|callable $attributes = []): mixed;
+
+    /**
+     * @param Attributes $attributes
+     *
+     * @return list<T>
+     */
+    public static function createMany(int $min, array|callable $attributes = []): array
+    {
+        return static::new()->many($min)->create($attributes);
+    }
 
     /**
      * @param int|null $max If set, when created, the collection will be a random size between $min and $max
