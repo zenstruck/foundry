@@ -286,7 +286,10 @@ should have. `Faker`_ is available to easily get random data:
         protected function getDefaults(): array
         {
             return [
+                // Call CategoryFactory::random() everytime this factory is instantiated
                 'category' => new LazyValue(fn() => CategoryFactory::random()),
+                // Memoize the result of the callback, so the same Category wil be used everytime
+                'category' => LazyValue::memoize(fn() => CategoryFactory::random()),
 
                 'file' => lazy(fn() => create_temp_file()), // or use the lazy() helper function
             ];
