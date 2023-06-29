@@ -59,4 +59,24 @@ final class LazyValueTest extends TestCase
 
         $this->assertSame([5, 'foo', 6, 'foo' => ['bar' => 7, 'baz' => 'foo'], [8, 'foo']], $value());
     }
+
+    /**
+     * @test
+     */
+    public function does_not_memoize_value_by_default(): void
+    {
+        $value = new LazyValue(fn () => new \stdClass());
+
+        $this->assertNotSame($value(), $value());
+    }
+
+    /**
+     * @test
+     */
+    public function can_handle_memoized_value(): void
+    {
+        $value = LazyValue::memoize(fn () => new \stdClass());
+
+        $this->assertSame($value(), $value());
+    }
 }

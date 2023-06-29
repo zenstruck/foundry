@@ -19,12 +19,24 @@ final class LazyValue
     /** @var callable():mixed */
     private $factory;
 
+    /** @var bool */
+    private $memoize;
+
+    /** @var mixed */
+    private $memoizedValue = null;
+
     /**
      * @param callable():mixed $factory
      */
-    public function __construct(callable $factory)
+    public function __construct(callable $factory, bool $memoize = false)
     {
         $this->factory = $factory;
+        $this->memoize = $memoize;
+    }
+
+    public static function memoize(callable $factory): self
+    {
+        return new self($factory, true);
     }
 
     /**
@@ -32,14 +44,22 @@ final class LazyValue
      */
     public function __invoke(): mixed
     {
+        if ($this->memoize && null !== $this->memoizedValue) {
+            return $this->memoizedValue;
+        }
+
         $value = ($this->factory)();
 
         if ($value instanceof self) {
-            return ($value)();
+            $value = ($value)();
         }
 
         if (\is_array($value)) {
-            return self::normalizeArray($value);
+            $value = self::normalizeArray($value);
+        }
+
+        if ($this->memoize) {
+            $this->memoizedValue = $value;
         }
 
         return $value;

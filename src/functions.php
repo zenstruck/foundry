@@ -132,3 +132,13 @@ function lazy(callable $factory): LazyValue
 {
     return new LazyValue($factory);
 }
+
+/**
+ * @see LazyValue::memoize
+ *
+ * @param callable():mixed $factory
+ */
+function memoize(callable $factory): LazyValue
+{
+    return LazyValue::memoize($factory);
+}
