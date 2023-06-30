@@ -52,19 +52,18 @@ final class FunctionsTest extends TestCase
      */
     public function lazy(): void
     {
-        $callback = new LazyValue(fn () => new \stdClass());
-        $value = lazy($callback);
+        $value = lazy(fn () => new \stdClass());
 
         $this->assertInstanceOf(LazyValue::class, $value);
         $this->assertNotSame($value(), $value());
     }
+
     /**
      * @test
      */
     public function memoize(): void
     {
-        $callback = new LazyValue(fn () => new \stdClass());
-        $value = memoize($callback);
+        $value = memoize(fn () => new \stdClass());
 
         $this->assertInstanceOf(LazyValue::class, $value);
         $this->assertSame($value(), $value());
