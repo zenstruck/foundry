@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Factory;
 
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
@@ -12,21 +21,21 @@ use Zenstruck\Foundry\Tests\Fixtures\PHP81\SomeEnum;
 /**
  * @extends ModelFactory<DocumentWithEnum>
  *
- * @method        DocumentWithEnum|Proxy create(array|callable $attributes = [])
- * @method static DocumentWithEnum|Proxy createOne(array $attributes = [])
- * @method static DocumentWithEnum|Proxy find(object|array|mixed $criteria)
- * @method static DocumentWithEnum|Proxy findOrCreate(array $attributes)
- * @method static DocumentWithEnum|Proxy first(string $sortedField = 'id')
- * @method static DocumentWithEnum|Proxy last(string $sortedField = 'id')
- * @method static DocumentWithEnum|Proxy random(array $attributes = [])
- * @method static DocumentWithEnum|Proxy randomOrCreate(array $attributes = [])
+ * @method        DocumentWithEnum|Proxy             create(array|callable $attributes = [])
+ * @method static DocumentWithEnum|Proxy             createOne(array $attributes = [])
+ * @method static DocumentWithEnum|Proxy             find(object|array|mixed $criteria)
+ * @method static DocumentWithEnum|Proxy             findOrCreate(array $attributes)
+ * @method static DocumentWithEnum|Proxy             first(string $sortedField = 'id')
+ * @method static DocumentWithEnum|Proxy             last(string $sortedField = 'id')
+ * @method static DocumentWithEnum|Proxy             random(array $attributes = [])
+ * @method static DocumentWithEnum|Proxy             randomOrCreate(array $attributes = [])
  * @method static DocumentRepository|RepositoryProxy repository()
- * @method static DocumentWithEnum[]|Proxy[] all()
- * @method static DocumentWithEnum[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static DocumentWithEnum[]|Proxy[] createSequence(iterable|callable $sequence)
- * @method static DocumentWithEnum[]|Proxy[] findBy(array $attributes)
- * @method static DocumentWithEnum[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
- * @method static DocumentWithEnum[]|Proxy[] randomSet(int $number, array $attributes = [])
+ * @method static DocumentWithEnum[]|Proxy[]         all()
+ * @method static DocumentWithEnum[]|Proxy[]         createMany(int $number, array|callable $attributes = [])
+ * @method static DocumentWithEnum[]|Proxy[]         createSequence(iterable|callable $sequence)
+ * @method static DocumentWithEnum[]|Proxy[]         findBy(array $attributes)
+ * @method static DocumentWithEnum[]|Proxy[]         randomRange(int $min, int $max, array $attributes = [])
+ * @method static DocumentWithEnum[]|Proxy[]         randomSet(int $number, array $attributes = [])
  */
 final class DocumentWithEnumFactory extends ModelFactory
 {

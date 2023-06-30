@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Factory;
 
 use Doctrine\ORM\EntityRepository;
@@ -12,21 +21,21 @@ use Zenstruck\Foundry\Tests\Fixtures\PHP81\SomeEnum;
 /**
  * @extends ModelFactory<EntityWithEnum>
  *
- * @method        EntityWithEnum|Proxy create(array|callable $attributes = [])
- * @method static EntityWithEnum|Proxy createOne(array $attributes = [])
- * @method static EntityWithEnum|Proxy find(object|array|mixed $criteria)
- * @method static EntityWithEnum|Proxy findOrCreate(array $attributes)
- * @method static EntityWithEnum|Proxy first(string $sortedField = 'id')
- * @method static EntityWithEnum|Proxy last(string $sortedField = 'id')
- * @method static EntityWithEnum|Proxy random(array $attributes = [])
- * @method static EntityWithEnum|Proxy randomOrCreate(array $attributes = [])
+ * @method        EntityWithEnum|Proxy             create(array|callable $attributes = [])
+ * @method static EntityWithEnum|Proxy             createOne(array $attributes = [])
+ * @method static EntityWithEnum|Proxy             find(object|array|mixed $criteria)
+ * @method static EntityWithEnum|Proxy             findOrCreate(array $attributes)
+ * @method static EntityWithEnum|Proxy             first(string $sortedField = 'id')
+ * @method static EntityWithEnum|Proxy             last(string $sortedField = 'id')
+ * @method static EntityWithEnum|Proxy             random(array $attributes = [])
+ * @method static EntityWithEnum|Proxy             randomOrCreate(array $attributes = [])
  * @method static EntityRepository|RepositoryProxy repository()
- * @method static EntityWithEnum[]|Proxy[] all()
- * @method static EntityWithEnum[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static EntityWithEnum[]|Proxy[] createSequence(iterable|callable $sequence)
- * @method static EntityWithEnum[]|Proxy[] findBy(array $attributes)
- * @method static EntityWithEnum[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
- * @method static EntityWithEnum[]|Proxy[] randomSet(int $number, array $attributes = [])
+ * @method static EntityWithEnum[]|Proxy[]         all()
+ * @method static EntityWithEnum[]|Proxy[]         createMany(int $number, array|callable $attributes = [])
+ * @method static EntityWithEnum[]|Proxy[]         createSequence(iterable|callable $sequence)
+ * @method static EntityWithEnum[]|Proxy[]         findBy(array $attributes)
+ * @method static EntityWithEnum[]|Proxy[]         randomRange(int $min, int $max, array $attributes = [])
+ * @method static EntityWithEnum[]|Proxy[]         randomSet(int $number, array $attributes = [])
  */
 final class EntityWithEnumFactory extends ModelFactory
 {

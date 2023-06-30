@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Factory;
 
 use App\Factory\Cascade\BrandFactory;
@@ -13,21 +22,21 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 /**
  * @extends ModelFactory<EntityWithRelations>
  *
- * @method        EntityWithRelations|Proxy create(array|callable $attributes = [])
- * @method static EntityWithRelations|Proxy createOne(array $attributes = [])
- * @method static EntityWithRelations|Proxy find(object|array|mixed $criteria)
- * @method static EntityWithRelations|Proxy findOrCreate(array $attributes)
- * @method static EntityWithRelations|Proxy first(string $sortedField = 'id')
- * @method static EntityWithRelations|Proxy last(string $sortedField = 'id')
- * @method static EntityWithRelations|Proxy random(array $attributes = [])
- * @method static EntityWithRelations|Proxy randomOrCreate(array $attributes = [])
+ * @method        EntityWithRelations|Proxy        create(array|callable $attributes = [])
+ * @method static EntityWithRelations|Proxy        createOne(array $attributes = [])
+ * @method static EntityWithRelations|Proxy        find(object|array|mixed $criteria)
+ * @method static EntityWithRelations|Proxy        findOrCreate(array $attributes)
+ * @method static EntityWithRelations|Proxy        first(string $sortedField = 'id')
+ * @method static EntityWithRelations|Proxy        last(string $sortedField = 'id')
+ * @method static EntityWithRelations|Proxy        random(array $attributes = [])
+ * @method static EntityWithRelations|Proxy        randomOrCreate(array $attributes = [])
  * @method static EntityRepository|RepositoryProxy repository()
- * @method static EntityWithRelations[]|Proxy[] all()
- * @method static EntityWithRelations[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static EntityWithRelations[]|Proxy[] createSequence(iterable|callable $sequence)
- * @method static EntityWithRelations[]|Proxy[] findBy(array $attributes)
- * @method static EntityWithRelations[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
- * @method static EntityWithRelations[]|Proxy[] randomSet(int $number, array $attributes = [])
+ * @method static EntityWithRelations[]|Proxy[]    all()
+ * @method static EntityWithRelations[]|Proxy[]    createMany(int $number, array|callable $attributes = [])
+ * @method static EntityWithRelations[]|Proxy[]    createSequence(iterable|callable $sequence)
+ * @method static EntityWithRelations[]|Proxy[]    findBy(array $attributes)
+ * @method static EntityWithRelations[]|Proxy[]    randomRange(int $min, int $max, array $attributes = [])
+ * @method static EntityWithRelations[]|Proxy[]    randomSet(int $number, array $attributes = [])
  */
 final class EntityWithRelationsFactory extends ModelFactory
 {

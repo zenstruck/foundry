@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Factory;
 
 use Zenstruck\Foundry\ModelFactory;
@@ -11,21 +20,21 @@ use Zenstruck\Foundry\Tests\Fixtures\Repository\PostRepository;
 /**
  * @extends ModelFactory<Post>
  *
- * @method        Post|Proxy create(array|callable $attributes = [])
- * @method static Post|Proxy createOne(array $attributes = [])
- * @method static Post|Proxy find(object|array|mixed $criteria)
- * @method static Post|Proxy findOrCreate(array $attributes)
- * @method static Post|Proxy first(string $sortedField = 'id')
- * @method static Post|Proxy last(string $sortedField = 'id')
- * @method static Post|Proxy random(array $attributes = [])
- * @method static Post|Proxy randomOrCreate(array $attributes = [])
+ * @method        Post|Proxy                     create(array|callable $attributes = [])
+ * @method static Post|Proxy                     createOne(array $attributes = [])
+ * @method static Post|Proxy                     find(object|array|mixed $criteria)
+ * @method static Post|Proxy                     findOrCreate(array $attributes)
+ * @method static Post|Proxy                     first(string $sortedField = 'id')
+ * @method static Post|Proxy                     last(string $sortedField = 'id')
+ * @method static Post|Proxy                     random(array $attributes = [])
+ * @method static Post|Proxy                     randomOrCreate(array $attributes = [])
  * @method static PostRepository|RepositoryProxy repository()
- * @method static Post[]|Proxy[] all()
- * @method static Post[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static Post[]|Proxy[] createSequence(iterable|callable $sequence)
- * @method static Post[]|Proxy[] findBy(array $attributes)
- * @method static Post[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
- * @method static Post[]|Proxy[] randomSet(int $number, array $attributes = [])
+ * @method static Post[]|Proxy[]                 all()
+ * @method static Post[]|Proxy[]                 createMany(int $number, array|callable $attributes = [])
+ * @method static Post[]|Proxy[]                 createSequence(iterable|callable $sequence)
+ * @method static Post[]|Proxy[]                 findBy(array $attributes)
+ * @method static Post[]|Proxy[]                 randomRange(int $min, int $max, array $attributes = [])
+ * @method static Post[]|Proxy[]                 randomSet(int $number, array $attributes = [])
  *
  * @phpstan-method        Proxy<Post> create(array|callable $attributes = [])
  * @phpstan-method static Proxy<Post> createOne(array $attributes = [])

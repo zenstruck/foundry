@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Factory;
 
 use Zenstruck\Foundry\ModelFactory;
@@ -9,8 +18,8 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
 /**
  * @extends ModelFactory<Address>
  *
- * @method        Address|Proxy create(array|callable $attributes = [])
- * @method static Address|Proxy createOne(array $attributes = [])
+ * @method        Address|Proxy     create(array|callable $attributes = [])
+ * @method static Address|Proxy     createOne(array $attributes = [])
  * @method static Address[]|Proxy[] createMany(int $number, array|callable $attributes = [])
  * @method static Address[]|Proxy[] createSequence(iterable|callable $sequence)
  */
