@@ -130,7 +130,7 @@ function faker(): Faker\Generator
  */
 function lazy(callable $factory): LazyValue
 {
-    return new LazyValue($factory);
+    return LazyValue::new($factory);
 }
 
 /**

@@ -271,29 +271,7 @@ should have. `Faker`_ is available to easily get random data:
 .. note::
 
     ``getDefaults()`` is called everytime a factory is instantiated (even if you don't end up
-    creating it). If you have a value for one of your attributes that has side effects (ie
-    creating a file or fetching a random existing entity from another factory), you can wrap
-    the value in a ``LazyValue``. This ensures the value is only calculated when/if it's
-    needed.
-
-    .. code-block:: php
-
-        use Zenstruck\Foundry\Attributes\LazyValue;
-        use function Zenstruck\Foundry\lazy;
-
-        // ...
-
-        protected function getDefaults(): array
-        {
-            return [
-                // Call CategoryFactory::random() everytime this factory is instantiated
-                'category' => new LazyValue(fn() => CategoryFactory::random()),
-                // Memoize the result of the callback, so the same Category wil be used everytime
-                'category' => LazyValue::memoize(fn() => CategoryFactory::random()),
-
-                'file' => lazy(fn() => create_temp_file()), // or use the lazy() helper function
-            ];
-        }
+    creating it). `Lazy values`_ allows you to ensure the value is only calculated when/if it's needed.
 
 Using your Factory
 ~~~~~~~~~~~~~~~~~~
@@ -780,7 +758,8 @@ The following assumes the ``Comment`` entity has a many-to-one relationship with
 
 .. tip::
 
-    It is also recommended that your ``ModelFactory::getDefaults()`` return a ``Factory`` and not the created entity:
+    It is also recommended that your ``ModelFactory::getDefaults()`` return a ``Factory`` and not the created entity.
+    However, you can use `Lazy values`_ if you need to create the entity in the ``getDefaults()`` method.
 
     .. code-block:: php
 
@@ -788,10 +767,15 @@ The following assumes the ``Comment`` entity has a many-to-one relationship with
         {
             return [
                 // RECOMMENDED
+                // The Post will only be created when the factory is instantiated
                 'post' => PostFactory::new(),
                 'post' => PostFactory::new()->published(),
+                // The callback will be called when the factory is instantiated, creating the Post
+                'post' => LazyValue::new(fn () => PostFactory::createOne()),
+                'post' => lazy(fn () => PostFactory::new()->published()->create()),
 
-                // NOT RECOMMENDED - will potentially result in extra unintended Posts
+                // NOT RECOMMENDED
+                // Will potentially result in extra unintended Posts (if you override the value during instantiation)
                 'post' => PostFactory::createOne(),
                 'post' => PostFactory::new()->published()->create(),
             ];
@@ -856,6 +840,53 @@ The following assumes the ``Post`` entity has a many-to-many relationship with `
 
     // Example 5: create 3 Posts each with between 0 and 3 unique Tags
     PostFactory::createMany(3, ['tags' => TagFactory::new()->many(0, 3)]);
+
+Lazy values
+~~~~~~~~~~~
+
+The ``getDefaults()`` method is called everytime a factory is instantiated (even if you don't end up
+creating it). Sometimes, you might not want your value calculated every time. For example, ff you have a value for one
+of your attributes that:
+
+ - has side effects (i.e. creating a file or fetching a random existing entity from another factory)
+ - you only want to calculate once (i.e. creating an entity from another factory to pass as a value into multiple other factories)
+
+You can wrap the value in a ``LazyValue`` which ensures the value is only calculated when/if it's needed. Additionally,
+the LazyValue can be  `memoized <https://en.wikipedia.org/wiki/Memoization>`_ so that it is only calculated once.
+
+    .. code-block:: php
+
+        use Zenstruck\Foundry\Attributes\LazyValue;
+        use function Zenstruck\Foundry\lazy;
+        use function Zenstruck\Foundry\memoize;
+
+        class TaskFactory extends ModelFactory
+        {
+            // ...
+
+            protected function getDefaults(): array
+            {
+                $owner = LazyValue::memoize(fn () => UserFactory::new());
+
+                return [
+                    // Call CategoryFactory::random() everytime this factory is instantiated
+                    'category' => LazyValue::new(fn() => CategoryFactory::random()),
+                    // The same User instance will be both added to the Project and set as the Task owner
+                    'project' => ProjectFactory::new(['users' => [$owner]]),
+                    'owner'   => $owner,
+                ];
+            }
+
+            protected static function getClass(): string
+            {
+                return Task::class;
+            }
+        }
+
+.. tip::
+
+    the ``lazy()`` and ``memoize()`` helper functions can also be used to create LazyValues,
+    instead of ``LazyValue::new()`` and ``LazyValue::memoize()``.
 
 Factories as Services
 ~~~~~~~~~~~~~~~~~~~~~

@@ -19,19 +19,28 @@ final class LazyValue
     /** @var callable():mixed */
     private $factory;
 
-    /** @var bool */
-    private $memoize;
+    private bool $memoize;
 
-    /** @var mixed */
-    private $memoizedValue = null;
+    private mixed $memoizedValue = null;
 
     /**
      * @param callable():mixed $factory
+     *
+     * @deprecated directly using LazyValue's constructor is deprecated. It will be private in v2. Use named constructors instead.
      */
-    public function __construct(callable $factory, bool $memoize = false)
+    public function __construct(callable $factory, bool $memoize = false, bool $calledInternally = false)
     {
         $this->factory = $factory;
         $this->memoize = $memoize;
+
+        if (!$calledInternally) {
+            trigger_deprecation('zenstruck/foundry', '1.34.0', "directly using LazyValue's constructor is deprecated. It will be private in v2. Use named constructors instead.");
+        }
+    }
+
+    public static function new(callable $factory): self
+    {
+        return new self($factory, false);
     }
 
     public static function memoize(callable $factory): self
