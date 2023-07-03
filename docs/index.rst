@@ -845,7 +845,7 @@ Lazy values
 ~~~~~~~~~~~
 
 The ``getDefaults()`` method is called everytime a factory is instantiated (even if you don't end up
-creating it). Sometimes, you might not want your value calculated every time. For example, ff you have a value for one
+creating it). Sometimes, you might not want your value calculated every time. For example, if you have a value for one
 of your attributes that:
 
  - has side effects (i.e. creating a file or fetching a random existing entity from another factory)
