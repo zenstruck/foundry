@@ -96,6 +96,11 @@ $(PSALM_BIN): vendor bin/tools/psalm/composer.json bin/tools/psalm/composer.lock
 	@${DOCKER_PHP_WITHOUT_XDEBUG} /usr/bin/composer bin psalm install
 	@touch -c $@ bin/tools/psalm/composer.json bin/tools/psalm/composer.lock
 
+.PHONY: docs
+docs: vendor ### Generate documentation to docs/output
+	@$(MAKE) --no-print-directory docker-start-if-not-running
+	@${DOCKER_PHP} ./bin/build-docs
+
 .PHONY: database-generate-migration
 database-generate-migration: database-drop-schema ### Generate new migration based on mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
 	@${DOCKER_PHP} vendor/bin/doctrine-migrations migrations:migrate --no-interaction --allow-no-migration # first, let's load into db existing migrations
