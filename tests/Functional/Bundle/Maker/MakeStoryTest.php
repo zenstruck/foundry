@@ -1,14 +1,5 @@
 <?php
 
-/*
- * This file is part of the zenstruck/foundry package.
- *
- * (c) Kevin Bond <kevinbond@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Zenstruck\Foundry\Tests\Functional\Bundle\Maker;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -34,6 +25,15 @@ final class MakeStoryTest extends MakerTestCase
         $this->assertFileExists(self::tempFile('src/Story/FooBarStory.php'));
         $this->assertSame(<<<EOF
             <?php
+
+            /*
+             * This file is part of the zenstruck/foundry package.
+             *
+             * (c) Kevin Bond <kevinbond@gmail.com>
+             *
+             * For the full copyright and license information, please view the LICENSE
+             * file that was distributed with this source code.
+             */
 
             namespace App\\Story;
 
@@ -72,6 +72,15 @@ final class MakeStoryTest extends MakerTestCase
         $this->assertSame(<<<EOF
             <?php
 
+            /*
+             * This file is part of the zenstruck/foundry package.
+             *
+             * (c) Kevin Bond <kevinbond@gmail.com>
+             *
+             * For the full copyright and license information, please view the LICENSE
+             * file that was distributed with this source code.
+             */
+
             namespace App\\Story;
 
             use Zenstruck\\Foundry\\Story;
@@ -104,6 +113,15 @@ final class MakeStoryTest extends MakerTestCase
         $this->assertFileExists(self::tempFile('tests/Story/FooBarStory.php'));
         $this->assertSame(<<<EOF
             <?php
+
+            /*
+             * This file is part of the zenstruck/foundry package.
+             *
+             * (c) Kevin Bond <kevinbond@gmail.com>
+             *
+             * For the full copyright and license information, please view the LICENSE
+             * file that was distributed with this source code.
+             */
 
             namespace App\\Tests\\Story;
 
@@ -141,6 +159,15 @@ final class MakeStoryTest extends MakerTestCase
         $this->assertStringNotContainsString('Note: pass --test if you want to generate stories in your tests/ directory', $output);
         $this->assertSame(<<<EOF
             <?php
+
+            /*
+             * This file is part of the zenstruck/foundry package.
+             *
+             * (c) Kevin Bond <kevinbond@gmail.com>
+             *
+             * For the full copyright and license information, please view the LICENSE
+             * file that was distributed with this source code.
+             */
 
             namespace App\\Tests\\Story;
 

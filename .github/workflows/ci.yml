@@ -39,7 +39,7 @@ jobs:
 
     services:
       mysql:
-        image: mysql:5.7
+        image: mysql:5.7.42
         env:
           MYSQL_ROOT_PASSWORD: 1234
         ports:
@@ -62,7 +62,7 @@ jobs:
           - 27017:27017
 
     env:
-      MYSQL_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
+      MYSQL_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7.42
       PGSQL_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry_${{ matrix.use-dama }}_${{ matrix.orm-db }}?charset=utf8&serverVersion=15
       MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
 

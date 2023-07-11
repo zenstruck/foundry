@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Factory;
 
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
@@ -11,21 +20,21 @@ use Zenstruck\Foundry\Tests\Fixtures\Document\ODMPost;
 /**
  * @extends ModelFactory<ODMPost>
  *
- * @method        ODMPost|Proxy create(array|callable $attributes = [])
- * @method static ODMPost|Proxy createOne(array $attributes = [])
- * @method static ODMPost|Proxy find(object|array|mixed $criteria)
- * @method static ODMPost|Proxy findOrCreate(array $attributes)
- * @method static ODMPost|Proxy first(string $sortedField = 'id')
- * @method static ODMPost|Proxy last(string $sortedField = 'id')
- * @method static ODMPost|Proxy random(array $attributes = [])
- * @method static ODMPost|Proxy randomOrCreate(array $attributes = [])
+ * @method        ODMPost|Proxy                      create(array|callable $attributes = [])
+ * @method static ODMPost|Proxy                      createOne(array $attributes = [])
+ * @method static ODMPost|Proxy                      find(object|array|mixed $criteria)
+ * @method static ODMPost|Proxy                      findOrCreate(array $attributes)
+ * @method static ODMPost|Proxy                      first(string $sortedField = 'id')
+ * @method static ODMPost|Proxy                      last(string $sortedField = 'id')
+ * @method static ODMPost|Proxy                      random(array $attributes = [])
+ * @method static ODMPost|Proxy                      randomOrCreate(array $attributes = [])
  * @method static DocumentRepository|RepositoryProxy repository()
- * @method static ODMPost[]|Proxy[] all()
- * @method static ODMPost[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static ODMPost[]|Proxy[] createSequence(iterable|callable $sequence)
- * @method static ODMPost[]|Proxy[] findBy(array $attributes)
- * @method static ODMPost[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
- * @method static ODMPost[]|Proxy[] randomSet(int $number, array $attributes = [])
+ * @method static ODMPost[]|Proxy[]                  all()
+ * @method static ODMPost[]|Proxy[]                  createMany(int $number, array|callable $attributes = [])
+ * @method static ODMPost[]|Proxy[]                  createSequence(iterable|callable $sequence)
+ * @method static ODMPost[]|Proxy[]                  findBy(array $attributes)
+ * @method static ODMPost[]|Proxy[]                  randomRange(int $min, int $max, array $attributes = [])
+ * @method static ODMPost[]|Proxy[]                  randomSet(int $number, array $attributes = [])
  */
 final class ODMPostFactory extends ModelFactory
 {

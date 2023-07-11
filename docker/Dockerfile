@@ -1,6 +1,6 @@
 ARG PHP_VERSION
 
-FROM php:${PHP_VERSION}-cli
+FROM php:${PHP_VERSION}-cli-bullseye
 
 COPY --from=composer:2.4 /usr/bin/composer /usr/bin/composer
 
@@ -49,7 +49,7 @@ ARG UID=1001
 ARG XDEBUG_HOST="172.17.0.1"
 
 RUN addgroup --system --gid ${UID} ${USER} ; \
-    adduser --system --disabled-password --uid ${UID} --ingroup ${USER} ${USER} ; \
+    adduser --system --home /home/${USER} --disabled-password --uid ${UID} --ingroup ${USER} ${USER} ; \
     mkdir -p /app/var ; \
     chown -R ${USER}:${USER} /app ; \
     sed -i "s/%xdebug_host%/${XDEBUG_HOST}/g" /usr/local/etc/php/conf.d/xdebug.ini
