@@ -40,7 +40,7 @@ final class LazyValue
 
     public static function new(callable $factory): self
     {
-        return new self($factory, false);
+        return new self($factory, true);
     }
 
     public static function memoize(callable $factory): self
