@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [v1.34.0](https://github.com/zenstruck/foundry/releases/tag/v1.34.0)
+
+July 12th, 2023 - [v1.33.0...v1.34.0](https://github.com/zenstruck/foundry/compare/v1.33.0...v1.34.0)
+
+* 850858e feat(lazy): Add memoized LazyValue (#475) by @ndench, @kbond
+* 6d2c7ce fix: maker with cs fixer (#476) by @nikophil
+* b6b6501 Fix a missing parenthesis in docs (#470) by @jmsche
+
 ## [v1.33.0](https://github.com/zenstruck/foundry/releases/tag/v1.33.0)
 
 May 23rd, 2023 - [v1.32.0...v1.33.0](https://github.com/zenstruck/foundry/compare/v1.32.0...v1.33.0)
