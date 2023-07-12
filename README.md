@@ -48,6 +48,7 @@ $ make help
 validate                       Run sca, full test suite and validate migrations
 test                           Run PHPUnit tests suite
 sca                            Run static analysis
+docs                           Generate documentation to docs/output
 database-generate-migration    Generate new migration based on mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
 database-validate-mapping      Validate mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
 database-drop-schema           Drop database schema

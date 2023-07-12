@@ -130,5 +130,15 @@ function faker(): Faker\Generator
  */
 function lazy(callable $factory): LazyValue
 {
-    return new LazyValue($factory);
+    return LazyValue::new($factory);
+}
+
+/**
+ * @see LazyValue::memoize
+ *
+ * @param callable():mixed $factory
+ */
+function memoize(callable $factory): LazyValue
+{
+    return LazyValue::memoize($factory);
 }

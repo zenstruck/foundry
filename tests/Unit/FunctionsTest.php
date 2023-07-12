@@ -16,6 +16,7 @@ use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\LazyValue;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\RepositoryProxy;
 use Zenstruck\Foundry\Test\Factories;
@@ -27,6 +28,8 @@ use function Zenstruck\Foundry\create_many;
 use function Zenstruck\Foundry\faker;
 use function Zenstruck\Foundry\instantiate;
 use function Zenstruck\Foundry\instantiate_many;
+use function Zenstruck\Foundry\memoize;
+use function Zenstruck\Foundry\lazy;
 use function Zenstruck\Foundry\repository;
 
 /**
@@ -42,6 +45,28 @@ final class FunctionsTest extends TestCase
     public function faker(): void
     {
         $this->assertIsString(faker()->name());
+    }
+
+    /**
+     * @test
+     */
+    public function lazy(): void
+    {
+        $value = lazy(fn () => new \stdClass());
+
+        $this->assertInstanceOf(LazyValue::class, $value);
+        $this->assertNotSame($value(), $value());
+    }
+
+    /**
+     * @test
+     */
+    public function memoize(): void
+    {
+        $value = memoize(fn () => new \stdClass());
+
+        $this->assertInstanceOf(LazyValue::class, $value);
+        $this->assertSame($value(), $value());
     }
 
     /**
