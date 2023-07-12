@@ -28,8 +28,8 @@ use function Zenstruck\Foundry\create_many;
 use function Zenstruck\Foundry\faker;
 use function Zenstruck\Foundry\instantiate;
 use function Zenstruck\Foundry\instantiate_many;
-use function Zenstruck\Foundry\memoize;
 use function Zenstruck\Foundry\lazy;
+use function Zenstruck\Foundry\memoize;
 use function Zenstruck\Foundry\repository;
 
 /**
@@ -52,7 +52,7 @@ final class FunctionsTest extends TestCase
      */
     public function lazy(): void
     {
-        $value = lazy(fn () => new \stdClass());
+        $value = lazy(fn() => new \stdClass());
 
         $this->assertInstanceOf(LazyValue::class, $value);
         $this->assertNotSame($value(), $value());
@@ -63,7 +63,7 @@ final class FunctionsTest extends TestCase
      */
     public function memoize(): void
     {
-        $value = memoize(fn () => new \stdClass());
+        $value = memoize(fn() => new \stdClass());
 
         $this->assertInstanceOf(LazyValue::class, $value);
         $this->assertSame($value(), $value());

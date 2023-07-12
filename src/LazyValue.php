@@ -38,16 +38,6 @@ final class LazyValue
         }
     }
 
-    public static function new(callable $factory): self
-    {
-        return new self($factory, false, true);
-    }
-
-    public static function memoize(callable $factory): self
-    {
-        return new self($factory, true, true);
-    }
-
     /**
      * @internal
      */
@@ -72,6 +62,16 @@ final class LazyValue
         }
 
         return $value;
+    }
+
+    public static function new(callable $factory): self
+    {
+        return new self($factory, false, true);
+    }
+
+    public static function memoize(callable $factory): self
+    {
+        return new self($factory, true, true);
     }
 
     /**

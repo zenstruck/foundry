@@ -66,7 +66,7 @@ final class LazyValueTest extends TestCase
      */
     public function does_not_memoize_value_by_default(): void
     {
-        $value = new LazyValue(fn () => new \stdClass());
+        $value = new LazyValue(fn() => new \stdClass());
 
         $this->assertNotSame($value(), $value());
     }
@@ -76,7 +76,7 @@ final class LazyValueTest extends TestCase
      */
     public function does_not_memoize_value(): void
     {
-        $value = LazyValue::new(fn () => new \stdClass());
+        $value = LazyValue::new(fn() => new \stdClass());
 
         $this->assertNotSame($value(), $value());
     }
@@ -86,7 +86,7 @@ final class LazyValueTest extends TestCase
      */
     public function can_handle_memoized_value(): void
     {
-        $value = LazyValue::memoize(fn () => new \stdClass());
+        $value = LazyValue::memoize(fn() => new \stdClass());
 
         $this->assertSame($value(), $value());
     }
