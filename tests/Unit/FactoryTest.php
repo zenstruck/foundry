@@ -59,7 +59,7 @@ final class FactoryTest extends TestCase
     public function lazy_values_are_only_calculated_if_needed(): void
     {
         $count = 0;
-        $lazyValue = new LazyValue(function() use (&$count) {
+        $lazyValue = LazyValue::new(function() use (&$count) {
             ++$count;
 
             return 'title';
@@ -82,6 +82,31 @@ final class FactoryTest extends TestCase
         ;
 
         $this->assertSame('title', $post->getTitle());
+        $this->assertSame(1, $count);
+    }
+
+    /**
+     * @test
+     */
+    public function lazy_memoized_values_are_only_calculated_once(): void
+    {
+        $count = 0;
+        $lazyValue = LazyValue::memoize(function() use (&$count) {
+            ++$count;
+
+            return 'title';
+        });
+        $factory = anonymous(Post::class, ['title' => $lazyValue, 'body' => 'body']);
+
+        $posts = $factory
+            ->many(3)
+            ->create()
+        ;
+
+        foreach ($posts as $post) {
+            $this->assertSame('title', $post->getTitle());
+        }
+
         $this->assertSame(1, $count);
     }
 
