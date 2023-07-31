@@ -14,7 +14,6 @@ namespace Zenstruck\Foundry;
 use Doctrine\Persistence\ManagerRegistry;
 use Faker;
 use Zenstruck\Foundry\Test\ORMDatabaseResetter;
-use Zenstruck\Foundry\Exception\FoundryBootException;
 
 /**
  * @internal

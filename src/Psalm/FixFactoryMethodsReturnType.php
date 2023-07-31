@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Psalm;
 
 use Psalm\Plugin\EventHandler\AfterMethodCallAnalysisInterface;
@@ -15,11 +24,11 @@ final class FixFactoryMethodsReturnType implements AfterMethodCallAnalysisInterf
 {
     public static function afterMethodCallAnalysis(AfterMethodCallAnalysisEvent $event): void
     {
-        [$class, $method] = explode('::', $event->getMethodId());
+        [$class, $method] = \explode('::', $event->getMethodId());
 
         //  PersistentObjectFactory::createOne() returns a list<Proxy<T>>
         //  ObjectFactory::createOne() returns a T
-        if (is_subclass_of($class, ObjectFactory::class) && 'createone' === $method) {
+        if (\is_subclass_of($class, ObjectFactory::class) && 'createone' === $method) {
             $templateType = $event->getCodebase()->classlikes->getStorageFor($class)->template_extended_params[ObjectFactory::class]['T'] ?? null;
 
             if (!$templateType) {
@@ -27,7 +36,7 @@ final class FixFactoryMethodsReturnType implements AfterMethodCallAnalysisInterf
             }
 
             $event->setReturnTypeCandidate(
-                match(is_subclass_of($class, PersistentObjectFactory::class)){
+                match (\is_subclass_of($class, PersistentObjectFactory::class)) {
                     true => PsalmTypeHelper::genericTypeFromUnionType(Proxy::class, $templateType),
                     false => $templateType
                 }
@@ -35,7 +44,7 @@ final class FixFactoryMethodsReturnType implements AfterMethodCallAnalysisInterf
         }
 
         //  PersistentObjectFactory->many() returns a FactoryCollection<Proxy<T>>
-        if (is_subclass_of($class, PersistentObjectFactory::class) && (\in_array($method, ['many', 'sequence'], true))) {
+        if (\is_subclass_of($class, PersistentObjectFactory::class) && \in_array($method, ['many', 'sequence'], true)) {
             $templateType = $event->getCodebase()->classlikes->getStorageFor($class)->template_extended_params[PersistentObjectFactory::class]['T'] ?? null;
 
             if (!$templateType) {

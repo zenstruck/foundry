@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Psalm;
 
 use Psalm\Plugin\EventHandler\Event\FunctionReturnTypeProviderEvent;
@@ -32,6 +41,22 @@ final class FixAnonymousFunctions implements FunctionReturnTypeProviderInterface
             'zenstruck\\foundry\\create_many' => self::getCreateManyReturnType($event),
             default => null,
         };
+    }
+
+    public static function getClassLikeNames(): array
+    {
+        return [PersistentObjectFactory::class];
+    }
+
+    // anonymous(Entity::class)->many() returns a FactoryCollection<Proxy<Entity>>
+    // anonymous(Entity::class)->sequence() returns a FactoryCollection<Proxy<Entity>>
+    public static function getMethodReturnType(MethodReturnTypeProviderEvent $event): ?Union
+    {
+        if (!\in_array($event->getMethodNameLowercase(), ['many', 'sequence'], true)) {
+            return null;
+        }
+
+        return PsalmTypeHelper::factoryCollection($event->getTemplateTypeParameters()[0]);
     }
 
     // anonymous(Entity::class) returns a FactoryCollection<Proxy<Entity>>
@@ -83,21 +108,5 @@ final class FixAnonymousFunctions implements FunctionReturnTypeProviderInterface
         }
 
         return new \Psalm\Type\Union([new \Psalm\Type\Atomic\TKeyedArray([$createdObjectType], is_list: true)]);
-    }
-
-    public static function getClassLikeNames(): array
-    {
-        return [PersistentObjectFactory::class];
-    }
-
-    // anonymous(Entity::class)->many() returns a FactoryCollection<Proxy<Entity>>
-    // anonymous(Entity::class)->sequence() returns a FactoryCollection<Proxy<Entity>>
-    public static function getMethodReturnType(MethodReturnTypeProviderEvent $event): ?Union
-    {
-        if (!\in_array($event->getMethodNameLowercase(), ['many', 'sequence'], true)) {
-            return null;
-        }
-
-        return PsalmTypeHelper::factoryCollection($event->getTemplateTypeParameters()[0]);
     }
 }

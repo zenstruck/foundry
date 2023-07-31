@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Psalm;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations\Document;
@@ -36,9 +45,9 @@ final class PsalmTypeHelper
 
     public static function factoryCollection(\Psalm\Type\Union $unionType): \Psalm\Type\Union
     {
-        return PsalmTypeHelper::genericTypeFromUnionType(
+        return self::genericTypeFromUnionType(
             FactoryCollection::class,
-            PsalmTypeHelper::genericTypeFromUnionType(Proxy::class, $unionType)
+            self::genericTypeFromUnionType(Proxy::class, $unionType)
         );
     }
 

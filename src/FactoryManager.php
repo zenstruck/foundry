@@ -33,7 +33,7 @@ final class FactoryManager
      * @param BaseFactory[]        $factories
      * @param CallableInstantiator $instantiator
      */
-    public function __construct(iterable $factories = [], Instantiator|\Closure $instantiator = null, ?Faker\Generator $faker = null)
+    public function __construct(iterable $factories = [], Instantiator|\Closure|null $instantiator = null, ?Faker\Generator $faker = null)
     {
         $this->factories = $factories;
         $this->instantiator = $instantiator ?? new Instantiator(); // @phpstan-ignore-line
