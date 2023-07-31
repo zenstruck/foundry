@@ -21,10 +21,10 @@ use Zenstruck\Foundry\LazyValue;
  * @template T of object
  * @extends BaseFactory<T>
  *
- * @phpstan-type CallableInstantiator Instantiator<T>|\Closure(Parameters,class-string<T>):T
+ * @psalm-type CallableInstantiator = Instantiator<T>|\Closure(Parameters,class-string<T>):T
  *
- * @phpstan-import-type Parameters from BaseFactory
- * @phpstan-import-type Attributes  from BaseFactory
+ * @psalm-import-type Parameters from BaseFactory
+ * @psalm-import-type Attributes  from BaseFactory
  */
 abstract class ObjectFactory extends BaseFactory
 {
@@ -42,6 +42,11 @@ abstract class ObjectFactory extends BaseFactory
      */
     abstract public static function class(): string;
 
+    /**
+     * @param Attributes $attributes
+     *
+     * @return T
+     */
     public function create(array|callable $attributes = []): object
     {
         return $this->normalizeAndInstantiate($attributes)[0];

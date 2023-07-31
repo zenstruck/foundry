@@ -8,6 +8,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ * @extends PersistentObjectFactory<Post>
  */
 class PostFactory extends PersistentObjectFactory
 {

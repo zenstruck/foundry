@@ -56,21 +56,6 @@ final class ModelFactoryTest extends TestCase
 
     /**
      * @test
-     * @group legacy
-     */
-    public function can_instantiate_many_legacy(): void
-    {
-        $this->expectDeprecation(\sprintf('Since zenstruck/foundry 1.7: Calling instance method "%1$s::createMany()" is deprecated and will be removed in 2.0, use e.g. "%1$s::new()->many(2)->create()" instead.', PostFactory::class));
-
-        $objects = PostFactory::new(['body' => 'body'])->createMany(2, ['title' => 'title']);
-
-        $this->assertCount(2, $objects);
-        $this->assertSame('title', $objects[0]->getTitle());
-        $this->assertSame('body', $objects[1]->getBody());
-    }
-
-    /**
-     * @test
      */
     public function can_instantiate_many(): void
     {

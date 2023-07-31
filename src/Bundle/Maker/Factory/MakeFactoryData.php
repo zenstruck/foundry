@@ -22,10 +22,6 @@ use Zenstruck\Foundry\RepositoryProxy;
  */
 final class MakeFactoryData
 {
-    public const STATIC_ANALYSIS_TOOL_NONE = 'none';
-    public const STATIC_ANALYSIS_TOOL_PHPSTAN = 'phpstan';
-    public const STATIC_ANALYSIS_TOOL_PSALM = 'psalm';
-
     /** @var list<string> */
     private array $uses;
     /** @var array<string, string> */
@@ -33,7 +29,7 @@ final class MakeFactoryData
     /** @var non-empty-list<MakeFactoryPHPDocMethod> */
     private array $methodsInPHPDoc;
 
-    public function __construct(private \ReflectionClass $object, private ClassNameDetails $factoryClassNameDetails, private ?\ReflectionClass $repository, private string $staticAnalysisTool, private bool $persisted)
+    public function __construct(private \ReflectionClass $object, private ClassNameDetails $factoryClassNameDetails, private ?\ReflectionClass $repository, private bool $persisted)
     {
         $this->uses = [
             PersistentObjectFactory::class,
@@ -78,16 +74,6 @@ final class MakeFactoryData
     public function isPersisted(): bool
     {
         return $this->persisted;
-    }
-
-    public function hasStaticAnalysisTool(): bool
-    {
-        return self::STATIC_ANALYSIS_TOOL_NONE !== $this->staticAnalysisTool;
-    }
-
-    public function staticAnalysisTool(): string
-    {
-        return $this->staticAnalysisTool;
     }
 
     /** @param class-string $use */

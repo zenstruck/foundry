@@ -7,6 +7,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Contact;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ * @extends PersistentObjectFactory<Contact>
  */
 final class ContactFactory extends PersistentObjectFactory
 {

@@ -16,7 +16,6 @@ use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Zenstruck\Foundry\Bundle\Maker\Factory\FactoryGenerator;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMComment;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMPost;
 use Zenstruck\Foundry\Tests\Fixtures\Document\Tag as AnotherTagClass;
@@ -43,9 +42,6 @@ use Zenstruck\Foundry\Tests\Fixtures\PHP81\EntityWithEnum;
  */
 final class MakeFactoryTest extends MakerTestCase
 {
-    private const PHPSTAN_PATH = __DIR__.'/../../../..'.FactoryGenerator::PHPSTAN_PATH;
-    private const PSALM_PATH = __DIR__.'/../../../..'.FactoryGenerator::PSALM_PATH;
-
     protected function setUp(): void
     {
         self::assertDirectoryDoesNotExist(self::tempDir());
@@ -56,16 +52,6 @@ final class MakeFactoryTest extends MakerTestCase
     protected function tearDown(): void
     {
         parent::tearDown();
-
-        $removeSCAMock = static function(string $file): void {
-            if (\file_exists($file)) {
-                \unlink($file);
-                \rmdir(\dirname($file));
-                \rmdir(\dirname($file, 2));
-            }
-        };
-        $removeSCAMock(self::PHPSTAN_PATH);
-        $removeSCAMock(self::PSALM_PATH);
     }
 
     /**
@@ -167,50 +153,6 @@ final class MakeFactoryTest extends MakerTestCase
         $tester->execute(['--test' => true]);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('tests/Factory/TagFactory.php'));
-    }
-
-    /**
-     * @test
-     * @dataProvider scaToolProvider
-     */
-    public function can_create_factory_with_static_analysis_annotations(string $scaTool): void
-    {
-        if (!\getenv('USE_ORM')) {
-            self::markTestSkipped('doctrine/orm not enabled.');
-        }
-
-        $this->emulateSCAToolEnabled($scaTool);
-
-        $tester = $this->makeFactoryCommandTester();
-
-        $tester->execute(['class' => Category::class]);
-
-        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/CategoryFactory.php'));
-    }
-
-    /**
-     * @test
-     * @dataProvider scaToolProvider
-     */
-    public function can_create_factory_for_entity_with_repository(string $scaTool): void
-    {
-        if (!\getenv('USE_ORM')) {
-            self::markTestSkipped('doctrine/orm not enabled.');
-        }
-
-        $this->emulateSCAToolEnabled($scaTool);
-
-        $tester = $this->makeFactoryCommandTester();
-
-        $tester->execute(['class' => ORMPost::class]);
-
-        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/PostFactory.php'));
-    }
-
-    public function scaToolProvider(): iterable
-    {
-        yield 'phpstan' => [self::PHPSTAN_PATH];
-        yield 'psalm' => [self::PSALM_PATH];
     }
 
     /**
@@ -572,12 +514,6 @@ final class MakeFactoryTest extends MakerTestCase
             factoriesRegistered: $options['factoriesRegistered'] ?? [],
             defaultMakeFactoryNamespace: $options['defaultMakeFactoryNamespace'] ?? null
         );
-    }
-
-    private function emulateSCAToolEnabled(string $scaToolFilePath): void
-    {
-        \mkdir(\dirname($scaToolFilePath), 0777, true);
-        \touch($scaToolFilePath);
     }
 
     private function makeFactoryCommandTester(array $factoriesRegistered = []): CommandTester

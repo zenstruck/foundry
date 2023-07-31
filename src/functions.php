@@ -40,7 +40,7 @@ function factory(string $class, array|\Closure $defaultAttributes = []): Anonymo
  *
  * @param class-string<T> $class
  *
- * @return (ObjectFactory|PersistentObjectFactory)<T>
+ * @return ObjectFactory<T>|PersistentObjectFactory<T>
  */
 function anonymous(string $class, array|callable $defaultAttributes = []): ObjectFactory|PersistentObjectFactory
 {
@@ -83,7 +83,7 @@ function anonymous(string $class, array|callable $defaultAttributes = []): Objec
 /**
  * @see BaseFactory::create()
  *
- * @return (Proxy&T)|T
+ * @return (Proxy<T>)|T
  *
  * @template T of object
  * @phpstan-param class-string<T> $class

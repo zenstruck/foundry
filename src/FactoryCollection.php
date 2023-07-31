@@ -16,8 +16,8 @@ namespace Zenstruck\Foundry;
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  *
- * @phpstan-import-type Parameters from BaseFactory
- * @phpstan-import-type Attributes  from BaseFactory
+ * @psalm-import-type Parameters from BaseFactory
+ * @psalm-import-type Attributes  from BaseFactory
  */
 final class FactoryCollection implements \IteratorAggregate
 {

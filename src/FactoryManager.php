@@ -19,7 +19,7 @@ use Zenstruck\Foundry\Object\ObjectFactory;
  *
  * @internal
  *
- * @phpstan-import-type CallableInstantiator from ObjectFactory
+ * @psalm-import-type CallableInstantiator from ObjectFactory
  */
 final class FactoryManager
 {

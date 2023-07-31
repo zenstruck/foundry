@@ -19,7 +19,6 @@ use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Bundle\Maker\Factory\Exception\FactoryClassAlreadyExistException;
 
 /**
@@ -27,13 +26,9 @@ use Zenstruck\Foundry\Bundle\Maker\Factory\Exception\FactoryClassAlreadyExistExc
  */
 final class FactoryGenerator
 {
-    public const PHPSTAN_PATH = '/vendor/phpstan/phpstan/phpstan';
-    public const PSALM_PATH = '/vendor/vimeo/psalm/psalm';
-
     /** @param \Traversable<int, DefaultPropertiesGuesser> $defaultPropertiesGuessers */
     public function __construct(
         private ManagerRegistry $managerRegistry,
-        private KernelInterface $kernel,
         private \Traversable $defaultPropertiesGuessers,
         private FactoryClassMap $factoryClassMap,
         private NamespaceGuesser $namespaceGuesser,
@@ -136,17 +131,7 @@ final class FactoryGenerator
             $object,
             $factory,
             $repository ?? null,
-            $this->staticAnalysisTool(),
             $persisted
         );
-    }
-
-    private function staticAnalysisTool(): string
-    {
-        return match (true) {
-            \file_exists($this->kernel->getProjectDir().self::PHPSTAN_PATH) => MakeFactoryData::STATIC_ANALYSIS_TOOL_PHPSTAN,
-            \file_exists($this->kernel->getProjectDir().self::PSALM_PATH) => MakeFactoryData::STATIC_ANALYSIS_TOOL_PSALM,
-            default => MakeFactoryData::STATIC_ANALYSIS_TOOL_NONE,
-        };
     }
 }

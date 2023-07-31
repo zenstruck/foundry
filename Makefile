@@ -111,7 +111,7 @@ database-generate-migration: database-drop-schema ### Generate new migration bas
 .PHONY: database-validate-mapping
 database-validate-mapping: database-drop-schema ### Validate mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
 	@${DOCKER_PHP} vendor/bin/doctrine-migrations migrations:migrate --no-interaction --allow-no-migration
-	@${DOCKER_PHP} bin/doctrine orm:validate-schema
+	@${DOCKER_PHP} bin/doctrine orm:validate-schema -v
 
 .PHONY: database-drop-schema
 database-drop-schema: vendor ### Drop database schema
@@ -150,7 +150,7 @@ docker-start: ### Start containers
 
 .PHONY: docker-stop
 docker-stop: ### Stop containers
-	@rm $(DOCKER_PHP_CONTAINER_FLAG)
+	@rm $(DOCKER_PHP_CONTAINER_FLAG) || true
 	@$(DOCKER_COMPOSE) stop
 
 .PHONY: docker-purge
