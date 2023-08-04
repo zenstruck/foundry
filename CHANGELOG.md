@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [v1.34.1](https://github.com/zenstruck/foundry/releases/tag/v1.34.1)
+
+August 4th, 2023 - [v1.34.0...v1.34.1](https://github.com/zenstruck/foundry/compare/v1.34.0...v1.34.1)
+
+* 2433482 minor: set `Factory::isPersisting()` protected (#486) by @nikophil
+* b86ca0a fix: deprecated code in `StubCommand` (#485) by @kbond
+
 ## [v1.34.0](https://github.com/zenstruck/foundry/releases/tag/v1.34.0)
 
 July 12th, 2023 - [v1.33.0...v1.34.0](https://github.com/zenstruck/foundry/compare/v1.33.0...v1.34.0)
