@@ -416,7 +416,7 @@ class Factory
         }
     }
 
-    private function isPersisting(): bool
+    protected function isPersisting(): bool
     {
         if (!$this->persist || !self::configuration()->hasManagerRegistry()) {
             return false;
