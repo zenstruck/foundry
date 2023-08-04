@@ -335,6 +335,32 @@ class Factory
         return $this->class;
     }
 
+    protected function isPersisting(): bool
+    {
+        if (!$this->persist || !self::configuration()->hasManagerRegistry()) {
+            return false;
+        }
+
+        try {
+            $classMetadata = self::configuration()->objectManagerFor($this->class)->getClassMetadata($this->class);
+        } catch (\RuntimeException) {
+            // entity not managed (perhaps Embeddable)
+            return false;
+        }
+
+        if ($classMetadata instanceof ORMClassMetadata && $classMetadata->isEmbeddedClass) {
+            // embedded entity
+            return false;
+        }
+
+        if ($classMetadata instanceof ODMClassMetadata && $classMetadata->isEmbeddedDocument) {
+            // embedded document
+            return false;
+        }
+
+        return true;
+    }
+
     private function normalizeAttributes(array|callable $attributes): array
     {
         return \is_callable($attributes) ? $attributes() : $attributes;
@@ -414,32 +440,6 @@ class Factory
         } catch (\RuntimeException) {
             return $object;
         }
-    }
-
-    protected function isPersisting(): bool
-    {
-        if (!$this->persist || !self::configuration()->hasManagerRegistry()) {
-            return false;
-        }
-
-        try {
-            $classMetadata = self::configuration()->objectManagerFor($this->class)->getClassMetadata($this->class);
-        } catch (\RuntimeException) {
-            // entity not managed (perhaps Embeddable)
-            return false;
-        }
-
-        if ($classMetadata instanceof ORMClassMetadata && $classMetadata->isEmbeddedClass) {
-            // embedded entity
-            return false;
-        }
-
-        if ($classMetadata instanceof ODMClassMetadata && $classMetadata->isEmbeddedDocument) {
-            // embedded document
-            return false;
-        }
-
-        return true;
     }
 
     /**
