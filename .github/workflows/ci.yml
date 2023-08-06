@@ -30,12 +30,12 @@ jobs:
           - {php: 8.0, symfony: 5.4.*, use-orm: 1, use-odm: 0, use-dama: 0, deps: lowest, orm-db: postgres}
           - {php: 8.0, symfony: 5.4.*, use-orm: 1, use-odm: 1, use-dama: 0, deps: lowest, orm-db: postgres}
           - {php: 8.0, symfony: 5.4.*, use-orm: 0, use-odm: 1, use-dama: 0, deps: lowest, orm-db: postgres}
-          - {php: 8.2, symfony: 6.2.*, use-orm: 1, use-odm: 0, use-dama: 0, deps: highest, orm-db: postgres}
-          - {php: 8.2, symfony: 6.2.*, use-orm: 1, use-odm: 1, use-dama: 0, deps: highest, orm-db: postgres}
-          - {php: 8.2, symfony: 6.2.*, use-orm: 1, use-odm: 0, use-dama: 1, deps: highest, orm-db: postgres}
-          - {php: 8.2, symfony: 6.2.*, use-orm: 0, use-odm: 1, use-dama: 0, deps: highest, orm-db: postgres}
-          - {php: 8.2, symfony: 6.2.*, use-orm: 1, use-odm: 0, use-dama: 1, deps: highest, orm-db: mysql}
-          - {php: 8.2, symfony: 6.2.*, use-orm: 1, use-odm: 0, use-dama: 0, deps: highest, orm-db: mysql}
+          - {php: 8.2, symfony: 6.3.*, use-orm: 1, use-odm: 0, use-dama: 0, deps: highest, orm-db: postgres}
+          - {php: 8.2, symfony: 6.3.*, use-orm: 1, use-odm: 1, use-dama: 0, deps: highest, orm-db: postgres}
+          - {php: 8.2, symfony: 6.3.*, use-orm: 1, use-odm: 0, use-dama: 1, deps: highest, orm-db: postgres}
+          - {php: 8.2, symfony: 6.3.*, use-orm: 0, use-odm: 1, use-dama: 0, deps: highest, orm-db: postgres}
+          - {php: 8.2, symfony: 6.3.*, use-orm: 1, use-odm: 0, use-dama: 1, deps: highest, orm-db: mysql}
+          - {php: 8.2, symfony: 6.3.*, use-orm: 1, use-odm: 0, use-dama: 0, deps: highest, orm-db: mysql}
 
     services:
       mysql:
