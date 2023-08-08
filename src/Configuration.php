@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Faker;
+use Zenstruck\Foundry\Exception\CannotGetRepositoryException;
 use Zenstruck\Foundry\Exception\FoundryBootException;
 
 /**
@@ -40,6 +41,8 @@ final class Configuration
     private bool $flushEnabled = true;
 
     private bool $databaseResetEnabled = true;
+
+    private bool $persistEnabled = true;
 
     /**
      * @param string[] $ormConnectionsToReset
@@ -177,6 +180,10 @@ final class Configuration
      */
     public function repositoryFor(object|string $objectOrClass): RepositoryProxy
     {
+        if (!$this->isPersistEnabled()) {
+            throw new \RuntimeException('Cannot get repository when persist is disabled.');
+        }
+
         if ($objectOrClass instanceof Proxy) {
             $objectOrClass = $objectOrClass->object();
         }
@@ -251,5 +258,20 @@ final class Configuration
         }
 
         return $this->managerRegistry;
+    }
+
+    public function disablePersist(): void
+    {
+        $this->persistEnabled = false;
+    }
+
+    public function enablePersist(): void
+    {
+        $this->persistEnabled = true;
+    }
+
+    public function isPersistEnabled(): bool
+    {
+        return $this->persistEnabled === true;
     }
 }

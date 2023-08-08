@@ -16,6 +16,8 @@ use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
+use function Zenstruck\Foundry\anonymous;
+use function Zenstruck\Foundry\create;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -423,6 +425,65 @@ abstract class ModelFactoryTest extends KernelTestCase
         // pass random method
         $category = $categoryFactoryClass::createOne(['updateName' => 'another foo']);
         self::assertSame('another foo', $category->getName());
+    }
+
+    /**
+     * @test
+     */
+    public function can_disable_persist_globally(): void
+    {
+        $this->disablePersist();
+
+        $categoryFactoryClass = $this->categoryFactoryClass();
+
+        $categoryFactoryClass::createOne(['name' => 'foo']);
+        $categoryFactoryClass::new()->create(['name' => 'foo']);
+        anonymous($this->categoryClass())->create(['name' => 'foo']);
+        create($this->categoryClass(), ['name' => 'foo']);
+
+        $this->enablePersist(); // need to reactivate persist to access to RepositoryAssertions
+        $categoryFactoryClass::assert()->count(0);
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_access_repository_method_when_persist_disabled(): void
+    {
+        $this->disablePersist();
+
+        $countErrors = 0;
+        try {
+            $this->categoryFactoryClass()::assert();
+        } catch (\RuntimeException $e) {
+            $countErrors++;
+        }
+
+        try {
+            $this->categoryFactoryClass()::repository();
+        } catch (\RuntimeException $e) {
+            $countErrors++;
+        }
+
+        try {
+            $this->categoryFactoryClass()::findBy([]);
+        } catch (\RuntimeException $e) {
+            $countErrors++;
+        }
+
+        self::assertSame(3, $countErrors);
+    }
+
+    /**
+     * @test
+     * @depends cannot_access_repository_method_when_persist_disabled
+     */
+    public function assert_persist_is_re_enabled_automatically(): void
+    {
+        self::assertTrue(Factory::configuration()->isPersistEnabled());
+
+        create($this->categoryClass(), ['name' => 'foo']);
+        $this->categoryFactoryClass()::assert()->count(1);
     }
 
     abstract protected function categoryClass(): string;

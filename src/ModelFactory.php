@@ -60,9 +60,16 @@ abstract class ModelFactory extends Factory
 
         $factory = $factory
             ->withAttributes(static fn(): array => $factory->getDefaults())
-            ->withAttributes($defaultAttributes)
-            ->initialize()
-        ;
+            ->withAttributes($defaultAttributes);
+
+        try {
+            if (!Factory::configuration()->isPersistEnabled()) {
+                $factory = $factory->withoutPersisting();
+            }
+        } catch (FoundryBootException) {
+        }
+
+        $factory = $factory->initialize();
 
         if (!$factory instanceof static) {
             throw new \TypeError(\sprintf('"%1$s::initialize()" must return an instance of "%1$s".', static::class));
@@ -259,7 +266,11 @@ abstract class ModelFactory extends Factory
 
     final public static function assert(): RepositoryAssertions
     {
-        return static::repository()->assert();
+        try {
+            return static::repository()->assert();
+        } catch (\Throwable $e) {
+            throw new \RuntimeException(\sprintf('Cannot create repository assertion: %s', $e->getMessage()), previous: $e);
+        }
     }
 
     /**
