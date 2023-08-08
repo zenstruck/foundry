@@ -16,6 +16,7 @@ use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
+
 use function Zenstruck\Foundry\anonymous;
 use function Zenstruck\Foundry\create;
 
@@ -456,19 +457,19 @@ abstract class ModelFactoryTest extends KernelTestCase
         try {
             $this->categoryFactoryClass()::assert();
         } catch (\RuntimeException $e) {
-            $countErrors++;
+            ++$countErrors;
         }
 
         try {
             $this->categoryFactoryClass()::repository();
         } catch (\RuntimeException $e) {
-            $countErrors++;
+            ++$countErrors;
         }
 
         try {
             $this->categoryFactoryClass()::findBy([]);
         } catch (\RuntimeException $e) {
-            $countErrors++;
+            ++$countErrors;
         }
 
         self::assertSame(3, $countErrors);

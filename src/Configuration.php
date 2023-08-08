@@ -15,7 +15,6 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Faker;
-use Zenstruck\Foundry\Exception\CannotGetRepositoryException;
 use Zenstruck\Foundry\Exception\FoundryBootException;
 
 /**
@@ -248,18 +247,6 @@ final class Configuration
         return $this->odmObjectManagersToReset;
     }
 
-    /**
-     * @throws FoundryBootException
-     */
-    private function managerRegistry(): ?ManagerRegistry
-    {
-        if (!$this->hasManagerRegistry()) {
-            throw FoundryBootException::notBootedWithDoctrine();
-        }
-
-        return $this->managerRegistry;
-    }
-
     public function disablePersist(): void
     {
         $this->persistEnabled = false;
@@ -272,6 +259,18 @@ final class Configuration
 
     public function isPersistEnabled(): bool
     {
-        return $this->persistEnabled === true;
+        return true === $this->persistEnabled;
+    }
+
+    /**
+     * @throws FoundryBootException
+     */
+    private function managerRegistry(): ?ManagerRegistry
+    {
+        if (!$this->hasManagerRegistry()) {
+            throw FoundryBootException::notBootedWithDoctrine();
+        }
+
+        return $this->managerRegistry;
     }
 }
