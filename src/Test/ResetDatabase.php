@@ -50,7 +50,7 @@ trait ResetDatabase
         }
 
         if (self::shouldReset($kernel)) {
-            DatabaseResetter::resetDatabase($kernel);
+            DatabaseResetter::resetDatabase($kernel, $isDAMADoctrineTestBundleEnabled);
         }
 
         if ($isDAMADoctrineTestBundleEnabled) {

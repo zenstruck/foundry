@@ -37,7 +37,7 @@ final class DatabaseResetter
         return \class_exists(StaticDriver::class) && StaticDriver::isKeepStaticConnections();
     }
 
-    public static function resetDatabase(KernelInterface $kernel): void
+    public static function resetDatabase(KernelInterface $kernel, bool $damaIsEnabled): void
     {
         if (!$kernel->getContainer()->has('doctrine')) {
             return;
@@ -47,7 +47,7 @@ final class DatabaseResetter
 
         $databaseResetter->resetDatabase();
 
-        self::bootFoundry($kernel);
+        self::bootFoundry($kernel, flushGlobalState: $damaIsEnabled);
 
         self::$hasBeenReset = true;
     }
@@ -82,7 +82,7 @@ final class DatabaseResetter
         return $databaseResetters;
     }
 
-    private static function bootFoundry(KernelInterface $kernel): void
+    private static function bootFoundry(KernelInterface $kernel, bool $flushGlobalState = true): void
     {
         $container = $kernel->getContainer();
 
@@ -90,9 +90,11 @@ final class DatabaseResetter
             TestState::bootFromContainer($container);
         }
 
-        TestState::flushGlobalState(
-            $container->has('.zenstruck_foundry.global_state_registry') ? $container->get('.zenstruck_foundry.global_state_registry') : null
-        );
+        if ($flushGlobalState) {
+            TestState::flushGlobalState(
+                $container->has('.zenstruck_foundry.global_state_registry') ? $container->get('.zenstruck_foundry.global_state_registry') : null
+            );
+        }
     }
 
     private static function createApplication(KernelInterface $kernel): Application
