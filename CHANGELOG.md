@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [v1.35.0](https://github.com/zenstruck/foundry/releases/tag/v1.35.0)
+
+August 10th, 2023 - [v1.34.1...v1.35.0](https://github.com/zenstruck/foundry/compare/v1.34.1...v1.35.0)
+
+* 342a2c9 feat: disable persist globally (#488) by @nikophil
+* fbccdd3 fix: do not flush global state twice when dama is not enabled (#489) by @nikophil
+
 ## [v1.34.1](https://github.com/zenstruck/foundry/releases/tag/v1.34.1)
 
 August 4th, 2023 - [v1.34.0...v1.34.1](https://github.com/zenstruck/foundry/compare/v1.34.0...v1.34.1)
