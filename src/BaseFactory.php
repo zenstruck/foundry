@@ -13,7 +13,6 @@ namespace Zenstruck\Foundry;
 
 use Faker;
 use Zenstruck\Foundry\Exception\FoundryBootException;
-use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
