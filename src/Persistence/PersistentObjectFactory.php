@@ -405,15 +405,6 @@ abstract class PersistentObjectFactory extends ObjectFactory
         return [$object, $parameters, $callbacks];
     }
 
-    private static function normalizeObject(object $object): object
-    {
-        try {
-            return Proxy::createFromPersisted($object)->refresh()->object();
-        } catch (\RuntimeException) {
-            return $object;
-        }
-    }
-
     protected function isPersisting(): bool
     {
         if (!$this->persist || !self::persistenceManager()->isPersistEnabled() || !self::persistenceManager()->hasManagerRegistry()) {
@@ -438,6 +429,15 @@ abstract class PersistentObjectFactory extends ObjectFactory
         }
 
         return true;
+    }
+
+    private static function normalizeObject(object $object): object
+    {
+        try {
+            return Proxy::createFromPersisted($object)->refresh()->object();
+        } catch (\RuntimeException) {
+            return $object;
+        }
     }
 
     /**
