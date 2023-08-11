@@ -9,7 +9,7 @@ foreach ($makeFactoryData->getUses() as $use) {
 ?>
 
 /**
- * @extends PersistentObjectFactory<<?= $makeFactoryData->getObjectShortName() ?>>
+ * @extends <?= $makeFactoryData->baseFactoryClass() ?><<?= $makeFactoryData->getObjectShortName() ?>>
  *
 <?php
 foreach ($makeFactoryData->getMethodsPHPDoc() as $methodPHPDoc) {
@@ -17,7 +17,7 @@ foreach ($makeFactoryData->getMethodsPHPDoc() as $methodPHPDoc) {
 }
 ?>
  */
-final class <?= $class_name ?> extends PersistentObjectFactory
+final class <?= $class_name ?> extends <?= $makeFactoryData->baseFactoryClass() ?>
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -51,9 +51,6 @@ foreach ($makeFactoryData->getDefaultProperties() as $propertyName => $value) {
     protected function initialize(): self
     {
         return $this
-<?php if (!$makeFactoryData->isPersisted()): ?>
-            ->withoutPersisting()
-<?php endif ?>
             // ->afterInstantiate(function(<?= $makeFactoryData->getObjectShortName() ?> $<?= lcfirst($makeFactoryData->getObjectShortName()) ?>): void {})
         ;
     }
