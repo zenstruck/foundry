@@ -14,7 +14,7 @@ class PostFactory extends PersistentObjectFactory
 {
     public function published(): static
     {
-        return $this->addState(static fn(): array => ['published_at' => self::faker()->dateTime()]);
+        return $this->withAttributes(static fn(): array => ['published_at' => self::faker()->dateTime()]);
     }
 
     public static function class(): string
