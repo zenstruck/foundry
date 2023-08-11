@@ -194,6 +194,9 @@ This command will generate a ``PostFactory`` class that looks like this:
 
     Using ``make:factory --test`` will generate the factory in ``tests/Factory``.
 
+    The generated ``@method`` docblocks above enable autocompletion with your IDE. They will be automatically added when
+    using the ``make:factory`` command.
+
 .. tip::
 
     You can globally configure which namespace the factories will be generated in:
@@ -209,39 +212,6 @@ This command will generate a ``PostFactory`` class that looks like this:
                         default_namespace: 'App\\MyFactories'
 
     You can override this configuration by using the ``--namespace`` option.
-
-
-.. note::
-
-    The generated ``@method`` docblocks above enable autocompletion with PhpStorm but
-    cause errors with PHPStan and Psalm. To support PHPStan or Psalm for your factory's, you need to *also*
-    add the following dockblocks (replace ``phpstan-`` prefix by ``psalm-`` accordingly to your static analysis tool):
-
-    .. code-block:: php
-
-        /**
-         * ...
-         *
-         * @phpstan-method        Proxy<Post> create(array|callable $attributes = [])
-         * @phpstan-method static Proxy<Post> createOne(array $attributes = [])
-         * @phpstan-method static Proxy<Post> find(object|array|mixed $criteria)
-         * @phpstan-method static Proxy<Post> findOrCreate(array $attributes)
-         * @phpstan-method static Proxy<Post> first(string $sortedField = 'id')
-         * @phpstan-method static Proxy<Post> last(string $sortedField = 'id')
-         * @phpstan-method static Proxy<Post> random(array $attributes = [])
-         * @phpstan-method static Proxy<Post> randomOrCreate(array $attributes = [])
-         * @phpstan-method static RepositoryProxy<Post> repository()
-         * @phpstan-method static list<Proxy<Post>> all()
-         * @phpstan-method static list<Proxy<Post>> createMany(int $number, array|callable $attributes = [])
-         * @phpstan-method static list<Proxy<Post>> createSequence(iterable|callable $sequence)
-         * @phpstan-method static list<Proxy<Post>> findBy(array $attributes)
-         * @phpstan-method static list<Proxy<Post>> randomRange(int $min, int $max, array $attributes = [])
-         * @phpstan-method static list<Proxy<Post>> randomSet(int $number, array $attributes = [])
-         */
-        final class PostFactory extends ModelFactory
-        {
-            // ...
-        }
 
 In the ``getDefaults()``, you can return an array of all default values that any new object
 should have. `Faker`_ is available to easily get random data:
@@ -1971,6 +1941,37 @@ Objects can be fetched from pools in your tests, fixtures or other stories:
     ProvinceStory::getRandomSet('be', 3); // 3 random Province|Proxy's from "be" pool
     ProvinceStory::getRandomRange('be', 1, 4); // between 1 and 4 random Province|Proxy's from "be" pool
     ProvinceStory::getPool('be'); // all Province|Proxy's from "be" pool
+
+Static analysis
+---------------
+
+Foundry ships a PHPStan extension and a Psalm plugin to help with static analysis.
+
+.. versionadded:: 1.36
+
+    PHPStan extension and Psalm plugin were added in version 1.36. Prior to this version it was needed to add some PHPDoc
+    ``@phpstan-method`` or ``@psalm-method`` annotations to the factories, in order to help the static analysis tools.
+    Those are not needed anymore, aand you can remove them.
+
+PHPStan extension
+~~~~~~~~~~~~~~~~~
+
+The PHPStan extension for Foundry will be installed automatically if you have ``phpstan/extension-installer`` installed.
+Otherwise you will need to include manually ``vendor/zenstruck/foundry/phpstan-foundry.neon`` in ``phpstan.neon``.
+
+Psalm plugin
+~~~~~~~~~~~~
+
+You can install the Psalm extension for Foundry by running the command ``vendor/bin/psalm-plugin enable zenstruck/foundry``.
+Or you can add the following snippet to `psalm.xml`:
+
+.. code-block:: xml
+
+    <plugins>
+        <pluginClass class="Zenstruck\Psalm\FoundryPlugin" />
+    </plugins>
+
+
 
 Bundle Configuration
 --------------------
