@@ -14,6 +14,7 @@ namespace Zenstruck\Foundry\Tests\Functional;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\BaseFactory;
 use Zenstruck\Foundry\FactoryCollection;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
@@ -492,7 +493,7 @@ abstract class ModelFactoryTest extends KernelTestCase
      */
     public function assert_persist_is_re_enabled_automatically(): void
     {
-        self::assertTrue(Factory::configuration()->isPersistEnabled());
+        self::assertTrue(PersistentObjectFactory::persistenceManager()->isPersistEnabled());
 
         create($this->categoryClass(), ['name' => 'foo']);
         $this->categoryFactoryClass()::assert()->count(1);

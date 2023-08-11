@@ -62,7 +62,7 @@ trait Factories
     public static function _tearDownFactories(): void
     {
         try {
-            Factory::configuration()->enablePersist();
+            PersistentObjectFactory::persistenceManager()->enablePersist();
         } catch (FoundryBootException) {
         }
 
@@ -71,11 +71,11 @@ trait Factories
 
     public function disablePersist(): void
     {
-        Factory::configuration()->disablePersist();
+        PersistentObjectFactory::persistenceManager()->disablePersist();
     }
 
     public function enablePersist(): void
     {
-        Factory::configuration()->enablePersist();
+        PersistentObjectFactory::persistenceManager()->enablePersist();
     }
 }
