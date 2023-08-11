@@ -414,7 +414,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
         }
     }
 
-    private function isPersisting(): bool
+    protected function isPersisting(): bool
     {
         if (!$this->persist || !self::persistenceManager()->isPersistEnabled() || !self::persistenceManager()->hasManagerRegistry()) {
             return false;
