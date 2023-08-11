@@ -363,17 +363,17 @@ you can also add *states*:
         public function published(): self
         {
             // call setPublishedAt() and pass a random DateTime
-            return $this->addState(['published_at' => self::faker()->dateTime()]);
+            return $this->withAttributes(['published_at' => self::faker()->dateTime()]);
         }
 
         public function unpublished(): self
         {
-            return $this->addState(['published_at' => null]);
+            return $this->withAttributes(['published_at' => null]);
         }
 
         public function withViewCount(int $count = null): self
         {
-            return $this->addState(function () use ($count) {
+            return $this->withAttributes(function () use ($count) {
                 return ['view_count' => $count ?? self::faker()->numberBetween(0, 10000)];
             });
         }

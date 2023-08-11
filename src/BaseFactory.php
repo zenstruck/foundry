@@ -55,7 +55,7 @@ abstract class BaseFactory
     final public static function new(array|callable|string $attributes = [], string ...$states): static
     {
         if (\is_string($attributes) || $states) {
-            trigger_deprecation('zenstruck/foundry', '1.32', 'Passing states as strings is deprecated and this behavior will be removed in 2.0.', self::class, self::class);
+            trigger_deprecation('zenstruck/foundry', '1.36', 'Passing states as strings is deprecated and this behavior will be removed in 2.0.', self::class, self::class);
         }
 
         if (\is_string($attributes)) {
@@ -292,6 +292,8 @@ abstract class BaseFactory
      */
     final protected function addState(array|callable $attributes = []): static
     {
+        trigger_deprecation('zenstruck/foundry', '1.36', 'Method "addState()" is deprecated and will be removed in 2.0, please use "withAttributes()" instead.');
+
         return $this->withAttributes($attributes);
     }
 

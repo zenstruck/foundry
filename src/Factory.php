@@ -19,7 +19,7 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  *
- * @deprecated since 1.32, use "Zenstruck\Foundry\Persistence\PersistentObjectFactory" instead
+ * @deprecated since 1.36, use "Zenstruck\Foundry\Persistence\PersistentObjectFactory" instead
  */
 abstract class Factory extends PersistentObjectFactory
 {
@@ -28,7 +28,7 @@ abstract class Factory extends PersistentObjectFactory
      */
     public function __construct(string $class, array|callable $defaultAttributes = [])
     {
-        trigger_deprecation('zenstruck/foundry', '1.32', '"%s" is deprecated and this class will be removed in 2.0, please use "%s" instead.', self::class, PersistentObjectFactory::class);
+        trigger_deprecation('zenstruck/foundry', '1.36', '"%s" is deprecated and this class will be removed in 2.0, please use "%s" instead.', self::class, PersistentObjectFactory::class);
 
         /** @phpstan-ignore-next-line */
         if (self::class === static::class) {
