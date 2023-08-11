@@ -109,7 +109,7 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
                 // let's drop all connections to the database to be able to drop it
                 $this->runCommand(
                     $this->application,
-                    'doctrine:query:sql',
+                    'dbal:run-sql',
                     [
                         '--connection' => $connection,
                         'sql' => 'SELECT pid, pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = current_database() AND pid <> pg_backend_pid()',
