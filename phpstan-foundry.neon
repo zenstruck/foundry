@@ -4,6 +4,10 @@ services:
         tags:
             - phpstan.broker.dynamicMethodReturnTypeExtension
     -
+        class: Zenstruck\Foundry\PhpStan\FactoryCollectionMethodsTypeResolver
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
         class: Zenstruck\Foundry\PhpStan\FactoryStaticMethodsTypeResolver
         tags:
             - phpstan.broker.dynamicStaticMethodReturnTypeExtension

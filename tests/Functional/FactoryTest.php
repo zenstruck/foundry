@@ -208,6 +208,9 @@ final class FactoryTest extends KernelTestCase
 
     /**
      * @test
+     *
+     * legacy tag could be removed once SomeOtherObjectFactory extends ObjectFactory
+     * @group legacy
      */
     public function can_create_an_object_not_persisted_with_nested_factory(): void
     {
@@ -218,7 +221,7 @@ final class FactoryTest extends KernelTestCase
 
     /**
      * @test
-     * @legacy
+     * @group legacy
      */
     public function can_use_legacy_factory(): void
     {

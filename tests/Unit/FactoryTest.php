@@ -24,6 +24,7 @@ use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\UserFactory;
 
@@ -162,11 +163,17 @@ final class FactoryTest extends TestCase
 
                 return $attributes;
             })
+            ->beforeInstantiate(static function(array $attributes): array {
+                $attributes['category'] = CategoryFactory::new(['name' => 'foo']);
+
+                return $attributes;
+            })
             ->create($attributeArray)
         ;
 
         $this->assertSame('title', $object->getTitle());
         $this->assertSame('body', $object->getBody());
+        $this->assertSame('foo', $object->getCategory()->getName());
     }
 
     /**

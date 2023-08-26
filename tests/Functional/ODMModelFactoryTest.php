@@ -38,14 +38,23 @@ final class ODMModelFactoryTest extends ModelFactoryTest
      */
     public function can_use_factory_for_embedded_object(): void
     {
-        $proxyObject = CommentFactory::createOne(['user' => new ODMUser('some user'), 'body' => 'some body']);
-        self::assertInstanceOf(Proxy::class, $proxyObject);
-        self::assertFalse($proxyObject->isPersisted());
-
-        $comment = $proxyObject->object();
+        $comment = CommentFactory::createOne(['user' => new ODMUser('some user'), 'body' => 'some body']);
         self::assertInstanceOf(ODMComment::class, $comment);
         self::assertEquals(new ODMUser('some user'), $comment->getUser());
         self::assertSame('some body', $comment->getBody());
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    public function can_use_factory_for_embedded_object_legacy(): void
+    {
+        $proxy = UserFactory::createOne(['name' => 'foo']);
+        self::assertInstanceOf(Proxy::class, $proxy);
+        self::assertSame('foo', $proxy->getName());
+        self::assertInstanceOf(ODMUser::class, $proxy->object());
+        self::assertSame('foo', $proxy->object()->getName());
     }
 
     /**
@@ -95,6 +104,9 @@ final class ODMModelFactoryTest extends ModelFactoryTest
 
     /**
      * @test
+     *
+     * legacy tag could be removed once UserFactory extends ObjectFactory
+     * @group legacy
      */
     public function can_find_or_create_from_object(): void
     {
@@ -112,6 +124,9 @@ final class ODMModelFactoryTest extends ModelFactoryTest
 
     /**
      * @test
+     *
+     *  legacy tag could be removed once UserFactory extends ObjectFactory
+     * @group legacy
      */
     public function can_find_or_create_from_proxy_of_object(): void
     {

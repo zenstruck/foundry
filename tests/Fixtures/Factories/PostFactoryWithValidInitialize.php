@@ -7,7 +7,7 @@ namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
  */
 final class PostFactoryWithValidInitialize extends PostFactory
 {
-    protected function initialize(): self
+    protected function initialize(): static
     {
         return $this->published();
     }

@@ -19,6 +19,7 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
  * Let's make Psalm forget about `@method` in factories PHPDoc.
+ * @internal
  */
 final class RemoveFactoryPhpDocMethods implements AfterClassLikeVisitInterface
 {
@@ -27,7 +28,7 @@ final class RemoveFactoryPhpDocMethods implements AfterClassLikeVisitInterface
         $classLikeStorage = $event->getStorage();
 
         if (PersistentObjectFactory::class === $classLikeStorage->parent_class
-            || \is_subclass_of($classLikeStorage->name, PersistentObjectFactory::class)) {
+            || PsalmTypeHelper::isSubClassOf($classLikeStorage->name, PersistentObjectFactory::class)) {
             foreach (\array_keys($classLikeStorage->pseudo_methods) as $name) {
                 if (\method_exists(PersistentObjectFactory::class, $name)) {
                     unset($classLikeStorage->pseudo_methods[$name]);

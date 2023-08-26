@@ -13,11 +13,13 @@ assertType('Zenstruck\Foundry\Proxy<Zenstruck\Foundry\Tests\Fixtures\Entity\Post
 assertType('Zenstruck\Foundry\Proxy<Zenstruck\Foundry\Tests\Fixtures\Entity\Post>', PostFactory::new()->create(['title' => 'foo']));
 assertType('Zenstruck\Foundry\Proxy<Zenstruck\Foundry\Tests\Fixtures\Entity\Post>', PostFactory::new()->create(fn() => ['title' => 'foo']));
 assertType('Zenstruck\Foundry\Proxy<Zenstruck\Foundry\Tests\Fixtures\Entity\Post>', PostFactory::createOne());
+assertType('Zenstruck\Foundry\Proxy<Zenstruck\Foundry\Tests\Fixtures\Entity\Post>', PostFactory::findOrCreate([]));
 assertType('Zenstruck\Foundry\RepositoryProxy<Zenstruck\Foundry\Tests\Fixtures\Entity\Post>', PostFactory::repository());
 assertType('Zenstruck\Foundry\FactoryCollection<Zenstruck\Foundry\Proxy<Zenstruck\Foundry\Tests\Fixtures\Entity\Post>>', PostFactory::new()->many(2));
 assertType('Zenstruck\Foundry\FactoryCollection<Zenstruck\Foundry\Proxy<Zenstruck\Foundry\Tests\Fixtures\Entity\Post>>', PostFactory::new()->sequence([[]]));
 assertType('array<int, Zenstruck\Foundry\Proxy<Zenstruck\Foundry\Tests\Fixtures\Entity\Post>>', PostFactory::new()->many(2)->create());
 assertType('array<int, Zenstruck\Foundry\Proxy<Zenstruck\Foundry\Tests\Fixtures\Entity\Post>>', PostFactory::createMany(2));
+assertType('array<int, Zenstruck\Foundry\Proxy<Zenstruck\Foundry\Tests\Fixtures\Entity\Post>>', PostFactory::all([]));
 
 assertType('Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject', SomeObjectFactory::new()->create());
 assertType('Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject', SomeObjectFactory::new()->create(['title' => 'foo']));
@@ -42,3 +44,7 @@ assertType('Zenstruck\Foundry\FactoryCollection<Zenstruck\Foundry\Tests\Fixtures
 assertType('array<int, Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject>', anonymous(SomeObject::class)->many(2)->create());
 assertType('Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject', create(SomeObject::class));
 assertType('Zenstruck\Foundry\FactoryCollection<Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject>', create_many(2, SomeObject::class));
+
+assertType('Zenstruck\Foundry\FactoryCollection<Zenstruck\Foundry\Tests\Fixtures\Entity\Post>', \Zenstruck\Foundry\FactoryCollection::set(PostFactory::new(), 2));
+assertType('array<int, Zenstruck\Foundry\Proxy<Zenstruck\Foundry\Tests\Fixtures\Entity\Post>>', \Zenstruck\Foundry\FactoryCollection::set(PostFactory::new(), 2)->create());
+assertType('array<int, Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject>', \Zenstruck\Foundry\FactoryCollection::set(SomeObjectFactory::new(), 2)->create());

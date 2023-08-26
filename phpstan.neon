@@ -10,8 +10,11 @@ parameters:
     paths:
         - ./src
 
-        # let's analyse factories generated with maker
+        # let's analyse a factory generated with maker
         - ./tests/Fixtures/Maker/expected/can_create_factory.php
+
+        # and a factory used in tests
+        - ./tests/Fixtures/Factories/PostFactory.php
     level: 8
     bootstrapFiles:
         - ./vendor/autoload.php

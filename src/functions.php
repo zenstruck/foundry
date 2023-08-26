@@ -11,10 +11,9 @@
 
 namespace Zenstruck\Foundry;
 
-use Doctrine\ODM\MongoDB\Mapping\Annotations\Document;
-use Doctrine\ORM\Mapping\Entity;
 use Faker;
 use Zenstruck\Foundry\Object\ObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistenceManager;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
@@ -50,8 +49,7 @@ function anonymous(string $class, array|callable $defaultAttributes = []): Objec
     if (!\class_exists($anonymousClassName)) { // @phpstan-ignore-line
         $factoryClass = ObjectFactory::class;
 
-        $reflectionClass = new \ReflectionClass($class);
-        if ($reflectionClass->getAttributes(Entity::class) || $reflectionClass->getAttributes(Document::class)) {
+        if (PersistenceManager::classCanBePersisted($class)) {
             $factoryClass = PersistentObjectFactory::class;
         }
 

@@ -51,8 +51,9 @@ abstract class BaseFactory
 
     /**
      * @param Attributes|string $attributes
+     * @final
      */
-    final public static function new(array|callable|string $attributes = [], string ...$states): static
+    public static function new(array|callable|string $attributes = [], string ...$states): static
     {
         if (\is_string($attributes) || $states) {
             trigger_deprecation('zenstruck/foundry', '1.36', 'Passing states as strings is deprecated and this behavior will be removed in 2.0.', self::class, self::class);
@@ -242,10 +243,6 @@ abstract class BaseFactory
      */
     protected function normalizeAttribute(mixed $value, string $name): mixed
     {
-        if (\is_callable($value)) {
-            $value = $value();
-        }
-
         if ($value instanceof FactoryCollection) {
             $value = $value->all();
         }
@@ -265,9 +262,10 @@ abstract class BaseFactory
     }
 
     /**
+     * @internal
      * @param Attributes $attributes
      */
-    final protected function mergedAttributes(array|callable $attributes): array
+    protected function mergedAttributes(array|callable $attributes): array
     {
         return \array_merge(
             ...[

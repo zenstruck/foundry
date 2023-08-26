@@ -43,6 +43,15 @@ abstract class PersistentObjectFactory extends ObjectFactory
     private bool $persist = true;
     private bool $cascadePersist = false;
 
+    final public static function new(array|callable|string $attributes = [], string ...$states): static
+    {
+        if (!PersistenceManager::classCanBePersisted(static::class())) {
+            trigger_deprecation('zenstruck/foundry', '1.36', 'Class "%s" cannot be persisted. Using "%s" with non-persistable class is deprecated and will throw an exception in 2.0. Please use "%s".', static::class(), PersistentObjectFactory::class, ObjectFactory::class);
+        }
+
+        return parent::new($attributes, ...$states);
+    }
+
     /**
      * @internal
      */
@@ -299,10 +308,6 @@ abstract class PersistentObjectFactory extends ObjectFactory
     {
         if ($value instanceof Proxy) {
             return $value->isPersisted() ? $value->refresh()->object() : $value->object();
-        }
-
-        if (\is_callable($value)) {
-            $value = $value();
         }
 
         if ($value instanceof FactoryCollection) {

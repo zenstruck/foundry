@@ -45,18 +45,37 @@ final class FactoryCollection implements \IteratorAggregate
         $this->max = $max ?? $min;
     }
 
+    /**
+     * @template U
+     *
+     * @param BaseFactory<U> $factory
+     *
+     * @return static<U>
+     */
     public static function set(BaseFactory $factory, int $count): self
     {
         return new self($factory, $count, null, null, true);
     }
 
+    /**
+     * @template U
+     *
+     * @param BaseFactory<U> $factory
+     *
+     * @return static<U>
+     */
     public static function range(BaseFactory $factory, int $min, int $max): self
     {
         return new self($factory, $min, $max, null, true);
     }
 
     /**
+     * @template U
+     *
+     * @param BaseFactory<U> $factory
      * @param Parameters $sequence
+     *
+     * @return static<U>
      */
     public static function sequence(BaseFactory $factory, iterable $sequence): self
     {

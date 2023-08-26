@@ -16,6 +16,9 @@ namespace Zenstruck\Foundry\Psalm;
 use Psalm\Plugin\PluginEntryPointInterface;
 use Psalm\Plugin\RegistrationInterface;
 
+/**
+ * @internal
+ */
 final class FoundryPlugin implements PluginEntryPointInterface
 {
     public function __invoke(RegistrationInterface $psalm, ?\SimpleXMLElement $config = null): void
