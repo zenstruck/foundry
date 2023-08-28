@@ -76,6 +76,7 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
                 [
                     '--em' => $manager,
                     '--force' => true,
+                    '--complete' => true,
                 ]
             );
         }
