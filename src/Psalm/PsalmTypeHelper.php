@@ -13,12 +13,14 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Psalm;
 
-use Doctrine\ODM\MongoDB\Mapping\Annotations\Document;
-use Doctrine\ORM\Mapping\Entity;
 use PhpParser\Node\Expr\ClassConstFetch;
 use Zenstruck\Foundry\FactoryCollection;
+use Zenstruck\Foundry\Persistence\PersistenceManager;
 use Zenstruck\Foundry\Proxy;
 
+/**
+ * @internal
+ */
 final class PsalmTypeHelper
 {
     public static function classType(string $targetClass): \Psalm\Type\Union
@@ -66,8 +68,19 @@ final class PsalmTypeHelper
             return null;
         }
 
-        $reflectionClass = new \ReflectionClass($factoryTargetClass);
+        return PersistenceManager::classCanBePersisted($factoryTargetClass);
+    }
 
-        return $reflectionClass->getAttributes(Entity::class) || $reflectionClass->getAttributes(Document::class);
+    /**
+     * @param class-string $class
+     * @param class-string $potentialParent
+     */
+    public static function isSubClassOf(string $class, string $potentialParent): bool
+    {
+        try {
+            return \is_subclass_of($class, $potentialParent);
+        } catch (\Throwable) {
+            return false;
+        }
     }
 }

@@ -680,6 +680,9 @@ final class ORMModelFactoryTest extends ModelFactoryTest
 
     /**
      * @test
+     *
+     *  legacy tag could be removed once SomeOtherObjectFactory extends ObjectFactory
+     * @group legacy
      */
     public function it_can_create_entity_with_property_name_different_from_constructor_name(): void
     {

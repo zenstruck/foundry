@@ -17,15 +17,23 @@ use PhpParser\Node\Expr\CallLike;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\StaticCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\Reflection\MethodReflection;
+use PHPStan\Type\Accessory\AccessoryArrayListType;
 use PHPStan\Type\ArrayType;
 use PHPStan\Type\Generic\GenericObjectType;
 use PHPStan\Type\IntegerType;
 use PHPStan\Type\ObjectType;
+use PHPStan\Type\ThisType;
+use PHPStan\Type\Type;
 use Zenstruck\Foundry\BaseFactory;
 use Zenstruck\Foundry\FactoryCollection;
+use Zenstruck\Foundry\Object\ObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Proxy;
 
+/**
+ * @internal
+ */
 final class FactoryMetadata
 {
     public function __construct(
@@ -36,15 +44,21 @@ final class FactoryMetadata
     ) {
     }
 
-    public static function getFactoryMetadata(CallLike $methodCall, Scope $scope): ?self
+    public static function getFactoryMetadata(CallLike $methodCall, MethodReflection $methodReflection, Scope $scope): ?self
     {
         $type = match (true) {
             $methodCall instanceof MethodCall => $scope->getType($methodCall->var),
-            $methodCall instanceof StaticCall => new ObjectType($methodCall->class->toString()),
+            $methodCall instanceof StaticCall => new ObjectType(
+                !in_array($methodCall->class->toString(), ['self', 'static'], true)
+                    ? $methodCall->class->toString()
+                    : $methodReflection->getDeclaringClass()->getName()
+            ),
             default => null
         };
 
-        if (!$type instanceof ObjectType) {
+        if ($type instanceof ThisType && is_a($factoryClass = $type->getClassName(), ObjectFactory::class, true)) {
+            return new self($factoryClass, $factoryClass::class());
+        } elseif (!$type instanceof ObjectType) {
             return null;
         }
 
@@ -76,12 +90,9 @@ final class FactoryMetadata
             : new ObjectType($this->targetClass);
     }
 
-    public function getListResultType(): ArrayType
+    public function getListResultType(): Type
     {
-        return new ArrayType(
-            new IntegerType(),
-            $this->getSingleResultType()
-        );
+        return AccessoryArrayListType::intersectWith(new ArrayType(new IntegerType(), $this->getSingleResultType()));
     }
 
     public function getFactoryCollectionResultType(): GenericObjectType

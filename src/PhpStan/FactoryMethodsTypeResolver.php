@@ -20,6 +20,9 @@ use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\Type;
 use Zenstruck\Foundry\BaseFactory;
 
+/**
+ * @internal
+ */
 final class FactoryMethodsTypeResolver implements DynamicMethodReturnTypeExtension
 {
     public function getClass(): string
@@ -42,7 +45,7 @@ final class FactoryMethodsTypeResolver implements DynamicMethodReturnTypeExtensi
 
     public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope): ?Type
     {
-        $factoryMetadata = FactoryMetadata::getFactoryMetadata($methodCall, $scope);
+        $factoryMetadata = FactoryMetadata::getFactoryMetadata($methodCall, $methodReflection, $scope);
 
         if (!$factoryMetadata) {
             return null;

@@ -13,7 +13,10 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Persistence;
 
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ODM\MongoDB\Mapping\Annotations\Document as ODMDocumentAttribute;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\Entity as ORMEntityAttribute;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Zenstruck\Foundry\Exception\FoundryBootException;
@@ -30,6 +33,8 @@ final class PersistenceManager
     private bool $flushEnabled = true;
 
     private bool $persistEnabled = true;
+
+    private static AnnotationReader|null $annotationReader = null;
 
     /**
      * @param class-string $class
@@ -117,6 +122,29 @@ final class PersistenceManager
         return true === $this->persistEnabled;
     }
 
+    /**
+     * @param class-string $targetClass
+     */
+    public static function classCanBePersisted(string $targetClass): bool
+    {
+        $reflectionClass = new \ReflectionClass($targetClass);
+
+        $attributes = $reflectionClass->getAttributes(ORMEntityAttribute::class);
+        if (!$attributes) {
+            $attributes = ($reflectionClass)->getAttributes(ODMDocumentAttribute::class);
+        }
+
+        if (!$attributes) {
+            $attributes = self::annotationReader()?->getClassAnnotation($reflectionClass, ORMEntityAttribute::class);
+        }
+
+        if (!$attributes) {
+            $attributes = self::annotationReader()?->getClassAnnotation($reflectionClass, ODMDocumentAttribute::class);
+        }
+
+        return (bool) $attributes;
+    }
+
     private function managerRegistry(): ManagerRegistry
     {
         if (!$this->hasManagerRegistry()) {
@@ -124,5 +152,14 @@ final class PersistenceManager
         }
 
         return $this->managerRegistry;
+    }
+
+    private static function annotationReader(): AnnotationReader|null
+    {
+        if (\class_exists(AnnotationReader::class)) {
+            return self::$annotationReader ??= new AnnotationReader();
+        }
+
+        return null;
     }
 }

@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\PhpStan;
 
-use Doctrine\ODM\MongoDB\Mapping\Annotations\Document;
-use Doctrine\ORM\Mapping\Entity;
 use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Name\FullyQualified;
@@ -25,8 +23,12 @@ use PHPStan\Type\Generic\GenericObjectType;
 use PHPStan\Type\ObjectType;
 use Zenstruck\Foundry\BaseFactory;
 use Zenstruck\Foundry\Object\ObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistenceManager;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
+/**
+ * @internal
+ */
 final class AnonymousFactoryTypeResolver implements DynamicFunctionReturnTypeExtension
 {
     public function getClass(): string
@@ -51,8 +53,7 @@ final class AnonymousFactoryTypeResolver implements DynamicFunctionReturnTypeExt
             return null;
         }
 
-        $reflectionClass = new \ReflectionClass($targetClass->class->toString());
-        if ($reflectionClass->getAttributes(Entity::class) || $reflectionClass->getAttributes(Document::class)) {
+        if (PersistenceManager::classCanBePersisted($targetClass->class->toString())) {
             $factoryClass = PersistentObjectFactory::class;
         } else {
             $factoryClass = ObjectFactory::class;

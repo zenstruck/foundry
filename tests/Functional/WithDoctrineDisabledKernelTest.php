@@ -17,8 +17,8 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Assert;
 use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\AddressFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Kernel;
 
 final class WithDoctrineDisabledKernelTest extends KernelTestCase
@@ -37,17 +37,17 @@ final class WithDoctrineDisabledKernelTest extends KernelTestCase
      */
     public function create_object(): void
     {
-        $address = AddressFactory::new()->withoutPersisting()->create(['value' => 'test'])->object();
-        Assert::that($address)->isInstanceOf(Address::class);
-        Assert::that($address->getValue())->is('test');
+        $address = PostFactory::new()->withoutPersisting()->create(['title' => 'test'])->object();
+        Assert::that($address)->isInstanceOf(Post::class);
+        Assert::that($address->getTitle())->is('test');
 
-        $address = AddressFactory::createOne(['value' => 'test'])->object();
-        Assert::that($address)->isInstanceOf(Address::class);
-        Assert::that($address->getValue())->is('test');
+        $address = PostFactory::createOne(['title' => 'test'])->object();
+        Assert::that($address)->isInstanceOf(Post::class);
+        Assert::that($address->getTitle())->is('test');
     }
 
     protected static function createKernel(array $options = []): KernelInterface
     {
-        return Kernel::create(false);
+        return Kernel::create(enableDoctrine: false);
     }
 }

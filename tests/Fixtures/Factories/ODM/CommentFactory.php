@@ -2,11 +2,11 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories\ODM;
 
-use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+use Zenstruck\Foundry\Object\ObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMComment;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMUser;
 
-class CommentFactory extends PersistentObjectFactory
+class CommentFactory extends ObjectFactory
 {
     public static function class(): string
     {

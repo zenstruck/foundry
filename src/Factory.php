@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry;
 
+use Zenstruck\Foundry\Object\ObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
@@ -28,7 +29,7 @@ abstract class Factory extends PersistentObjectFactory
      */
     public function __construct(string $class, array|callable $defaultAttributes = [])
     {
-        trigger_deprecation('zenstruck/foundry', '1.36', '"%s" is deprecated and this class will be removed in 2.0, please use "%s" instead.', self::class, PersistentObjectFactory::class);
+        trigger_deprecation('zenstruck/foundry', '1.36', '"%s" is deprecated and this class will be removed in 2.0, please use "%s" or "%s" instead.', self::class, PersistentObjectFactory::class, ObjectFactory::class);
 
         /** @phpstan-ignore-next-line */
         if (self::class === static::class) {

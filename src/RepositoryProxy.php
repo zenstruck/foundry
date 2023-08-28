@@ -21,6 +21,7 @@ use Doctrine\Persistence\Mapping\MappingException;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Zenstruck\Foundry\Object\ObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
@@ -326,11 +327,12 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
                 continue;
             }
 
-            if ($attributeValue instanceof PersistentObjectFactory) {
-                $attributeValue = $attributeValue->withoutPersisting()->create()->object();
-            } elseif ($attributeValue instanceof Proxy) {
-                $attributeValue = $attributeValue->object();
-            }
+            $attributeValue = match(true){
+                $attributeValue instanceof PersistentObjectFactory => $attributeValue->withoutPersisting()->create()->object(),
+                $attributeValue instanceof ObjectFactory => $attributeValue->create(),
+                $attributeValue instanceof Proxy => $attributeValue->object(),
+                default => $attributeValue
+            };
 
             try {
                 $metadataForAttribute = $this->getObjectManager()->getClassMetadata($attributeValue::class);
@@ -362,7 +364,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
                 $normalizedCriteria["{$attributeName}.{$field}"] = $embeddableFieldValue;
             }
         }
-
+        
         return $this->findOneBy($normalizedCriteria);
     }
 

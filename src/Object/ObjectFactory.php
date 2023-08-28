@@ -112,14 +112,6 @@ abstract class ObjectFactory extends BaseFactory
         // execute "lazy" values
         $parameters = LazyValue::normalizeArray($parameters);
 
-        foreach ($this->beforeInstantiate as $hook) {
-            $parameters = $hook($parameters, static::class());
-
-            if (!\is_array($parameters)) {
-                throw new \LogicException('Before Instantiate event callback must return an array.');
-            }
-        }
-
         $object = ($this->instantiator ?? self::factoryManager()->defaultObjectInstantiator())($parameters, static::class());
 
         foreach ($this->afterInstantiate as $hook) {
@@ -127,5 +119,25 @@ abstract class ObjectFactory extends BaseFactory
         }
 
         return [$object, $parameters];
+    }
+
+    /**
+     * @param Attributes $attributes
+     *
+     * @internal
+     */
+    final protected function mergedAttributes(array|callable $attributes): array
+    {
+        $attributes = parent::mergedAttributes($attributes);
+
+        foreach ($this->beforeInstantiate as $hook) {
+            $attributes = $hook($attributes, static::class());
+
+            if (!\is_array($attributes)) {
+                throw new \LogicException('Before Instantiate event callback must return an array.');
+            }
+        }
+
+        return $attributes;
     }
 }

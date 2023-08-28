@@ -22,6 +22,9 @@ use Zenstruck\Foundry\Object\ObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Proxy;
 
+/**
+ * @internal
+ */
 final class FixAnonymousFunctions implements FunctionReturnTypeProviderInterface, MethodReturnTypeProviderInterface
 {
     public static function getFunctionIds(): array
