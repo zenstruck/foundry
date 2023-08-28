@@ -11,20 +11,20 @@
 
 namespace App\Factory;
 
-use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+use Zenstruck\Foundry\Object\ObjectFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMComment;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\UserFactory;
 
 /**
- * @extends PersistentObjectFactory<ODMComment>
+ * @extends ObjectFactory<ODMComment>
  *
  * @method        ODMComment|Proxy     create(array|callable $attributes = [])
  * @method static ODMComment|Proxy     createOne(array $attributes = [])
  * @method static ODMComment[]|Proxy[] createMany(int $number, array|callable $attributes = [])
  * @method static ODMComment[]|Proxy[] createSequence(iterable|callable $sequence)
  */
-final class ODMCommentFactory extends PersistentObjectFactory
+final class ODMCommentFactory extends ObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -60,7 +60,6 @@ final class ODMCommentFactory extends PersistentObjectFactory
     protected function initialize(): self
     {
         return $this
-            ->withoutPersisting()
             // ->afterInstantiate(function(ODMComment $oDMComment): void {})
         ;
     }
