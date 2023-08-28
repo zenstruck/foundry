@@ -72,7 +72,7 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
         foreach ($this->objectManagersToReset() as $manager) {
             $this->runCommand(
                 $this->application,
-                'doctrine:schema:create',
+                'doctrine:schema:update',
                 [
                     '--em' => $manager,
                 ]
