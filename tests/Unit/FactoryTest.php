@@ -216,7 +216,9 @@ final class FactoryTest extends TestCase
      */
     public function can_register_default_instantiator(): void
     {
-        BaseFactory::boot(new FactoryManager(instantiator: static fn(): Post => new Post('different title', 'different body')), Configuration::default());
+        $configuration = Configuration::default();
+        $configuration->setInstantiator(static fn(): Post => new Post('different title', 'different body'));
+        BaseFactory::boot(new FactoryManager(), $configuration);
 
         $object = anonymous(Post::class, ['title' => 'title', 'body' => 'body'])->create();
 
