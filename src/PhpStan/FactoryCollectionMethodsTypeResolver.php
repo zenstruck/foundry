@@ -40,7 +40,7 @@ final class FactoryCollectionMethodsTypeResolver implements DynamicMethodReturnT
 
     public function isMethodSupported(MethodReflection $methodReflection): bool
     {
-        return $methodReflection->getName() === 'create';
+        return 'create' === $methodReflection->getName();
     }
 
     public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope): ?Type
@@ -56,7 +56,7 @@ final class FactoryCollectionMethodsTypeResolver implements DynamicMethodReturnT
 
         $targetClass = $targetType->getClassName();
 
-        if ($targetClass === Proxy::class) {
+        if (Proxy::class === $targetClass) {
             $typeReturnedByCollection = $targetType;
         } else {
             $typeReturnedByCollection = PersistenceManager::classCanBePersisted($targetClass)

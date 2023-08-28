@@ -73,7 +73,7 @@ final class FactoryCollection implements \IteratorAggregate
      * @template U
      *
      * @param BaseFactory<U> $factory
-     * @param Parameters $sequence
+     * @param Parameters     $sequence
      *
      * @return static<U>
      */

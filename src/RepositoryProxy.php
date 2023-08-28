@@ -327,7 +327,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
                 continue;
             }
 
-            $attributeValue = match(true){
+            $attributeValue = match (true) {
                 $attributeValue instanceof PersistentObjectFactory => $attributeValue->withoutPersisting()->create()->object(),
                 $attributeValue instanceof ObjectFactory => $attributeValue->create(),
                 $attributeValue instanceof Proxy => $attributeValue->object(),
@@ -364,7 +364,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
                 $normalizedCriteria["{$attributeName}.{$field}"] = $embeddableFieldValue;
             }
         }
-        
+
         return $this->findOneBy($normalizedCriteria);
     }
 

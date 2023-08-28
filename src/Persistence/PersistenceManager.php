@@ -131,7 +131,7 @@ final class PersistenceManager
 
         $attributes = $reflectionClass->getAttributes(ORMEntityAttribute::class);
         if (!$attributes) {
-            $attributes = ($reflectionClass)->getAttributes(ODMDocumentAttribute::class);
+            $attributes = $reflectionClass->getAttributes(ODMDocumentAttribute::class);
         }
 
         if (!$attributes) {

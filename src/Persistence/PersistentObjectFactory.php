@@ -46,7 +46,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     final public static function new(array|callable|string $attributes = [], string ...$states): static
     {
         if (!PersistenceManager::classCanBePersisted(static::class())) {
-            trigger_deprecation('zenstruck/foundry', '1.36', 'Class "%s" cannot be persisted. Using "%s" with non-persistable class is deprecated and will throw an exception in 2.0. Please use "%s".', static::class(), PersistentObjectFactory::class, ObjectFactory::class);
+            trigger_deprecation('zenstruck/foundry', '1.36', 'Class "%s" cannot be persisted. Using "%s" with non-persistable class is deprecated and will throw an exception in 2.0. Please use "%s".', static::class(), self::class, ObjectFactory::class);
         }
 
         return parent::new($attributes, ...$states);

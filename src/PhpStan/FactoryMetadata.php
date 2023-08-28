@@ -49,14 +49,14 @@ final class FactoryMetadata
         $type = match (true) {
             $methodCall instanceof MethodCall => $scope->getType($methodCall->var),
             $methodCall instanceof StaticCall => new ObjectType(
-                !in_array($methodCall->class->toString(), ['self', 'static'], true)
+                !\in_array($methodCall->class->toString(), ['self', 'static'], true)
                     ? $methodCall->class->toString()
                     : $methodReflection->getDeclaringClass()->getName()
             ),
             default => null
         };
 
-        if ($type instanceof ThisType && is_a($factoryClass = $type->getClassName(), ObjectFactory::class, true)) {
+        if ($type instanceof ThisType && \is_a($factoryClass = $type->getClassName(), ObjectFactory::class, true)) {
             return new self($factoryClass, $factoryClass::class());
         } elseif (!$type instanceof ObjectType) {
             return null;
