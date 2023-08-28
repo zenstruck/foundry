@@ -75,6 +75,7 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
                 'doctrine:schema:update',
                 [
                     '--em' => $manager,
+                    '--force' => true,
                 ]
             );
         }
