@@ -112,7 +112,7 @@ abstract class ObjectFactory extends BaseFactory
         // execute "lazy" values
         $parameters = LazyValue::normalizeArray($parameters);
 
-        $object = ($this->instantiator ?? self::factoryManager()->defaultObjectInstantiator())($parameters, static::class());
+        $object = ($this->instantiator ?? self::configuration()->instantiator())($parameters, static::class());
 
         foreach ($this->afterInstantiate as $hook) {
             $hook($object, $parameters);

@@ -41,8 +41,6 @@
 
         <service id=".zenstruck_foundry.factory_manager" class="Zenstruck\Foundry\FactoryManager" public="true">
             <argument type="tagged_iterator" tag="foundry.factory" />
-            <argument type="service" id=".zenstruck_foundry.default_instantiator" />
-            <argument type="service" id=".zenstruck_foundry.faker" />
         </service>
 
         <service id=".zenstruck_foundry.persistence_manager" class="Zenstruck\Foundry\Persistence\PersistenceManager" public="true">

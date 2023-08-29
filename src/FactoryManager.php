@@ -11,33 +11,18 @@
 
 namespace Zenstruck\Foundry;
 
-use Faker;
-use Zenstruck\Foundry\Object\ObjectFactory;
-
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @internal
- *
- * @psalm-import-type CallableInstantiator from ObjectFactory
  */
 final class FactoryManager
 {
-    private iterable $factories;
-
-    /** @var CallableInstantiator */
-    private Instantiator|\Closure $instantiator;
-    private Faker\Generator $faker;
-
     /**
-     * @param BaseFactory[]        $factories
-     * @param CallableInstantiator $instantiator
+     * @param BaseFactory[] $factories
      */
-    public function __construct(iterable $factories = [], Instantiator|\Closure|null $instantiator = null, ?Faker\Generator $faker = null)
+    public function __construct(private iterable $factories = [])
     {
-        $this->factories = $factories;
-        $this->instantiator = $instantiator ?? new Instantiator(); // @phpstan-ignore-line
-        $this->faker = $faker ?? Faker\Factory::create();
     }
 
     /**
@@ -51,7 +36,7 @@ final class FactoryManager
     {
         foreach ($this->factories as $factory) {
             if ($class === $factory::class) {
-                return $factory;
+                return $factory; // @phpstan-ignore-line
             }
         }
 
@@ -60,18 +45,5 @@ final class FactoryManager
         } catch (\ArgumentCountError $e) {
             throw new \RuntimeException('Factories with dependencies (Factory services) cannot be used without the foundry bundle.', 0, $e);
         }
-    }
-
-    /**
-     * @return CallableInstantiator
-     */
-    public function defaultObjectInstantiator(): Instantiator|\Closure
-    {
-        return $this->instantiator;
-    }
-
-    public function faker(): Faker\Generator
-    {
-        return $this->faker;
     }
 }

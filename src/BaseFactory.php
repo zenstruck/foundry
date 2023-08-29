@@ -198,7 +198,7 @@ abstract class BaseFactory
             return;
         }
 
-        self::factoryManager()->faker()->unique(true); // reset unique
+        self::configuration()->faker()->unique(true); // reset unique
         self::$factoryManager = null;
         self::$configuration = null;
     }
@@ -232,7 +232,7 @@ abstract class BaseFactory
     final public static function faker(): Faker\Generator
     {
         try {
-            return self::factoryManager()->faker();
+            return self::configuration()->faker();
         } catch (FoundryBootException $exception) {
             throw new \RuntimeException("Cannot get Foundry's configuration. If using faker in a data provider, consider passing attributes as a callable.", previous: $exception);
         }
