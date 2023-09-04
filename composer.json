@@ -4,7 +4,7 @@
     "homepage": "https://github.com/zenstruck/foundry",
     "type": "library",
     "license": "MIT",
-    "keywords": ["fixture", "factory", "test", "symfony", "faker", "doctrine"],
+    "keywords": ["fixture", "factory", "test", "symfony", "faker", "doctrine", "dev"],
     "authors": [
         {
             "name": "Kevin Bond",
