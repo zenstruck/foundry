@@ -318,7 +318,7 @@ Using your Factory
     PostFactory::truncate(); // empty the database table
 
     PostFactory::count(); // the number of persisted Posts
-    PostFactory::count(['category' => $category); // the number of persisted Posts with the given category
+    PostFactory::count(['category' => $category]); // the number of persisted Posts with the given category
 
     PostFactory::all(); // Post[]|Proxy[] all the persisted Posts
 
