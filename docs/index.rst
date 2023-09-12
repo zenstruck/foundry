@@ -399,6 +399,10 @@ You can use states to make your tests very explicit to improve readability:
     // states that don't require arguments can be added as strings to PostFactory::new()
     $post = PostFactory::new('published', 'withViewCount')->create();
 
+.. note::
+
+    Be sure to chain the states/hooks off of ``$this`` because factories are `Immutable`_.
+
 Attributes
 ~~~~~~~~~~
 
@@ -622,10 +626,6 @@ You can override your model factory's ``initialize()`` method to add default sta
             ;
         }
     }
-
-.. note::
-
-    Be sure to chain the states/hooks off of ``$this`` because factories are `Immutable`_.
 
 .. _instantiation:
 
