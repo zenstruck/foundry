@@ -47,10 +47,11 @@ final class StoryManager
             return self::$instances[$class];
         }
 
-        $story = $this->getOrCreateStory($class);
-        $story->build();
+        self::$instances[$class] = $this->getOrCreateStory($class);
 
-        return self::$instances[$class] = $story;
+        self::$instances[$class]->build();
+
+        return self::$instances[$class];
     }
 
     public static function setGlobalState(): void
