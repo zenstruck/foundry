@@ -13,14 +13,17 @@ namespace Zenstruck\Foundry\Tests\Functional;
 
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\CategoryPoolStory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\CategoryStory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\PostStory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\ServiceStory;
+use Zenstruck\Foundry\Tests\Fixtures\Stories\StoryWhichReadsItsOwnPool;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -220,5 +223,18 @@ final class StoryTest extends KernelTestCase
         $this->expectException(\RuntimeException::class);
 
         CategoryPoolStory::getRandomRange('pool-name', 0, 100);
+    }
+
+    /**
+     * @test
+     */
+    public function story_can_access_its_own_pool(): void
+    {
+        $item = StoryWhichReadsItsOwnPool::get('random-from-own-pool');
+
+        self::assertInstanceOf(Proxy::class, $item);
+        self::assertInstanceOf(Category::class, $item->object());
+
+        self::assertContains($item->object()->getName(), ['php', 'symfony']);
     }
 }
