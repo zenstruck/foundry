@@ -113,7 +113,7 @@ final class Proxy implements \Stringable
      */
     public function object(): object
     {
-        if (!$this->autoRefresh || !$this->persisted || !Factory::configuration()->isFlushingEnabled()) {
+        if (!$this->autoRefresh || !$this->persisted || !Factory::configuration()->isFlushingEnabled() || !Factory::configuration()->isPersistEnabled()) {
             return $this->object;
         }
 
@@ -164,6 +164,10 @@ final class Proxy implements \Stringable
 
     public function refresh(): self
     {
+        if (!Factory::configuration()->isPersistEnabled()) {
+            return $this;
+        }
+
         if (!$this->persisted) {
             throw new \RuntimeException(\sprintf('Cannot refresh unpersisted object (%s).', $this->class));
         }
@@ -300,6 +304,10 @@ final class Proxy implements \Stringable
 
     private function objectManager(): ObjectManager
     {
+        if (!Factory::configuration()->isPersistEnabled()) {
+            throw new \RuntimeException('Should not get doctrine\'s object manager when persist is disabled.');
+        }
+
         return Factory::configuration()->objectManagerFor($this->class);
     }
 }
