@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## [v1.36.0](https://github.com/zenstruck/foundry/releases/tag/v1.36.0)
+
+October 13th, 2023 - [v1.35.0...v1.36.0](https://github.com/zenstruck/foundry/compare/v1.35.0...v1.36.0)
+
+* 5ffa1cd minor: allow Symfony 7.0 (#509) by @kbond
+* 925eab3 fix: proxy should not try to refresh when persist is disabled (#508) by @nikophil
+* e8b3ff5 feat: allow stories to call their own pool (#506) by @nikophil
+* 881280e docs: Move note about immutability into States section (#504) by @pavelmaca
+* d6eb810 doc: fix typo (#502) by @ternel
+* 131517a minor: flag repo as dev-dependency for composer (#501) by @Chris53897, @Chris8934
+* 4da5628 fix: replace doctrine:query:sql with dbal:run-sql (#492) by @KDederichs
+
 ## [v1.35.0](https://github.com/zenstruck/foundry/releases/tag/v1.35.0)
 
 August 10th, 2023 - [v1.34.1...v1.35.0](https://github.com/zenstruck/foundry/compare/v1.34.1...v1.35.0)
