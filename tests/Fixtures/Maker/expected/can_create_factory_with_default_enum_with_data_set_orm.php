@@ -12,14 +12,14 @@
 namespace App\Factory;
 
 use Doctrine\ORM\EntityRepository;
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\RepositoryProxy;
 use Zenstruck\Foundry\Tests\Fixtures\PHP81\EntityWithEnum;
 use Zenstruck\Foundry\Tests\Fixtures\PHP81\SomeEnum;
 
 /**
- * @extends ModelFactory<EntityWithEnum>
+ * @extends PersistentProxyObjectFactory<EntityWithEnum>
  *
  * @method        EntityWithEnum|Proxy             create(array|callable $attributes = [])
  * @method static EntityWithEnum|Proxy             createOne(array $attributes = [])
@@ -37,7 +37,7 @@ use Zenstruck\Foundry\Tests\Fixtures\PHP81\SomeEnum;
  * @method static EntityWithEnum[]|Proxy[]         randomRange(int $min, int $max, array $attributes = [])
  * @method static EntityWithEnum[]|Proxy[]         randomSet(int $number, array $attributes = [])
  */
-final class EntityWithEnumFactory extends ModelFactory
+final class EntityWithEnumFactory extends PersistentProxyObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

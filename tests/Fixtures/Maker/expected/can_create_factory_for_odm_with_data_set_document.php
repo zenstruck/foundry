@@ -12,13 +12,13 @@
 namespace App\Factory;
 
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\RepositoryProxy;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMPost;
 
 /**
- * @extends ModelFactory<ODMPost>
+ * @extends PersistentProxyObjectFactory<ODMPost>
  *
  * @method        ODMPost|Proxy                      create(array|callable $attributes = [])
  * @method static ODMPost|Proxy                      createOne(array $attributes = [])
@@ -36,7 +36,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Document\ODMPost;
  * @method static ODMPost[]|Proxy[]                  randomRange(int $min, int $max, array $attributes = [])
  * @method static ODMPost[]|Proxy[]                  randomSet(int $number, array $attributes = [])
  */
-final class ODMPostFactory extends ModelFactory
+final class ODMPostFactory extends PersistentProxyObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

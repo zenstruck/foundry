@@ -11,10 +11,10 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\EntityForRelations;
 
-class EntityForRelationsFactory extends ModelFactory
+class EntityForRelationsFactory extends PersistentProxyObjectFactory
 {
     protected static function getClass(): string
     {

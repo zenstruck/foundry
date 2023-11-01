@@ -11,14 +11,14 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Service;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class CategoryServiceFactory extends ModelFactory
+final class CategoryServiceFactory extends PersistentProxyObjectFactory
 {
     public function __construct(private Service $service)
     {

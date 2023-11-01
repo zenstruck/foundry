@@ -12,12 +12,12 @@
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories\ODM;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMComment;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMPost;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMUser;
 
-class PostFactory extends ModelFactory
+class PostFactory extends PersistentProxyObjectFactory
 {
     public function published(): static
     {

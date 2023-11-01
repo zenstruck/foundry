@@ -13,14 +13,14 @@ namespace App\Factory;
 
 use App\Factory\Cascade\BrandFactory;
 use Doctrine\ORM\EntityRepository;
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\RepositoryProxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\EntityWithRelations;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 
 /**
- * @extends ModelFactory<EntityWithRelations>
+ * @extends PersistentProxyObjectFactory<EntityWithRelations>
  *
  * @method        EntityWithRelations|Proxy        create(array|callable $attributes = [])
  * @method static EntityWithRelations|Proxy        createOne(array $attributes = [])
@@ -38,7 +38,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
  * @method static EntityWithRelations[]|Proxy[]    randomRange(int $min, int $max, array $attributes = [])
  * @method static EntityWithRelations[]|Proxy[]    randomSet(int $number, array $attributes = [])
  */
-final class EntityWithRelationsFactory extends ModelFactory
+final class EntityWithRelationsFactory extends PersistentProxyObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
