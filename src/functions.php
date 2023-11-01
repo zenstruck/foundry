@@ -42,7 +42,7 @@ function factory(string $class, array|callable $defaultAttributes = []): Anonymo
  */
 function anonymous(string $class, array|callable $defaultAttributes = []): Factory
 {
-    return new class($class, $defaultAttributes) extends Factory {};
+    return new class($class, $defaultAttributes, calledInternally: true) extends Factory {};
 }
 
 /**
