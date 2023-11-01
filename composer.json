@@ -22,7 +22,7 @@
         "zenstruck/callback": "^1.1"
     },
     "require-dev": {
-        "bamarni/composer-bin-plugin": "^1.4",
+        "bamarni/composer-bin-plugin": "^1.8",
         "dama/doctrine-test-bundle": "^7.0|^8.0",
         "doctrine/doctrine-bundle": "^2.5",
         "doctrine/doctrine-migrations-bundle": "^2.2|^3.0",
@@ -50,8 +50,14 @@
         "doctrine/mongodb-odm": "2.5.0"
     },
     "autoload": {
-        "psr-4": { "Zenstruck\\Foundry\\": "src/" },
-        "files": ["src/functions.php"]
+        "psr-4": {
+            "Zenstruck\\Foundry\\": "src/",
+            "Zenstruck\\Foundry\\Utils\\Rector\\": "utils/rector/src/"
+        },
+        "files": [
+            "src/functions.php",
+            "src/Persistence/functions.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

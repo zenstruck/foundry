@@ -16,6 +16,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ * @group maker
  */
 final class MakeStoryTest extends MakerTestCase
 {

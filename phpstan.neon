@@ -34,7 +34,3 @@ parameters:
     excludePaths:
         - ./src/Bundle/Resources
 
-    ignoreErrors:
-        -
-            message: '#Unsafe usage of new static\(\).*#'
-            path: ./src/ModelFactory.php

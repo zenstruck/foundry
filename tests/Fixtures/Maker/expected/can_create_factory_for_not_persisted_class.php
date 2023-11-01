@@ -11,19 +11,13 @@
 
 namespace App\Factory;
 
-use Zenstruck\Foundry\ModelFactory;
-use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject;
 
 /**
- * @extends ModelFactory<SomeObject>
- *
- * @method        SomeObject|Proxy     create(array|callable $attributes = [])
- * @method static SomeObject|Proxy     createOne(array $attributes = [])
- * @method static SomeObject[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static SomeObject[]|Proxy[] createSequence(iterable|callable $sequence)
+ * @extends ObjectFactory<SomeObject>
  */
-final class SomeObjectFactory extends ModelFactory
+final class SomeObjectFactory extends ObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -32,7 +26,11 @@ final class SomeObjectFactory extends ModelFactory
      */
     public function __construct()
     {
-        parent::__construct();
+    }
+
+    public static function class(): string
+    {
+        return SomeObject::class;
     }
 
     /**
@@ -40,7 +38,7 @@ final class SomeObjectFactory extends ModelFactory
      *
      * @todo add your default values here
      */
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [
             'arrayMandatory' => [],
@@ -60,16 +58,10 @@ final class SomeObjectFactory extends ModelFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
      */
-    protected function initialize(): self
+    protected function initialize(): static
     {
         return $this
-            ->withoutPersisting()
             // ->afterInstantiate(function(SomeObject $someObject): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return SomeObject::class;
     }
 }

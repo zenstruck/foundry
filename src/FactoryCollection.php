@@ -32,7 +32,7 @@ final class FactoryCollection implements \IteratorAggregate
      *
      *@deprecated using directly FactoryCollection's constructor is deprecated. It will be private in v2. Use named constructors instead.
      */
-    public function __construct(private Factory $factory, ?int $min = null, ?int $max = null, private ?iterable $sequence = null, bool $calledInternally = false)
+    public function __construct(public Factory $factory, ?int $min = null, ?int $max = null, private ?iterable $sequence = null, bool $calledInternally = false)
     {
         if ($max && $min > $max) {
             throw new \InvalidArgumentException('Min must be less than max.');
@@ -46,7 +46,17 @@ final class FactoryCollection implements \IteratorAggregate
         $this->max = $max ?? $min;
     }
 
+    /**
+     * @deprecated Use FactoryCollection::many() instead
+     */
     public static function set(Factory $factory, int $count): self
+    {
+        trigger_deprecation('zenstruck/foundry', '1.37.0', 'Method %s() is deprecated and will be removed in 2.0. Use "%s::many()" instead.', __METHOD__, __CLASS__);
+
+        return self::many($factory, $count);
+    }
+
+    public static function many(Factory $factory, int $count): self
     {
         return new self($factory, $count, null, null, true);
     }
@@ -65,16 +75,25 @@ final class FactoryCollection implements \IteratorAggregate
     }
 
     /**
-     * @return list<TObject&Proxy<TObject>>
-     *
-     * @phpstan-return list<Proxy<TObject>>
+     * @return list<TObject>
      */
-    public function create(array|callable $attributes = []): array
-    {
+    public function create(
+        array|callable $attributes = [],
+        /**
+         * @deprecated
+         * @internal
+         */
+        bool $noProxy = false,
+    ): array {
+        if (2 === \count(\func_get_args()) && !\str_starts_with(\debug_backtrace(options: \DEBUG_BACKTRACE_IGNORE_ARGS, limit: 1)[0]['class'] ?? '', 'Zenstruck\Foundry')) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', 'Parameter "$noProxy" of method "%s()" is deprecated and will be removed in Foundry 2.0.', __METHOD__);
+        }
+
         $objects = [];
         foreach ($this->all() as $i => $factory) {
             $objects[] = $factory->create(
                 \is_callable($attributes) ? $attributes($i + 1) : $attributes,
+                $noProxy || !$factory->shouldUseProxy(),
             );
         }
 
@@ -97,7 +116,7 @@ final class FactoryCollection implements \IteratorAggregate
 
         $factories = [];
         foreach ($this->sequence as $attributes) {
-            $factories[] = (clone $this->factory)->withAttributes($attributes);
+            $factories[] = (clone $this->factory)->with($attributes);
         }
 
         return $factories;
@@ -105,6 +124,8 @@ final class FactoryCollection implements \IteratorAggregate
 
     public function factory(): Factory
     {
+        trigger_deprecation('zenstruck\foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in Foundry 2.0. Use public property %s::$factory instead', __METHOD__, __CLASS__);
+
         return $this->factory;
     }
 

@@ -16,6 +16,8 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Faker;
 use Zenstruck\Foundry\Exception\FoundryBootException;
+use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 
 /**
  * @internal
@@ -53,7 +55,7 @@ final class Configuration
         $this->stories = new StoryManager([]);
         $this->factories = new ModelFactoryManager([]);
         $this->faker = Faker\Factory::create();
-        $this->instantiator = new Instantiator();
+        $this->instantiator = Instantiator::withConstructor();
     }
 
     public function stories(): StoryManager
@@ -175,16 +177,16 @@ final class Configuration
     /**
      * @template TObject of object
      * @phpstan-param Proxy<TObject>|TObject|class-string<TObject> $objectOrClass
-     * @phpstan-return RepositoryProxy<TObject>
+     * @phpstan-return RepositoryDecorator<TObject>
      */
-    public function repositoryFor(object|string $objectOrClass): RepositoryProxy
+    public function repositoryFor(object|string $objectOrClass): RepositoryDecorator
     {
         if (!$this->isPersistEnabled()) {
             throw new \RuntimeException('Cannot get repository when persist is disabled.');
         }
 
         if ($objectOrClass instanceof Proxy) {
-            $objectOrClass = $objectOrClass->object();
+            $objectOrClass = $objectOrClass->_real();
         }
 
         if (!\is_string($objectOrClass)) {
@@ -198,7 +200,7 @@ final class Configuration
             throw new \RuntimeException(\sprintf('No repository registered for "%s".', $objectOrClass));
         }
 
-        return new RepositoryProxy($repository);
+        return new RepositoryDecorator($repository);
     }
 
     public function objectManagerFor(object|string $objectOrClass): ObjectManager
@@ -249,11 +251,19 @@ final class Configuration
 
     public function disablePersist(): void
     {
+        if (!self::hasManagerRegistry()) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', 'Calling function "disable_persisting()" when Foundry is booted without doctrine is deprecated and will throw an exception in 2.0.');
+        }
+
         $this->persistEnabled = false;
     }
 
     public function enablePersist(): void
     {
+        if (!self::hasManagerRegistry()) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', 'Calling function "enable_persisting()" when Foundry is booted without doctrine is deprecated and will throw an exception in 2.0.');
+        }
+
         $this->persistEnabled = true;
     }
 

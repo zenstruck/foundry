@@ -165,7 +165,7 @@ class Kernel extends BaseKernel
         }
 
         if (\getenv('USE_FOUNDRY_BUNDLE')) {
-            $foundryConfig = ['auto_refresh_proxies' => false];
+            $foundryConfig = ['auto_refresh_proxies' => true];
             if ($this->defaultMakeFactoryNamespace) {
                 $foundryConfig['make_factory'] = ['default_namespace' => $this->defaultMakeFactoryNamespace];
             }
@@ -175,7 +175,7 @@ class Kernel extends BaseKernel
                 $globalState[] = TagStory::class;
                 $globalState[] = TagStoryAsInvokableService::class;
 
-                $foundryConfig['database_resetter'] = ['orm' => ['reset_mode' => $this->ormResetMode]];
+                $foundryConfig['orm'] = ['reset' => ['mode' => $this->ormResetMode]];
             }
 
             if ($this->enableDoctrine && \getenv('MONGO_URL') && !\getenv('USE_DAMA_DOCTRINE_TEST_BUNDLE')) {

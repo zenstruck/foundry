@@ -17,7 +17,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\CategoryFactory;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class ODMRepositoryProxyTest extends RepositoryProxyTest
+final class ODMRepositoryDecoratorTest extends RepositoryDecoratorTest
 {
     protected function setUp(): void
     {

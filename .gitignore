@@ -3,6 +3,7 @@
 /phpunit-dama-doctrine.xml
 /vendor/
 /bin/tools/*/vendor/
+/bin/tools/php-cs-fixer/composer.lock
 /build/
 /.php-cs-fixer.cache
 /.phpunit.result.cache
@@ -13,3 +14,7 @@
 /.env.local
 /docker-compose.override.yaml
 /tests/Fixtures/Migrations/
+
+/utils/rector/vendor
+/utils/rector/.phpunit.result.cache
+/utils/rector/composer.lock

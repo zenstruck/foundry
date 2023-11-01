@@ -17,7 +17,11 @@ use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Faker;
 use Zenstruck\Foundry\Exception\FoundryBootException;
 use Zenstruck\Foundry\Persistence\InversedRelationshipPostPersistCallback;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\PostPersistCallback;
+use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Proxy as ProxyObject;
 
 /**
  * @template TObject of object
@@ -42,7 +46,7 @@ class Factory
     private bool $cascadePersist = false;
 
     /** @var array<array|callable> */
-    private array $attributeSet = [];
+    private array $attributes = [];
 
     /** @var callable[] */
     private array $beforeInstantiate = [];
@@ -64,11 +68,11 @@ class Factory
         }
 
         $this->class = $class;
-        $this->attributeSet[] = $defaultAttributes;
+        $this->attributes[] = $defaultAttributes;
     }
 
     /**
-     * @phpstan-return list<Proxy<TObject>>
+     * @phpstan-return ($this is PersistentProxyObjectFactory ? list<Proxy<TObject>> : list<TObject>)
      */
     public function __call(string $name, array $arguments): array
     {
@@ -78,17 +82,29 @@ class Factory
 
         trigger_deprecation('zenstruck/foundry', '1.7', 'Calling instance method "%1$s::createMany()" is deprecated and will be removed in 2.0, use e.g. "%1$s::new()->stateAdapter()->many(%2$d)->create()" instead.', static::class, $arguments[0]);
 
-        return $this->many($arguments[0])->create($arguments[1] ?? []);
+        return $this->many($arguments[0])->create($arguments[1] ?? [], noProxy: $this->shouldUseProxy());
     }
 
     /**
-     * @return Proxy<TObject>&TObject
-     * @phpstan-return Proxy<TObject>
+     * @final
+     *
+     * @return (Proxy<TObject>&TObject)|TObject
+     * @phpstan-return ($noProxy is true ? TObject: Proxy<TObject>)
      */
-    final public function create(array|callable $attributes = []): Proxy
-    {
+    public function create(
+        array|callable $attributes = [],
+        /**
+         * @deprecated
+         * @internal
+         */
+        bool $noProxy = false,
+    ): object {
+        if (2 === \count(\func_get_args()) && !\str_starts_with(\debug_backtrace(options: \DEBUG_BACKTRACE_IGNORE_ARGS, limit: 1)[0]['class'] ?? '', 'Zenstruck\Foundry')) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', 'Parameter "$noProxy" of method "%s()" is deprecated and will be removed in Foundry 2.0.', __METHOD__);
+        }
+
         // merge the factory attribute set with the passed attributes
-        $attributeSet = \array_merge($this->attributeSet, [$attributes]);
+        $attributeSet = \array_merge($this->attributes, [$attributes]);
 
         // normalize each attribute set and collapse
         $attributes = \array_merge(...\array_map(fn(callable|array $attributes): array => $this->normalizeAttributes($attributes), $attributeSet));
@@ -137,19 +153,18 @@ class Factory
             $callback($object, $attributes);
         }
 
-        $proxy = new Proxy($object);
-
-        if (!$this->isPersisting()) {
-            return $proxy;
+        if (!$this->isPersisting(calledInternally: true)) {
+            return $noProxy ? $object : new ProxyObject($object);
         }
+
+        $proxy = new ProxyObject($object);
 
         if ($this->cascadePersist && !$postPersistCallbacks) {
             return $proxy;
         }
 
-        return $proxy
-            ->save()
-            ->withoutAutoRefresh(function(Proxy $proxy) use ($attributes, $postPersistCallbacks): void {
+        $proxy->_save()
+            ->_withoutAutoRefresh(function(ProxyObject $proxy) use ($attributes, $postPersistCallbacks): void {
                 $callbacks = [...$postPersistCallbacks, ...$this->afterPersist];
 
                 if (!$callbacks) {
@@ -160,20 +175,22 @@ class Factory
                     $proxy->executeCallback($callback, $attributes);
                 }
 
-                $proxy->save(); // save again as afterPersist events may have modified
+                $proxy->_save(); // save again as afterPersist events may have modified
             })
         ;
+
+        return $noProxy ? $proxy->_real() : $proxy;
     }
 
     /**
      * @param int|null $max If set, when created, the collection will be a random size between $min and $max
      *
-     * @return FactoryCollection<TObject>
+     * @return ($this is PersistentProxyObjectFactory ? FactoryCollection<Proxy<TObject>> : FactoryCollection<TObject>)
      */
     final public function many(int $min, ?int $max = null): FactoryCollection
     {
         if (!$max) {
-            return FactoryCollection::set($this, $min);
+            return FactoryCollection::many($this, $min);
         }
 
         return FactoryCollection::range($this, $min, $max);
@@ -182,7 +199,7 @@ class Factory
     /**
      * @param iterable<array<string, mixed>>|callable(): iterable<array<string, mixed>> $sequence
      *
-     * @return FactoryCollection<TObject>
+     * @return ($this is PersistentProxyObjectFactory ? FactoryCollection<Proxy<TObject>> : FactoryCollection<TObject>)
      */
     final public function sequence(iterable|callable $sequence): FactoryCollection
     {
@@ -196,8 +213,17 @@ class Factory
     /**
      * @return static
      */
-    public function withoutPersisting(): self
-    {
+    public function withoutPersisting(
+        /**
+         * @internal
+         * @deprecated
+         */
+        bool $calledInternally = false,
+    ): self {
+        if (!$calledInternally && !$this instanceof PersistentObjectFactory) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', 'Calling "withoutPersisting()" on a non-persistent factory class is deprecated and will trigger an error in 2.0.', __METHOD__);
+        }
+
         $cloned = clone $this;
         $cloned->persist = false;
 
@@ -207,14 +233,23 @@ class Factory
     /**
      * @param array|callable $attributes
      *
+     * @deprecated use with() instead
+     *
      * @return static
      */
     final public function withAttributes($attributes = []): self
     {
-        $cloned = clone $this;
-        $cloned->attributeSet[] = $attributes;
+        trigger_deprecation('zenstruck\foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in 2.0. Use "%s::with()" instead.', __METHOD__, self::class);
 
-        return $cloned;
+        return $this->with($attributes);
+    }
+
+    final public function with(array|callable $attributes = []): static
+    {
+        $clone = clone $this;
+        $clone->attributes[] = $attributes;
+
+        return $clone;
     }
 
     /**
@@ -250,6 +285,10 @@ class Factory
      */
     final public function afterPersist(callable $callback): self
     {
+        if (!$this instanceof PersistentObjectFactory) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', 'Calling "afterPersist()" on a non-persistent factory class is deprecated and will trigger an error in 2.0.', __METHOD__);
+        }
+
         $cloned = clone $this;
         $cloned->afterPersist[] = $callback;
 
@@ -313,6 +352,13 @@ class Factory
 
     final public static function faker(): Faker\Generator
     {
+        if (
+            null === ($calledClass = \debug_backtrace(options: \DEBUG_BACKTRACE_IGNORE_ARGS, limit: 2)[1]['class'] ?? null)
+            || !\is_a($calledClass, self::class, allow_string: true)
+        ) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', 'Method "%s()" will be protected in Foundry 2.0 and should not be called from outside of a factory. Use function "Zenstruck\Foundry\faker()" instead.', __METHOD__);
+        }
+
         try {
             return self::configuration()->faker();
         } catch (FoundryBootException) {
@@ -320,23 +366,51 @@ class Factory
         }
     }
 
+    /**
+     * @deprecated
+     */
     final public static function delayFlush(callable $callback): mixed
     {
+        trigger_deprecation('zenstruck\foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in Foundry 2.0. Use "Zenstruck\Foundry\Persistence\flush_after()" instead.', __METHOD__);
+
         return self::configuration()->delayFlush($callback);
     }
 
     /**
      * @internal
      *
-     * @phpstan-return class-string<TObject>
+     * @return TObject
      */
-    final protected function class(): string
+    public function createAndUproxify(): object
     {
-        return $this->class;
+        $object = $this->create(
+            noProxy: !$this->shouldUseProxy(),
+        );
+
+        return $object instanceof Proxy ? $object->_real() : $object;
     }
 
-    protected function isPersisting(): bool
+    /**
+     * @internal
+     *
+     * @return ($this is PersistentProxyObjectFactory ? true : false)
+     */
+    public function shouldUseProxy(): bool
     {
+        return $this instanceof PersistentProxyObjectFactory;
+    }
+
+    protected function isPersisting(
+        /**
+         * @internal
+         * @deprecated
+         */
+        bool $calledInternally = false,
+    ): bool {
+        if (!$calledInternally && !$this instanceof PersistentObjectFactory) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', 'Calling "isPersisting()" on a non-persistent factory class is deprecated and will trigger an error in 2.0.', __METHOD__);
+        }
+
         if (!$this->persist || !self::configuration()->isPersistEnabled() || !self::configuration()->hasManagerRegistry()) {
             return false;
         }
@@ -368,8 +442,8 @@ class Factory
 
     private function normalizeAttribute(mixed $value, string $name): mixed
     {
-        if ($value instanceof Proxy) {
-            return $value->isPersisted() ? $value->refresh()->object() : $value->object();
+        if ($value instanceof ProxyObject) {
+            return $value->isPersisted(calledInternally: true) ? $value->_refresh()->_real() : $value->_real();
         }
 
         if ($value instanceof FactoryCollection) {
@@ -387,13 +461,13 @@ class Factory
             return \is_object($value) ? self::normalizeObject($value) : $value;
         }
 
-        if (!$this->isPersisting()) {
+        if (!$this->isPersisting(calledInternally: true)) {
             // ensure attribute Factories' are also not persisted
-            $value = $value->withoutPersisting();
+            $value = $value->withoutPersisting(calledInternally: true);
         }
 
         if (!self::configuration()->hasManagerRegistry()) {
-            return $value->create()->object();
+            return $value->createAndUproxify();
         }
 
         try {
@@ -401,17 +475,17 @@ class Factory
 
             if (!$objectManager instanceof EntityManagerInterface || $objectManager->getClassMetadata($value->class)->isEmbeddedClass) {
                 // we may deal with ODM document or ORM\Embedded
-                return $value->create()->object();
+                return $value->createAndUproxify();
             }
         } catch (\Throwable) {
             // not persisted object
-            return $value->create()->object();
+            return $value->createAndUproxify();
         }
 
         $relationshipMetadata = self::getRelationshipMetadata($objectManager, $this->class, $name);
 
         if (!$relationshipMetadata) {
-            return $value->create()->object();
+            return $value->createAndUproxify();
         }
 
         if ($relationshipMetadata['isOwningSide']) {
@@ -421,7 +495,7 @@ class Factory
             $relationshipField = $relationshipMetadata['inversedField'];
             $cascadePersist = $relationshipMetadata['cascade'];
 
-            if ($this->isPersisting() && null !== $relationshipField && false === $cascadePersist) {
+            if ($this->isPersisting(calledInternally: true) && null !== $relationshipField && false === $cascadePersist) {
                 return new InversedRelationshipPostPersistCallback($value, $relationshipField, $isCollection);
             }
         }
@@ -430,13 +504,17 @@ class Factory
             $value = $value->withCascadePersist();
         }
 
-        return $value->create()->object();
+        return $value->createAndUproxify();
     }
 
     private static function normalizeObject(object $object): object
     {
+        if ((new \ReflectionClass($object::class))->isFinal()) {
+            return $object;
+        }
+
         try {
-            return Proxy::createFromPersisted($object)->refresh()->object();
+            return ProxyObject::createFromPersisted($object)->_refresh()->_real();
         } catch (\RuntimeException) {
             return $object;
         }

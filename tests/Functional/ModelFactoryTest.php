@@ -14,11 +14,14 @@ namespace Zenstruck\Foundry\Tests\Functional;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\FactoryCollection;
+use Zenstruck\Foundry\RepositoryAssertions;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
-use function Zenstruck\Foundry\anonymous;
-use function Zenstruck\Foundry\create;
+use function Zenstruck\Foundry\Persistence\disable_persisting;
+use function Zenstruck\Foundry\Persistence\enable_persisting;
+use function Zenstruck\Foundry\Persistence\persist;
+use function Zenstruck\Foundry\Persistence\persistent_factory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -67,9 +70,9 @@ abstract class ModelFactoryTest extends KernelTestCase
         $categoryFactoryClass = $this->categoryFactoryClass();
 
         $categoryFactoryClass::assert()->count(0);
-        $this->assertInstanceOf($this->categoryClass(), $categoryFactoryClass::randomOrCreate()->object());
+        $this->assertInstanceOf($this->categoryClass(), $categoryFactoryClass::randomOrCreate()->_real());
         $categoryFactoryClass::assert()->count(1);
-        $this->assertInstanceOf($this->categoryClass(), $categoryFactoryClass::randomOrCreate()->object());
+        $this->assertInstanceOf($this->categoryClass(), $categoryFactoryClass::randomOrCreate()->_real());
         $categoryFactoryClass::assert()->count(1);
     }
 
@@ -234,10 +237,10 @@ abstract class ModelFactoryTest extends KernelTestCase
         $categories = $categoryFactoryClass::all();
 
         $this->assertCount(4, $categories);
-        $this->assertInstanceOf($this->categoryClass(), $categories[0]->object());
-        $this->assertInstanceOf($this->categoryClass(), $categories[1]->object());
-        $this->assertInstanceOf($this->categoryClass(), $categories[2]->object());
-        $this->assertInstanceOf($this->categoryClass(), $categories[3]->object());
+        $this->assertInstanceOf($this->categoryClass(), $categories[0]->_real());
+        $this->assertInstanceOf($this->categoryClass(), $categories[1]->_real());
+        $this->assertInstanceOf($this->categoryClass(), $categories[2]->_real());
+        $this->assertInstanceOf($this->categoryClass(), $categories[3]->_real());
     }
 
     /**
@@ -257,7 +260,7 @@ abstract class ModelFactoryTest extends KernelTestCase
 
         if ($this instanceof ORMModelFactoryTest) {
             $this->assertSame('third', $categoryFactoryClass::find($category)->getName());
-            $this->assertSame('third', $categoryFactoryClass::find($category->object())->getName());
+            $this->assertSame('third', $categoryFactoryClass::find($category->_real())->getName());
         }
     }
 
@@ -311,9 +314,20 @@ abstract class ModelFactoryTest extends KernelTestCase
 
     /**
      * @test
+     */
+    public function can_create_sequence(): void
+    {
+        $categoryFactoryClass = $this->categoryFactoryClass();
+        $categoryFactoryClass::createSequence([['name' => 'foo'], ['name' => 'bar']]);
+
+        $categoryFactoryClass::assert()->exists(['name' => 'foo']);
+        $categoryFactoryClass::assert()->exists(['name' => 'bar']);
+    }
+
+    /**
      * @dataProvider sequenceProvider
      */
-    public function can_create_sequence(\Closure|string|array $sequence): void
+    public function can_create_sequence_with_callable(callable $sequence): void
     {
         $categoryFactoryClass = $this->categoryFactoryClass();
         $categoryFactoryClass::createSequence($sequence);
@@ -324,10 +338,6 @@ abstract class ModelFactoryTest extends KernelTestCase
 
     public function sequenceProvider(): iterable
     {
-        yield 'with array of attributes' => [
-            [['name' => 'foo'], ['name' => 'bar']],
-        ];
-
         yield 'with a callable which returns an array of attributes' => [
             static fn(): array => [['name' => 'foo'], ['name' => 'bar']],
         ];
@@ -361,7 +371,7 @@ abstract class ModelFactoryTest extends KernelTestCase
     public function can_use_factory_collection_as_data_provider(FactoryCollection $factoryCollection): void
     {
         $factoryCollection->create();
-        $factoryCollection->factory()::assert()->exists(['name' => 'foo']);
+        $factoryCollection->factory::assert()->exists(['name' => 'foo']);
     }
 
     public function factoryCollectionAsDataProvider(): iterable
@@ -433,16 +443,16 @@ abstract class ModelFactoryTest extends KernelTestCase
      */
     public function can_disable_persist_globally(): void
     {
-        $this->disablePersist();
+        disable_persisting();
 
         $categoryFactoryClass = $this->categoryFactoryClass();
 
         $categoryFactoryClass::createOne(['name' => 'foo']);
         $categoryFactoryClass::new()->create(['name' => 'foo']);
-        anonymous($this->categoryClass())->create(['name' => 'foo']);
-        create($this->categoryClass(), ['name' => 'foo']);
+        persistent_factory($this->categoryClass())->create(['name' => 'foo']);
+        persist($this->categoryClass(), ['name' => 'foo']);
 
-        $this->enablePersist(); // need to reactivate persist to access to RepositoryAssertions
+        enable_persisting(); // need to reactivate persist to access to RepositoryAssertions
         $categoryFactoryClass::assert()->count(0);
     }
 
@@ -451,7 +461,7 @@ abstract class ModelFactoryTest extends KernelTestCase
      */
     public function cannot_access_repository_method_when_persist_disabled(): void
     {
-        $this->disablePersist();
+        disable_persisting();
 
         $countErrors = 0;
         try {
@@ -483,7 +493,7 @@ abstract class ModelFactoryTest extends KernelTestCase
     {
         self::assertTrue(Factory::configuration()->isPersistEnabled());
 
-        create($this->categoryClass(), ['name' => 'foo']);
+        persist($this->categoryClass(), ['name' => 'foo']);
         $this->categoryFactoryClass()::assert()->count(1);
     }
 

@@ -18,7 +18,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Zenstruck\Foundry\ChainManagerRegistry;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\Instantiator;
+use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\StoryManager;
 
 /**
@@ -37,51 +37,51 @@ final class TestState
     private static array $globalStates = [];
 
     /**
-     * @deprecated Use TestState::configure()
+     * @deprecated Use UnitTestConfig::configure()
      */
     public static function setInstantiator(callable $instantiator): void
     {
-        trigger_deprecation('zenstruck\foundry', '1.23', 'Usage of TestState::setInstantiator() is deprecated. Please use TestState::configure().');
+        trigger_deprecation('zenstruck/foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in Foundry 2.0. Use "%s::configure()" instead.', __METHOD__, UnitTestConfig::class);
 
         self::$instantiator = $instantiator;
     }
 
     /**
-     * @deprecated Use TestState::configure()
+     * @deprecated Use UnitTestConfig::configure()
      */
     public static function setFaker(Faker\Generator $faker): void
     {
-        trigger_deprecation('zenstruck\foundry', '1.23', 'Usage of TestState::setFaker() is deprecated. Please use TestState::configure().');
+        trigger_deprecation('zenstruck/foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in Foundry 2.0. Use "%s::configure()" instead.', __METHOD__, UnitTestConfig::class);
 
         self::$faker = $faker;
     }
 
     /**
-     * @deprecated Use bundle configuration
+     * @deprecated
      */
     public static function enableDefaultProxyAutoRefresh(): void
     {
-        trigger_deprecation('zenstruck\foundry', '1.23', 'Usage of TestState::enableDefaultProxyAutoRefresh() is deprecated. Please use bundle configuration under "auto_refresh_proxies" key.');
+        trigger_deprecation('zenstruck/foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __METHOD__);
 
         self::$defaultProxyAutoRefresh = true;
     }
 
     /**
-     * @deprecated Use bundle configuration
+     * @deprecated
      */
     public static function disableDefaultProxyAutoRefresh(): void
     {
-        trigger_deprecation('zenstruck\foundry', '1.23', 'Usage of TestState::disableDefaultProxyAutoRefresh() is deprecated. Please use bundle configuration under "auto_refresh_proxies" key.');
+        trigger_deprecation('zenstruck/foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __METHOD__);
 
         self::$defaultProxyAutoRefresh = false;
     }
 
     /**
-     * @deprecated Use TestState::enableDefaultProxyAutoRefresh()
+     * @deprecated
      */
     public static function alwaysAutoRefreshProxies(): void
     {
-        trigger_deprecation('zenstruck\foundry', '1.9', 'TestState::alwaysAutoRefreshProxies() is deprecated, use TestState::enableDefaultProxyAutoRefresh().');
+        trigger_deprecation('zenstruck/foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __METHOD__);
 
         self::enableDefaultProxyAutoRefresh();
     }
@@ -146,11 +146,11 @@ final class TestState
     }
 
     /**
-     * @deprecated use TestState::bootFoundry()
+     * @deprecated
      */
     public static function bootFactory(Configuration $configuration): Configuration
     {
-        trigger_deprecation('zenstruck/foundry', '1.4.0', 'TestState::bootFactory() is deprecated, use TestState::bootFoundry().');
+        trigger_deprecation('zenstruck/foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __METHOD__);
 
         self::bootFoundry($configuration);
 
@@ -220,7 +220,21 @@ final class TestState
         StoryManager::setGlobalState();
     }
 
+    /**
+     * @deprecated
+     */
     public static function configure(?Instantiator $instantiator = null, ?Faker\Generator $faker = null): void
+    {
+        trigger_deprecation('zenstruck/foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in Foundry 2.0. Use "%s::configure()" instead.', __METHOD__, UnitTestConfig::class);
+
+        self::$instantiator = $instantiator;
+        self::$faker = $faker;
+    }
+
+    /**
+     * @internal
+     */
+    public static function configureInternal(?Instantiator $instantiator = null, ?Faker\Generator $faker = null): void
     {
         self::$instantiator = $instantiator;
         self::$faker = $faker;
