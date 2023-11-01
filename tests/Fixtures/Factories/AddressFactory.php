@@ -24,7 +24,7 @@ final class AddressFactory extends PersistentProxyObjectFactory
         return Address::class;
     }
 
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return ['value' => 'Some address'];
     }

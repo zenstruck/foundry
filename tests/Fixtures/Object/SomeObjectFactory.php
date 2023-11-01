@@ -24,7 +24,7 @@ use Zenstruck\Foundry\Proxy;
  */
 final class SomeObjectFactory extends PersistentProxyObjectFactory
 {
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [
             'arrayMandatory' => [],

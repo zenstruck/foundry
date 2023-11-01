@@ -24,7 +24,7 @@ final class ContactFactory extends PersistentProxyObjectFactory
         return Contact::class;
     }
 
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [
             'name' => 'Sally',

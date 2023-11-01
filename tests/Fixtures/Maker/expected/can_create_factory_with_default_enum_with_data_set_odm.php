@@ -53,7 +53,7 @@ final class DocumentWithEnumFactory extends PersistentProxyObjectFactory
      *
      * @todo add your default values here
      */
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [
             'enum' => self::faker()->randomElement(SomeEnum::cases()),

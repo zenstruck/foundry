@@ -22,7 +22,7 @@ class CommentFactory extends PersistentProxyObjectFactory
         return ODMComment::class;
     }
 
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [
             'user' => new ODMUser(self::faker()->userName()),

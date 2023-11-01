@@ -21,7 +21,7 @@ class EntityForRelationsFactory extends PersistentProxyObjectFactory
         return EntityForRelations::class;
     }
 
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [];
     }

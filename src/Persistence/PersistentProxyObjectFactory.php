@@ -56,7 +56,7 @@ abstract class PersistentProxyObjectFactory extends Factory
         }
 
         $factory = $factory
-            ->with(static fn(): array => $factory->getDefaults())
+            ->with(static fn(): array => $factory->defaults())
             ->with($defaultAttributes);
 
         try {
@@ -310,8 +310,5 @@ abstract class PersistentProxyObjectFactory extends Factory
         return $this->with($attributes);
     }
 
-    /**
-     * @return mixed[]
-     */
-    abstract protected function getDefaults(): array;
+    abstract protected function defaults(): array|callable;
 }

@@ -16,7 +16,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\User;
 
 final class UserFactory extends PersistentProxyObjectFactory
 {
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [
             'name' => self::faker()->name(),
