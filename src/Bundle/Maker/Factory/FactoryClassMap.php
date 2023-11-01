@@ -31,7 +31,7 @@ final class FactoryClassMap
             \array_reduce(
                 \iterator_to_array($factories, preserve_keys: true),
                 static function(array $carry, PersistentProxyObjectFactory $factory): array {
-                    $carry[$factory::class] = $factory::getEntityClass();
+                    $carry[$factory::class] = $factory::class();
 
                     return $carry;
                 },

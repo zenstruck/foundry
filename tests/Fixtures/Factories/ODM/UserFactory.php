@@ -16,7 +16,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Document\ODMUser;
 
 final class UserFactory extends PersistentProxyObjectFactory
 {
-    protected static function getClass(): string
+    public static function class(): string
     {
         return ODMUser::class;
     }

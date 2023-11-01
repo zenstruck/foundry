@@ -47,6 +47,11 @@ final class ODMPostFactory extends PersistentProxyObjectFactory
     {
     }
 
+    public static function class(): string
+    {
+        return ODMPost::class;
+    }
+
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      *
@@ -70,10 +75,5 @@ final class ODMPostFactory extends PersistentProxyObjectFactory
         return $this
             // ->afterInstantiate(function(ODMPost $oDMPost): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return ODMPost::class;
     }
 }

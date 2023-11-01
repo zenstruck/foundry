@@ -19,7 +19,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Contact;
  */
 final class ContactFactory extends PersistentProxyObjectFactory
 {
-    protected static function getClass(): string
+    public static function class(): string
     {
         return Contact::class;
     }

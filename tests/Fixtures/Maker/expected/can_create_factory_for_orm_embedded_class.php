@@ -34,6 +34,11 @@ final class AddressFactory extends PersistentProxyObjectFactory
     {
     }
 
+    public static function class(): string
+    {
+        return Address::class;
+    }
+
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      *
@@ -55,10 +60,5 @@ final class AddressFactory extends PersistentProxyObjectFactory
             ->withoutPersisting()
             // ->afterInstantiate(function(Address $address): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return Address::class;
     }
 }

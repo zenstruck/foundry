@@ -47,6 +47,11 @@ final class CommentFactory extends PersistentProxyObjectFactory
     {
     }
 
+    public static function class(): string
+    {
+        return Comment::class;
+    }
+
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      *
@@ -71,10 +76,5 @@ final class CommentFactory extends PersistentProxyObjectFactory
         return $this
             // ->afterInstantiate(function(Comment $comment): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return Comment::class;
     }
 }

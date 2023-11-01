@@ -27,7 +27,7 @@ final class EntityWithPropertyNameDifferentFromConstructFactory extends Persiste
         ];
     }
 
-    protected static function getClass(): string
+    public static function class(): string
     {
         return EntityWithPropertyNameDifferentFromConstruct::class;
     }

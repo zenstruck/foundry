@@ -344,16 +344,6 @@ class Factory
         return self::configuration()->delayFlush($callback);
     }
 
-    /**
-     * @internal
-     *
-     * @phpstan-return class-string<TObject>
-     */
-    final protected function class(): string
-    {
-        return $this->class;
-    }
-
     protected function isPersisting(): bool
     {
         if (!$this->persist || !self::configuration()->isPersistEnabled() || !self::configuration()->hasManagerRegistry()) {

@@ -49,6 +49,11 @@ final class EntityWithRelationsFactory extends PersistentProxyObjectFactory
     {
     }
 
+    public static function class(): string
+    {
+        return EntityWithRelations::class;
+    }
+
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      *
@@ -71,10 +76,5 @@ final class EntityWithRelationsFactory extends PersistentProxyObjectFactory
         return $this
             // ->afterInstantiate(function(EntityWithRelations $entityWithRelations): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return EntityWithRelations::class;
     }
 }

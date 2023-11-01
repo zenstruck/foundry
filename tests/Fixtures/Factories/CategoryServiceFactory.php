@@ -25,7 +25,7 @@ final class CategoryServiceFactory extends PersistentProxyObjectFactory
         parent::__construct();
     }
 
-    protected static function getClass(): string
+    public static function class(): string
     {
         return Category::class;
     }
