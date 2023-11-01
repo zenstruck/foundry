@@ -19,7 +19,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
  */
 final class AddressFactory extends PersistentProxyObjectFactory
 {
-    protected static function getClass(): string
+    public static function class(): string
     {
         return Address::class;
     }

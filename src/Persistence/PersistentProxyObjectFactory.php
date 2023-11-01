@@ -23,7 +23,7 @@ abstract class PersistentProxyObjectFactory extends Factory
 {
     public function __construct()
     {
-        parent::__construct(static::getClass(), calledInternally: true);
+        parent::__construct(static::class(), calledInternally: true);
     }
 
     /**
@@ -133,7 +133,7 @@ abstract class PersistentProxyObjectFactory extends Factory
     final public static function first(string $sortedField = 'id'): Proxy
     {
         if (null === $proxy = static::repository()->first($sortedField)) {
-            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', static::getClass()));
+            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', static::class()));
         }
 
         return $proxy;
@@ -150,7 +150,7 @@ abstract class PersistentProxyObjectFactory extends Factory
     final public static function last(string $sortedField = 'id'): Proxy
     {
         if (null === $proxy = static::repository()->last($sortedField)) {
-            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', static::getClass()));
+            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', static::class()));
         }
 
         return $proxy;
@@ -244,7 +244,7 @@ abstract class PersistentProxyObjectFactory extends Factory
     final public static function find($criteria): Proxy
     {
         if (null === $proxy = static::repository()->find($criteria)) {
-            throw new \RuntimeException(\sprintf('Could not find "%s" object.', static::getClass()));
+            throw new \RuntimeException(\sprintf('Could not find "%s" object.', static::class()));
         }
 
         return $proxy;
@@ -275,20 +275,11 @@ abstract class PersistentProxyObjectFactory extends Factory
      */
     final public static function repository(): RepositoryProxy
     {
-        return static::configuration()->repositoryFor(static::getClass());
-    }
-
-    /**
-     * @internal
-     * @phpstan-return class-string<TModel>
-     */
-    final public static function getEntityClass(): string
-    {
-        return static::getClass();
+        return static::configuration()->repositoryFor(static::class());
     }
 
     /** @phpstan-return class-string<TModel> */
-    abstract protected static function getClass(): string;
+    abstract public static function class(): string;
 
     /**
      * Override to add default instantiator and default afterInstantiate/afterPersist events.

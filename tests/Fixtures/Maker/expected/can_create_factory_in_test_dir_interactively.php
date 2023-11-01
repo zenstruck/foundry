@@ -47,6 +47,11 @@ final class TagFactory extends PersistentProxyObjectFactory
     {
     }
 
+    public static function class(): string
+    {
+        return Tag::class;
+    }
+
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      *
@@ -67,10 +72,5 @@ final class TagFactory extends PersistentProxyObjectFactory
         return $this
             // ->afterInstantiate(function(Tag $tag): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return Tag::class;
     }
 }

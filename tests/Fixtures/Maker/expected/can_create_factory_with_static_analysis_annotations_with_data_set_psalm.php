@@ -63,6 +63,11 @@ final class CategoryFactory extends PersistentProxyObjectFactory
     {
     }
 
+    public static function class(): string
+    {
+        return Category::class;
+    }
+
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      *
@@ -83,10 +88,5 @@ final class CategoryFactory extends PersistentProxyObjectFactory
         return $this
             // ->afterInstantiate(function(Category $category): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return Category::class;
     }
 }

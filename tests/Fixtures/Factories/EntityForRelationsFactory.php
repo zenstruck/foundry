@@ -16,7 +16,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\EntityForRelations;
 
 class EntityForRelationsFactory extends PersistentProxyObjectFactory
 {
-    protected static function getClass(): string
+    public static function class(): string
     {
         return EntityForRelations::class;
     }

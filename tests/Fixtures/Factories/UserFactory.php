@@ -23,7 +23,7 @@ final class UserFactory extends PersistentProxyObjectFactory
         ];
     }
 
-    protected static function getClass(): string
+    public static function class(): string
     {
         return User::class;
     }

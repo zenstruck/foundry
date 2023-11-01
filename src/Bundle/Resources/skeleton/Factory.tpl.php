@@ -36,6 +36,11 @@ final class <?php echo $class_name; ?> extends PersistentProxyObjectFactory
     {
     }
 
+    public static function class(): string
+    {
+        return <?php echo $makeFactoryData->getObjectShortName() ?>::class;
+    }
+
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      *
@@ -63,10 +68,5 @@ foreach ($makeFactoryData->getDefaultProperties() as $propertyName => $value) {
 <?php } ?>
             // ->afterInstantiate(function(<?php echo $makeFactoryData->getObjectShortName(); ?> $<?php echo \lcfirst($makeFactoryData->getObjectShortName()); ?>): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return <?php echo $makeFactoryData->getObjectShortName(); ?>::class;
     }
 }

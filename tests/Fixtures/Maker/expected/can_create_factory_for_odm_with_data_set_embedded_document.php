@@ -35,6 +35,11 @@ final class ODMCommentFactory extends PersistentProxyObjectFactory
     {
     }
 
+    public static function class(): string
+    {
+        return ODMComment::class;
+    }
+
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      *
@@ -57,10 +62,5 @@ final class ODMCommentFactory extends PersistentProxyObjectFactory
             ->withoutPersisting()
             // ->afterInstantiate(function(ODMComment $oDMComment): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return ODMComment::class;
     }
 }

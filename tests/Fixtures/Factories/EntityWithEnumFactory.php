@@ -24,7 +24,7 @@ final class EntityWithEnumFactory extends PersistentProxyObjectFactory
         ];
     }
 
-    protected static function getClass(): string
+    public static function class(): string
     {
         return EntityWithEnum::class;
     }

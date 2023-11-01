@@ -19,7 +19,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Document\ODMCategory;
  */
 final class CategoryFactory extends PersistentProxyObjectFactory
 {
-    protected static function getClass(): string
+    public static function class(): string
     {
         return ODMCategory::class;
     }

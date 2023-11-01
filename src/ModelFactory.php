@@ -32,6 +32,18 @@ abstract class ModelFactory extends PersistentProxyObjectFactory
     }
 
     /**
+     * @phpstan-return class-string<TModel>
+     *
+     * @deprecated use class() instead
+     */
+    abstract protected static function getClass(): string;
+
+    public static function class(): string
+    {
+        return static::getClass();
+    }
+
+    /**
      * @return mixed[]
      *
      * @deprecated use defaults() instead
