@@ -13,3 +13,7 @@
 /.env.local
 /docker-compose.override.yaml
 /tests/Fixtures/Migrations/
+
+/utils/rector/vendor
+/utils/rector/.phpunit.result.cache
+/utils/rector/composer.lock

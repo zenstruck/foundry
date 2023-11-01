@@ -16,6 +16,9 @@ use Zenstruck\Foundry\ChainManagerRegistry;
 use Zenstruck\Foundry\Exception\FoundryBootException;
 use Zenstruck\Foundry\Factory;
 
+use function Zenstruck\Foundry\Persistence\disable_persisting;
+use function Zenstruck\Foundry\Persistence\enable_persisting;
+
 /**
  * @mixin KernelTestCase
  *
@@ -60,20 +63,34 @@ trait Factories
     public static function _tearDownFactories(): void
     {
         try {
-            Factory::configuration()->enablePersist();
+            $configuration = Factory::configuration();
+
+            if ($configuration->hasManagerRegistry()) {
+                $configuration->enablePersist();
+            }
         } catch (FoundryBootException) {
         }
 
         TestState::shutdownFoundry();
     }
 
+    /**
+     * @deprecated
+     */
     public function disablePersist(): void
     {
-        Factory::configuration()->disablePersist();
+        trigger_deprecation('zenstruck\foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in Foundry 2.0. Use "Zenstruck\Foundry\Persistence\disable_persisting()" instead.', __METHOD__);
+
+        disable_persisting();
     }
 
+    /**
+     * @deprecated
+     */
     public function enablePersist(): void
     {
-        Factory::configuration()->enablePersist();
+        trigger_deprecation('zenstruck\foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in Foundry 2.0. Use "Zenstruck\Foundry\Persistence\enable_persisting()" instead.', __METHOD__);
+
+        enable_persisting();
     }
 }

@@ -11,19 +11,13 @@
 
 namespace App\Factory;
 
-use Zenstruck\Foundry\ModelFactory;
-use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 
 /**
- * @extends ModelFactory<Category>
- *
- * @method        Category|Proxy     create(array|callable $attributes = [])
- * @method static Category|Proxy     createOne(array $attributes = [])
- * @method static Category[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static Category[]|Proxy[] createSequence(iterable|callable $sequence)
+ * @extends ObjectFactory<Category>
  */
-final class CategoryFactory extends ModelFactory
+final class CategoryFactory extends ObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -32,7 +26,11 @@ final class CategoryFactory extends ModelFactory
      */
     public function __construct()
     {
-        parent::__construct();
+    }
+
+    public static function class(): string
+    {
+        return Category::class;
     }
 
     /**
@@ -40,7 +38,7 @@ final class CategoryFactory extends ModelFactory
      *
      * @todo add your default values here
      */
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [
             'posts' => null, // TODO add Doctrine\Common\Collections\Collection value manually
@@ -51,16 +49,10 @@ final class CategoryFactory extends ModelFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
      */
-    protected function initialize(): self
+    protected function initialize(): static
     {
         return $this
-            ->withoutPersisting()
             // ->afterInstantiate(function(Category $category): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return Category::class;
     }
 }

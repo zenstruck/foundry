@@ -12,29 +12,29 @@
 namespace App\Factory;
 
 use Doctrine\ORM\EntityRepository;
-use Zenstruck\Foundry\ModelFactory;
-use Zenstruck\Foundry\Proxy;
-use Zenstruck\Foundry\RepositoryProxy;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 
 /**
- * @extends ModelFactory<Category>
+ * @extends PersistentProxyObjectFactory<Category>
  *
- * @method        Category|Proxy                   create(array|callable $attributes = [])
- * @method static Category|Proxy                   createOne(array $attributes = [])
- * @method static Category|Proxy                   find(object|array|mixed $criteria)
- * @method static Category|Proxy                   findOrCreate(array $attributes)
- * @method static Category|Proxy                   first(string $sortedField = 'id')
- * @method static Category|Proxy                   last(string $sortedField = 'id')
- * @method static Category|Proxy                   random(array $attributes = [])
- * @method static Category|Proxy                   randomOrCreate(array $attributes = [])
- * @method static EntityRepository|RepositoryProxy repository()
- * @method static Category[]|Proxy[]               all()
- * @method static Category[]|Proxy[]               createMany(int $number, array|callable $attributes = [])
- * @method static Category[]|Proxy[]               createSequence(iterable|callable $sequence)
- * @method static Category[]|Proxy[]               findBy(array $attributes)
- * @method static Category[]|Proxy[]               randomRange(int $min, int $max, array $attributes = [])
- * @method static Category[]|Proxy[]               randomSet(int $number, array $attributes = [])
+ * @method        Category|Proxy                       create(array|callable $attributes = [])
+ * @method static Category|Proxy                       createOne(array $attributes = [])
+ * @method static Category|Proxy                       find(object|array|mixed $criteria)
+ * @method static Category|Proxy                       findOrCreate(array $attributes)
+ * @method static Category|Proxy                       first(string $sortedField = 'id')
+ * @method static Category|Proxy                       last(string $sortedField = 'id')
+ * @method static Category|Proxy                       random(array $attributes = [])
+ * @method static Category|Proxy                       randomOrCreate(array $attributes = [])
+ * @method static EntityRepository|RepositoryDecorator repository()
+ * @method static Category[]|Proxy[]                   all()
+ * @method static Category[]|Proxy[]                   createMany(int $number, array|callable $attributes = [])
+ * @method static Category[]|Proxy[]                   createSequence(iterable|callable $sequence)
+ * @method static Category[]|Proxy[]                   findBy(array $attributes)
+ * @method static Category[]|Proxy[]                   randomRange(int $min, int $max, array $attributes = [])
+ * @method static Category[]|Proxy[]                   randomSet(int $number, array $attributes = [])
  *
  * @psalm-method        Proxy<Category> create(array|callable $attributes = [])
  * @psalm-method static Proxy<Category> createOne(array $attributes = [])
@@ -44,7 +44,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
  * @psalm-method static Proxy<Category> last(string $sortedField = 'id')
  * @psalm-method static Proxy<Category> random(array $attributes = [])
  * @psalm-method static Proxy<Category> randomOrCreate(array $attributes = [])
- * @psalm-method static RepositoryProxy<Category> repository()
+ * @psalm-method static RepositoryDecorator<Category> repository()
  * @psalm-method static list<Proxy<Category>> all()
  * @psalm-method static list<Proxy<Category>> createMany(int $number, array|callable $attributes = [])
  * @psalm-method static list<Proxy<Category>> createSequence(iterable|callable $sequence)
@@ -52,7 +52,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
  * @psalm-method static list<Proxy<Category>> randomRange(int $min, int $max, array $attributes = [])
  * @psalm-method static list<Proxy<Category>> randomSet(int $number, array $attributes = [])
  */
-final class CategoryFactory extends ModelFactory
+final class CategoryFactory extends PersistentProxyObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -61,7 +61,11 @@ final class CategoryFactory extends ModelFactory
      */
     public function __construct()
     {
-        parent::__construct();
+    }
+
+    public static function class(): string
+    {
+        return Category::class;
     }
 
     /**
@@ -69,7 +73,7 @@ final class CategoryFactory extends ModelFactory
      *
      * @todo add your default values here
      */
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [
             'name' => self::faker()->text(255),
@@ -79,15 +83,10 @@ final class CategoryFactory extends ModelFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
      */
-    protected function initialize(): self
+    protected function initialize(): static
     {
         return $this
             // ->afterInstantiate(function(Category $category): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return Category::class;
     }
 }

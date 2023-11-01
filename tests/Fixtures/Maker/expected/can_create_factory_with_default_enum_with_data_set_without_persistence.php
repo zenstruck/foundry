@@ -11,20 +11,14 @@
 
 namespace App\Factory;
 
-use Zenstruck\Foundry\ModelFactory;
-use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\PHP81\EntityWithEnum;
 use Zenstruck\Foundry\Tests\Fixtures\PHP81\SomeEnum;
 
 /**
- * @extends ModelFactory<EntityWithEnum>
- *
- * @method        EntityWithEnum|Proxy     create(array|callable $attributes = [])
- * @method static EntityWithEnum|Proxy     createOne(array $attributes = [])
- * @method static EntityWithEnum[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static EntityWithEnum[]|Proxy[] createSequence(iterable|callable $sequence)
+ * @extends ObjectFactory<EntityWithEnum>
  */
-final class EntityWithEnumFactory extends ModelFactory
+final class EntityWithEnumFactory extends ObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -33,7 +27,11 @@ final class EntityWithEnumFactory extends ModelFactory
      */
     public function __construct()
     {
-        parent::__construct();
+    }
+
+    public static function class(): string
+    {
+        return EntityWithEnum::class;
     }
 
     /**
@@ -41,7 +39,7 @@ final class EntityWithEnumFactory extends ModelFactory
      *
      * @todo add your default values here
      */
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [
             'enum' => self::faker()->randomElement(SomeEnum::cases()),
@@ -51,16 +49,10 @@ final class EntityWithEnumFactory extends ModelFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
      */
-    protected function initialize(): self
+    protected function initialize(): static
     {
         return $this
-            ->withoutPersisting()
             // ->afterInstantiate(function(EntityWithEnum $entityWithEnum): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return EntityWithEnum::class;
     }
 }

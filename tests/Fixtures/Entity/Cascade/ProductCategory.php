@@ -54,4 +54,12 @@ class ProductCategory
     {
         return $this->products;
     }
+
+    public function addProduct(Product $product): void
+    {
+        if (!$this->products->contains($product)) {
+            $this->products[] = $product;
+            $product->addCategory($this);
+        }
+    }
 }

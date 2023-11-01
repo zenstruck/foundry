@@ -18,7 +18,7 @@ use Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractExtensionTestCase;
 use Symfony\Bundle\MakerBundle\MakerBundle;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Zenstruck\Foundry\Bundle\DependencyInjection\ZenstruckFoundryExtension;
-use Zenstruck\Foundry\Instantiator;
+use Zenstruck\Foundry\Object\Instantiator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -57,6 +57,12 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
         $this->assertContainerBuilderNotHasService('.zenstruck_foundry.maker.story');
         $this->assertContainerBuilderHasServiceDefinitionWithTag('.zenstruck_foundry.maker.factory_stub', 'console.command');
         $this->assertContainerBuilderHasServiceDefinitionWithTag('.zenstruck_foundry.maker.story_stub', 'console.command');
+
+        $configurationArguments = $this->container->getDefinition('.zenstruck_foundry.configuration')->getArguments();
+        $this->assertSame(['default'], $configurationArguments['$ormConnectionsToReset']);
+        $this->assertSame(['default'], $configurationArguments['$ormObjectManagersToReset']);
+        $this->assertSame('schema', $configurationArguments['$ormResetMode']);
+        $this->assertSame(['default'], $configurationArguments['$odmObjectManagersToReset']);
     }
 
     /**
@@ -118,15 +124,54 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
      */
     public function custom_instantiator_config(): void
     {
+        $this->load([
+            'instantiator' => [
+                'use_constructor' => false,
+                'allow_extra_attributes' => true,
+                'always_force_properties' => true,
+            ],
+        ]);
+
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.default_instantiator', 'allowExtra');
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.default_instantiator', 'alwaysForce');
+
+        $instantiator = $this->container->get('.zenstruck_foundry.default_instantiator');
+
+        // matthiasnoback/symfony-dependency-injection-test cannot assert if a service is created through a factory.
+        // so, we're checking that private property "Instantiator::$withoutConstructor" was set to true.
+        $useConstructor = \Closure::bind(static fn(Instantiator $instantiator) => $instantiator->useConstructor, null, Instantiator::class)($instantiator);
+        self::assertFalse($useConstructor);
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    public function can_configure_instantiator_without_constructor(): void
+    {
+        $this->load(['instantiator' => ['without_constructor' => true]]);
+
+        $instantiator = $this->container->get('.zenstruck_foundry.default_instantiator');
+
+        // matthiasnoback/symfony-dependency-injection-test cannot assert if a service is created through a factory.
+        // so, we're checking that private property "Instantiator::$withoutConstructor" was set to true.
+        $useConstructor = \Closure::bind(static fn(Instantiator $instantiator) => $instantiator->useConstructor, null, Instantiator::class)($instantiator);
+        self::assertFalse($useConstructor);
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    public function throws_exception_when_instantiator_has_wrong_configuration(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot set "without_constructor" and "use_constructor" to the same value.');
+
         $this->load(['instantiator' => [
             'without_constructor' => true,
-            'allow_extra_attributes' => true,
-            'always_force_properties' => true,
+            'use_constructor' => true,
         ]]);
-
-        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.default_instantiator', 'withoutConstructor');
-        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.default_instantiator', 'allowExtraAttributes');
-        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.default_instantiator', 'alwaysForceProperties');
     }
 
     /**
@@ -157,7 +202,7 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
     public function cannot_configure_without_constructor_if_using_custom_instantiator_service(): void
     {
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Invalid configuration for path "zenstruck_foundry.instantiator": Cannot set "without_constructor" when using custom service.');
+        $this->expectExceptionMessage('Invalid configuration for path "zenstruck_foundry.instantiator": Cannot set "use_constructor: false" when using custom service.');
 
         $this->load(['instantiator' => ['service' => 'my_instantiator', 'without_constructor' => true]]);
     }
@@ -175,6 +220,7 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_enable_auto_refresh_proxies(): void
     {
@@ -187,6 +233,7 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_disable_auto_refresh_proxies(): void
     {
@@ -211,15 +258,51 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
 
     /**
      * @test
+     * @group legacy
      * @testWith ["orm"]
      *           ["odm"]
+     */
+    public function cannot_configure_legacy_database_resetter_if_doctrine_not_enabled(string $doctrine): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('should be enabled to use config under "%s.reset"', 'orm' === $doctrine ? 'orm' : 'mongo'));
+
+        $this->load(['database_resetter' => [$doctrine => []]]);
+    }
+
+    /**
+     * @test
+     * @testWith ["orm"]
+     *           ["mongo"]
      */
     public function cannot_configure_database_resetter_if_doctrine_not_enabled(string $doctrine): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(\sprintf('should be enabled to use config under "database_resetter.%s"', $doctrine));
+        $this->expectExceptionMessage(\sprintf('should be enabled to use config under "%s.reset"', $doctrine));
 
-        $this->load(['database_resetter' => [$doctrine => []]]);
+        $this->load([$doctrine => ['reset' => []]]);
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    public function can_configure_legacy_database_resetter_if_doctrine_enabled(): void
+    {
+        $this->setParameter('kernel.bundles', [DoctrineBundle::class, DoctrineMongoDBBundle::class]);
+
+        $this->load([
+            'database_resetter' => [
+                'orm' => ['connections' => ['orm_connection'], 'object_managers' => ['object_manager_orm'], 'reset_mode' => 'migrate'],
+                'odm' => ['object_managers' => ['object_manager_odm']],
+            ],
+        ]);
+
+        $configurationArguments = $this->container->getDefinition('.zenstruck_foundry.configuration')->getArguments();
+        $this->assertSame(['orm_connection'], $configurationArguments['$ormConnectionsToReset']);
+        $this->assertSame(['object_manager_orm'], $configurationArguments['$ormObjectManagersToReset']);
+        $this->assertSame('migrate', $configurationArguments['$ormResetMode']);
+        $this->assertSame(['object_manager_odm'], $configurationArguments['$odmObjectManagersToReset']);
     }
 
     /**
@@ -230,10 +313,8 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
         $this->setParameter('kernel.bundles', [DoctrineBundle::class, DoctrineMongoDBBundle::class]);
 
         $this->load([
-            'database_resetter' => [
-                'orm' => ['connections' => ['orm_connection'], 'object_managers' => ['object_manager_orm'], 'reset_mode' => 'migrate'],
-                'odm' => ['object_managers' => ['object_manager_odm']],
-            ],
+            'orm' => ['reset' => ['connections' => ['orm_connection'], 'entity_managers' => ['object_manager_orm'], 'mode' => 'migrate']],
+            'mongo' => ['reset' => ['document_managers' => ['object_manager_odm']]],
         ]);
 
         $configurationArguments = $this->container->getDefinition('.zenstruck_foundry.configuration')->getArguments();

@@ -50,8 +50,14 @@
         "doctrine/mongodb-odm": "2.5.0"
     },
     "autoload": {
-        "psr-4": { "Zenstruck\\Foundry\\": "src/" },
-        "files": ["src/functions.php"]
+        "psr-4": {
+            "Zenstruck\\Foundry\\": "src/",
+            "Zenstruck\\Foundry\\Utils\\Rector\\": "utils/rector/src/"
+        },
+        "files": [
+            "src/functions.php",
+            "src/Persistence/functions.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

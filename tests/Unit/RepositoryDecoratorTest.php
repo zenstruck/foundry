@@ -13,20 +13,21 @@ namespace Zenstruck\Foundry\Tests\Unit;
 
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
-use Zenstruck\Foundry\RepositoryProxy;
+use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class RepositoryProxyTest extends TestCase
+final class RepositoryDecoratorTest extends TestCase
 {
     /**
      * @test
+     * @group legacy
      * @dataProvider objectRepositoryWithoutFindOneByOrderBy
      */
     public function calling_find_one_by_with_order_by_when_wrapped_repo_does_not_have_throws_exception(ObjectRepository $inner): void
     {
-        $proxy = new RepositoryProxy($inner);
+        $proxy = new RepositoryDecorator($inner);
 
         $this->expectException(\RuntimeException::class);
 
@@ -35,25 +36,25 @@ final class RepositoryProxyTest extends TestCase
 
     public static function objectRepositoryWithoutFindOneByOrderBy(): iterable
     {
-        yield [new RepositoryProxy(new class() extends RepositoryStub {
+        yield [new RepositoryDecorator(new class() extends RepositoryStub {
             public function findOneBy(array $criteria): void
             {
             }
         })];
 
-        yield [new RepositoryProxy(new class() extends RepositoryStub {
+        yield [new RepositoryDecorator(new class() extends RepositoryStub {
             public function findOneBy(array $criteria, ?array $foo = null): void
             {
             }
         })];
 
-        yield [new RepositoryProxy(new class() extends RepositoryStub {
+        yield [new RepositoryDecorator(new class() extends RepositoryStub {
             public function findOneBy(array $criteria, $orderBy = null): void
             {
             }
         })];
 
-        yield [new RepositoryProxy(new class() extends RepositoryStub {
+        yield [new RepositoryDecorator(new class() extends RepositoryStub {
             public function findOneBy(array $criteria, ?string $orderBy = null): void
             {
             }
@@ -67,7 +68,7 @@ final class RepositoryProxyTest extends TestCase
     {
         $inner = $this->createMock(ObjectRepository::class);
 
-        $repository = new RepositoryProxy($inner);
+        $repository = new RepositoryDecorator($inner);
 
         $this->assertSame($inner, $repository->inner());
     }
