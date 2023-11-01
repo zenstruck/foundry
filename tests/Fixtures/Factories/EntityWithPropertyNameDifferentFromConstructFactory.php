@@ -11,11 +11,11 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\EntityWithPropertyNameDifferentFromConstruct;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObjectFactory;
 
-final class EntityWithPropertyNameDifferentFromConstructFactory extends ModelFactory
+final class EntityWithPropertyNameDifferentFromConstructFactory extends PersistentProxyObjectFactory
 {
     protected function getDefaults(): array
     {

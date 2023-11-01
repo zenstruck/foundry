@@ -12,13 +12,13 @@
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
 use Zenstruck\Foundry\Instantiator;
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-class PostFactory extends ModelFactory
+class PostFactory extends PersistentProxyObjectFactory
 {
     public function published(): static
     {

@@ -12,13 +12,13 @@
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
 use Zenstruck\Foundry\Instantiator;
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class CategoryFactory extends ModelFactory
+final class CategoryFactory extends PersistentProxyObjectFactory
 {
     protected static function getClass(): string
     {

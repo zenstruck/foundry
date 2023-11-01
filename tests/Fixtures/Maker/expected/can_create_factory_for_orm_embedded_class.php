@@ -11,19 +11,19 @@
 
 namespace App\Factory;
 
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
 
 /**
- * @extends ModelFactory<Address>
+ * @extends PersistentProxyObjectFactory<Address>
  *
  * @method        Address|Proxy     create(array|callable $attributes = [])
  * @method static Address|Proxy     createOne(array $attributes = [])
  * @method static Address[]|Proxy[] createMany(int $number, array|callable $attributes = [])
  * @method static Address[]|Proxy[] createSequence(iterable|callable $sequence)
  */
-final class AddressFactory extends ModelFactory
+final class AddressFactory extends PersistentProxyObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

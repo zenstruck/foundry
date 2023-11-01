@@ -11,13 +11,13 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories\ODM;
 
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Document\Tag;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class TagFactory extends ModelFactory
+final class TagFactory extends PersistentProxyObjectFactory
 {
     protected static function getClass(): string
     {
