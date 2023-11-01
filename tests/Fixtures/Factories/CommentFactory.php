@@ -16,7 +16,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Comment;
 
 final class CommentFactory extends PersistentProxyObjectFactory
 {
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [
             'user' => UserFactory::new(),

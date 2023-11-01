@@ -35,7 +35,7 @@ class PostFactory extends PersistentProxyObjectFactory
         return Post::class;
     }
 
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [
             'title' => self::faker()->sentence(),

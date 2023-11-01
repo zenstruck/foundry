@@ -17,7 +17,7 @@ use Zenstruck\Foundry\Tests\Fixtures\PHP81\SomeEnum;
 
 final class EntityWithEnumFactory extends PersistentProxyObjectFactory
 {
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [
             'enum' => self::faker()->randomElement(SomeEnum::cases()),
