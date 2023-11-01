@@ -22,6 +22,11 @@ class PostFactory extends ModelFactory
 {
     public function published(): static
     {
+        return $this->with(static fn(): array => ['published_at' => self::faker()->dateTime()]);
+    }
+
+    public function publishedWithLegacyMethod(): static
+    {
         return $this->addState(static fn(): array => ['published_at' => self::faker()->dateTime()]);
     }
 

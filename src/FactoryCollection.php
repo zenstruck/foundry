@@ -97,7 +97,7 @@ final class FactoryCollection implements \IteratorAggregate
 
         $factories = [];
         foreach ($this->sequence as $attributes) {
-            $factories[] = (clone $this->factory)->withAttributes($attributes);
+            $factories[] = (clone $this->factory)->with($attributes);
         }
 
         return $factories;
