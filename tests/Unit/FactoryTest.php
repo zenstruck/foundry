@@ -23,6 +23,7 @@ use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 
+use Zenstruck\Foundry\Tests\Fixtures\Factories\LegacyPostFactory;
 use function Zenstruck\Foundry\anonymous;
 use function Zenstruck\Foundry\lazy;
 
@@ -441,5 +442,17 @@ final class FactoryTest extends TestCase
         $factory = anonymous($object::class)->create(['value' => ['foo' => 'bar']]);
 
         $this->assertSame(['foo' => 'bar'], $factory->value);
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    public function can_use_legacy_model_factory(): void
+    {
+        $post = LegacyPostFactory::createOne(['title' => 'title', 'body' => 'body']);
+
+        self::assertSame('title', $post->getTitle());
+        self::assertSame('body', $post->getBody());
     }
 }

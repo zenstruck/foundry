@@ -20,7 +20,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
  */
 final class CategoryFactory extends PersistentProxyObjectFactory
 {
-    protected static function getClass(): string
+    public static function class(): string
     {
         return Category::class;
     }

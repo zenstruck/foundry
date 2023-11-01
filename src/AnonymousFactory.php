@@ -21,8 +21,15 @@ namespace Zenstruck\Foundry;
  */
 final class AnonymousFactory extends Factory implements \Countable, \IteratorAggregate
 {
+    /**
+     * @var class-string<TModel>
+     */
+    private string $class;
+
     public function __construct(string $class, array|callable $defaultAttributes = [])
     {
+        $this->class = $class;
+
         trigger_deprecation('zenstruck\foundry', '1.30', 'Class "AnonymousFactory" is deprecated and will be removed in 2.0. Use the "anonymous()" or "repository()" functions instead.');
 
         parent::__construct($class, $defaultAttributes, calledInternally: true);
@@ -62,7 +69,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     public function first(string $sortedField = 'id'): Proxy
     {
         if (null === $proxy = $this->repository()->first($sortedField)) {
-            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', $this->class()));
+            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', $this->class));
         }
 
         return $proxy;
@@ -76,7 +83,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     public function last(string $sortedField = 'id'): Proxy
     {
         if (null === $proxy = $this->repository()->last($sortedField)) {
-            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', $this->class()));
+            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', $this->class));
         }
 
         return $proxy;
@@ -166,7 +173,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     public function find($criteria): Proxy
     {
         if (null === $proxy = $this->repository()->find($criteria)) {
-            throw new \RuntimeException(\sprintf('Could not find "%s" object.', $this->class()));
+            throw new \RuntimeException(\sprintf('Could not find "%s" object.', $this->class));
         }
 
         return $proxy;
@@ -192,6 +199,6 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
      */
     public function repository(): RepositoryProxy
     {
-        return self::configuration()->repositoryFor($this->class());
+        return self::configuration()->repositoryFor($this->class);
     }
 }

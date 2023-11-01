@@ -63,6 +63,11 @@ final class PostFactory extends PersistentProxyObjectFactory
     {
     }
 
+    public static function class(): string
+    {
+        return Post::class;
+    }
+
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      *
@@ -86,10 +91,5 @@ final class PostFactory extends PersistentProxyObjectFactory
         return $this
             // ->afterInstantiate(function(Post $post): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return Post::class;
     }
 }

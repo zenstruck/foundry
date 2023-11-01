@@ -30,7 +30,7 @@ class PostFactory extends PersistentProxyObjectFactory
         return $this->addState(static fn(): array => ['published_at' => self::faker()->dateTime()]);
     }
 
-    protected static function getClass(): string
+    public static function class(): string
     {
         return Post::class;
     }

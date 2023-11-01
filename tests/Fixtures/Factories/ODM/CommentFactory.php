@@ -17,7 +17,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Document\ODMUser;
 
 class CommentFactory extends PersistentProxyObjectFactory
 {
-    protected static function getClass(): string
+    public static function class(): string
     {
         return ODMComment::class;
     }

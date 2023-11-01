@@ -30,7 +30,7 @@ final class SomeOtherObjectFactory extends PersistentProxyObjectFactory
         ];
     }
 
-    protected static function getClass(): string
+    public static function class(): string
     {
         return SomeOtherObject::class;
     }

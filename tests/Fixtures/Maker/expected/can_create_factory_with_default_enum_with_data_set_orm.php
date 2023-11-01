@@ -48,6 +48,11 @@ final class EntityWithEnumFactory extends PersistentProxyObjectFactory
     {
     }
 
+    public static function class(): string
+    {
+        return EntityWithEnum::class;
+    }
+
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      *
@@ -68,10 +73,5 @@ final class EntityWithEnumFactory extends PersistentProxyObjectFactory
         return $this
             // ->afterInstantiate(function(EntityWithEnum $entityWithEnum): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return EntityWithEnum::class;
     }
 }

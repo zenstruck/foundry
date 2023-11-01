@@ -19,7 +19,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Document\Tag;
  */
 final class TagFactory extends PersistentProxyObjectFactory
 {
-    protected static function getClass(): string
+    public static function class(): string
     {
         return Tag::class;
     }

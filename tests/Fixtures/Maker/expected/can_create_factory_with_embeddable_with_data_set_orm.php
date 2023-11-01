@@ -47,6 +47,11 @@ final class ContactFactory extends PersistentProxyObjectFactory
     {
     }
 
+    public static function class(): string
+    {
+        return Contact::class;
+    }
+
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      *
@@ -68,10 +73,5 @@ final class ContactFactory extends PersistentProxyObjectFactory
         return $this
             // ->afterInstantiate(function(Contact $contact): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return Contact::class;
     }
 }
