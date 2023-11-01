@@ -45,7 +45,6 @@ final class ContactFactory extends ModelFactory
      */
     public function __construct()
     {
-        parent::__construct();
     }
 
     /**

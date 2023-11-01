@@ -61,7 +61,6 @@ final class PostFactory extends ModelFactory
      */
     public function __construct()
     {
-        parent::__construct();
     }
 
     /**

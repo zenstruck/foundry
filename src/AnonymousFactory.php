@@ -25,7 +25,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     {
         trigger_deprecation('zenstruck\foundry', '1.30', 'Class "AnonymousFactory" is deprecated and will be removed in 2.0. Use the "anonymous()" or "repository()" functions instead.');
 
-        parent::__construct($class, $defaultAttributes);
+        parent::__construct($class, $defaultAttributes, calledInternally: true);
     }
 
     /**

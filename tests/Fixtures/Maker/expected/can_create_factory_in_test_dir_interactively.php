@@ -45,7 +45,6 @@ final class TagFactory extends ModelFactory
      */
     public function __construct()
     {
-        parent::__construct();
     }
 
     /**

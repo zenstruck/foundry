@@ -34,7 +34,6 @@ final class <?php echo $class_name; ?> extends ModelFactory
      */
     public function __construct()
     {
-        parent::__construct();
     }
 
     /**
