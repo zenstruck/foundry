@@ -24,7 +24,7 @@ final class TagFactory extends PersistentProxyObjectFactory
         return Tag::class;
     }
 
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return ['name' => self::faker()->sentence()];
     }

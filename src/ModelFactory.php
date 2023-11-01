@@ -30,4 +30,16 @@ abstract class ModelFactory extends PersistentProxyObjectFactory
 
         parent::__construct();
     }
+
+    /**
+     * @return mixed[]
+     *
+     * @deprecated use defaults() instead
+     */
+    abstract protected function getDefaults(): array;
+
+    protected function defaults(): array|callable
+    {
+        return $this->getDefaults();
+    }
 }

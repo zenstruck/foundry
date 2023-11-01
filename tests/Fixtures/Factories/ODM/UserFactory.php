@@ -21,7 +21,7 @@ final class UserFactory extends PersistentProxyObjectFactory
         return ODMUser::class;
     }
 
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [];
     }

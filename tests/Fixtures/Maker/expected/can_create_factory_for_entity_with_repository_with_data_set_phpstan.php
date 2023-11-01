@@ -68,7 +68,7 @@ final class PostFactory extends PersistentProxyObjectFactory
      *
      * @todo add your default values here
      */
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [
             'body' => self::faker()->text(),

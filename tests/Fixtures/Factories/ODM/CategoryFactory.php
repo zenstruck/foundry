@@ -24,7 +24,7 @@ final class CategoryFactory extends PersistentProxyObjectFactory
         return ODMCategory::class;
     }
 
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return ['name' => self::faker()->sentence()];
     }

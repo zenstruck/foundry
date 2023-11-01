@@ -41,7 +41,7 @@ final class <?php echo $class_name; ?> extends PersistentProxyObjectFactory
      *
      * @todo add your default values here
      */
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [
 <?php
