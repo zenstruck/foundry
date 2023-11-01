@@ -61,7 +61,6 @@ final class CategoryFactory extends ModelFactory
      */
     public function __construct()
     {
-        parent::__construct();
     }
 
     /**

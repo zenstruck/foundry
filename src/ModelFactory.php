@@ -26,7 +26,7 @@ abstract class ModelFactory extends Factory
 {
     public function __construct()
     {
-        parent::__construct(static::getClass());
+        parent::__construct(static::getClass(), calledInternally: true);
     }
 
     /**

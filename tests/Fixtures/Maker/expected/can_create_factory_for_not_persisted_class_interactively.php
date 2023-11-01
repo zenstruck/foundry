@@ -32,7 +32,6 @@ final class SomeObjectFactory extends ModelFactory
      */
     public function __construct()
     {
-        parent::__construct();
     }
 
     /**

@@ -33,7 +33,6 @@ final class EntityWithEnumFactory extends ModelFactory
      */
     public function __construct()
     {
-        parent::__construct();
     }
 
     /**
