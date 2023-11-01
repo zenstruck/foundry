@@ -12,13 +12,13 @@
 namespace App\Factory;
 
 use Doctrine\ORM\EntityRepository;
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\RepositoryProxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 
 /**
- * @extends ModelFactory<Category>
+ * @extends PersistentProxyObjectFactory<Category>
  *
  * @method        Category|Proxy                   create(array|callable $attributes = [])
  * @method static Category|Proxy                   createOne(array $attributes = [])
@@ -52,7 +52,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
  * @phpstan-method static list<Proxy<Category>> randomRange(int $min, int $max, array $attributes = [])
  * @phpstan-method static list<Proxy<Category>> randomSet(int $number, array $attributes = [])
  */
-final class CategoryFactory extends ModelFactory
+final class CategoryFactory extends PersistentProxyObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

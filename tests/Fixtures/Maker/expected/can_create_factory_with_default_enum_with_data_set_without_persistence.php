@@ -11,20 +11,20 @@
 
 namespace App\Factory;
 
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\PHP81\EntityWithEnum;
 use Zenstruck\Foundry\Tests\Fixtures\PHP81\SomeEnum;
 
 /**
- * @extends ModelFactory<EntityWithEnum>
+ * @extends PersistentProxyObjectFactory<EntityWithEnum>
  *
  * @method        EntityWithEnum|Proxy     create(array|callable $attributes = [])
  * @method static EntityWithEnum|Proxy     createOne(array $attributes = [])
  * @method static EntityWithEnum[]|Proxy[] createMany(int $number, array|callable $attributes = [])
  * @method static EntityWithEnum[]|Proxy[] createSequence(iterable|callable $sequence)
  */
-final class EntityWithEnumFactory extends ModelFactory
+final class EntityWithEnumFactory extends PersistentProxyObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

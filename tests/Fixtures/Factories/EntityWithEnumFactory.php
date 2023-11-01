@@ -11,11 +11,11 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\PHP81\EntityWithEnum;
 use Zenstruck\Foundry\Tests\Fixtures\PHP81\SomeEnum;
 
-final class EntityWithEnumFactory extends ModelFactory
+final class EntityWithEnumFactory extends PersistentProxyObjectFactory
 {
     protected function getDefaults(): array
     {

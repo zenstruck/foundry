@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Zenstruck\Foundry\Bundle\Command\StubMakeFactory;
 use Zenstruck\Foundry\Bundle\Command\StubMakeStory;
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Story;
 use Zenstruck\Foundry\Test\ORMDatabaseResetter;
 
@@ -41,7 +41,7 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
             ->addTag('foundry.story')
         ;
 
-        $container->registerForAutoconfiguration(ModelFactory::class)
+        $container->registerForAutoconfiguration(PersistentProxyObjectFactory::class)
             ->addTag('foundry.factory')
         ;
 

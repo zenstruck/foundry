@@ -9,7 +9,7 @@ foreach ($makeFactoryData->getUses() as $use) {
 ?>
 
 /**
- * @extends ModelFactory<<?php echo $makeFactoryData->getObjectShortName(); ?>>
+ * @extends PersistentProxyObjectFactory<<?php echo $makeFactoryData->getObjectShortName(); ?>>
  *
 <?php
 foreach ($makeFactoryData->getMethodsPHPDoc() as $methodPHPDoc) {
@@ -25,7 +25,7 @@ if ($makeFactoryData->hasStaticAnalysisTool()) {
 }
 ?>
  */
-final class <?php echo $class_name; ?> extends ModelFactory
+final class <?php echo $class_name; ?> extends PersistentProxyObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

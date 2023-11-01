@@ -11,10 +11,10 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\User;
 
-final class UserFactory extends ModelFactory
+final class UserFactory extends PersistentProxyObjectFactory
 {
     protected function getDefaults(): array
     {
