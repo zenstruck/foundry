@@ -11,11 +11,15 @@
 
 namespace Zenstruck\Foundry\Bundle\Maker\Factory;
 
+use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
-use Zenstruck\Foundry\ModelFactory;
-use Zenstruck\Foundry\Proxy;
-use Zenstruck\Foundry\RepositoryProxy;
+use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\ObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 
 /**
  * @internal
@@ -36,14 +40,20 @@ final class MakeFactoryData
     public function __construct(private \ReflectionClass $object, private ClassNameDetails $factoryClassNameDetails, private ?\ReflectionClass $repository, private string $staticAnalysisTool, private bool $persisted)
     {
         $this->uses = [
-            ModelFactory::class,
-            Proxy::class,
+            $this->getFactoryClass(),
             $object->getName(),
         ];
 
+        if ($this->persisted) {
+            $this->uses[] = Proxy::class;
+        }
+
         if ($repository) {
             $this->uses[] = $repository->getName();
-            $this->uses[] = RepositoryProxy::class;
+            $this->uses[] = ProxyRepositoryDecorator::class;
+            if (!\str_starts_with($repository->getName(), 'Doctrine')) {
+                $this->uses[] = \is_a($repository->getName(), DocumentRepository::class, allow_string: true) ? DocumentRepository::class : EntityRepository::class;
+            }
         }
 
         $this->methodsInPHPDoc = MakeFactoryPHPDocMethod::createAll($this);
@@ -59,6 +69,19 @@ final class MakeFactoryData
         return $this->object->getShortName();
     }
 
+    /**
+     * @return class-string<Factory>
+     */
+    public function getFactoryClass(): string
+    {
+        return $this->isPersisted() ? PersistentProxyObjectFactory::class : ObjectFactory::class;
+    }
+
+    public function getFactoryClassShortName(): string
+    {
+        return (new \ReflectionClass($this->getFactoryClass()))->getShortName();
+    }
+
     public function getFactoryClassNameDetails(): ClassNameDetails
     {
         return $this->factoryClassNameDetails;
@@ -70,9 +93,9 @@ final class MakeFactoryData
         return $this->object->getName();
     }
 
-    public function getRepositoryShortName(): ?string
+    public function getRepositoryReflectionClass(): ?\ReflectionClass
     {
-        return $this->repository?->getShortName();
+        return $this->repository;
     }
 
     public function isPersisted(): bool

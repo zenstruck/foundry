@@ -1,14 +1,34 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Parameter \\#1 \\$objectOrClass of class ReflectionClass constructor expects class\\-string\\<object\\>\\|object, class\\-string\\|null given\\.$#"
+			message: "#^Should not use node with type \"Expr_Eval\", please change the code\\.$#"
 			count: 1
-			path: src/Bundle/DependencyInjection/GlobalStatePass.php
+			path: src/AnonymousFactoryGenerator.php
+
+		-
+			message: "#^Method Zenstruck\\\\Foundry\\\\Configuration\\:\\:repositoryFor\\(\\) should return Zenstruck\\\\Foundry\\\\Persistence\\\\RepositoryDecorator\\<TObject of object\\> but returns Zenstruck\\\\Foundry\\\\Persistence\\\\ProxyRepositoryDecorator\\<object\\>\\|Zenstruck\\\\Foundry\\\\Persistence\\\\RepositoryDecorator\\<TObject of object\\>\\.$#"
+			count: 1
+			path: src/Configuration.php
 
 		-
 			message: "#^Parameter \\#1 \\$class of method Doctrine\\\\Persistence\\\\ManagerRegistry\\:\\:getManagerForClass\\(\\) expects class\\-string, string given\\.$#"
 			count: 1
 			path: src/Configuration.php
+
+		-
+			message: "#^Method Zenstruck\\\\Foundry\\\\Factory\\:\\:createAndUproxify\\(\\) should return TObject of object but returns object\\.$#"
+			count: 1
+			path: src/Factory.php
+
+		-
+			message: "#^Should not use function \"debug_backtrace\", please change the code\\.$#"
+			count: 2
+			path: src/Factory.php
+
+		-
+			message: "#^Method Zenstruck\\\\Foundry\\\\FactoryCollection\\:\\:create\\(\\) should return array\\<int, TObject of object\\> but returns array\\<int\\<0, max\\>, \\(TObject of object\\)\\|Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TObject of object\\>\\>\\.$#"
+			count: 1
+			path: src/FactoryCollection.php
 
 		-
 			message: "#^Parameter \\#1 \\$min of function random_int expects int, int\\|null given\\.$#"
@@ -21,7 +41,82 @@ parameters:
 			path: src/FactoryCollection.php
 
 		-
-			message: "#^Method Zenstruck\\\\Foundry\\\\RepositoryProxy\\:\\:proxyResult\\(\\) should return array\\<int, Zenstruck\\\\Foundry\\\\Proxy\\<TProxiedObject of object\\>\\>\\|Zenstruck\\\\Foundry\\\\Proxy\\<TProxiedObject of object\\> but returns \\(TProxiedObject of object\\)\\|null\\.$#"
+			message: "#^Should not use function \"debug_backtrace\", please change the code\\.$#"
+			count: 1
+			path: src/FactoryCollection.php
+
+		-
+			message: "#^Class Zenstruck\\\\Foundry\\\\Instantiator extends @final class Zenstruck\\\\Foundry\\\\Object\\\\Instantiator\\.$#"
+			count: 1
+			path: src/Instantiator.php
+
+		-
+			message: "#^If condition is always false\\.$#"
+			count: 1
+			path: src/Instantiator.php
+
+		-
+			message: "#^Method Zenstruck\\\\Foundry\\\\ObjectFactory\\:\\:__callStatic\\(\\) should return array\\<int, TModel of object\\> but returns array\\<int, \\(TModel of object\\)\\|Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TModel of object\\>\\>\\.$#"
+			count: 1
+			path: src/ObjectFactory.php
+
+		-
+			message: "#^Method Zenstruck\\\\Foundry\\\\ObjectFactory\\:\\:createSequence\\(\\) should return array\\<int, TModel of object\\> but returns array\\<int, \\(TModel of object\\)\\|Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TModel of object\\>\\>\\.$#"
+			count: 1
+			path: src/ObjectFactory.php
+
+		-
+			message: "#^Should not use function \"debug_backtrace\", please change the code\\.$#"
+			count: 1
+			path: src/ObjectFactory.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/ObjectFactory.php
+
+		-
+			message: "#^Should not use function \"debug_backtrace\", please change the code\\.$#"
+			count: 1
+			path: src/Persistence/PersistentProxyObjectFactory.php
+
+		-
+			message: "#^Class Zenstruck\\\\Foundry\\\\Persistence\\\\ProxyRepositoryDecorator extends @final class Zenstruck\\\\Foundry\\\\Persistence\\\\RepositoryDecorator\\.$#"
+			count: 1
+			path: src/Persistence/ProxyRepositoryDecorator.php
+
+		-
+			message: "#^Method Zenstruck\\\\Foundry\\\\Persistence\\\\ProxyRepositoryDecorator\\:\\:proxyResult\\(\\) should return array\\<int, Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TProxiedObject of object\\>\\>\\|Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TProxiedObject of object\\> but returns \\(TProxiedObject of object\\)\\|null\\.$#"
+			count: 1
+			path: src/Persistence/ProxyRepositoryDecorator.php
+
+		-
+			message: "#^Method Zenstruck\\\\Foundry\\\\Persistence\\\\ProxyRepositoryDecorator\\:\\:proxyResult\\(\\) should return array\\<int, Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TProxiedObject of object\\>\\>\\|Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TProxiedObject of object\\> but returns Zenstruck\\\\Foundry\\\\Proxy\\.$#"
+			count: 1
+			path: src/Persistence/ProxyRepositoryDecorator.php
+
+		-
+			message: "#^PHPDoc tag @return with type Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TObject of object\\> is not subtype of native type Zenstruck\\\\Foundry\\\\Proxy\\.$#"
+			count: 1
+			path: src/Proxy.php
+
+		-
+			message: "#^Class Zenstruck\\\\Foundry\\\\RepositoryAssertions extends @final class Zenstruck\\\\Foundry\\\\Persistence\\\\RepositoryAssertions\\.$#"
+			count: 1
+			path: src/RepositoryAssertions.php
+
+		-
+			message: "#^If condition is always false\\.$#"
+			count: 1
+			path: src/RepositoryAssertions.php
+
+		-
+			message: "#^Class Zenstruck\\\\Foundry\\\\RepositoryProxy extends @final class Zenstruck\\\\Foundry\\\\Persistence\\\\ProxyRepositoryDecorator\\.$#"
+			count: 1
+			path: src/RepositoryProxy.php
+
+		-
+			message: "#^If condition is always false\\.$#"
 			count: 1
 			path: src/RepositoryProxy.php
 
@@ -54,8 +149,3 @@ parameters:
 			message: "#^Parameter \\#1 \\$configuration of static method Zenstruck\\\\Foundry\\\\Factory\\<object\\>\\:\\:boot\\(\\) expects Zenstruck\\\\Foundry\\\\Configuration, object\\|null given\\.$#"
 			count: 1
 			path: src/ZenstruckFoundryBundle.php
-
-		-
-			message: "#^Function Zenstruck\\\\Foundry\\\\anonymous\\(\\) should return Zenstruck\\\\Foundry\\\\Factory\\<TObject of object\\> but returns class@anonymous/src/functions\\.php\\:45\\.$#"
-			count: 1
-			path: src/functions.php

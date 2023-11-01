@@ -17,8 +17,8 @@ use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\LazyValue;
-use Zenstruck\Foundry\Proxy;
-use Zenstruck\Foundry\RepositoryProxy;
+use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
@@ -26,10 +26,12 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 use function Zenstruck\Foundry\create;
 use function Zenstruck\Foundry\create_many;
 use function Zenstruck\Foundry\faker;
-use function Zenstruck\Foundry\instantiate;
 use function Zenstruck\Foundry\instantiate_many;
 use function Zenstruck\Foundry\lazy;
 use function Zenstruck\Foundry\memoize;
+use function Zenstruck\Foundry\object;
+use function Zenstruck\Foundry\Persistence\disable_persisting;
+use function Zenstruck\Foundry\Persistence\enable_persisting;
 use function Zenstruck\Foundry\repository;
 
 /**
@@ -74,27 +76,27 @@ final class FunctionsTest extends TestCase
      */
     public function instantiate(): void
     {
-        $proxy = instantiate(Post::class, ['title' => 'title', 'body' => 'body']);
+        $object = object(Post::class, ['title' => 'title', 'body' => 'body']);
 
-        $this->assertInstanceOf(Post::class, $proxy->object());
-        $this->assertFalse($proxy->isPersisted());
-        $this->assertSame('title', $proxy->getTitle());
+        $this->assertInstanceOf(Post::class, $object);
+        $this->assertSame('title', $object->getTitle());
     }
 
     /**
      * @test
+     * @group legacy
      */
     public function instantiate_many(): void
     {
         $objects = instantiate_many(3, Category::class);
 
         $this->assertCount(3, $objects);
-        $this->assertInstanceOf(Category::class, $objects[0]->object());
-        $this->assertFalse($objects[0]->isPersisted());
+        $this->assertInstanceOf(Category::class, $objects[0]->_real());
     }
 
     /**
      * @test
+     * @group legacy
      */
     public function create(): void
     {
@@ -114,6 +116,7 @@ final class FunctionsTest extends TestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function create_many(): void
     {
@@ -133,6 +136,7 @@ final class FunctionsTest extends TestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function repository(): void
     {
@@ -146,6 +150,18 @@ final class FunctionsTest extends TestCase
 
         Factory::configuration()->setManagerRegistry($registry);
 
-        $this->assertInstanceOf(RepositoryProxy::class, repository(new Category()));
+        $this->assertInstanceOf(RepositoryDecorator::class, repository(new Category()));
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    public function enable_or_disable_persisting_can_be_called_without_doctrine(): void
+    {
+        $this->expectNotToPerformAssertions();
+
+        enable_persisting();
+        disable_persisting();
     }
 }

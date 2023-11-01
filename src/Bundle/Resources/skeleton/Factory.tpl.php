@@ -9,23 +9,25 @@ foreach ($makeFactoryData->getUses() as $use) {
 ?>
 
 /**
- * @extends ModelFactory<<?php echo $makeFactoryData->getObjectShortName(); ?>>
- *
+ * @extends <?php echo $makeFactoryData->getFactoryClassShortName(); ?><<?php echo $makeFactoryData->getObjectShortName(); ?>>
 <?php
-foreach ($makeFactoryData->getMethodsPHPDoc() as $methodPHPDoc) {
-    echo "{$methodPHPDoc->toString()}\n";
-}
-
-if ($makeFactoryData->hasStaticAnalysisTool()) {
+if ($makeFactoryData->isPersisted()) {
     echo " *\n";
-
     foreach ($makeFactoryData->getMethodsPHPDoc() as $methodPHPDoc) {
-        echo "{$methodPHPDoc->toString($makeFactoryData->staticAnalysisTool())}\n";
+        echo "{$methodPHPDoc->toString()}\n";
+    }
+
+    if ($makeFactoryData->hasStaticAnalysisTool()) {
+        echo " *\n";
+
+        foreach ($makeFactoryData->getMethodsPHPDoc() as $methodPHPDoc) {
+            echo "{$methodPHPDoc->toString($makeFactoryData->staticAnalysisTool())}\n";
+        }
     }
 }
 ?>
  */
-final class <?php echo $class_name; ?> extends ModelFactory
+final class <?php echo $class_name; ?> extends <?php echo $makeFactoryData->getFactoryClassShortName(); ?>
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -34,7 +36,11 @@ final class <?php echo $class_name; ?> extends ModelFactory
      */
     public function __construct()
     {
-        parent::__construct();
+    }
+
+    public static function class(): string
+    {
+        return <?php echo $makeFactoryData->getObjectShortName(); ?>::class;
     }
 
     /**
@@ -42,7 +48,7 @@ final class <?php echo $class_name; ?> extends ModelFactory
      *
      * @todo add your default values here
      */
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [
 <?php
@@ -56,18 +62,10 @@ foreach ($makeFactoryData->getDefaultProperties() as $propertyName => $value) {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
      */
-    protected function initialize(): self
+    protected function initialize(): static
     {
         return $this
-<?php if (!$makeFactoryData->isPersisted()) { ?>
-            ->withoutPersisting()
-<?php } ?>
             // ->afterInstantiate(function(<?php echo $makeFactoryData->getObjectShortName(); ?> $<?php echo \lcfirst($makeFactoryData->getObjectShortName()); ?>): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return <?php echo $makeFactoryData->getObjectShortName(); ?>::class;
     }
 }

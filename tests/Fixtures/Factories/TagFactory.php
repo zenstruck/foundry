@@ -11,20 +11,20 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class TagFactory extends ModelFactory
+final class TagFactory extends PersistentProxyObjectFactory
 {
-    protected static function getClass(): string
+    public static function class(): string
     {
         return Tag::class;
     }
 
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return ['name' => self::faker()->sentence()];
     }

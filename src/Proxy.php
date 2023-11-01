@@ -17,14 +17,21 @@ use Doctrine\Persistence\ObjectManager;
 use Zenstruck\Assert;
 use Zenstruck\Callback;
 use Zenstruck\Callback\Parameter;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\Proxy as ProxyBase;
+use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 
 /**
+ * @deprecated Typehint Zenstruck\Foundry\Persistence\Proxy instead
+ *
  * @template TProxiedObject of object
+ * @implements ProxyBase<TProxiedObject>
+ *
  * @mixin TProxiedObject
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class Proxy implements \Stringable
+final class Proxy implements \Stringable, ProxyBase
 {
     /**
      * @phpstan-var class-string<TProxiedObject>
@@ -44,44 +51,58 @@ final class Proxy implements \Stringable
         /** @param TProxiedObject $object */
         private object $object,
     ) {
+        if ((new \ReflectionClass($object::class))->isFinal()) {
+            trigger_deprecation(
+                'zenstruck\foundry', '1.38.0',
+                'Using a proxy factory with a final class is deprecated and will throw an error in Foundry 2.0. Use "%s" instead (don\'t forget to remember all ->object() calls!), or unfinalize "%s" class.',
+                PersistentProxyObjectFactory::class,
+                $object::class,
+            );
+        }
+
+        if ((new \ReflectionClass($object::class))->isAnonymous()) {
+            trigger_deprecation(
+                'zenstruck\foundry', '1.38.0',
+                'Using a proxy factory with an anonymous class is deprecated and will throw an error in Foundry 2.0. Use "%s" instead.',
+                ObjectFactory::class,
+                $object::class,
+            );
+        }
+
         $this->class = $object::class;
         $this->autoRefresh = Factory::configuration()->defaultProxyAutoRefresh();
     }
 
     public function __call(string $method, array $arguments) // @phpstan-ignore-line
     {
-        return $this->object()->{$method}(...$arguments);
+        return $this->_real()->{$method}(...$arguments);
     }
 
     public function __get(string $name): mixed
     {
-        return $this->object()->{$name};
+        return $this->_real()->{$name};
     }
 
     public function __set(string $name, mixed $value): void
     {
-        $this->object()->{$name} = $value;
+        $this->_real()->{$name} = $value;
     }
 
     public function __unset(string $name): void
     {
-        unset($this->object()->{$name});
+        unset($this->_real()->{$name});
     }
 
     public function __isset(string $name): bool
     {
-        return isset($this->object()->{$name});
+        return isset($this->_real()->{$name});
     }
 
     public function __toString(): string
     {
-        $object = $this->object();
+        $object = $this->_real();
 
         if (!\method_exists($object, '__toString')) {
-            if (\PHP_VERSION_ID < 70400) {
-                return '(no __toString)';
-            }
-
             throw new \RuntimeException(\sprintf('Proxied object "%s" cannot be converted to a string.', $this->class));
         }
 
@@ -93,7 +114,7 @@ final class Proxy implements \Stringable
      *
      * @template TObject of object
      * @phpstan-param TObject $object
-     * @phpstan-return Proxy<TObject>
+     * @phpstan-return ProxyBase<TObject>
      */
     public static function createFromPersisted(object $object): self
     {
@@ -103,43 +124,55 @@ final class Proxy implements \Stringable
         return $proxy;
     }
 
-    public function isPersisted(): bool
+    /**
+     * @deprecated without replacement
+     */
+    public function isPersisted(bool $calledInternally = false): bool
     {
+        if (!$calledInternally) {
+            trigger_deprecation('zenstruck\foundry', '1.38.0', 'Method "%s()" is deprecated and will be removed in 2.0 without replacement.', __METHOD__);
+        }
+
         return $this->persisted;
     }
 
     /**
      * @return TProxiedObject
+     *
+     * @deprecated Use method "_real()" instead
      */
     public function object(): object
+    {
+        trigger_deprecation('zenstruck\foundry', '1.38.0', 'Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_real()" instead.', __METHOD__, self::class);
+
+        return $this->_real();
+    }
+
+    public function _real(): object
     {
         if (!$this->autoRefresh || !$this->persisted || !Factory::configuration()->isFlushingEnabled() || !Factory::configuration()->isPersistEnabled()) {
             return $this->object;
         }
 
-        $om = $this->objectManager();
-
-        // only check for changes if the object is managed in the current om
-        if (($om instanceof EntityManagerInterface || $om instanceof DocumentManager) && $om->contains($this->object)) {
-            // cannot use UOW::recomputeSingleEntityChangeSet() here as it wrongly computes embedded objects as changed
-            $om->getUnitOfWork()->computeChangeSet($om->getClassMetadata($this->class), $this->object);
-
-            if (
-                ($om instanceof EntityManagerInterface && !empty($om->getUnitOfWork()->getEntityChangeSet($this->object)))
-                || ($om instanceof DocumentManager && !empty($om->getUnitOfWork()->getDocumentChangeSet($this->object)))) {
-                throw new \RuntimeException(\sprintf('Cannot auto refresh "%s" as there are unsaved changes. Be sure to call ->save() or disable auto refreshing (see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#auto-refresh for details).', $this->class));
-            }
+        try {
+            $this->_autoRefresh();
+        } catch (\Throwable) {
         }
-
-        $this->refresh();
 
         return $this->object;
     }
 
     /**
-     * @phpstan-return static
+     * @deprecated Use method "_save()" instead
      */
-    public function save(): self
+    public function save(): static
+    {
+        trigger_deprecation('zenstruck\foundry', '1.38.0', 'Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_save()" instead.', __METHOD__, self::class);
+
+        return $this->_save();
+    }
+
+    public function _save(): static
     {
         $this->objectManager()->persist($this->object);
 
@@ -152,7 +185,17 @@ final class Proxy implements \Stringable
         return $this;
     }
 
-    public function remove(): self
+    /**
+     * @deprecated Use method "_delete()" instead
+     */
+    public function remove(): static
+    {
+        trigger_deprecation('zenstruck\foundry', '1.38.0', 'Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_delete()" instead.', __METHOD__, self::class);
+
+        return $this->_delete();
+    }
+
+    public function _delete(): static
     {
         $this->objectManager()->remove($this->object);
         $this->objectManager()->flush();
@@ -162,7 +205,17 @@ final class Proxy implements \Stringable
         return $this;
     }
 
-    public function refresh(): self
+    /**
+     * @deprecated Use method "_refresh()" instead
+     */
+    public function refresh(): static
+    {
+        trigger_deprecation('zenstruck\foundry', '1.38.0', 'Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_refresh()" instead.', __METHOD__, self::class);
+
+        return $this->_refresh();
+    }
+
+    public function _refresh(): static
     {
         if (!Factory::configuration()->isPersistEnabled()) {
             return $this;
@@ -170,6 +223,20 @@ final class Proxy implements \Stringable
 
         if (!$this->persisted) {
             throw new \RuntimeException(\sprintf('Cannot refresh unpersisted object (%s).', $this->class));
+        }
+
+        $om = $this->objectManager();
+
+        // only check for changes if the object is managed in the current om
+        if (($om instanceof EntityManagerInterface || $om instanceof DocumentManager) && !$om->getUnitOfWork()->isScheduledForInsert($this->object) && $om->contains($this->object)) {
+            // cannot use UOW::recomputeSingleEntityChangeSet() here as it wrongly computes embedded objects as changed
+            $om->getUnitOfWork()->computeChangeSet($om->getClassMetadata($this->class), $this->object);
+
+            if (
+                ($om instanceof EntityManagerInterface && !empty($om->getUnitOfWork()->getEntityChangeSet($this->object)))
+                || ($om instanceof DocumentManager && !empty($om->getUnitOfWork()->getDocumentChangeSet($this->object)))) {
+                throw new \RuntimeException(\sprintf('Cannot auto refresh "%s" as there are unsaved changes. Be sure to call ->save() or disable auto refreshing (see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#auto-refresh for details).', $this->class));
+            }
         }
 
         if ($this->objectManager()->contains($this->object)) {
@@ -187,36 +254,85 @@ final class Proxy implements \Stringable
         return $this;
     }
 
-    public function forceSet(string $property, mixed $value): self
+    /**
+     * @deprecated Use method "_set()" instead
+     */
+    public function forceSet(string $property, mixed $value): static
     {
-        return $this->forceSetAll([$property => $value]);
+        trigger_deprecation('zenstruck\foundry', '1.38.0', 'Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_set()" instead.', __METHOD__, self::class);
+
+        return $this->_set($property, $value);
     }
 
-    public function forceSetAll(array $properties): self
+    public function _set(string $property, mixed $value): static
     {
-        $object = $this->object();
+        $this->_autoRefresh();
+        $object = $this->_real();
+
+        Instantiator::forceSet($object, $property, $value, calledInternally: true);
+
+        return $this;
+    }
+
+    /**
+     * @deprecated without replacement
+     */
+    public function forceSetAll(array $properties): static
+    {
+        trigger_deprecation('zenstruck\foundry', '1.38.0', 'Method "%s()" is deprecated and will be removed in 2.0 without replacement.', __METHOD__);
+
+        $object = $this->_real();
 
         foreach ($properties as $property => $value) {
-            Instantiator::forceSet($object, $property, $value);
+            Instantiator::forceSet($object, $property, $value, calledInternally: true);
         }
 
         return $this;
     }
 
     /**
-     * @return mixed
+     * @deprecated Use method "_get()" instead
      */
-    public function forceGet(string $property)
+    public function forceGet(string $property): mixed
     {
-        return Instantiator::forceGet($this->object(), $property);
+        trigger_deprecation('zenstruck\foundry', '1.38.0', 'Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_get()" instead.', __METHOD__, self::class);
+
+        return $this->_get($property);
     }
 
-    public function repository(): RepositoryProxy
+    public function _get(string $property): mixed
     {
-        return Factory::configuration()->repositoryFor($this->class);
+        $this->_autoRefresh();
+
+        return Instantiator::forceGet($this->_real(), $property, calledInternally: true);
     }
 
-    public function enableAutoRefresh(): self
+    /**
+     * @deprecated Use method "_repository()" instead
+     */
+    public function repository(): ProxyRepositoryDecorator
+    {
+        trigger_deprecation('zenstruck\foundry', '1.38.0', 'Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_repository()" instead.', __METHOD__, self::class);
+
+        return $this->_repository();
+    }
+
+    public function _repository(): ProxyRepositoryDecorator
+    {
+        return Factory::configuration()->repositoryFor($this->class, proxy: true);
+    }
+
+    /**
+     * @deprecated Use method "_enableAutoRefresh()" instead
+     */
+    public function enableAutoRefresh(): static
+    {
+        trigger_deprecation('zenstruck\foundry', '1.38.0', 'Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_enableAutoRefresh()" instead.', __METHOD__, self::class);
+
+        return $this->_enableAutoRefresh();
+    }
+
+    public function _enableAutoRefresh(): static
     {
         if (!$this->persisted) {
             throw new \RuntimeException(\sprintf('Cannot enable auto-refresh on unpersisted object (%s).', $this->class));
@@ -227,7 +343,17 @@ final class Proxy implements \Stringable
         return $this;
     }
 
-    public function disableAutoRefresh(): self
+    /**
+     * @deprecated Use method "_disableAutoRefresh()" instead
+     */
+    public function disableAutoRefresh(): static
+    {
+        trigger_deprecation('zenstruck\foundry', '1.38.0', 'Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_disableAutoRefresh()" instead.', __METHOD__, self::class);
+
+        return $this->_disableAutoRefresh();
+    }
+
+    public function _disableAutoRefresh(): static
     {
         $this->autoRefresh = false;
 
@@ -235,14 +361,18 @@ final class Proxy implements \Stringable
     }
 
     /**
-     * Ensures "autoRefresh" is disabled when executing $callback. Re-enables
-     * "autoRefresh" after executing callback if it was enabled.
-     *
      * @param callable $callback (object|Proxy $object): void
      *
-     * @phpstan-return static
+     * @deprecated Use method "_withoutAutoRefresh()" instead
      */
-    public function withoutAutoRefresh(callable $callback): self
+    public function withoutAutoRefresh(callable $callback): static
+    {
+        trigger_deprecation('zenstruck\foundry', '1.38.0', 'Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_withoutAutoRefresh()" instead.', __METHOD__, self::class);
+
+        return $this->_withoutAutoRefresh($callback);
+    }
+
+    public function _withoutAutoRefresh(callable $callback): static
     {
         $original = $this->autoRefresh;
         $this->autoRefresh = false;
@@ -254,15 +384,25 @@ final class Proxy implements \Stringable
         return $this;
     }
 
+    /**
+     * @deprecated without replacement
+     */
     public function assertPersisted(string $message = '{entity} is not persisted.'): self
     {
+        trigger_deprecation('zenstruck\foundry', '1.38.0', 'Method "%s()" is deprecated and will be removed in 2.0 without replacement.', __METHOD__);
+
         Assert::that($this->fetchObject())->isNotEmpty($message, ['entity' => $this->class]);
 
         return $this;
     }
 
+    /**
+     * @deprecated without replacement
+     */
     public function assertNotPersisted(string $message = '{entity} is persisted but it should not be.'): self
     {
+        trigger_deprecation('zenstruck\foundry', '1.38.0', 'Method "%s()" is deprecated and will be removed in 2.0 without replacement.', __METHOD__);
+
         Assert::that($this->fetchObject())->isEmpty($message, ['entity' => $this->class]);
 
         return $this;
@@ -276,8 +416,8 @@ final class Proxy implements \Stringable
         Callback::createFor($callback)->invoke(
             Parameter::union(
                 Parameter::untyped($this),
-                Parameter::typed(self::class, $this),
-                Parameter::typed($this->class, Parameter::factory(fn(): object => $this->object())),
+                Parameter::typed(ProxyBase::class, $this),
+                Parameter::typed($this->class, Parameter::factory(fn(): object => $this->_real())),
             )->optional(),
             ...$arguments,
         );
@@ -309,5 +449,14 @@ final class Proxy implements \Stringable
         }
 
         return Factory::configuration()->objectManagerFor($this->class);
+    }
+
+    private function _autoRefresh(): void
+    {
+        if (!$this->autoRefresh) {
+            return;
+        }
+
+        $this->_refresh();
     }
 }

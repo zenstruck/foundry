@@ -15,7 +15,8 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Proxy as ProxyObject;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 
@@ -31,21 +32,22 @@ final class ProxyTest extends TestCase
      */
     public function can_force_get_and_set_non_public_properties(): void
     {
-        $proxy = new Proxy(new Category());
+        $proxy = new ProxyObject(new Category());
 
-        $this->assertNull($proxy->forceGet('name'));
+        $this->assertNull($proxy->_get('name'));
 
-        $proxy->forceSet('name', 'foo');
+        $proxy->_set('name', 'foo');
 
-        $this->assertSame('foo', $proxy->forceGet('name'));
+        $this->assertSame('foo', $proxy->_get('name'));
     }
 
     /**
      * @test
+     * @group legacy
      */
     public function can_access_wrapped_objects_properties(): void
     {
-        $proxy = new Proxy(new class() {
+        $proxy = new ProxyObject(new class() {
             public $property;
         });
 
@@ -70,11 +72,12 @@ final class ProxyTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Cannot refresh unpersisted object (Zenstruck\Foundry\Tests\Fixtures\Entity\Category).');
 
-        (new Proxy(new Category()))->refresh();
+        (new ProxyObject(new Category()))->_refresh();
     }
 
     /**
      * @test
+     * @group legacy
      */
     public function saving_unpersisted_proxy_changes_it_to_a_persisted_proxy(): void
     {
@@ -87,11 +90,11 @@ final class ProxyTest extends TestCase
 
         Factory::configuration()->setManagerRegistry($registry)->enableDefaultProxyAutoRefresh();
 
-        $category = new Proxy(new Category());
+        $category = new ProxyObject(new Category());
 
         $this->assertFalse($category->isPersisted());
 
-        $category->save();
+        $category->_save();
 
         $this->assertTrue($category->isPersisted());
     }
@@ -101,37 +104,48 @@ final class ProxyTest extends TestCase
      */
     public function can_use_without_auto_refresh_with_proxy_or_object_typehint(): void
     {
-        $proxy = new Proxy(new Category());
+        $proxy = new ProxyObject(new Category());
         $calls = 0;
 
         $proxy
-            ->withoutAutoRefresh(static function(Proxy $proxy) use (&$calls): void {
+            ->_withoutAutoRefresh(static function(Proxy $proxy) use (&$calls): void {
                 ++$calls;
             })
-            ->withoutAutoRefresh(static function(Category $category) use (&$calls): void {
+            ->_withoutAutoRefresh(static function(Category $category) use (&$calls): void {
                 ++$calls;
             })
-            ->withoutAutoRefresh(function($proxy) use (&$calls): void {
+            ->_withoutAutoRefresh(function($proxy) use (&$calls): void {
                 $this->assertInstanceOf(Proxy::class, $proxy);
                 ++$calls;
             })
-            ->withoutAutoRefresh(static function() use (&$calls): void {
+            ->_withoutAutoRefresh(static function() use (&$calls): void {
                 ++$calls;
             })
-            ->withoutAutoRefresh(fn(Proxy $proxy) => $this->functionWithProxy($proxy))
-            ->withoutAutoRefresh(fn(Category $category) => $this->functionWithObject($category))
-            ->withoutAutoRefresh(fn($proxy) => $this->functionWithNoTypeHint($proxy))
-            ->withoutAutoRefresh(static fn(Proxy $proxy) => self::staticFunctionWithProxy($proxy))
-            ->withoutAutoRefresh(static fn(Category $category) => self::staticFunctionWithObject($category))
-            ->withoutAutoRefresh(static fn($proxy) => self::staticFunctionWithNoTypeHint($proxy))
+            ->_withoutAutoRefresh(fn(Proxy $proxy) => $this->functionWithProxy($proxy))
+            ->_withoutAutoRefresh(fn(Category $category) => $this->functionWithObject($category))
+            ->_withoutAutoRefresh(fn($proxy) => $this->functionWithNoTypeHint($proxy))
+            ->_withoutAutoRefresh(static fn(Proxy $proxy) => self::staticFunctionWithProxy($proxy))
+            ->_withoutAutoRefresh(static fn(Category $category) => self::staticFunctionWithObject($category))
+            ->_withoutAutoRefresh(static fn($proxy) => self::staticFunctionWithNoTypeHint($proxy))
         ;
 
         $this->assertSame(4, $calls);
     }
 
+    /**
+     * @test
+     */
+    public function can_use_new_class_as_legacy_one(): void
+    {
+        $proxy = new ProxyObject(new Category());
+
+        self::assertInstanceOf(ProxyObject::class, $proxy);
+        self::assertInstanceOf(Proxy::class, $proxy);
+    }
+
     public function functionWithProxy(Proxy $proxy): void
     {
-        $this->assertInstanceOf(Category::class, $proxy->object());
+        $this->assertInstanceOf(Category::class, $proxy->_real());
     }
 
     public function functionWithObject(Category $category): void
@@ -142,12 +156,12 @@ final class ProxyTest extends TestCase
     public function functionWithNoTypeHint($proxy): void
     {
         $this->assertInstanceOf(Proxy::class, $proxy);
-        $this->assertInstanceOf(Category::class, $proxy->object());
+        $this->assertInstanceOf(Category::class, $proxy->_real());
     }
 
     public static function staticFunctionWithProxy(Proxy $proxy): void
     {
-        self::assertInstanceOf(Category::class, $proxy->object());
+        self::assertInstanceOf(Category::class, $proxy->_real());
     }
 
     public static function staticFunctionWithObject(Category $category): void
@@ -158,6 +172,6 @@ final class ProxyTest extends TestCase
     public static function staticFunctionWithNoTypeHint($proxy): void
     {
         self::assertInstanceOf(Proxy::class, $proxy);
-        self::assertInstanceOf(Category::class, $proxy->object());
+        self::assertInstanceOf(Category::class, $proxy->_real());
     }
 }

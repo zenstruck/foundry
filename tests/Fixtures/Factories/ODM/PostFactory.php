@@ -12,21 +12,21 @@
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories\ODM;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMComment;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMPost;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMUser;
 
-class PostFactory extends ModelFactory
+class PostFactory extends PersistentProxyObjectFactory
 {
     public function published(): static
     {
-        return $this->addState(static fn(): array => ['published_at' => self::faker()->dateTime()]);
+        return $this->with(static fn(): array => ['published_at' => self::faker()->dateTime()]);
     }
 
     public function withComments(): static
     {
-        return $this->addState(static fn(): array => [
+        return $this->with(static fn(): array => [
             'comments' => new ArrayCollection([
                 new ODMComment(new ODMUser('user'), 'body'),
                 new ODMComment(new ODMUser('user'), 'body'),
@@ -34,12 +34,12 @@ class PostFactory extends ModelFactory
         ]);
     }
 
-    protected static function getClass(): string
+    public static function class(): string
     {
         return ODMPost::class;
     }
 
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [
             'title' => self::faker()->sentence(),

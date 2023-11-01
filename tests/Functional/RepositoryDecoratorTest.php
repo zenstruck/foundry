@@ -15,17 +15,17 @@ use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Assert;
-use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 
-use function Zenstruck\Foundry\repository;
+use function Zenstruck\Foundry\Persistence\proxy_repository;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-abstract class RepositoryProxyTest extends KernelTestCase
+abstract class RepositoryDecoratorTest extends KernelTestCase
 {
     use ExpectDeprecationTrait, Factories, ResetDatabase;
 
@@ -34,7 +34,7 @@ abstract class RepositoryProxyTest extends KernelTestCase
      */
     public function assertions(): void
     {
-        $repository = repository($this->categoryClass());
+        $repository = proxy_repository($this->categoryClass());
 
         $repository->assert()->empty();
 
@@ -96,14 +96,14 @@ abstract class RepositoryProxyTest extends KernelTestCase
      */
     public function assertions_legacy(): void
     {
-        $repository = repository($this->categoryClass());
+        $repository = proxy_repository($this->categoryClass());
 
-        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryProxy::assertEmpty() is deprecated, use RepositoryProxy::assert()->empty().');
-        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryProxy::assertCount() is deprecated, use RepositoryProxy::assert()->count().');
-        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryProxy::assertCountGreaterThan() is deprecated, use RepositoryProxy::assert()->countGreaterThan().');
-        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryProxy::assertCountGreaterThanOrEqual() is deprecated, use RepositoryProxy::assert()->countGreaterThanOrEqual().');
-        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryProxy::assertCountLessThan() is deprecated, use RepositoryProxy::assert()->countLessThan().');
-        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryProxy::assertCountLessThanOrEqual() is deprecated, use RepositoryProxy::assert()->countLessThanOrEqual().');
+        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryDecorator::assertEmpty() is deprecated, use RepositoryDecorator::assert()->empty().');
+        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryDecorator::assertCount() is deprecated, use RepositoryDecorator::assert()->count().');
+        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryDecorator::assertCountGreaterThan() is deprecated, use RepositoryDecorator::assert()->countGreaterThan().');
+        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryDecorator::assertCountGreaterThanOrEqual() is deprecated, use RepositoryDecorator::assert()->countGreaterThanOrEqual().');
+        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryDecorator::assertCountLessThan() is deprecated, use RepositoryDecorator::assert()->countLessThan().');
+        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryDecorator::assertCountLessThanOrEqual() is deprecated, use RepositoryDecorator::assert()->countLessThanOrEqual().');
 
         $repository->assertEmpty();
 
@@ -121,7 +121,7 @@ abstract class RepositoryProxyTest extends KernelTestCase
      */
     public function can_fetch_objects(): void
     {
-        $repository = repository($this->categoryClass());
+        $repository = proxy_repository($this->categoryClass());
 
         $this->categoryFactoryClass()::createMany(2);
 
@@ -141,14 +141,14 @@ abstract class RepositoryProxyTest extends KernelTestCase
      */
     public function find_can_be_passed_proxy_or_object_or_array(): void
     {
-        $repository = repository($this->categoryClass());
+        $repository = proxy_repository($this->categoryClass());
         $proxy = $this->categoryFactoryClass()::createOne(['name' => 'foo']);
 
         $this->assertInstanceOf(Proxy::class, $repository->find(['name' => 'foo']));
 
         if (Category::class === $this->categoryClass()) {
             $this->assertInstanceOf(Proxy::class, $repository->find($proxy));
-            $this->assertInstanceOf(Proxy::class, $repository->find($proxy->object()));
+            $this->assertInstanceOf(Proxy::class, $repository->find($proxy->_real()));
         }
     }
 
@@ -162,7 +162,7 @@ abstract class RepositoryProxyTest extends KernelTestCase
         $ids = [];
 
         while (5 !== \count(\array_unique($ids))) {
-            $ids[] = repository($this->categoryClass())->random()->getId();
+            $ids[] = proxy_repository($this->categoryClass())->random()->getId();
         }
 
         $this->assertCount(5, \array_unique($ids));
@@ -176,7 +176,7 @@ abstract class RepositoryProxyTest extends KernelTestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(\sprintf('At least 1 "%s" object(s) must have been persisted (0 persisted).', $this->categoryClass()));
 
-        repository($this->categoryClass())->random();
+        proxy_repository($this->categoryClass())->random();
     }
 
     /**
@@ -186,7 +186,7 @@ abstract class RepositoryProxyTest extends KernelTestCase
     {
         $this->categoryFactoryClass()::createMany(5);
 
-        $objects = repository($this->categoryClass())->randomSet(3);
+        $objects = proxy_repository($this->categoryClass())->randomSet(3);
 
         $this->assertCount(3, $objects);
         $this->assertCount(
@@ -208,7 +208,7 @@ abstract class RepositoryProxyTest extends KernelTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$number must be positive (-1 given).');
 
-        repository($this->categoryClass())->randomSet(-1);
+        proxy_repository($this->categoryClass())->randomSet(-1);
     }
 
     /**
@@ -221,7 +221,7 @@ abstract class RepositoryProxyTest extends KernelTestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(\sprintf('At least 2 "%s" object(s) must have been persisted (1 persisted).', $this->categoryClass()));
 
-        repository($this->categoryClass())->randomSet(2);
+        proxy_repository($this->categoryClass())->randomSet(2);
     }
 
     /**
@@ -234,7 +234,7 @@ abstract class RepositoryProxyTest extends KernelTestCase
         $counts = [];
 
         while (4 !== \count(\array_unique($counts))) {
-            $counts[] = \count(repository($this->categoryClass())->randomRange(0, 3));
+            $counts[] = \count(proxy_repository($this->categoryClass())->randomRange(0, 3));
         }
 
         $this->assertCount(4, \array_unique($counts));
@@ -256,7 +256,7 @@ abstract class RepositoryProxyTest extends KernelTestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(\sprintf('At least 2 "%s" object(s) must have been persisted (1 persisted).', $this->categoryClass()));
 
-        repository($this->categoryClass())->randomRange(0, 2);
+        proxy_repository($this->categoryClass())->randomRange(0, 2);
     }
 
     /**
@@ -267,7 +267,7 @@ abstract class RepositoryProxyTest extends KernelTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$min must be positive (-1 given).');
 
-        repository($this->categoryClass())->randomRange(-1, 3);
+        proxy_repository($this->categoryClass())->randomRange(-1, 3);
     }
 
     /**
@@ -278,7 +278,7 @@ abstract class RepositoryProxyTest extends KernelTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$max (3) cannot be less than $min (5).');
 
-        repository($this->categoryClass())->randomRange(5, 3);
+        proxy_repository($this->categoryClass())->randomRange(5, 3);
     }
 
     /**
@@ -337,9 +337,22 @@ abstract class RepositoryProxyTest extends KernelTestCase
 
         $categoryFactoryClass::createMany(4);
 
-        $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using RepositoryProxy::getCount() is deprecated, use RepositoryProxy::count() (it is now Countable).');
+        $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using RepositoryDecorator::getCount() is deprecated, use RepositoryDecorator::count() (it is now Countable).');
 
         $this->assertSame(4, $categoryFactoryClass::repository()->getCount());
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    public function can_use_new_class_as_legacy_one(): void
+    {
+        self::assertTrue($this->categoryFactoryClass()::repository() instanceof \Zenstruck\Foundry\Persistence\RepositoryDecorator);
+        self::assertTrue($this->categoryFactoryClass()::repository() instanceof \Zenstruck\Foundry\RepositoryProxy);
+
+        self::assertTrue($this->categoryFactoryClass()::assert() instanceof \Zenstruck\Foundry\Persistence\RepositoryAssertions);
+        self::assertTrue($this->categoryFactoryClass()::assert() instanceof \Zenstruck\Foundry\RepositoryAssertions);
     }
 
     abstract protected function categoryClass(): string;

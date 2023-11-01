@@ -18,12 +18,12 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 
-use function Zenstruck\Foundry\repository;
+use function Zenstruck\Foundry\Persistence\repository;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class ORMRepositoryProxyTest extends RepositoryProxyTest
+final class ORMRepositoryDecoratorTest extends RepositoryDecoratorTest
 {
     protected function setUp(): void
     {
@@ -56,7 +56,7 @@ final class ORMRepositoryProxyTest extends RepositoryProxyTest
         PostFactory::random();
 
         // load a random Category which should be a "doctrine proxy"
-        $category = CategoryFactory::random()->object();
+        $category = CategoryFactory::random()->_real();
 
         // ensure the category is a "doctrine proxy" and a Category
         if (\interface_exists(DoctrineProxy::class)) {
@@ -70,6 +70,7 @@ final class ORMRepositoryProxyTest extends RepositoryProxyTest
 
     /**
      * @test
+     * @group legacy
      */
     public function proxy_wrapping_orm_entity_manager_can_order_by_in_find_one_by(): void
     {

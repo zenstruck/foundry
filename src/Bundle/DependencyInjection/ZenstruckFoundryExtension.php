@@ -22,9 +22,12 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Zenstruck\Foundry\Bundle\Command\StubMakeFactory;
 use Zenstruck\Foundry\Bundle\Command\StubMakeStory;
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Object\Instantiator;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Story;
 use Zenstruck\Foundry\Test\ORMDatabaseResetter;
+use Zenstruck\Foundry\Test\ResetDatabase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -41,18 +44,29 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
             ->addTag('foundry.story')
         ;
 
-        $container->registerForAutoconfiguration(ModelFactory::class)
+        $container->registerForAutoconfiguration(PersistentProxyObjectFactory::class)
             ->addTag('foundry.factory')
         ;
 
         $this->configureFaker($mergedConfig['faker'], $container);
         $this->configureDefaultInstantiator($mergedConfig['instantiator'], $container);
-        $this->configureDatabaseResetter($mergedConfig['database_resetter'], $container);
+        $this->configureDatabaseResetter($mergedConfig, $container);
         $this->configureMakeFactory($mergedConfig['make_factory'], $container, $loader);
 
         if (true === $mergedConfig['auto_refresh_proxies']) {
             $container->getDefinition('.zenstruck_foundry.configuration')->addMethodCall('enableDefaultProxyAutoRefresh');
         } elseif (false === $mergedConfig['auto_refresh_proxies']) {
+            trigger_deprecation(
+                'zenstruck\foundry',
+                '1.38.0',
+                <<<MESSAGE
+                    Configuring the default proxy auto-refresh to false is deprecated. You should set it to "true", which will be the default value in 2.0.
+                    If you still want to disable auto refresh, make your factory implement "%s" instead of "%s".
+                    MESSAGE,
+                PersistentObjectFactory::class,
+                PersistentProxyObjectFactory::class,
+            );
+
             $container->getDefinition('.zenstruck_foundry.configuration')->addMethodCall('disableDefaultProxyAutoRefresh');
         }
     }
@@ -86,16 +100,23 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
 
         $definition = $container->getDefinition('.zenstruck_foundry.default_instantiator');
 
-        if ($config['without_constructor']) {
-            $definition->addMethodCall('withoutConstructor');
+        if (isset($config['without_constructor'])
+            && isset($config['use_constructor'])
+            && $config['without_constructor'] === $config['use_constructor']
+        ) {
+            throw new \InvalidArgumentException('Cannot set "without_constructor" and "use_constructor" to the same value.');
         }
 
+        $withoutConstructor = $config['without_constructor'] ?? !($config['use_constructor'] ?? true);
+
+        $definition->setFactory([Instantiator::class, $withoutConstructor ? 'withoutConstructor' : 'withConstructor']);
+
         if ($config['allow_extra_attributes']) {
-            $definition->addMethodCall('allowExtraAttributes');
+            $definition->addMethodCall('allowExtra');
         }
 
         if ($config['always_force_properties']) {
-            $definition->addMethodCall('alwaysForceProperties');
+            $definition->addMethodCall('alwaysForce');
         }
     }
 
@@ -103,22 +124,34 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
     {
         $configurationDefinition = $container->getDefinition('.zenstruck_foundry.configuration');
 
-        if (false === $config['enabled']) {
+        $legacyConfig = $config['database_resetter'];
+
+        if (false === $legacyConfig['enabled']) {
+            trigger_deprecation('zenstruck\foundry', '1.38.0', 'Disabling database reset via bundle configuration is deprecated and will be removed in 2.0. Instead you should not use "%s" trait in your test.', ResetDatabase::class);
+
             $configurationDefinition->addMethodCall('disableDatabaseReset');
         }
 
-        if (isset($config['orm']) && !self::isBundleLoaded($container, DoctrineBundle::class)) {
-            throw new \InvalidArgumentException('doctrine/doctrine-bundle should be enabled to use config under "database_resetter.orm".');
+        if (isset($legacyConfig['orm']) && isset($config['orm']['reset'])) {
+            throw new \InvalidArgumentException('Configurations "zenstruck_foundry.orm.reset" and "zenstruck_foundry.database_resetter.orm" are incompatible. You should only use "zenstruck_foundry.orm.reset".');
         }
 
-        if (isset($config['odm']) && !self::isBundleLoaded($container, DoctrineMongoDBBundle::class)) {
-            throw new \InvalidArgumentException('doctrine/mongodb-odm-bundle should be enabled to use config under "database_resetter.odm".');
+        if ((isset($legacyConfig['orm']) || isset($config['orm']['reset'])) && !self::isBundleLoaded($container, DoctrineBundle::class)) {
+            throw new \InvalidArgumentException('doctrine/doctrine-bundle should be enabled to use config under "orm.reset".');
         }
 
-        $configurationDefinition->setArgument('$ormConnectionsToReset', $config['orm']['connections'] ?? []);
-        $configurationDefinition->setArgument('$ormObjectManagersToReset', $config['orm']['object_managers'] ?? []);
-        $configurationDefinition->setArgument('$ormResetMode', $config['orm']['reset_mode'] ?? ORMDatabaseResetter::RESET_MODE_SCHEMA);
-        $configurationDefinition->setArgument('$odmObjectManagersToReset', $config['odm']['object_managers'] ?? []);
+        if (isset($legacyConfig['odm']) && isset($config['mongo']['reset'])) {
+            throw new \InvalidArgumentException('Configurations "zenstruck_foundry.mongo.reset" and "zenstruck_foundry.database_resetter.odm" are incompatible. You should only use "zenstruck_foundry.mongo.reset".');
+        }
+
+        if ((isset($legacyConfig['odm']) || isset($config['mongo']['reset'])) && !self::isBundleLoaded($container, DoctrineMongoDBBundle::class)) {
+            throw new \InvalidArgumentException('doctrine/mongodb-odm-bundle should be enabled to use config under "mongo.reset".');
+        }
+
+        $configurationDefinition->setArgument('$ormConnectionsToReset', $legacyConfig['orm']['connections'] ?? $config['orm']['reset']['connections'] ?? ['default']);
+        $configurationDefinition->setArgument('$ormObjectManagersToReset', $legacyConfig['orm']['object_managers'] ?? $config['orm']['reset']['entity_managers'] ?? ['default']);
+        $configurationDefinition->setArgument('$ormResetMode', $legacyConfig['orm']['reset_mode'] ?? $config['orm']['reset']['mode'] ?? ORMDatabaseResetter::RESET_MODE_SCHEMA);
+        $configurationDefinition->setArgument('$odmObjectManagersToReset', $legacyConfig['odm']['object_managers'] ?? $config['mongo']['reset']['document_managers'] ?? ['default']);
     }
 
     private function configureMakeFactory(array $makerConfig, ContainerBuilder $container, FileLoader $loader): void

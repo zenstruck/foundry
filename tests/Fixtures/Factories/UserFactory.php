@@ -11,20 +11,20 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\User;
 
-final class UserFactory extends ModelFactory
+final class UserFactory extends PersistentProxyObjectFactory
 {
-    protected function getDefaults(): array
+    public static function class(): string
+    {
+        return User::class;
+    }
+
+    protected function defaults(): array|callable
     {
         return [
             'name' => self::faker()->name(),
         ];
-    }
-
-    protected static function getClass(): string
-    {
-        return User::class;
     }
 }

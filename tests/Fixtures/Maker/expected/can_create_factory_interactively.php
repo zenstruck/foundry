@@ -12,31 +12,31 @@
 namespace App\Factory;
 
 use Doctrine\ORM\EntityRepository;
-use Zenstruck\Foundry\ModelFactory;
-use Zenstruck\Foundry\Proxy;
-use Zenstruck\Foundry\RepositoryProxy;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Comment;
 
 /**
- * @extends ModelFactory<Comment>
+ * @extends PersistentProxyObjectFactory<Comment>
  *
- * @method        Comment|Proxy                    create(array|callable $attributes = [])
- * @method static Comment|Proxy                    createOne(array $attributes = [])
- * @method static Comment|Proxy                    find(object|array|mixed $criteria)
- * @method static Comment|Proxy                    findOrCreate(array $attributes)
- * @method static Comment|Proxy                    first(string $sortedField = 'id')
- * @method static Comment|Proxy                    last(string $sortedField = 'id')
- * @method static Comment|Proxy                    random(array $attributes = [])
- * @method static Comment|Proxy                    randomOrCreate(array $attributes = [])
- * @method static EntityRepository|RepositoryProxy repository()
- * @method static Comment[]|Proxy[]                all()
- * @method static Comment[]|Proxy[]                createMany(int $number, array|callable $attributes = [])
- * @method static Comment[]|Proxy[]                createSequence(iterable|callable $sequence)
- * @method static Comment[]|Proxy[]                findBy(array $attributes)
- * @method static Comment[]|Proxy[]                randomRange(int $min, int $max, array $attributes = [])
- * @method static Comment[]|Proxy[]                randomSet(int $number, array $attributes = [])
+ * @method        Comment|Proxy                             create(array|callable $attributes = [])
+ * @method static Comment|Proxy                             createOne(array $attributes = [])
+ * @method static Comment|Proxy                             find(object|array|mixed $criteria)
+ * @method static Comment|Proxy                             findOrCreate(array $attributes)
+ * @method static Comment|Proxy                             first(string $sortedField = 'id')
+ * @method static Comment|Proxy                             last(string $sortedField = 'id')
+ * @method static Comment|Proxy                             random(array $attributes = [])
+ * @method static Comment|Proxy                             randomOrCreate(array $attributes = [])
+ * @method static EntityRepository|ProxyRepositoryDecorator repository()
+ * @method static Comment[]|Proxy[]                         all()
+ * @method static Comment[]|Proxy[]                         createMany(int $number, array|callable $attributes = [])
+ * @method static Comment[]|Proxy[]                         createSequence(iterable|callable $sequence)
+ * @method static Comment[]|Proxy[]                         findBy(array $attributes)
+ * @method static Comment[]|Proxy[]                         randomRange(int $min, int $max, array $attributes = [])
+ * @method static Comment[]|Proxy[]                         randomSet(int $number, array $attributes = [])
  */
-final class CommentFactory extends ModelFactory
+final class CommentFactory extends PersistentProxyObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -45,7 +45,11 @@ final class CommentFactory extends ModelFactory
      */
     public function __construct()
     {
-        parent::__construct();
+    }
+
+    public static function class(): string
+    {
+        return Comment::class;
     }
 
     /**
@@ -53,7 +57,7 @@ final class CommentFactory extends ModelFactory
      *
      * @todo add your default values here
      */
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [
             'approved' => self::faker()->boolean(),
@@ -67,15 +71,10 @@ final class CommentFactory extends ModelFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
      */
-    protected function initialize(): self
+    protected function initialize(): static
     {
         return $this
             // ->afterInstantiate(function(Comment $comment): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return Comment::class;
     }
 }

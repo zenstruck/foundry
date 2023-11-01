@@ -13,32 +13,32 @@ namespace App\Factory;
 
 use App\Factory\Cascade\BrandFactory;
 use Doctrine\ORM\EntityRepository;
-use Zenstruck\Foundry\ModelFactory;
-use Zenstruck\Foundry\Proxy;
-use Zenstruck\Foundry\RepositoryProxy;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\EntityWithRelations;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 
 /**
- * @extends ModelFactory<EntityWithRelations>
+ * @extends PersistentProxyObjectFactory<EntityWithRelations>
  *
- * @method        EntityWithRelations|Proxy        create(array|callable $attributes = [])
- * @method static EntityWithRelations|Proxy        createOne(array $attributes = [])
- * @method static EntityWithRelations|Proxy        find(object|array|mixed $criteria)
- * @method static EntityWithRelations|Proxy        findOrCreate(array $attributes)
- * @method static EntityWithRelations|Proxy        first(string $sortedField = 'id')
- * @method static EntityWithRelations|Proxy        last(string $sortedField = 'id')
- * @method static EntityWithRelations|Proxy        random(array $attributes = [])
- * @method static EntityWithRelations|Proxy        randomOrCreate(array $attributes = [])
- * @method static EntityRepository|RepositoryProxy repository()
- * @method static EntityWithRelations[]|Proxy[]    all()
- * @method static EntityWithRelations[]|Proxy[]    createMany(int $number, array|callable $attributes = [])
- * @method static EntityWithRelations[]|Proxy[]    createSequence(iterable|callable $sequence)
- * @method static EntityWithRelations[]|Proxy[]    findBy(array $attributes)
- * @method static EntityWithRelations[]|Proxy[]    randomRange(int $min, int $max, array $attributes = [])
- * @method static EntityWithRelations[]|Proxy[]    randomSet(int $number, array $attributes = [])
+ * @method        EntityWithRelations|Proxy                 create(array|callable $attributes = [])
+ * @method static EntityWithRelations|Proxy                 createOne(array $attributes = [])
+ * @method static EntityWithRelations|Proxy                 find(object|array|mixed $criteria)
+ * @method static EntityWithRelations|Proxy                 findOrCreate(array $attributes)
+ * @method static EntityWithRelations|Proxy                 first(string $sortedField = 'id')
+ * @method static EntityWithRelations|Proxy                 last(string $sortedField = 'id')
+ * @method static EntityWithRelations|Proxy                 random(array $attributes = [])
+ * @method static EntityWithRelations|Proxy                 randomOrCreate(array $attributes = [])
+ * @method static EntityRepository|ProxyRepositoryDecorator repository()
+ * @method static EntityWithRelations[]|Proxy[]             all()
+ * @method static EntityWithRelations[]|Proxy[]             createMany(int $number, array|callable $attributes = [])
+ * @method static EntityWithRelations[]|Proxy[]             createSequence(iterable|callable $sequence)
+ * @method static EntityWithRelations[]|Proxy[]             findBy(array $attributes)
+ * @method static EntityWithRelations[]|Proxy[]             randomRange(int $min, int $max, array $attributes = [])
+ * @method static EntityWithRelations[]|Proxy[]             randomSet(int $number, array $attributes = [])
  */
-final class EntityWithRelationsFactory extends ModelFactory
+final class EntityWithRelationsFactory extends PersistentProxyObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -47,7 +47,11 @@ final class EntityWithRelationsFactory extends ModelFactory
      */
     public function __construct()
     {
-        parent::__construct();
+    }
+
+    public static function class(): string
+    {
+        return EntityWithRelations::class;
     }
 
     /**
@@ -55,7 +59,7 @@ final class EntityWithRelationsFactory extends ModelFactory
      *
      * @todo add your default values here
      */
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [
             'manyToOne' => CategoryFactory::new(),
@@ -67,15 +71,10 @@ final class EntityWithRelationsFactory extends ModelFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
      */
-    protected function initialize(): self
+    protected function initialize(): static
     {
         return $this
             // ->afterInstantiate(function(EntityWithRelations $entityWithRelations): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return EntityWithRelations::class;
     }
 }

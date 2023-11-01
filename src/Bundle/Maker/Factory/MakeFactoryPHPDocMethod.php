@@ -11,12 +11,14 @@
 
 namespace Zenstruck\Foundry\Bundle\Maker\Factory;
 
+use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
+
 /**
  * @internal
  */
 final class MakeFactoryPHPDocMethod
 {
-    public function __construct(private string $objectName, private string $prototype, private bool $returnsCollection, private bool $isStatic = true, private ?string $repository = null)
+    public function __construct(private string $objectName, private string $prototype, private bool $returnsCollection, private bool $isStatic = true, private ?\ReflectionClass $repository = null)
     {
     }
 
@@ -44,8 +46,8 @@ final class MakeFactoryPHPDocMethod
             $methods[] = new self($makeFactoryData->getObjectShortName(), 'randomRange(int $min, int $max, array $attributes = [])', returnsCollection: true);
             $methods[] = new self($makeFactoryData->getObjectShortName(), 'randomSet(int $number, array $attributes = [])', returnsCollection: true);
 
-            if (null !== $makeFactoryData->getRepositoryShortName()) {
-                $methods[] = new self($makeFactoryData->getObjectShortName(), 'repository()', returnsCollection: false, repository: $makeFactoryData->getRepositoryShortName());
+            if (null !== $makeFactoryData->getRepositoryReflectionClass()) {
+                $methods[] = new self($makeFactoryData->getObjectShortName(), 'repository()', returnsCollection: false, repository: $makeFactoryData->getRepositoryReflectionClass());
             }
         }
 
@@ -59,14 +61,20 @@ final class MakeFactoryPHPDocMethod
 
         if ($this->repository) {
             $returnType = match ((bool) $staticAnalysisTool) {
-                false => "{$this->repository}|RepositoryProxy",
-                true => "RepositoryProxy<{$this->objectName}>",
+                false => "{$this->repository->getShortName()}|ProxyRepositoryDecorator",
+                true => \sprintf(
+                    'ProxyRepositoryDecorator<%s, %s>',
+                    $this->objectName,
+                    \is_a($this->repository->getName(), DocumentRepository::class, allow_string: true)
+                        ? 'DocumentRepository'
+                        : 'EntityRepository'
+                ),
             };
         } else {
             $returnType = match ([$this->returnsCollection, (bool) $staticAnalysisTool]) {
-                [true, true] => "list<Proxy<{$this->objectName}>>",
+                [true, true] => "list<{$this->objectName}&Proxy<{$this->objectName}>>",
                 [true, false] => "{$this->objectName}[]|Proxy[]",
-                [false, true] => "Proxy<{$this->objectName}>",
+                [false, true] => "{$this->objectName}&Proxy<{$this->objectName}>",
                 [false, false] => "{$this->objectName}|Proxy",
             };
         }

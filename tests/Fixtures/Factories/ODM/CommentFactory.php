@@ -11,18 +11,18 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories\ODM;
 
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMComment;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMUser;
 
-class CommentFactory extends ModelFactory
+class CommentFactory extends PersistentProxyObjectFactory
 {
-    protected static function getClass(): string
+    public static function class(): string
     {
         return ODMComment::class;
     }
 
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [
             'user' => new ODMUser(self::faker()->userName()),
