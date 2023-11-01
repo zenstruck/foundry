@@ -59,8 +59,8 @@ abstract class ModelFactory extends Factory
         }
 
         $factory = $factory
-            ->withAttributes(static fn(): array => $factory->getDefaults())
-            ->withAttributes($defaultAttributes);
+            ->with(static fn(): array => $factory->getDefaults())
+            ->with($defaultAttributes);
 
         try {
             if (!Factory::configuration()->isPersistEnabled()) {
@@ -303,9 +303,14 @@ abstract class ModelFactory extends Factory
         return $this;
     }
 
+    /**
+     * @deprecated use with() instead
+     */
     final protected function addState(array|callable $attributes = []): static
     {
-        return $this->withAttributes($attributes);
+        trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Method "%s()" is deprecated and will be removed in version 2.0. Use "%s::with()" instead.', __METHOD__, Factory::class));
+
+        return $this->with($attributes);
     }
 
     /**
