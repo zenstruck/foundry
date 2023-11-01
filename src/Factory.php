@@ -24,6 +24,9 @@ use Zenstruck\Foundry\Persistence\PostPersistCallback;
  * @abstract
  *
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @phpstan-type Parameters = array<string,mixed>
+ * @phpstan-type Attributes = Parameters|callable(int):Parameters
  */
 class Factory
 {
@@ -42,7 +45,7 @@ class Factory
     private bool $cascadePersist = false;
 
     /** @var array<array|callable> */
-    private array $attributeSet = [];
+    private array $attributes = [];
 
     /** @var callable[] */
     private array $beforeInstantiate = [];
@@ -64,7 +67,7 @@ class Factory
         }
 
         $this->class = $class;
-        $this->attributeSet[] = $defaultAttributes;
+        $this->attributes[] = $defaultAttributes;
     }
 
     /**
@@ -88,7 +91,7 @@ class Factory
     final public function create(array|callable $attributes = []): Proxy
     {
         // merge the factory attribute set with the passed attributes
-        $attributeSet = \array_merge($this->attributeSet, [$attributes]);
+        $attributeSet = \array_merge($this->attributes, [$attributes]);
 
         // normalize each attribute set and collapse
         $attributes = \array_merge(...\array_map(fn(callable|array $attributes): array => $this->normalizeAttributes($attributes), $attributeSet));
@@ -207,14 +210,26 @@ class Factory
     /**
      * @param array|callable $attributes
      *
+     * @deprecated use with() instead
+     *
      * @return static
      */
     final public function withAttributes($attributes = []): self
     {
-        $cloned = clone $this;
-        $cloned->attributeSet[] = $attributes;
+        trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::with()" instead.', __METHOD__, self::class));
 
-        return $cloned;
+        return $this->with($attributes);
+    }
+
+    /**
+     * @param Attributes $attributes
+     */
+    final public function with(array|callable $attributes = []): static
+    {
+        $clone = clone $this;
+        $clone->attributes[] = $attributes;
+
+        return $clone;
     }
 
     /**

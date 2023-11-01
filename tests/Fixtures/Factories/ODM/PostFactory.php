@@ -21,12 +21,12 @@ class PostFactory extends ModelFactory
 {
     public function published(): static
     {
-        return $this->addState(static fn(): array => ['published_at' => self::faker()->dateTime()]);
+        return $this->with(static fn(): array => ['published_at' => self::faker()->dateTime()]);
     }
 
     public function withComments(): static
     {
-        return $this->addState(static fn(): array => [
+        return $this->with(static fn(): array => [
             'comments' => new ArrayCollection([
                 new ODMComment(new ODMUser('user'), 'body'),
                 new ODMComment(new ODMUser('user'), 'body'),
