@@ -13,7 +13,7 @@ namespace Zenstruck\Foundry\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
@@ -208,7 +208,7 @@ final class FactoryTest extends KernelTestCase
      */
     public function can_create_an_object_not_persisted_with_nested_factory(): void
     {
-        $notPersistedObject = SomeObjectFactory::new()->create()->object();
+        $notPersistedObject = SomeObjectFactory::new()->create()->_real();
         self::assertInstanceOf(SomeObject::class, $notPersistedObject);
         self::assertInstanceOf(SomeOtherObject::class, $notPersistedObject->someOtherObjectMandatory);
     }

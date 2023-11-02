@@ -21,6 +21,7 @@ use Doctrine\Persistence\Mapping\MappingException;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Zenstruck\Foundry\Persistence\Proxy;
 
 /**
  * @mixin EntityRepository<TProxiedObject>
@@ -306,7 +307,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
     public function find($criteria)
     {
         if ($criteria instanceof Proxy) {
-            $criteria = $criteria->object();
+            $criteria = $criteria->_real();
         }
 
         if (!\is_array($criteria)) {
@@ -326,9 +327,9 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
             }
 
             if ($attributeValue instanceof Factory) {
-                $attributeValue = $attributeValue->withoutPersisting()->create()->object();
+                $attributeValue = $attributeValue->withoutPersisting()->create()->_real();
             } elseif ($attributeValue instanceof Proxy) {
-                $attributeValue = $attributeValue->object();
+                $attributeValue = $attributeValue->_real();
             }
 
             try {
@@ -443,7 +444,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
     private static function normalizeCriteria(array $criteria): array
     {
         return \array_map(
-            static fn($value) => $value instanceof Proxy ? $value->object() : $value,
+            static fn($value) => $value instanceof Proxy ? $value->_real() : $value,
             $criteria
         );
     }

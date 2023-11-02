@@ -82,9 +82,9 @@ abstract class AnonymousFactoryTest extends KernelTestCase
         $factory = AnonymousFactory::new($this->categoryClass(), ['name' => 'php']);
 
         $factory->assert()->count(0);
-        $this->assertInstanceOf($this->categoryClass(), $factory->randomOrCreate()->object());
+        $this->assertInstanceOf($this->categoryClass(), $factory->randomOrCreate()->_real());
         $factory->assert()->count(1);
-        $this->assertInstanceOf($this->categoryClass(), $factory->randomOrCreate()->object());
+        $this->assertInstanceOf($this->categoryClass(), $factory->randomOrCreate()->_real());
         $factory->assert()->count(1);
     }
 
@@ -257,10 +257,10 @@ abstract class AnonymousFactoryTest extends KernelTestCase
 
         $this->assertCount(4, $categories);
         $this->assertCount(4, \iterator_to_array($factory));
-        $this->assertInstanceOf($this->categoryClass(), $categories[0]->object());
-        $this->assertInstanceOf($this->categoryClass(), $categories[1]->object());
-        $this->assertInstanceOf($this->categoryClass(), $categories[2]->object());
-        $this->assertInstanceOf($this->categoryClass(), $categories[3]->object());
+        $this->assertInstanceOf($this->categoryClass(), $categories[0]->_real());
+        $this->assertInstanceOf($this->categoryClass(), $categories[1]->_real());
+        $this->assertInstanceOf($this->categoryClass(), $categories[2]->_real());
+        $this->assertInstanceOf($this->categoryClass(), $categories[3]->_real());
     }
 
     /**
@@ -284,7 +284,7 @@ abstract class AnonymousFactoryTest extends KernelTestCase
             return;
         }
 
-        $this->assertSame('third', $factory->find($category->object())->getName());
+        $this->assertSame('third', $factory->find($category->_real())->getName());
         $this->assertSame('third', $factory->find($category)->getName());
     }
 

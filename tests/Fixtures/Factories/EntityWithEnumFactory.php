@@ -12,6 +12,7 @@
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\PHP81\EntityWithEnum;
 use Zenstruck\Foundry\Tests\Fixtures\PHP81\SomeEnum;
 

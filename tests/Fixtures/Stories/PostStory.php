@@ -29,7 +29,7 @@ final class PostStory extends Story
         $this->addState('postB', PostFactory::new()->create([
             'title' => 'Post B',
             'category' => CategoryStory::php(),
-        ])->object());
+        ])->_real());
 
         $this->addState('postC', PostFactory::new([
             'title' => 'Post C',

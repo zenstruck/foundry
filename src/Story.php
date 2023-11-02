@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Foundry;
 
+use Zenstruck\Foundry\Persistence\Proxy;
+
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
@@ -182,8 +184,8 @@ abstract class Story
         }
 
         // ensure proxies are persisted
-        if (!$object->isPersisted()) {
-            $object->save();
+        if (!$object->isPersisted(calledInternally: true)) {
+            $object->_save();
         }
 
         return $object;

@@ -67,9 +67,9 @@ abstract class ModelFactoryTest extends KernelTestCase
         $categoryFactoryClass = $this->categoryFactoryClass();
 
         $categoryFactoryClass::assert()->count(0);
-        $this->assertInstanceOf($this->categoryClass(), $categoryFactoryClass::randomOrCreate()->object());
+        $this->assertInstanceOf($this->categoryClass(), $categoryFactoryClass::randomOrCreate()->_real());
         $categoryFactoryClass::assert()->count(1);
-        $this->assertInstanceOf($this->categoryClass(), $categoryFactoryClass::randomOrCreate()->object());
+        $this->assertInstanceOf($this->categoryClass(), $categoryFactoryClass::randomOrCreate()->_real());
         $categoryFactoryClass::assert()->count(1);
     }
 
@@ -234,10 +234,10 @@ abstract class ModelFactoryTest extends KernelTestCase
         $categories = $categoryFactoryClass::all();
 
         $this->assertCount(4, $categories);
-        $this->assertInstanceOf($this->categoryClass(), $categories[0]->object());
-        $this->assertInstanceOf($this->categoryClass(), $categories[1]->object());
-        $this->assertInstanceOf($this->categoryClass(), $categories[2]->object());
-        $this->assertInstanceOf($this->categoryClass(), $categories[3]->object());
+        $this->assertInstanceOf($this->categoryClass(), $categories[0]->_real());
+        $this->assertInstanceOf($this->categoryClass(), $categories[1]->_real());
+        $this->assertInstanceOf($this->categoryClass(), $categories[2]->_real());
+        $this->assertInstanceOf($this->categoryClass(), $categories[3]->_real());
     }
 
     /**
@@ -257,7 +257,7 @@ abstract class ModelFactoryTest extends KernelTestCase
 
         if ($this instanceof ORMModelFactoryTest) {
             $this->assertSame('third', $categoryFactoryClass::find($category)->getName());
-            $this->assertSame('third', $categoryFactoryClass::find($category->object())->getName());
+            $this->assertSame('third', $categoryFactoryClass::find($category->_real())->getName());
         }
     }
 

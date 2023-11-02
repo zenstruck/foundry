@@ -12,7 +12,7 @@
 namespace App\Factory;
 
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\PHP81\EntityWithEnum;
 use Zenstruck\Foundry\Tests\Fixtures\PHP81\SomeEnum;
 

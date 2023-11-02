@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Foundry;
 
+use Zenstruck\Foundry\Persistence\Proxy;
+
 /**
  * @template TModel of object
  * @template-extends Factory<TModel>

@@ -6,7 +6,6 @@ namespace Zenstruck\Foundry\Persistence;
 
 use Zenstruck\Foundry\Exception\FoundryBootException;
 use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\RepositoryAssertions;
 use Zenstruck\Foundry\RepositoryProxy;
 
