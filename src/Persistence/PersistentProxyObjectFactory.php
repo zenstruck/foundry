@@ -56,7 +56,7 @@ abstract class PersistentProxyObjectFactory extends Factory
         }
 
         $factory = $factory
-            ->with(static fn(): array => $factory->defaults())
+            ->with(static fn(): array|callable => $factory->defaults())
             ->with($defaultAttributes);
 
         try {
@@ -286,6 +286,7 @@ abstract class PersistentProxyObjectFactory extends Factory
      *
      * @return static
      */
+    #[\ReturnTypeWillChange]
     protected function initialize()
     {
         return $this;

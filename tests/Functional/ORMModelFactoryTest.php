@@ -53,6 +53,7 @@ final class ORMModelFactoryTest extends ModelFactoryTest
 
     /**
      * @test
+     * @group legacy
      */
     public function initialize_must_return_an_instance_of_the_current_factory(): void
     {
@@ -64,6 +65,7 @@ final class ORMModelFactoryTest extends ModelFactoryTest
 
     /**
      * @test
+     * @group legacy
      */
     public function initialize_must_return_a_value(): void
     {

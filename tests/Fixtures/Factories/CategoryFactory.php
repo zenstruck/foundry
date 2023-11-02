@@ -30,7 +30,7 @@ final class CategoryFactory extends PersistentProxyObjectFactory
         return ['name' => self::faker()->sentence()];
     }
 
-    protected function initialize()
+    protected function initialize(): static
     {
         return $this
             ->instantiateWith(

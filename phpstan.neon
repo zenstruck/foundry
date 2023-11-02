@@ -37,4 +37,4 @@ parameters:
     ignoreErrors:
         -
             message: '#Unsafe usage of new static\(\).*#'
-            path: ./src/ModelFactory.php
+            path: ./src/Persistence/PersistentProxyObjectFactory.php
