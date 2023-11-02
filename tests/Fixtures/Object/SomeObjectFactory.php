@@ -12,7 +12,7 @@
 namespace Zenstruck\Foundry\Tests\Fixtures\Object;
 
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Persistence\Proxy;
 
 /**
  * @extends PersistentProxyObjectFactory<SomeObject>

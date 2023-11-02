@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\LazyValue;
-use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
@@ -427,7 +427,7 @@ final class FactoryTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Foundry was booted without doctrine. Ensure your TestCase extends '.KernelTestCase::class);
 
-        anonymous(Post::class)->create(['title' => 'title', 'body' => 'body'])->save();
+        anonymous(Post::class)->create(['title' => 'title', 'body' => 'body'])->_save();
     }
 
     /**
@@ -454,5 +454,15 @@ final class FactoryTest extends TestCase
 
         self::assertSame('title', $post->getTitle());
         self::assertSame('body', $post->getBody());
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    public function can_use_legacy_proxy_class(): void
+    {
+        $post = anonymous(Post::class)->create(['title' => 'title', 'body' => 'body']);
+        self::assertInstanceOf(\Zenstruck\Foundry\Proxy::class, $post);
     }
 }

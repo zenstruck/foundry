@@ -51,7 +51,10 @@
     },
     "autoload": {
         "psr-4": { "Zenstruck\\Foundry\\": "src/" },
-        "files": ["src/functions.php"]
+        "files": [
+            "src/functions.php",
+            "src/deprecated.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

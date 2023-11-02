@@ -21,7 +21,12 @@ parameters:
 			path: src/FactoryCollection.php
 
 		-
-			message: "#^Method Zenstruck\\\\Foundry\\\\RepositoryProxy\\:\\:proxyResult\\(\\) should return array\\<int, Zenstruck\\\\Foundry\\\\Proxy\\<TProxiedObject of object\\>\\>\\|Zenstruck\\\\Foundry\\\\Proxy\\<TProxiedObject of object\\> but returns \\(TProxiedObject of object\\)\\|null\\.$#"
+			message: "#^If condition is always false\\.$#"
+			count: 1
+			path: src/Proxy.php
+
+		-
+			message: "#^Method Zenstruck\\\\Foundry\\\\RepositoryProxy\\:\\:proxyResult\\(\\) should return array\\<int, Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TProxiedObject of object\\>\\>\\|Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TProxiedObject of object\\> but returns \\(TProxiedObject of object\\)\\|null\\.$#"
 			count: 1
 			path: src/RepositoryProxy.php
 
@@ -56,6 +61,6 @@ parameters:
 			path: src/ZenstruckFoundryBundle.php
 
 		-
-			message: "#^Function Zenstruck\\\\Foundry\\\\anonymous\\(\\) should return Zenstruck\\\\Foundry\\\\Factory\\<TObject of object\\> but returns class@anonymous/src/functions\\.php\\:45\\.$#"
+			message: "#^Function Zenstruck\\\\Foundry\\\\anonymous\\(\\) should return Zenstruck\\\\Foundry\\\\Factory\\<TObject of object\\> but returns class@anonymous/src/functions\\.php\\:46\\.$#"
 			count: 1
 			path: src/functions.php

@@ -13,7 +13,7 @@ namespace App\Factory;
 
 use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\RepositoryProxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Contact;
 
