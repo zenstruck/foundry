@@ -68,7 +68,7 @@ final class DocumentWithEnumFactory extends PersistentProxyObjectFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
      */
-    protected function initialize(): self
+    protected function initialize(): static
     {
         return $this
             // ->afterInstantiate(function(DocumentWithEnum $documentWithEnum): void {})

@@ -43,7 +43,7 @@ class PostFactory extends PersistentProxyObjectFactory
         ];
     }
 
-    protected function initialize()
+    protected function initialize(): static
     {
         return $this
             ->instantiateWith(

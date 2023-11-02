@@ -24,9 +24,6 @@ use Zenstruck\Foundry\Persistence\PostPersistCallback;
  * @abstract
  *
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @phpstan-type Parameters = array<string,mixed>
- * @phpstan-type Attributes = Parameters|callable(int):Parameters
  */
 class Factory
 {
@@ -226,7 +223,7 @@ class Factory
     }
 
     /**
-     * @param Attributes $attributes
+     * @param array|callable $attributes
      */
     final public function with(array|callable $attributes = []): static
     {

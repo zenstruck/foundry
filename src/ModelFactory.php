@@ -21,6 +21,8 @@ use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
  * @phpstan-method static list<Proxy<TModel>> createMany(int $number, array|callable $attributes = [])
  *
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @deprecated use PersistentProxyObjectFactory instead
  */
 abstract class ModelFactory extends PersistentProxyObjectFactory
 {
