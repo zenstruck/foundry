@@ -16,6 +16,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Faker;
 use Zenstruck\Foundry\Exception\FoundryBootException;
+use Zenstruck\Foundry\Persistence\Proxy;
 
 /**
  * @internal
@@ -184,7 +185,7 @@ final class Configuration
         }
 
         if ($objectOrClass instanceof Proxy) {
-            $objectOrClass = $objectOrClass->object();
+            $objectOrClass = $objectOrClass->_real();
         }
 
         if (!\is_string($objectOrClass)) {

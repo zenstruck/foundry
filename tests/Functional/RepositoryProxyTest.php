@@ -15,7 +15,7 @@ use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Assert;
-use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
@@ -148,7 +148,7 @@ abstract class RepositoryProxyTest extends KernelTestCase
 
         if (Category::class === $this->categoryClass()) {
             $this->assertInstanceOf(Proxy::class, $repository->find($proxy));
-            $this->assertInstanceOf(Proxy::class, $repository->find($proxy->object()));
+            $this->assertInstanceOf(Proxy::class, $repository->find($proxy->_real()));
         }
     }
 

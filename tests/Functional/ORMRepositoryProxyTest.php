@@ -55,7 +55,7 @@ final class ORMRepositoryProxyTest extends RepositoryProxyTest
         PostFactory::random();
 
         // load a random Category which should be a "doctrine proxy"
-        $category = CategoryFactory::random()->object();
+        $category = CategoryFactory::random()->_real();
 
         // ensure the category is a "doctrine proxy" and a Category
         $this->assertInstanceOf(DoctrineProxy::class, $category);

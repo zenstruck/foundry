@@ -34,6 +34,11 @@ final class NoPersistenceObjectsAutoCompleter
 
                 $class = $this->toPSR4($rootPath, $phpFile, $namespacePrefix);
 
+                if ($class === 'Zenstruck\Foundry\Proxy') {
+                    // do not load legacy Proxy: prevents deprecations in tests.
+                    continue;
+                }
+
                 try {
                     // @phpstan-ignore-next-line $class is not always a class-string
                     $reflection = new \ReflectionClass($class);

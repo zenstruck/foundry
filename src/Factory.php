@@ -18,6 +18,7 @@ use Faker;
 use Zenstruck\Foundry\Exception\FoundryBootException;
 use Zenstruck\Foundry\Persistence\InversedRelationshipPostPersistCallback;
 use Zenstruck\Foundry\Persistence\PostPersistCallback;
+use Zenstruck\Foundry\Persistence\Proxy;
 
 /**
  * @template TObject of object
@@ -152,8 +153,8 @@ class Factory
         }
 
         return $proxy
-            ->save()
-            ->withoutAutoRefresh(function(Proxy $proxy) use ($attributes, $postPersistCallbacks): void {
+            ->_save()
+            ->_withoutAutoRefresh(function(Proxy $proxy) use ($attributes, $postPersistCallbacks): void {
                 $callbacks = [...$postPersistCallbacks, ...$this->afterPersist];
 
                 if (!$callbacks) {
@@ -164,7 +165,7 @@ class Factory
                     $proxy->executeCallback($callback, $attributes);
                 }
 
-                $proxy->save(); // save again as afterPersist events may have modified
+                $proxy->_save(); // save again as afterPersist events may have modified
             })
         ;
     }
@@ -375,7 +376,7 @@ class Factory
     private function normalizeAttribute(mixed $value, string $name): mixed
     {
         if ($value instanceof Proxy) {
-            return $value->isPersisted() ? $value->refresh()->object() : $value->object();
+            return $value->isPersisted(calledInternally: true) ? $value->_refresh()->_real() : $value->_real();
         }
 
         if ($value instanceof FactoryCollection) {
@@ -399,7 +400,7 @@ class Factory
         }
 
         if (!self::configuration()->hasManagerRegistry()) {
-            return $value->create()->object();
+            return $value->create()->_real();
         }
 
         try {
@@ -407,17 +408,17 @@ class Factory
 
             if (!$objectManager instanceof EntityManagerInterface || $objectManager->getClassMetadata($value->class)->isEmbeddedClass) {
                 // we may deal with ODM document or ORM\Embedded
-                return $value->create()->object();
+                return $value->create()->_real();
             }
         } catch (\Throwable) {
             // not persisted object
-            return $value->create()->object();
+            return $value->create()->_real();
         }
 
         $relationshipMetadata = self::getRelationshipMetadata($objectManager, $this->class, $name);
 
         if (!$relationshipMetadata) {
-            return $value->create()->object();
+            return $value->create()->_real();
         }
 
         if ($relationshipMetadata['isOwningSide']) {
@@ -436,13 +437,13 @@ class Factory
             $value = $value->withCascadePersist();
         }
 
-        return $value->create()->object();
+        return $value->create()->_real();
     }
 
     private static function normalizeObject(object $object): object
     {
         try {
-            return Proxy::createFromPersisted($object)->refresh()->object();
+            return Proxy::createFromPersisted($object)->_refresh()->_real();
         } catch (\RuntimeException) {
             return $object;
         }

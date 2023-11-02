@@ -37,11 +37,11 @@ final class WithDoctrineDisabledKernelTest extends KernelTestCase
      */
     public function create_object(): void
     {
-        $address = AddressFactory::new()->withoutPersisting()->create(['value' => 'test'])->object();
+        $address = AddressFactory::new()->withoutPersisting()->create(['value' => 'test'])->_real();
         Assert::that($address)->isInstanceOf(Address::class);
         Assert::that($address->getValue())->is('test');
 
-        $address = AddressFactory::createOne(['value' => 'test'])->object();
+        $address = AddressFactory::createOne(['value' => 'test'])->_real();
         Assert::that($address)->isInstanceOf(Address::class);
         Assert::that($address->getValue())->is('test');
     }

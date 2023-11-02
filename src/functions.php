@@ -12,6 +12,7 @@
 namespace Zenstruck\Foundry;
 
 use Faker;
+use Zenstruck\Foundry\Persistence\Proxy;
 
 /**
  * @see Factory::__construct()
