@@ -26,10 +26,12 @@
         "dama/doctrine-test-bundle": "^7.0",
         "doctrine/doctrine-bundle": "^2.5",
         "doctrine/doctrine-migrations-bundle": "^2.2|^3.0",
-        "doctrine/mongodb-odm": "^2.0",
+        "doctrine/mongodb-odm": "^2.4",
         "doctrine/mongodb-odm-bundle": "^4.4.0",
-        "doctrine/orm": "^2.9",
+        "doctrine/orm": "^2.11",
         "matthiasnoback/symfony-dependency-injection-test": "^4.1",
+        "phpunit/phpunit": "^9.5.0",
+        "symfony/dotenv": "^5.4|^6.0|^7.0",
         "symfony/framework-bundle": "^5.4|^6.0|^7.0",
         "symfony/maker-bundle": "^1.49",
         "symfony/phpunit-bridge": "^5.4|^6.0|^7.0",
@@ -64,6 +66,22 @@
             "bin-links": true,
             "forward-command": false
         }
+    },
+    "scripts": {
+        "test": [
+            "@test-no-dama",
+            "@test-dama",
+            "@test-no-foundry-bundle"
+        ],
+        "test-no-dama": "vendor/bin/phpunit",
+        "test-dama": "vendor/bin/phpunit -c phpunit.dama.xml.dist",
+        "test-no-foundry-bundle": "USE_FOUNDRY_BUNDLE=0 vendor/bin/phpunit -c phpunit.dama.xml.dist"
+    },
+    "scripts-descriptions": {
+        "test": "Run all test permutations",
+        "test-no-dama": "Test without dama/doctrine-test-bundle",
+        "test-dama": "Test with dama/doctrine-test-bundle",
+        "test-no-foundry-bundle": "Test without foundry bundle"
     },
     "minimum-stability": "dev",
     "prefer-stable": true

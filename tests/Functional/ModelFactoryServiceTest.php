@@ -28,7 +28,7 @@ final class ModelFactoryServiceTest extends KernelTestCase
 
     protected function setUp(): void
     {
-        if (!\getenv('USE_ORM')) {
+        if (!\getenv('DATABASE_URL')) {
             self::markTestSkipped('doctrine/orm not enabled.');
         }
     }

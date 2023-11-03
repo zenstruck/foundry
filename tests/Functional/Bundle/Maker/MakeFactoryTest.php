@@ -73,7 +73,7 @@ final class MakeFactoryTest extends MakerTestCase
      */
     public function can_create_factory(): void
     {
-        if (!\getenv('USE_ORM')) {
+        if (!\getenv('DATABASE_URL')) {
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
@@ -94,7 +94,7 @@ final class MakeFactoryTest extends MakerTestCase
      */
     public function can_create_factory_interactively(): void
     {
-        if (!\getenv('USE_ORM')) {
+        if (!\getenv('DATABASE_URL')) {
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
@@ -123,7 +123,7 @@ final class MakeFactoryTest extends MakerTestCase
      */
     public function can_create_factory_in_test_dir(): void
     {
-        if (!\getenv('USE_ORM')) {
+        if (!\getenv('DATABASE_URL')) {
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
@@ -139,7 +139,7 @@ final class MakeFactoryTest extends MakerTestCase
      */
     public function can_create_factory_in_a_sub_directory(): void
     {
-        if (!\getenv('USE_ORM')) {
+        if (!\getenv('DATABASE_URL')) {
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
@@ -157,7 +157,7 @@ final class MakeFactoryTest extends MakerTestCase
      */
     public function can_create_factory_in_test_dir_interactively(): void
     {
-        if (!\getenv('USE_ORM')) {
+        if (!\getenv('DATABASE_URL')) {
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
@@ -175,7 +175,7 @@ final class MakeFactoryTest extends MakerTestCase
      */
     public function can_create_factory_with_static_analysis_annotations(string $scaTool): void
     {
-        if (!\getenv('USE_ORM')) {
+        if (!\getenv('DATABASE_URL')) {
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
@@ -194,7 +194,7 @@ final class MakeFactoryTest extends MakerTestCase
      */
     public function can_create_factory_for_entity_with_repository(string $scaTool): void
     {
-        if (!\getenv('USE_ORM')) {
+        if (!\getenv('DATABASE_URL')) {
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
@@ -267,7 +267,7 @@ final class MakeFactoryTest extends MakerTestCase
      */
     public function can_customize_namespace(): void
     {
-        if (!\getenv('USE_ORM')) {
+        if (!\getenv('DATABASE_URL')) {
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
@@ -286,7 +286,7 @@ final class MakeFactoryTest extends MakerTestCase
      */
     public function can_customize_namespace_with_test_flag(): void
     {
-        if (!\getenv('USE_ORM')) {
+        if (!\getenv('DATABASE_URL')) {
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
@@ -305,7 +305,7 @@ final class MakeFactoryTest extends MakerTestCase
      */
     public function can_customize_namespace_with_root_namespace_prefix(): void
     {
-        if (!\getenv('USE_ORM')) {
+        if (!\getenv('DATABASE_URL')) {
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
@@ -324,7 +324,7 @@ final class MakeFactoryTest extends MakerTestCase
      */
     public function can_customize_namespace_with_test_flag_with_root_namespace_prefix(): void
     {
-        if (!\getenv('USE_ORM')) {
+        if (!\getenv('DATABASE_URL')) {
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
@@ -346,7 +346,7 @@ final class MakeFactoryTest extends MakerTestCase
         $tester = $this->makeFactoryCommandTester();
 
         $inputs = ['All']; // which factory to generate?
-        if (\getenv('USE_ORM')) {
+        if (\getenv('DATABASE_URL')) {
             $inputs[] = 'OtherTagFactory'; // name collision handling (only for ORM, the collision is caused my an ORM class
         }
 
@@ -355,13 +355,13 @@ final class MakeFactoryTest extends MakerTestCase
 
         $expectedFactories = [];
 
-        if (\getenv('USE_ORM')) {
+        if (\getenv('DATABASE_URL')) {
             $expectedFactories = ['Cascade/BrandFactory', 'CategoryFactory', 'CommentFactory', 'ContactFactory', 'EntityForRelationsFactory', 'UserFactory', 'TagFactory', 'Cascade/TagFactory'];
         }
 
-        if (\getenv('USE_ODM')) {
+        if (\getenv('MONGO_URL')) {
             $expectedFactories = [...$expectedFactories, 'ODMCategoryFactory', 'ODMCommentFactory', 'ODMPostFactory', 'ODMUserFactory'];
-            $expectedFactories[] = \getenv('USE_ORM') ? 'OtherTagFactory' : 'TagFactory';
+            $expectedFactories[] = \getenv('DATABASE_URL') ? 'OtherTagFactory' : 'TagFactory';
         }
 
         self::assertGreaterThan(0, \count($expectedFactories));
@@ -376,7 +376,7 @@ final class MakeFactoryTest extends MakerTestCase
      */
     public function can_create_factory_for_odm(string $class, string $file): void
     {
-        if (!\getenv('USE_ODM')) {
+        if (!\getenv('MONGO_URL')) {
             self::markTestSkipped('doctrine/odm not enabled.');
         }
 
@@ -418,7 +418,7 @@ final class MakeFactoryTest extends MakerTestCase
      */
     public function can_create_factory_with_relation_defaults(): void
     {
-        if (!\getenv('USE_ORM')) {
+        if (!\getenv('DATABASE_URL')) {
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
@@ -434,7 +434,7 @@ final class MakeFactoryTest extends MakerTestCase
      */
     public function can_create_factory_with_relation_for_all_fields(): void
     {
-        if (!\getenv('USE_ORM')) {
+        if (!\getenv('DATABASE_URL')) {
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 
@@ -461,11 +461,11 @@ final class MakeFactoryTest extends MakerTestCase
 
     public function objectsWithEmbeddableProvider(): iterable
     {
-        if (\getenv('USE_ORM')) {
+        if (\getenv('DATABASE_URL')) {
             yield 'orm' => [Contact::class, 'ContactFactory', 'AddressFactory'];
         }
 
-        if (\getenv('USE_ODM')) {
+        if (\getenv('MONGO_URL')) {
             yield 'odm' => [ODMPost::class, 'ODMPostFactory', 'ODMUserFactory', [CommentFactory::class]];
         }
     }
@@ -487,11 +487,11 @@ final class MakeFactoryTest extends MakerTestCase
 
     public function canCreateFactoryWithDefaultEnumProvider(): iterable
     {
-        if (\getenv('USE_ORM')) {
+        if (\getenv('DATABASE_URL')) {
             yield 'orm' => [EntityWithEnum::class];
         }
 
-        if (\getenv('USE_ODM')) {
+        if (\getenv('MONGO_URL')) {
             yield 'odm' => [DocumentWithEnum::class];
         }
 
@@ -503,7 +503,7 @@ final class MakeFactoryTest extends MakerTestCase
      */
     public function can_create_factory_for_orm_embedded_class(): void
     {
-        if (!\getenv('USE_ORM')) {
+        if (!\getenv('DATABASE_URL')) {
             self::markTestSkipped('doctrine/odm not enabled.');
         }
 
@@ -520,7 +520,7 @@ final class MakeFactoryTest extends MakerTestCase
      */
     public function it_handles_name_collision(): void
     {
-        if (!\getenv('USE_ORM') || !\getenv('USE_ODM')) {
+        if (!\getenv('DATABASE_URL') || !\getenv('MONGO_URL')) {
             self::markTestSkipped('doctrine/odm and doctrine/orm should be enabled enabled.');
         }
 
@@ -548,7 +548,7 @@ final class MakeFactoryTest extends MakerTestCase
      */
     public function it_uses_default_namespace_from_configuration(string $defaultNamespace): void
     {
-        if (!\getenv('USE_ORM')) {
+        if (!\getenv('DATABASE_URL')) {
             self::markTestSkipped('doctrine/orm not enabled.');
         }
 

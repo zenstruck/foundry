@@ -22,6 +22,13 @@ final class FakerTest extends KernelTestCase
 {
     use Factories;
 
+    protected function setUp(): void
+    {
+        if (!\getenv('USE_FOUNDRY_BUNDLE')) {
+            $this->markTestSkipped('ZenstruckFoundryBundle not enabled.');
+        }
+    }
+
     /**
      * @test
      */

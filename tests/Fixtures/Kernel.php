@@ -54,7 +54,7 @@ class Kernel extends BaseKernel
     {
         yield new FrameworkBundle();
 
-        if ($this->enableDoctrine && \getenv('USE_ORM')) {
+        if ($this->enableDoctrine && \getenv('DATABASE_URL')) {
             yield new DoctrineBundle();
         }
 
@@ -68,11 +68,11 @@ class Kernel extends BaseKernel
             yield new DAMADoctrineTestBundle();
         }
 
-        if (ORMDatabaseResetter::RESET_MODE_MIGRATE === $this->ormResetMode && $this->enableDoctrine && \getenv('USE_ORM')) {
+        if ($this->withMigrations()) {
             yield new DoctrineMigrationsBundle();
         }
 
-        if ($this->enableDoctrine && \getenv('USE_ODM')) {
+        if ($this->enableDoctrine && \getenv('MONGO_URL')) {
             yield new DoctrineMongoDBBundle();
         }
     }
@@ -81,7 +81,18 @@ class Kernel extends BaseKernel
     {
         return \sprintf(
             "{$this->getProjectDir()}/var/cache/test/%s",
-            \md5(\json_encode([$this->enableDoctrine, $this->ormResetMode, $this->factoriesRegistered, $this->defaultMakeFactoryNamespace], \JSON_THROW_ON_ERROR))
+            \md5(
+                \json_encode(
+                    [
+                        $this->enableDoctrine,
+                        $this->ormResetMode,
+                        $this->factoriesRegistered,
+                        $this->defaultMakeFactoryNamespace,
+                        $this->withMigrations(),
+                    ],
+                    \JSON_THROW_ON_ERROR
+                )
+            )
         );
     }
 
@@ -107,7 +118,7 @@ class Kernel extends BaseKernel
             'test' => true,
         ]);
 
-        if ($this->enableDoctrine && \getenv('USE_ORM')) {
+        if ($this->enableDoctrine && \getenv('DATABASE_URL')) {
             $mappings = [
                 'Test' => [
                     'is_bundle' => false,
@@ -148,14 +159,14 @@ class Kernel extends BaseKernel
             }
             $globalState = [];
 
-            if ($this->enableDoctrine && \getenv('USE_ORM')) {
+            if ($this->enableDoctrine && \getenv('DATABASE_URL')) {
                 $globalState[] = TagStory::class;
                 $globalState[] = TagStoryAsInvokableService::class;
 
                 $foundryConfig['database_resetter'] = ['orm' => ['reset_mode' => $this->ormResetMode]];
             }
 
-            if ($this->enableDoctrine && \getenv('USE_ODM') && !\getenv('USE_DAMA_DOCTRINE_TEST_BUNDLE')) {
+            if ($this->enableDoctrine && \getenv('MONGO_URL') && !\getenv('USE_DAMA_DOCTRINE_TEST_BUNDLE')) {
                 $globalState[] = ODMTagStory::class;
                 $globalState[] = ODMTagStoryAsAService::class;
                 $c->register(ODMTagStoryAsAService::class)->addTag('foundry.story');
@@ -166,7 +177,7 @@ class Kernel extends BaseKernel
             $c->loadFromExtension('zenstruck_foundry', $foundryConfig);
         }
 
-        if (ORMDatabaseResetter::RESET_MODE_MIGRATE === $this->ormResetMode) {
+        if ($this->withMigrations()) {
             $c->loadFromExtension('doctrine_migrations', [
                 'migrations_paths' => [
                     'Zenstruck\Foundry\Tests\Fixtures\Migrations' => '%kernel.project_dir%/tests/Fixtures/Migrations',
@@ -174,7 +185,7 @@ class Kernel extends BaseKernel
             ]);
         }
 
-        if ($this->enableDoctrine && \getenv('USE_ODM')) {
+        if ($this->enableDoctrine && \getenv('MONGO_URL')) {
             $mappings = [
                 'Test' => [
                     'is_bundle' => false,
@@ -208,5 +219,10 @@ class Kernel extends BaseKernel
                 ],
             ]);
         }
+    }
+
+    private function withMigrations(): bool
+    {
+        return $this->enableDoctrine && \getenv('DATABASE_URL') && \getenv('TEST_MIGRATIONS');
     }
 }

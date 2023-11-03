@@ -30,89 +30,66 @@ Want to watch a screencast 🎥 about it? Check out https://symfonycasts.com/fou
 
 ## How to contribute
 
-The test suite of this library needs one or more database, and static analysis needs to be ran on the smaller PHP version
-supported (currently PHP 7.2), then it comes with a full docker stack.
+### Running the Test Suite
 
-### Install docker
+The test suite of this library needs one or more databases, then it comes with a docker compose configuration.
 
-You must [install docker](https://docs.docker.com/engine/install/) and [install docker-compose](https://docs.docker.com/compose/install/)
-at first before running the tests.
+> [!NOTE]
+> Docker and PHP installed locally (with `mysql`, `pgsql` & `mongodb` extensions) is required.
 
-### Run tests
+You can start the containers and run the test suite:
 
-The library is shipped with a `Makefile` to run tests.
-Each target will build and start the docker stack and install composer only if needed.
+```bash
+# start the container
+$ docker compose up --detach
 
-```shell
-$ make help
-validate                       Run sca, full test suite and validate migrations
-test                           Run PHPUnit tests suite
-sca                            Run static analysis
-docs                           Generate documentation to docs/output
-database-generate-migration    Generate new migration based on mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
-database-validate-mapping      Validate mapping in Zenstruck\Foundry\Tests\Fixtures\Entity
-database-drop-schema           Drop database schema
-composer                       Run composer command
-docker-start                   Build and run containers
-docker-stop                    Stop containers
-docker-purge                   Purge containers
-clear                          Start from a fresh install (use it for troubleshooting)
+# install dependencies
+$ composer update
+
+# run test suite with all available permutations
+$ composer test
+
+# run only one permutation
+$ vendor/bin/phpunit
+
+# run test suite with dama/doctrine-test-bundle
+$ vendor/bin/phpunit -c phpunit.dama.xml.dist
+
+# run test suite with postgreSQL instead of MySQL
+$ DATABASE_URL="postgresql://zenstruck:zenstruck@127.0.0.1:5433/zenstruck_foundry?serverVersion=15" vendor/bin/phpunit
 ```
 
-Use double-dash to pass any PHPUnit options or arguments with `make`:
-```shell
-$ make test -- --stop-on-failure
-$ make test -- --filter FactoryTest
-# don't use "=" options value. ie: don't do this:
-$ make test -- --filter=FactoryTest
+### Overriding the default configuration
+
+You can override default environment variables by creating a `.env.local` file, to easily enable permutations:
+
+```bash
+# .env.local
+DATABASE_URL="postgresql://zenstruck:zenstruck@127.0.0.1:5433/zenstruck_foundry?serverVersion=15"
+
+# run test suite with postgreSQL
+$ vendor/bin/phpunit
 ```
 
-Same syntax is available for composer:
-```shell
-$ make composer -- info symfony/*
+The `.env.local` file can also be used to override the port of the database containers,
+if it does not meet your local requirements. You'll also need to override docker compose configuration:
+
+Here is an example to use MySQL on port `3308`:
+
+```yaml
+# docker-compose.override.yml
+version: '3.9'
+
+services:
+    mysql:
+        ports:
+            - "3308:3306"
 ```
 
-#### Run tests in different environments
-
-You can create a `.env` file to change the context in which tests will execute:
 ```dotenv
-USE_ORM=1
-USE_ODM=1
-USE_DAMA_DOCTRINE_TEST_BUNDLE=1
-SYMFONY_REQUIRE=5.4.* # allowed values: 5.4.* | 6.0.* | 6.1.* | 6.2.*
-PHP_VERSION=8.0 # allowed values: 8.0 | 8.1 | 8.2
-PREFER_LOWEST=1 # force composer to request lowest dependencies
+# .env.local
+DATABASE_URL="mysql://root:1234@127.0.0.1:3308/foundry_test?serverVersion=5.7.42"
 ```
-
-### Change docker's ports
-
-You can also add these variables to the `.env` file to change the ports used by docker:
-```dotenv
-PGSQL_PORT=5434
-MONGO_PORT=27018
-```
-
-### Execute commands in php container
-
-You can execute any command into the php container using docker compose:
-```shell
-$ docker-compose exec php [your commmand] # or "docker compose" depending on your compose version
-```
-
-### Using xdebug with PhpStorm
-
-The php container is shipped with xdebug activated. You can use step by step debugging session with PhpStorm: you should
-create a server called `FOUNDRY` in your PHP Remote Debug, with the IDE key `xdebug_foundry`
-
-![PhpStorm with xdebug](docs/phpstorm-xdebug-config.png)
-
-### Troubleshooting
-
-IF any problem occurs with the docker stack or a `make` target, try to run `make clear`.
-
-## Migrations
-
-Whenever an entity in the fixtures is added or updated a migration must be generated with `make migrations-generate`
 
 ## Credit
 

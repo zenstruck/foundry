@@ -28,12 +28,8 @@ final class ORMDatabaseResetterTest extends KernelTestCase
             self::markTestSkipped('The database should not be reset if dama/doctrine-test-bundle is enabled.');
         }
 
-        if (!\getenv('USE_ORM')) {
+        if (!\getenv('DATABASE_URL')) {
             self::markTestSkipped('doctrine/orm is not enabled.');
-        }
-
-        if (!\str_starts_with(\getenv('DATABASE_URL'), 'postgres')) {
-            self::markTestSkipped('Can only test migrations with postgresql.');
         }
     }
 
@@ -60,7 +56,10 @@ final class ORMDatabaseResetterTest extends KernelTestCase
     public function databaseResetterProvider(): iterable
     {
         yield [ORMDatabaseResetter::RESET_MODE_SCHEMA];
-        yield [ORMDatabaseResetter::RESET_MODE_MIGRATE];
+
+        if (getenv('TEST_MIGRATIONS')) {
+            yield [ORMDatabaseResetter::RESET_MODE_MIGRATE];
+        }
     }
 
     protected static function createKernel(array $options = []): KernelInterface

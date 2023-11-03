@@ -19,7 +19,7 @@ final class ODMGlobalStateTest extends GlobalStateTest
 {
     protected function setUp(): void
     {
-        if (!\getenv('USE_ODM')) {
+        if (!\getenv('MONGO_URL')) {
             self::markTestSkipped('doctrine/odm not enabled.');
         }
 

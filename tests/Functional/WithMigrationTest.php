@@ -16,6 +16,7 @@ namespace Zenstruck\Foundry\Tests\Functional;
 use Doctrine\ORM\Tools\SchemaValidator;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ORMDatabaseResetter;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
@@ -24,6 +25,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Kernel;
 final class WithMigrationTest extends KernelTestCase
 {
     use ResetDatabase;
+    use Factories;
 
     /**
      * @test
@@ -48,13 +50,9 @@ final class WithMigrationTest extends KernelTestCase
     protected static function createKernel(array $options = []): KernelInterface
     {
         // ResetDatabase trait uses @beforeClass annotation which would always be called before setUpBeforeClass()
-        // but it also calls "static::createKernel()" which we can use to skip test if USE_ORM is false.
-        if (!\getenv('USE_ORM')) {
+        // but it also calls "static::createKernel()" which we can use to skip test if DATABASE_URL is false.
+        if (!\getenv('DATABASE_URL') || !\getenv('TEST_MIGRATIONS')) {
             self::markTestSkipped('doctrine/orm not enabled.');
-        }
-
-        if (!\str_starts_with(\getenv('DATABASE_URL'), 'postgres')) {
-            self::markTestSkipped('Can only test migrations with postgresql.');
         }
 
         return Kernel::create(true, ORMDatabaseResetter::RESET_MODE_MIGRATE);

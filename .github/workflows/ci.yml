@@ -8,76 +8,76 @@ on:
 
 jobs:
   tests:
-    name: PHP ${{ matrix.php }}, SF ${{ matrix.symfony }} - ${{ matrix.deps }} ${{ matrix.use-orm == '1' && (matrix.orm-db == 'postgres' && '- ORM (postgres)' || '- ORM (mysql)') || '' }} ${{ matrix.use-odm == '1' && '- ODM' || '' }} ${{ matrix.use-dama == '1' && '- DAMA' || '' }}
+    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.use-dama == 1 && contains(matrix.database, 'sql') && ' (dama)' || '' }}
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
-        php: [8.0, 8.1, 8.2]
-        symfony: [5.4.*, 6.2.*, 6.3.*]
-        deps: [highest]
-        use-orm: [1]
-        use-odm: [1]
-        use-dama: [1]
-        orm-db: [postgres]
-        exclude:
-          - {use-orm: 0, use-odm: 0} # tested directly in a test case
-          - {use-orm: 0, use-dama: 1} # cannot happen
-          # conflicts
-          - {php: 8.0, symfony: 6.2.*}
-          - {php: 8.0, symfony: 6.3.*}
+        php: [ 8.1, 8.2 ]
+        deps: [ highest ]
+        symfony: [ 6.3.*, 6.4.* ]
+        database: [ mysql, mongo ]
+        use-dama: [ 1 ]
         include:
-          - {php: 8.0, symfony: 5.4.*, use-orm: 1, use-odm: 0, use-dama: 0, deps: lowest, orm-db: postgres}
-          - {php: 8.0, symfony: 5.4.*, use-orm: 1, use-odm: 1, use-dama: 0, deps: lowest, orm-db: postgres}
-          - {php: 8.0, symfony: 5.4.*, use-orm: 0, use-odm: 1, use-dama: 0, deps: lowest, orm-db: postgres}
-          - {php: 8.2, symfony: 6.3.*, use-orm: 1, use-odm: 0, use-dama: 0, deps: highest, orm-db: postgres}
-          - {php: 8.2, symfony: 6.3.*, use-orm: 1, use-odm: 1, use-dama: 0, deps: highest, orm-db: postgres}
-          - {php: 8.2, symfony: 6.3.*, use-orm: 1, use-odm: 0, use-dama: 1, deps: highest, orm-db: postgres}
-          - {php: 8.2, symfony: 6.3.*, use-orm: 0, use-odm: 1, use-dama: 0, deps: highest, orm-db: postgres}
-          - {php: 8.2, symfony: 6.3.*, use-orm: 1, use-odm: 0, use-dama: 1, deps: highest, orm-db: mysql}
-          - {php: 8.2, symfony: 6.3.*, use-orm: 1, use-odm: 0, use-dama: 0, deps: highest, orm-db: mysql}
-
+          - php: 8.0
+            deps: lowest
+            symfony: '5.4.*'
+            database: mysql|mongo
+            use-dama: 1
+          - php: 8.2
+            deps: highest
+            symfony: '*'
+            database: none
+            use-dama: 1
+          - php: 8.2
+            deps: highest
+            symfony: '*'
+            database: mysql|mongo
+            use-dama: 1
+          - php: 8.2
+            deps: highest
+            symfony: '*'
+            database: pgsql|mongo
+            use-dama: 1
+          - php: 8.2
+            deps: highest
+            symfony: '*'
+            database: mysql
+            use-dama: 0
+          - php: 8.2
+            deps: highest
+            symfony: '*'
+            database: pgsql
+            use-dama: 0
+    env:
+      DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || '' }}
+      MONGO_URL: ${{ contains(matrix.database, 'mongo') && 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb' || '' }}
+      USE_DAMA_DOCTRINE_TEST_BUNDLE: ${{ matrix.use-dama == 1 && contains(matrix.database, 'sql') && 1 || 0 }}
     services:
-      mysql:
-        image: mysql:5.7.42
-        env:
-          MYSQL_ROOT_PASSWORD: 1234
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
       postgres:
-        image: postgres:15
+        image: ${{ contains(matrix.database, 'pgsql') && 'postgres:15' || '' }}
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_DB: zenstruck_foundry_${{ matrix.use-dama }}_${{ matrix.orm-db }}
-          POSTGRES_PASSWORD: 1234
-        options: --health-cmd pg_isready --health-interval=10s --health-timeout=5s --health-retries=5
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: foundry
         ports:
           - 5432:5432
-
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
       mongo:
-        image: mongo:4
+        image: ${{ contains(matrix.database, 'mongo') && 'mongo:4' || '' }}
         ports:
           - 27017:27017
-
-    env:
-      MYSQL_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7.42
-      PGSQL_URL: postgresql://postgres:1234@127.0.0.1:5432/zenstruck_foundry_${{ matrix.use-dama }}_${{ matrix.orm-db }}?charset=utf8&serverVersion=15
-      MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Verify MySQL version
-        run: mysql --host 127.0.0.1 -uroot -p1234 -e "STATUS"
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: pgsql, sqlite, mongodb
           coverage: none
           tools: flex
 
@@ -89,51 +89,49 @@ jobs:
         env:
           SYMFONY_REQUIRE: ${{ matrix.symfony }}
 
-      - name: 'Test'
-        run: |
-          if [ "${{ matrix.use-dama }}" == "1" ]; then
-            CONFIGURATION="--configuration phpunit-dama-doctrine.xml.dist"
-          fi
+      - name: Set up MySQL
+        if: contains(matrix.database, 'mysql')
+        run: sudo /etc/init.d/mysql start
 
-          vendor/bin/simple-phpunit ${CONFIGURATION}
+      - name: Test
+        run: vendor/bin/phpunit -c "${PHPUNIT_CONFIG_FILE}"
+        shell: bash
         env:
-          USE_ORM: ${{ matrix.use-orm }}
-          USE_ODM: ${{ matrix.use-odm }}
-          USE_FOUNDRY_BUNDLE: 1
-          DATABASE_URL: ${{ matrix.orm-db == 'postgres' && env.PGSQL_URL || env.MYSQL_URL }}
+          TEST_MIGRATIONS: 1
+          PHPUNIT_CONFIG_FILE: ${{ env.USE_DAMA_DOCTRINE_TEST_BUNDLE == 1 && 'phpunit.dama.xml.dist' || 'phpunit.xml.dist' }}
 
   code-coverage:
     name: Code Coverage
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://root:root@localhost:5432/foundry?serverVersion=15
+      MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
     services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ROOT_PASSWORD: 1234
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
       mongo:
         image: mongo:4
         ports:
           - 27017:27017
-
-    env:
-      DATABASE_URL: mysql://root:1234@127.0.0.1:3306/zenstruck_foundry?serverVersion=5.7
-      MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
-
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: foundry
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Verify MySQL version
-        run: mysql --host 127.0.0.1 -uroot -p1234 -e "STATUS"
-
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.0
-          extensions: pgsql, sqlite
+          php-version: 8.2
           coverage: xdebug
           ini-values: xdebug.mode=coverage
 
@@ -141,19 +139,18 @@ jobs:
         uses: ramsey/composer-install@v2
         with:
           composer-options: --prefer-dist
-          dependency-versions: "highest"
 
-      - name: 'Coverage'
-        run: vendor/bin/simple-phpunit -v --configuration phpunit-dama-doctrine.xml.dist --coverage-text --coverage-clover=foundry.clover
+      - name: Test with coverage
+        run: vendor/bin/phpunit -c phpunit.dama.xml.dist --coverage-text --coverage-clover coverage.xml
+        shell: bash
         env:
-          USE_ORM: 1
-          USE_ODM: 1
-          USE_FOUNDRY_BUNDLE: 1
+          USE_FOUNDRY_BUNDLE: 0
+          SYMFONY_DEPRECATIONS_HELPER: disabled
 
       - name: Publish coverage report to Codecov
         uses: codecov/codecov-action@v3
         with:
-          file: ./*.clover
+          file: ./coverage.xml
 
   composer-validate:
     uses: zenstruck/.github/.github/workflows/php-composer-validate.yml@main
@@ -189,7 +186,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.0
+          php-version: 8.1
           coverage: none
 
       - name: Install dependencies
@@ -208,47 +205,6 @@ jobs:
 
       - name: Run Psalm on factories generated with maker
         run: bin/tools/psalm/vendor/vimeo/psalm/psalm
-
-  test-docker-stack:
-    name: CI with docker stack
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        php: ['8.0', '8.1', '8.2']
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Run test suite with docker
-        run: |
-          echo "PHP_VERSION=${{ matrix.php }}" > .env
-          make validate
-
-  push_docker_images:
-    name: Push docker images after CI complete on main branch
-    needs: [tests, composer-validate, build-docs, static-analysis, test-docker-stack]
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/1.x' }}
-    strategy:
-      fail-fast: false
-      matrix:
-        php: ['8.0', '8.1', '8.2']
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Login to ghcr.io
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io/zenstruck
-          username: token
-          password: ${{ secrets.PACKAGE_PUSH_TOKEN }}
-
-      - name: Build and push images
-        run: ./docker/build.sh push ${{ matrix.php }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.PACKAGE_PUSH_TOKEN }}
 
   fixcs:
     name: Run php-cs-fixer
@@ -271,4 +227,3 @@ jobs:
         with:
           key: ${{ secrets.GPG_PRIVATE_KEY }}
           token: ${{ secrets.COMPOSER_TOKEN }}
-          phpcsconfig: false
