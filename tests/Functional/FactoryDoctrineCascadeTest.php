@@ -50,7 +50,7 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
         ])->instantiateWith(function(array $attributes, string $class): object {
             $this->assertNull($attributes['brand']->getId());
 
-            return (new Instantiator())($attributes, $class);
+            return Instantiator::withConstructor()($attributes, $class);
         })->create();
 
         $this->assertNotNull($product->getBrand()->getId());
@@ -68,7 +68,7 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
         ])->instantiateWith(function(array $attributes, string $class): object {
             //            $this->assertNull($attributes['products'][0]->getId());
 
-            return (new Instantiator())($attributes, $class);
+            return Instantiator::withConstructor()($attributes, $class);
         })->create();
 
         $this->assertCount(2, $brand->getProducts());
@@ -87,7 +87,7 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
         ])->instantiateWith(function(array $attributes, string $class): object {
             $this->assertNull($attributes['tags'][0]->getId());
 
-            return (new Instantiator())($attributes, $class);
+            return Instantiator::withConstructor()($attributes, $class);
         })->create();
 
         $this->assertCount(1, $product->getTags());
@@ -106,7 +106,7 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
         ])->instantiateWith(function(array $attributes, string $class): object {
             $this->assertNull($attributes['categories'][0]->getId());
 
-            return (new Instantiator())($attributes, $class);
+            return Instantiator::withConstructor()($attributes, $class);
         })->create();
 
         $this->assertCount(1, $product->getCategories());
@@ -125,7 +125,7 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
         ])->instantiateWith(function(array $attributes, string $class): object {
             $this->assertNull($attributes['review']->getId());
 
-            return (new Instantiator())($attributes, $class);
+            return Instantiator::withConstructor()($attributes, $class);
         })->create();
 
         $this->assertNotNull($product->getReview()->getId());
@@ -143,7 +143,7 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
         ])->instantiateWith(function(array $attributes, string $class): object {
             $this->assertNull($attributes['review']->getId());
 
-            return (new Instantiator())($attributes, $class);
+            return Instantiator::withConstructor()($attributes, $class);
         })->create();
 
         $this->assertNotNull($product->getReview()->getId());

@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Zenstruck\Foundry\Bundle\Command\StubMakeFactory;
 use Zenstruck\Foundry\Bundle\Command\StubMakeStory;
+use Zenstruck\Foundry\Instantiator;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Story;
 use Zenstruck\Foundry\Test\ORMDatabaseResetter;
@@ -87,7 +88,7 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
         $definition = $container->getDefinition('.zenstruck_foundry.default_instantiator');
 
         if ($config['without_constructor']) {
-            $definition->addMethodCall('withoutConstructor');
+            $definition->setFactory([Instantiator::class, 'withoutConstructor']);
         }
 
         if ($config['allow_extra_attributes']) {
