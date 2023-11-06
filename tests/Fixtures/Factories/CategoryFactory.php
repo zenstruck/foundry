@@ -34,7 +34,7 @@ final class CategoryFactory extends PersistentProxyObjectFactory
     {
         return $this
             ->instantiateWith(
-                (new Instantiator())->allowExtraAttributes(['extraPostsBeforeInstantiate', 'extraPostsAfterInstantiate'])
+                Instantiator::withConstructor()->allowExtraAttributes(['extraPostsBeforeInstantiate', 'extraPostsAfterInstantiate'])
             )
             ->beforeInstantiate(function(array $attributes): array {
                 if (isset($attributes['extraPostsBeforeInstantiate'])) {

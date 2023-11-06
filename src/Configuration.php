@@ -55,7 +55,7 @@ final class Configuration
         $this->stories = new StoryManager([]);
         $this->factories = new ModelFactoryManager([]);
         $this->faker = Faker\Factory::create();
-        $this->instantiator = new Instantiator();
+        $this->instantiator = Instantiator::withConstructor();
     }
 
     public function stories(): StoryManager
