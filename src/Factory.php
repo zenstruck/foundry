@@ -337,8 +337,13 @@ class Factory
         }
     }
 
+    /**
+     * @deprecated
+     */
     final public static function delayFlush(callable $callback): mixed
     {
+        trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Method "%s()" is deprecated and will be removed in Foundry 2.0. Use "Zenstruck\Foundry\Persistence\flush_after()" instead.', __METHOD__));
+
         return self::configuration()->delayFlush($callback);
     }
 

@@ -12,21 +12,22 @@
 namespace Zenstruck\Foundry\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeOtherObject;
 
 use function Zenstruck\Foundry\anonymous;
-use function Zenstruck\Foundry\create;
-use function Zenstruck\Foundry\repository;
+use function Zenstruck\Foundry\object;
+use function Zenstruck\Foundry\Persistence\flush_after;
+use function Zenstruck\Foundry\Persistence\persist;
+use function Zenstruck\Foundry\Persistence\repository;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -48,9 +49,9 @@ final class FactoryTest extends KernelTestCase
     public function many_to_one_relationship(): void
     {
         $categoryFactory = anonymous(Category::class, ['name' => 'foo']);
-        $category = create(Category::class, ['name' => 'bar']);
-        $postA = create(Post::class, ['title' => 'title', 'body' => 'body', 'category' => $categoryFactory]);
-        $postB = create(Post::class, ['title' => 'title', 'body' => 'body', 'category' => $category]);
+        $category = persist(Category::class, ['name' => 'bar']);
+        $postA = persist(Post::class, ['title' => 'title', 'body' => 'body', 'category' => $categoryFactory]);
+        $postB = persist(Post::class, ['title' => 'title', 'body' => 'body', 'category' => $category]);
 
         $this->assertSame('foo', $postA->getCategory()->getName());
         $this->assertSame('bar', $postB->getCategory()->getName());
@@ -61,11 +62,11 @@ final class FactoryTest extends KernelTestCase
      */
     public function one_to_many_relationship(): void
     {
-        $category = create(Category::class, [
+        $category = persist(Category::class, [
             'name' => 'bar',
             'posts' => [
                 anonymous(Post::class, ['title' => 'Post A', 'body' => 'body']),
-                create(Post::class, ['title' => 'Post B', 'body' => 'body']),
+                persist(Post::class, ['title' => 'Post B', 'body' => 'body']),
             ],
         ]);
 
@@ -84,12 +85,12 @@ final class FactoryTest extends KernelTestCase
      */
     public function many_to_many_relationship(): void
     {
-        $post = create(Post::class, [
+        $post = persist(Post::class, [
             'title' => 'title',
             'body' => 'body',
             'tags' => [
                 anonymous(Tag::class, ['name' => 'Tag A']),
-                create(Tag::class, ['name' => 'Tag B']),
+                persist(Tag::class, ['name' => 'Tag B']),
             ],
         ]);
 
@@ -108,11 +109,11 @@ final class FactoryTest extends KernelTestCase
      */
     public function many_to_many_reverse_relationship(): void
     {
-        $tag = create(Tag::class, [
+        $tag = persist(Tag::class, [
             'name' => 'bar',
             'posts' => [
                 anonymous(Post::class, ['title' => 'Post A', 'body' => 'body']),
-                create(Post::class, ['title' => 'Post B', 'body' => 'body']),
+                persist(Post::class, ['title' => 'Post B', 'body' => 'body']),
             ],
         ]);
 
@@ -155,20 +156,15 @@ final class FactoryTest extends KernelTestCase
         repository(Post::class)->assert()->empty();
         repository(Category::class)->assert()->empty();
 
-        $post = null;
-        $return = Factory::delayFlush(static function() use (&$post): Proxy {
-            $post = anonymous(Post::class)->create([
+        flush_after(static function(): void {
+            anonymous(Post::class)->create([
                 'title' => 'title',
                 'body' => 'body',
                 'category' => anonymous(Category::class, ['name' => 'name']),
             ]);
             repository(Post::class)->assert()->empty();
             repository(Category::class)->assert()->empty();
-
-            return $post;
         });
-
-        $this->assertSame($post, $return);
 
         repository(Post::class)->assert()->count(1);
         repository(Category::class)->assert()->count(1);
@@ -182,8 +178,7 @@ final class FactoryTest extends KernelTestCase
         repository(Post::class)->assert()->empty();
         repository(Category::class)->assert()->empty();
 
-        $post = null;
-        $return = Factory::delayFlush(static function() use (&$post): Proxy {
+        flush_after(static function(): void {
             $post = anonymous(Post::class)->create([
                 'title' => 'title',
                 'body' => 'body',
@@ -193,11 +188,7 @@ final class FactoryTest extends KernelTestCase
             $post->setBody('new body');
             repository(Post::class)->assert()->empty();
             repository(Category::class)->assert()->empty();
-
-            return $post;
         });
-
-        $this->assertSame($post, $return);
 
         repository(Post::class)->assert()->count(1);
         repository(Category::class)->assert()->count(1);
@@ -211,5 +202,17 @@ final class FactoryTest extends KernelTestCase
         $notPersistedObject = SomeObjectFactory::new()->create()->_real();
         self::assertInstanceOf(SomeObject::class, $notPersistedObject);
         self::assertInstanceOf(SomeOtherObject::class, $notPersistedObject->someOtherObjectMandatory);
+    }
+
+    /**
+     * @test
+     */
+    public function instantiate(): void
+    {
+        $proxy = object(Post::class, ['title' => 'title', 'body' => 'body']);
+
+        $this->assertInstanceOf(Post::class, $proxy->_real());
+        PostFactory::assert()->count(0);
+        $this->assertSame('title', $proxy->getTitle());
     }
 }
