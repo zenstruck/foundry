@@ -15,7 +15,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\LazyValue;
 use Zenstruck\Foundry\Persistence\Proxy;
@@ -24,12 +23,10 @@ use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 
-use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 use function Zenstruck\Foundry\create;
 use function Zenstruck\Foundry\create_many;
 use function Zenstruck\Foundry\faker;
-use function Zenstruck\Foundry\instantiate;
+use function Zenstruck\Foundry\object;
 use function Zenstruck\Foundry\instantiate_many;
 use function Zenstruck\Foundry\lazy;
 use function Zenstruck\Foundry\memoize;
@@ -38,7 +35,7 @@ use function Zenstruck\Foundry\repository;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class FunctionsTest extends KernelTestCase
+final class FunctionsTest extends TestCase
 {
     use Factories;
 
@@ -77,35 +74,27 @@ final class FunctionsTest extends KernelTestCase
      */
     public function instantiate(): void
     {
-        if (!\getenv('DATABASE_URL')) {
-            self::markTestSkipped('doctrine/orm not enabled: cannot get Post repository.');
-        }
-
-        $proxy = instantiate(Post::class, ['title' => 'title', 'body' => 'body']);
+        $proxy = object(Post::class, ['title' => 'title', 'body' => 'body']);
 
         $this->assertInstanceOf(Post::class, $proxy->_real());
-        PostFactory::assert()->count(0);
         $this->assertSame('title', $proxy->getTitle());
     }
 
     /**
      * @test
+     * @group legacy
      */
     public function instantiate_many(): void
     {
-        if (!\getenv('DATABASE_URL')) {
-            self::markTestSkipped('doctrine/orm not enabled: cannot get Post repository.');
-        }
-
         $objects = instantiate_many(3, Category::class);
 
         $this->assertCount(3, $objects);
         $this->assertInstanceOf(Category::class, $objects[0]->_real());
-        CategoryFactory::assert()->count(0);
     }
 
     /**
      * @test
+     * @group legacy
      */
     public function create(): void
     {
@@ -125,6 +114,7 @@ final class FunctionsTest extends KernelTestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function create_many(): void
     {
@@ -144,6 +134,7 @@ final class FunctionsTest extends KernelTestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function repository(): void
     {

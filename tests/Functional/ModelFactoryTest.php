@@ -18,7 +18,9 @@ use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
 use function Zenstruck\Foundry\anonymous;
-use function Zenstruck\Foundry\create;
+use function Zenstruck\Foundry\Persistence\disable_persisting;
+use function Zenstruck\Foundry\Persistence\enable_persisting;
+use function Zenstruck\Foundry\Persistence\persist;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -433,16 +435,16 @@ abstract class ModelFactoryTest extends KernelTestCase
      */
     public function can_disable_persist_globally(): void
     {
-        $this->disablePersist();
+        disable_persisting();
 
         $categoryFactoryClass = $this->categoryFactoryClass();
 
         $categoryFactoryClass::createOne(['name' => 'foo']);
         $categoryFactoryClass::new()->create(['name' => 'foo']);
         anonymous($this->categoryClass())->create(['name' => 'foo']);
-        create($this->categoryClass(), ['name' => 'foo']);
+        persist($this->categoryClass(), ['name' => 'foo']);
 
-        $this->enablePersist(); // need to reactivate persist to access to RepositoryAssertions
+        enable_persisting(); // need to reactivate persist to access to RepositoryAssertions
         $categoryFactoryClass::assert()->count(0);
     }
 
@@ -451,7 +453,7 @@ abstract class ModelFactoryTest extends KernelTestCase
      */
     public function cannot_access_repository_method_when_persist_disabled(): void
     {
-        $this->disablePersist();
+        disable_persisting();
 
         $countErrors = 0;
         try {
@@ -483,7 +485,7 @@ abstract class ModelFactoryTest extends KernelTestCase
     {
         self::assertTrue(Factory::configuration()->isPersistEnabled());
 
-        create($this->categoryClass(), ['name' => 'foo']);
+        persist($this->categoryClass(), ['name' => 'foo']);
         $this->categoryFactoryClass()::assert()->count(1);
     }
 
