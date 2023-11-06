@@ -15,28 +15,28 @@ use App\Factory\Cascade\BrandFactory;
 use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\RepositoryProxy;
+use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\EntityWithRelations;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 
 /**
  * @extends PersistentProxyObjectFactory<EntityWithRelations>
  *
- * @method        EntityWithRelations|Proxy        create(array|callable $attributes = [])
- * @method static EntityWithRelations|Proxy        createOne(array $attributes = [])
- * @method static EntityWithRelations|Proxy        find(object|array|mixed $criteria)
- * @method static EntityWithRelations|Proxy        findOrCreate(array $attributes)
- * @method static EntityWithRelations|Proxy        first(string $sortedField = 'id')
- * @method static EntityWithRelations|Proxy        last(string $sortedField = 'id')
- * @method static EntityWithRelations|Proxy        random(array $attributes = [])
- * @method static EntityWithRelations|Proxy        randomOrCreate(array $attributes = [])
- * @method static EntityRepository|RepositoryProxy repository()
- * @method static EntityWithRelations[]|Proxy[]    all()
- * @method static EntityWithRelations[]|Proxy[]    createMany(int $number, array|callable $attributes = [])
- * @method static EntityWithRelations[]|Proxy[]    createSequence(iterable|callable $sequence)
- * @method static EntityWithRelations[]|Proxy[]    findBy(array $attributes)
- * @method static EntityWithRelations[]|Proxy[]    randomRange(int $min, int $max, array $attributes = [])
- * @method static EntityWithRelations[]|Proxy[]    randomSet(int $number, array $attributes = [])
+ * @method        EntityWithRelations|Proxy            create(array|callable $attributes = [])
+ * @method static EntityWithRelations|Proxy            createOne(array $attributes = [])
+ * @method static EntityWithRelations|Proxy            find(object|array|mixed $criteria)
+ * @method static EntityWithRelations|Proxy            findOrCreate(array $attributes)
+ * @method static EntityWithRelations|Proxy            first(string $sortedField = 'id')
+ * @method static EntityWithRelations|Proxy            last(string $sortedField = 'id')
+ * @method static EntityWithRelations|Proxy            random(array $attributes = [])
+ * @method static EntityWithRelations|Proxy            randomOrCreate(array $attributes = [])
+ * @method static EntityRepository|RepositoryDecorator repository()
+ * @method static EntityWithRelations[]|Proxy[]        all()
+ * @method static EntityWithRelations[]|Proxy[]        createMany(int $number, array|callable $attributes = [])
+ * @method static EntityWithRelations[]|Proxy[]        createSequence(iterable|callable $sequence)
+ * @method static EntityWithRelations[]|Proxy[]        findBy(array $attributes)
+ * @method static EntityWithRelations[]|Proxy[]        randomRange(int $min, int $max, array $attributes = [])
+ * @method static EntityWithRelations[]|Proxy[]        randomSet(int $number, array $attributes = [])
  */
 final class EntityWithRelationsFactory extends PersistentProxyObjectFactory
 {

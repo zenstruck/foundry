@@ -15,7 +15,7 @@ use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\RepositoryProxy;
+use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 
 /**
  * @internal
@@ -43,7 +43,7 @@ final class MakeFactoryData
 
         if ($repository) {
             $this->uses[] = $repository->getName();
-            $this->uses[] = RepositoryProxy::class;
+            $this->uses[] = RepositoryDecorator::class;
         }
 
         $this->methodsInPHPDoc = MakeFactoryPHPDocMethod::createAll($this);
