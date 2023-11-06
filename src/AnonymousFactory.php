@@ -12,6 +12,8 @@
 namespace Zenstruck\Foundry;
 
 use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Persistence\RepositoryDecorator;
+use Zenstruck\Foundry\Persistence\RepositoryAssertions;
 
 /**
  * @template TModel of object
@@ -64,7 +66,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
-     * @see RepositoryProxy::first()
+     * @see RepositoryDecorator::first()
      *
      * @throws \RuntimeException If no entities exist
      */
@@ -78,7 +80,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
-     * @see RepositoryProxy::last()
+     * @see RepositoryDecorator::last()
      *
      * @throws \RuntimeException If no entities exist
      */
@@ -92,7 +94,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
-     * @see RepositoryProxy::random()
+     * @see RepositoryDecorator::random()
      */
     public function random(array $attributes = []): Proxy
     {
@@ -115,7 +117,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
-     * @see RepositoryProxy::randomSet()
+     * @see RepositoryDecorator::randomSet()
      *
      * @return object[]
      */
@@ -125,7 +127,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
-     * @see RepositoryProxy::randomRange()
+     * @see RepositoryDecorator::randomRange()
      *
      * @return object[]
      */
@@ -135,7 +137,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
-     * @see RepositoryProxy::count()
+     * @see RepositoryDecorator::count()
      */
     public function count(): int
     {
@@ -148,7 +150,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
-     * @see RepositoryProxy::truncate()
+     * @see RepositoryDecorator::truncate()
      */
     public function truncate(): void
     {
@@ -156,7 +158,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
-     * @see RepositoryProxy::findAll()
+     * @see RepositoryDecorator::findAll()
      *
      * @return object[]
      */
@@ -166,7 +168,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
-     * @see RepositoryProxy::find()
+     * @see RepositoryDecorator::find()
      *
      * @phpstan-param Proxy<TModel>|array|mixed $criteria
      *
@@ -182,7 +184,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
-     * @see RepositoryProxy::findBy()
+     * @see RepositoryDecorator::findBy()
      *
      * @return object[]
      */
@@ -197,9 +199,9 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
-     * @phpstan-return RepositoryProxy<TModel>
+     * @phpstan-return RepositoryDecorator<TModel>
      */
-    public function repository(): RepositoryProxy
+    public function repository(): RepositoryDecorator
     {
         return self::configuration()->repositoryFor($this->class);
     }

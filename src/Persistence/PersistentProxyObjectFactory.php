@@ -6,8 +6,6 @@ namespace Zenstruck\Foundry\Persistence;
 
 use Zenstruck\Foundry\Exception\FoundryBootException;
 use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\RepositoryAssertions;
-use Zenstruck\Foundry\RepositoryProxy;
 
 /**
  * @template TModel of object
@@ -122,7 +120,7 @@ abstract class PersistentProxyObjectFactory extends Factory
     }
 
     /**
-     * @see RepositoryProxy::first()
+     * @see RepositoryDecorator::first()
      *
      * @return Proxy<TModel>&TModel
      * @phpstan-return Proxy<TModel>
@@ -139,7 +137,7 @@ abstract class PersistentProxyObjectFactory extends Factory
     }
 
     /**
-     * @see RepositoryProxy::last()
+     * @see RepositoryDecorator::last()
      *
      * @return Proxy<TModel>&TModel
      * @phpstan-return Proxy<TModel>
@@ -156,7 +154,7 @@ abstract class PersistentProxyObjectFactory extends Factory
     }
 
     /**
-     * @see RepositoryProxy::random()
+     * @see RepositoryDecorator::random()
      *
      * @return Proxy<TModel>&TModel
      * @phpstan-return Proxy<TModel>
@@ -182,7 +180,7 @@ abstract class PersistentProxyObjectFactory extends Factory
     }
 
     /**
-     * @see RepositoryProxy::randomSet()
+     * @see RepositoryDecorator::randomSet()
      *
      * @return list<TModel&Proxy<TModel>>
      * @phpstan-return list<Proxy<TModel>>
@@ -193,7 +191,7 @@ abstract class PersistentProxyObjectFactory extends Factory
     }
 
     /**
-     * @see RepositoryProxy::randomRange()
+     * @see RepositoryDecorator::randomRange()
      *
      * @return list<TModel&Proxy<TModel>>
      * @phpstan-return list<Proxy<TModel>>
@@ -204,7 +202,7 @@ abstract class PersistentProxyObjectFactory extends Factory
     }
 
     /**
-     * @see RepositoryProxy::count()
+     * @see RepositoryDecorator::count()
      */
     final public static function count(array $criteria = []): int
     {
@@ -212,7 +210,7 @@ abstract class PersistentProxyObjectFactory extends Factory
     }
 
     /**
-     * @see RepositoryProxy::truncate()
+     * @see RepositoryDecorator::truncate()
      */
     final public static function truncate(): void
     {
@@ -220,7 +218,7 @@ abstract class PersistentProxyObjectFactory extends Factory
     }
 
     /**
-     * @see RepositoryProxy::findAll()
+     * @see RepositoryDecorator::findAll()
      *
      * @return list<TModel&Proxy<TModel>>
      * @phpstan-return list<Proxy<TModel>>
@@ -231,7 +229,7 @@ abstract class PersistentProxyObjectFactory extends Factory
     }
 
     /**
-     * @see RepositoryProxy::find()
+     * @see RepositoryDecorator::find()
      *
      * @phpstan-param Proxy<TModel>|array|mixed $criteria
      * @phpstan-return Proxy<TModel>
@@ -250,7 +248,7 @@ abstract class PersistentProxyObjectFactory extends Factory
     }
 
     /**
-     * @see RepositoryProxy::findBy()
+     * @see RepositoryDecorator::findBy()
      *
      * @return list<TModel&Proxy<TModel>>
      * @phpstan-return list<Proxy<TModel>>
@@ -270,9 +268,9 @@ abstract class PersistentProxyObjectFactory extends Factory
     }
 
     /**
-     * @phpstan-return RepositoryProxy<TModel>
+     * @phpstan-return RepositoryDecorator<TModel>
      */
-    final public static function repository(): RepositoryProxy
+    final public static function repository(): RepositoryDecorator
     {
         return static::configuration()->repositoryFor(static::class());
     }

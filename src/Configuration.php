@@ -17,6 +17,7 @@ use Doctrine\Persistence\ObjectManager;
 use Faker;
 use Zenstruck\Foundry\Exception\FoundryBootException;
 use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 
 /**
  * @internal
@@ -176,9 +177,9 @@ final class Configuration
     /**
      * @template TObject of object
      * @phpstan-param Proxy<TObject>|TObject|class-string<TObject> $objectOrClass
-     * @phpstan-return RepositoryProxy<TObject>
+     * @phpstan-return RepositoryDecorator<TObject>
      */
-    public function repositoryFor(object|string $objectOrClass): RepositoryProxy
+    public function repositoryFor(object|string $objectOrClass): RepositoryDecorator
     {
         if (!$this->isPersistEnabled()) {
             throw new \RuntimeException('Cannot get repository when persist is disabled.');
@@ -199,7 +200,7 @@ final class Configuration
             throw new \RuntimeException(\sprintf('No repository registered for "%s".', $objectOrClass));
         }
 
-        return new RepositoryProxy($repository);
+        return new RepositoryDecorator($repository);
     }
 
     public function objectManagerFor(object|string $objectOrClass): ObjectManager

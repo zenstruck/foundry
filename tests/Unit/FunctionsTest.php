@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\LazyValue;
 use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\RepositoryProxy;
+use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
@@ -148,6 +148,6 @@ final class FunctionsTest extends TestCase
 
         Factory::configuration()->setManagerRegistry($registry);
 
-        $this->assertInstanceOf(RepositoryProxy::class, repository(new Category()));
+        $this->assertInstanceOf(RepositoryDecorator::class, repository(new Category()));
     }
 }
