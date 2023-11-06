@@ -40,6 +40,7 @@ use Zenstruck\Foundry\Tests\Fixtures\PHP81\EntityWithEnum;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ * @group maker
  */
 final class MakeFactoryTest extends MakerTestCase
 {
