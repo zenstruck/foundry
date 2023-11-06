@@ -14,27 +14,27 @@ namespace App\Factory;
 use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\RepositoryProxy;
+use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Comment;
 
 /**
  * @extends PersistentProxyObjectFactory<Comment>
  *
- * @method        Comment|Proxy                    create(array|callable $attributes = [])
- * @method static Comment|Proxy                    createOne(array $attributes = [])
- * @method static Comment|Proxy                    find(object|array|mixed $criteria)
- * @method static Comment|Proxy                    findOrCreate(array $attributes)
- * @method static Comment|Proxy                    first(string $sortedField = 'id')
- * @method static Comment|Proxy                    last(string $sortedField = 'id')
- * @method static Comment|Proxy                    random(array $attributes = [])
- * @method static Comment|Proxy                    randomOrCreate(array $attributes = [])
- * @method static EntityRepository|RepositoryProxy repository()
- * @method static Comment[]|Proxy[]                all()
- * @method static Comment[]|Proxy[]                createMany(int $number, array|callable $attributes = [])
- * @method static Comment[]|Proxy[]                createSequence(iterable|callable $sequence)
- * @method static Comment[]|Proxy[]                findBy(array $attributes)
- * @method static Comment[]|Proxy[]                randomRange(int $min, int $max, array $attributes = [])
- * @method static Comment[]|Proxy[]                randomSet(int $number, array $attributes = [])
+ * @method        Comment|Proxy                        create(array|callable $attributes = [])
+ * @method static Comment|Proxy                        createOne(array $attributes = [])
+ * @method static Comment|Proxy                        find(object|array|mixed $criteria)
+ * @method static Comment|Proxy                        findOrCreate(array $attributes)
+ * @method static Comment|Proxy                        first(string $sortedField = 'id')
+ * @method static Comment|Proxy                        last(string $sortedField = 'id')
+ * @method static Comment|Proxy                        random(array $attributes = [])
+ * @method static Comment|Proxy                        randomOrCreate(array $attributes = [])
+ * @method static EntityRepository|RepositoryDecorator repository()
+ * @method static Comment[]|Proxy[]                    all()
+ * @method static Comment[]|Proxy[]                    createMany(int $number, array|callable $attributes = [])
+ * @method static Comment[]|Proxy[]                    createSequence(iterable|callable $sequence)
+ * @method static Comment[]|Proxy[]                    findBy(array $attributes)
+ * @method static Comment[]|Proxy[]                    randomRange(int $min, int $max, array $attributes = [])
+ * @method static Comment[]|Proxy[]                    randomSet(int $number, array $attributes = [])
  */
 final class CommentFactory extends PersistentProxyObjectFactory
 {

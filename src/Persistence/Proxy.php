@@ -19,7 +19,6 @@ use Zenstruck\Callback;
 use Zenstruck\Callback\Parameter;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\Instantiator;
-use Zenstruck\Foundry\RepositoryProxy;
 
 /**
  * @template TProxiedObject of object
@@ -287,14 +286,14 @@ class Proxy implements \Stringable
     /**
      * @deprecated
      */
-    public function repository(): RepositoryProxy
+    public function repository(): RepositoryDecorator
     {
         trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_repository()" instead.', __METHOD__, self::class));
 
         return $this->_repository();
     }
 
-    public function _repository(): RepositoryProxy
+    public function _repository(): RepositoryDecorator
     {
         return Factory::configuration()->repositoryFor($this->class);
     }

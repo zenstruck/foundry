@@ -13,28 +13,28 @@ namespace App\Factory;
 
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\RepositoryProxy;
+use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Repository\PostRepository;
 
 /**
  * @extends PersistentProxyObjectFactory<Post>
  *
- * @method        Post|Proxy                     create(array|callable $attributes = [])
- * @method static Post|Proxy                     createOne(array $attributes = [])
- * @method static Post|Proxy                     find(object|array|mixed $criteria)
- * @method static Post|Proxy                     findOrCreate(array $attributes)
- * @method static Post|Proxy                     first(string $sortedField = 'id')
- * @method static Post|Proxy                     last(string $sortedField = 'id')
- * @method static Post|Proxy                     random(array $attributes = [])
- * @method static Post|Proxy                     randomOrCreate(array $attributes = [])
- * @method static PostRepository|RepositoryProxy repository()
- * @method static Post[]|Proxy[]                 all()
- * @method static Post[]|Proxy[]                 createMany(int $number, array|callable $attributes = [])
- * @method static Post[]|Proxy[]                 createSequence(iterable|callable $sequence)
- * @method static Post[]|Proxy[]                 findBy(array $attributes)
- * @method static Post[]|Proxy[]                 randomRange(int $min, int $max, array $attributes = [])
- * @method static Post[]|Proxy[]                 randomSet(int $number, array $attributes = [])
+ * @method        Post|Proxy                         create(array|callable $attributes = [])
+ * @method static Post|Proxy                         createOne(array $attributes = [])
+ * @method static Post|Proxy                         find(object|array|mixed $criteria)
+ * @method static Post|Proxy                         findOrCreate(array $attributes)
+ * @method static Post|Proxy                         first(string $sortedField = 'id')
+ * @method static Post|Proxy                         last(string $sortedField = 'id')
+ * @method static Post|Proxy                         random(array $attributes = [])
+ * @method static Post|Proxy                         randomOrCreate(array $attributes = [])
+ * @method static PostRepository|RepositoryDecorator repository()
+ * @method static Post[]|Proxy[]                     all()
+ * @method static Post[]|Proxy[]                     createMany(int $number, array|callable $attributes = [])
+ * @method static Post[]|Proxy[]                     createSequence(iterable|callable $sequence)
+ * @method static Post[]|Proxy[]                     findBy(array $attributes)
+ * @method static Post[]|Proxy[]                     randomRange(int $min, int $max, array $attributes = [])
+ * @method static Post[]|Proxy[]                     randomSet(int $number, array $attributes = [])
  *
  * @phpstan-method        Proxy<Post> create(array|callable $attributes = [])
  * @phpstan-method static Proxy<Post> createOne(array $attributes = [])
@@ -44,7 +44,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Repository\PostRepository;
  * @phpstan-method static Proxy<Post> last(string $sortedField = 'id')
  * @phpstan-method static Proxy<Post> random(array $attributes = [])
  * @phpstan-method static Proxy<Post> randomOrCreate(array $attributes = [])
- * @phpstan-method static RepositoryProxy<Post> repository()
+ * @phpstan-method static RepositoryDecorator<Post> repository()
  * @phpstan-method static list<Proxy<Post>> all()
  * @phpstan-method static list<Proxy<Post>> createMany(int $number, array|callable $attributes = [])
  * @phpstan-method static list<Proxy<Post>> createSequence(iterable|callable $sequence)

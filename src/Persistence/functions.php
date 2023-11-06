@@ -11,10 +11,8 @@
 
 namespace Zenstruck\Foundry\Persistence;
 
-use Doctrine\Persistence\ObjectRepository;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\RepositoryProxy;
 use function Zenstruck\Foundry\anonymous;
 
 /**
@@ -24,9 +22,9 @@ use function Zenstruck\Foundry\anonymous;
  *
  * @param class-string<TObject> $class
  *
- * @return RepositoryProxy<TObject>
+ * @return RepositoryDecorator<TObject>
  */
-function repository(string $class): RepositoryProxy
+function repository(string $class): RepositoryDecorator
 {
     return Factory::configuration()->repositoryFor($class);
 }

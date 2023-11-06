@@ -22,7 +22,7 @@ use function Zenstruck\Foundry\Persistence\repository;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class ORMRepositoryProxyTest extends RepositoryProxyTest
+final class ORMRepositoryDecoratorTest extends RepositoryDecoratorTest
 {
     protected function setUp(): void
     {

@@ -59,8 +59,8 @@ final class MakeFactoryPHPDocMethod
 
         if ($this->repository) {
             $returnType = match ((bool) $staticAnalysisTool) {
-                false => "{$this->repository}|RepositoryProxy",
-                true => "RepositoryProxy<{$this->objectName}>",
+                false => "{$this->repository}|RepositoryDecorator",
+                true => "RepositoryDecorator<{$this->objectName}>",
             };
         } else {
             /** @phpstan-ignore-next-line */
