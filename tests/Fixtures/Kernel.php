@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Tests\Fixtures;
 
 use DAMA\DoctrineTestBundle\DAMADoctrineTestBundle;
@@ -129,7 +138,7 @@ class Kernel extends BaseKernel
                 ],
             ];
 
-            if (PHP_VERSION_ID >= 80100) {
+            if (\PHP_VERSION_ID >= 80100) {
                 $mappings['Test8.1'] = [
                     'is_bundle' => false,
                     'type' => 'attribute',
@@ -146,7 +155,7 @@ class Kernel extends BaseKernel
                     'orm' => [
                         'auto_generate_proxy_classes' => true,
                         'auto_mapping' => true,
-                        'mappings' => $mappings
+                        'mappings' => $mappings,
                     ],
                 ]
             );
@@ -196,7 +205,7 @@ class Kernel extends BaseKernel
                 ],
             ];
 
-            if (PHP_VERSION_ID >= 80100) {
+            if (\PHP_VERSION_ID >= 80100) {
                 $mappings['Test8.1'] = [
                     'is_bundle' => false,
                     'type' => 'attribute',

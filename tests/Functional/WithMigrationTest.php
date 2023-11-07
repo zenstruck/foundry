@@ -24,8 +24,8 @@ use Zenstruck\Foundry\Tests\Fixtures\Kernel;
 
 final class WithMigrationTest extends KernelTestCase
 {
-    use ResetDatabase;
     use Factories;
+    use ResetDatabase;
 
     /**
      * @test

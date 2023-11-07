@@ -1,24 +1,33 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Tests\Fixtures\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Brand;
 
 #[ORM\Entity]
-#[ORM\Table(name: "entity_with_relations")]
+#[ORM\Table(name: 'entity_with_relations')]
 class EntityWithRelations
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\OneToOne(targetEntity: Category::class, cascade: ["persist", "remove"])]
+    #[ORM\OneToOne(targetEntity: Category::class, cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
     private $oneToOne;
 
-    #[ORM\OneToOne(targetEntity: Category::class, cascade: ["persist", "remove"])]
+    #[ORM\OneToOne(targetEntity: Category::class, cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: true)]
     private $oneToOneNullable;
 
@@ -40,6 +49,6 @@ class EntityWithRelations
     #[ORM\JoinColumn(nullable: false)]
     private $manyToOneWithNotExistingFactory;
 
-    #[ORM\OneToMany(targetEntity: EntityForRelations::class, mappedBy: "manyToOne")]
+    #[ORM\OneToMany(targetEntity: EntityForRelations::class, mappedBy: 'manyToOne')]
     private $oneToMany;
 }

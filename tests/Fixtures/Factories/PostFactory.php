@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
 use Zenstruck\Foundry\Instantiator;
@@ -35,7 +44,7 @@ class PostFactory extends ModelFactory
             ->instantiateWith(
                 (new Instantiator())->allowExtraAttributes(['extraCategoryBeforeInstantiate', 'extraCategoryAfterInstantiate'])
             )
-            ->beforeInstantiate(function (array $attributes): array {
+            ->beforeInstantiate(function(array $attributes): array {
                 if (isset($attributes['extraCategoryBeforeInstantiate'])) {
                     $attributes['category'] = $attributes['extraCategoryBeforeInstantiate'];
                 }
@@ -43,7 +52,7 @@ class PostFactory extends ModelFactory
 
                 return $attributes;
             })
-            ->afterInstantiate(function (Post $object, array $attributes): void {
+            ->afterInstantiate(function(Post $object, array $attributes): void {
                 if (isset($attributes['extraCategoryAfterInstantiate'])) {
                     $object->setCategory($attributes['extraCategoryAfterInstantiate']);
                 }

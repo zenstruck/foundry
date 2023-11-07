@@ -57,7 +57,7 @@ final class ORMDatabaseResetterTest extends KernelTestCase
     {
         yield [ORMDatabaseResetter::RESET_MODE_SCHEMA];
 
-        if (getenv('TEST_MIGRATIONS')) {
+        if (\getenv('TEST_MIGRATIONS')) {
             yield [ORMDatabaseResetter::RESET_MODE_MIGRATE];
         }
     }

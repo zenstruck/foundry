@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Tests\Fixtures\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -7,24 +16,24 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-#[ORM\Table(name: "tags")]
+#[ORM\Table(name: 'tags')]
 class Tag
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
     /**
      * @var mixed|null
      */
-    #[ORM\Column(type: "string", length: 255)]
+    #[ORM\Column(type: 'string', length: 255)]
     private ?string $name = null;
 
-    #[ORM\ManyToMany(targetEntity: Post::class, mappedBy: "tags")]
+    #[ORM\ManyToMany(targetEntity: Post::class, mappedBy: 'tags')]
     private Collection $posts;
 
-    #[ORM\ManyToMany(targetEntity: Post::class, mappedBy: "secondaryTags")]
+    #[ORM\ManyToMany(targetEntity: Post::class, mappedBy: 'secondaryTags')]
     private Collection $secondaryPosts;
 
     public function __construct()

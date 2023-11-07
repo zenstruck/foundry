@@ -1,10 +1,10 @@
-<?= "<?php\n" ?>
+<?php echo "<?php\n"; ?>
 
-namespace <?= $namespace; ?>;
+namespace <?php echo $namespace; ?>;
 
 use Zenstruck\Foundry\Story;
 
-final class <?= $class_name ?> extends Story
+final class <?php echo $class_name; ?> extends Story
 {
     public function build(): void
     {

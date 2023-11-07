@@ -1,15 +1,15 @@
-<?php /** @var \Zenstruck\Foundry\Bundle\Maker\Factory\MakeFactoryData $makeFactoryData */?><?= "<?php\n" ?>
+<?php /** @var \Zenstruck\Foundry\Bundle\Maker\Factory\MakeFactoryData $makeFactoryData */ ?><?php echo "<?php\n"; ?>
 
-namespace <?= $namespace ?>;
+namespace <?php echo $namespace; ?>;
 
 <?php
 foreach ($makeFactoryData->getUses() as $use) {
-    echo "use $use;\n";
+    echo "use {$use};\n";
 }
 ?>
 
 /**
- * @extends ModelFactory<<?= $makeFactoryData->getObjectShortName() ?>>
+ * @extends ModelFactory<<?php echo $makeFactoryData->getObjectShortName(); ?>>
  *
 <?php
 foreach ($makeFactoryData->getMethodsPHPDoc() as $methodPHPDoc) {
@@ -25,7 +25,7 @@ if ($makeFactoryData->hasStaticAnalysisTool()) {
 }
 ?>
  */
-final class <?= $class_name ?> extends ModelFactory
+final class <?php echo $class_name; ?> extends ModelFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -59,15 +59,15 @@ foreach ($makeFactoryData->getDefaultProperties() as $propertyName => $value) {
     protected function initialize(): self
     {
         return $this
-<?php if (!$makeFactoryData->isPersisted()): ?>
+<?php if (!$makeFactoryData->isPersisted()) { ?>
             ->withoutPersisting()
-<?php endif ?>
-            // ->afterInstantiate(function(<?= $makeFactoryData->getObjectShortName() ?> $<?= lcfirst($makeFactoryData->getObjectShortName()) ?>): void {})
+<?php } ?>
+            // ->afterInstantiate(function(<?php echo $makeFactoryData->getObjectShortName(); ?> $<?php echo \lcfirst($makeFactoryData->getObjectShortName()); ?>): void {})
         ;
     }
 
     protected static function getClass(): string
     {
-        return <?= $makeFactoryData->getObjectShortName() ?>::class;
+        return <?php echo $makeFactoryData->getObjectShortName(); ?>::class;
     }
 }

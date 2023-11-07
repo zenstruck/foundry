@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Tests\Fixtures\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -8,69 +17,69 @@ use Doctrine\ORM\Mapping as ORM;
 use Zenstruck\Foundry\Tests\Fixtures\Repository\PostRepository;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
-#[ORM\Table(name: "posts")]
-#[ORM\InheritanceType(value: "SINGLE_TABLE")]
-#[ORM\DiscriminatorColumn(name: "type")]
-#[ORM\DiscriminatorMap(["simple" => Post::class, "specific" => SpecificPost::class])]
+#[ORM\Table(name: 'posts')]
+#[ORM\InheritanceType(value: 'SINGLE_TABLE')]
+#[ORM\DiscriminatorColumn(name: 'type')]
+#[ORM\DiscriminatorMap(['simple' => Post::class, 'specific' => SpecificPost::class])]
 class Post implements \Stringable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\Column(type: "string", length: 255)]
+    #[ORM\Column(type: 'string', length: 255)]
     private string $title;
 
-    #[ORM\Column(type: "text")]
+    #[ORM\Column(type: 'text')]
     private string $body;
 
-    #[ORM\Column(type: "string", length: 255, nullable: true)]
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $shortDescription;
 
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(type: 'integer')]
     private int $viewCount = 0;
 
-    #[ORM\Column(type: "datetime")]
+    #[ORM\Column(type: 'datetime')]
     private \DateTime $createdAt;
 
-    #[ORM\Column(type: "datetime", nullable: true)]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTime $publishedAt = null;
 
-    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: "posts")]
+    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'posts')]
     #[ORM\JoinColumn]
     private ?Category $category = null;
 
-    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: "secondaryPosts")]
-    #[ORM\JoinColumn(name: "secondary_category_id")]
+    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'secondaryPosts')]
+    #[ORM\JoinColumn(name: 'secondary_category_id')]
     private ?Category $secondaryCategory = null;
 
-    #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: "posts")]
+    #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: 'posts')]
     private Collection $tags;
 
-    #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: "secondaryPosts")]
-    #[ORM\JoinTable(name: "post_tag_secondary")]
+    #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: 'secondaryPosts')]
+    #[ORM\JoinTable(name: 'post_tag_secondary')]
     private Collection $secondaryTags;
 
-    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: "post")]
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'post')]
     private Collection $comments;
 
-    #[ORM\OneToOne(targetEntity: Post::class, inversedBy: "mostRelevantRelatedToPost")]
+    #[ORM\OneToOne(targetEntity: self::class, inversedBy: 'mostRelevantRelatedToPost')]
     private ?Post $mostRelevantRelatedPost = null;
 
-    #[ORM\OneToOne(targetEntity: Post::class, mappedBy: "mostRelevantRelatedPost")]
+    #[ORM\OneToOne(targetEntity: self::class, mappedBy: 'mostRelevantRelatedPost')]
     private ?Post $mostRelevantRelatedToPost = null;
 
-    #[ORM\OneToOne(targetEntity: Post::class, inversedBy: "lessRelevantRelatedToPost")]
+    #[ORM\OneToOne(targetEntity: self::class, inversedBy: 'lessRelevantRelatedToPost')]
     private ?Post $lessRelevantRelatedPost = null;
 
-    #[ORM\OneToOne(targetEntity: Post::class, mappedBy: "lessRelevantRelatedPost")]
+    #[ORM\OneToOne(targetEntity: self::class, mappedBy: 'lessRelevantRelatedPost')]
     private ?Post $lessRelevantRelatedToPost = null;
 
-    #[ORM\ManyToMany(targetEntity: Post::class, inversedBy: "relatedToPosts")]
+    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'relatedToPosts')]
     private Collection $relatedPosts;
 
-    #[ORM\ManyToMany(targetEntity: Post::class, mappedBy: "relatedPosts")]
+    #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'relatedPosts')]
     private Collection $relatedToPosts;
 
     public function __construct(string $title, string $body, ?string $shortDescription = null)
