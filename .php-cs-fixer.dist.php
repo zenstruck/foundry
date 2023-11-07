@@ -1,11 +1,5 @@
 <?php
 
-$finder = PhpCsFixer\Finder::create()
-    ->in([__DIR__.'/src', __DIR__.'/tests'])
-    ->notName('*.tpl.php')
-    ->exclude('Fixtures/')
-;
-
 $file = __DIR__.'/.php-cs-fixer.temp.php';
 
 \file_put_contents(
