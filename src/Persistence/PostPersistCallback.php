@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Persistence;
 
-use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Persistence\Proxy;
 
 /**
  * @internal

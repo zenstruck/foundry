@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Foundry;
 
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+
 /**
  * @internal
  *
@@ -19,16 +21,16 @@ namespace Zenstruck\Foundry;
 final class ModelFactoryManager
 {
     /**
-     * @param ModelFactory[] $factories
+     * @param PersistentProxyObjectFactory[] $factories
      */
     public function __construct(private iterable $factories)
     {
     }
 
     /**
-     * @param class-string<ModelFactory> $class
+     * @param class-string<PersistentProxyObjectFactory> $class
      */
-    public function create(string $class): ModelFactory
+    public function create(string $class): PersistentProxyObjectFactory
     {
         foreach ($this->factories as $factory) {
             if ($class === $factory::class) {

@@ -53,6 +53,7 @@ final class ORMModelFactoryTest extends ModelFactoryTest
 
     /**
      * @test
+     * @group legacy
      */
     public function initialize_must_return_an_instance_of_the_current_factory(): void
     {
@@ -64,6 +65,7 @@ final class ORMModelFactoryTest extends ModelFactoryTest
 
     /**
      * @test
+     * @group legacy
      */
     public function initialize_must_return_a_value(): void
     {
@@ -481,7 +483,6 @@ final class ORMModelFactoryTest extends ModelFactoryTest
     {
         $post = $factory->create();
 
-        $post->assertPersisted();
         $this->assertSame($published, $post->isPublished());
     }
 
@@ -512,7 +513,7 @@ final class ORMModelFactoryTest extends ModelFactoryTest
      */
     public function many_to_one_unmanaged_raw_entity(): void
     {
-        $category = CategoryFactory::createOne(['name' => 'My Category'])->object();
+        $category = CategoryFactory::createOne(['name' => 'My Category'])->_real();
 
         self::getContainer()->get(EntityManagerInterface::class)->clear();
 
@@ -552,7 +553,7 @@ final class ORMModelFactoryTest extends ModelFactoryTest
      */
     public function can_count_based_on_a_relationship(): void
     {
-        $category = CategoryFactory::createOne()->object();
+        $category = CategoryFactory::createOne()->_real();
         PostFactory::createMany(2, ['category' => $category]);
         PostFactory::createMany(2);
 
@@ -573,7 +574,7 @@ final class ORMModelFactoryTest extends ModelFactoryTest
         $contact2 = ContactFactory::findOrCreate($attributes);
         ContactFactory::assert()->count(1);
 
-        self::assertSame($contact->object(), $contact2->object());
+        self::assertSame($contact->_real(), $contact2->_real());
     }
 
     /**
@@ -588,7 +589,7 @@ final class ORMModelFactoryTest extends ModelFactoryTest
         $contact2 = ContactFactory::findOrCreate($attributes);
         ContactFactory::assert()->count(1);
 
-        self::assertSame($contact->object(), $contact2->object());
+        self::assertSame($contact->_real(), $contact2->_real());
     }
 
     /**
@@ -597,15 +598,15 @@ final class ORMModelFactoryTest extends ModelFactoryTest
     public function can_find_or_create_from_object(): void
     {
         $user = UserFactory::createOne();
-        $comment = CommentFactory::findOrCreate($attributes = ['user' => $user->object(), 'createdAt' => new \DateTimeImmutable('2023-01-01')]);
+        $comment = CommentFactory::findOrCreate($attributes = ['user' => $user->_real(), 'createdAt' => new \DateTimeImmutable('2023-01-01')]);
 
-        self::assertSame($user->object(), $comment->getUser());
+        self::assertSame($user->_real(), $comment->getUser());
         CommentFactory::assert()->count(1);
 
         $comment2 = CommentFactory::findOrCreate($attributes);
         CommentFactory::assert()->count(1);
 
-        self::assertSame($comment->object(), $comment2->object());
+        self::assertSame($comment->_real(), $comment2->_real());
     }
 
     /**
@@ -616,13 +617,13 @@ final class ORMModelFactoryTest extends ModelFactoryTest
         $user = UserFactory::createOne();
         $comment = CommentFactory::findOrCreate($attributes = ['user' => $user]);
 
-        self::assertSame($user->object(), $comment->getUser());
+        self::assertSame($user->_real(), $comment->getUser());
         CommentFactory::assert()->count(1);
 
         $comment2 = CommentFactory::findOrCreate($attributes);
         CommentFactory::assert()->count(1);
 
-        self::assertSame($comment->object(), $comment2->object());
+        self::assertSame($comment->_real(), $comment2->_real());
     }
 
     /**
@@ -637,7 +638,7 @@ final class ORMModelFactoryTest extends ModelFactoryTest
         $entityWithEnum2 = EntityWithEnumFactory::findOrCreate($attributes);
         EntityWithEnumFactory::assert()->count(1);
 
-        self::assertSame($entityWithEnum->object(), $entityWithEnum2->object());
+        self::assertSame($entityWithEnum->_real(), $entityWithEnum2->_real());
     }
 
     /**

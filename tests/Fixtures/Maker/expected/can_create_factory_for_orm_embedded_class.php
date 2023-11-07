@@ -11,19 +11,19 @@
 
 namespace App\Factory;
 
-use Zenstruck\Foundry\ModelFactory;
-use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
 
 /**
- * @extends ModelFactory<Address>
+ * @extends PersistentProxyObjectFactory<Address>
  *
  * @method        Address|Proxy     create(array|callable $attributes = [])
  * @method static Address|Proxy     createOne(array $attributes = [])
  * @method static Address[]|Proxy[] createMany(int $number, array|callable $attributes = [])
  * @method static Address[]|Proxy[] createSequence(iterable|callable $sequence)
  */
-final class AddressFactory extends ModelFactory
+final class AddressFactory extends PersistentProxyObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -32,7 +32,11 @@ final class AddressFactory extends ModelFactory
      */
     public function __construct()
     {
-        parent::__construct();
+    }
+
+    public static function class(): string
+    {
+        return Address::class;
     }
 
     /**
@@ -40,7 +44,7 @@ final class AddressFactory extends ModelFactory
      *
      * @todo add your default values here
      */
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [
             'value' => self::faker()->sentence(),
@@ -50,16 +54,11 @@ final class AddressFactory extends ModelFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
      */
-    protected function initialize(): self
+    protected function initialize(): static
     {
         return $this
             ->withoutPersisting()
             // ->afterInstantiate(function(Address $address): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return Address::class;
     }
 }

@@ -27,7 +27,7 @@ final class InstantiatorTest extends TestCase
      */
     public function default_instantiate(): void
     {
-        $object = (new Instantiator())([
+        $object = Instantiator::withConstructor()([
             'propA' => 'A',
             'propB' => 'B',
             'propC' => 'C',
@@ -49,7 +49,7 @@ final class InstantiatorTest extends TestCase
     {
         $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using a differently cased attribute is deprecated, use the same case as the object property instead.');
 
-        $object = (new Instantiator())([
+        $object = Instantiator::withConstructor()([
             'prop_a' => 'A',
             'prop_b' => 'B',
             'prop_c' => 'C',
@@ -71,7 +71,7 @@ final class InstantiatorTest extends TestCase
     {
         $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using a differently cased attribute is deprecated, use the same case as the object property instead.');
 
-        $object = (new Instantiator())([
+        $object = Instantiator::withConstructor()([
             'prop-a' => 'A',
             'prop-b' => 'B',
             'prop-c' => 'C',
@@ -90,7 +90,7 @@ final class InstantiatorTest extends TestCase
      */
     public function can_leave_off_default_constructor_argument(): void
     {
-        $object = (new Instantiator())([
+        $object = Instantiator::withConstructor()([
             'propB' => 'B',
         ], InstantiatorDummy::class);
 
@@ -103,7 +103,27 @@ final class InstantiatorTest extends TestCase
      */
     public function can_instantiate_object_with_private_constructor(): void
     {
-        $object = (new Instantiator())([
+        $object = Instantiator::withoutConstructor()([
+            'propA' => 'A',
+            'propB' => 'B',
+            'propC' => 'C',
+            'propD' => 'D',
+        ], PrivateConstructorInstantiatorDummy::class);
+
+        $this->assertSame('A', $object->propA);
+        $this->assertSame('A', $object->getPropA());
+        $this->assertSame('setter B', $object->getPropB());
+        $this->assertSame('setter C', $object->getPropC());
+        $this->assertSame('setter D', $object->getPropD());
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    public function can_instantiate_object_with_private_constructor_and_instantiator_configured_without_constructor(): void
+    {
+        $object = Instantiator::withConstructor()([
             'propA' => 'A',
             'propB' => 'B',
             'propC' => 'C',
@@ -125,7 +145,7 @@ final class InstantiatorTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Missing constructor argument "propB" for "Zenstruck\Foundry\Tests\Unit\InstantiatorDummy".');
 
-        (new Instantiator())([], InstantiatorDummy::class);
+        Instantiator::withConstructor()([], InstantiatorDummy::class);
     }
 
     /**
@@ -136,7 +156,7 @@ final class InstantiatorTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot set attribute "extra" for object "Zenstruck\Foundry\Tests\Unit\InstantiatorDummy" (not public and no setter).');
 
-        (new Instantiator())([
+        Instantiator::withConstructor()([
             'propB' => 'B',
             'extra' => 'foo',
         ], InstantiatorDummy::class);
@@ -147,7 +167,7 @@ final class InstantiatorTest extends TestCase
      */
     public function can_set_attributes_that_should_be_optional(): void
     {
-        $object = (new Instantiator())->allowExtraAttributes(['extra'])([
+        $object = Instantiator::withConstructor()->allowExtraAttributes(['extra'])([
             'propB' => 'B',
             'extra' => 'foo',
         ], InstantiatorDummy::class);
@@ -163,7 +183,7 @@ final class InstantiatorTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot set attribute "extra2" for object "Zenstruck\Foundry\Tests\Unit\InstantiatorDummy" (not public and no setter).');
 
-        (new Instantiator())->allowExtraAttributes(['extra1'])([
+        Instantiator::withConstructor()->allowExtraAttributes(['extra1'])([
             'propB' => 'B',
             'extra1' => 'foo',
             'extra2' => 'bar',
@@ -178,7 +198,7 @@ final class InstantiatorTest extends TestCase
     {
         $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using "optional:" attribute prefixes is deprecated, use Instantiator::allowExtraAttributes() instead (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#instantiation).');
 
-        $object = (new Instantiator())([
+        $object = Instantiator::withConstructor()([
             'propB' => 'B',
             'optional:extra' => 'foo',
         ], InstantiatorDummy::class);
@@ -191,7 +211,7 @@ final class InstantiatorTest extends TestCase
      */
     public function can_always_allow_extra_attributes(): void
     {
-        $object = (new Instantiator())->allowExtraAttributes()([
+        $object = Instantiator::withConstructor()->allowExtraAttributes()([
             'propB' => 'B',
             'extra' => 'foo',
         ], InstantiatorDummy::class);
@@ -204,7 +224,7 @@ final class InstantiatorTest extends TestCase
      */
     public function can_disable_constructor(): void
     {
-        $object = (new Instantiator())->withoutConstructor()([
+        $object = (Instantiator::withoutConstructor())([
             'propA' => 'A',
             'propB' => 'B',
             'propC' => 'C',
@@ -223,7 +243,7 @@ final class InstantiatorTest extends TestCase
      */
     public function can_set_attributes_that_should_be_force_set(): void
     {
-        $object = (new Instantiator())->withoutConstructor()->alwaysForceProperties(['propD'])([
+        $object = Instantiator::withoutConstructor()->alwaysForceProperties(['propD'])([
             'propB' => 'B',
             'propD' => 'D',
         ], InstantiatorDummy::class);
@@ -236,11 +256,31 @@ final class InstantiatorTest extends TestCase
      * @test
      * @group legacy
      */
+    public function can_disable_constructor_legacy(): void
+    {
+        $object = Instantiator::withConstructor()->withoutConstructor()([
+            'propA' => 'A',
+            'propB' => 'B',
+            'propC' => 'C',
+            'propD' => 'D',
+        ], InstantiatorDummy::class);
+
+        $this->assertSame('A', $object->propA);
+        $this->assertSame('A', $object->getPropA());
+        $this->assertSame('setter B', $object->getPropB());
+        $this->assertSame('setter C', $object->getPropC());
+        $this->assertSame('setter D', $object->getPropD());
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
     public function prefixing_attribute_key_with_force_sets_the_property_directly(): void
     {
         $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using "force:" property prefixes is deprecated, use Instantiator::alwaysForceProperties() instead (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#instantiation).');
 
-        $object = (new Instantiator())([
+        $object = Instantiator::withConstructor()([
             'propA' => 'A',
             'propB' => 'B',
             'propC' => 'C',
@@ -262,7 +302,7 @@ final class InstantiatorTest extends TestCase
     {
         $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using "force:" property prefixes is deprecated, use Instantiator::alwaysForceProperties() instead (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#instantiation).');
 
-        $object = (new Instantiator())([
+        $object = Instantiator::withConstructor()([
             'prop_a' => 'A',
             'prop_b' => 'B',
             'prop_c' => 'C',
@@ -284,7 +324,7 @@ final class InstantiatorTest extends TestCase
     {
         $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using "force:" property prefixes is deprecated, use Instantiator::alwaysForceProperties() instead (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#instantiation).');
 
-        $object = (new Instantiator())([
+        $object = Instantiator::withConstructor()([
             'prop-a' => 'A',
             'prop-b' => 'B',
             'prop-c' => 'C',
@@ -308,7 +348,7 @@ final class InstantiatorTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Class "Zenstruck\Foundry\Tests\Unit\InstantiatorDummy" does not have property "extra".');
 
-        (new Instantiator())([
+        Instantiator::withConstructor()([
             'propB' => 'B',
             'force:extra' => 'foo',
         ], InstantiatorDummy::class);
@@ -388,7 +428,7 @@ final class InstantiatorTest extends TestCase
      */
     public function can_use_always_force_mode(): void
     {
-        $object = (new Instantiator())->alwaysForceProperties()([
+        $object = Instantiator::withConstructor()->alwaysForceProperties()([
             'propA' => 'A',
             'propB' => 'B',
             'propC' => 'C',
@@ -410,7 +450,7 @@ final class InstantiatorTest extends TestCase
     {
         $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using a differently cased attribute is deprecated, use the same case as the object property instead.');
 
-        $object = (new Instantiator())->alwaysForceProperties()([
+        $object = Instantiator::withConstructor()->alwaysForceProperties()([
             'prop_a' => 'A',
             'prop_b' => 'B',
             'prop_c' => 'C',
@@ -432,7 +472,7 @@ final class InstantiatorTest extends TestCase
     {
         $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using a differently cased attribute is deprecated, use the same case as the object property instead.');
 
-        $object = (new Instantiator())->alwaysForceProperties()([
+        $object = Instantiator::withConstructor()->alwaysForceProperties()([
             'prop-a' => 'A',
             'prop-b' => 'B',
             'prop-c' => 'C',
@@ -454,7 +494,7 @@ final class InstantiatorTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Class "Zenstruck\Foundry\Tests\Unit\InstantiatorDummy" does not have property "extra".');
 
-        (new Instantiator())->alwaysForceProperties()([
+        Instantiator::withConstructor()->alwaysForceProperties()([
             'propB' => 'B',
             'extra' => 'foo',
         ], InstantiatorDummy::class);
@@ -468,7 +508,7 @@ final class InstantiatorTest extends TestCase
     {
         $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using "optional:" attribute prefixes is deprecated, use Instantiator::allowExtraAttributes() instead (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#instantiation).');
 
-        $object = (new Instantiator())->alwaysForceProperties()([
+        $object = Instantiator::withConstructor()->alwaysForceProperties()([
             'propB' => 'B',
             'propD' => 'D',
             'optional:extra' => 'foo',
@@ -482,7 +522,7 @@ final class InstantiatorTest extends TestCase
      */
     public function always_force_mode_with_allow_extra_attributes_mode(): void
     {
-        $object = (new Instantiator())->allowExtraAttributes()->alwaysForceProperties()([
+        $object = Instantiator::withConstructor()->allowExtraAttributes()->alwaysForceProperties()([
             'propB' => 'B',
             'propD' => 'D',
             'extra' => 'foo',
@@ -496,7 +536,7 @@ final class InstantiatorTest extends TestCase
      */
     public function always_force_mode_can_set_parent_class_properties(): void
     {
-        $object = (new Instantiator())->alwaysForceProperties()([
+        $object = Instantiator::withConstructor()->alwaysForceProperties()([
             'propA' => 'A',
             'propB' => 'B',
             'propC' => 'C',
@@ -519,7 +559,7 @@ final class InstantiatorTest extends TestCase
     {
         $this->expectException(\Throwable::class);
 
-        (new Instantiator())->allowExtraAttributes()([
+        Instantiator::withConstructor()->allowExtraAttributes()([
             'propB' => 'B',
             'propF' => 'F',
         ], InstantiatorDummy::class);
@@ -530,7 +570,7 @@ final class InstantiatorTest extends TestCase
      */
     public function can_set_variadic_constructor_attributes(): void
     {
-        $object = (new Instantiator())([
+        $object = Instantiator::withConstructor()([
             'propA' => 'A',
             'propB' => ['B', 'C', 'D'],
         ], VariadicInstantiatorDummy::class);
@@ -546,7 +586,7 @@ final class InstantiatorTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Missing constructor argument "propB" for "Zenstruck\Foundry\Tests\Unit\VariadicInstantiatorDummy".');
-        (new Instantiator())([
+        Instantiator::withConstructor()([
             'propA' => 'A',
         ], VariadicInstantiatorDummy::class);
     }

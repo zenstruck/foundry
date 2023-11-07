@@ -12,25 +12,30 @@
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
 use Zenstruck\Foundry\Instantiator;
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-class PostFactory extends ModelFactory
+class PostFactory extends PersistentProxyObjectFactory
 {
     public function published(): static
+    {
+        return $this->with(static fn(): array => ['published_at' => self::faker()->dateTime()]);
+    }
+
+    public function publishedWithLegacyMethod(): static
     {
         return $this->addState(static fn(): array => ['published_at' => self::faker()->dateTime()]);
     }
 
-    protected static function getClass(): string
+    public static function class(): string
     {
         return Post::class;
     }
 
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [
             'title' => self::faker()->sentence(),
@@ -38,11 +43,11 @@ class PostFactory extends ModelFactory
         ];
     }
 
-    protected function initialize()
+    protected function initialize(): static
     {
         return $this
             ->instantiateWith(
-                (new Instantiator())->allowExtraAttributes(['extraCategoryBeforeInstantiate', 'extraCategoryAfterInstantiate'])
+                Instantiator::withConstructor()->allowExtraAttributes(['extraCategoryBeforeInstantiate', 'extraCategoryAfterInstantiate'])
             )
             ->beforeInstantiate(function(array $attributes): array {
                 if (isset($attributes['extraCategoryBeforeInstantiate'])) {

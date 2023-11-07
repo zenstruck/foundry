@@ -18,11 +18,12 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\LazyValue;
-use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 
+use Zenstruck\Foundry\Tests\Fixtures\Factories\LegacyPostFactory;
 use function Zenstruck\Foundry\anonymous;
 use function Zenstruck\Foundry\lazy;
 
@@ -44,13 +45,22 @@ final class FactoryTest extends TestCase
 
         $this->assertSame('title', anonymous(Post::class, $attributeArray)->create()->getTitle());
         $this->assertSame('title', anonymous(Post::class)->create($attributeArray)->getTitle());
-        $this->assertSame('title', anonymous(Post::class)->withAttributes($attributeArray)->create()->getTitle());
+        $this->assertSame('title', anonymous(Post::class)->with($attributeArray)->create()->getTitle());
         $this->assertSame('title', anonymous(Post::class, $attributeCallback)->create()->getTitle());
         $this->assertSame('title', anonymous(Post::class)->create($attributeCallback)->getTitle());
-        $this->assertSame('title', anonymous(Post::class)->withAttributes($attributeCallback)->create()->getTitle());
+        $this->assertSame('title', anonymous(Post::class)->with($attributeCallback)->create()->getTitle());
         $this->assertSame('title', anonymous(Post::class, $attributeArrayWithLazyValue)->create()->getTitle());
         $this->assertSame('title', anonymous(Post::class)->create($attributeArrayWithLazyValue)->getTitle());
-        $this->assertSame('title', anonymous(Post::class)->withAttributes($attributeArrayWithLazyValue)->create()->getTitle());
+        $this->assertSame('title', anonymous(Post::class)->with($attributeArrayWithLazyValue)->create()->getTitle());
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    public function can_use_legacy_with_attributes(): void
+    {
+        $this->assertSame('title', anonymous(Post::class)->withAttributes(['title' => 'title', 'body' => 'body'])->create()->getTitle());
     }
 
     /**
@@ -67,8 +77,8 @@ final class FactoryTest extends TestCase
         $factory = anonymous(Post::class, ['title' => $lazyValue, 'body' => 'body']);
 
         $post = $factory
-            ->withAttributes(['title' => $lazyValue])
-            ->withAttributes(['title' => $lazyValue])
+            ->with(['title' => $lazyValue])
+            ->with(['title' => $lazyValue])
             ->create(['title' => 'title'])
         ;
 
@@ -76,8 +86,8 @@ final class FactoryTest extends TestCase
         $this->assertSame(0, $count);
 
         $post = $factory
-            ->withAttributes(['title' => $lazyValue])
-            ->withAttributes(['title' => $lazyValue])
+            ->with(['title' => $lazyValue])
+            ->with(['title' => $lazyValue])
             ->create(['title' => $lazyValue])
         ;
 
@@ -133,7 +143,7 @@ final class FactoryTest extends TestCase
         $this->assertSame('title', $objects[1]->getTitle());
         $this->assertSame('title', $objects[2]->getTitle());
 
-        $objects = (new Factory(Post::class))->withAttributes($attributeArray)->createMany(3);
+        $objects = (new Factory(Post::class))->with($attributeArray)->createMany(3);
 
         $this->assertCount(3, $objects);
         $this->assertSame('title', $objects[0]->getTitle());
@@ -154,7 +164,7 @@ final class FactoryTest extends TestCase
         $this->assertSame('title', $objects[1]->getTitle());
         $this->assertSame('title', $objects[2]->getTitle());
 
-        $objects = (new Factory(Post::class))->withAttributes($attributeCallback)->createMany(3);
+        $objects = (new Factory(Post::class))->with($attributeCallback)->createMany(3);
 
         $this->assertCount(3, $objects);
         $this->assertSame('title', $objects[0]->getTitle());
@@ -303,7 +313,7 @@ final class FactoryTest extends TestCase
         $factory = anonymous(Post::class);
         $objectId = \spl_object_id($factory);
 
-        $this->assertNotSame(\spl_object_id($factory->withAttributes([])), $objectId);
+        $this->assertNotSame(\spl_object_id($factory->with([])), $objectId);
         $this->assertNotSame(\spl_object_id($factory->withoutPersisting()), $objectId);
         $this->assertNotSame(\spl_object_id($factory->instantiateWith(static function(): void {})), $objectId);
         $this->assertNotSame(\spl_object_id($factory->beforeInstantiate(static function(): void {})), $objectId);
@@ -417,7 +427,7 @@ final class FactoryTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Foundry was booted without doctrine. Ensure your TestCase extends '.KernelTestCase::class);
 
-        anonymous(Post::class)->create(['title' => 'title', 'body' => 'body'])->save();
+        anonymous(Post::class)->create(['title' => 'title', 'body' => 'body'])->_save();
     }
 
     /**
@@ -432,5 +442,27 @@ final class FactoryTest extends TestCase
         $factory = anonymous($object::class)->create(['value' => ['foo' => 'bar']]);
 
         $this->assertSame(['foo' => 'bar'], $factory->value);
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    public function can_use_legacy_model_factory(): void
+    {
+        $post = LegacyPostFactory::createOne(['title' => 'title', 'body' => 'body']);
+
+        self::assertSame('title', $post->getTitle());
+        self::assertSame('body', $post->getBody());
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    public function can_use_legacy_proxy_class(): void
+    {
+        $post = anonymous(Post::class)->create(['title' => 'title', 'body' => 'body']);
+        self::assertInstanceOf(\Zenstruck\Foundry\Proxy::class, $post);
     }
 }

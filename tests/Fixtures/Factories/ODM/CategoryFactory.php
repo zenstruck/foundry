@@ -11,20 +11,20 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories\ODM;
 
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMCategory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class CategoryFactory extends ModelFactory
+final class CategoryFactory extends PersistentProxyObjectFactory
 {
-    protected static function getClass(): string
+    public static function class(): string
     {
         return ODMCategory::class;
     }
 
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return ['name' => self::faker()->sentence()];
     }

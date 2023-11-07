@@ -19,6 +19,9 @@ use function Symfony\Component\String\u;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @method static self withoutConstructor()
+ * @method self withoutConstructor()
  */
 final class Instantiator
 {
@@ -34,6 +37,13 @@ final class Instantiator
 
     /** @var string[] */
     private array $forceProperties = [];
+
+    public function __construct(bool $calledInternally = false)
+    {
+        if (!$calledInternally) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('%1$s constructor will be private in Foundry 2.0. Use either "%1$s::withConstructor()" or "%1$s::withoutConstructor()"', self::class));
+        }
+    }
 
     /**
      * @param class-string $class
@@ -90,14 +100,35 @@ final class Instantiator
         return $object;
     }
 
-    /**
-     * Instantiate objects without calling the constructor.
-     */
-    public function withoutConstructor(): self
+    public function __call(string $name, array $arguments): self
     {
+        if ('withoutConstructor' !== $name) {
+            throw new \BadMethodCallException(\sprintf('Call to undefined method "%s::%s".', static::class, $name));
+        }
+
+        trigger_deprecation('zenstruck/foundry', '1.37.0', 'Calling instance method "%1$s::withoutConstructor()" is deprecated and will be removed in 2.0. Use static call instead: "%1$s::withoutConstructor()" instead.', static::class);
+
         $this->withoutConstructor = true;
 
         return $this;
+    }
+
+    public static function __callStatic(string $name, array $arguments): self
+    {
+        if ('withoutConstructor' !== $name) {
+            throw new \BadMethodCallException(\sprintf('Call to undefined method "%s::%s".', static::class, $name));
+        }
+
+        $instance = new self(calledInternally: true);
+
+        $instance->withoutConstructor = true;
+
+        return $instance;
+    }
+
+    public static function withConstructor(): self
+    {
+        return new self(calledInternally: true);
     }
 
     /**
@@ -240,6 +271,10 @@ final class Instantiator
         $constructor = $class->getConstructor();
 
         if ($this->withoutConstructor || !$constructor || !$constructor->isPublic()) {
+            if (!$this->withoutConstructor && $constructor && !$constructor->isPublic()) {
+                trigger_deprecation('zenstruck\foundry', '1.37.0', 'Instantiator was created to instantiate "%s" by calling the constructor whereas the constructor is not public. This is deprecated and will throw an exception in Foundry 2.0. Use "%s::withoutConstructor()" instead or make constructor public.', $class->getName(), self::class);
+            }
+
             return $class->newInstanceWithoutConstructor();
         }
 

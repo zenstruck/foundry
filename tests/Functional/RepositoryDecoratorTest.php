@@ -15,17 +15,17 @@ use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Assert;
-use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 
-use function Zenstruck\Foundry\repository;
+use function Zenstruck\Foundry\Persistence\repository;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-abstract class RepositoryProxyTest extends KernelTestCase
+abstract class RepositoryDecoratorTest extends KernelTestCase
 {
     use ExpectDeprecationTrait, Factories, ResetDatabase;
 
@@ -98,12 +98,12 @@ abstract class RepositoryProxyTest extends KernelTestCase
     {
         $repository = repository($this->categoryClass());
 
-        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryProxy::assertEmpty() is deprecated, use RepositoryProxy::assert()->empty().');
-        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryProxy::assertCount() is deprecated, use RepositoryProxy::assert()->count().');
-        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryProxy::assertCountGreaterThan() is deprecated, use RepositoryProxy::assert()->countGreaterThan().');
-        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryProxy::assertCountGreaterThanOrEqual() is deprecated, use RepositoryProxy::assert()->countGreaterThanOrEqual().');
-        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryProxy::assertCountLessThan() is deprecated, use RepositoryProxy::assert()->countLessThan().');
-        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryProxy::assertCountLessThanOrEqual() is deprecated, use RepositoryProxy::assert()->countLessThanOrEqual().');
+        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryDecorator::assertEmpty() is deprecated, use RepositoryDecorator::assert()->empty().');
+        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryDecorator::assertCount() is deprecated, use RepositoryDecorator::assert()->count().');
+        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryDecorator::assertCountGreaterThan() is deprecated, use RepositoryDecorator::assert()->countGreaterThan().');
+        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryDecorator::assertCountGreaterThanOrEqual() is deprecated, use RepositoryDecorator::assert()->countGreaterThanOrEqual().');
+        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryDecorator::assertCountLessThan() is deprecated, use RepositoryDecorator::assert()->countLessThan().');
+        $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryDecorator::assertCountLessThanOrEqual() is deprecated, use RepositoryDecorator::assert()->countLessThanOrEqual().');
 
         $repository->assertEmpty();
 
@@ -148,7 +148,7 @@ abstract class RepositoryProxyTest extends KernelTestCase
 
         if (Category::class === $this->categoryClass()) {
             $this->assertInstanceOf(Proxy::class, $repository->find($proxy));
-            $this->assertInstanceOf(Proxy::class, $repository->find($proxy->object()));
+            $this->assertInstanceOf(Proxy::class, $repository->find($proxy->_real()));
         }
     }
 
@@ -337,9 +337,22 @@ abstract class RepositoryProxyTest extends KernelTestCase
 
         $categoryFactoryClass::createMany(4);
 
-        $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using RepositoryProxy::getCount() is deprecated, use RepositoryProxy::count() (it is now Countable).');
+        $this->expectDeprecation('Since zenstruck\foundry 1.5.0: Using RepositoryDecorator::getCount() is deprecated, use RepositoryDecorator::count() (it is now Countable).');
 
         $this->assertSame(4, $categoryFactoryClass::repository()->getCount());
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    public function can_use_new_class_as_legacy_one(): void
+    {
+        self::assertTrue($this->categoryFactoryClass()::repository() instanceof \Zenstruck\Foundry\RepositoryProxy);
+        self::assertTrue($this->categoryFactoryClass()::repository() instanceof \Zenstruck\Foundry\Persistence\RepositoryDecorator);
+
+        self::assertTrue($this->categoryFactoryClass()::assert() instanceof \Zenstruck\Foundry\RepositoryAssertions);
+        self::assertTrue($this->categoryFactoryClass()::assert() instanceof \Zenstruck\Foundry\Persistence\RepositoryAssertions);
     }
 
     abstract protected function categoryClass(): string;

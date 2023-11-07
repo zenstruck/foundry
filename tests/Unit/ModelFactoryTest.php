@@ -37,6 +37,15 @@ final class ModelFactoryTest extends TestCase
 
     /**
      * @test
+     * @group legacy
+     */
+    public function can_set_states_with_legacy_method(): void
+    {
+        $this->assertTrue(PostFactory::new()->publishedWithLegacyMethod()->create()->isPublished());
+    }
+
+    /**
+     * @test
      */
     public function can_set_state_via_new(): void
     {

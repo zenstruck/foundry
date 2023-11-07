@@ -11,12 +11,12 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
-use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Comment;
 
-final class CommentFactory extends ModelFactory
+final class CommentFactory extends PersistentProxyObjectFactory
 {
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [
             'user' => UserFactory::new(),
@@ -26,7 +26,7 @@ final class CommentFactory extends ModelFactory
         ];
     }
 
-    protected static function getClass(): string
+    public static function class(): string
     {
         return Comment::class;
     }

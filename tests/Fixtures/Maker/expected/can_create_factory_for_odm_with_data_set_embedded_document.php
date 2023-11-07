@@ -11,20 +11,20 @@
 
 namespace App\Factory;
 
-use Zenstruck\Foundry\ModelFactory;
-use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMComment;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\UserFactory;
 
 /**
- * @extends ModelFactory<ODMComment>
+ * @extends PersistentProxyObjectFactory<ODMComment>
  *
  * @method        ODMComment|Proxy     create(array|callable $attributes = [])
  * @method static ODMComment|Proxy     createOne(array $attributes = [])
  * @method static ODMComment[]|Proxy[] createMany(int $number, array|callable $attributes = [])
  * @method static ODMComment[]|Proxy[] createSequence(iterable|callable $sequence)
  */
-final class ODMCommentFactory extends ModelFactory
+final class ODMCommentFactory extends PersistentProxyObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -33,7 +33,11 @@ final class ODMCommentFactory extends ModelFactory
      */
     public function __construct()
     {
-        parent::__construct();
+    }
+
+    public static function class(): string
+    {
+        return ODMComment::class;
     }
 
     /**
@@ -41,7 +45,7 @@ final class ODMCommentFactory extends ModelFactory
      *
      * @todo add your default values here
      */
-    protected function getDefaults(): array
+    protected function defaults(): array|callable
     {
         return [
             'body' => self::faker()->sentence(),
@@ -52,16 +56,11 @@ final class ODMCommentFactory extends ModelFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
      */
-    protected function initialize(): self
+    protected function initialize(): static
     {
         return $this
             ->withoutPersisting()
             // ->afterInstantiate(function(ODMComment $oDMComment): void {})
         ;
-    }
-
-    protected static function getClass(): string
-    {
-        return ODMComment::class;
     }
 }
