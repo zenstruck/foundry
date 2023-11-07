@@ -16,6 +16,11 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Comment;
 
 final class CommentFactory extends PersistentProxyObjectFactory
 {
+    public static function class(): string
+    {
+        return Comment::class;
+    }
+
     protected function defaults(): array|callable
     {
         return [
@@ -24,10 +29,5 @@ final class CommentFactory extends PersistentProxyObjectFactory
             'created_at' => self::faker()->dateTime(),
             'post' => PostFactory::new(),
         ];
-    }
-
-    public static function class(): string
-    {
-        return Comment::class;
     }
 }

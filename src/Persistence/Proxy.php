@@ -109,7 +109,7 @@ class Proxy implements \Stringable
     public function isPersisted(bool $calledInternally = false): bool
     {
         if (!$calledInternally) {
-            trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Method "%s()" is deprecated and will be removed in 2.0 without replacement.', __METHOD__));
+            trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in 2.0 without replacement.', __METHOD__));
         }
 
         return $this->persisted;
@@ -122,7 +122,7 @@ class Proxy implements \Stringable
      */
     public function object(): object
     {
-        trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_real()" instead.', __METHOD__, self::class));
+        trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_real()" instead.', __METHOD__, self::class));
 
         return $this->_real();
     }
@@ -160,7 +160,7 @@ class Proxy implements \Stringable
      */
     public function save(): static
     {
-        trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_save()" instead.', __METHOD__, self::class));
+        trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_save()" instead.', __METHOD__, self::class));
 
         return $this->_save();
     }
@@ -183,7 +183,7 @@ class Proxy implements \Stringable
      */
     public function remove(): static
     {
-        trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_delete()" instead.', __METHOD__, self::class));
+        trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_delete()" instead.', __METHOD__, self::class));
 
         return $this->_delete();
     }
@@ -203,7 +203,7 @@ class Proxy implements \Stringable
      */
     public function refresh(): static
     {
-        trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_refresh()" instead.', __METHOD__, self::class));
+        trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_refresh()" instead.', __METHOD__, self::class));
 
         return $this->_refresh();
     }
@@ -238,7 +238,7 @@ class Proxy implements \Stringable
      */
     public function forceSet(string $property, mixed $value): static
     {
-        trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_set()" instead.', __METHOD__, self::class));
+        trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_set()" instead.', __METHOD__, self::class));
 
         return $this->_set($property, $value);
     }
@@ -257,7 +257,7 @@ class Proxy implements \Stringable
      */
     public function forceSetAll(array $properties): static
     {
-        trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Method "%s()" is deprecated and will be removed in 2.0 without replacement.', __METHOD__));
+        trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in 2.0 without replacement.', __METHOD__));
 
         $object = $this->_real();
 
@@ -273,7 +273,7 @@ class Proxy implements \Stringable
      */
     public function get(string $property): mixed
     {
-        trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_get()" instead.', __METHOD__, self::class));
+        trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_get()" instead.', __METHOD__, self::class));
 
         return $this->_get($property);
     }
@@ -288,7 +288,7 @@ class Proxy implements \Stringable
      */
     public function repository(): RepositoryDecorator
     {
-        trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_repository()" instead.', __METHOD__, self::class));
+        trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_repository()" instead.', __METHOD__, self::class));
 
         return $this->_repository();
     }
@@ -303,7 +303,7 @@ class Proxy implements \Stringable
      */
     public function enableAutoRefresh(): static
     {
-        trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_enableAutoRefresh()" instead.', __METHOD__, self::class));
+        trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_enableAutoRefresh()" instead.', __METHOD__, self::class));
 
         return $this->_enableAutoRefresh();
     }
@@ -324,7 +324,7 @@ class Proxy implements \Stringable
      */
     public function disableAutoRefresh(): static
     {
-        trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_disableAutoRefresh()" instead.', __METHOD__, self::class));
+        trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_disableAutoRefresh()" instead.', __METHOD__, self::class));
 
         return $this->_disableAutoRefresh();
     }
@@ -343,7 +343,7 @@ class Proxy implements \Stringable
      */
     public function withoutAutoRefresh(callable $callback): static
     {
-        trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_withoutAutoRefresh()" instead.', __METHOD__, self::class));
+        trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_withoutAutoRefresh()" instead.', __METHOD__, self::class));
 
         return $this->_withoutAutoRefresh($callback);
     }
@@ -371,7 +371,7 @@ class Proxy implements \Stringable
      */
     public function assertPersisted(string $message = '{entity} is not persisted.'): self
     {
-        trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Method "%s()" is deprecated and will be removed in 2.0 without replacement.', __METHOD__));
+        trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in 2.0 without replacement.', __METHOD__));
 
         Assert::that($this->fetchObject())->isNotEmpty($message, ['entity' => $this->class]);
 
@@ -383,7 +383,7 @@ class Proxy implements \Stringable
      */
     public function assertNotPersisted(string $message = '{entity} is persisted but it should not be.'): self
     {
-        trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Method "%s()" is deprecated and will be removed in 2.0 without replacement.', __METHOD__));
+        trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in 2.0 without replacement.', __METHOD__));
 
         Assert::that($this->fetchObject())->isEmpty($message, ['entity' => $this->class]);
 

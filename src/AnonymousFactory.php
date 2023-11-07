@@ -12,8 +12,8 @@
 namespace Zenstruck\Foundry;
 
 use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 use Zenstruck\Foundry\Persistence\RepositoryAssertions;
+use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 
 /**
  * @template TModel of object

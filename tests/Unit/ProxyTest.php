@@ -138,8 +138,8 @@ final class ProxyTest extends TestCase
     {
         $proxy = new Proxy(new Category());
 
-        self::assertTrue($proxy instanceof \Zenstruck\Foundry\Proxy);
-        self::assertTrue($proxy instanceof \Zenstruck\Foundry\Persistence\Proxy);
+        self::assertInstanceOf(\Zenstruck\Foundry\Proxy::class, $proxy);
+        self::assertInstanceOf(\Zenstruck\Foundry\Persistence\Proxy::class, $proxy);
     }
 
     public function functionWithProxy(Proxy $proxy): void

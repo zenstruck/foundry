@@ -21,7 +21,7 @@ use function Symfony\Component\String\u;
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @method static self withoutConstructor()
- * @method self withoutConstructor()
+ * @method        self withoutConstructor()
  */
 final class Instantiator
 {
@@ -41,7 +41,7 @@ final class Instantiator
     public function __construct(bool $calledInternally = false)
     {
         if (!$calledInternally) {
-            trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('%1$s constructor will be private in Foundry 2.0. Use either "%1$s::withConstructor()" or "%1$s::withoutConstructor()"', self::class));
+            trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('%1$s constructor will be private in Foundry 2.0. Use either "%1$s::withConstructor()" or "%1$s::withoutConstructor()"', self::class));
         }
     }
 

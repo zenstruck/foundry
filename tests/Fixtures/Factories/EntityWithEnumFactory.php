@@ -12,21 +12,20 @@
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\PHP81\EntityWithEnum;
 use Zenstruck\Foundry\Tests\Fixtures\PHP81\SomeEnum;
 
 final class EntityWithEnumFactory extends PersistentProxyObjectFactory
 {
+    public static function class(): string
+    {
+        return EntityWithEnum::class;
+    }
+
     protected function defaults(): array|callable
     {
         return [
             'enum' => self::faker()->randomElement(SomeEnum::cases()),
         ];
-    }
-
-    public static function class(): string
-    {
-        return EntityWithEnum::class;
     }
 }
