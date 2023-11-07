@@ -12,7 +12,6 @@
 namespace Zenstruck\Foundry\Persistence;
 
 use Zenstruck\Assert;
-use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

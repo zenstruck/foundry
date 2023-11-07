@@ -218,14 +218,11 @@ class Factory
      */
     final public function withAttributes($attributes = []): self
     {
-        trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::with()" instead.', __METHOD__, self::class));
+        trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::with()" instead.', __METHOD__, self::class));
 
         return $this->with($attributes);
     }
 
-    /**
-     * @param array|callable $attributes
-     */
     final public function with(array|callable $attributes = []): static
     {
         $clone = clone $this;
@@ -342,7 +339,7 @@ class Factory
      */
     final public static function delayFlush(callable $callback): mixed
     {
-        trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Method "%s()" is deprecated and will be removed in Foundry 2.0. Use "Zenstruck\Foundry\Persistence\flush_after()" instead.', __METHOD__));
+        trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in Foundry 2.0. Use "Zenstruck\Foundry\Persistence\flush_after()" instead.', __METHOD__));
 
         return self::configuration()->delayFlush($callback);
     }

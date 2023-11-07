@@ -13,7 +13,7 @@ namespace Zenstruck\Foundry;
 
 use Zenstruck\Foundry\Persistence\RepositoryAssertions as NewRepositoryAssertions;
 
-trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Class "%s" is deprecated and will be removed in version 2.0. Use "%s" instead.', RepositoryAssertions::class, NewRepositoryAssertions::class));
+trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Class "%s" is deprecated and will be removed in version 2.0. Use "%s" instead.', RepositoryAssertions::class, NewRepositoryAssertions::class));
 
 if (false) {
     /**

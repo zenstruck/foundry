@@ -13,6 +13,7 @@ namespace Zenstruck\Foundry\Persistence;
 
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
+
 use function Zenstruck\Foundry\anonymous;
 
 /**

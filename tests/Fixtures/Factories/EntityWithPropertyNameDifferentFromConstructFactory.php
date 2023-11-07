@@ -17,6 +17,11 @@ use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObjectFactory;
 
 final class EntityWithPropertyNameDifferentFromConstructFactory extends PersistentProxyObjectFactory
 {
+    public static function class(): string
+    {
+        return EntityWithPropertyNameDifferentFromConstruct::class;
+    }
+
     protected function defaults(): array|callable
     {
         return [
@@ -25,10 +30,5 @@ final class EntityWithPropertyNameDifferentFromConstructFactory extends Persiste
             'embedded' => AddressFactory::new(),
             'notPersistedObject' => SomeObjectFactory::new(),
         ];
-    }
-
-    public static function class(): string
-    {
-        return EntityWithPropertyNameDifferentFromConstruct::class;
     }
 }

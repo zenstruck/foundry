@@ -24,6 +24,11 @@ use Zenstruck\Foundry\Persistence\Proxy;
  */
 final class SomeObjectFactory extends PersistentProxyObjectFactory
 {
+    public static function class(): string
+    {
+        return SomeObject::class;
+    }
+
     protected function defaults(): array|callable
     {
         return [
@@ -38,10 +43,5 @@ final class SomeObjectFactory extends PersistentProxyObjectFactory
             'stringNullable' => self::faker()->sentence(),
             'stringWithDefault' => self::faker()->sentence(),
         ];
-    }
-
-    public static function class(): string
-    {
-        return SomeObject::class;
     }
 }

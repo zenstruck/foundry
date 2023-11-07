@@ -60,7 +60,7 @@ function anonymous(string $class, array|callable $defaultAttributes = []): Facto
  */
 function create(string $class, array|callable $attributes = []): Proxy
 {
-    trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Function "%s()" is deprecated and will be removed in Foundry 2.0. Use "Zenstruck\Foundry\Persistence\persist()" instead.', __FUNCTION__));
+    trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Function "%s()" is deprecated and will be removed in Foundry 2.0. Use "Zenstruck\Foundry\Persistence\persist()" instead.', __FUNCTION__));
 
     return anonymous($class)->create($attributes);
 }
@@ -78,7 +78,7 @@ function create(string $class, array|callable $attributes = []): Proxy
  */
 function create_many(int $number, string $class, array|callable $attributes = []): array
 {
-    trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Function "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __FUNCTION__));
+    trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Function "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __FUNCTION__));
 
     return anonymous($class)->many($number)->create($attributes);
 }
@@ -96,7 +96,7 @@ function create_many(int $number, string $class, array|callable $attributes = []
  */
 function instantiate(string $class, array|callable $attributes = []): Proxy
 {
-    trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Function "%s()" is deprecated and will be removed in Foundry 2.0. Use "%s::object()" instead.', __FUNCTION__, __NAMESPACE__));
+    trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Function "%s()" is deprecated and will be removed in Foundry 2.0. Use "%s::object()" instead.', __FUNCTION__, __NAMESPACE__));
 
     return object($class, $attributes);
 }
@@ -128,7 +128,7 @@ function object(string $class, array|callable $attributes = []): Proxy
  */
 function instantiate_many(int $number, string $class, array|callable $attributes = []): array
 {
-    trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Function "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __FUNCTION__));
+    trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Function "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __FUNCTION__));
 
     return anonymous($class)->withoutPersisting()->many($number)->create($attributes);
 }
@@ -146,10 +146,10 @@ function instantiate_many(int $number, string $class, array|callable $attributes
  */
 function repository(object|string $objectOrClass): RepositoryDecorator
 {
-    trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Function "%s()" is deprecated and will be removed in Foundry 2.0. Use "Zenstruck\Foundry\Persistence\repository()" instead.', __FUNCTION__));
+    trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Function "%s()" is deprecated and will be removed in Foundry 2.0. Use "Zenstruck\Foundry\Persistence\repository()" instead.', __FUNCTION__));
 
-    if (is_object($objectOrClass)) {
-        trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Passing objects to "%s()" is deprecated and will be removed in Foundry 2.0. Pass directly class-string instead.', __FUNCTION__));
+    if (\is_object($objectOrClass)) {
+        trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Passing objects to "%s()" is deprecated and will be removed in Foundry 2.0. Pass directly class-string instead.', __FUNCTION__));
 
         $objectOrClass = $objectOrClass::class;
     }

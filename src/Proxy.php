@@ -13,7 +13,7 @@ namespace Zenstruck\Foundry;
 
 use Zenstruck\Foundry\Persistence\Proxy as ProxyBase;
 
-trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Class "%s" is deprecated and will be removed in version 2.0. Use "%s" instead.', Proxy::class, ProxyBase::class));
+trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Class "%s" is deprecated and will be removed in version 2.0. Use "%s" instead.', Proxy::class, ProxyBase::class));
 
 if (false) {
     /**

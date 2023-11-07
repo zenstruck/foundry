@@ -17,7 +17,7 @@ use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 trigger_deprecation(
     'zenstruck\foundry',
     '1.37.0',
-    sprintf('Class "%s" is deprecated and will be removed in version 2.0. Use "%s" instead.', RepositoryProxy::class, RepositoryDecorator::class)
+    \sprintf('Class "%s" is deprecated and will be removed in version 2.0. Use "%s" instead.', RepositoryProxy::class, RepositoryDecorator::class)
 );
 
 if (false) {
