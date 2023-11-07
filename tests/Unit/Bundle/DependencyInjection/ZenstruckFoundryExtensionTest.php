@@ -131,7 +131,7 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
 
         // matthiasnoback/symfony-dependency-injection-test cannot assert if a service is created through a factory.
         // so, we're checking that private property "Instantiator::$withoutConstructor" was set to true.
-        $withoutConstructor = \Closure::bind(static function (Instantiator $instantiator){return $instantiator->withoutConstructor;}, null, Instantiator::class)($instantiator);
+        $withoutConstructor = \Closure::bind(static fn(Instantiator $instantiator) => $instantiator->withoutConstructor, null, Instantiator::class)($instantiator);
         self::assertTrue($withoutConstructor);
     }
 

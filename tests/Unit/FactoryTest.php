@@ -22,8 +22,8 @@ use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
-
 use Zenstruck\Foundry\Tests\Fixtures\Factories\LegacyPostFactory;
+
 use function Zenstruck\Foundry\anonymous;
 use function Zenstruck\Foundry\lazy;
 

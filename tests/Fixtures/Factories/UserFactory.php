@@ -16,15 +16,15 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\User;
 
 final class UserFactory extends PersistentProxyObjectFactory
 {
+    public static function class(): string
+    {
+        return User::class;
+    }
+
     protected function defaults(): array|callable
     {
         return [
             'name' => self::faker()->name(),
         ];
-    }
-
-    public static function class(): string
-    {
-        return User::class;
     }
 }

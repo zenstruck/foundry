@@ -38,7 +38,7 @@ final class <?php echo $class_name; ?> extends PersistentProxyObjectFactory
 
     public static function class(): string
     {
-        return <?php echo $makeFactoryData->getObjectShortName() ?>::class;
+        return <?php echo $makeFactoryData->getObjectShortName(); ?>::class;
     }
 
     /**

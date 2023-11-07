@@ -26,10 +26,10 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 use function Zenstruck\Foundry\create;
 use function Zenstruck\Foundry\create_many;
 use function Zenstruck\Foundry\faker;
-use function Zenstruck\Foundry\object;
 use function Zenstruck\Foundry\instantiate_many;
 use function Zenstruck\Foundry\lazy;
 use function Zenstruck\Foundry\memoize;
+use function Zenstruck\Foundry\object;
 use function Zenstruck\Foundry\repository;
 
 /**

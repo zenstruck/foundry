@@ -29,9 +29,14 @@ abstract class ModelFactory extends PersistentProxyObjectFactory
 {
     public function __construct()
     {
-        trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Class "%s" is deprecated and will be removed in version 2.0. Use "%s" instead.', self::class, PersistentProxyObjectFactory::class));
+        trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Class "%s" is deprecated and will be removed in version 2.0. Use "%s" instead.', self::class, PersistentProxyObjectFactory::class));
 
         parent::__construct();
+    }
+
+    public static function class(): string
+    {
+        return static::getClass();
     }
 
     /**
@@ -40,11 +45,6 @@ abstract class ModelFactory extends PersistentProxyObjectFactory
      * @deprecated use class() instead
      */
     abstract protected static function getClass(): string;
-
-    public static function class(): string
-    {
-        return static::getClass();
-    }
 
     /**
      * @return mixed[]

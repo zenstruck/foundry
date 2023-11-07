@@ -24,14 +24,14 @@ use Zenstruck\Foundry\Persistence\Proxy;
  */
 final class SomeOtherObjectFactory extends PersistentProxyObjectFactory
 {
+    public static function class(): string
+    {
+        return SomeOtherObject::class;
+    }
+
     protected function defaults(): array|callable
     {
         return [
         ];
-    }
-
-    public static function class(): string
-    {
-        return SomeOtherObject::class;
     }
 }
