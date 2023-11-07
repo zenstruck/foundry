@@ -9,5 +9,7 @@
 /tests/Fixtures/tmp
 /var/
 /docs/output/
-/.env
 /docker/.makefile
+/.env.local
+/docker-compose.override.yaml
+/tests/Fixtures/Migrations/

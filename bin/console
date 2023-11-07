@@ -1,0 +1,10 @@
+#!/usr/bin/env php
+<?php
+
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Zenstruck\Foundry\Tests\Fixtures\Kernel;
+
+require_once __DIR__ . '/../tests/bootstrap.php';
+
+$application = new Application(new Kernel('test', true));
+$application->run();

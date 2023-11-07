@@ -26,7 +26,7 @@ final class ORMProxyTest extends ProxyTest
 {
     protected function setUp(): void
     {
-        if (!\getenv('USE_ORM')) {
+        if (!\getenv('DATABASE_URL')) {
             self::markTestSkipped('doctrine/orm not enabled.');
         }
     }
