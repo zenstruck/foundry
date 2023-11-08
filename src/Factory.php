@@ -192,6 +192,8 @@ class Factory
     final public function sequence(iterable|callable $sequence): FactoryCollection
     {
         if (\is_callable($sequence)) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Passing a callable to method "%s()" is deprecated and will be removed in 2.0.', __METHOD__, self::class));
+
             $sequence = $sequence();
         }
 
