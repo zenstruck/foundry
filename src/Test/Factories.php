@@ -63,7 +63,11 @@ trait Factories
     public static function _tearDownFactories(): void
     {
         try {
-            Factory::configuration()->enablePersist();
+            $configuration = Factory::configuration();
+
+            if ($configuration->hasManagerRegistry()) {
+                $configuration->enablePersist();
+            }
         } catch (FoundryBootException) {
         }
 
