@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Foundry;
 
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
 
 /**
@@ -67,16 +69,27 @@ final class FactoryCollection implements \IteratorAggregate
     }
 
     /**
-     * @return list<TObject&Proxy<TObject>>
+     * @return list<TObject&Proxy<TObject>>|list<TObject>
      *
-     * @phpstan-return list<Proxy<TObject>>
+     * @phpstan-return ($noProxy is true ? list<TObject>: list<Proxy<TObject>>|list<TObject>)
      */
-    public function create(array|callable $attributes = []): array
-    {
+    public function create(
+        array|callable $attributes = [],
+        /**
+         * @deprecated
+         * @internal
+         */
+        bool $noProxy = false
+    ): array {
+        if (\count(func_get_args()) === 2 && !str_starts_with(debug_backtrace(options: \DEBUG_BACKTRACE_IGNORE_ARGS, limit: 2)[1]['class'] ?? '', 'Zenstruck\Foundry')) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Parameter "$noProxy" of method "%s()" is deprecated and will be removed in Foundry 2.0.', __METHOD__));
+        }
+
         $objects = [];
         foreach ($this->all() as $i => $factory) {
             $objects[] = $factory->create(
-                \is_callable($attributes) ? $attributes($i + 1) : $attributes
+                \is_callable($attributes) ? $attributes($i + 1) : $attributes,
+                $noProxy || !$factory instanceof PersistentProxyObjectFactory && $factory instanceof PersistentObjectFactory
             );
         }
 

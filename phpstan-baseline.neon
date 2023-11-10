@@ -11,6 +11,11 @@ parameters:
 			path: src/Configuration.php
 
 		-
+			message: "#^Should not use function \"debug_backtrace\", please change the code\\.$#"
+			count: 1
+			path: src/Factory.php
+
+		-
 			message: "#^Parameter \\#1 \\$min of function random_int expects int, int\\|null given\\.$#"
 			count: 1
 			path: src/FactoryCollection.php
@@ -19,6 +24,16 @@ parameters:
 			message: "#^Parameter \\#2 \\$max of function random_int expects int, int\\|null given\\.$#"
 			count: 1
 			path: src/FactoryCollection.php
+
+		-
+			message: "#^Should not use function \"debug_backtrace\", please change the code\\.$#"
+			count: 1
+			path: src/FactoryCollection.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Persistence/PersistentObjectFactory.php
 
 		-
 			message: "#^Method Zenstruck\\\\Foundry\\\\Persistence\\\\RepositoryDecorator\\:\\:proxyResult\\(\\) should return array\\<int, Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TProxiedObject of object\\>\\>\\|Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TProxiedObject of object\\> but returns \\(TProxiedObject of object\\)\\|null\\.$#"

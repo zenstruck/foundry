@@ -11,18 +11,18 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Object;
 
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
 
 /**
- * @extends PersistentProxyObjectFactory<SomeObject>
+ * @extends PersistentObjectFactory<SomeObject>
  *
  * @method        SomeObject|Proxy     create(array|callable $attributes = [])
  * @method static SomeObject|Proxy     createOne(array $attributes = [])
  * @method static SomeObject[]|Proxy[] createMany(int $number, array|callable $attributes = [])
  * @method static SomeObject[]|Proxy[] createSequence(iterable|callable $sequence)
  */
-final class SomeObjectFactory extends PersistentProxyObjectFactory
+final class SomeObjectFactory extends PersistentObjectFactory
 {
     public static function class(): string
     {

@@ -199,7 +199,7 @@ final class FactoryTest extends KernelTestCase
      */
     public function can_create_an_object_not_persisted_with_nested_factory(): void
     {
-        $notPersistedObject = SomeObjectFactory::new()->create()->_real();
+        $notPersistedObject = SomeObjectFactory::new()->create();
         self::assertInstanceOf(SomeObject::class, $notPersistedObject);
         self::assertInstanceOf(SomeOtherObject::class, $notPersistedObject->someOtherObjectMandatory);
     }

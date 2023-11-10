@@ -12,20 +12,20 @@
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 
-/**
- * @author Kevin Bond <kevinbond@gmail.com>
- */
-final class AddressFactory extends PersistentObjectFactory
+class PostFactoryNoProxy extends PersistentObjectFactory
 {
     public static function class(): string
     {
-        return Address::class;
+        return Post::class;
     }
 
     protected function defaults(): array|callable
     {
-        return ['value' => 'Some address'];
+        return [
+            'title' => self::faker()->sentence(),
+            'body' => self::faker()->sentence(),
+        ];
     }
 }
