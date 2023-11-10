@@ -30,6 +30,8 @@ use function Zenstruck\Foundry\instantiate_many;
 use function Zenstruck\Foundry\lazy;
 use function Zenstruck\Foundry\memoize;
 use function Zenstruck\Foundry\object;
+use function Zenstruck\Foundry\Persistence\disable_persisting;
+use function Zenstruck\Foundry\Persistence\enable_persisting;
 use function Zenstruck\Foundry\repository;
 
 /**
@@ -149,5 +151,17 @@ final class FunctionsTest extends TestCase
         Factory::configuration()->setManagerRegistry($registry);
 
         $this->assertInstanceOf(RepositoryDecorator::class, repository(new Category()));
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    public function enable_or_disable_persisting_can_be_called_without_doctrine(): void
+    {
+        $this->expectNotToPerformAssertions();
+
+        enable_persisting();
+        disable_persisting();
     }
 }

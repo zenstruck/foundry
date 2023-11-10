@@ -314,9 +314,21 @@ abstract class ModelFactoryTest extends KernelTestCase
 
     /**
      * @test
-     * @dataProvider sequenceProvider
      */
-    public function can_create_sequence(\Closure|string|array $sequence): void
+    public function can_create_sequence(): void
+    {
+        $categoryFactoryClass = $this->categoryFactoryClass();
+        $categoryFactoryClass::createSequence([['name' => 'foo'], ['name' => 'bar']]);
+
+        $categoryFactoryClass::assert()->exists(['name' => 'foo']);
+        $categoryFactoryClass::assert()->exists(['name' => 'bar']);
+    }
+
+    /**
+     * @dataProvider sequenceProvider
+     * @group legacy
+     */
+    public function can_create_sequence_with_callable(callable $sequence): void
     {
         $categoryFactoryClass = $this->categoryFactoryClass();
         $categoryFactoryClass::createSequence($sequence);
@@ -327,10 +339,6 @@ abstract class ModelFactoryTest extends KernelTestCase
 
     public function sequenceProvider(): iterable
     {
-        yield 'with array of attributes' => [
-            [['name' => 'foo'], ['name' => 'bar']],
-        ];
-
         yield 'with a callable which returns an array of attributes' => [
             static fn(): array => [['name' => 'foo'], ['name' => 'bar']],
         ];
