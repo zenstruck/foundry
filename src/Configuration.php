@@ -251,11 +251,19 @@ final class Configuration
 
     public function disablePersist(): void
     {
+        if (!self::hasManagerRegistry()) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', 'Calling function "disable_persisting()" when Foundry is booted without doctrine is deprecated and will throw an exception in 2.0.');
+        }
+
         $this->persistEnabled = false;
     }
 
     public function enablePersist(): void
     {
+        if (!self::hasManagerRegistry()) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', 'Calling function "enable_persisting()" when Foundry is booted without doctrine is deprecated and will throw an exception in 2.0.');
+        }
+
         $this->persistEnabled = true;
     }
 
