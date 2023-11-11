@@ -17,7 +17,6 @@ use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Faker;
 use Zenstruck\Foundry\Exception\FoundryBootException;
 use Zenstruck\Foundry\Persistence\InversedRelationshipPostPersistCallback;
-use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\PostPersistCallback;
 use Zenstruck\Foundry\Persistence\Proxy;
@@ -75,7 +74,7 @@ class Factory
     }
 
     /**
-     * @phpstan-return ($this is PersistentProxyObjectFactory ? list<Proxy<TObject>> : ($this is PersistentObjectFactory ? list<TObject> : list<Proxy<TObject>>))
+     * @phpstan-return ($this is PersistentProxyObjectFactory ? list<Proxy<TObject>> : list<TObject>)
      */
     public function __call(string $name, array $arguments): array
     {
@@ -103,7 +102,7 @@ class Factory
         bool $noProxy = false
     ): object
     {
-        if (\count(func_get_args()) === 2 && !str_starts_with(debug_backtrace(options: \DEBUG_BACKTRACE_IGNORE_ARGS, limit: 2)[1]['class'] ?? '', 'Zenstruck\Foundry')) {
+        if (\count(func_get_args()) === 2 && !str_starts_with(debug_backtrace(options: \DEBUG_BACKTRACE_IGNORE_ARGS, limit: 1)[0]['class'] ?? '', 'Zenstruck\Foundry')) {
             trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Parameter "$noProxy" of method "%s()" is deprecated and will be removed in Foundry 2.0.', __METHOD__));
         }
 
@@ -462,6 +461,10 @@ class Factory
 
     private static function normalizeObject(object $object): object
     {
+        if ((new \ReflectionClass($object::class))->isFinal()) {
+            return $object;
+        }
+
         try {
             return Proxy::createFromPersisted($object)->_refresh()->_real();
         } catch (\RuntimeException) {
@@ -515,10 +518,12 @@ class Factory
     }
 
     /**
-     * @return ($this is PersistentProxyObjectFactory ? true : ($this is PersistentObjectFactory ? false : true))
+     * @internal
+     *
+     * @return ($this is PersistentProxyObjectFactory ? true : false)
      */
-    private function shouldUseProxy(): bool
+    public function shouldUseProxy(): bool
     {
-        return $this instanceof PersistentProxyObjectFactory || !$this instanceof PersistentObjectFactory;
+        return $this instanceof PersistentProxyObjectFactory;
     }
 }

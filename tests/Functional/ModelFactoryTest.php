@@ -18,7 +18,7 @@ use Zenstruck\Foundry\RepositoryAssertions;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
-use function Zenstruck\Foundry\anonymous;
+use function Zenstruck\Foundry\Persistence\persistent_factory;
 use function Zenstruck\Foundry\Persistence\disable_persisting;
 use function Zenstruck\Foundry\Persistence\enable_persisting;
 use function Zenstruck\Foundry\Persistence\persist;
@@ -450,7 +450,7 @@ abstract class ModelFactoryTest extends KernelTestCase
 
         $categoryFactoryClass::createOne(['name' => 'foo']);
         $categoryFactoryClass::new()->create(['name' => 'foo']);
-        anonymous($this->categoryClass())->create(['name' => 'foo']);
+        persistent_factory($this->categoryClass())->create(['name' => 'foo']);
         persist($this->categoryClass(), ['name' => 'foo']);
 
         enable_persisting(); // need to reactivate persist to access to RepositoryAssertions

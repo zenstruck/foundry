@@ -76,10 +76,10 @@ final class FunctionsTest extends TestCase
      */
     public function instantiate(): void
     {
-        $proxy = object(Post::class, ['title' => 'title', 'body' => 'body']);
+        $object = object(Post::class, ['title' => 'title', 'body' => 'body']);
 
-        $this->assertInstanceOf(Post::class, $proxy->_real());
-        $this->assertSame('title', $proxy->getTitle());
+        $this->assertInstanceOf(Post::class, $object);
+        $this->assertSame('title', $object->getTitle());
     }
 
     /**
