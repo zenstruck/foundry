@@ -1658,6 +1658,46 @@ accordingly. Your database is still reset before running your test suite but the
     Using `Global State`_ that creates both ORM and ODM factories when using DAMADoctrineTestBundle
     is not supported.
 
+paratestphp/paratest
+....................
+
+You can use `paratestphp/paratest <https://github.com/paratestphp/paratest>`_ to run your tests in parallel.
+This can dramatically improve test speed. The following considerations need to be taken into account:
+
+1. Your doctrine package configuration needs to have paratest's ``TEST_TOKEN`` environment variable in
+   the database name. This is so each parallel process has its own database. For example:
+
+   .. code-block:: yaml
+
+   # config/packages/doctrine.yaml
+       when@test:
+           doctrine:
+               dbal:
+                   dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+
+2. If using `DAMADoctrineTestBundle`_ and ``paratestphp/paratest`` < 7.0, you need to set the ``--runner`` option to
+   ``WrapperRunner``. This is so the database is reset once per process (without this option, it is reset once per
+   test class).
+
+   .. code-block:: terminal
+
+       vendor/bin/paratest --runner WrapperRunner
+
+3. If running with debug mode disabled, you need to adjust the `Disable Debug Mode`_ code to the following:
+
+   .. code-block:: php
+
+       // tests/bootstrap.php
+       // ...
+       if (false === (bool) $_SERVER['APP_DEBUG'] && null === ($_SERVER['TEST_TOKEN'] ?? null)) {
+           /*
+            * Ensure a fresh cache when debug mode is disabled. When using paratest, this
+            * file is required once at the very beginning, and once per process. Checking that
+            * TEST_TOKEN is not set ensures this is only run once at the beginning.
+            */
+           (new Filesystem())->remove(__DIR__.'/../var/cache/test');
+       }
+
 Disable Debug Mode
 ..................
 
