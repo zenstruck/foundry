@@ -1658,57 +1658,63 @@ accordingly. Your database is still reset before running your test suite but the
     Using `Global State`_ that creates both ORM and ODM factories when using DAMADoctrineTestBundle
     is not supported.
 
-Miscellaneous
-.............
+Disable Debug Mode
+..................
 
-1. Disable debug mode when running tests. In your ``.env.test`` file, you can set ``APP_DEBUG=0`` to have your tests
-   run without debug mode. This can speed up your tests considerably. You will need to ensure you cache is cleared
-   before running the test suite. The best place to do this is in your ``tests/bootstrap.php``:
+In your ``.env.test`` file, you can set ``APP_DEBUG=0`` to have your tests run without debug mode. This can speed up
+your tests considerably. You will need to ensure you cache is cleared before running the test suite. The best place to
+do this is in your ``tests/bootstrap.php``:
 
-   .. code-block:: php
+.. code-block:: php
 
-       // tests/bootstrap.php
-       // ...
-       if (false === (bool) $_SERVER['APP_DEBUG']) {
-           // ensure fresh cache
-           (new Symfony\Component\Filesystem\Filesystem())->remove(__DIR__.'/../var/cache/test');
-       }
+    // tests/bootstrap.php
+    // ...
+    if (false === (bool) $_SERVER['APP_DEBUG']) {
+        // ensure fresh cache
+        (new Symfony\Component\Filesystem\Filesystem())->remove(__DIR__.'/../var/cache/test');
+    }
 
-2. Reduce password encoder *work factor*. If you have a lot of tests that work with encoded passwords, this will cause
-   these tests to be unnecessarily slow. You can improve the speed by reducing the *work factor* of your encoder:
+Reduce Password Encoder *Work Factor*
+.....................................
 
-   .. code-block:: yaml
+If you have a lot of tests that work with encoded passwords, this will cause these tests to be unnecessarily slow.
+You can improve the speed by reducing the *work factor* of your encoder:
 
-       # config/packages/test/security.yaml
-       encoders:
-           # use your user class name here
-           App\Entity\User:
-               # This should be the same value as in config/packages/security.yaml
-               algorithm: auto
-               cost: 4 # Lowest possible value for bcrypt
-               time_cost: 3 # Lowest possible value for argon
-               memory_cost: 10 # Lowest possible value for argon
+.. code-block:: yaml
 
-3. Pre-encode user passwords with a known value via ``bin/console security:encode-password`` and set this in
-   ``ModelFactory::getDefaults()``. Add the known value as a ``const`` on your factory:
+    # config/packages/test/security.yaml
+    encoders:
+        # use your user class name here
+        App\Entity\User:
+            # This should be the same value as in config/packages/security.yaml
+            algorithm: auto
+            cost: 4 # Lowest possible value for bcrypt
+            time_cost: 3 # Lowest possible value for argon
+            memory_cost: 10 # Lowest possible value for argon
 
-   .. code-block:: php
+Pre-Encode Passwords
+....................
 
-       class UserFactory extends ModelFactory
-       {
-           public const DEFAULT_PASSWORD = '1234'; // the password used to create the pre-encoded version below
+Pre-encode user passwords with a known value via ``bin/console security:encode-password`` and set this in
+``ModelFactory::getDefaults()``. Add the known value as a ``const`` on your factory:
 
-           protected function getDefaults(): array
-           {
-               return [
-                   // ...
-                   'password' => '$argon2id$v=19$m=65536,t=4,p=1$pLFF3D2gnvDmxMuuqH4BrA$3vKfv0cw+6EaNspq9btVAYc+jCOqrmWRstInB2fRPeQ',
-               ];
-           }
-       }
+.. code-block:: php
 
-   Now, in your tests, when you need access to the unencoded password for a user created with ``UserFactory``, use
-   ``UserFactory::DEFAULT_PASSWORD``.
+    class UserFactory extends ModelFactory
+    {
+        public const DEFAULT_PASSWORD = '1234'; // the password used to create the pre-encoded version below
+
+        protected function getDefaults(): array
+        {
+            return [
+                // ...
+                'password' => '$argon2id$v=19$m=65536,t=4,p=1$pLFF3D2gnvDmxMuuqH4BrA$3vKfv0cw+6EaNspq9btVAYc+jCOqrmWRstInB2fRPeQ',
+            ];
+        }
+    }
+
+Now, in your tests, when you need access to the unencoded password for a user created with ``UserFactory``, use
+``UserFactory::DEFAULT_PASSWORD``.
 
 Non-Kernel Tests
 ~~~~~~~~~~~~~~~~
