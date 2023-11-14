@@ -1484,7 +1484,9 @@ Global State
 ~~~~~~~~~~~~
 
 If you have an initial database state you want for all tests, you can set this in the config of the bundle. Accepted
-values are: stories as service, "global" stories and invokable services.
+values are: stories as service, "global" stories and invokable services. Global state is loaded before each using
+the ``ResetDatabase`` trait. If you are using `DamaDoctrineTestBundle`_, it is only loaded once for the entire
+test suite.
 
 .. configuration-block::
 
@@ -1507,6 +1509,10 @@ values are: stories as service, "global" stories and invokable services.
 .. note::
 
     The :ref:`ResetDatabase <enable-foundry-in-your-testcase>` trait is required when using global state.
+
+.. warning::
+
+    Be aware that a complex global state could slow down your test suite.
 
 PHPUnit Data Providers
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -1658,57 +1664,103 @@ accordingly. Your database is still reset before running your test suite but the
     Using `Global State`_ that creates both ORM and ODM factories when using DAMADoctrineTestBundle
     is not supported.
 
-Miscellaneous
-.............
+paratestphp/paratest
+....................
 
-1. Disable debug mode when running tests. In your ``.env.test`` file, you can set ``APP_DEBUG=0`` to have your tests
-   run without debug mode. This can speed up your tests considerably. You will need to ensure you cache is cleared
-   before running the test suite. The best place to do this is in your ``tests/bootstrap.php``:
+You can use `paratestphp/paratest <https://github.com/paratestphp/paratest>`_ to run your tests in parallel.
+This can dramatically improve test speed. The following considerations need to be taken into account:
+
+1. Your doctrine package configuration needs to have paratest's ``TEST_TOKEN`` environment variable in
+   the database name. This is so each parallel process has its own database. For example:
+
+   .. code-block:: yaml
+
+   # config/packages/doctrine.yaml
+       when@test:
+           doctrine:
+               dbal:
+                   dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+
+2. If using `DAMADoctrineTestBundle`_ and ``paratestphp/paratest`` < 7.0, you need to set the ``--runner`` option to
+   ``WrapperRunner``. This is so the database is reset once per process (without this option, it is reset once per
+   test class).
+
+   .. code-block:: terminal
+
+       vendor/bin/paratest --runner WrapperRunner
+
+3. If running with debug mode disabled, you need to adjust the `Disable Debug Mode`_ code to the following:
 
    .. code-block:: php
 
        // tests/bootstrap.php
        // ...
-       if (false === (bool) $_SERVER['APP_DEBUG']) {
-           // ensure fresh cache
-           (new Symfony\Component\Filesystem\Filesystem())->remove(__DIR__.'/../var/cache/test');
+       if (false === (bool) $_SERVER['APP_DEBUG'] && null === ($_SERVER['TEST_TOKEN'] ?? null)) {
+           /*
+            * Ensure a fresh cache when debug mode is disabled. When using paratest, this
+            * file is required once at the very beginning, and once per process. Checking that
+            * TEST_TOKEN is not set ensures this is only run once at the beginning.
+            */
+           (new Filesystem())->remove(__DIR__.'/../var/cache/test');
        }
 
-2. Reduce password encoder *work factor*. If you have a lot of tests that work with encoded passwords, this will cause
-   these tests to be unnecessarily slow. You can improve the speed by reducing the *work factor* of your encoder:
+Disable Debug Mode
+..................
 
-   .. code-block:: yaml
+In your ``.env.test`` file, you can set ``APP_DEBUG=0`` to have your tests run without debug mode. This can speed up
+your tests considerably. You will need to ensure you cache is cleared before running the test suite. The best place to
+do this is in your ``tests/bootstrap.php``:
 
-       # config/packages/test/security.yaml
-       encoders:
-           # use your user class name here
-           App\Entity\User:
-               # This should be the same value as in config/packages/security.yaml
-               algorithm: auto
-               cost: 4 # Lowest possible value for bcrypt
-               time_cost: 3 # Lowest possible value for argon
-               memory_cost: 10 # Lowest possible value for argon
+.. code-block:: php
 
-3. Pre-encode user passwords with a known value via ``bin/console security:encode-password`` and set this in
-   ``ModelFactory::getDefaults()``. Add the known value as a ``const`` on your factory:
+    // tests/bootstrap.php
+    // ...
+    if (false === (bool) $_SERVER['APP_DEBUG']) {
+        // ensure fresh cache
+        (new Symfony\Component\Filesystem\Filesystem())->remove(__DIR__.'/../var/cache/test');
+    }
 
-   .. code-block:: php
+Reduce Password Encoder *Work Factor*
+.....................................
 
-       class UserFactory extends ModelFactory
-       {
-           public const DEFAULT_PASSWORD = '1234'; // the password used to create the pre-encoded version below
+If you have a lot of tests that work with encoded passwords, this will cause these tests to be unnecessarily slow.
+You can improve the speed by reducing the *work factor* of your encoder:
 
-           protected function getDefaults(): array
-           {
-               return [
-                   // ...
-                   'password' => '$argon2id$v=19$m=65536,t=4,p=1$pLFF3D2gnvDmxMuuqH4BrA$3vKfv0cw+6EaNspq9btVAYc+jCOqrmWRstInB2fRPeQ',
-               ];
-           }
-       }
+.. code-block:: yaml
 
-   Now, in your tests, when you need access to the unencoded password for a user created with ``UserFactory``, use
-   ``UserFactory::DEFAULT_PASSWORD``.
+    # config/packages/test/security.yaml
+    encoders:
+        # use your user class name here
+        App\Entity\User:
+            # This should be the same value as in config/packages/security.yaml
+            algorithm: auto
+            cost: 4 # Lowest possible value for bcrypt
+            time_cost: 3 # Lowest possible value for argon
+            memory_cost: 10 # Lowest possible value for argon
+
+Pre-Encode Passwords
+....................
+
+Pre-encode user passwords with a known value via ``bin/console security:encode-password`` and set this in
+``ModelFactory::getDefaults()``. Add the known value as a ``const`` on your factory:
+
+.. code-block:: php
+
+    class UserFactory extends ModelFactory
+    {
+        public const DEFAULT_PASSWORD = '1234'; // the password used to create the pre-encoded version below
+
+        protected function getDefaults(): array
+        {
+            return [
+                // ...
+                'password' => '$argon2id$v=19$m=65536,t=4,p=1$pLFF3D2gnvDmxMuuqH4BrA$3vKfv0cw+6EaNspq9btVAYc+jCOqrmWRstInB2fRPeQ',
+            ];
+        }
+    }
+
+Now, in your tests, when you need access to the unencoded password for a user created with ``UserFactory``, use
+``UserFactory::DEFAULT_PASSWORD``.
 
 Non-Kernel Tests
 ~~~~~~~~~~~~~~~~
