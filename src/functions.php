@@ -14,6 +14,7 @@ namespace Zenstruck\Foundry;
 use Faker;
 use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Persistence\RepositoryDecorator;
+
 use function Zenstruck\Foundry\Persistence\persist_proxy;
 use function Zenstruck\Foundry\Persistence\persistent_factory;
 use function Zenstruck\Foundry\Persistence\proxy_factory;
@@ -47,7 +48,7 @@ function factory(string $class, array|callable $defaultAttributes = []): Anonymo
  */
 function anonymous(string $class, array|callable $defaultAttributes = []): Factory
 {
-    trigger_deprecation('zenstruck\foundry', '1.37', sprintf('Usage of "%s()" function is deprecated and will be removed in 2.0. Use the "Zenstruck\Foundry\Persistence\proxy_factory()" function instead.', __FUNCTION__));
+    trigger_deprecation('zenstruck\foundry', '1.37', \sprintf('Usage of "%s()" function is deprecated and will be removed in 2.0. Use the "Zenstruck\Foundry\Persistence\proxy_factory()" function instead.', __FUNCTION__));
 
     return proxy_factory($class, $defaultAttributes);
 }

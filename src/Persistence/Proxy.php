@@ -19,7 +19,6 @@ use Zenstruck\Callback;
 use Zenstruck\Callback\Parameter;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\Instantiator;
-use Zenstruck\Foundry\Persistence\Proxy as ProxyBase;
 
 /**
  * @template TProxiedObject of object
