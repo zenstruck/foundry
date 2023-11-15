@@ -329,7 +329,7 @@ final class RepositoryDecorator implements ObjectRepository, \IteratorAggregate,
             }
 
             if ($attributeValue instanceof Factory) {
-                $attributeValue = $attributeValue->withoutPersisting()->create()->_real();
+                $attributeValue = $attributeValue->withoutPersisting()->createAndUproxify();
             } elseif ($attributeValue instanceof Proxy) {
                 $attributeValue = $attributeValue->_real();
             }

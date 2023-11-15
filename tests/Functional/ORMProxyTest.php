@@ -11,13 +11,15 @@
 
 namespace Zenstruck\Foundry\Tests\Functional;
 
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
 
-use function Zenstruck\Foundry\anonymous;
+use function Zenstruck\Foundry\Persistence\persistent_factory;
+use function Zenstruck\Foundry\Persistence\proxy_factory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -47,7 +49,7 @@ final class ORMProxyTest extends ProxyTest
      */
     public function can_autorefresh_entity_with_embedded_object(): void
     {
-        $contact = anonymous(Contact::class)->create(['name' => 'john'])
+        $contact = proxy_factory(Contact::class)->create(['name' => 'john'])
             ->_enableAutoRefresh()
         ;
 

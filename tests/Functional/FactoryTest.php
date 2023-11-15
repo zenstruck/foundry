@@ -23,7 +23,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeOtherObject;
 
-use function Zenstruck\Foundry\anonymous;
+use function Zenstruck\Foundry\Persistence\persistent_factory;
 use function Zenstruck\Foundry\object;
 use function Zenstruck\Foundry\Persistence\flush_after;
 use function Zenstruck\Foundry\Persistence\persist;
@@ -48,7 +48,7 @@ final class FactoryTest extends KernelTestCase
      */
     public function many_to_one_relationship(): void
     {
-        $categoryFactory = anonymous(Category::class, ['name' => 'foo']);
+        $categoryFactory = persistent_factory(Category::class, ['name' => 'foo']);
         $category = persist(Category::class, ['name' => 'bar']);
         $postA = persist(Post::class, ['title' => 'title', 'body' => 'body', 'category' => $categoryFactory]);
         $postB = persist(Post::class, ['title' => 'title', 'body' => 'body', 'category' => $category]);
@@ -65,7 +65,7 @@ final class FactoryTest extends KernelTestCase
         $category = persist(Category::class, [
             'name' => 'bar',
             'posts' => [
-                anonymous(Post::class, ['title' => 'Post A', 'body' => 'body']),
+                persistent_factory(Post::class, ['title' => 'Post A', 'body' => 'body']),
                 persist(Post::class, ['title' => 'Post B', 'body' => 'body']),
             ],
         ]);
@@ -89,7 +89,7 @@ final class FactoryTest extends KernelTestCase
             'title' => 'title',
             'body' => 'body',
             'tags' => [
-                anonymous(Tag::class, ['name' => 'Tag A']),
+                persistent_factory(Tag::class, ['name' => 'Tag A']),
                 persist(Tag::class, ['name' => 'Tag B']),
             ],
         ]);
@@ -112,7 +112,7 @@ final class FactoryTest extends KernelTestCase
         $tag = persist(Tag::class, [
             'name' => 'bar',
             'posts' => [
-                anonymous(Post::class, ['title' => 'Post A', 'body' => 'body']),
+                persistent_factory(Post::class, ['title' => 'Post A', 'body' => 'body']),
                 persist(Post::class, ['title' => 'Post B', 'body' => 'body']),
             ],
         ]);
@@ -132,10 +132,10 @@ final class FactoryTest extends KernelTestCase
      */
     public function creating_with_factory_attribute_persists_the_factory(): void
     {
-        $object = anonymous(Post::class)->create([
+        $object = persistent_factory(Post::class)->create([
             'title' => 'title',
             'body' => 'body',
-            'category' => anonymous(Category::class, ['name' => 'name']),
+            'category' => persistent_factory(Category::class, ['name' => 'name']),
         ]);
 
         $this->assertNotNull($object->getCategory()->getId());
@@ -146,7 +146,7 @@ final class FactoryTest extends KernelTestCase
      */
     public function can_create_embeddable(): void
     {
-        $object = anonymous(Address::class)->create(['value' => 'an address']);
+        $object = persistent_factory(Address::class)->create(['value' => 'an address']);
 
         $this->assertSame('an address', $object->getValue());
     }
@@ -157,10 +157,10 @@ final class FactoryTest extends KernelTestCase
         repository(Category::class)->assert()->empty();
 
         flush_after(static function(): void {
-            anonymous(Post::class)->create([
+            persistent_factory(Post::class)->create([
                 'title' => 'title',
                 'body' => 'body',
-                'category' => anonymous(Category::class, ['name' => 'name']),
+                'category' => persistent_factory(Category::class, ['name' => 'name']),
             ]);
             repository(Post::class)->assert()->empty();
             repository(Category::class)->assert()->empty();
@@ -179,10 +179,10 @@ final class FactoryTest extends KernelTestCase
         repository(Category::class)->assert()->empty();
 
         flush_after(static function(): void {
-            $post = anonymous(Post::class)->create([
+            $post = persistent_factory(Post::class)->create([
                 'title' => 'title',
                 'body' => 'body',
-                'category' => anonymous(Category::class, ['name' => 'name']),
+                'category' => persistent_factory(Category::class, ['name' => 'name']),
             ]);
             $post->setTitle('new title');
             $post->setBody('new body');
@@ -199,7 +199,7 @@ final class FactoryTest extends KernelTestCase
      */
     public function can_create_an_object_not_persisted_with_nested_factory(): void
     {
-        $notPersistedObject = SomeObjectFactory::new()->create()->_real();
+        $notPersistedObject = SomeObjectFactory::new()->create();
         self::assertInstanceOf(SomeObject::class, $notPersistedObject);
         self::assertInstanceOf(SomeOtherObject::class, $notPersistedObject->someOtherObjectMandatory);
     }
@@ -209,10 +209,10 @@ final class FactoryTest extends KernelTestCase
      */
     public function instantiate(): void
     {
-        $proxy = object(Post::class, ['title' => 'title', 'body' => 'body']);
+        $object = object(Post::class, ['title' => 'title', 'body' => 'body']);
 
-        $this->assertInstanceOf(Post::class, $proxy->_real());
+        $this->assertInstanceOf(Post::class, $object);
         PostFactory::assert()->count(0);
-        $this->assertSame('title', $proxy->getTitle());
+        $this->assertSame('title', $object->getTitle());
     }
 }
