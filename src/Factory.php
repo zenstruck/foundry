@@ -100,10 +100,9 @@ class Factory
          * @internal
          */
         bool $noProxy = false
-    ): object
-    {
-        if (\count(func_get_args()) === 2 && !str_starts_with(debug_backtrace(options: \DEBUG_BACKTRACE_IGNORE_ARGS, limit: 1)[0]['class'] ?? '', 'Zenstruck\Foundry')) {
-            trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Parameter "$noProxy" of method "%s()" is deprecated and will be removed in Foundry 2.0.', __METHOD__));
+    ): object {
+        if (2 === \count(\func_get_args()) && !\str_starts_with(\debug_backtrace(options: \DEBUG_BACKTRACE_IGNORE_ARGS, limit: 1)[0]['class'] ?? '', 'Zenstruck\Foundry')) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Parameter "$noProxy" of method "%s()" is deprecated and will be removed in Foundry 2.0.', __METHOD__));
         }
 
         // merge the factory attribute set with the passed attributes
@@ -361,6 +360,30 @@ class Factory
         return self::configuration()->delayFlush($callback);
     }
 
+    /**
+     * @internal
+     *
+     * @return TObject
+     */
+    public function createAndUproxify(): object
+    {
+        $object = $this->create(
+            noProxy: !$this->shouldUseProxy()
+        );
+
+        return $object instanceof Proxy ? $object->_real() : $object;
+    }
+
+    /**
+     * @internal
+     *
+     * @return ($this is PersistentProxyObjectFactory ? true : false)
+     */
+    public function shouldUseProxy(): bool
+    {
+        return $this instanceof PersistentProxyObjectFactory;
+    }
+
     protected function isPersisting(): bool
     {
         if (!$this->persist || !self::configuration()->isPersistEnabled() || !self::configuration()->hasManagerRegistry()) {
@@ -501,29 +524,5 @@ class Factory
         $cloned->cascadePersist = true;
 
         return $cloned;
-    }
-
-    /**
-     * @internal
-     *
-     * @return TObject
-     */
-    public function createAndUproxify(): object
-    {
-        $object = $this->create(
-            noProxy: !$this->shouldUseProxy()
-        );
-
-        return $object instanceof Proxy ? $object->_real() : $object;
-    }
-
-    /**
-     * @internal
-     *
-     * @return ($this is PersistentProxyObjectFactory ? true : false)
-     */
-    public function shouldUseProxy(): bool
-    {
-        return $this instanceof PersistentProxyObjectFactory;
     }
 }

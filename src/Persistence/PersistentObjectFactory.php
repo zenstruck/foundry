@@ -41,7 +41,7 @@ abstract class PersistentObjectFactory extends Factory
             throw new \BadMethodCallException(\sprintf('Call to undefined static method "%s::%s".', static::class, $name));
         }
 
-        return static::new()->many($arguments[0])->create(($arguments[1] ?? []), noProxy: true);
+        return static::new()->many($arguments[0])->create($arguments[1] ?? [], noProxy: true);
     }
 
     /**
@@ -99,10 +99,9 @@ abstract class PersistentObjectFactory extends Factory
          * @internal
          */
         bool $noProxy = false
-    ): object
-    {
-        if (\count(func_get_args()) === 2 && !str_starts_with(debug_backtrace(options: \DEBUG_BACKTRACE_IGNORE_ARGS, limit: 1)[0]['class'] ?? '', 'Zenstruck\Foundry')) {
-            trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Parameter "$noProxy" of method "%s()" is deprecated and will be removed in Foundry 2.0.', __METHOD__));
+    ): object {
+        if (2 === \count(\func_get_args()) && !\str_starts_with(\debug_backtrace(options: \DEBUG_BACKTRACE_IGNORE_ARGS, limit: 1)[0]['class'] ?? '', 'Zenstruck\Foundry')) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Parameter "$noProxy" of method "%s()" is deprecated and will be removed in Foundry 2.0.', __METHOD__));
         }
 
         return parent::create(
@@ -349,12 +348,12 @@ abstract class PersistentObjectFactory extends Factory
     abstract protected function defaults(): array|callable;
 
     /**
-     * @param list<Proxy<TModel>> $proxies
+     * @param  list<Proxy<TModel>> $proxies
      * @return list<TModel>
      */
     private static function unproxy(array $proxies): array
     {
-        return array_map(
+        return \array_map(
             static fn(Proxy $proxy) => $proxy->_real(),
             $proxies
         );

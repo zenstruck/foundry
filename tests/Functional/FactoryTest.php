@@ -23,10 +23,10 @@ use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeOtherObject;
 
-use function Zenstruck\Foundry\Persistence\persistent_factory;
 use function Zenstruck\Foundry\object;
 use function Zenstruck\Foundry\Persistence\flush_after;
 use function Zenstruck\Foundry\Persistence\persist;
+use function Zenstruck\Foundry\Persistence\persistent_factory;
 use function Zenstruck\Foundry\Persistence\repository;
 
 /**

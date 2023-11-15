@@ -18,10 +18,10 @@ use Zenstruck\Foundry\RepositoryAssertions;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
-use function Zenstruck\Foundry\Persistence\persistent_factory;
 use function Zenstruck\Foundry\Persistence\disable_persisting;
 use function Zenstruck\Foundry\Persistence\enable_persisting;
 use function Zenstruck\Foundry\Persistence\persist;
+use function Zenstruck\Foundry\Persistence\persistent_factory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

@@ -24,8 +24,8 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\LegacyPostFactory;
 
-use function Zenstruck\Foundry\Persistence\persistent_factory;
 use function Zenstruck\Foundry\lazy;
+use function Zenstruck\Foundry\Persistence\persistent_factory;
 use function Zenstruck\Foundry\Persistence\proxy_factory;
 
 /**

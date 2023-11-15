@@ -27,39 +27,6 @@ use Zenstruck\Foundry\Factory;
  */
 abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
 {
-    final public static function new(array|callable|string $defaultAttributes = [], string ...$states): static
-    {
-        if ((new \ReflectionClass(static::class()))->isFinal()) {
-            trigger_deprecation(
-                'zenstruck\foundry', '1.37.0',
-                \sprintf('Using a proxy factory with a final class is deprecated and will throw an error in Foundry 2.0. Use "%s" instead, or unfinalize "%s" class.', PersistentProxyObjectFactory::class, static::class())
-            );
-        }
-
-        return parent::new($defaultAttributes, ...$states);
-    }
-
-    /**
-     * @final
-     *
-     * @return Proxy<TModel>
-     */
-    final public function create(
-        array|callable $attributes = [],
-        /**
-         * @deprecated
-         * @internal
-         */
-        bool $noProxy = false
-    ): object
-    {
-        if (\count(func_get_args()) === 2 && !str_starts_with(debug_backtrace(options: \DEBUG_BACKTRACE_IGNORE_ARGS, limit: 1)[0]['class'] ?? '', 'Zenstruck\Foundry')) {
-            trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Parameter "$noProxy" of method "%s()" is deprecated and will be removed in Foundry 2.0.', __METHOD__));
-        }
-
-        return Factory::create($attributes, noProxy: false);
-    }
-
     /**
      * @phpstan-return list<Proxy<TModel>>
      */
@@ -70,6 +37,36 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
         }
 
         return static::new()->many($arguments[0])->create($arguments[1] ?? [], noProxy: false);
+    }
+
+    final public static function new(array|callable|string $defaultAttributes = [], string ...$states): static
+    {
+        if ((new \ReflectionClass(static::class()))->isFinal()) {
+            trigger_deprecation(
+                'zenstruck\foundry', '1.37.0',
+                \sprintf('Using a proxy factory with a final class is deprecated and will throw an error in Foundry 2.0. Use "%s" instead, or unfinalize "%s" class.', self::class, static::class())
+            );
+        }
+
+        return parent::new($defaultAttributes, ...$states);
+    }
+
+    /**
+     * @return Proxy<TModel>
+     */
+    final public function create(
+        array|callable $attributes = [],
+        /**
+         * @deprecated
+         * @internal
+         */
+        bool $noProxy = false
+    ): object {
+        if (2 === \count(\func_get_args()) && !\str_starts_with(\debug_backtrace(options: \DEBUG_BACKTRACE_IGNORE_ARGS, limit: 1)[0]['class'] ?? '', 'Zenstruck\Foundry')) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Parameter "$noProxy" of method "%s()" is deprecated and will be removed in Foundry 2.0.', __METHOD__));
+        }
+
+        return Factory::create($attributes, noProxy: false);
     }
 
     /**

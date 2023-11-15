@@ -36,11 +36,11 @@ abstract class ModelFactory extends PersistentProxyObjectFactory
             'zenstruck\foundry', '1.37.0',
             \sprintf(
                 <<<MESSAGE
-                Class "%s" is deprecated and will be removed in version 2.0. Use "%s" instead.
-                Be aware that both classes exist "%s" and "%s".
-                You should use the first one if you don't need a proxy or if the target class of the factory is final:
-                in Foundry 2.0 proxy system will leverage Symfony's lazy object system and it will be impossible to create a proxy for a final class.
-                MESSAGE,
+                    Class "%s" is deprecated and will be removed in version 2.0. Use "%s" instead.
+                    Be aware that both classes exist "%s" and "%s".
+                    You should use the first one if you don't need a proxy or if the target class of the factory is final:
+                    in Foundry 2.0 proxy system will leverage Symfony's lazy object system and it will be impossible to create a proxy for a final class.
+                    MESSAGE,
                 self::class,
                 $newFactoryClass,
                 PersistentObjectFactory::class,
