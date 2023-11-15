@@ -1,0 +1,16 @@
+<?php
+
+namespace Doctrine\ORM\Repository;
+
+use Doctrine\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityManagerInterface;
+
+interface RepositoryFactory
+{
+    /**
+     * @template TEntityClass of object
+     * @phpstan-param class-string<TEntityClass> $entityName
+     * @phpstan-return ObjectRepository<TEntityClass>
+     */
+    public function getRepository(EntityManagerInterface $entityManager, $entityName);
+}

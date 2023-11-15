@@ -1,0 +1,156 @@
+<?php
+
+namespace Doctrine\ORM;
+
+use Doctrine\ORM\Query\Expr;
+
+class QueryBuilder
+{
+
+	/**
+	 * @return Query<mixed>
+	 */
+	public function getQuery()
+	{
+	}
+
+	/**
+	 * @param \Doctrine\Common\Collections\ArrayCollection<array-key, mixed>|array<mixed> $parameters
+	 * @return static
+	 */
+	public function setParameters($parameters)
+	{
+
+	}
+
+	/**
+	 * @param string                                                                            $dqlPartName
+	 * @param literal-string|object|list<literal-string>|array{join: array<int|string, object>} $dqlPart
+	 * @param bool                                                                              $append
+	 *
+	 * @return $this
+	 */
+	public function add($dqlPartName, $dqlPart, $append = false)
+	{
+
+	}
+
+	/**
+	 * @param literal-string|null $delete
+	 * @param literal-string|null $alias
+	 *
+	 * @return $this
+	 */
+	public function delete($delete = null, $alias = null)
+	{
+
+	}
+
+	/**
+	 * @param literal-string|null $update
+	 * @param literal-string|null $alias
+	 *
+	 * @return $this
+	 */
+	public function update($update = null, $alias = null)
+	{
+
+	}
+
+	/**
+	 * @param literal-string|class-string $from
+	 * @param literal-string              $alias
+	 * @param literal-string|null         $indexBy
+	 *
+	 * @return $this
+	 */
+	public function from($from, $alias, $indexBy = null)
+	{
+
+	}
+
+	/**
+	 * @param literal-string|class-string                        $join
+	 * @param literal-string                                     $alias
+	 * @param Expr\Join::ON|Expr\Join::WITH|null                 $conditionType
+	 * @param literal-string|Expr\Comparison|Expr\Composite|Expr\Func|null $condition
+	 * @param literal-string|null                                $indexBy
+	 *
+	 * @return $this
+	 */
+	public function innerJoin($join, $alias, $conditionType = null, $condition = null, $indexBy = null)
+	{
+
+	}
+
+	/**
+	 * @param literal-string|class-string                        $join
+	 * @param literal-string                                     $alias
+	 * @param Expr\Join::ON|Expr\Join::WITH|null                 $conditionType
+	 * @param literal-string|Expr\Comparison|Expr\Composite|Expr\Func|null $condition
+	 * @param literal-string|null                                $indexBy
+	 *
+	 * @return $this
+	 */
+	public function leftJoin($join, $alias, $conditionType = null, $condition = null, $indexBy = null)
+	{
+
+	}
+
+	/**
+	 * @param literal-string|class-string                        $join
+	 * @param literal-string                                     $alias
+	 * @param Expr\Join::ON|Expr\Join::WITH|null                 $conditionType
+	 * @param literal-string|Expr\Comparison|Expr\Composite|Expr\Func|null $condition
+	 * @param literal-string|null                                $indexBy
+	 *
+	 * @return $this
+	 */
+	public function join($join, $alias, $conditionType = null, $condition = null, $indexBy = null)
+	{
+
+	}
+
+	/**
+	 * @return literal-string
+	 */
+	public function getRootAlias()
+	{
+
+	}
+
+	/**
+	 * @return list<literal-string>
+	 */
+	public function getRootAliases()
+	{
+
+	}
+
+	/**
+	 * @return list<literal-string>
+	 */
+	public function getAllAlias()
+	{
+
+	}
+
+	/**
+	 * @param literal-string|object|array<mixed> $predicates
+	 * @return $this
+	 */
+	public function where($predicates)
+	{
+
+	}
+
+	/**
+	 * @param literal-string|object|array<mixed> $predicates
+	 * @return $this
+	 */
+	public function andWhere($predicates)
+	{
+
+	}
+
+}

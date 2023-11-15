@@ -1,0 +1,422 @@
+parameters:
+	doctrine:
+		repositoryClass: null
+		ormRepositoryClass: null
+		odmRepositoryClass: null
+		queryBuilderClass: null
+		allCollectionsSelectable: true
+		objectManagerLoader: null
+		searchOtherMethodsForQueryBuilderBeginning: true
+		queryBuilderFastAlgorithm: false
+	featureToggles:
+		skipCheckGenericClasses:
+			- Doctrine\ODM\MongoDB\Mapping\ClassMetadata
+			- Doctrine\ORM\Mapping\ClassMetadata
+			- Doctrine\ORM\Mapping\ClassMetadataInfo
+			- Doctrine\Persistence\Mapping\ClassMetadata
+			- Doctrine\ORM\AbstractQuery
+			- Doctrine\ORM\Query
+			- Doctrine\ORM\Tools\Pagination\Paginator
+	stubFiles:
+		- stubs/Criteria.stub
+		- stubs/DBAL/Exception/UniqueConstraintViolationException.stub
+		- stubs/DocumentManager.stub
+		- stubs/DocumentRepository.stub
+		- stubs/EntityManager.stub
+		- stubs/EntityManagerDecorator.stub
+		- stubs/EntityManagerInterface.stub
+		- stubs/MongoClassMetadataInfo.stub
+
+		- stubs/Persistence/ManagerRegistry.stub
+		- stubs/Persistence/ObjectManager.stub
+		- stubs/Persistence/ObjectManagerDecorator.stub
+		- stubs/Persistence/ObjectRepository.stub
+		- stubs/RepositoryFactory.stub
+		- stubs/Collections/ArrayCollection.stub
+		- stubs/Collections/Collection.stub
+		- stubs/Collections/ReadableCollection.stub
+		- stubs/Collections/Selectable.stub
+		- stubs/ORM/AbstractQuery.stub
+		- stubs/ORM/Exception/ORMException.stub
+		- stubs/ORM/Id/AbstractIdGenerator.stub
+		- stubs/ORM/Mapping/ClassMetadata.stub
+		- stubs/ORM/Mapping/ClassMetadataInfo.stub
+		- stubs/ORM/NonUniqueResultException.stub
+		- stubs/ORM/NoResultException.stub
+		- stubs/ORM/ORMException.stub
+		- stubs/ORM/UnexpectedResultException.stub
+		- stubs/ORM/Query/Expr.stub
+		- stubs/ORM/Query.stub
+		- stubs/ORM/Query/Expr/Comparison.stub
+		- stubs/ORM/Query/Expr/Composite.stub
+		- stubs/ORM/Query/Expr/Func.stub
+		- stubs/ORM/Query/Expr/Join.stub
+		- stubs/ORM/Tools/Pagination/Paginator.stub
+		- stubs/Persistence/Mapping/ClassMetadata.stub
+		- stubs/ServiceDocumentRepository.stub
+
+parametersSchema:
+	doctrine: structure([
+		repositoryClass: schema(string(), nullable())
+		ormRepositoryClass: schema(string(), nullable())
+		odmRepositoryClass: schema(string(), nullable())
+		queryBuilderClass: schema(string(), nullable())
+		allCollectionsSelectable: bool()
+		objectManagerLoader: schema(string(), nullable())
+		searchOtherMethodsForQueryBuilderBeginning: bool()
+		queryBuilderFastAlgorithm: bool()
+	])
+
+conditionalTags:
+	PHPStan\Reflection\Doctrine\DoctrineSelectableClassReflectionExtension:
+		phpstan.broker.methodsClassReflectionExtension: %doctrine.allCollectionsSelectable%
+
+services:
+	-
+		class: PHPStan\Type\Doctrine\DescriptorRegistryFactory
+
+	doctrineTypeDescriptorRegistry:
+		class: PHPStan\Type\Doctrine\DefaultDescriptorRegistry
+		factory: @PHPStan\Type\Doctrine\DescriptorRegistryFactory::createRegistry
+
+	-
+		class: PHPStan\Reflection\Doctrine\DoctrineSelectableClassReflectionExtension
+	-
+		class: PHPStan\Reflection\Doctrine\EntityRepositoryClassReflectionExtension
+		tags:
+			- phpstan.broker.methodsClassReflectionExtension
+	-
+		class: PHPStan\Type\Doctrine\QueryBuilder\CreateQueryBuilderDynamicReturnTypeExtension
+		arguments:
+			queryBuilderClass: %doctrine.queryBuilderClass%
+			fasterVersion: %doctrine.queryBuilderFastAlgorithm%
+		tags:
+			- phpstan.broker.dynamicMethodReturnTypeExtension
+	-
+		class: PHPStan\Type\Doctrine\QueryBuilder\EntityRepositoryCreateQueryBuilderDynamicReturnTypeExtension
+		tags:
+			- phpstan.broker.dynamicMethodReturnTypeExtension
+	-
+		class: PHPStan\Type\Doctrine\DoctrineSelectableDynamicReturnTypeExtension
+		tags:
+			- phpstan.broker.dynamicMethodReturnTypeExtension
+	-
+		class: PHPStan\Type\Doctrine\ObjectMetadataResolver
+		arguments:
+			objectManagerLoader: %doctrine.objectManagerLoader%
+			tmpDir: %tmpDir%
+	-
+		class: PHPStan\Type\Doctrine\QueryBuilder\QueryBuilderGetDqlDynamicReturnTypeExtension
+		arguments:
+			queryBuilderClass: %doctrine.queryBuilderClass%
+		tags:
+			- phpstan.broker.dynamicMethodReturnTypeExtension
+	-
+		class: PHPStan\Type\Doctrine\QueryBuilder\QueryBuilderGetQueryDynamicReturnTypeExtension
+		arguments:
+			queryBuilderClass: %doctrine.queryBuilderClass%
+			argumentsProcessor: @doctrineQueryBuilderArgumentsProcessor
+			descriptorRegistry: @doctrineTypeDescriptorRegistry
+		tags:
+			- phpstan.broker.dynamicMethodReturnTypeExtension
+	-
+		class: PHPStan\Type\Doctrine\QueryBuilder\QueryBuilderMethodDynamicReturnTypeExtension
+		arguments:
+			queryBuilderClass: %doctrine.queryBuilderClass%
+		tags:
+			- phpstan.broker.dynamicMethodReturnTypeExtension
+
+	-
+		class: PHPStan\Type\Doctrine\QueryBuilder\QueryBuilderTypeSpecifyingExtension
+		arguments:
+			queryBuilderClass: %doctrine.queryBuilderClass%
+		tags:
+			- phpstan.typeSpecifier.methodTypeSpecifyingExtension
+	-
+		class: PHPStan\Type\Doctrine\Query\QueryGetDqlDynamicReturnTypeExtension
+		tags:
+			- phpstan.broker.dynamicMethodReturnTypeExtension
+	-
+		class: PHPStan\Type\Doctrine\CreateQueryDynamicReturnTypeExtension
+		arguments:
+			objectMetadataResolver: @PHPStan\Type\Doctrine\ObjectMetadataResolver
+			descriptorRegistry: @doctrineTypeDescriptorRegistry
+		tags:
+			- phpstan.broker.dynamicMethodReturnTypeExtension
+	-
+		class: PHPStan\Type\Doctrine\Query\QueryResultDynamicReturnTypeExtension
+		tags:
+			- phpstan.broker.dynamicMethodReturnTypeExtension
+	-
+		class: PHPStan\Type\Doctrine\QueryBuilder\Expr\ExpressionBuilderDynamicReturnTypeExtension
+		arguments:
+			argumentsProcessor: @doctrineQueryBuilderArgumentsProcessor
+		tags:
+			- phpstan.broker.dynamicMethodReturnTypeExtension
+	-
+		class: PHPStan\Type\Doctrine\QueryBuilder\Expr\BaseExpressionDynamicReturnTypeExtension
+		arguments:
+			argumentsProcessor: @doctrineQueryBuilderArgumentsProcessor
+		tags:
+			- phpstan.broker.dynamicMethodReturnTypeExtension
+	-
+		class: PHPStan\Rules\Doctrine\ORM\PropertiesExtension
+		tags:
+			- phpstan.properties.readWriteExtension
+	-
+		class: PHPStan\Type\Doctrine\QueryBuilder\OtherMethodQueryBuilderParser
+		arguments:
+			descendIntoOtherMethods: %doctrine.searchOtherMethodsForQueryBuilderBeginning%
+			parser: @defaultAnalysisParser
+
+	-
+		class: PHPStan\Type\Doctrine\QueryBuilder\ReturnQueryBuilderExpressionTypeResolverExtension
+		tags:
+			- phpstan.broker.expressionTypeResolverExtension
+
+	-
+		class: PHPStan\Stubs\Doctrine\StubFilesExtensionLoader
+		tags:
+			- phpstan.stubFilesExtension
+		arguments:
+			bleedingEdge: %featureToggles.bleedingEdge%
+
+	doctrineQueryBuilderArgumentsProcessor:
+		class: PHPStan\Type\Doctrine\ArgumentsProcessor
+		autowired: false
+
+	managerRegistryGetRepository:
+		class: PHPStan\Type\Doctrine\GetRepositoryDynamicReturnTypeExtension
+		tags:
+			- phpstan.broker.dynamicMethodReturnTypeExtension
+		arguments:
+			managerClass: Doctrine\Persistence\ManagerRegistry
+			repositoryClass: %doctrine.repositoryClass%
+			ormRepositoryClass: %doctrine.ormRepositoryClass%
+			odmRepositoryClass: %doctrine.odmRepositoryClass%
+
+	objectManagerGetRepository:
+		class: PHPStan\Type\Doctrine\GetRepositoryDynamicReturnTypeExtension
+		tags:
+			- phpstan.broker.dynamicMethodReturnTypeExtension
+		arguments:
+			managerClass: Doctrine\Persistence\ObjectManager
+			repositoryClass: %doctrine.repositoryClass%
+			ormRepositoryClass: %doctrine.ormRepositoryClass%
+			odmRepositoryClass: %doctrine.odmRepositoryClass%
+
+	persistenceManagerRegistryGetRepository:
+		class: PHPStan\Type\Doctrine\GetRepositoryDynamicReturnTypeExtension
+		tags:
+			- phpstan.broker.dynamicMethodReturnTypeExtension
+		arguments:
+			managerClass: Doctrine\Persistence\ManagerRegistry
+			repositoryClass: %doctrine.repositoryClass%
+			ormRepositoryClass: %doctrine.ormRepositoryClass%
+			odmRepositoryClass: %doctrine.odmRepositoryClass%
+
+	persistenceObjectManagerGetRepository:
+		class: PHPStan\Type\Doctrine\GetRepositoryDynamicReturnTypeExtension
+		tags:
+			- phpstan.broker.dynamicMethodReturnTypeExtension
+		arguments:
+			managerClass: Doctrine\Persistence\ObjectManager
+			repositoryClass: %doctrine.repositoryClass%
+			ormRepositoryClass: %doctrine.ormRepositoryClass%
+			odmRepositoryClass: %doctrine.odmRepositoryClass%
+
+	## NewExprDynamicReturnTypeExtensions
+
+	-
+		class: PHPStan\Type\Doctrine\QueryBuilder\Expr\NewExprDynamicReturnTypeExtension
+		tags:
+			- phpstan.broker.dynamicStaticMethodReturnTypeExtension
+		arguments:
+			class: Doctrine\ORM\Query\Expr\Base
+			argumentsProcessor: @doctrineQueryBuilderArgumentsProcessor
+	-
+		class: PHPStan\Type\Doctrine\QueryBuilder\Expr\NewExprDynamicReturnTypeExtension
+		tags:
+			- phpstan.broker.dynamicStaticMethodReturnTypeExtension
+		arguments:
+			class: Doctrine\ORM\Query\Expr\Comparison
+			argumentsProcessor: @doctrineQueryBuilderArgumentsProcessor
+	-
+		class: PHPStan\Type\Doctrine\QueryBuilder\Expr\NewExprDynamicReturnTypeExtension
+		tags:
+			- phpstan.broker.dynamicStaticMethodReturnTypeExtension
+		arguments:
+			class: Doctrine\ORM\Query\Expr\From
+			argumentsProcessor: @doctrineQueryBuilderArgumentsProcessor
+	-
+		class: PHPStan\Type\Doctrine\QueryBuilder\Expr\NewExprDynamicReturnTypeExtension
+		tags:
+			- phpstan.broker.dynamicStaticMethodReturnTypeExtension
+		arguments:
+			class: Doctrine\ORM\Query\Expr\Func
+			argumentsProcessor: @doctrineQueryBuilderArgumentsProcessor
+	-
+		class: PHPStan\Type\Doctrine\QueryBuilder\Expr\NewExprDynamicReturnTypeExtension
+		tags:
+			- phpstan.broker.dynamicStaticMethodReturnTypeExtension
+		arguments:
+			class: Doctrine\ORM\Query\Expr\Join
+			argumentsProcessor: @doctrineQueryBuilderArgumentsProcessor
+	-
+		class: PHPStan\Type\Doctrine\QueryBuilder\Expr\NewExprDynamicReturnTypeExtension
+		tags:
+			- phpstan.broker.dynamicStaticMethodReturnTypeExtension
+		arguments:
+			class: Doctrine\ORM\Query\Expr\Math
+			argumentsProcessor: @doctrineQueryBuilderArgumentsProcessor
+	-
+		class: PHPStan\Type\Doctrine\QueryBuilder\Expr\NewExprDynamicReturnTypeExtension
+		tags:
+			- phpstan.broker.dynamicStaticMethodReturnTypeExtension
+		arguments:
+			class: Doctrine\ORM\Query\Expr\OrderBy
+			argumentsProcessor: @doctrineQueryBuilderArgumentsProcessor
+	-
+		class: PHPStan\Type\Doctrine\QueryBuilder\Expr\NewExprDynamicReturnTypeExtension
+		tags:
+			- phpstan.broker.dynamicStaticMethodReturnTypeExtension
+		arguments:
+			class: Doctrine\ORM\Query\Expr
+			argumentsProcessor: @doctrineQueryBuilderArgumentsProcessor
+	-
+		class: PHPStan\Type\Doctrine\DBAL\QueryBuilder\QueryBuilderExecuteMethodExtension
+		tags:
+			- phpstan.broker.dynamicMethodReturnTypeExtension
+
+	# Type descriptors
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\ArrayType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\AsciiStringType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\BigIntType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\BinaryType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\BlobType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\BooleanType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\DateImmutableType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\DateIntervalType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\DateTimeImmutableType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\DateTimeType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\DateTimeTzImmutableType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\DateTimeTzType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\DateType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\DecimalType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\FloatType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\GuidType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\IntegerType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\JsonArrayType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\JsonType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\ObjectType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\SimpleArrayType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\SmallIntType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\StringType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\TextType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\TimeImmutableType
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\TimeType
+		tags: [phpstan.doctrine.typeDescriptor]
+
+	# 3rd party Type descriptors
+	-
+		factory: PHPStan\Type\Doctrine\Descriptors\ReflectionDescriptor('Carbon\Doctrine\CarbonImmutableType')
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		factory: PHPStan\Type\Doctrine\Descriptors\ReflectionDescriptor('Carbon\Doctrine\CarbonType')
+		tags: [phpstan.doctrine.typeDescriptor]
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\Ramsey\UuidTypeDescriptor
+		tags: [phpstan.doctrine.typeDescriptor]
+		arguments:
+			uuidTypeName: Ramsey\Uuid\Doctrine\UuidType
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\Ramsey\UuidTypeDescriptor
+		tags: [phpstan.doctrine.typeDescriptor]
+		arguments:
+			uuidTypeName: Ramsey\Uuid\Doctrine\UuidBinaryType
+	-
+		class: PHPStan\Type\Doctrine\Descriptors\Ramsey\UuidTypeDescriptor
+		tags: [phpstan.doctrine.typeDescriptor]
+		arguments:
+			uuidTypeName: Ramsey\Uuid\Doctrine\UuidBinaryOrderedTimeType
+
+	# Doctrine Collection
+	-
+		class: PHPStan\Type\Doctrine\Collection\IsEmptyTypeSpecifyingExtension
+		arguments:
+			collectionClass: Doctrine\Common\Collections\Collection
+		tags:
+			- phpstan.typeSpecifier.methodTypeSpecifyingExtension
+
+	-
+		class: PHPStan\Type\Doctrine\Collection\IsEmptyTypeSpecifyingExtension
+		arguments:
+			collectionClass: Doctrine\Common\Collections\ReadableCollection
+		tags:
+			- phpstan.typeSpecifier.methodTypeSpecifyingExtension
+
+	-
+		class: PHPStan\Rules\Gedmo\PropertiesExtension
+		tags:
+			- phpstan.properties.readWriteExtension
+
+	-
+		class: PHPStan\PhpDoc\Doctrine\QueryTypeNodeResolverExtension
+		tags:
+			- phpstan.phpDoc.typeNodeResolverExtension
+
+	-
+		class: PHPStan\Type\Doctrine\EntityManagerInterfaceThrowTypeExtension
+		tags:
+			- phpstan.dynamicMethodThrowTypeExtension

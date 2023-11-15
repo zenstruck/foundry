@@ -1,0 +1,16 @@
+<?php
+
+namespace Doctrine\Common\Collections;
+
+use Countable;
+use IteratorAggregate;
+
+/**
+ * @template TKey of array-key
+ * @template-covariant T
+ * @extends IteratorAggregate<TKey, T>
+ */
+interface ReadableCollection extends Countable, IteratorAggregate
+{
+
+}

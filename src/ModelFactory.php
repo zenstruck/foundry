@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry;
 
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
 
@@ -29,7 +30,23 @@ abstract class ModelFactory extends PersistentProxyObjectFactory
 {
     public function __construct()
     {
-        trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Class "%s" is deprecated and will be removed in version 2.0. Use "%s" instead.', self::class, PersistentProxyObjectFactory::class));
+        $newFactoryClass = (new \ReflectionClass(static::class()))->isFinal() ? PersistentObjectFactory::class : PersistentProxyObjectFactory::class;
+
+        trigger_deprecation(
+            'zenstruck\foundry', '1.37.0',
+            \sprintf(
+                <<<MESSAGE
+                Class "%s" is deprecated and will be removed in version 2.0. Use "%s" instead.
+                Be aware that both classes exist "%s" and "%s".
+                You should use the first one if you don't need a proxy or if the target class of the factory is final:
+                in Foundry 2.0 proxy system will leverage Symfony's lazy object system and it will be impossible to create a proxy for a final class.
+                MESSAGE,
+                self::class,
+                $newFactoryClass,
+                PersistentObjectFactory::class,
+                PersistentProxyObjectFactory::class
+            )
+        );
 
         parent::__construct();
     }

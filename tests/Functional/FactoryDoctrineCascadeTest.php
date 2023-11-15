@@ -23,7 +23,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Review;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Tag;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Variant;
 
-use function Zenstruck\Foundry\anonymous;
+use function Zenstruck\Foundry\Persistence\persistent_factory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -44,9 +44,9 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
      */
     public function many_to_one_relationship(): void
     {
-        $product = anonymous(Product::class, [
+        $product = persistent_factory(Product::class, [
             'name' => 'foo',
-            'brand' => anonymous(Brand::class, ['name' => 'bar']),
+            'brand' => persistent_factory(Brand::class, ['name' => 'bar']),
         ])->instantiateWith(function(array $attributes, string $class): object {
             $this->assertNull($attributes['brand']->getId());
 
@@ -62,9 +62,9 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
      */
     public function one_to_many_relationship(): void
     {
-        $brand = anonymous(Brand::class, [
+        $brand = persistent_factory(Brand::class, [
             'name' => 'brand',
-            'products' => anonymous(Product::class, ['name' => 'product'])->many(2),
+            'products' => persistent_factory(Product::class, ['name' => 'product'])->many(2),
         ])->instantiateWith(function(array $attributes, string $class): object {
             //            $this->assertNull($attributes['products'][0]->getId());
 
@@ -81,9 +81,9 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
      */
     public function many_to_many_relationship(): void
     {
-        $product = anonymous(Product::class, [
+        $product = persistent_factory(Product::class, [
             'name' => 'foo',
-            'tags' => [anonymous(Tag::class, ['name' => 'bar'])],
+            'tags' => [persistent_factory(Tag::class, ['name' => 'bar'])],
         ])->instantiateWith(function(array $attributes, string $class): object {
             $this->assertNull($attributes['tags'][0]->getId());
 
@@ -100,9 +100,9 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
      */
     public function many_to_many_reverse_relationship(): void
     {
-        $product = anonymous(Product::class, [
+        $product = persistent_factory(Product::class, [
             'name' => 'foo',
-            'categories' => [anonymous(ProductCategory::class, ['name' => 'bar'])],
+            'categories' => [persistent_factory(ProductCategory::class, ['name' => 'bar'])],
         ])->instantiateWith(function(array $attributes, string $class): object {
             $this->assertNull($attributes['categories'][0]->getId());
 
@@ -119,9 +119,9 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
      */
     public function one_to_one_relationship(): void
     {
-        $product = anonymous(Product::class, [
+        $product = persistent_factory(Product::class, [
             'name' => 'foo',
-            'review' => anonymous(Review::class, ['rank' => 5]),
+            'review' => persistent_factory(Review::class, ['rank' => 5]),
         ])->instantiateWith(function(array $attributes, string $class): object {
             $this->assertNull($attributes['review']->getId());
 
@@ -137,9 +137,9 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
      */
     public function one_to_one_reverse_relationship(): void
     {
-        $product = anonymous(Product::class, [
+        $product = persistent_factory(Product::class, [
             'name' => 'foo',
-            'review' => anonymous(Review::class, ['rank' => 4]),
+            'review' => persistent_factory(Review::class, ['rank' => 4]),
         ])->instantiateWith(function(array $attributes, string $class): object {
             $this->assertNull($attributes['review']->getId());
 
@@ -155,13 +155,13 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
      */
     public function nested_relationship_without_cascade(): void
     {
-        $product = anonymous(Product::class, [
+        $product = persistent_factory(Product::class, [
             'name' => 'foo',
             'variants' => [
-                anonymous(Variant::class, [
+                persistent_factory(Variant::class, [
                     'name' => 'bar',
                     // asserts a "sub" relationship without cascade persist is persisted
-                    'image' => anonymous(Image::class, ['path' => '/some/path']),
+                    'image' => persistent_factory(Image::class, ['path' => '/some/path']),
                 ]),
             ],
         ])->create();
@@ -174,11 +174,11 @@ final class FactoryDoctrineCascadeTest extends KernelTestCase
      */
     public function nested_collections_with_cascade(): void
     {
-        $brand = anonymous(Brand::class, [
+        $brand = persistent_factory(Brand::class, [
             'name' => 'brand',
-            'products' => anonymous(Product::class, [
+            'products' => persistent_factory(Product::class, [
                 'name' => 'product',
-                'variants' => anonymous(Variant::class, ['name' => 'variant'])->many(3),
+                'variants' => persistent_factory(Variant::class, ['name' => 'variant'])->many(3),
             ])->many(2),
         ])->create();
 

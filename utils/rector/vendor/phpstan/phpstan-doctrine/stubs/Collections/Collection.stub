@@ -1,0 +1,46 @@
+<?php
+
+namespace Doctrine\Common\Collections;
+
+use ArrayAccess;
+use Countable;
+use IteratorAggregate;
+
+/**
+ * @template TKey of array-key
+ * @template T
+ * @extends IteratorAggregate<TKey, T>
+ * @extends ArrayAccess<TKey|null, T>
+ * @extends ReadableCollection<TKey, T>
+ */
+interface Collection extends Countable, IteratorAggregate, ArrayAccess, ReadableCollection
+{
+
+    /**
+     * @phpstan-impure
+     *
+     * @param T $element
+     *
+     * @return true
+     */
+    public function add($element) {}
+
+    /**
+     * @phpstan-impure
+     *
+     * @param TKey $key
+     *
+     * @return T|null
+     */
+    public function remove($key) {}
+
+    /**
+     * @phpstan-impure
+     *
+     * @param T $element
+     *
+     * @return bool
+     */
+    public function removeElement($element) {}
+
+}

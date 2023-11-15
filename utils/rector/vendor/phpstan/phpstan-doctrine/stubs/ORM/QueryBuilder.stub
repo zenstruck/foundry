@@ -1,0 +1,24 @@
+<?php
+
+namespace Doctrine\ORM;
+
+class QueryBuilder
+{
+
+	/**
+	 * @param \Doctrine\Common\Collections\ArrayCollection<array-key, mixed>|array<mixed> $parameters
+	 * @return static
+	 */
+	public function setParameters($parameters)
+	{
+
+	}
+
+	/**
+	 * @return Query<mixed>
+	 */
+	public function getQuery()
+	{
+	}
+
+}

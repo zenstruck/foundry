@@ -1,0 +1,47 @@
+<?php
+
+namespace Doctrine\ODM\MongoDB\Repository;
+
+use Doctrine\Persistence\ObjectRepository;
+
+/**
+ * @template TDocumentClass of object
+ * @implements ObjectRepository<TDocumentClass>
+ */
+class DocumentRepository implements ObjectRepository
+{
+
+	/**
+	 * @phpstan-param mixed $id
+	 * @phpstan-param int|null $lockMode
+	 * @phpstan-param int|null $lockVersion
+	 * @phpstan-return TDocumentClass|null
+	 */
+	public function find($id, $lockMode = null, $lockVersion = null);
+
+	/**
+	 * @phpstan-return array<int, TDocumentClass>
+	 */
+	public function findAll();
+
+	/**
+	 * @phpstan-param array<string, mixed> $criteria
+	 * @phpstan-param array<string, string>|null $sort
+	 * @phpstan-param int|null $limit
+	 * @phpstan-param int|null $skip
+	 * @phpstan-return array<int, TDocumentClass>
+	 */
+	public function findBy(array $criteria, ?array $sort = null, $limit = null, $skip = null);
+
+	/**
+	 * @phpstan-param array<string, mixed> $criteria The criteria.
+	 * @phpstan-return TDocumentClass|null
+	 */
+	public function findOneBy(array $criteria);
+
+	/**
+	 * @phpstan-return class-string<TDocumentClass>
+	 */
+	public function getClassName();
+
+}

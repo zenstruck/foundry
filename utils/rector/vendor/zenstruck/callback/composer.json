@@ -1,0 +1,31 @@
+{
+    "name": "zenstruck/callback",
+    "description": "Callable wrapper to validate and inject arguments.",
+    "homepage": "https://github.com/zenstruck/callback",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["utility", "callback", "callable"],
+    "authors": [
+        {
+            "name": "Kevin Bond",
+            "email": "kevinbond@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.5",
+        "symfony/polyfill-php80": "^1.14"
+    },
+    "require-dev": {
+        "symfony/phpunit-bridge": "^5.2"
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": { "Zenstruck\\": "src/" }
+    },
+    "autoload-dev": {
+        "psr-4": { "Zenstruck\\Callback\\Tests\\": "tests/" }
+    }
+}

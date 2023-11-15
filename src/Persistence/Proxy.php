@@ -19,6 +19,7 @@ use Zenstruck\Callback;
 use Zenstruck\Callback\Parameter;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\Instantiator;
+use Zenstruck\Foundry\Persistence\Proxy as ProxyBase;
 
 /**
  * @template TProxiedObject of object
@@ -48,6 +49,13 @@ class Proxy implements \Stringable
         /** @param TProxiedObject $object */
         private object $object
     ) {
+        if ((new \ReflectionClass($object::class))->isFinal()) {
+            trigger_deprecation(
+                'zenstruck\foundry', '1.37.0',
+                \sprintf('Using a proxy factory with a final class is deprecated and will throw an error in Foundry 2.0. Use "%s" instead, or unfinalize "%s" class.', PersistentProxyObjectFactory::class, $object::class)
+            );
+        }
+
         $this->class = $object::class;
         $this->autoRefresh = Factory::configuration()->defaultProxyAutoRefresh();
     }

@@ -1,0 +1,32 @@
+<?php
+
+namespace Doctrine\ORM;
+
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\NonUniqueResultException;
+
+/**
+ * @template-covariant TKey The type of column used in indexBy
+ * @template-covariant TResult The type of results returned by this query in HYDRATE_OBJECT mode
+ */
+abstract class AbstractQuery
+{
+
+	/**
+	 * @param ArrayCollection<array-key, mixed>|array<mixed> $parameters
+	 * @return static
+	 */
+	public function setParameters($parameters)
+	{
+
+	}
+
+	/**
+	* @return bool|float|int|string|null
+	*
+	* @throws NoResultException
+	* @throws NonUniqueResultException
+	*/
+	public function getSingleScalarResult();
+
+}

@@ -1,0 +1,8 @@
+<?php
+
+namespace Doctrine\ORM\Query\Expr;
+
+class Func
+{
+
+}

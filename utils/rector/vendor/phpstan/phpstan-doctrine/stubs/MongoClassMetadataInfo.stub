@@ -1,0 +1,41 @@
+<?php
+
+namespace Doctrine\ODM\MongoDB\Mapping;
+
+use Doctrine\Persistence\Mapping\ClassMetadata as BaseClassMetadata;
+use ReflectionClass;
+
+/**
+ * @template-covariant T of object
+ * @template-implements BaseClassMetadata<T>
+ */
+class ClassMetadata implements BaseClassMetadata
+{
+
+	/** @var string|null */
+	public $customRepositoryClassName;
+
+	/**
+	 * @var class-string<T>
+	 */
+	public $name;
+
+	/**
+	 * @param class-string<T> $documentName
+	 */
+	public function __construct(string $documentName)
+	{
+
+	}
+
+	/**
+	 * @return class-string<T>
+	 */
+	public function getName();
+
+	/**
+	 * @return ReflectionClass<T>
+	 */
+	public function getReflectionClass();
+
+}

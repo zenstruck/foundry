@@ -1,0 +1,61 @@
+<?php
+
+namespace Doctrine\ORM\Mapping;
+
+use Doctrine\ORM\Id\AbstractIdGenerator;
+use Doctrine\Persistence\Mapping\ClassMetadata;
+use ReflectionClass;
+
+/**
+ * @template-covariant T of object
+ * @template-implements ClassMetadata<T>
+ * @phpstan-import-type AssociationMapping from \Doctrine\ORM\Mapping\ClassMetadata
+ * @phpstan-import-type FieldMapping from \Doctrine\ORM\Mapping\ClassMetadata
+ * @phpstan-import-type EmbeddedClassMapping from \Doctrine\ORM\Mapping\ClassMetadata
+ * @phpstan-import-type JoinColumnData from \Doctrine\ORM\Mapping\ClassMetadata
+ * @phpstan-import-type DiscriminatorColumnMapping from \Doctrine\ORM\Mapping\ClassMetadata
+ */
+class ClassMetadataInfo implements ClassMetadata
+{
+
+	/**
+	 * @var AbstractIdGenerator|null
+	 */
+	public $idGenerator;
+
+	/** @var string|null */
+	public $customRepositoryClassName;
+
+	/**
+     * @param class-string<T> $entityName
+     */
+    public function __construct($entityName)
+    {
+
+    }
+
+    /**
+	 * @param string $assocName
+	 * @return class-string
+	 */
+	public function getAssociationTargetClass($assocName);
+
+    /**
+	 * @return T
+	 */
+	public function newInstance()
+	{
+
+	}
+
+	/**
+	 * @return class-string<T>
+	 */
+	public function getName();
+
+	/**
+	 * @return ReflectionClass<T>
+	 */
+	public function getReflectionClass();
+
+}

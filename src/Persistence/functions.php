@@ -11,19 +11,18 @@
 
 namespace Zenstruck\Foundry\Persistence;
 
+use Zenstruck\Foundry\AnonymousFactoryGenerator;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
 
-use function Zenstruck\Foundry\anonymous;
-
 /**
+ * @param class-string<TObject> $class
+ *
+ * @return RepositoryDecorator<TObject>
  * @see Configuration::repositoryFor()
  *
  * @template TObject of object
  *
- * @param class-string<TObject> $class
- *
- * @return RepositoryDecorator<TObject>
  */
 function repository(string $class): RepositoryDecorator
 {
@@ -31,17 +30,65 @@ function repository(string $class): RepositoryDecorator
 }
 
 /**
- * @see Factory::create()
- *
  * @return TObject
  *
  * @template TObject of object
  * @phpstan-param class-string<TObject> $class
+ * @see Factory::create()
  */
 function persist(string $class, array|callable $attributes = []): object
 {
-    return anonymous($class)->create($attributes)->_real();
+    return persistent_factory($class)->create($attributes);
 }
+
+/**
+ * @return Proxy<TObject>
+ *
+ * @template TObject of object
+ * @phpstan-param class-string<TObject> $class
+ * @see Factory::create()
+ */
+function persist_proxy(string $class, array|callable $attributes = []): Proxy
+{
+    return proxy_factory($class)->create($attributes);
+}
+
+/**
+ * Create an anonymous "persistent" factory for the given class.
+ *
+ * @template T of object
+ *
+ * @param class-string<T> $class
+ * @param array<string,mixed>|callable(int):array<string,mixed> $attributes
+ *
+ * @return PersistentObjectFactory<T>
+ */
+function persistent_factory(string $class, array|callable $attributes = []): PersistentObjectFactory
+{
+    return AnonymousFactoryGenerator::create($class, PersistentObjectFactory::class)::new($attributes);
+}
+
+/**
+ * Create an anonymous "persistent with proxy" factory for the given class.
+ *
+ * @template T of object
+ *
+ * @param class-string<T> $class
+ * @param array<string,mixed>|callable(int):array<string,mixed> $attributes
+ *
+ * @return PersistentProxyObjectFactory<T>
+ */
+function proxy_factory(string $class, array|callable $attributes = []): PersistentProxyObjectFactory
+{
+    if ((new \ReflectionClass($class))->isFinal()) {
+        throw new \RuntimeException(
+            \sprintf('Cannot create PersistentProxyObjectFactory for final class "%s". Pass parameter "$withProxy" to false instead, or unfinalize "%1$s" class.', $class)
+        );
+    }
+
+    return AnonymousFactoryGenerator::create($class, PersistentProxyObjectFactory::class)::new($attributes);
+}
+
 
 /**
  * @param callable():void $callback

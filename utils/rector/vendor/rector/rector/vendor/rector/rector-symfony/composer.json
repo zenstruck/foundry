@@ -1,0 +1,74 @@
+{
+    "name": "rector\/rector-symfony",
+    "type": "rector-extension",
+    "license": "MIT",
+    "description": "Rector upgrades rules for Symfony Framework",
+    "require": {
+        "php": ">=8.1",
+        "ext-xml": "*"
+    },
+    "require-dev": {
+        "phpstan\/extension-installer": "^1.3",
+        "phpstan\/phpstan": "^1.10.28",
+        "phpstan\/phpstan-webmozart-assert": "^1.2",
+        "phpunit\/phpunit": "^10.3",
+        "rector\/phpstan-rules": "^0.6",
+        "rector\/rector-generator": "^0.7",
+        "rector\/rector-src": "dev-main",
+        "symfony\/config": "^6.3",
+        "symfony\/dependency-injection": "^6.3",
+        "symfony\/routing": "^6.2",
+        "symfony\/security-core": "^6.2",
+        "symfony\/security-http": "^6.1",
+        "symfony\/validator": "^6.2",
+        "symplify\/easy-ci": "^11.2",
+        "symplify\/easy-coding-standard": "^12.0",
+        "symplify\/phpstan-extensions": "^11.1",
+        "symplify\/phpstan-rules": "^12.0",
+        "symplify\/rule-doc-generator": "^12.0",
+        "symplify\/vendor-patches": "^11.2",
+        "tomasvotruba\/class-leak": "^0.1",
+        "tomasvotruba\/cognitive-complexity": "^0.1",
+        "tomasvotruba\/type-coverage": "^0.2",
+        "tomasvotruba\/unused-public": "^0.2",
+        "tracy\/tracy": "^2.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "Rector\\Symfony\\": [
+                "src",
+                "rules"
+            ]
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Rector\\Symfony\\Tests\\": [
+                "tests",
+                "rules-tests"
+            ]
+        },
+        "classmap": [
+            "stubs"
+        ]
+    },
+    "scripts": {
+        "phpstan": "vendor\/bin\/phpstan analyse --ansi --error-format symplify",
+        "check-cs": "vendor\/bin\/ecs check --ansi",
+        "fix-cs": "vendor\/bin\/ecs check --fix --ansi",
+        "docs": "vendor\/bin\/rule-doc-generator generate src rules --output-file docs\/rector_rules_overview.md --ansi"
+    },
+    "extra": {
+        "enable-patching": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "cweagans\/composer-patches": true,
+            "rector\/extension-installer": true,
+            "phpstan\/extension-installer": true
+        }
+    }
+}

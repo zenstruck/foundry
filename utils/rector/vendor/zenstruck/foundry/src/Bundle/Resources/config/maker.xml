@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services
+        https://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id=".zenstruck_foundry.maker.factory" class="Zenstruck\Foundry\Bundle\Maker\MakeFactory">
+            <argument type="service" id="kernel" />
+            <argument type="service" id=".zenstruck_foundry.maker.factory.generator" />
+            <argument type="service" id=".zenstruck_foundry.maker.factory.autoCompleter" />
+            <argument type="service" id=".zenstruck_foundry.maker.factory.candidate_classes_extractor" />
+            <tag name="maker.command" />
+        </service>
+
+        <service id=".zenstruck_foundry.maker.factory.orm_default_properties_guesser" class="Zenstruck\Foundry\Bundle\Maker\Factory\ORMDefaultPropertiesGuesser">
+            <argument type="service" id=".zenstruck_foundry.chain_manager_registry" />
+            <argument type="service" id=".zenstruck_foundry.maker.factory.factory_class_map" />
+            <argument type="service" id=".zenstruck_foundry.maker.factory.generator" />
+            <tag name="foundry.make_factory.default_properties_guesser" />
+        </service>
+
+        <service id=".zenstruck_foundry.maker.factory.odm_default_properties_guesser" class="Zenstruck\Foundry\Bundle\Maker\Factory\ODMDefaultPropertiesGuesser">
+            <argument type="service" id=".zenstruck_foundry.chain_manager_registry" />
+            <argument type="service" id=".zenstruck_foundry.maker.factory.factory_class_map" />
+            <argument type="service" id=".zenstruck_foundry.maker.factory.generator" />
+            <tag name="foundry.make_factory.default_properties_guesser" />
+        </service>
+
+        <service id=".zenstruck_foundry.maker.factory.doctrine_scalar_fields_default_properties_guesser" class="\Zenstruck\Foundry\Bundle\Maker\Factory\DoctrineScalarFieldsDefaultPropertiesGuesser">
+            <argument type="service" id=".zenstruck_foundry.chain_manager_registry" />
+            <argument type="service" id=".zenstruck_foundry.maker.factory.factory_class_map" />
+            <argument type="service" id=".zenstruck_foundry.maker.factory.generator" />
+            <tag name="foundry.make_factory.default_properties_guesser" />
+        </service>
+
+        <service id=".zenstruck_foundry.maker.factory.object_default_properties_guesser" class="Zenstruck\Foundry\Bundle\Maker\Factory\ObjectDefaultPropertiesGuesser">
+            <argument type="service" id=".zenstruck_foundry.maker.factory.factory_class_map" />
+            <argument type="service" id=".zenstruck_foundry.maker.factory.generator" />
+            <tag name="foundry.make_factory.default_properties_guesser" />
+        </service>
+
+        <service id=".zenstruck_foundry.maker.story" class="Zenstruck\Foundry\Bundle\Maker\MakeStory">
+            <tag name="maker.command" />
+        </service>
+
+        <service id=".zenstruck_foundry.maker.factory.factory_class_map" class="Zenstruck\Foundry\Bundle\Maker\Factory\FactoryClassMap">
+            <argument type="tagged_iterator" tag="foundry.factory" />
+        </service>
+
+        <service id=".zenstruck_foundry.maker.factory.generator" class="Zenstruck\Foundry\Bundle\Maker\Factory\FactoryGenerator">
+            <argument type="service" id=".zenstruck_foundry.chain_manager_registry" />
+            <argument type="service" id="kernel" />
+            <argument type="tagged_iterator" tag="foundry.make_factory.default_properties_guesser" />
+            <argument type="service" id=".zenstruck_foundry.maker.factory.factory_class_map" />
+            <argument type="service" id=".zenstruck_foundry.maker.factory.namespace_guesser" />
+        </service>
+
+        <service id=".zenstruck_foundry.maker.factory.autoCompleter" class="Zenstruck\Foundry\Bundle\Maker\Factory\NoPersistenceObjectsAutoCompleter">
+            <argument>%kernel.project_dir%</argument>
+        </service>
+
+        <service id=".zenstruck_foundry.maker.factory.candidate_classes_extractor" class="Zenstruck\Foundry\Bundle\Maker\Factory\FactoryCandidatesClassesExtractor">
+            <argument type="service" id=".zenstruck_foundry.chain_manager_registry" />
+            <argument type="service" id=".zenstruck_foundry.maker.factory.factory_class_map" />
+        </service>
+
+        <service id=".zenstruck_foundry.maker.factory.namespace_guesser" class="Zenstruck\Foundry\Bundle\Maker\Factory\NamespaceGuesser">
+            <argument type="service" id=".zenstruck_foundry.chain_manager_registry" />
+        </service>
+    </services>
+</container>

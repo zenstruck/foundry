@@ -11,13 +11,13 @@
 
 namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Address;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class AddressFactory extends PersistentProxyObjectFactory
+final class AddressFactory extends PersistentObjectFactory
 {
     public static function class(): string
     {

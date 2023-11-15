@@ -1,0 +1,59 @@
+{
+    "name": "doctrine/persistence",
+    "type": "library",
+    "description": "The Doctrine Persistence project is a set of shared interfaces and functionality that the different Doctrine object mappers share.",
+    "keywords": [
+        "persistence",
+        "object",
+        "mapper",
+        "orm",
+        "odm"
+    ],
+    "homepage": "https://www.doctrine-project.org/projects/persistence.html",
+    "license": "MIT",
+    "authors": [
+        {"name": "Guilherme Blanco", "email": "guilhermeblanco@gmail.com"},
+        {"name": "Roman Borschel", "email": "roman@code-factory.org"},
+        {"name": "Benjamin Eberlei", "email": "kontakt@beberlei.de"},
+        {"name": "Jonathan Wage", "email": "jonwage@gmail.com"},
+        {"name": "Johannes Schmitt", "email": "schmittjoh@gmail.com"},
+        {"name": "Marco Pivetta", "email": "ocramius@gmail.com"}
+    ],
+    "require": {
+        "php": "^7.2 || ^8.0",
+        "doctrine/event-manager": "^1 || ^2",
+        "psr/cache": "^1.0 || ^2.0 || ^3.0"
+    },
+    "require-dev": {
+        "composer/package-versions-deprecated": "^1.11",
+        "phpstan/phpstan": "1.9.4",
+        "phpstan/phpstan-phpunit": "^1",
+        "phpstan/phpstan-strict-rules": "^1.1",
+        "doctrine/coding-standard": "^11",
+        "doctrine/common": "^3.0",
+        "phpunit/phpunit": "^8.5 || ^9.5",
+        "symfony/cache": "^4.4 || ^5.4 || ^6.0",
+        "vimeo/psalm": "4.30.0 || 5.3.0"
+    },
+    "conflict": {
+        "doctrine/common": "<2.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "Doctrine\\Persistence\\": "src/Persistence"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Doctrine\\Tests\\": "tests",
+            "Doctrine\\Tests_PHP74\\": "tests_php74",
+            "Doctrine\\Tests_PHP81\\": "tests_php81"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "composer/package-versions-deprecated": true
+        }
+    }
+}

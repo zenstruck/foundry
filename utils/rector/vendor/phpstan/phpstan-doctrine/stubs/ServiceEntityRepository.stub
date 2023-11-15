@@ -1,0 +1,11 @@
+<?php
+namespace Doctrine\Bundle\DoctrineBundle\Repository;
+
+use \Doctrine\ORM\EntityRepository;
+
+/**
+ * @template TEntityClass of object
+ * @template-extends EntityRepository<TEntityClass>
+ */
+class ServiceEntityRepository extends EntityRepository {
+}

@@ -1,0 +1,42 @@
+<?php
+
+namespace Doctrine\ORM\Query;
+
+class Expr
+{
+
+	/**
+	 * @param string $x
+	 * @return ($x is literal-string ? literal-string&non-empty-string : string)
+	 */
+	public function isNull($x)
+	{
+	}
+
+	/**
+	 * @param string $x
+	 * @return ($x is literal-string ? literal-string&non-empty-string : string)
+	 */
+	public function isNotNull($x)
+	{
+	}
+
+	/**
+	 * @param string $val
+	 * @param int|string $x
+	 * @param int|string $y
+	 * @return ($val is literal-string ? ($x is literal-string ? ($y is literal-string ? literal-string&non-empty-string : string) : string) : string)
+	 */
+	public function between($val, $x, $y)
+	{
+	}
+
+	/**
+	 * @template T of string
+	 * @param T ...$x
+	 * @return (T is literal-string ? literal-string : string)
+	 */
+	public function countDistinct(...$x) {
+	}
+
+}

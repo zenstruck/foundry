@@ -1,0 +1,18 @@
+<?php
+namespace Doctrine\Bundle\DoctrineBundle\Repository;
+
+use Doctrine\ORM\EntityRepository;
+
+/**
+ * @template TEntityClass of object
+ * @template-extends LazyServiceEntityRepository<TEntityClass>
+ */
+class ServiceEntityRepository extends LazyServiceEntityRepository {
+}
+
+/**
+ * @template TEntityClass of object
+ * @template-extends EntityRepository<TEntityClass>
+ */
+class LazyServiceEntityRepository extends EntityRepository {
+}

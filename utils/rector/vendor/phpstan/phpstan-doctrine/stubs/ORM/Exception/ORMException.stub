@@ -1,0 +1,10 @@
+<?php
+
+namespace Doctrine\ORM\Exception;
+
+use Doctrine\ORM\ORMException as BaseORMException;
+
+class ORMException extends BaseORMException
+{
+
+}

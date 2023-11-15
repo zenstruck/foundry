@@ -1,0 +1,12 @@
+<?php
+
+namespace Doctrine\Common\Collections;
+
+/**
+ * @template TKey
+ * @template T
+ */
+interface Selectable
+{
+
+}

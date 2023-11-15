@@ -1,0 +1,61 @@
+parameters:
+	doctrine:
+		reportDynamicQueryBuilders: false
+		reportUnknownTypes: false
+		allowNullablePropertyForRequiredField: false
+
+parametersSchema:
+	doctrine: structure([
+		repositoryClass: schema(string(), nullable())
+		ormRepositoryClass: schema(string(), nullable())
+		odmRepositoryClass: schema(string(), nullable())
+		queryBuilderClass: schema(string(), nullable())
+		allCollectionsSelectable: bool()
+		objectManagerLoader: schema(string(), nullable())
+		searchOtherMethodsForQueryBuilderBeginning: bool()
+		queryBuilderFastAlgorithm: bool()
+		reportDynamicQueryBuilders: bool()
+		reportUnknownTypes: bool()
+		allowNullablePropertyForRequiredField: bool()
+	])
+
+rules:
+	- PHPStan\Rules\Doctrine\ORM\DqlRule
+	- PHPStan\Rules\Doctrine\ORM\RepositoryMethodCallRule
+	- PHPStan\Rules\Doctrine\ORM\EntityNotFinalRule
+
+conditionalTags:
+	PHPStan\Rules\Doctrine\ORM\EntityMappingExceptionRule:
+		phpstan.rules.rule: %featureToggles.bleedingEdge%
+	PHPStan\Rules\Doctrine\ORM\EntityConstructorNotFinalRule:
+		phpstan.rules.rule: %featureToggles.bleedingEdge%
+
+services:
+	-
+		class: PHPStan\Rules\Doctrine\ORM\QueryBuilderDqlRule
+		arguments:
+			reportDynamicQueryBuilders: %doctrine.reportDynamicQueryBuilders%
+		tags:
+			- phpstan.rules.rule
+	-
+		class: PHPStan\Rules\Doctrine\ORM\EntityColumnRule
+		arguments:
+			reportUnknownTypes: %doctrine.reportUnknownTypes%
+			allowNullablePropertyForRequiredField: %doctrine.allowNullablePropertyForRequiredField%
+			bleedingEdge: %featureToggles.bleedingEdge%
+			descriptorRegistry: @doctrineTypeDescriptorRegistry
+		tags:
+			- phpstan.rules.rule
+	-
+		class: PHPStan\Rules\Doctrine\ORM\EntityMappingExceptionRule
+	-
+		class: PHPStan\Rules\Doctrine\ORM\EntityNotFinalRule
+	-
+		class: PHPStan\Rules\Doctrine\ORM\EntityRelationRule
+		arguments:
+			allowNullablePropertyForRequiredField: %doctrine.allowNullablePropertyForRequiredField%
+			bleedingEdge: %featureToggles.bleedingEdge%
+		tags:
+			- phpstan.rules.rule
+	-
+		class: PHPStan\Rules\Doctrine\ORM\EntityConstructorNotFinalRule

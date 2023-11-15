@@ -1,0 +1,13 @@
+<?php
+
+namespace Doctrine\Bundle\MongoDBBundle\Repository;
+
+use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
+
+/**
+ * @template TDocumentClass of object
+ * @template-extends DocumentRepository<TDocumentClass>
+ */
+class ServiceDocumentRepository extends DocumentRepository
+{
+}

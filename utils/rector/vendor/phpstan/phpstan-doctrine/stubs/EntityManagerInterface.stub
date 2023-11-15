@@ -1,0 +1,71 @@
+<?php
+
+namespace Doctrine\ORM;
+
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectRepository;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\Mapping\ClassMetadata;
+
+interface EntityManagerInterface extends ObjectManager
+{
+
+	/**
+	 * @template T of object
+	 * @phpstan-param class-string<T> $className
+	 * @phpstan-param mixed  $id
+	 * @phpstan-return T|null
+	 */
+	public function find($className, $id);
+
+	/**
+	 * @template T of object
+	 * @phpstan-param T $object
+	 * @phpstan-return T
+	 */
+	public function merge($object);
+
+	/**
+	 * @template T of object
+	 * @phpstan-param class-string<T> $className
+	 * @phpstan-return ObjectRepository<T>
+	 */
+	public function getRepository($className);
+
+	/**
+	 * @template T of object
+	 * @phpstan-param class-string<T> $entityName
+	 * @phpstan-param mixed $id
+	 * @phpstan-return T|null
+	 *
+	 * @throws ORMException
+	 */
+	public function getReference($entityName, $id);
+
+	/**
+	 * @template T of object
+	 * @phpstan-param class-string<T> $entityName
+	 * @phpstan-param mixed $identifier
+	 *
+	 * @phpstan-return T|null
+	 */
+	public function getPartialReference($entityName, $identifier);
+
+	/**
+	 * @template T of object
+	 * @phpstan-param T $entity
+	 * @phpstan-param bool $deep
+	 * @phpstan-return T
+	 * @deprecated 2.7 This method is being removed from the ORM and won't have any replacement
+	 */
+	public function copy($entity, $deep = false);
+
+	/**
+	 * @template T of object
+	 * @phpstan-param class-string<T> $className
+	 *
+	 * @phpstan-return ClassMetadata<T>
+	 */
+	public function getClassMetadata($className);
+
+}

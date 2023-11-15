@@ -1,0 +1,11 @@
+<?php
+
+namespace Doctrine\ORM\Query\Expr;
+
+class Join
+{
+
+	public const ON   = 'ON';
+    public const WITH = 'WITH';
+
+}

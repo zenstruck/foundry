@@ -17,6 +17,7 @@ use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Faker;
 use Zenstruck\Foundry\Exception\FoundryBootException;
 use Zenstruck\Foundry\Persistence\InversedRelationshipPostPersistCallback;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\PostPersistCallback;
 use Zenstruck\Foundry\Persistence\Proxy;
 
@@ -73,7 +74,7 @@ class Factory
     }
 
     /**
-     * @phpstan-return list<Proxy<TObject>>
+     * @phpstan-return ($this is PersistentProxyObjectFactory ? list<Proxy<TObject>> : list<TObject>)
      */
     public function __call(string $name, array $arguments): array
     {
@@ -83,15 +84,28 @@ class Factory
 
         trigger_deprecation('zenstruck/foundry', '1.7', 'Calling instance method "%1$s::createMany()" is deprecated and will be removed in 2.0, use e.g. "%1$s::new()->stateAdapter()->many(%2$d)->create()" instead.', static::class, $arguments[0]);
 
-        return $this->many($arguments[0])->create($arguments[1] ?? []);
+        return $this->many($arguments[0])->create($arguments[1] ?? [], noProxy: $this->shouldUseProxy());
     }
 
     /**
-     * @return Proxy<TObject>&TObject
-     * @phpstan-return Proxy<TObject>
+     * @final
+     *
+     * @return (Proxy<TObject>&TObject)|TObject
+     * @phpstan-return ($noProxy is true ? TObject: Proxy<TObject>)
      */
-    final public function create(array|callable $attributes = []): Proxy
+    public function create(
+        array|callable $attributes = [],
+        /**
+         * @deprecated
+         * @internal
+         */
+        bool $noProxy = false
+    ): object
     {
+        if (\count(func_get_args()) === 2 && !str_starts_with(debug_backtrace(options: \DEBUG_BACKTRACE_IGNORE_ARGS, limit: 1)[0]['class'] ?? '', 'Zenstruck\Foundry')) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Parameter "$noProxy" of method "%s()" is deprecated and will be removed in Foundry 2.0.', __METHOD__));
+        }
+
         // merge the factory attribute set with the passed attributes
         $attributeSet = \array_merge($this->attributes, [$attributes]);
 
@@ -142,18 +156,17 @@ class Factory
             $callback($object, $attributes);
         }
 
-        $proxy = new Proxy($object);
-
         if (!$this->isPersisting()) {
-            return $proxy;
+            return $noProxy ? $object : new Proxy($object);
         }
+
+        $proxy = new Proxy($object);
 
         if ($this->cascadePersist && !$postPersistCallbacks) {
             return $proxy;
         }
 
-        return $proxy
-            ->_save()
+        $proxy->_save()
             ->_withoutAutoRefresh(function(Proxy $proxy) use ($attributes, $postPersistCallbacks): void {
                 $callbacks = [...$postPersistCallbacks, ...$this->afterPersist];
 
@@ -168,6 +181,8 @@ class Factory
                 $proxy->_save(); // save again as afterPersist events may have modified
             })
         ;
+
+        return $noProxy ? $proxy->_real() : $proxy;
     }
 
     /**
@@ -404,7 +419,7 @@ class Factory
         }
 
         if (!self::configuration()->hasManagerRegistry()) {
-            return $value->create()->_real();
+            return $value->createAndUproxify();
         }
 
         try {
@@ -412,17 +427,17 @@ class Factory
 
             if (!$objectManager instanceof EntityManagerInterface || $objectManager->getClassMetadata($value->class)->isEmbeddedClass) {
                 // we may deal with ODM document or ORM\Embedded
-                return $value->create()->_real();
+                return $value->createAndUproxify();
             }
         } catch (\Throwable) {
             // not persisted object
-            return $value->create()->_real();
+            return $value->createAndUproxify();
         }
 
         $relationshipMetadata = self::getRelationshipMetadata($objectManager, $this->class, $name);
 
         if (!$relationshipMetadata) {
-            return $value->create()->_real();
+            return $value->createAndUproxify();
         }
 
         if ($relationshipMetadata['isOwningSide']) {
@@ -441,11 +456,15 @@ class Factory
             $value = $value->withCascadePersist();
         }
 
-        return $value->create()->_real();
+        return $value->createAndUproxify();
     }
 
     private static function normalizeObject(object $object): object
     {
+        if ((new \ReflectionClass($object::class))->isFinal()) {
+            return $object;
+        }
+
         try {
             return Proxy::createFromPersisted($object)->_refresh()->_real();
         } catch (\RuntimeException) {
@@ -482,5 +501,29 @@ class Factory
         $cloned->cascadePersist = true;
 
         return $cloned;
+    }
+
+    /**
+     * @internal
+     *
+     * @return TObject
+     */
+    public function createAndUproxify(): object
+    {
+        $object = $this->create(
+            noProxy: !$this->shouldUseProxy()
+        );
+
+        return $object instanceof Proxy ? $object->_real() : $object;
+    }
+
+    /**
+     * @internal
+     *
+     * @return ($this is PersistentProxyObjectFactory ? true : false)
+     */
+    public function shouldUseProxy(): bool
+    {
+        return $this instanceof PersistentProxyObjectFactory;
     }
 }

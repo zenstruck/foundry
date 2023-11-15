@@ -18,18 +18,46 @@ use Zenstruck\Foundry\Factory;
 
 /**
  * @template TModel of object
- * @template-extends Factory<TModel>
+ * @template-extends PersistentObjectFactory<TModel>
  *
  * @method static Proxy[]|TModel[] createMany(int $number, array|callable $attributes = [])
  * @phpstan-method static list<Proxy<TModel>> createMany(int $number, array|callable $attributes = [])
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-abstract class PersistentProxyObjectFactory extends Factory
+abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
 {
-    public function __construct()
+    final public static function new(array|callable|string $defaultAttributes = [], string ...$states): static
     {
-        parent::__construct(static::class(), calledInternally: true);
+        if ((new \ReflectionClass(static::class()))->isFinal()) {
+            trigger_deprecation(
+                'zenstruck\foundry', '1.37.0',
+                \sprintf('Using a proxy factory with a final class is deprecated and will throw an error in Foundry 2.0. Use "%s" instead, or unfinalize "%s" class.', PersistentProxyObjectFactory::class, static::class())
+            );
+        }
+
+        return parent::new($defaultAttributes, ...$states);
+    }
+
+    /**
+     * @final
+     *
+     * @return Proxy<TModel>
+     */
+    final public function create(
+        array|callable $attributes = [],
+        /**
+         * @deprecated
+         * @internal
+         */
+        bool $noProxy = false
+    ): object
+    {
+        if (\count(func_get_args()) === 2 && !str_starts_with(debug_backtrace(options: \DEBUG_BACKTRACE_IGNORE_ARGS, limit: 1)[0]['class'] ?? '', 'Zenstruck\Foundry')) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Parameter "$noProxy" of method "%s()" is deprecated and will be removed in Foundry 2.0.', __METHOD__));
+        }
+
+        return Factory::create($attributes, noProxy: false);
     }
 
     /**
@@ -41,48 +69,7 @@ abstract class PersistentProxyObjectFactory extends Factory
             throw new \BadMethodCallException(\sprintf('Call to undefined static method "%s::%s".', static::class, $name));
         }
 
-        return static::new()->many($arguments[0])->create($arguments[1] ?? []);
-    }
-
-    /**
-     * @param array|callable|string $defaultAttributes If string, assumes state
-     * @param string                ...$states         Optionally pass default states (these must be methods on your ObjectFactory with no arguments)
-     */
-    final public static function new(array|callable|string $defaultAttributes = [], string ...$states): static
-    {
-        if (\is_string($defaultAttributes)) {
-            $states = \array_merge([$defaultAttributes], $states);
-            $defaultAttributes = [];
-        }
-
-        try {
-            $factory = self::isBooted() ? self::configuration()->factories()->create(static::class) : new static();
-        } catch (\ArgumentCountError $e) {
-            throw new \RuntimeException('Model Factories with dependencies (Model Factory services) cannot be created before foundry is booted.', 0, $e);
-        }
-
-        $factory = $factory
-            ->with(static fn(): array|callable => $factory->defaults())
-            ->with($defaultAttributes);
-
-        try {
-            if (!Factory::configuration()->isPersistEnabled()) {
-                $factory = $factory->withoutPersisting();
-            }
-        } catch (FoundryBootException) {
-        }
-
-        $factory = $factory->initialize();
-
-        if (!$factory instanceof static) {
-            throw new \TypeError(\sprintf('"%1$s::initialize()" must return an instance of "%1$s".', static::class));
-        }
-
-        foreach ($states as $state) {
-            $factory = $factory->{$state}();
-        }
-
-        return $factory;
+        return static::new()->many($arguments[0])->create($arguments[1] ?? [], noProxy: false);
     }
 
     /**
@@ -211,22 +198,6 @@ abstract class PersistentProxyObjectFactory extends Factory
     }
 
     /**
-     * @see RepositoryDecorator::count()
-     */
-    final public static function count(array $criteria = []): int
-    {
-        return static::repository()->count($criteria);
-    }
-
-    /**
-     * @see RepositoryDecorator::truncate()
-     */
-    final public static function truncate(): void
-    {
-        static::repository()->truncate();
-    }
-
-    /**
      * @see RepositoryDecorator::findAll()
      *
      * @return list<TModel&Proxy<TModel>>
@@ -266,47 +237,4 @@ abstract class PersistentProxyObjectFactory extends Factory
     {
         return static::repository()->findBy($attributes);
     }
-
-    final public static function assert(): RepositoryAssertions
-    {
-        try {
-            return static::repository()->assert();
-        } catch (\Throwable $e) {
-            throw new \RuntimeException(\sprintf('Cannot create repository assertion: %s', $e->getMessage()), previous: $e);
-        }
-    }
-
-    /**
-     * @phpstan-return RepositoryDecorator<TModel>
-     */
-    final public static function repository(): RepositoryDecorator
-    {
-        return static::configuration()->repositoryFor(static::class());
-    }
-
-    /** @phpstan-return class-string<TModel> */
-    abstract public static function class(): string;
-
-    /**
-     * Override to add default instantiator and default afterInstantiate/afterPersist events.
-     *
-     * @return static
-     */
-    #[\ReturnTypeWillChange]
-    protected function initialize()
-    {
-        return $this;
-    }
-
-    /**
-     * @deprecated use with() instead
-     */
-    final protected function addState(array|callable $attributes = []): static
-    {
-        trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in version 2.0. Use "%s::with()" instead.', __METHOD__, Factory::class));
-
-        return $this->with($attributes);
-    }
-
-    abstract protected function defaults(): array|callable;
 }

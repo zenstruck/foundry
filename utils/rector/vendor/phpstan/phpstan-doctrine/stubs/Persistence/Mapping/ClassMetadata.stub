@@ -1,0 +1,26 @@
+<?php
+
+namespace Doctrine\Persistence\Mapping;
+
+use ReflectionClass;
+
+/**
+ * @template-covariant T of object
+ */
+interface ClassMetadata
+{
+    /**
+     * @return class-string<T>
+     */
+    public function getName();
+
+    /**
+     * @return ReflectionClass<T>
+     */
+    public function getReflectionClass();
+
+    /**
+     * @return list<string>
+     */
+    public function getIdentifier();
+}
