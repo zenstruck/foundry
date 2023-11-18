@@ -62,7 +62,7 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
         $this->assertSame(['default'], $configurationArguments['$ormConnectionsToReset']);
         $this->assertSame(['default'], $configurationArguments['$ormObjectManagersToReset']);
         $this->assertSame('schema', $configurationArguments['$ormResetMode']);
-//        $this->assertSame(['object_manager_odm'], $configurationArguments['$odmObjectManagersToReset']);
+        $this->assertSame(['default'], $configurationArguments['$odmObjectManagersToReset']);
     }
 
     /**
@@ -232,7 +232,7 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
     public function cannot_configure_legacy_database_resetter_if_doctrine_not_enabled(string $doctrine): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(\sprintf('should be enabled to use config under "database_resetter.%s"', $doctrine));
+        $this->expectExceptionMessage(\sprintf('should be enabled to use config under "%s.reset"', $doctrine === 'orm' ? 'orm' : 'mongo'));
 
         $this->load(['database_resetter' => [$doctrine => []]]);
     }
@@ -240,13 +240,14 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
     /**
      * @test
      * @testWith ["orm"]
+     *           ["mongo"]
      */
     public function cannot_configure_database_resetter_if_doctrine_not_enabled(string $doctrine): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(\sprintf('should be enabled to use config under "database_resetter.%s"', $doctrine));
+        $this->expectExceptionMessage(\sprintf('should be enabled to use config under "%s.reset"', $doctrine));
 
-        $this->load([$doctrine => []]);
+        $this->load([$doctrine => ['reset' => []]]);
     }
 
     /**
@@ -280,14 +281,14 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
 
         $this->load([
             'orm' => ['reset' => ['connections' => ['orm_connection'], 'entity_managers' => ['object_manager_orm'], 'mode' => 'migrate']],
-//            'mongo' => ['object_managers' => ['object_manager_odm']],
+            'mongo' => ['reset' => ['document_managers' => ['object_manager_odm']]],
         ]);
 
         $configurationArguments = $this->container->getDefinition('.zenstruck_foundry.configuration')->getArguments();
         $this->assertSame(['orm_connection'], $configurationArguments['$ormConnectionsToReset']);
         $this->assertSame(['object_manager_orm'], $configurationArguments['$ormObjectManagersToReset']);
         $this->assertSame('migrate', $configurationArguments['$ormResetMode']);
-//        $this->assertSame(['object_manager_odm'], $configurationArguments['$odmObjectManagersToReset']);
+        $this->assertSame(['object_manager_odm'], $configurationArguments['$odmObjectManagersToReset']);
     }
 
     /**

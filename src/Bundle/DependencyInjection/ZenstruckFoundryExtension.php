@@ -120,17 +120,21 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
         }
 
         if ((isset($legacyConfig['orm']) || isset($config['orm']['reset'])) && !self::isBundleLoaded($container, DoctrineBundle::class)) {
-            throw new \InvalidArgumentException('doctrine/doctrine-bundle should be enabled to use config under "database_resetter.orm".');
+            throw new \InvalidArgumentException('doctrine/doctrine-bundle should be enabled to use config under "orm.reset".');
         }
 
-        if (isset($legacyConfig['odm']) && !self::isBundleLoaded($container, DoctrineMongoDBBundle::class)) {
-            throw new \InvalidArgumentException('doctrine/mongodb-odm-bundle should be enabled to use config under "database_resetter.odm".');
+        if (isset($legacyConfig['odm']) && isset($config['mongo']['reset'])) {
+            throw new \InvalidArgumentException('Configurations "zenstruck_foundry.mongo.reset" and "zenstruck_foundry.database_resetter.odm" are incompatible. You should only use "zenstruck_foundry.mongo.reset".');
+        }
+
+        if ((isset($legacyConfig['odm']) || isset($config['mongo']['reset']))  && !self::isBundleLoaded($container, DoctrineMongoDBBundle::class)) {
+            throw new \InvalidArgumentException('doctrine/mongodb-odm-bundle should be enabled to use config under "mongo.reset".');
         }
 
         $configurationDefinition->setArgument('$ormConnectionsToReset', $legacyConfig['orm']['connections'] ?? $config['orm']['reset']['connections'] ?? ['default']);
         $configurationDefinition->setArgument('$ormObjectManagersToReset', $legacyConfig['orm']['object_managers'] ?? $config['orm']['reset']['entity_managers'] ?? ['default']);
         $configurationDefinition->setArgument('$ormResetMode', $legacyConfig['orm']['reset_mode'] ?? $config['orm']['reset']['mode'] ?? ORMDatabaseResetter::RESET_MODE_SCHEMA);
-        $configurationDefinition->setArgument('$odmObjectManagersToReset', $legacyConfig['odm']['object_managers'] ?? []);
+        $configurationDefinition->setArgument('$odmObjectManagersToReset', $legacyConfig['odm']['object_managers'] ?? $config['mongo']['reset']['document_managers'] ?? ['default']);
     }
 
     private function configureMakeFactory(array $makerConfig, ContainerBuilder $container, FileLoader $loader): void
