@@ -88,9 +88,16 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
 
         $definition = $container->getDefinition('.zenstruck_foundry.default_instantiator');
 
-        if ($config['without_constructor']) {
-            $definition->setFactory([Instantiator::class, 'withoutConstructor']);
+        if (isset($config['without_constructor'])
+            && isset($config['use_constructor'])
+            && $config['without_constructor'] === $config['use_constructor']
+        ) {
+            throw new \InvalidArgumentException('Cannot set "without_constructor" and "use_constructor" to the same value.');
         }
+
+        $withoutConstructor = $config['without_constructor'] ?? !($config['use_constructor'] ?? true);
+
+        $definition->setFactory([Instantiator::class, $withoutConstructor ? 'withoutConstructor' : 'withConstructor']);
 
         if ($config['allow_extra_attributes']) {
             $definition->addMethodCall('allowExtraAttributes');
