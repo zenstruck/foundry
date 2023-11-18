@@ -172,7 +172,7 @@ class Kernel extends BaseKernel
                 $globalState[] = TagStory::class;
                 $globalState[] = TagStoryAsInvokableService::class;
 
-                $foundryConfig['database_resetter'] = ['orm' => ['reset_mode' => $this->ormResetMode]];
+                $foundryConfig['orm'] = ['reset' => ['mode' => $this->ormResetMode]];
             }
 
             if ($this->enableDoctrine && \getenv('MONGO_URL') && !\getenv('USE_DAMA_DOCTRINE_TEST_BUNDLE')) {

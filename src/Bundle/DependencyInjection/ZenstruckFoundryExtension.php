@@ -24,8 +24,11 @@ use Zenstruck\Foundry\Bundle\Command\StubMakeFactory;
 use Zenstruck\Foundry\Bundle\Command\StubMakeStory;
 use Zenstruck\Foundry\Instantiator;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\Proxy as ProxyBase;
+use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Story;
 use Zenstruck\Foundry\Test\ORMDatabaseResetter;
+use Zenstruck\Foundry\Test\ResetDatabase;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -48,7 +51,7 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
 
         $this->configureFaker($mergedConfig['faker'], $container);
         $this->configureDefaultInstantiator($mergedConfig['instantiator'], $container);
-        $this->configureDatabaseResetter($mergedConfig['database_resetter'], $container);
+        $this->configureDatabaseResetter($mergedConfig, $container);
         $this->configureMakeFactory($mergedConfig['make_factory'], $container, $loader);
 
         if (true === $mergedConfig['auto_refresh_proxies']) {
@@ -104,22 +107,30 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
     {
         $configurationDefinition = $container->getDefinition('.zenstruck_foundry.configuration');
 
-        if (false === $config['enabled']) {
+        $legacyConfig = $config['database_resetter'];
+
+        if (false === $legacyConfig['enabled']) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Disabling database reset via bundle configuration is deprecated and will be removed in 2.0. Instead you should not use "%s" trait in your test.', ResetDatabase::class));
+
             $configurationDefinition->addMethodCall('disableDatabaseReset');
         }
 
-        if (isset($config['orm']) && !self::isBundleLoaded($container, DoctrineBundle::class)) {
+        if (isset($legacyConfig['orm']) && isset($config['orm']['reset'])) {
+            throw new \InvalidArgumentException('Configurations "zenstruck_foundry.orm.reset" and "zenstruck_foundry.database_resetter.orm" are incompatible. You should only use "zenstruck_foundry.orm.reset".');
+        }
+
+        if ((isset($legacyConfig['orm']) || isset($config['orm']['reset'])) && !self::isBundleLoaded($container, DoctrineBundle::class)) {
             throw new \InvalidArgumentException('doctrine/doctrine-bundle should be enabled to use config under "database_resetter.orm".');
         }
 
-        if (isset($config['odm']) && !self::isBundleLoaded($container, DoctrineMongoDBBundle::class)) {
+        if (isset($legacyConfig['odm']) && !self::isBundleLoaded($container, DoctrineMongoDBBundle::class)) {
             throw new \InvalidArgumentException('doctrine/mongodb-odm-bundle should be enabled to use config under "database_resetter.odm".');
         }
 
-        $configurationDefinition->setArgument('$ormConnectionsToReset', $config['orm']['connections'] ?? []);
-        $configurationDefinition->setArgument('$ormObjectManagersToReset', $config['orm']['object_managers'] ?? []);
-        $configurationDefinition->setArgument('$ormResetMode', $config['orm']['reset_mode'] ?? ORMDatabaseResetter::RESET_MODE_SCHEMA);
-        $configurationDefinition->setArgument('$odmObjectManagersToReset', $config['odm']['object_managers'] ?? []);
+        $configurationDefinition->setArgument('$ormConnectionsToReset', $legacyConfig['orm']['connections'] ?? $config['orm']['reset']['connections'] ?? ['default']);
+        $configurationDefinition->setArgument('$ormObjectManagersToReset', $legacyConfig['orm']['object_managers'] ?? $config['orm']['reset']['entity_managers'] ?? ['default']);
+        $configurationDefinition->setArgument('$ormResetMode', $legacyConfig['orm']['reset_mode'] ?? $config['orm']['reset']['mode'] ?? ORMDatabaseResetter::RESET_MODE_SCHEMA);
+        $configurationDefinition->setArgument('$odmObjectManagersToReset', $legacyConfig['odm']['object_managers'] ?? []);
     }
 
     private function configureMakeFactory(array $makerConfig, ContainerBuilder $container, FileLoader $loader): void
