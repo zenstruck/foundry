@@ -852,13 +852,11 @@ of your attributes that:
  - you only want to calculate once (i.e. creating an entity from another factory to pass as a value into multiple other factories)
 
 You can wrap the value in a ``LazyValue`` which ensures the value is only calculated when/if it's needed. Additionally,
-the LazyValue can be  `memoized <https://en.wikipedia.org/wiki/Memoization>`_ so that it is only calculated once.
+the LazyValue can be `memoized <https://en.wikipedia.org/wiki/Memoization>`_ so that it is only calculated once.
 
     .. code-block:: php
 
         use Zenstruck\Foundry\Attributes\LazyValue;
-        use function Zenstruck\Foundry\lazy;
-        use function Zenstruck\Foundry\memoize;
 
         class TaskFactory extends ModelFactory
         {
@@ -866,7 +864,7 @@ the LazyValue can be  `memoized <https://en.wikipedia.org/wiki/Memoization>`_ so
 
             protected function getDefaults(): array
             {
-                $owner = LazyValue::memoize(fn () => UserFactory::new());
+                $owner = LazyValue::memoize(fn() => UserFactory::createOne());
 
                 return [
                     // Call CategoryFactory::random() everytime this factory is instantiated
