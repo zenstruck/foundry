@@ -232,7 +232,7 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
     public function cannot_configure_legacy_database_resetter_if_doctrine_not_enabled(string $doctrine): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(\sprintf('should be enabled to use config under "%s.reset"', $doctrine === 'orm' ? 'orm' : 'mongo'));
+        $this->expectExceptionMessage(\sprintf('should be enabled to use config under "%s.reset"', 'orm' === $doctrine ? 'orm' : 'mongo'));
 
         $this->load(['database_resetter' => [$doctrine => []]]);
     }

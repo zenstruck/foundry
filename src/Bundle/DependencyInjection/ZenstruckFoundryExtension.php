@@ -24,8 +24,6 @@ use Zenstruck\Foundry\Bundle\Command\StubMakeFactory;
 use Zenstruck\Foundry\Bundle\Command\StubMakeStory;
 use Zenstruck\Foundry\Instantiator;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Persistence\Proxy as ProxyBase;
-use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Story;
 use Zenstruck\Foundry\Test\ORMDatabaseResetter;
 use Zenstruck\Foundry\Test\ResetDatabase;
@@ -110,7 +108,7 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
         $legacyConfig = $config['database_resetter'];
 
         if (false === $legacyConfig['enabled']) {
-            trigger_deprecation('zenstruck\foundry', '1.37.0', sprintf('Disabling database reset via bundle configuration is deprecated and will be removed in 2.0. Instead you should not use "%s" trait in your test.', ResetDatabase::class));
+            trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Disabling database reset via bundle configuration is deprecated and will be removed in 2.0. Instead you should not use "%s" trait in your test.', ResetDatabase::class));
 
             $configurationDefinition->addMethodCall('disableDatabaseReset');
         }
@@ -127,7 +125,7 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
             throw new \InvalidArgumentException('Configurations "zenstruck_foundry.mongo.reset" and "zenstruck_foundry.database_resetter.odm" are incompatible. You should only use "zenstruck_foundry.mongo.reset".');
         }
 
-        if ((isset($legacyConfig['odm']) || isset($config['mongo']['reset']))  && !self::isBundleLoaded($container, DoctrineMongoDBBundle::class)) {
+        if ((isset($legacyConfig['odm']) || isset($config['mongo']['reset'])) && !self::isBundleLoaded($container, DoctrineMongoDBBundle::class)) {
             throw new \InvalidArgumentException('doctrine/mongodb-odm-bundle should be enabled to use config under "mongo.reset".');
         }
 
