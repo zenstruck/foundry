@@ -82,7 +82,7 @@ final class Configuration implements ConfigurationInterface
                         ->booleanNode('use_constructor')
                             ->info('Use the constructor to instantiate objects.')
                             // default is set in ZenstruckFoundryExtension till we have deprecation layer
-                            //->defaultTrue()
+                            // ->defaultTrue()
                         ->end()
                         ->booleanNode('allow_extra_attributes')
                             ->defaultFalse()
