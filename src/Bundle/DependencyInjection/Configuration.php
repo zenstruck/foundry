@@ -96,7 +96,7 @@ final class Configuration implements ConfigurationInterface
                 ->end()
                 ->arrayNode('orm')
                     // could be activated in 2.0
-                    //->addDefaultsIfNotSet()
+                    // ->addDefaultsIfNotSet()
                     ->children()
                     ->arrayNode('reset')
                         ->addDefaultsIfNotSet()
@@ -122,7 +122,7 @@ final class Configuration implements ConfigurationInterface
                 ->end()
                 ->arrayNode('mongo')
                     // could be activated in 2.0
-                    //->addDefaultsIfNotSet()
+                    // ->addDefaultsIfNotSet()
                     ->children()
                         ->arrayNode('reset')
                             ->addDefaultsIfNotSet()
