@@ -27,7 +27,7 @@ final class Instantiator
 {
     private static ?PropertyAccessor $propertyAccessor = null;
 
-    private bool $withoutConstructor = false;
+    private bool $useConstructor = true;
 
     private bool $allowExtraAttributes = false;
 
@@ -108,7 +108,7 @@ final class Instantiator
 
         trigger_deprecation('zenstruck/foundry', '1.37.0', 'Calling instance method "%1$s::withoutConstructor()" is deprecated and will be removed in 2.0. Use static call instead: "%1$s::withoutConstructor()" instead.', static::class);
 
-        $this->withoutConstructor = true;
+        $this->useConstructor = false;
 
         return $this;
     }
@@ -121,7 +121,7 @@ final class Instantiator
 
         $instance = new self(calledInternally: true);
 
-        $instance->withoutConstructor = true;
+        $instance->useConstructor = false;
 
         return $instance;
     }
@@ -270,8 +270,8 @@ final class Instantiator
         $class = new \ReflectionClass($class);
         $constructor = $class->getConstructor();
 
-        if ($this->withoutConstructor || !$constructor || !$constructor->isPublic()) {
-            if (!$this->withoutConstructor && $constructor && !$constructor->isPublic()) {
+        if (!$this->useConstructor || !$constructor || !$constructor->isPublic()) {
+            if ($this->useConstructor && $constructor && !$constructor->isPublic()) {
                 trigger_deprecation('zenstruck\foundry', '1.37.0', 'Instantiator was created to instantiate "%s" by calling the constructor whereas the constructor is not public. This is deprecated and will throw an exception in Foundry 2.0. Use "%s::withoutConstructor()" instead or make constructor public.', $class->getName(), self::class);
             }
 
