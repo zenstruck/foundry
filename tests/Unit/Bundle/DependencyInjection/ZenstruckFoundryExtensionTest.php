@@ -126,7 +126,7 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
     {
         $this->load([
             'instantiator' => [
-                'without_constructor' => true,
+                'use_constructor' => false,
                 'allow_extra_attributes' => true,
                 'always_force_properties' => true,
             ],
@@ -139,8 +139,39 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
 
         // matthiasnoback/symfony-dependency-injection-test cannot assert if a service is created through a factory.
         // so, we're checking that private property "Instantiator::$withoutConstructor" was set to true.
-        $withoutConstructor = \Closure::bind(static fn(Instantiator $instantiator) => $instantiator->withoutConstructor, null, Instantiator::class)($instantiator);
-        self::assertTrue($withoutConstructor);
+        $useConstructor = \Closure::bind(static fn(Instantiator $instantiator) => $instantiator->useConstructor, null, Instantiator::class)($instantiator);
+        self::assertFalse($useConstructor);
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    public function can_configure_instantiator_without_constructor(): void
+    {
+        $this->load(['instantiator' => ['without_constructor' => true]]);
+
+        $instantiator = $this->container->get('.zenstruck_foundry.default_instantiator');
+
+        // matthiasnoback/symfony-dependency-injection-test cannot assert if a service is created through a factory.
+        // so, we're checking that private property "Instantiator::$withoutConstructor" was set to true.
+        $useConstructor = \Closure::bind(static fn(Instantiator $instantiator) => $instantiator->useConstructor, null, Instantiator::class)($instantiator);
+        self::assertFalse($useConstructor);
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    public function throws_exception_when_instantiator_has_wrong_configuration(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot set "without_constructor" and "use_constructor" to the same value.');
+
+        $this->load(['instantiator' => [
+            'without_constructor' => true,
+            'use_constructor' => true,
+        ]]);
     }
 
     /**
@@ -171,7 +202,7 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
     public function cannot_configure_without_constructor_if_using_custom_instantiator_service(): void
     {
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Invalid configuration for path "zenstruck_foundry.instantiator": Cannot set "without_constructor" when using custom service.');
+        $this->expectExceptionMessage('Invalid configuration for path "zenstruck_foundry.instantiator": Cannot set "use_constructor: false" when using custom service.');
 
         $this->load(['instantiator' => ['service' => 'my_instantiator', 'without_constructor' => true]]);
     }
