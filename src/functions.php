@@ -13,6 +13,7 @@ namespace Zenstruck\Foundry;
 
 use Faker;
 use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Proxy as ProxyObject;
 use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 
 use function Zenstruck\Foundry\Persistence\persist_proxy;
@@ -104,7 +105,7 @@ function instantiate(string $class, array|callable $attributes = []): Proxy
 {
     trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Function "%s()" is deprecated and will be removed in Foundry 2.0. Use "%s::object()" instead.', __FUNCTION__, __NAMESPACE__));
 
-    return new Proxy(object($class, $attributes));
+    return new ProxyObject(object($class, $attributes));
 }
 
 /**
