@@ -67,9 +67,7 @@ final class FactoryCollection implements \IteratorAggregate
     }
 
     /**
-     * @return list<TObject&Proxy<TObject>>|list<TObject>
-     *
-     * @phpstan-return ($noProxy is true ? list<TObject>: list<Proxy<TObject>>|list<TObject>)
+     * @return list<TObject>
      */
     public function create(
         array|callable $attributes = [],
