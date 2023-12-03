@@ -6,11 +6,6 @@ parameters:
 			path: src/AnonymousFactoryGenerator.php
 
 		-
-			message: "#^Parameter \\#1 \\$objectOrClass of class ReflectionClass constructor expects class\\-string\\<T of object\\>\\|T of object, string\\|null given\\.$#"
-			count: 1
-			path: src/Bundle/DependencyInjection/GlobalStatePass.php
-
-		-
 			message: "#^Parameter \\#1 \\$class of method Doctrine\\\\Persistence\\\\ManagerRegistry\\:\\:getManagerForClass\\(\\) expects class\\-string, string given\\.$#"
 			count: 1
 			path: src/Configuration.php

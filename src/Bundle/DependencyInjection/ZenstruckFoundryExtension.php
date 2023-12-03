@@ -100,11 +100,11 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
         $definition->setFactory([Instantiator::class, $withoutConstructor ? 'withoutConstructor' : 'withConstructor']);
 
         if ($config['allow_extra_attributes']) {
-            $definition->addMethodCall('allowExtraAttributes');
+            $definition->addMethodCall('allowExtra');
         }
 
         if ($config['always_force_properties']) {
-            $definition->addMethodCall('alwaysForceProperties');
+            $definition->addMethodCall('alwaysForce');
         }
     }
 

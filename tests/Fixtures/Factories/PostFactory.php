@@ -47,7 +47,7 @@ class PostFactory extends PersistentProxyObjectFactory
     {
         return $this
             ->instantiateWith(
-                Instantiator::withConstructor()->allowExtraAttributes(['extraCategoryBeforeInstantiate', 'extraCategoryAfterInstantiate'])
+                Instantiator::withConstructor()->allowExtra('extraCategoryBeforeInstantiate', 'extraCategoryAfterInstantiate')
             )
             ->beforeInstantiate(function(array $attributes): array {
                 if (isset($attributes['extraCategoryBeforeInstantiate'])) {

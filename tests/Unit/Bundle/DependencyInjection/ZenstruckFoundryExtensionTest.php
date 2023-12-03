@@ -132,8 +132,8 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
             ],
         ]);
 
-        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.default_instantiator', 'allowExtraAttributes');
-        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.default_instantiator', 'alwaysForceProperties');
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.default_instantiator', 'allowExtra');
+        $this->assertContainerBuilderHasServiceDefinitionWithMethodCall('.zenstruck_foundry.default_instantiator', 'alwaysForce');
 
         $instantiator = $this->container->get('.zenstruck_foundry.default_instantiator');
 
