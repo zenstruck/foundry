@@ -27,7 +27,6 @@ final class FactoryClassMap
     /** @param \Traversable<ModelFactory> $factories */
     public function __construct(\Traversable $factories)
     {
-        /** @phpstan-ignore-next-line */
         $this->classesWithFactories = \array_unique(
             \array_reduce(
                 \iterator_to_array($factories, preserve_keys: true),

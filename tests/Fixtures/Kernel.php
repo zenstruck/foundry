@@ -151,7 +151,10 @@ class Kernel extends BaseKernel
             $c->loadFromExtension(
                 'doctrine',
                 [
-                    'dbal' => ['url' => '%env(resolve:DATABASE_URL)%'],
+                    'dbal' => [
+                        'url' => '%env(resolve:DATABASE_URL)%',
+                        'use_savepoints' => true,
+                    ],
                     'orm' => [
                         'auto_generate_proxy_classes' => true,
                         'auto_mapping' => true,
