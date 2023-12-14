@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## [v1.36.1](https://github.com/zenstruck/foundry/releases/tag/v1.36.1)
+
+December 14th, 2023 - [v1.36.0...v1.36.1](https://github.com/zenstruck/foundry/compare/v1.36.0...v1.36.1)
+
+* 8ea43d5 minor: add Symfony 7.0 to the test matrix (#539) by @kbond
+* 4c4d099 minor: update psalm (#539) by @kbond
+* c9ddf74 minor: update/fix phpstan issues (#539) by @kbond
+* de3b26e minor: allow `dama/doctrine-test-bundle` 8.x (#539) by @kbond
+* a1a22ce doc: fix memoize example (#526) by @kbond
+* b7c0cb7 minor(ci): remove mysql/no-dama from matrix (#521) by @kbond
+* e41bbe8 doc: add warning about complex global state performance (#520) by @kbond
+* 81eb3b8 doc: add section on `paratestphp/paratest` (#520) by @kbond
+* 8666777 doc: adjust test performance section (#520) by @kbond
+* a0bbf5b fix: phpunit xsd path (#520) by @kbond
+* ed0cd7b chore: remove Makefile (#513) by @nikophil
+
 ## [v1.36.0](https://github.com/zenstruck/foundry/releases/tag/v1.36.0)
 
 October 13th, 2023 - [v1.35.0...v1.36.0](https://github.com/zenstruck/foundry/compare/v1.35.0...v1.36.0)
