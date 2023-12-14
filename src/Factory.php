@@ -187,7 +187,7 @@ class Factory
     /**
      * @param int|null $max If set, when created, the collection will be a random size between $min and $max
      *
-     * @return FactoryCollection<TObject>
+     * @return ($this is PersistentProxyObjectFactory ? FactoryCollection<Proxy<TObject>> : FactoryCollection<TObject>)
      */
     final public function many(int $min, ?int $max = null): FactoryCollection
     {
@@ -201,7 +201,7 @@ class Factory
     /**
      * @param iterable<array<string, mixed>>|callable(): iterable<array<string, mixed>> $sequence
      *
-     * @return FactoryCollection<TObject>
+     * @return ($this is PersistentProxyObjectFactory ? FactoryCollection<Proxy<TObject>> : FactoryCollection<TObject>)
      */
     final public function sequence(iterable|callable $sequence): FactoryCollection
     {
