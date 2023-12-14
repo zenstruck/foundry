@@ -63,7 +63,6 @@ final class MakeFactoryPHPDocMethod
                 true => "RepositoryProxy<{$this->objectName}>",
             };
         } else {
-            /** @phpstan-ignore-next-line */
             $returnType = match ([$this->returnsCollection, (bool) $staticAnalysisTool]) {
                 [true, true] => "list<Proxy<{$this->objectName}>>",
                 [true, false] => "{$this->objectName}[]|Proxy[]",

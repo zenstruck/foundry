@@ -1,7 +1,7 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Parameter \\#1 \\$objectOrClass of class ReflectionClass constructor expects class\\-string\\<T of object\\>\\|T of object, string\\|null given\\.$#"
+			message: "#^Parameter \\#1 \\$objectOrClass of class ReflectionClass constructor expects class\\-string\\<object\\>\\|object, class\\-string\\|null given\\.$#"
 			count: 1
 			path: src/Bundle/DependencyInjection/GlobalStatePass.php
 
