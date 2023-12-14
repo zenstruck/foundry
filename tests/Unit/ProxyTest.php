@@ -16,6 +16,7 @@ use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Proxy as ProxyObject;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 
@@ -31,7 +32,7 @@ final class ProxyTest extends TestCase
      */
     public function can_force_get_and_set_non_public_properties(): void
     {
-        $proxy = new Proxy(new Category());
+        $proxy = new ProxyObject(new Category());
 
         $this->assertNull($proxy->_get('name'));
 
@@ -45,7 +46,7 @@ final class ProxyTest extends TestCase
      */
     public function can_access_wrapped_objects_properties(): void
     {
-        $proxy = new Proxy(new class() {
+        $proxy = new ProxyObject(new class() {
             public $property;
         });
 
@@ -70,7 +71,7 @@ final class ProxyTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Cannot refresh unpersisted object (Zenstruck\Foundry\Tests\Fixtures\Entity\Category).');
 
-        (new Proxy(new Category()))->_refresh();
+        (new ProxyObject(new Category()))->_refresh();
     }
 
     /**
@@ -88,7 +89,7 @@ final class ProxyTest extends TestCase
 
         Factory::configuration()->setManagerRegistry($registry)->enableDefaultProxyAutoRefresh();
 
-        $category = new Proxy(new Category());
+        $category = new ProxyObject(new Category());
 
         $this->assertFalse($category->isPersisted());
 
@@ -102,7 +103,7 @@ final class ProxyTest extends TestCase
      */
     public function can_use_without_auto_refresh_with_proxy_or_object_typehint(): void
     {
-        $proxy = new Proxy(new Category());
+        $proxy = new ProxyObject(new Category());
         $calls = 0;
 
         $proxy
@@ -136,7 +137,7 @@ final class ProxyTest extends TestCase
      */
     public function can_use_new_class_as_legacy_one(): void
     {
-        $proxy = new Proxy(new Category());
+        $proxy = new ProxyObject(new Category());
 
         self::assertInstanceOf(\Zenstruck\Foundry\Proxy::class, $proxy);
         self::assertInstanceOf(\Zenstruck\Foundry\Persistence\Proxy::class, $proxy);

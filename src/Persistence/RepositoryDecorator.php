@@ -24,6 +24,7 @@ use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\Proxy as ProxyObject;
 
 /**
  * @mixin EntityRepository<TProxiedObject>
@@ -437,7 +438,7 @@ final class RepositoryDecorator implements ObjectRepository, \IteratorAggregate,
         }
 
         if ($result && \is_a($result, $this->getClassName())) {
-            return Proxy::createFromPersisted($result);
+            return ProxyObject::createFromPersisted($result);
         }
 
         return $result;

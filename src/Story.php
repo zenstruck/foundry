@@ -12,6 +12,7 @@
 namespace Zenstruck\Foundry;
 
 use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Proxy as ProxyObject;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -179,8 +180,8 @@ abstract class Story
         }
 
         // ensure objects are proxied
-        if (!$object instanceof Proxy) {
-            $object = new Proxy($object);
+        if (!$object instanceof ProxyObject) {
+            $object = new ProxyObject($object);
         }
 
         // ensure proxies are persisted

@@ -19,6 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\LazyValue;
 use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Proxy as ProxyObject;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
@@ -286,7 +287,7 @@ final class FactoryTest extends TestCase
         $object = persistent_factory(Post::class)->create([
             'title' => 'title',
             'body' => 'body',
-            'category' => new Proxy(new Category()),
+            'category' => new ProxyObject(new Category()),
         ]);
 
         $this->assertInstanceOf(Category::class, $object->getCategory());
