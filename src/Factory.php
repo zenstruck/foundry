@@ -20,6 +20,7 @@ use Zenstruck\Foundry\Persistence\InversedRelationshipPostPersistCallback;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\PostPersistCallback;
 use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Proxy as ProxyObject;
 
 /**
  * @template TObject of object
@@ -152,17 +153,17 @@ class Factory
         }
 
         if (!$this->isPersisting()) {
-            return $noProxy ? $object : new Proxy($object);
+            return $noProxy ? $object : new ProxyObject($object);
         }
 
-        $proxy = new Proxy($object);
+        $proxy = new ProxyObject($object);
 
         if ($this->cascadePersist && !$postPersistCallbacks) {
             return $proxy;
         }
 
         $proxy->_save()
-            ->_withoutAutoRefresh(function(Proxy $proxy) use ($attributes, $postPersistCallbacks): void {
+            ->_withoutAutoRefresh(function(ProxyObject $proxy) use ($attributes, $postPersistCallbacks): void {
                 $callbacks = [...$postPersistCallbacks, ...$this->afterPersist];
 
                 if (!$callbacks) {
@@ -413,7 +414,7 @@ class Factory
 
     private function normalizeAttribute(mixed $value, string $name): mixed
     {
-        if ($value instanceof Proxy) {
+        if ($value instanceof ProxyObject) {
             return $value->isPersisted(calledInternally: true) ? $value->_refresh()->_real() : $value->_real();
         }
 
@@ -485,7 +486,7 @@ class Factory
         }
 
         try {
-            return Proxy::createFromPersisted($object)->_refresh()->_real();
+            return ProxyObject::createFromPersisted($object)->_refresh()->_real();
         } catch (\RuntimeException) {
             return $object;
         }

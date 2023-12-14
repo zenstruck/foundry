@@ -71,7 +71,12 @@ parameters:
 			path: src/Persistence/RepositoryDecorator.php
 
 		-
-			message: "#^If condition is always false\\.$#"
+			message: "#^Method Zenstruck\\\\Foundry\\\\Persistence\\\\RepositoryDecorator\\:\\:proxyResult\\(\\) should return array\\<int, Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TProxiedObject of object\\>\\>\\|Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TProxiedObject of object\\> but returns Zenstruck\\\\Foundry\\\\Proxy\\.$#"
+			count: 1
+			path: src/Persistence/RepositoryDecorator.php
+
+		-
+			message: "#^PHPDoc tag @return with type Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TObject of object\\> is not subtype of native type Zenstruck\\\\Foundry\\\\Proxy\\.$#"
 			count: 1
 			path: src/Proxy.php
 
