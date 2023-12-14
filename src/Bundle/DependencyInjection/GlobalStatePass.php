@@ -69,7 +69,7 @@ final class GlobalStatePass implements CompilerPassInterface
 
         $globalStateItemDefinition = $container->getDefinition($globalStateItem);
 
-        return (new \ReflectionClass($globalStateItemDefinition->getClass()))->hasMethod('__invoke');
+        return (new \ReflectionClass($globalStateItemDefinition->getClass()))->hasMethod('__invoke'); // @phpstan-ignore-line
     }
 
     private function isStandaloneStory(ContainerBuilder $container, string $globalStateItem): bool

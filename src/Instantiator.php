@@ -54,7 +54,7 @@ final class Instantiator
 
         foreach ($attributes as $attribute => $value) {
             if (0 === \mb_strpos($attribute, 'optional:')) {
-                trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using "optional:" attribute prefixes is deprecated, use Instantiator::allowExtraAttributes() instead (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#instantiation).');
+                trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using "optional:" attribute prefixes is deprecated, use Instantiator::allowExtra() instead (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#instantiation).');
                 continue;
             }
 
@@ -75,7 +75,7 @@ final class Instantiator
             }
 
             if (0 === \mb_strpos($attribute, 'force:')) {
-                trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using "force:" property prefixes is deprecated, use Instantiator::alwaysForceProperties() instead (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#instantiation).');
+                trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using "force:" property prefixes is deprecated, use Instantiator::alwaysForce() instead (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#instantiation).');
 
                 self::forceSet($object, \mb_substr($attribute, 6), $value);
 
@@ -135,14 +135,28 @@ final class Instantiator
      * Ignore attributes that can't be set to object.
      *
      * @param string[] $attributes The attributes you'd like the instantiator to ignore (if empty, ignore any extra)
+     *
+     * @deprecated Use self::allowExtra() instead
      */
     public function allowExtraAttributes(array $attributes = []): self
     {
-        if (empty($attributes)) {
+        trigger_deprecation('zenstruck/foundry', '1.37.0', 'Method "Instantiator::allowExtraAttributes()" is deprecated. Please use "Instantiator::allowExtra()" instead.');
+
+        return $this->allowExtra(...$attributes);
+    }
+
+    /**
+     * Ignore attributes that can't be set to object.
+     *
+     * @param string $parameters The attributes you'd like the instantiator to ignore (if empty, ignore any extra)
+     */
+    public function allowExtra(string ...$parameters): self
+    {
+        if (empty($parameters)) {
             $this->allowExtraAttributes = true;
         }
 
-        $this->extraAttributes = $attributes;
+        $this->extraAttributes = $parameters;
 
         return $this;
     }
@@ -151,8 +165,22 @@ final class Instantiator
      * Always force properties, never use setters (still uses constructor unless disabled).
      *
      * @param string[] $properties The properties you'd like the instantiator to "force set" (if empty, force set all)
+     *
+     * @deprecated Use self::alwaysForce() instead
      */
     public function alwaysForceProperties(array $properties = []): self
+    {
+        trigger_deprecation('zenstruck/foundry', '1.37.0', 'Method "Instantiator::alwaysForceProperties()" is deprecated. Please use "Instantiator::alwaysForce()" instead.');
+
+        return $this->alwaysForce(...$properties);
+    }
+
+    /**
+     * Always force properties, never use setters (still uses constructor unless disabled).
+     *
+     * @param string $properties The properties you'd like the instantiator to "force set" (if empty, force set all)
+     */
+    public function alwaysForce(string ...$properties): self
     {
         if (empty($properties)) {
             $this->alwaysForceProperties = true;
