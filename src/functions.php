@@ -13,8 +13,8 @@ namespace Zenstruck\Foundry;
 
 use Faker;
 use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\Proxy as ProxyObject;
 use Zenstruck\Foundry\Persistence\RepositoryDecorator;
+use Zenstruck\Foundry\Proxy as ProxyObject;
 
 use function Zenstruck\Foundry\Persistence\persist_proxy;
 use function Zenstruck\Foundry\Persistence\persistent_factory;
