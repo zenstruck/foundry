@@ -58,15 +58,11 @@ class Factory
     /**
      * @param class-string<TObject> $class
      */
-    public function __construct(string $class, array|callable $defaultAttributes = [], bool $calledInternally = false)
+    public function __construct(string $class, array|callable $defaultAttributes = [])
     {
         /** @phpstan-ignore-next-line */
         if (self::class === static::class) {
             trigger_deprecation('zenstruck/foundry', '1.9', 'Instantiating "%s" directly is deprecated and this class will be abstract in 2.0, use "anonymous()" function instead.', self::class);
-        }
-
-        if (!$calledInternally) {
-            trigger_deprecation('zenstruck\foundry', '1.37.0', 'Constructor of class Zenstruck\Foundry\Factory is deprecated and will be removed in version 2.0. You should not call parent::__construct() anymore from your factories.');
         }
 
         $this->class = $class;
