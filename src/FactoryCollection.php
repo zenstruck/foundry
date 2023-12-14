@@ -11,8 +11,6 @@
 
 namespace Zenstruck\Foundry;
 
-use Zenstruck\Foundry\Persistence\Proxy;
-
 /**
  * @template TObject of object
  *
