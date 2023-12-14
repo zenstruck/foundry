@@ -29,7 +29,7 @@ abstract class PersistentObjectFactory extends Factory
 {
     public function __construct()
     {
-        parent::__construct(static::class(), calledInternally: true);
+        parent::__construct(static::class());
     }
 
     /**
