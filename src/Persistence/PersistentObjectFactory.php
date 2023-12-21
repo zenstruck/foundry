@@ -101,7 +101,7 @@ abstract class PersistentObjectFactory extends Factory
         bool $noProxy = false
     ): object {
         if (2 === \count(\func_get_args()) && !\str_starts_with(\debug_backtrace(options: \DEBUG_BACKTRACE_IGNORE_ARGS, limit: 1)[0]['class'] ?? '', 'Zenstruck\Foundry')) {
-            trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Parameter "$noProxy" of method "%s()" is deprecated and will be removed in Foundry 2.0.', __METHOD__));
+            trigger_deprecation('zenstruck\foundry', '1.37.0', 'Parameter "$noProxy" of method "%s()" is deprecated and will be removed in Foundry 2.0.', __METHOD__);
         }
 
         return parent::create(
@@ -340,7 +340,7 @@ abstract class PersistentObjectFactory extends Factory
      */
     final protected function addState(array|callable $attributes = []): static
     {
-        trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in version 2.0. Use "%s::with()" instead.', __METHOD__, Factory::class));
+        trigger_deprecation('zenstruck\foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in version 2.0. Use "%s::with()" instead.', __METHOD__, Factory::class);
 
         return $this->with($attributes);
     }

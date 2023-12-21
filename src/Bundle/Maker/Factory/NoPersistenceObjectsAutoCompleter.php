@@ -34,7 +34,7 @@ final class NoPersistenceObjectsAutoCompleter
 
                 $class = $this->toPSR4($rootPath, $phpFile, $namespacePrefix);
 
-                if (\in_array($class, ['Zenstruck\Foundry\Proxy', 'Zenstruck\Foundry\RepositoryProxy'])) {
+                if (\in_array($class, ['Zenstruck\Foundry\Proxy', 'Zenstruck\Foundry\RepositoryProxy', 'Zenstruck\Foundry\RepositoryAssertions'])) {
                     // do not load legacy Proxy: prevents deprecations in tests.
                     continue;
                 }

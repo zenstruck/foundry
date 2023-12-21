@@ -348,11 +348,11 @@ abstract class RepositoryDecoratorTest extends KernelTestCase
      */
     public function can_use_new_class_as_legacy_one(): void
     {
-        self::assertTrue($this->categoryFactoryClass()::repository() instanceof \Zenstruck\Foundry\RepositoryProxy);
         self::assertTrue($this->categoryFactoryClass()::repository() instanceof \Zenstruck\Foundry\Persistence\RepositoryDecorator);
+        self::assertTrue($this->categoryFactoryClass()::repository() instanceof \Zenstruck\Foundry\RepositoryProxy);
 
-        self::assertTrue($this->categoryFactoryClass()::assert() instanceof \Zenstruck\Foundry\RepositoryAssertions);
         self::assertTrue($this->categoryFactoryClass()::assert() instanceof \Zenstruck\Foundry\Persistence\RepositoryAssertions);
+        self::assertTrue($this->categoryFactoryClass()::assert() instanceof \Zenstruck\Foundry\RepositoryAssertions);
     }
 
     abstract protected function categoryClass(): string;

@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Zenstruck\Foundry\Bundle\Command\StubMakeFactory;
 use Zenstruck\Foundry\Bundle\Command\StubMakeStory;
-use Zenstruck\Foundry\Instantiator;
+use \Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Story;
@@ -127,7 +127,7 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
         $legacyConfig = $config['database_resetter'];
 
         if (false === $legacyConfig['enabled']) {
-            trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Disabling database reset via bundle configuration is deprecated and will be removed in 2.0. Instead you should not use "%s" trait in your test.', ResetDatabase::class));
+            trigger_deprecation('zenstruck\foundry', '1.37.0', 'Disabling database reset via bundle configuration is deprecated and will be removed in 2.0. Instead you should not use "%s" trait in your test.', ResetDatabase::class);
 
             $configurationDefinition->addMethodCall('disableDatabaseReset');
         }

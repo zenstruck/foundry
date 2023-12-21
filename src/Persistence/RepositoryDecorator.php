@@ -31,8 +31,10 @@ use Zenstruck\Foundry\Proxy as ProxyObject;
  * @template TProxiedObject of object
  *
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @final
  */
-final class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Countable
+class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Countable
 {
     /**
      * @param ObjectRepository<TProxiedObject> $repository
@@ -457,3 +459,5 @@ final class RepositoryDecorator implements ObjectRepository, \IteratorAggregate,
         return Factory::configuration()->objectManagerFor($this->getClassName());
     }
 }
+
+class_exists(\Zenstruck\Foundry\RepositoryProxy::class);

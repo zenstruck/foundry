@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Test;
 
 use Faker;
-use Zenstruck\Foundry\Instantiator;
+use \Zenstruck\Foundry\Object\Instantiator;
 
 final class UnitTestConfig
 {

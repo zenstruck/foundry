@@ -13,7 +13,7 @@ namespace Zenstruck\Foundry\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
-use Zenstruck\Foundry\Instantiator;
+use Zenstruck\Foundry\Object\Instantiator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
