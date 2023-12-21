@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Functional;
 
+use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMCategory;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMComment;
@@ -97,6 +98,9 @@ final class ODMModelFactoryTest extends ModelFactoryTest
      */
     public function can_find_or_create_from_object(): void
     {
+        // must disable auto refresh proxy: otherwise doctrine would update post from db and recreate the user object.
+        Factory::configuration()->disableDefaultProxyAutoRefresh();
+
         $user = UserFactory::createOne(['name' => 'some user']);
         $post = PostFactory::findOrCreate($attributes = ['user' => $user->_real()]);
 
@@ -114,6 +118,9 @@ final class ODMModelFactoryTest extends ModelFactoryTest
      */
     public function can_find_or_create_from_proxy_of_object(): void
     {
+        // must disable auto refresh proxy: otherwise doctrine would update post from db and recreate the user object.
+        Factory::configuration()->disableDefaultProxyAutoRefresh();
+
         $user = UserFactory::createOne(['name' => 'some user']);
         $post = PostFactory::findOrCreate($attributes = ['user' => $user]);
 

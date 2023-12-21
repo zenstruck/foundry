@@ -220,6 +220,7 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_enable_auto_refresh_proxies(): void
     {
@@ -232,6 +233,7 @@ final class ZenstruckFoundryExtensionTest extends AbstractExtensionTestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_disable_auto_refresh_proxies(): void
     {
