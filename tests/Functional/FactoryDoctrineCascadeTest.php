@@ -11,9 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Functional;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Instantiator;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
@@ -24,7 +22,6 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\ProductCategory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Review;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Tag;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Variant;
-use Zenstruck\Foundry\Tests\Fixtures\Kernel;
 
 use function Zenstruck\Foundry\Persistence\persistent_factory;
 
