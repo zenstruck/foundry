@@ -82,6 +82,7 @@ class Product
     public function setReview(Review $review): void
     {
         $this->review = $review;
+        $review->setProduct($this);
     }
 
     public function getVariants(): Collection
@@ -113,6 +114,7 @@ class Product
     {
         if (!$this->categories->contains($category)) {
             $this->categories[] = $category;
+            $category->addProduct($this);
         }
     }
 

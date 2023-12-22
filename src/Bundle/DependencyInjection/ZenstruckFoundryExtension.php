@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Zenstruck\Foundry\Bundle\Command\StubMakeFactory;
 use Zenstruck\Foundry\Bundle\Command\StubMakeStory;
 use Zenstruck\Foundry\Instantiator;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Story;
 use Zenstruck\Foundry\Test\ORMDatabaseResetter;
@@ -55,6 +56,17 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
         if (true === $mergedConfig['auto_refresh_proxies']) {
             $container->getDefinition('.zenstruck_foundry.configuration')->addMethodCall('enableDefaultProxyAutoRefresh');
         } elseif (false === $mergedConfig['auto_refresh_proxies']) {
+            trigger_deprecation(
+                'zenstruck\foundry',
+                '1.37.0',
+                <<<MESSAGE
+                Configuring the default proxy auto-refresh to false is deprecated. You should set it to "true", which will be the default value in 2.0.
+                If you still want to disable auto refresh, make your factory implement "%s" instead of "%s".
+                MESSAGE,
+                PersistentObjectFactory::class,
+                PersistentProxyObjectFactory::class,
+            );
+
             $container->getDefinition('.zenstruck_foundry.configuration')->addMethodCall('disableDefaultProxyAutoRefresh');
         }
     }

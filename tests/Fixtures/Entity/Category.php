@@ -95,7 +95,7 @@ class Category
     {
         if (!$this->secondaryPosts->contains($secondaryPost)) {
             $this->secondaryPosts[] = $secondaryPost;
-            $secondaryPost->setCategory($this);
+            $secondaryPost->setSecondaryCategory($this);
         }
     }
 
@@ -105,7 +105,7 @@ class Category
             $this->secondaryPosts->removeElement($secondaryPost);
             // set the owning side to null (unless already changed)
             if ($secondaryPost->getCategory() === $this) {
-                $secondaryPost->setCategory(null);
+                $secondaryPost->setSecondaryCategory(null);
             }
         }
     }
