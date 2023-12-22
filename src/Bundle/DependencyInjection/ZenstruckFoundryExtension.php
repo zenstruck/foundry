@@ -60,9 +60,9 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
                 'zenstruck\foundry',
                 '1.37.0',
                 <<<MESSAGE
-                Configuring the default proxy auto-refresh to false is deprecated. You should set it to "true", which will be the default value in 2.0.
-                If you still want to disable auto refresh, make your factory implement "%s" instead of "%s".
-                MESSAGE,
+                    Configuring the default proxy auto-refresh to false is deprecated. You should set it to "true", which will be the default value in 2.0.
+                    If you still want to disable auto refresh, make your factory implement "%s" instead of "%s".
+                    MESSAGE,
                 PersistentObjectFactory::class,
                 PersistentProxyObjectFactory::class,
             );
