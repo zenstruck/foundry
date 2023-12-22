@@ -136,6 +136,7 @@ abstract class ProxyTest extends KernelTestCase
     public function can_force_set_multiple_fields(): void
     {
         $post = $this->postFactoryClass()::createOne(['title' => 'old title', 'body' => 'old body']);
+        $post->_disableAutoRefresh();
 
         $this->assertSame('old title', $post->getTitle());
         $this->assertSame('old body', $post->getBody());
@@ -248,6 +249,7 @@ abstract class ProxyTest extends KernelTestCase
     public function without_auto_refresh_does_not_enable_auto_refresh_if_it_was_disabled_originally(): void
     {
         $post = $this->postFactoryClass()::createOne(['title' => 'old title', 'body' => 'old body']);
+        $post->_disableAutoRefresh();
 
         $this->assertSame('old title', $post->getTitle());
         $this->assertSame('old body', $post->getBody());
@@ -274,6 +276,7 @@ abstract class ProxyTest extends KernelTestCase
     public function without_auto_refresh_keeps_disabled_if_originally_disabled(): void
     {
         $post = $this->postFactoryClass()::createOne(['title' => 'old title', 'body' => 'old body']);
+        $post->_disableAutoRefresh();
 
         $this->assertSame('old title', $post->getTitle());
         $this->assertSame('old body', $post->getBody());

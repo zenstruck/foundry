@@ -165,7 +165,7 @@ class Kernel extends BaseKernel
         }
 
         if (\getenv('USE_FOUNDRY_BUNDLE')) {
-            $foundryConfig = ['auto_refresh_proxies' => false];
+            $foundryConfig = ['auto_refresh_proxies' => true];
             if ($this->defaultMakeFactoryNamespace) {
                 $foundryConfig['make_factory'] = ['default_namespace' => $this->defaultMakeFactoryNamespace];
             }
