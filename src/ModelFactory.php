@@ -11,7 +11,7 @@
 
 namespace Zenstruck\Foundry;
 
-use Zenstruck\Foundry\Object\ObjectFactory;
+use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;

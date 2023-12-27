@@ -31,7 +31,7 @@ Here is the full list of modifications needed:
 
 `Zenstruck\Foundry\ModelFactory` is now deprecated.
 You should choose between:
-- `\Zenstruck\Foundry\Object\ObjectFactory`: creates not-persistent plain objects,
+- `\Zenstruck\Foundry\ObjectFactory`: creates not-persistent plain objects,
 - `\Zenstruck\Foundry\Persistence\PersistentObjectFactory`: creates and stores persisted objects, and directly return them,
 - `\Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory`: same as above, but returns a "proxy" version of the object.
   This last class basically acts the same way as the old `ModelFactory`.
