@@ -201,6 +201,30 @@ jobs:
       - name: Run Psalm on factories generated with maker
         run: bin/tools/psalm/vendor/vimeo/psalm/psalm
 
+  test-rector-rules:
+    name: Test rector rules
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+          coverage: none
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v2
+        with:
+          composer-options: --prefer-dist
+          working-directory: "./utils/rector"
+
+      - name: Test
+        run: vendor/bin/phpunit
+        shell: bash
+        working-directory: "./utils/rector"
+
   fixcs:
     name: Run php-cs-fixer
     needs: sync-with-template
