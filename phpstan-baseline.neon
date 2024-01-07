@@ -6,16 +6,6 @@ parameters:
 			path: src/AnonymousFactoryGenerator.php
 
 		-
-			message: "#^Property Zenstruck\\\\Foundry\\\\Bundle\\\\Maker\\\\Factory\\\\FactoryClassMap\\:\\:\\$classesWithFactories \\(array\\<class\\-string, class\\-string\\>\\) does not accept array\\.$#"
-			count: 1
-			path: src/Bundle/Maker/Factory/FactoryClassMap.php
-
-		-
-			message: "#^Match expression does not handle remaining value\\: array\\{bool, bool\\}$#"
-			count: 1
-			path: src/Bundle/Maker/Factory/MakeFactoryPHPDocMethod.php
-
-		-
 			message: "#^Parameter \\#1 \\$class of method Doctrine\\\\Persistence\\\\ManagerRegistry\\:\\:getManagerForClass\\(\\) expects class\\-string, string given\\.$#"
 			count: 1
 			path: src/Configuration.php
@@ -31,7 +21,7 @@ parameters:
 			path: src/Factory.php
 
 		-
-			message: "#^Method Zenstruck\\\\Foundry\\\\FactoryCollection\\:\\:create\\(\\) should return array\\<int, TObject of object\\> but returns array\\<int, \\(TObject of object\\)\\|Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TObject of object\\>\\>\\.$#"
+			message: "#^Method Zenstruck\\\\Foundry\\\\FactoryCollection\\:\\:create\\(\\) should return array\\<int, TObject of object\\> but returns array\\<int\\<0, max\\>, \\(TObject of object\\)\\|Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TObject of object\\>\\>\\.$#"
 			count: 1
 			path: src/FactoryCollection.php
 

@@ -9,23 +9,25 @@ foreach ($makeFactoryData->getUses() as $use) {
 ?>
 
 /**
- * @extends PersistentProxyObjectFactory<<?php echo $makeFactoryData->getObjectShortName(); ?>>
- *
+ * @extends <?php echo $makeFactoryData->getFactoryClassShortName(); ?><<?php echo $makeFactoryData->getObjectShortName(); ?>>
 <?php
-foreach ($makeFactoryData->getMethodsPHPDoc() as $methodPHPDoc) {
-    echo "{$methodPHPDoc->toString()}\n";
-}
-
-if ($makeFactoryData->hasStaticAnalysisTool()) {
+if ($makeFactoryData->isPersisted()) {
     echo " *\n";
-
     foreach ($makeFactoryData->getMethodsPHPDoc() as $methodPHPDoc) {
-        echo "{$methodPHPDoc->toString($makeFactoryData->staticAnalysisTool())}\n";
+        echo "{$methodPHPDoc->toString()}\n";
+    }
+
+    if ($makeFactoryData->hasStaticAnalysisTool()) {
+        echo " *\n";
+
+        foreach ($makeFactoryData->getMethodsPHPDoc() as $methodPHPDoc) {
+            echo "{$methodPHPDoc->toString($makeFactoryData->staticAnalysisTool())}\n";
+        }
     }
 }
 ?>
  */
-final class <?php echo $class_name; ?> extends PersistentProxyObjectFactory
+final class <?php echo $class_name; ?> extends <?php echo $makeFactoryData->getFactoryClassShortName(); ?>
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -63,9 +65,6 @@ foreach ($makeFactoryData->getDefaultProperties() as $propertyName => $value) {
     protected function initialize(): static
     {
         return $this
-<?php if (!$makeFactoryData->isPersisted()) { ?>
-            ->withoutPersisting()
-<?php } ?>
             // ->afterInstantiate(function(<?php echo $makeFactoryData->getObjectShortName(); ?> $<?php echo \lcfirst($makeFactoryData->getObjectShortName()); ?>): void {})
         ;
     }
