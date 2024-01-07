@@ -44,7 +44,7 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
         if ((new \ReflectionClass(static::class()))->isFinal()) {
             trigger_deprecation(
                 'zenstruck\foundry', '1.37.0',
-                'Using a proxy factory with a final class is deprecated and will throw an error in Foundry 2.0. Use "Zenstruck\Foundry\Object\ObjectFactory" instead (don\'t forget to remove all ->object() calls!).',
+                'Using a proxy factory with a final class is deprecated and will throw an error in Foundry 2.0. Use "Zenstruck\Foundry\ObjectFactory" instead (don\'t forget to remove all ->object() calls!).',
                 self::class,
                 static::class(),
             );

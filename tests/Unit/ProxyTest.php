@@ -133,7 +133,6 @@ final class ProxyTest extends TestCase
 
     /**
      * @test
-     * @group legacy
      */
     public function can_use_new_class_as_legacy_one(): void
     {

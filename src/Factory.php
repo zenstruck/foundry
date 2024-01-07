@@ -17,6 +17,7 @@ use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Faker;
 use Zenstruck\Foundry\Exception\FoundryBootException;
 use Zenstruck\Foundry\Persistence\InversedRelationshipPostPersistCallback;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\PostPersistCallback;
 use Zenstruck\Foundry\Persistence\Proxy;
@@ -152,7 +153,7 @@ class Factory
             $callback($object, $attributes);
         }
 
-        if (!$this->isPersisting()) {
+        if (!$this->isPersisting(calledInternally: true)) {
             return $noProxy ? $object : new ProxyObject($object);
         }
 
@@ -214,8 +215,18 @@ class Factory
     /**
      * @return static
      */
-    public function withoutPersisting(): self
+    public function withoutPersisting(
+        /**
+         * @internal
+         * @deprecated
+         */
+        bool $calledInternally = false
+    ): self
     {
+        if (!$calledInternally && !$this instanceof PersistentObjectFactory) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', 'Calling "withoutPersisting()" on a non-persistent factory class is deprecated and will trigger an error in 2.0.', __METHOD__);
+        }
+
         $cloned = clone $this;
         $cloned->persist = false;
 
@@ -277,6 +288,10 @@ class Factory
      */
     final public function afterPersist(callable $callback): self
     {
+        if (!$this instanceof PersistentObjectFactory) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', 'Calling "afterPersist()" on a non-persistent factory class is deprecated and will trigger an error in 2.0.', __METHOD__);
+        }
+
         $cloned = clone $this;
         $cloned->afterPersist[] = $callback;
 
@@ -381,8 +396,18 @@ class Factory
         return $this instanceof PersistentProxyObjectFactory;
     }
 
-    protected function isPersisting(): bool
+    protected function isPersisting(
+        /**
+         * @internal
+         * @deprecated
+         */
+        bool $calledInternally = false
+    ): bool
     {
+        if (!$calledInternally && !$this instanceof PersistentObjectFactory) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', 'Calling "isPersisting()" on a non-persistent factory class is deprecated and will trigger an error in 2.0.', __METHOD__);
+        }
+
         if (!$this->persist || !self::configuration()->isPersistEnabled() || !self::configuration()->hasManagerRegistry()) {
             return false;
         }
@@ -433,9 +458,9 @@ class Factory
             return \is_object($value) ? self::normalizeObject($value) : $value;
         }
 
-        if (!$this->isPersisting()) {
+        if (!$this->isPersisting(calledInternally: true)) {
             // ensure attribute Factories' are also not persisted
-            $value = $value->withoutPersisting();
+            $value = $value->withoutPersisting(calledInternally: true);
         }
 
         if (!self::configuration()->hasManagerRegistry()) {
@@ -467,7 +492,7 @@ class Factory
             $relationshipField = $relationshipMetadata['inversedField'];
             $cascadePersist = $relationshipMetadata['cascade'];
 
-            if ($this->isPersisting() && null !== $relationshipField && false === $cascadePersist) {
+            if ($this->isPersisting(calledInternally: true) && null !== $relationshipField && false === $cascadePersist) {
                 return new InversedRelationshipPostPersistCallback($value, $relationshipField, $isCollection);
             }
         }
