@@ -49,7 +49,7 @@ function factory(string $class, array|callable $defaultAttributes = []): Anonymo
  */
 function anonymous(string $class, array|callable $defaultAttributes = []): Factory
 {
-    trigger_deprecation('zenstruck\foundry', '1.37', \sprintf('Usage of "%s()" function is deprecated and will be removed in 2.0. Use the "Zenstruck\Foundry\Persistence\proxy_factory()" function instead.', __FUNCTION__));
+    trigger_deprecation('zenstruck\foundry', '1.37', 'Usage of "%s()" function is deprecated and will be removed in 2.0. Use the "Zenstruck\Foundry\Persistence\proxy_factory()" function instead.', __FUNCTION__);
 
     return proxy_factory($class, $defaultAttributes);
 }
@@ -67,7 +67,7 @@ function anonymous(string $class, array|callable $defaultAttributes = []): Facto
  */
 function create(string $class, array|callable $attributes = []): Proxy
 {
-    trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Function "%s()" is deprecated and will be removed in Foundry 2.0. Use "Zenstruck\Foundry\Persistence\persist_proxy()" instead.', __FUNCTION__));
+    trigger_deprecation('zenstruck\foundry', '1.37.0', 'Function "%s()" is deprecated and will be removed in Foundry 2.0. Use "Zenstruck\Foundry\Persistence\persist_proxy()" instead.', __FUNCTION__);
 
     return persist_proxy($class, $attributes);
 }
@@ -85,7 +85,7 @@ function create(string $class, array|callable $attributes = []): Proxy
  */
 function create_many(int $number, string $class, array|callable $attributes = []): array
 {
-    trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Function "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __FUNCTION__));
+    trigger_deprecation('zenstruck\foundry', '1.37.0', 'Function "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __FUNCTION__);
 
     return proxy_factory($class)->many($number)->create($attributes);
 }
@@ -103,7 +103,7 @@ function create_many(int $number, string $class, array|callable $attributes = []
  */
 function instantiate(string $class, array|callable $attributes = []): Proxy
 {
-    trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Function "%s()" is deprecated and will be removed in Foundry 2.0. Use "%s::object()" instead.', __FUNCTION__, __NAMESPACE__));
+    trigger_deprecation('zenstruck\foundry', '1.37.0', 'Function "%s()" is deprecated and will be removed in Foundry 2.0. Use "%s::object()" instead.', __FUNCTION__, __NAMESPACE__);
 
     return new ProxyObject(object($class, $attributes));
 }
@@ -134,7 +134,7 @@ function object(string $class, array|callable $attributes = []): object
  */
 function instantiate_many(int $number, string $class, array|callable $attributes = []): array
 {
-    trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Function "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __FUNCTION__));
+    trigger_deprecation('zenstruck\foundry', '1.37.0', 'Function "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __FUNCTION__);
 
     return proxy_factory($class)->withoutPersisting()->many($number)->create($attributes);
 }
@@ -152,10 +152,10 @@ function instantiate_many(int $number, string $class, array|callable $attributes
  */
 function repository(object|string $objectOrClass): RepositoryDecorator
 {
-    trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Function "%s()" is deprecated and will be removed in Foundry 2.0. Use "Zenstruck\Foundry\Persistence\repository()" instead.', __FUNCTION__));
+    trigger_deprecation('zenstruck\foundry', '1.37.0', 'Function "%s()" is deprecated and will be removed in Foundry 2.0. Use "Zenstruck\Foundry\Persistence\repository()" instead.', __FUNCTION__);
 
     if (\is_object($objectOrClass)) {
-        trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Passing objects to "%s()" is deprecated and will be removed in Foundry 2.0. Pass directly class-string instead.', __FUNCTION__));
+        trigger_deprecation('zenstruck\foundry', '1.37.0', 'Passing objects to "%s()" is deprecated and will be removed in Foundry 2.0. Pass directly class-string instead.', __FUNCTION__);
 
         $objectOrClass = $objectOrClass::class;
     }

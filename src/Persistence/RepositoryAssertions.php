@@ -15,8 +15,10 @@ use Zenstruck\Assert;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @final
  */
-final class RepositoryAssertions
+class RepositoryAssertions
 {
     private static string $countWithoutCriteriaDeprecationMessagePattern = 'Passing the message to %s() as second parameter is deprecated. Use third parameter.';
 
@@ -136,3 +138,5 @@ final class RepositoryAssertions
         return $this;
     }
 }
+
+class_exists(\Zenstruck\Foundry\RepositoryAssertions::class);

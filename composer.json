@@ -53,7 +53,6 @@
         "psr-4": {"Zenstruck\\Foundry\\": "src/"},
         "files": [
             "src/functions.php",
-            "src/deprecations.php",
             "src/Persistence/functions.php"
         ]
     },

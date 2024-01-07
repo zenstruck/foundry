@@ -18,7 +18,7 @@ use Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractExtensionTestCase;
 use Symfony\Bundle\MakerBundle\MakerBundle;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Zenstruck\Foundry\Bundle\DependencyInjection\ZenstruckFoundryExtension;
-use Zenstruck\Foundry\Instantiator;
+use Zenstruck\Foundry\Object\Instantiator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

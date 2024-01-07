@@ -12,7 +12,7 @@
 namespace Zenstruck\Foundry\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Instantiator;
+use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Cascade\Brand;

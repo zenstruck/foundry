@@ -5,8 +5,8 @@
         https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id=".zenstruck_foundry.default_instantiator" class="Zenstruck\Foundry\Instantiator">
-            <factory class="Zenstruck\Foundry\Instantiator" method="withConstructor" />
+        <service id=".zenstruck_foundry.default_instantiator" class="Zenstruck\Foundry\Object\Instantiator">
+            <factory class="Zenstruck\Foundry\Object\Instantiator" method="withConstructor" />
         </service>
         <service id=".zenstruck_foundry.faker" class="Faker\Generator">
             <factory class="Faker\Factory" method="create" />
