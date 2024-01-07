@@ -681,6 +681,7 @@ final class ORMModelFactoryTest extends ModelFactoryTest
 
     /**
      * @test
+     * @group legacy
      */
     public function it_can_create_entity_with_property_name_different_from_constructor_name(): void
     {
