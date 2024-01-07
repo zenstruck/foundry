@@ -20,14 +20,92 @@ You should set the `SYMFONY_DEPRECATIONS_HELPER` variable in `phpunit.xml` or `.
 SYMFONY_DEPRECATIONS_HELPER="max[self]=0&amp;max[direct]=0&amp;quiet[]=indirect&amp;quiet[]=other"
 ```
 
+## Rector rules
+
+In the latest 1.x version, you'll find [rector rules](https://getrector.org/) which will help with the migration path.
+
+First, you'll need `rector/rector` and `phpstan/phpstan-doctrine`:
+```shell
+composer require --dev rector/rector phpstan/phpstan-doctrine
+```
+
+Then, create a `rector.php` file:
+```php
+<?php
+
+use Rector\Config\RectorConfig;
+use Zenstruck\Foundry\Utils\Rector\PersistenceResolver;
+
+return static function (RectorConfig $rectorConfig): void {
+    $rectorConfig->paths(['tests']); // add all paths where Foundry is used
+
+    $rectorConfig->import(__DIR__ . '/vendor/zenstruck/foundry/utils/rector/config/foundry-set.php');
+};
+```
+
+And finally, run Rector:
+```shell
+# you can run Rector in "dry run" mode, in order to see which files will be modified
+vendor/bin/rector process --dry-run
+
+# actually modify files
+vendor/bin/rector process
+```
+
+> [!IMPORTANT]
+> Rector rules may not totally cover all deprecations (some complex cases may not be handled)
+> You'd still need to run the tests with deprecation helper enabled to ensure everything is fixed
+> and then fix all deprecations left.
+
+### Doctrine's mapping
+
+Rector rules need to understand your Doctrine mapping to guess which one of `PersistentProxyObjectFactory` or
+`ObjectFactory` it should use.
+
+If your mapping is defined in the code thanks to attributes or annotations, everything is OK.
+If the mapping is defined outside the code, with xml, yaml or php configuration, some extra work is needed:
+
+1. Create a `tests/object-manager.php` file which will expose your doctrine config. Here is an example:
+```php
+use App\Kernel;
+use Symfony\Component\Dotenv\Dotenv;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+(new Dotenv())->bootEnv(__DIR__ . '/../.env');
+
+$kernel = new Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
+$kernel->boot();
+return $kernel->getContainer()->get('doctrine')->getManager();
+```
+
+2. Provide this file path to Rector's config:
+```php
+<?php
+
+use Rector\Config\RectorConfig;
+use Zenstruck\Foundry\Utils\Rector\PersistenceResolver;
+
+return static function (RectorConfig $rectorConfig): void {
+    $rectorConfig->singleton(
+        PersistenceResolver::class,
+        static fn() => new PersistenceResolver(__DIR__ . '/tests/object-manager.php')
+    );
+
+    // ...
+};
+```
+
+## Deprecations list
+
 Here is the full list of modifications needed:
 
-## Factory
+### Factory
 
 - `withAttributes()` and `addState()` are both deprecated in favor of `with()`
 - `sequence()` and `createSequence()` do not accept `callable` as a parameter anymore
 
-### Change factories' base class
+#### Change factories' base class
 
 `Zenstruck\Foundry\ModelFactory` is now deprecated.
 You should choose between:
@@ -94,7 +172,7 @@ protected function initialize(); static
 }
 ```
 
-## Proxy
+### Proxy
 
 Foundry 2.0 will completely change how `Proxy` system works, by leveraging Symfony's lazy proxy mechanism.
 `Proxy` won't be anymore a wrapper class, but a "real" proxy, meaning your objects will be of the desired class AND `Proxy` object.
@@ -119,7 +197,7 @@ This implies that calling `->object()` (or, now, `_real()`) everywhere to satisf
   - `assertNotPersisted()` is removed without any replacement
 - Everywhere you've type-hinted `Zenstruck\Foundry\FactoryCollection<T>` which was coming from a `PersistentProxyObjectFactory`, replace to `Zenstruck\Foundry\FactoryCollection<Proxy<T>>`
 
-## Instantiator
+### Instantiator
 
 - `Zenstruck\Foundry\Instantiator` class is deprecated in favor of `\Zenstruck\Foundry\Object\Instantiator`. You should change them everywhere.
 - `new Instantiator()` is deprecated: use `Instantiator::withConstructor()` or `Instantiator::withoutConstructor()` depending on your needs.
@@ -127,7 +205,7 @@ This implies that calling `->object()` (or, now, `_real()`) everywhere to satisf
 - `Instantiator::allowExtraAttributes()` is deprecated in favor of `Instantiator::allowExtra()`. Be careful of the modification of the parameter which is now a variadic.
 - Configuration `zenstruck_foundry.without_constructor` is deprecated in favor of `zenstruck_foundry.use_constructor`
 
-## Standalone functions
+### Standalone functions
 
 - `Zenstruck\Foundry\create()` -> `Zenstruck\Foundry\Persistence\persist()`
 - `Zenstruck\Foundry\instantiate()` -> `Zenstruck\Foundry\object()`
@@ -137,12 +215,12 @@ This implies that calling `->object()` (or, now, `_real()`) everywhere to satisf
 - `Zenstruck\Foundry\instantiate_many()` is removed without any replacement
 - `Zenstruck\Foundry\create_many()` is removed without any replacement
 
-## Trait `Factories`
+### Trait `Factories`
 - `Factories::disablePersist()` -> `Zenstruck\Foundry\Persistence\disable_persisting()`
 - `Factories::enablePersist()` -> `Zenstruck\Foundry\Persistence\enable_persisting()`
 - both `disablePersist()` and `enable_persisting()` should not be called when Foundry is booted without Doctrine (ie: in a unit test)
 
-## Bundle configuration
+### Bundle configuration
 
 Here is a diff of the bundle's configuration, all configs in red should be migrated to the green ones:
 
@@ -172,9 +250,10 @@ zenstruck_foundry:
 -            object_managers:      []
 ```
 
-## Misc.
+### Misc.
 - type-hinting to `Zenstruck\Foundry\RepositoryProxy` should be replaced by `Zenstruck\Foundry\Persistence\RepositoryDecorator`
 - type-hinting to `Zenstruck\Foundry\RepositoryAssertions` should be replaced by `Zenstruck\Foundry\Persistence\RepositoryAssertions`
+- Methods in `Zenstruck\Foundry\RepositoryProxy` do not return `Proxy` anymore, but they return the actual object
 
 
 
