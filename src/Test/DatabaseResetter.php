@@ -92,7 +92,7 @@ final class DatabaseResetter
 
         if ($flushGlobalState) {
             TestState::flushGlobalState(
-                $container->has('.zenstruck_foundry.global_state_registry') ? $container->get('.zenstruck_foundry.global_state_registry') : null
+                $container->has('.zenstruck_foundry.global_state_registry') ? $container->get('.zenstruck_foundry.global_state_registry') : null,
             );
         }
     }
@@ -115,7 +115,7 @@ final class DatabaseResetter
             $container->get('doctrine'),
             $configuration ? $configuration->getOrmConnectionsToReset() : [],
             $configuration ? $configuration->getOrmObjectManagersToReset() : [],
-            $configuration ? $configuration->getOrmResetMode() : ORMDatabaseResetter::RESET_MODE_SCHEMA
+            $configuration ? $configuration->getOrmResetMode() : ORMDatabaseResetter::RESET_MODE_SCHEMA,
         );
     }
 
@@ -127,7 +127,7 @@ final class DatabaseResetter
         return new ODMSchemaResetter(
             $application,
             $container->get('doctrine_mongodb'),
-            $configuration ? $configuration->getOdmObjectManagersToReset() : []
+            $configuration ? $configuration->getOdmObjectManagersToReset() : [],
         );
     }
 

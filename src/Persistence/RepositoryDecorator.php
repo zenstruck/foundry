@@ -348,7 +348,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
             $isEmbedded = match ($metadataForAttribute::class) {
                 ORMClassMetadata::class => $metadataForAttribute->isEmbeddedClass,
                 ODMClassMetadata::class => $metadataForAttribute->isEmbeddedDocument,
-                default => throw new \LogicException(\sprintf('Metadata class %s is not supported.', $metadataForAttribute::class))
+                default => throw new \LogicException(\sprintf('Metadata class %s is not supported.', $metadataForAttribute::class)),
             };
 
             // it's a regular entity
@@ -450,7 +450,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
     {
         return \array_map(
             static fn($value) => $value instanceof Proxy ? $value->_real() : $value,
-            $criteria
+            $criteria,
         );
     }
 
@@ -460,4 +460,4 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
     }
 }
 
-class_exists(\Zenstruck\Foundry\RepositoryProxy::class);
+\class_exists(\Zenstruck\Foundry\RepositoryProxy::class);

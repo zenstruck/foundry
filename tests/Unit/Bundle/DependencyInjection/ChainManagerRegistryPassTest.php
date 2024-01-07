@@ -34,7 +34,7 @@ class ChainManagerRegistryPassTest extends AbstractCompilerPassTestCase
         $this->assertContainerBuilderHasServiceDefinitionWithArgument(
             '.zenstruck_foundry.chain_manager_registry',
             '$managerRegistries',
-            [new Reference('doctrine'), new Reference('doctrine_mongodb')]
+            [new Reference('doctrine'), new Reference('doctrine_mongodb')],
         );
     }
 
@@ -52,7 +52,7 @@ class ChainManagerRegistryPassTest extends AbstractCompilerPassTestCase
         $this->assertContainerBuilderHasServiceDefinitionWithArgument(
             '.zenstruck_foundry.chain_manager_registry',
             '$managerRegistries',
-            [new Reference('doctrine')]
+            [new Reference('doctrine')],
         );
     }
 

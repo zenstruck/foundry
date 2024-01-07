@@ -75,7 +75,7 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
                 'doctrine:schema:create',
                 [
                     '--em' => $manager,
-                ]
+                ],
             );
         }
     }
@@ -95,7 +95,7 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
                 [
                     '--em' => $manager,
                     '--force' => true,
-                ]
+                ],
             );
         }
     }
@@ -132,7 +132,7 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
                 'doctrine:database:create',
                 [
                     '--connection' => $connection,
-                ]
+                ],
             );
         }
     }

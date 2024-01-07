@@ -81,7 +81,7 @@ final class ORMRepositoryDecoratorTest extends RepositoryDecoratorTest
     {
         self::assertSame(
             [['id' => 1]],
-            PostFactory::repository()->returnNestedArray()
+            PostFactory::repository()->returnNestedArray(),
         );
     }
 

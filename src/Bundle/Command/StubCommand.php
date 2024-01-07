@@ -22,7 +22,7 @@ abstract class StubCommand extends Command
     {
         (new SymfonyStyle($input, $output))
             ->error(
-                \sprintf("To run \"%s\" you need the \"MakerBundle\" which is currently not installed.\n\nTry running \"composer require symfony/maker-bundle --dev\".", static::getDefaultName())
+                \sprintf("To run \"%s\" you need the \"MakerBundle\" which is currently not installed.\n\nTry running \"composer require symfony/maker-bundle --dev\".", static::getDefaultName()),
             )
         ;
 

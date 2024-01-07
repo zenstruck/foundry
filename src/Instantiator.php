@@ -11,16 +11,15 @@
 
 namespace Zenstruck\Foundry;
 
-
 use Zenstruck\Foundry\Object\Instantiator as NewInstatiator;
 
-if (!class_exists(NewInstatiator::class, false)) {
+if (!\class_exists(NewInstatiator::class, false)) {
     trigger_deprecation(
         'zenstruck\foundry',
         '1.37.0',
         'Class "%s" is deprecated and will be removed in version 2.0. Use "%s" instead.',
         Instantiator::class,
-        NewInstatiator::class
+        NewInstatiator::class,
     );
 }
 

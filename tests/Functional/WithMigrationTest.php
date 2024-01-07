@@ -38,7 +38,7 @@ final class WithMigrationTest extends KernelTestCase
         $validator = new SchemaValidator($kernel->getContainer()->get('doctrine')->getManager());
         self::assertEmpty(
             $validator->validateMapping(),
-            \implode("\n", \array_map(static fn($s): string => \implode("\n", $s), $validator->validateMapping()))
+            \implode("\n", \array_map(static fn($s): string => \implode("\n", $s), $validator->validateMapping())),
         );
         self::assertTrue($validator->schemaInSyncWithMetadata());
 

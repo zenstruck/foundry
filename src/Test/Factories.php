@@ -49,8 +49,8 @@ trait Factories
                 }
 
                 return TestState::initializeChainManagerRegistry(static::$kernel->getContainer());
-            }
-            )
+            },
+            ),
         );
 
         $kernel->shutdown();

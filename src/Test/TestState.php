@@ -18,7 +18,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Zenstruck\Foundry\ChainManagerRegistry;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
-use \Zenstruck\Foundry\Object\Instantiator;
+use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\StoryManager;
 
 /**

@@ -49,14 +49,14 @@ final class Proxy implements \Stringable, ProxyBase
      */
     public function __construct(
         /** @param TProxiedObject $object */
-        private object $object
+        private object $object,
     ) {
         if ((new \ReflectionClass($object::class))->isFinal()) {
             trigger_deprecation(
                 'zenstruck\foundry', '1.37.0',
                 'Using a proxy factory with a final class is deprecated and will throw an error in Foundry 2.0. Use "%s" instead (don\'t forget to remember all ->object() calls!), or unfinalize "%s" class.',
                 PersistentProxyObjectFactory::class,
-                $object::class
+                $object::class,
             );
         }
 
@@ -402,9 +402,9 @@ final class Proxy implements \Stringable, ProxyBase
             Parameter::union(
                 Parameter::untyped($this),
                 Parameter::typed(ProxyBase::class, $this),
-                Parameter::typed($this->class, Parameter::factory(fn(): object => $this->_real()))
+                Parameter::typed($this->class, Parameter::factory(fn(): object => $this->_real())),
             )->optional(),
-            ...$arguments
+            ...$arguments,
         );
     }
 

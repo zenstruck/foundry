@@ -194,9 +194,9 @@ abstract class RepositoryDecoratorTest extends KernelTestCase
             \array_unique(
                 \array_map(
                     static fn($category) => $category->getId(),
-                    $objects
-                )
-            )
+                    $objects,
+                ),
+            ),
         );
     }
 

@@ -465,6 +465,6 @@ final class FactoryTest extends TestCase
     public function can_use_legacy_proxy_class(): void
     {
         $post = proxy_factory(Post::class)->create(['title' => 'title', 'body' => 'body']);
-        self::assertInstanceOf(\Zenstruck\Foundry\Proxy::class, $post);
+        self::assertInstanceOf(ProxyObject::class, $post);
     }
 }

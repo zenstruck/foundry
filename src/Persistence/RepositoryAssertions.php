@@ -139,4 +139,4 @@ class RepositoryAssertions
     }
 }
 
-class_exists(\Zenstruck\Foundry\RepositoryAssertions::class);
+\class_exists(\Zenstruck\Foundry\RepositoryAssertions::class);

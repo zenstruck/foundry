@@ -96,7 +96,7 @@ class Factory
          * @deprecated
          * @internal
          */
-        bool $noProxy = false
+        bool $noProxy = false,
     ): object {
         if (2 === \count(\func_get_args()) && !\str_starts_with(\debug_backtrace(options: \DEBUG_BACKTRACE_IGNORE_ARGS, limit: 1)[0]['class'] ?? '', 'Zenstruck\Foundry')) {
             trigger_deprecation('zenstruck\foundry', '1.37.0', 'Parameter "$noProxy" of method "%s()" is deprecated and will be removed in Foundry 2.0.', __METHOD__);
@@ -365,7 +365,7 @@ class Factory
     public function createAndUproxify(): object
     {
         $object = $this->create(
-            noProxy: !$this->shouldUseProxy()
+            noProxy: !$this->shouldUseProxy(),
         );
 
         return $object instanceof Proxy ? $object->_real() : $object;
@@ -425,7 +425,7 @@ class Factory
         if (\is_array($value)) {
             return \array_map(
                 fn($value) => $this->normalizeAttribute($value, $name),
-                $value
+                $value,
             );
         }
 

@@ -36,7 +36,7 @@ final class NamespaceGuesser
             $doctrineNamespaces[] = match (true) {
                 \is_a($manager, EntityManager::class) => \array_values($manager->getConfiguration()->getEntityNamespaces()),
                 \is_a($manager, DocumentManager::class) => \array_values($manager->getConfiguration()->getDocumentNamespaces()),
-                default => []
+                default => [],
             };
         }
 
