@@ -220,9 +220,8 @@ class Factory
          * @internal
          * @deprecated
          */
-        bool $calledInternally = false
-    ): self
-    {
+        bool $calledInternally = false,
+    ): self {
         if (!$calledInternally && !$this instanceof PersistentObjectFactory) {
             trigger_deprecation('zenstruck\foundry', '1.37.0', 'Calling "withoutPersisting()" on a non-persistent factory class is deprecated and will trigger an error in 2.0.', __METHOD__);
         }
@@ -401,9 +400,8 @@ class Factory
          * @internal
          * @deprecated
          */
-        bool $calledInternally = false
-    ): bool
-    {
+        bool $calledInternally = false,
+    ): bool {
         if (!$calledInternally && !$this instanceof PersistentObjectFactory) {
             trigger_deprecation('zenstruck\foundry', '1.37.0', 'Calling "isPersisting()" on a non-persistent factory class is deprecated and will trigger an error in 2.0.', __METHOD__);
         }
