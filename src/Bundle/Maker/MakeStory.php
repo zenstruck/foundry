@@ -68,13 +68,13 @@ final class MakeStory extends AbstractMaker
         $storyClassNameDetails = $generator->createClassNameDetails(
             $input->getArgument('name'),
             $input->getOption('test') ? 'Tests\\Story' : 'Story',
-            'Story'
+            'Story',
         );
 
         $generator->generateClass(
             $storyClassNameDetails->getFullName(),
             __DIR__.'/../Resources/skeleton/Story.tpl.php',
-            []
+            [],
         );
 
         $generator->writeChanges();

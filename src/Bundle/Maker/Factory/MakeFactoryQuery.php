@@ -32,7 +32,7 @@ final class MakeFactoryQuery
             allFields: (bool) $input->getOption('all-fields'),
             class: $class,
             generateAllFactories: $generateAllFactories,
-            generator: $generator
+            generator: $generator,
         );
     }
 

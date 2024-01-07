@@ -13,13 +13,13 @@ namespace Zenstruck\Foundry;
 
 use Zenstruck\Foundry\Persistence\RepositoryAssertions as NewRepositoryAssertions;
 
-if (!class_exists(NewRepositoryAssertions::class, false)) {
+if (!\class_exists(NewRepositoryAssertions::class, false)) {
     trigger_deprecation(
         'zenstruck\foundry',
         '1.37.0',
         'Class "%s" is deprecated and will be removed in version 2.0. Use "%s" instead.',
         RepositoryAssertions::class,
-        NewRepositoryAssertions::class
+        NewRepositoryAssertions::class,
     );
 }
 

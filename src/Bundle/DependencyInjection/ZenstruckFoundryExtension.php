@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Zenstruck\Foundry\Bundle\Command\StubMakeFactory;
 use Zenstruck\Foundry\Bundle\Command\StubMakeStory;
-use \Zenstruck\Foundry\Object\Instantiator;
+use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Story;
@@ -172,7 +172,7 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
         return \in_array(
             $bundleName,
             \is_array($bundles = $container->getParameter('kernel.bundles')) ? $bundles : [],
-            true
+            true,
         );
     }
 }

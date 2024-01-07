@@ -14,13 +14,13 @@ namespace Zenstruck\Foundry;
 use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 
-if (!class_exists(RepositoryDecorator::class, false)) {
+if (!\class_exists(RepositoryDecorator::class, false)) {
     trigger_deprecation(
         'zenstruck\foundry',
         '1.37.0',
         'Class "%s" is deprecated and will be removed in version 2.0. Use "%s" instead.',
         RepositoryProxy::class,
-        RepositoryDecorator::class
+        RepositoryDecorator::class,
     );
 }
 

@@ -73,7 +73,7 @@ final class FactoryCollection implements \IteratorAggregate
          * @deprecated
          * @internal
          */
-        bool $noProxy = false
+        bool $noProxy = false,
     ): array {
         if (2 === \count(\func_get_args()) && !\str_starts_with(\debug_backtrace(options: \DEBUG_BACKTRACE_IGNORE_ARGS, limit: 1)[0]['class'] ?? '', 'Zenstruck\Foundry')) {
             trigger_deprecation('zenstruck\foundry', '1.37.0', 'Parameter "$noProxy" of method "%s()" is deprecated and will be removed in Foundry 2.0.', __METHOD__);
@@ -83,7 +83,7 @@ final class FactoryCollection implements \IteratorAggregate
         foreach ($this->all() as $i => $factory) {
             $objects[] = $factory->create(
                 \is_callable($attributes) ? $attributes($i + 1) : $attributes,
-                $noProxy || !$factory->shouldUseProxy()
+                $noProxy || !$factory->shouldUseProxy(),
             );
         }
 
@@ -100,7 +100,7 @@ final class FactoryCollection implements \IteratorAggregate
         if (!$this->sequence) {
             return \array_map(
                 fn(): Factory => clone $this->factory,
-                \array_fill(0, \random_int($this->min, $this->max), null)
+                \array_fill(0, \random_int($this->min, $this->max), null),
             );
         }
 

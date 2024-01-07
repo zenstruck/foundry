@@ -35,8 +35,8 @@ final class FactoryClassMap
 
                     return $carry;
                 },
-                []
-            )
+                [],
+            ),
         );
     }
 

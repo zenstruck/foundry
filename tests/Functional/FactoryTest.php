@@ -72,7 +72,7 @@ final class FactoryTest extends KernelTestCase
 
         $posts = \array_map(
             static fn($post) => $post->getTitle(),
-            $category->getPosts()->toArray()
+            $category->getPosts()->toArray(),
         );
 
         $this->assertCount(2, $posts);
@@ -96,7 +96,7 @@ final class FactoryTest extends KernelTestCase
 
         $tags = \array_map(
             static fn($tag) => $tag->getName(),
-            $post->getTags()->toArray()
+            $post->getTags()->toArray(),
         );
 
         $this->assertCount(2, $tags);
@@ -119,7 +119,7 @@ final class FactoryTest extends KernelTestCase
 
         $posts = \array_map(
             static fn($post) => $post->getTitle(),
-            $tag->getPosts()->toArray()
+            $tag->getPosts()->toArray(),
         );
 
         $this->assertCount(2, $posts);

@@ -79,12 +79,12 @@ final class NoPersistenceObjectsAutoCompleter
         return \array_combine(
             \array_map(
                 static fn(string $namespacePrefix): string => \trim($namespacePrefix, '\\'),
-                \array_keys($definedNamespaces)
+                \array_keys($definedNamespaces),
             ),
             \array_map(
                 static fn(string $rootFragment): string => \trim($rootFragment, '/'),
-                \array_values($definedNamespaces)
-            )
+                \array_values($definedNamespaces),
+            ),
         );
     }
 
@@ -94,7 +94,7 @@ final class NoPersistenceObjectsAutoCompleter
 
         return \array_map(
             fn(string $file): string => "{$this->kernelRootDir}/{$file}",
-            $composerConfig['autoload']['files'] ?? []
+            $composerConfig['autoload']['files'] ?? [],
         );
     }
 

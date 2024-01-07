@@ -59,7 +59,7 @@ final class ChainManagerRegistry implements ManagerRegistry
         return \array_reduce(
             $this->managerRegistries,
             static fn(array $carry, ManagerRegistry $managerRegistry): array => \array_merge($carry, \array_values($managerRegistry->getManagers())),
-            []
+            [],
         );
     }
 

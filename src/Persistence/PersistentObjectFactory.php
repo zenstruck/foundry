@@ -98,7 +98,7 @@ abstract class PersistentObjectFactory extends Factory
          * @deprecated
          * @internal
          */
-        bool $noProxy = false
+        bool $noProxy = false,
     ): object {
         if (2 === \count(\func_get_args()) && !\str_starts_with(\debug_backtrace(options: \DEBUG_BACKTRACE_IGNORE_ARGS, limit: 1)[0]['class'] ?? '', 'Zenstruck\Foundry')) {
             trigger_deprecation('zenstruck\foundry', '1.37.0', 'Parameter "$noProxy" of method "%s()" is deprecated and will be removed in Foundry 2.0.', __METHOD__);
@@ -106,7 +106,7 @@ abstract class PersistentObjectFactory extends Factory
 
         return parent::create(
             $attributes,
-            noProxy: true
+            noProxy: true,
         );
     }
 
@@ -355,7 +355,7 @@ abstract class PersistentObjectFactory extends Factory
     {
         return \array_map(
             static fn(Proxy $proxy) => $proxy->_real(),
-            $proxies
+            $proxies,
         );
     }
 }

@@ -57,14 +57,14 @@ final class GlobalStateRegistry
                     // let's use ::load() in order to register the service in StoryManager
                     $story::class::load();
                 },
-                $this->storiesAsService
+                $this->storiesAsService,
             ),
             ...$this->invokableServices,
             ...\array_map(
                 static fn(string $storyClassName): \Closure => static function() use ($storyClassName): void {
                     $storyClassName::load();
                 },
-                $this->standaloneStories
+                $this->standaloneStories,
             ),
         ];
     }
