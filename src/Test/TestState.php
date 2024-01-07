@@ -18,7 +18,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Zenstruck\Foundry\ChainManagerRegistry;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\Instantiator;
+use \Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\StoryManager;
 
 /**
@@ -41,7 +41,7 @@ final class TestState
      */
     public static function setInstantiator(callable $instantiator): void
     {
-        trigger_deprecation('zenstruck/foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in Foundry 2.0. Use "%s::configure()" instead.', __METHOD__, UnitTestConfig::class));
+        trigger_deprecation('zenstruck/foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in Foundry 2.0. Use "%s::configure()" instead.', __METHOD__, UnitTestConfig::class);
 
         self::$instantiator = $instantiator;
     }
@@ -51,7 +51,7 @@ final class TestState
      */
     public static function setFaker(Faker\Generator $faker): void
     {
-        trigger_deprecation('zenstruck/foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in Foundry 2.0. Use "%s::configure()" instead.', __METHOD__, UnitTestConfig::class));
+        trigger_deprecation('zenstruck/foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in Foundry 2.0. Use "%s::configure()" instead.', __METHOD__, UnitTestConfig::class);
 
         self::$faker = $faker;
     }
@@ -61,7 +61,7 @@ final class TestState
      */
     public static function enableDefaultProxyAutoRefresh(): void
     {
-        trigger_deprecation('zenstruck/foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __METHOD__));
+        trigger_deprecation('zenstruck/foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __METHOD__);
 
         self::$defaultProxyAutoRefresh = true;
     }
@@ -71,7 +71,7 @@ final class TestState
      */
     public static function disableDefaultProxyAutoRefresh(): void
     {
-        trigger_deprecation('zenstruck/foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __METHOD__));
+        trigger_deprecation('zenstruck/foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __METHOD__);
 
         self::$defaultProxyAutoRefresh = false;
     }
@@ -81,7 +81,7 @@ final class TestState
      */
     public static function alwaysAutoRefreshProxies(): void
     {
-        trigger_deprecation('zenstruck/foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __METHOD__));
+        trigger_deprecation('zenstruck/foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __METHOD__);
 
         self::enableDefaultProxyAutoRefresh();
     }
@@ -150,7 +150,7 @@ final class TestState
      */
     public static function bootFactory(Configuration $configuration): Configuration
     {
-        trigger_deprecation('zenstruck/foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __METHOD__));
+        trigger_deprecation('zenstruck/foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __METHOD__);
 
         self::bootFoundry($configuration);
 
@@ -225,7 +225,7 @@ final class TestState
      */
     public static function configure(?Instantiator $instantiator = null, ?Faker\Generator $faker = null): void
     {
-        trigger_deprecation('zenstruck/foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in Foundry 2.0. Use "%s::configure()" instead.', __METHOD__, UnitTestConfig::class));
+        trigger_deprecation('zenstruck/foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in Foundry 2.0. Use "%s::configure()" instead.', __METHOD__, UnitTestConfig::class);
 
         self::$instantiator = $instantiator;
         self::$faker = $faker;

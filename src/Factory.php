@@ -99,7 +99,7 @@ class Factory
         bool $noProxy = false
     ): object {
         if (2 === \count(\func_get_args()) && !\str_starts_with(\debug_backtrace(options: \DEBUG_BACKTRACE_IGNORE_ARGS, limit: 1)[0]['class'] ?? '', 'Zenstruck\Foundry')) {
-            trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Parameter "$noProxy" of method "%s()" is deprecated and will be removed in Foundry 2.0.', __METHOD__));
+            trigger_deprecation('zenstruck\foundry', '1.37.0', 'Parameter "$noProxy" of method "%s()" is deprecated and will be removed in Foundry 2.0.', __METHOD__);
         }
 
         // merge the factory attribute set with the passed attributes
@@ -203,7 +203,7 @@ class Factory
     final public function sequence(iterable|callable $sequence): FactoryCollection
     {
         if (\is_callable($sequence)) {
-            trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Passing a callable to method "%s()" is deprecated and will be removed in 2.0.', __METHOD__));
+            trigger_deprecation('zenstruck\foundry', '1.37.0', 'Passing a callable to method "%s()" is deprecated and will be removed in 2.0.', __METHOD__);
 
             $sequence = $sequence();
         }
@@ -231,7 +231,7 @@ class Factory
      */
     final public function withAttributes($attributes = []): self
     {
-        trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in 2.0. Use "%s::with()" instead.', __METHOD__, self::class));
+        trigger_deprecation('zenstruck\foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in 2.0. Use "%s::with()" instead.', __METHOD__, self::class);
 
         return $this->with($attributes);
     }
@@ -352,7 +352,7 @@ class Factory
      */
     final public static function delayFlush(callable $callback): mixed
     {
-        trigger_deprecation('zenstruck\foundry', '1.37.0', \sprintf('Method "%s()" is deprecated and will be removed in Foundry 2.0. Use "Zenstruck\Foundry\Persistence\flush_after()" instead.', __METHOD__));
+        trigger_deprecation('zenstruck\foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in Foundry 2.0. Use "Zenstruck\Foundry\Persistence\flush_after()" instead.', __METHOD__);
 
         return self::configuration()->delayFlush($callback);
     }

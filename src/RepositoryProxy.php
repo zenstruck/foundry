@@ -14,11 +14,17 @@ namespace Zenstruck\Foundry;
 use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 
-trigger_deprecation(
-    'zenstruck\foundry',
-    '1.37.0',
-    \sprintf('Class "%s" is deprecated and will be removed in version 2.0. Use "%s" instead.', RepositoryProxy::class, RepositoryDecorator::class)
-);
+if (!class_exists(RepositoryDecorator::class, false)) {
+    trigger_deprecation(
+        'zenstruck\foundry',
+        '1.37.0',
+        'Class "%s" is deprecated and will be removed in version 2.0. Use "%s" instead.',
+        RepositoryProxy::class,
+        RepositoryDecorator::class
+    );
+}
+
+\class_alias(RepositoryDecorator::class, RepositoryProxy::class);
 
 if (false) {
     /**
@@ -29,7 +35,7 @@ if (false) {
      *
      * @author Kevin Bond <kevinbond@gmail.com>
      */
-    final class RepositoryProxy
+    final class RepositoryProxy extends RepositoryDecorator
     {
     }
 }
