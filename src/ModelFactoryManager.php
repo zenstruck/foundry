@@ -11,8 +11,6 @@
 
 namespace Zenstruck\Foundry;
 
-use Zenstruck\Foundry\ObjectFactory;
-
 /**
  * @internal
  *
