@@ -13,6 +13,8 @@ namespace Zenstruck\Foundry\Bundle\Maker\Factory;
 
 use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
+use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Persistence\RepositoryDecorator;
@@ -36,10 +38,13 @@ final class MakeFactoryData
     public function __construct(private \ReflectionClass $object, private ClassNameDetails $factoryClassNameDetails, private ?\ReflectionClass $repository, private string $staticAnalysisTool, private bool $persisted)
     {
         $this->uses = [
-            PersistentProxyObjectFactory::class,
-            Proxy::class,
+            $this->getFactoryClass(),
             $object->getName(),
         ];
+
+        if ($this->persisted) {
+            $this->uses[] = Proxy::class;
+        }
 
         if ($repository) {
             $this->uses[] = $repository->getName();
@@ -57,6 +62,19 @@ final class MakeFactoryData
     public function getObjectShortName(): string
     {
         return $this->object->getShortName();
+    }
+
+    /**
+     * @return class-string<Factory>
+     */
+    public function getFactoryClass(): string
+    {
+        return $this->isPersisted() ? PersistentProxyObjectFactory::class : ObjectFactory::class;
+    }
+
+    public function getFactoryClassShortName(): string
+    {
+        return (new \ReflectionClass($this->getFactoryClass()))->getShortName();
     }
 
     public function getFactoryClassNameDetails(): ClassNameDetails

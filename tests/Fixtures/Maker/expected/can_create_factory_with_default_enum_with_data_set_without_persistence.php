@@ -11,20 +11,14 @@
 
 namespace App\Factory;
 
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\PHP81\EntityWithEnum;
 use Zenstruck\Foundry\Tests\Fixtures\PHP81\SomeEnum;
 
 /**
- * @extends PersistentProxyObjectFactory<EntityWithEnum>
- *
- * @method        EntityWithEnum|Proxy     create(array|callable $attributes = [])
- * @method static EntityWithEnum|Proxy     createOne(array $attributes = [])
- * @method static EntityWithEnum[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static EntityWithEnum[]|Proxy[] createSequence(iterable|callable $sequence)
+ * @extends ObjectFactory<EntityWithEnum>
  */
-final class EntityWithEnumFactory extends PersistentProxyObjectFactory
+final class EntityWithEnumFactory extends ObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -58,7 +52,6 @@ final class EntityWithEnumFactory extends PersistentProxyObjectFactory
     protected function initialize(): static
     {
         return $this
-            ->withoutPersisting()
             // ->afterInstantiate(function(EntityWithEnum $entityWithEnum): void {})
         ;
     }

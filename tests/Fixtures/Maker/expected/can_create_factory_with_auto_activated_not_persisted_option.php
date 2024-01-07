@@ -11,19 +11,13 @@
 
 namespace App\Factory;
 
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 
 /**
- * @extends PersistentProxyObjectFactory<Category>
- *
- * @method        Category|Proxy     create(array|callable $attributes = [])
- * @method static Category|Proxy     createOne(array $attributes = [])
- * @method static Category[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static Category[]|Proxy[] createSequence(iterable|callable $sequence)
+ * @extends ObjectFactory<Category>
  */
-final class CategoryFactory extends PersistentProxyObjectFactory
+final class CategoryFactory extends ObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -58,7 +52,6 @@ final class CategoryFactory extends PersistentProxyObjectFactory
     protected function initialize(): static
     {
         return $this
-            ->withoutPersisting()
             // ->afterInstantiate(function(Category $category): void {})
         ;
     }
