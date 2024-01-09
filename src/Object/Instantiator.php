@@ -224,9 +224,8 @@ class Instantiator
         /**
          * @internal
          */
-        bool $calledInternally = false
-    )
-    {
+        bool $calledInternally = false,
+    ) {
         if (!$calledInternally) {
             trigger_deprecation('zenstruck\foundry', '1.37.0', 'Method "%s()" is deprecated with no replacement.', __METHOD__);
         }

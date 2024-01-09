@@ -356,7 +356,7 @@ class Factory
     {
         if (
             null === ($calledClass = \debug_backtrace(options: \DEBUG_BACKTRACE_IGNORE_ARGS, limit: 2)[1]['class'] ?? null)
-            || !is_a($calledClass, self::class, allow_string: true)
+            || !\is_a($calledClass, self::class, allow_string: true)
         ) {
             trigger_deprecation('zenstruck\foundry', '1.37.0', 'Method "%s()" will be protected in Foundry 2.0 and should not be called from outside of a factory. Use function "Zenstruck\Foundry\faker()" instead.', __METHOD__);
         }
