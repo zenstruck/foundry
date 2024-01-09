@@ -11,6 +11,7 @@ use Zenstruck\Foundry\Utils\Rector\ChangeFunctionsCalls;
 use Zenstruck\Foundry\Utils\Rector\ChangeInstantiatorMethodCalls;
 use Zenstruck\Foundry\Utils\Rector\ChangeLegacyClassImports;
 use Zenstruck\Foundry\Utils\Rector\ChangeProxyMethodCalls;
+use Zenstruck\Foundry\Utils\Rector\ChangeStaticFactoryFakerCalls;
 use Zenstruck\Foundry\Utils\Rector\PersistenceResolver;
 use Zenstruck\Foundry\Utils\Rector\RemoveProxyRealObjectMethodCallsForNotProxifiedObjects;
 use Zenstruck\Foundry\Utils\Rector\RuleRequirementsChecker;
@@ -34,5 +35,6 @@ return static function (RectorConfig $rectorConfig): void {
         ChangeFactoryMethodCalls::class,
         ChangeFunctionsCalls::class,
         ChangeProxyMethodCalls::class,
+        ChangeStaticFactoryFakerCalls::class,
     ]);
 };
