@@ -1,8 +1,0 @@
-<?php
-
-namespace Doctrine\ORM;
-
-class ORMException extends \Exception
-{
-
-}

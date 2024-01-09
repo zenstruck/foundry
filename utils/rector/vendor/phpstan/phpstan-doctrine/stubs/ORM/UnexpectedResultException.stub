@@ -1,9 +1,0 @@
-<?php
-
-namespace Doctrine\ORM;
-
-use Doctrine\ORM\Exception\ORMException;
-
-class UnexpectedResultException extends ORMException
-{
-}
