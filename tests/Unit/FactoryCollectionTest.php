@@ -30,7 +30,7 @@ final class FactoryCollectionTest extends TestCase
      */
     public function can_create_with_static_size(): void
     {
-        $collection = FactoryCollection::set(persistent_factory(Category::class), 2);
+        $collection = FactoryCollection::many(persistent_factory(Category::class), 2);
 
         $this->assertCount(2, $collection->create());
         $this->assertCount(2, $collection->create());

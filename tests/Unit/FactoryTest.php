@@ -25,6 +25,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\LegacyPostFactory;
 
+use function Zenstruck\Foundry\faker;
 use function Zenstruck\Foundry\lazy;
 use function Zenstruck\Foundry\Persistence\persistent_factory;
 use function Zenstruck\Foundry\Persistence\proxy_factory;
@@ -260,10 +261,10 @@ final class FactoryTest extends TestCase
      */
     public function can_register_custom_faker(): void
     {
-        $defaultFaker = Factory::faker();
+        $defaultFaker = faker();
         Factory::configuration()->setFaker(Faker\Factory::create());
 
-        $this->assertNotSame(\spl_object_id(Factory::faker()), \spl_object_id($defaultFaker));
+        $this->assertNotSame(\spl_object_id(faker()), \spl_object_id($defaultFaker));
     }
 
     /**

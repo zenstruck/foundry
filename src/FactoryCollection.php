@@ -46,7 +46,17 @@ final class FactoryCollection implements \IteratorAggregate
         $this->max = $max ?? $min;
     }
 
+    /**
+     * @deprecated Use FactoryCollection::many() instead
+     */
     public static function set(Factory $factory, int $count): self
+    {
+        trigger_deprecation('zenstruck/foundry', '1.37.0', 'Method %s() is deprecated and will be removed in 2.0. Use "%s::many()" instead.', __METHOD__, __CLASS__);
+
+        return self::many($factory, $count);
+    }
+
+    public static function many(Factory $factory, int $count): self
     {
         return new self($factory, $count, null, null, true);
     }

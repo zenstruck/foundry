@@ -3,6 +3,7 @@
 namespace Zenstruck\Foundry\Utils\Rector\Tests\Fixtures;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject;
 use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject;
@@ -40,6 +41,10 @@ class DummyKernelTestCase extends KernelTestCase
 
         \Zenstruck\Foundry\Factory::delayFlush(static fn() => true);
         \Zenstruck\Foundry\Test\TestState::configure(faker: null);
+
+        Factory::faker();
+
+        FactoryCollection::set(DummyObjectModelFactory::new(), 5);
     }
 }
 
@@ -87,6 +92,10 @@ class DummyKernelTestCase extends KernelTestCase
 
         \Zenstruck\Foundry\Persistence\flush_after(static fn() => true);
         \Zenstruck\Foundry\Test\UnitTestConfig::configure(faker: null);
+
+        \Zenstruck\Foundry\faker();
+
+        FactoryCollection::many(DummyObjectModelFactory::new(), 5);
     }
 }
 

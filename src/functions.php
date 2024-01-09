@@ -168,7 +168,7 @@ function repository(object|string $objectOrClass): RepositoryDecorator
  */
 function faker(): Faker\Generator
 {
-    return Factory::faker();
+    return Factory::configuration()->faker();
 }
 
 /**

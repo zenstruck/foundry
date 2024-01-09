@@ -19,7 +19,7 @@ final class DummyObjectModelFactory extends ModelFactory
 {
     protected function getDefaults(): array
     {
-        return [];
+        return ['field' => self::faker()];
     }
 
     public function published(): static
@@ -62,7 +62,7 @@ final class DummyObjectModelFactory extends \Zenstruck\Foundry\ObjectFactory
 {
     protected function defaults(): array
     {
-        return [];
+        return ['field' => self::faker()];
     }
 
     public function published(): static

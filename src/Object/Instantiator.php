@@ -67,7 +67,7 @@ class Instantiator
 
             if ($this->alwaysForceProperties || \in_array($attribute, $this->forceProperties, true)) {
                 try {
-                    self::forceSet($object, $attribute, $value);
+                    self::forceSet($object, $attribute, $value, calledInternally: true);
                 } catch (\InvalidArgumentException $e) {
                     if (!$this->allowExtraAttributes) {
                         throw $e;
@@ -80,7 +80,7 @@ class Instantiator
             if (0 === \mb_strpos($attribute, 'force:')) {
                 trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using "force:" property prefixes is deprecated, use Instantiator::alwaysForce() instead (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#instantiation).');
 
-                self::forceSet($object, \mb_substr($attribute, 6), $value);
+                self::forceSet($object, \mb_substr($attribute, 6), $value, calledInternally: true);
 
                 continue;
             }
@@ -195,18 +195,42 @@ class Instantiator
     }
 
     /**
+     * @deprecated
      * @throws \InvalidArgumentException if property does not exist for $object
      */
-    public static function forceSet(object $object, string $property, mixed $value): void
+    public static function forceSet(
+        object $object,
+        string $property,
+        mixed $value,
+        /**
+         * @internal
+         */
+        bool $calledInternally = false): void
     {
+        if (!$calledInternally) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', 'Method "%s()" is deprecated with no replacement.', __METHOD__);
+        }
+
         self::accessibleProperty($object, $property)->setValue($object, $value);
     }
 
     /**
+     * @deprecated
      * @return mixed
      */
-    public static function forceGet(object $object, string $property)
+    public static function forceGet(
+        object $object,
+        string $property,
+        /**
+         * @internal
+         */
+        bool $calledInternally = false
+    )
     {
+        if (!$calledInternally) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', 'Method "%s()" is deprecated with no replacement.', __METHOD__);
+        }
+
         return self::accessibleProperty($object, $property)->getValue($object);
     }
 

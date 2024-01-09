@@ -256,7 +256,7 @@ final class Proxy implements \Stringable, ProxyBase
     {
         $object = $this->_real();
 
-        Instantiator::forceSet($object, $property, $value);
+        Instantiator::forceSet($object, $property, $value, calledInternally: true);
 
         return $this;
     }
@@ -271,7 +271,7 @@ final class Proxy implements \Stringable, ProxyBase
         $object = $this->_real();
 
         foreach ($properties as $property => $value) {
-            Instantiator::forceSet($object, $property, $value);
+            Instantiator::forceSet($object, $property, $value, calledInternally: true);
         }
 
         return $this;
@@ -289,7 +289,7 @@ final class Proxy implements \Stringable, ProxyBase
 
     public function _get(string $property): mixed
     {
-        return Instantiator::forceGet($this->_real(), $property);
+        return Instantiator::forceGet($this->_real(), $property, calledInternally: true);
     }
 
     /**
