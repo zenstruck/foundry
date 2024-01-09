@@ -399,6 +399,7 @@ final class InstantiatorTest extends TestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_use_force_set_and_get(): void
     {
@@ -457,6 +458,7 @@ final class InstantiatorTest extends TestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function force_get_throws_exception_for_invalid_property(): void
     {
@@ -612,7 +614,6 @@ final class InstantiatorTest extends TestCase
         $this->assertSame('constructor B', $object->getPropB());
         $this->assertSame('constructor C', $object->getPropC());
         $this->assertSame('D', $object->getPropD());
-        $this->assertSame('E', Instantiator::forceGet($object, 'propE'));
     }
 
     /**
@@ -645,7 +646,7 @@ final class InstantiatorTest extends TestCase
     /**
      * @test
      */
-    public function missing_variadic_argument_thtrows(): void
+    public function missing_variadic_argument_throws(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Missing constructor argument "propB" for "Zenstruck\Foundry\Tests\Unit\VariadicInstantiatorDummy".');

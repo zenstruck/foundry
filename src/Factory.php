@@ -190,7 +190,7 @@ class Factory
     final public function many(int $min, ?int $max = null): FactoryCollection
     {
         if (!$max) {
-            return FactoryCollection::set($this, $min);
+            return FactoryCollection::many($this, $min);
         }
 
         return FactoryCollection::range($this, $min, $max);

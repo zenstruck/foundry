@@ -58,7 +58,7 @@ final class ChangeStaticFactoryFakerCalls extends AbstractRector
             return null;
         }
 
-        /** @var MutatingScope */
+        /** @var MutatingScope $mutatingScope */
         $mutatingScope = $node->getAttribute('scope');
 
         // if the Factory::faker() was called from a Factory, then do nothing

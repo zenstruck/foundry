@@ -3,6 +3,12 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\Renaming\Contract\MethodCallRenameInterface;
+use Rector\Renaming\Rector\MethodCall\RenameMethodRector;
+use Rector\Renaming\ValueObject\MethodCallRename;
+use Rector\Transform\Rector\MethodCall\MethodCallToPropertyFetchRector;
+use Rector\Transform\ValueObject\MethodCallToPropertyFetch;
+use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Utils\Rector\AddProxyToFactoryCollectionTypeInPhpDoc;
 use Zenstruck\Foundry\Utils\Rector\ChangeDisableEnablePersist;
 use Zenstruck\Foundry\Utils\Rector\ChangeFactoryBaseClass;
@@ -37,4 +43,11 @@ return static function (RectorConfig $rectorConfig): void {
         ChangeProxyMethodCalls::class,
         ChangeStaticFactoryFakerCalls::class,
     ]);
+
+    $rectorConfig->ruleWithConfiguration(
+        RenameMethodRector::class,
+        [
+            new MethodCallRename(FactoryCollection::class, 'set', 'many')
+        ]
+    );
 };
