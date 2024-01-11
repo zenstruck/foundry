@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Utils\Rector\Tests\Fixtures;
 
-use Zenstruck\Foundry\ModelFactory;
-
-class DummyObjectModelFactory extends ModelFactory
+final class DummyModelFactoryExtendingUserFactory extends DummyObjectModelFactory
 {
     protected function getDefaults(): array
     {

@@ -6,6 +6,7 @@ namespace Zenstruck\Foundry\Utils\Rector;
 
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
+use PHPStan\Analyser\MutatingScope;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ExtendsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
@@ -191,7 +192,16 @@ final class ChangeFactoryBaseClass extends AbstractRector
 
     private function changeBaseClass(Node\Stmt\Class_ $node): Node\Stmt\Class_|null
     {
-        if ($this->persistenceResolver->shouldTransformFactoryIntoObjectFactory($this->getName($node))) {
+        /** @var MutatingScope $mutatingScope */
+        $mutatingScope = $node->getAttribute('scope');
+        $classReflection = $mutatingScope->getClassReflection();
+
+        if (
+            !str_starts_with($classReflection->getParentClass()->getName(), 'Zenstruck\Foundry')
+            || str_starts_with($classReflection->getParentClass()->getName(), 'Zenstruck\Foundry\Utils\Rector')
+        ) {
+            $newFactoryClass = $classReflection->getParentClass()->getName();
+        } elseif ($this->persistenceResolver->shouldTransformFactoryIntoObjectFactory($this->getName($node))) {
             $newFactoryClass = '\\' . ObjectFactory::class;
             $node->extends = new Node\Name($newFactoryClass);
         } else {

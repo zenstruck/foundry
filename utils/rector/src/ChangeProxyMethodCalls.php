@@ -83,7 +83,7 @@ final class ChangeProxyMethodCalls extends AbstractRector
             case 'forceSet':
                 $node->name = new Node\Identifier('_set');
                 return $node;
-            case 'get':
+            case 'forceGet':
                 $node->name = new Node\Identifier('_get');
                 return $node;
             case 'repository':
