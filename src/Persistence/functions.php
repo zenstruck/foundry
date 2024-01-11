@@ -14,6 +14,7 @@ namespace Zenstruck\Foundry\Persistence;
 use Zenstruck\Foundry\AnonymousFactoryGenerator;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\Proxy as LegacyProxy;
 
 /**
  * @param class-string<TObject> $class
@@ -84,6 +85,20 @@ function proxy_factory(string $class, array|callable $attributes = []): Persiste
     }
 
     return AnonymousFactoryGenerator::create($class, PersistentProxyObjectFactory::class)::new($attributes);
+}
+
+/**
+ * Create an auto-refreshable proxy for the object.
+ *
+ * @template T of object
+ *
+ * @param T $object
+ *
+ * @return Proxy<T>
+ */
+function proxy(object $object): object
+{
+    return new LegacyProxy($object);
 }
 
 /**
