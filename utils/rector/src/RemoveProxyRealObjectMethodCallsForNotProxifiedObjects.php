@@ -64,8 +64,11 @@ final class RemoveProxyRealObjectMethodCallsForNotProxifiedObjects extends Abstr
 
         if ($node->var instanceof Node\Expr\FuncCall) {
             $name = $node->var->name->getAttribute('namespacedName') ?? (string)$node->var->name;
+            if (str_starts_with($name, '\\')) {
+                $name = substr($name, 1);
+            }
 
-            if (in_array($name, ['Zenstruck\Foundry\create', 'Zenstruck\Foundry\instantiate'])) {
+            if (in_array($name, ['Zenstruck\Foundry\create', 'Zenstruck\Foundry\instantiate', 'Zenstruck\Foundry\Persistence\proxy'])) {
                 return null;
             }
         }

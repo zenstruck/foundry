@@ -33,6 +33,8 @@ class DummyKernelTestCase extends KernelTestCase
         DummyObjectModelFactory::new()->withAttributes(['published' => true])->object();
         DummyPersistentModelFactory::createOne()->object();
 
+        DummyPersistentModelFactory::new()->many(0, 1)->factory();
+
         /** @var Proxy<DummyPersistentObject> */
         $object = DummyPersistentModelFactory::createOne();
         $object->refresh();
@@ -86,6 +88,8 @@ class DummyKernelTestCase extends KernelTestCase
     {
         DummyObjectModelFactory::new()->with(['published' => true]);
         DummyPersistentModelFactory::createOne()->_real();
+
+        DummyPersistentModelFactory::new()->many(0, 1)->factory;
 
         /** @var Proxy<DummyPersistentObject> */
         $object = DummyPersistentModelFactory::createOne();

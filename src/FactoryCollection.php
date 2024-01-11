@@ -32,7 +32,7 @@ final class FactoryCollection implements \IteratorAggregate
      *
      *@deprecated using directly FactoryCollection's constructor is deprecated. It will be private in v2. Use named constructors instead.
      */
-    public function __construct(private Factory $factory, ?int $min = null, ?int $max = null, private ?iterable $sequence = null, bool $calledInternally = false)
+    public function __construct(public Factory $factory, ?int $min = null, ?int $max = null, private ?iterable $sequence = null, bool $calledInternally = false)
     {
         if ($max && $min > $max) {
             throw new \InvalidArgumentException('Min must be less than max.');
@@ -124,6 +124,8 @@ final class FactoryCollection implements \IteratorAggregate
 
     public function factory(): Factory
     {
+        trigger_deprecation('zenstruck\foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in Foundry 2.0. Use public property %s::$factory instead', __METHOD__, __CLASS__);
+
         return $this->factory;
     }
 
