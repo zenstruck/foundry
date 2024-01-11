@@ -8,7 +8,7 @@ function legacyProxy(\Zenstruck\Foundry\Proxy $proxy): void
     $proxy->remove();
     $proxy->refresh();
     $proxy->forceSet();
-    $proxy->get();
+    $proxy->forceGet();
     $proxy->repository();
     $proxy->enableAutoRefresh();
     $proxy->disableAutoRefresh();
@@ -23,7 +23,7 @@ function newProxy(\Zenstruck\Foundry\Persistence\Proxy $proxy): void
     $proxy->remove();
     $proxy->refresh();
     $proxy->forceSet();
-    $proxy->get();
+    $proxy->forceGet();
     $proxy->repository();
     $proxy->enableAutoRefresh();
     $proxy->disableAutoRefresh();

@@ -27,7 +27,7 @@ final class ChangeProxyMethodCalls extends AbstractRector
                     $proxy->remove();
                     $proxy->refresh();
                     $proxy->forceSet();
-                    $proxy->get();
+                    $proxy->forceGet();
                     $proxy->repository();
                     $proxy->enableAutoRefresh();
                     $proxy->disableAutoRefresh();
