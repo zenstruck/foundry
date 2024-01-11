@@ -62,6 +62,14 @@ final class RemoveProxyRealObjectMethodCallsForNotProxifiedObjects extends Abstr
             return null;
         }
 
+        if ($node->var instanceof Node\Expr\FuncCall) {
+            $name = $node->var->name->getAttribute('namespacedName') ?? (string)$node->var->name;
+
+            if (in_array($name, ['Zenstruck\Foundry\create', 'Zenstruck\Foundry\instantiate'])) {
+                return null;
+            }
+        }
+
         /**
          * If "object()" or "_real()" is called on an object which is a proxy,
          * we should check if this object will use `ObjectFactory` as factory.

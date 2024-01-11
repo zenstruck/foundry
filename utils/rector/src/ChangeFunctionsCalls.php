@@ -6,6 +6,7 @@ namespace Zenstruck\Foundry\Utils\Rector;
 
 use PhpParser\Node;
 use PhpParser\Node\Identifier;
+use PHPStan\Analyser\MutatingScope;
 use PHPStan\Type\ThisType;
 use Rector\Core\Rector\AbstractRector;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
@@ -69,7 +70,9 @@ final class ChangeFunctionsCalls extends AbstractRector
             return null;
         }
 
-        switch ((string)$node->name) {
+        $name = $node->name->getAttribute('namespacedName') ?? (string)$node->name;
+
+        switch ($name) {
             case 'Zenstruck\Foundry\create':
                 $node->name = new Node\Name('\Zenstruck\Foundry\Persistence\persist_proxy');
                 return $node;

@@ -12,6 +12,8 @@ use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObjectModelFactory;
 use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentModelFactory;
 
+use function Zenstruck\Foundry\instantiate;
+
 class DummyKernelTestCase extends KernelTestCase
 {
     use Factories;
@@ -45,6 +47,9 @@ class DummyKernelTestCase extends KernelTestCase
         Factory::faker();
 
         FactoryCollection::set(DummyObjectModelFactory::new(), 5);
+
+        instantiate(DummyPersistentObject::class, [])->object();
+        instantiate(DummyObject::class, [])->object();
     }
 }
 
@@ -96,6 +101,9 @@ class DummyKernelTestCase extends KernelTestCase
         \Zenstruck\Foundry\faker();
 
         FactoryCollection::many(DummyObjectModelFactory::new(), 5);
+
+        \Zenstruck\Foundry\Persistence\proxy(\Zenstruck\Foundry\object(DummyPersistentObject::class, []))->_real();
+        \Zenstruck\Foundry\Persistence\proxy(\Zenstruck\Foundry\object(DummyObject::class, []))->_real();
     }
 }
 
