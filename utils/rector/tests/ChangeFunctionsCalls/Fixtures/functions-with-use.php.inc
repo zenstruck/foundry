@@ -18,8 +18,8 @@ TestState::configure(faker: null);
 -----
 <?php
 
-\Zenstruck\Foundry\Persistence\persist(SomeClass::class, []);
-\Zenstruck\Foundry\object(SomeClass::class, ['published' => true]);
+\Zenstruck\Foundry\Persistence\persist_proxy(SomeClass::class, []);
+\Zenstruck\Foundry\Persistence\proxy(\Zenstruck\Foundry\object(SomeClass::class, ['published' => true]));
 \Zenstruck\Foundry\Persistence\repository($someObject);
 
 \Zenstruck\Foundry\Persistence\flush_after(static fn() => true);

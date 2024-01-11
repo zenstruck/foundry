@@ -43,8 +43,8 @@ final class ChangeFunctionsCalls extends AbstractRector
                     TestState::configure(faker: null);
                     CODE_SAMPLE,
                     <<<CODE_SAMPLE
-                    \Zenstruck\Foundry\Persistence\persist(SomeClass::class, []);
-                    \Zenstruck\Foundry\object(SomeClass::class, ['published' => true]);
+                    \Zenstruck\Foundry\Persistence\persist_proxy(SomeClass::class, []);
+                    \Zenstruck\Foundry\Persistence\proxy(\Zenstruck\Foundry\object(SomeClass::class, ['published' => true]));
                     \Zenstruck\Foundry\Persistence\repository(\$someObject);
                     \Zenstruck\Foundry\Persistence\flush_after(static fn() => true);
                     \Zenstruck\Foundry\Test\UnitTestConfig::configure(faker: null);
@@ -71,11 +71,11 @@ final class ChangeFunctionsCalls extends AbstractRector
 
         switch ((string)$node->name) {
             case 'Zenstruck\Foundry\create':
-                $node->name = new Node\Name('\Zenstruck\Foundry\Persistence\persist');
+                $node->name = new Node\Name('\Zenstruck\Foundry\Persistence\persist_proxy');
                 return $node;
             case 'Zenstruck\Foundry\instantiate':
                 $node->name = new Node\Name('\Zenstruck\Foundry\object');
-                return $node;
+                return new Node\Expr\FuncCall(new Node\Name('\Zenstruck\Foundry\Persistence\proxy'), [new Node\Arg($node)]);
             case 'Zenstruck\Foundry\repository':
                 $node->name = new Node\Name('\Zenstruck\Foundry\Persistence\repository');
                 return $node;

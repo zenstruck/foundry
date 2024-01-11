@@ -86,8 +86,8 @@ class DummyKernelTestCase extends KernelTestCase
         $object = DummyPersistentModelFactory::createOne();
         $object->_refresh();
 
-        \Zenstruck\Foundry\Persistence\persist(SomeClass::class, []);
-        \Zenstruck\Foundry\object(SomeClass::class, ['published' => true]);
+        \Zenstruck\Foundry\Persistence\persist_proxy(SomeClass::class, []);
+        \Zenstruck\Foundry\Persistence\proxy(\Zenstruck\Foundry\object(SomeClass::class, ['published' => true]));
         \Zenstruck\Foundry\Persistence\repository($object);
 
         \Zenstruck\Foundry\Persistence\flush_after(static fn() => true);
