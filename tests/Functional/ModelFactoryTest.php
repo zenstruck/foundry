@@ -371,7 +371,7 @@ abstract class ModelFactoryTest extends KernelTestCase
     public function can_use_factory_collection_as_data_provider(FactoryCollection $factoryCollection): void
     {
         $factoryCollection->create();
-        $factoryCollection->factory()::assert()->exists(['name' => 'foo']);
+        $factoryCollection->factory::assert()->exists(['name' => 'foo']);
     }
 
     public function factoryCollectionAsDataProvider(): iterable

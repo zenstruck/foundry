@@ -50,4 +50,11 @@ return static function (RectorConfig $rectorConfig): void {
             new MethodCallRename(FactoryCollection::class, 'set', 'many')
         ]
     );
+
+    $rectorConfig->ruleWithConfiguration(
+        MethodCallToPropertyFetchRector::class,
+        [
+            new MethodCallToPropertyFetch(FactoryCollection::class, 'factory', 'factory')
+        ]
+    );
 };
