@@ -89,7 +89,7 @@ interface Proxy
     /**
      * @deprecated Use method "_get()" instead
      */
-    public function get(string $property): mixed;
+    public function forceGet(string $property): mixed;
 
     /**
      * @deprecated Use method "_repository()" instead

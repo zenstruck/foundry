@@ -326,7 +326,6 @@ abstract class ModelFactoryTest extends KernelTestCase
 
     /**
      * @dataProvider sequenceProvider
-     * @group legacy
      */
     public function can_create_sequence_with_callable(callable $sequence): void
     {

@@ -280,7 +280,7 @@ final class Proxy implements \Stringable, ProxyBase
     /**
      * @deprecated Use method "_get()" instead
      */
-    public function get(string $property): mixed
+    public function forceGet(string $property): mixed
     {
         trigger_deprecation('zenstruck\foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_get()" instead.', __METHOD__, self::class);
 

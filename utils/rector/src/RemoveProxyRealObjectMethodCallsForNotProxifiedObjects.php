@@ -100,7 +100,7 @@ final class RemoveProxyRealObjectMethodCallsForNotProxifiedObjects extends Abstr
             return false;
         }
 
-        /** @var MutatingScope */
+        /** @var MutatingScope $mutatingScope */
         $mutatingScope = $var->getAttribute('scope');
 
         $type = $mutatingScope->getType($var);
