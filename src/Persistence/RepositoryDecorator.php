@@ -401,6 +401,10 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
      */
     public function findOneBy(array $criteria, ?array $orderBy = null): ?Proxy
     {
+        if (null !== $orderBy) {
+            trigger_deprecation('zenstruck\foundry', '1.37.0', 'Argument "$orderBy" of method "%s()" is deprecated and will be removed in Foundry 2.0. Use "%s::findBy()" instead if you need an order.', __METHOD__, __CLASS__);
+        }
+
         if (\is_array($orderBy)) {
             $wrappedParams = (new \ReflectionClass($this->repository))->getMethod('findOneBy')->getParameters();
 

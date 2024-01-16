@@ -64,6 +64,7 @@ final class ORMRepositoryDecoratorTest extends RepositoryDecoratorTest
 
     /**
      * @test
+     * @group legacy
      */
     public function proxy_wrapping_orm_entity_manager_can_order_by_in_find_one_by(): void
     {

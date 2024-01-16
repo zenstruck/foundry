@@ -22,6 +22,7 @@ final class RepositoryDecoratorTest extends TestCase
 {
     /**
      * @test
+     * @group legacy
      * @dataProvider objectRepositoryWithoutFindOneByOrderBy
      */
     public function calling_find_one_by_with_order_by_when_wrapped_repo_does_not_have_throws_exception(ObjectRepository $inner): void
