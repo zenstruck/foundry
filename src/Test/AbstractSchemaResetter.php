@@ -26,7 +26,7 @@ abstract class AbstractSchemaResetter
     {
         $exit = $application->run(
             new ArrayInput(\array_merge(['command' => $command], $parameters)),
-            $output = new BufferedOutput()
+            $output = new BufferedOutput(),
         );
 
         if (0 !== $exit && !$canFail) {

@@ -57,7 +57,7 @@ final class MakeStoryTest extends MakerTestCase
             }
 
             EOF
-            , \file_get_contents(self::tempFile('src/Story/FooBarStory.php'))
+            , \file_get_contents(self::tempFile('src/Story/FooBarStory.php')),
         );
     }
 
@@ -103,7 +103,7 @@ final class MakeStoryTest extends MakerTestCase
             }
 
             EOF
-            , \file_get_contents(self::tempFile('src/Story/FooBarStory.php'))
+            , \file_get_contents(self::tempFile('src/Story/FooBarStory.php')),
         );
     }
 
@@ -145,7 +145,7 @@ final class MakeStoryTest extends MakerTestCase
             }
 
             EOF
-            , \file_get_contents(self::tempFile('tests/Story/FooBarStory.php'))
+            , \file_get_contents(self::tempFile('tests/Story/FooBarStory.php')),
         );
     }
 
@@ -191,7 +191,7 @@ final class MakeStoryTest extends MakerTestCase
             }
 
             EOF
-            , \file_get_contents(self::tempFile('tests/Story/FooBarStory.php'))
+            , \file_get_contents(self::tempFile('tests/Story/FooBarStory.php')),
         );
     }
 

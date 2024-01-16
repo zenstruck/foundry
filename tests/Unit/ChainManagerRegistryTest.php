@@ -32,7 +32,7 @@ final class ChainManagerRegistryTest extends TestCase
         $managerRegistry2 = $this->createMock(ManagerRegistry::class);
 
         $managerRegistry2->expects($this->once())->method('getRepository')->willReturn(
-            $repository = $this->createMock(ObjectRepository::class)
+            $repository = $this->createMock(ObjectRepository::class),
         );
 
         $chainManagerRegistry = new ChainManagerRegistry([$managerRegistry1, $managerRegistry2]);
@@ -69,7 +69,7 @@ final class ChainManagerRegistryTest extends TestCase
         $managerRegistry2 = $this->createMock(ManagerRegistry::class);
 
         $managerRegistry2->expects($this->once())->method('getManagerForClass')->willReturn(
-            $objectManager = $this->createMock(ObjectManager::class)
+            $objectManager = $this->createMock(ObjectManager::class),
         );
 
         $chainManagerRegistry = new ChainManagerRegistry([$managerRegistry1, $managerRegistry2]);
@@ -99,21 +99,21 @@ final class ChainManagerRegistryTest extends TestCase
         $managerRegistry2 = $this->createMock(ManagerRegistry::class);
 
         $managerRegistry1->expects($this->once())->method('getManagers')->willReturn(
-            [$objectManager1 = $this->createMock(ObjectManager::class)]
+            [$objectManager1 = $this->createMock(ObjectManager::class)],
         );
 
         $managerRegistry2->expects($this->once())->method('getManagers')->willReturn(
             [
                 $objectManager2 = $this->createMock(ObjectManager::class),
                 $objectManager3 = $this->createMock(ObjectManager::class),
-            ]
+            ],
         );
 
         $chainManagerRegistry = new ChainManagerRegistry([$managerRegistry1, $managerRegistry2]);
 
         $this->assertSame(
             [$objectManager1, $objectManager2, $objectManager3],
-            $chainManagerRegistry->getManagers()
+            $chainManagerRegistry->getManagers(),
         );
     }
 }

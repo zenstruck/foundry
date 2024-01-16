@@ -99,9 +99,9 @@ class Kernel extends BaseKernel
                         $this->defaultMakeFactoryNamespace,
                         $this->withMigrations(),
                     ],
-                    \JSON_THROW_ON_ERROR
-                )
-            )
+                    \JSON_THROW_ON_ERROR,
+                ),
+            ),
         );
     }
 
@@ -160,7 +160,7 @@ class Kernel extends BaseKernel
                         'auto_mapping' => true,
                         'mappings' => $mappings,
                     ],
-                ]
+                ],
             );
         }
 

@@ -42,7 +42,7 @@ final class Proxy implements \Stringable
      */
     public function __construct(
         /** @param TProxiedObject $object */
-        private object $object
+        private object $object,
     ) {
         $this->class = $object::class;
         $this->autoRefresh = Factory::configuration()->defaultProxyAutoRefresh();
@@ -277,9 +277,9 @@ final class Proxy implements \Stringable
             Parameter::union(
                 Parameter::untyped($this),
                 Parameter::typed(self::class, $this),
-                Parameter::typed($this->class, Parameter::factory(fn(): object => $this->object()))
+                Parameter::typed($this->class, Parameter::factory(fn(): object => $this->object())),
             )->optional(),
-            ...$arguments
+            ...$arguments,
         );
     }
 

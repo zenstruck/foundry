@@ -81,7 +81,7 @@ final class ORMRepositoryProxyTest extends RepositoryProxyTest
     {
         self::assertSame(
             [['id' => 1]],
-            PostFactory::repository()->returnNestedArray()
+            PostFactory::repository()->returnNestedArray(),
         );
     }
 

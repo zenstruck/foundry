@@ -18,7 +18,7 @@ final class Address
 {
     public function __construct(
         #[ORM\Column(type: 'string', nullable: true)]
-        private string $value
+        private string $value,
     ) {
     }
 

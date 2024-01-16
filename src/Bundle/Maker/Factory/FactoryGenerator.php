@@ -69,8 +69,8 @@ final class FactoryGenerator
                     \sprintf(
                         'Class "%s" already exists. Chose another one please (it will be generated in namespace "%s")',
                         Str::getShortClassName($factoryClass),
-                        Str::getNamespace($factoryClass)
-                    )
+                        Str::getNamespace($factoryClass),
+                    ),
                 );
 
                 $question->setValidator(
@@ -81,7 +81,7 @@ final class FactoryGenerator
                         }
 
                         return $newFactoryClass;
-                    }
+                    },
                 );
                 $factoryClass = $io->askQuestion($question);
 
@@ -100,7 +100,7 @@ final class FactoryGenerator
             __DIR__.'/../../Resources/skeleton/Factory.tpl.php',
             [
                 'makeFactoryData' => $makeFactoryData,
-            ]
+            ],
         );
 
         return $factoryClass;
@@ -114,7 +114,7 @@ final class FactoryGenerator
         $factory = $generator->createClassNameDetails(
             $object->getShortName(),
             ($this->namespaceGuesser)($generator, $class, $makeFactoryQuery->getNamespace(), $makeFactoryQuery->isTest()),
-            'Factory'
+            'Factory',
         );
 
         if ($persisted = $makeFactoryQuery->isPersisted()) {
@@ -137,7 +137,7 @@ final class FactoryGenerator
             $factory,
             $repository ?? null,
             $this->staticAnalysisTool(),
-            $persisted
+            $persisted,
         );
     }
 

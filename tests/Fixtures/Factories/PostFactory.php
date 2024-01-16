@@ -42,7 +42,7 @@ class PostFactory extends ModelFactory
     {
         return $this
             ->instantiateWith(
-                (new Instantiator())->allowExtraAttributes(['extraCategoryBeforeInstantiate', 'extraCategoryAfterInstantiate'])
+                (new Instantiator())->allowExtraAttributes(['extraCategoryBeforeInstantiate', 'extraCategoryAfterInstantiate']),
             )
             ->beforeInstantiate(function(array $attributes): array {
                 if (isset($attributes['extraCategoryBeforeInstantiate'])) {

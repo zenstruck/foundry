@@ -34,7 +34,7 @@ final class CategoryFactory extends ModelFactory
     {
         return $this
             ->instantiateWith(
-                (new Instantiator())->allowExtraAttributes(['extraPostsBeforeInstantiate', 'extraPostsAfterInstantiate'])
+                (new Instantiator())->allowExtraAttributes(['extraPostsBeforeInstantiate', 'extraPostsAfterInstantiate']),
             )
             ->beforeInstantiate(function(array $attributes): array {
                 if (isset($attributes['extraPostsBeforeInstantiate'])) {

@@ -40,7 +40,7 @@ final class MakeFactory extends AbstractMaker
         private FactoryGenerator $factoryGenerator,
         private NoPersistenceObjectsAutoCompleter $noPersistenceObjectsAutoCompleter,
         private FactoryCandidatesClassesExtractor $factoryCandidatesClassesExtractor,
-        private string $defaultNamespace
+        private string $defaultNamespace,
     ) {
     }
 
@@ -105,7 +105,7 @@ final class MakeFactory extends AbstractMaker
                     }
 
                     return $class;
-                }
+                },
             );
             $question->setAutocompleterValues($this->noPersistenceObjectsAutoCompleter->getAutocompleteValues());
             $class = $io->askQuestion($question);

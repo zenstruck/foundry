@@ -110,7 +110,7 @@ final class MakeFactoryTest extends MakerTestCase
         $output = $tester->getDisplay();
         $this->assertStringContainsString(
             'A factory for class "Zenstruck\Foundry\Tests\Fixtures\Entity\User" is missing for field Comment::$user. Do you want to create it?',
-            $output
+            $output,
         );
 
         $this->assertFileDoesNotExist(self::tempFile('src/Factory/UserFactory.php'));
@@ -570,7 +570,7 @@ final class MakeFactoryTest extends MakerTestCase
         return Kernel::create(
             enableDoctrine: $options['enableDoctrine'] ?? true,
             factoriesRegistered: $options['factoriesRegistered'] ?? [],
-            defaultMakeFactoryNamespace: $options['defaultMakeFactoryNamespace'] ?? null
+            defaultMakeFactoryNamespace: $options['defaultMakeFactoryNamespace'] ?? null,
         );
     }
 
@@ -584,8 +584,8 @@ final class MakeFactoryTest extends MakerTestCase
     {
         return new CommandTester(
             (new Application(
-                self::bootKernel($factoriesRegistered)
-            ))->find('make:factory')
+                self::bootKernel($factoriesRegistered),
+            ))->find('make:factory'),
         );
     }
 }

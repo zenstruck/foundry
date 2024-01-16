@@ -28,7 +28,7 @@ abstract class AbstractDefaultPropertyGuesser implements DefaultPropertiesGuesse
     {
         if (!$factoryClass = $this->factoryClassMap->getFactoryForClass($fieldClass)) {
             if ($makeFactoryQuery->generateAllFactories() || $io->confirm(
-                "A factory for class \"{$fieldClass}\" is missing for field {$makeFactoryData->getObjectShortName()}::\${$fieldName}. Do you want to create it?"
+                "A factory for class \"{$fieldClass}\" is missing for field {$makeFactoryData->getObjectShortName()}::\${$fieldName}. Do you want to create it?",
             )) {
                 $factoryClass = $this->factoryGenerator->generateFactory($io, $makeFactoryQuery->withClass($fieldClass));
             } else {

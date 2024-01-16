@@ -302,7 +302,7 @@ final class ORMModelFactoryTest extends ModelFactoryTest
         TagFactory::assert()->count(
             \getenv('USE_FOUNDRY_BUNDLE')
                 ? 5  // 3 created by this test and 2 in global state
-                : 3
+                : 3,
         );
         PostFactory::assert()->count(1);
     }
@@ -322,7 +322,7 @@ final class ORMModelFactoryTest extends ModelFactoryTest
         TagFactory::assert()->count(
             \getenv('USE_FOUNDRY_BUNDLE')
                 ? 8  // 6 created by this test and 2 in global state
-                : 6
+                : 6,
         );
         PostFactory::assert()->count(1);
     }
@@ -368,7 +368,7 @@ final class ORMModelFactoryTest extends ModelFactoryTest
         TagFactory::assert()->count(
             \getenv('USE_FOUNDRY_BUNDLE')
                 ? 3 // 1 created by this test and 2 in global state
-                : 1
+                : 1,
         );
         PostFactory::assert()->count(3);
     }
@@ -388,7 +388,7 @@ final class ORMModelFactoryTest extends ModelFactoryTest
         TagFactory::assert()->count(
             \getenv('USE_FOUNDRY_BUNDLE')
                 ? 3 // 1 created by this test and 2 in global state
-                : 1
+                : 1,
         );
         PostFactory::assert()->count(6);
     }
@@ -435,7 +435,7 @@ final class ORMModelFactoryTest extends ModelFactoryTest
         TagFactory::assert()->count(
             \getenv('USE_FOUNDRY_BUNDLE')
                 ? 8  // 6 created by this test and 2 in global state
-                : 6
+                : 6,
         );
         PostFactory::assert()->count(2);
     }
@@ -468,7 +468,7 @@ final class ORMModelFactoryTest extends ModelFactoryTest
         TagFactory::assert()->count(
             \getenv('USE_FOUNDRY_BUNDLE')
                 ? 2  // 2 created in global state
-                : 0
+                : 0,
         );
         PostFactory::assert()->empty();
     }

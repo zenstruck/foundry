@@ -40,7 +40,7 @@ final class ODMSchemaResetter extends AbstractSchemaResetter
                     'doctrine:mongodb:schema:drop',
                     [
                         '--dm' => $manager,
-                    ]
+                    ],
                 );
             } catch (\Exception) {
             }
@@ -50,7 +50,7 @@ final class ODMSchemaResetter extends AbstractSchemaResetter
                 'doctrine:mongodb:schema:create',
                 [
                     '--dm' => $manager,
-                ]
+                ],
             );
         }
     }

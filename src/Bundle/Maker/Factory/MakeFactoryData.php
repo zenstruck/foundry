@@ -130,7 +130,7 @@ final class MakeFactoryData
         $methodsInPHPDoc = $this->methodsInPHPDoc;
         \usort(
             $methodsInPHPDoc,
-            static fn(MakeFactoryPHPDocMethod $m1, MakeFactoryPHPDocMethod $m2) => $m1->sortValue() <=> $m2->sortValue()
+            static fn(MakeFactoryPHPDocMethod $m1, MakeFactoryPHPDocMethod $m2) => $m1->sortValue() <=> $m2->sortValue(),
         );
 
         return $methodsInPHPDoc;
@@ -151,7 +151,7 @@ final class MakeFactoryData
         $enumShortClassName = Str::getShortClassName($enumClass);
         $this->addDefaultProperty(
             $propertyName,
-            "self::faker()->randomElement({$enumShortClassName}::cases()),"
+            "self::faker()->randomElement({$enumShortClassName}::cases()),",
         );
     }
 }

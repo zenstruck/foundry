@@ -379,7 +379,7 @@ class Factory
         if (\is_array($value)) {
             return \array_map(
                 fn($value) => $this->normalizeAttribute($value, $name),
-                $value
+                $value,
             );
         }
 

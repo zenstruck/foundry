@@ -29,7 +29,7 @@ final class TestState
     /** @var callable|null */
     private static $instantiator;
 
-    private static ?\Faker\Generator $faker = null;
+    private static ?Faker\Generator $faker = null;
 
     private static ?bool $defaultProxyAutoRefresh = null;
 

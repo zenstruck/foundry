@@ -342,7 +342,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
             $isEmbedded = match ($metadataForAttribute::class) {
                 ORMClassMetadata::class => $metadataForAttribute->isEmbeddedClass,
                 ODMClassMetadata::class => $metadataForAttribute->isEmbeddedDocument,
-                default => throw new \LogicException(\sprintf('Metadata class %s is not supported.', $metadataForAttribute::class))
+                default => throw new \LogicException(\sprintf('Metadata class %s is not supported.', $metadataForAttribute::class)),
             };
 
             // it's a regular entity
@@ -444,7 +444,7 @@ final class RepositoryProxy implements ObjectRepository, \IteratorAggregate, \Co
     {
         return \array_map(
             static fn($value) => $value instanceof Proxy ? $value->object() : $value,
-            $criteria
+            $criteria,
         );
     }
 

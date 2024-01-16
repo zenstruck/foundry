@@ -139,7 +139,7 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
         return \in_array(
             $bundleName,
             \is_array($bundles = $container->getParameter('kernel.bundles')) ? $bundles : [],
-            true
+            true,
         );
     }
 }
