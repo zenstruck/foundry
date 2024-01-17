@@ -43,6 +43,7 @@ final class ProxyTest extends TestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_access_wrapped_objects_properties(): void
     {

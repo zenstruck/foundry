@@ -60,6 +60,15 @@ final class Proxy implements \Stringable, ProxyBase
             );
         }
 
+        if ((new \ReflectionClass($object::class))->isAnonymous()) {
+            trigger_deprecation(
+                'zenstruck\foundry', '1.37.0',
+                'Using a proxy factory with an anonymous class is deprecated and will throw an error in Foundry 2.0. Use "%s" instead.',
+                ObjectFactory::class,
+                $object::class,
+            );
+        }
+
         $this->class = $object::class;
         $this->autoRefresh = Factory::configuration()->defaultProxyAutoRefresh();
     }
