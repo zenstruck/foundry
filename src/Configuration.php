@@ -32,7 +32,7 @@ final class Configuration
 
     private ModelFactoryManager $factories;
 
-    private \Faker\Generator $faker;
+    private Faker\Generator $faker;
 
     /** @var callable */
     private $instantiator;
