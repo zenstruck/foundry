@@ -32,6 +32,11 @@ final class DatabaseResetter
         return self::$hasBeenReset;
     }
 
+    public static function isDAMADoctrineTestBundleAvailable(): bool
+    {
+        return \class_exists(StaticDriver::class);
+    }
+
     public static function isDAMADoctrineTestBundleEnabled(): bool
     {
         return \class_exists(StaticDriver::class) && StaticDriver::isKeepStaticConnections();

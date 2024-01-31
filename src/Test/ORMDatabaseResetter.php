@@ -46,6 +46,15 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
 
     public function resetDatabase(): void
     {
+        if (DatabaseResetter::isDAMADoctrineTestBundleAvailable() && $this->isResetUsingMigrations()) {
+            try{
+                $this->runCommand($this->application, 'doctrine:migrations:up-to-date', ['--fail-on-unregistered' => true]);
+                // not required as the database schema is already up-to-date
+                return;
+            }catch(\RuntimeException $e){
+            }
+        }
+
         $this->dropAndResetDatabase();
         $this->createSchema();
     }
