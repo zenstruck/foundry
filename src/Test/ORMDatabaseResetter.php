@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Test;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\Persistence\ManagerRegistry;
@@ -46,12 +47,14 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
 
     public function resetDatabase(): void
     {
-        if (DatabaseResetter::isDAMADoctrineTestBundleAvailable() && $this->isResetUsingMigrations()) {
+        if (DatabaseResetter::isDAMADoctrineTestBundleEnabled(true) && $this->isResetUsingMigrations()) {
             try{
                 $this->runCommand($this->application, 'doctrine:migrations:up-to-date', ['--fail-on-unregistered' => true]);
-                // not required as the database schema is already up-to-date
+                $this->truncateAllTables();
+
+                // not required as the database schema is already up-to-date and all tables were truncated
                 return;
-            }catch(\RuntimeException $e){
+            }catch(\Throwable $e){
             }
         }
 
@@ -179,5 +182,38 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
         }
 
         return self::RESET_MODE_MIGRATE === $this->resetMode;
+    }
+
+
+    private function truncateAllTables(): void {
+        foreach ($this->connectionsToReset() as $connectionName) {
+            /** @var Connection $connection */
+            $connection = $this->registry->getConnection($connectionName);
+            $databasePlatform = $connection->getDatabasePlatform();
+            $truncateStatement = $databasePlatform->getTruncateTableSQL("%s");
+
+            switch($databasePlatform->getName()){
+                case 'postgresql': $connection->executeStatement('SET CONSTRAINTS ALL DEFERRED;'); break;
+                case 'mysql': $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0;'); break;
+            }
+
+            $tables = $connection->getSchemaManager()->listTableNames();
+            $connection->beginTransaction();
+            foreach ($tables as $tableName)
+            {
+                if ($tableName === 'doctrine_migration_versions') {
+                    continue;
+                }
+                $connection->executeStatement(sprintf($truncateStatement, $tableName));
+            }
+            $connection->commit();
+
+            switch($databasePlatform->getName()){
+                case 'postgresql': $connection->executeStatement('SET CONSTRAINTS ALL IMMEDIATE;'); break;
+                case 'mysql': $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1;'); break;
+            }
+
+            unset($connection);
+        }
     }
 }
