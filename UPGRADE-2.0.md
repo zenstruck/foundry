@@ -96,6 +96,34 @@ return static function (RectorConfig $rectorConfig): void {
 };
 ```
 
+## Known BC breaks
+
+The following error cannot be covered by Rector rules nor by the deprecation layer.
+```
+RefreshObjectFailed: Cannot auto refresh "[Entity FQCN]" as there are unsaved changes.
+Be sure to call ->_save() or disable auto refreshing.
+```
+
+This is an auto-refresh problem, where the "proxified" object is being accessed after modification.
+You'll find some [documentation](https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#auto-refresh)
+about it.
+
+To mitigate this problem, you should either stop using a proxy object, or wrap the modifications in the method
+`->_withoutAutoRefresh()`.
+
+```diff
+$proxyPost = PostProxyFactory::createOne();
+- $proxyPost->setTitle();
+- $proxyPost->setBody(); // 💥
++$proxyPost->_withoutAutoRefresh(
++   function(Post $object) {
++       $proxyPost->setTitle();
++       $proxyPost->setBody();
++   }
++);
+```
+
+
 ## Deprecations list
 
 Here is the full list of modifications needed:
