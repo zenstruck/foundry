@@ -184,33 +184,47 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
         return self::RESET_MODE_MIGRATE === $this->resetMode;
     }
 
-
     private function truncateAllTables(): void {
         foreach ($this->connectionsToReset() as $connectionName) {
             /** @var Connection $connection */
             $connection = $this->registry->getConnection($connectionName);
-            $databasePlatform = $connection->getDatabasePlatform();
-            $truncateStatement = $databasePlatform->getTruncateTableSQL("%s");
+            $tables = $connection->getSchemaManager()->listTableNames();
 
-            switch($databasePlatform->getName()){
-                case 'postgresql': $connection->executeStatement('SET CONSTRAINTS ALL DEFERRED;'); break;
-                case 'mysql': $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0;'); break;
+            if(count($tables) === 0) {
+                continue;
             }
 
-            $tables = $connection->getSchemaManager()->listTableNames();
-            $connection->beginTransaction();
+            $databasePlatform = $connection->getDatabasePlatform()->getName();
+            $truncateStatement = match($databasePlatform) {
+                'postgresql' => 'TRUNCATE %s RESTART IDENTITY CASCADE;',
+                'mysql' => 'TRUNCATE %s;',
+                'sqlite' => 'DELETE FROM %s;',
+                // fallback to dropping and recreating schema
+                default => throw new \RuntimeException('Database platform not supported')
+            };
+
+            $statements = "";
             foreach ($tables as $tableName)
             {
                 if ($tableName === 'doctrine_migration_versions') {
                     continue;
                 }
-                $connection->executeStatement(sprintf($truncateStatement, $tableName));
+                $statements .= sprintf($truncateStatement, $tableName);
             }
-            $connection->commit();
 
-            switch($databasePlatform->getName()){
-                case 'postgresql': $connection->executeStatement('SET CONSTRAINTS ALL IMMEDIATE;'); break;
-                case 'mysql': $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1;'); break;
+            $disableForeignKeyChecks = match($databasePlatform) {
+                'mysql' => 'SET FOREIGN_KEY_CHECKS = 0; %s SET FOREIGN_KEY_CHECKS = 1;',
+                'sqlite' => 'PRAGMA foreign_keys = OFF; %s PRAGMA foreign_keys = ON;',
+                default => '%s',
+            };
+
+            try {
+                $connection->beginTransaction();
+                $connection->executeStatement(sprintf($disableForeignKeyChecks, $statements));
+                $connection->commit();
+            }catch(\Throwable $e) {
+                $connection->rollBack();
+                throw new \RuntimeException('Failed to reset database', 0, $e);
             }
 
             unset($connection);
