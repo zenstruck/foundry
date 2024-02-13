@@ -46,6 +46,7 @@ final class ModelFactoryTest extends TestCase
 
     /**
      * @test
+     * @group legacy
      */
     public function can_set_state_via_new(): void
     {
