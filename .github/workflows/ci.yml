@@ -92,6 +92,9 @@ jobs:
         env:
           SYMFONY_REQUIRE: ${{ matrix.symfony }}
 
+      - name: Install php cs fixer (needed for maker bundle)
+        run: composer bin php-cs-fixer install
+
       - name: Set up MySQL
         if: contains(matrix.database, 'mysql')
         run: sudo /etc/init.d/mysql start
