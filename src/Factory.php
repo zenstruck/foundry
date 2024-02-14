@@ -457,10 +457,12 @@ class Factory
             return null;
         }
 
+        $metaDataField = $relationshipMetadata['inversedBy'] ?? $relationshipMetadata['mappedBy'] ?? null;
+
         return [
             'cascade' => $relationshipMetadata['isCascadePersist'],
-            'inversedField' => $relationshipMetadata['inversedBy'] ?? $relationshipMetadata['mappedBy'] ?? null,
-            'inverseIsCollection' => $entityManager->getClassMetadata($relationshipMetadata['targetEntity'])->isCollectionValuedAssociation($relationshipMetadata['inversedBy'] ?? $relationshipMetadata['mappedBy']),
+            'inversedField' => $metaDataField,
+            'inverseIsCollection' => $metaDataField && $entityManager->getClassMetadata($relationshipMetadata['targetEntity'])->isCollectionValuedAssociation($metaDataField),
             'isOwningSide' => $relationshipMetadata['isOwningSide'],
         ];
     }
