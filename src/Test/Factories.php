@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Foundry\Test;
 
+use PHPUnit\Framework\Attributes\After;
+use PHPUnit\Framework\Attributes\Before;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\ChainManagerRegistry;
 use Zenstruck\Foundry\Exception\FoundryBootException;
@@ -27,6 +29,7 @@ trait Factories
      * @internal
      * @before
      */
+    #[Before]
     public static function _setUpFactories(): void
     {
         if (!\is_subclass_of(static::class, KernelTestCase::class)) {
@@ -57,6 +60,7 @@ trait Factories
      * @internal
      * @after
      */
+    #[After]
     public static function _tearDownFactories(): void
     {
         try {
