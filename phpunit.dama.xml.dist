@@ -1,34 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!-- https://phpunit.de/manual/current/en/appendixes.configuration.html -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
-         colors="true"
          bootstrap="tests/bootstrap.php"
+         colors="true"
          failOnRisky="true"
          failOnWarning="true"
 >
     <php>
-        <ini name="error_reporting" value="-1"/>
-        <env name="KERNEL_CLASS" value="Zenstruck\Foundry\Tests\Fixtures\Kernel"/>
+        <ini name="error_reporting" value="-1" />
+        <server name="KERNEL_CLASS" value="Zenstruck\Foundry\Tests\Fixture\TestKernel" />
+        <server name="SHELL_VERBOSITY" value="-1" />
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0&amp;max[direct]=0&amp;quiet[]=indirect&amp;quiet[]=other&amp;ignoreFile=./tests/baseline-ignore"/>
         <env name="USE_DAMA_DOCTRINE_TEST_BUNDLE" value="1"/>
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0&amp;max[direct]=0&amp;quiet[]=indirect&amp;quiet[]=other"/>
-        <env name="SHELL_VERBOSITY" value="0"/>
     </php>
+
+    <testsuites>
+        <testsuite name="zenstruck/foundry Test Suite">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
 
     <coverage>
         <include>
-            <directory>./src/</directory>
+            <directory>src</directory>
         </include>
-        <exclude>
-            <directory>./src/Bundle/Resources/</directory>
-        </exclude>
     </coverage>
 
-    <testsuites>
-        <testsuite name="Project Test Suite">
-            <directory>./tests/</directory>
-        </testsuite>
-    </testsuites>
+    <listeners>
+        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
+    </listeners>
 
     <extensions>
         <extension class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension"/>

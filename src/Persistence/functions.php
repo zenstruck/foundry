@@ -11,59 +11,32 @@
 
 namespace Zenstruck\Foundry\Persistence;
 
+use Doctrine\Persistence\ObjectRepository;
 use Zenstruck\Foundry\AnonymousFactoryGenerator;
 use Zenstruck\Foundry\Configuration;
-use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\Proxy as LegacyProxy;
 
 /**
- * @param class-string<TObject> $class
+ * @template T of object
  *
- * @return RepositoryDecorator<TObject>
- * @see Configuration::repositoryFor()
+ * @param class-string<T> $class
  *
- * @template TObject of object
+ * @return RepositoryDecorator<T,ObjectRepository<T>>
  */
 function repository(string $class): RepositoryDecorator
 {
-    return Factory::configuration()->repositoryFor($class, proxy: false);
+    return new RepositoryDecorator($class); // @phpstan-ignore-line
 }
 
 /**
- * @param class-string<TObject> $class
+ * @template T of object
  *
- * @return ProxyRepositoryDecorator<TObject>
- * @see Configuration::repositoryFor()
+ * @param class-string<T> $class
  *
- * @template TObject of object
+ * @return ProxyRepositoryDecorator<T,ObjectRepository<T>>
  */
 function proxy_repository(string $class): ProxyRepositoryDecorator
 {
-    return Factory::configuration()->repositoryFor($class, proxy: true);
-}
-
-/**
- * @return TObject
- *
- * @template TObject of object
- * @phpstan-param class-string<TObject> $class
- * @see Factory::create()
- */
-function persist(string $class, array|callable $attributes = []): object
-{
-    return persistent_factory($class)->create($attributes);
-}
-
-/**
- * @return Proxy<TObject>
- *
- * @template TObject of object
- * @phpstan-param class-string<TObject> $class
- * @see Factory::create()
- */
-function persist_proxy(string $class, array|callable $attributes = []): Proxy
-{
-    return proxy_factory($class)->create($attributes);
+    return new ProxyRepositoryDecorator($class); // @phpstan-ignore-line
 }
 
 /**
@@ -93,11 +66,22 @@ function persistent_factory(string $class, array|callable $attributes = []): Per
  */
 function proxy_factory(string $class, array|callable $attributes = []): PersistentProxyObjectFactory
 {
-    if ((new \ReflectionClass($class))->isFinal()) {
-        throw new \RuntimeException(\sprintf('Cannot create PersistentProxyObjectFactory for final class "%s". Pass parameter "$withProxy" to false instead, or unfinalize "%1$s" class.', $class));
-    }
-
     return AnonymousFactoryGenerator::create($class, PersistentProxyObjectFactory::class)::new($attributes);
+}
+
+/**
+ * Instantiate and "persist" the given class.
+ *
+ * @template T of object
+ *
+ * @param class-string<T>                                       $class
+ * @param array<string,mixed>|callable(int):array<string,mixed> $attributes
+ *
+ * @return T
+ */
+function persist(string $class, array|callable $attributes = []): object
+{
+    return persistent_factory($class, $attributes)->andPersist()->create();
 }
 
 /**
@@ -107,11 +91,61 @@ function proxy_factory(string $class, array|callable $attributes = []): Persiste
  *
  * @param T $object
  *
- * @return Proxy<T>
+ * @return T&Proxy<T>
  */
 function proxy(object $object): object
 {
-    return new LegacyProxy($object);
+    return ProxyGenerator::wrap($object);
+}
+
+/**
+ * Recursively unwrap all proxies.
+ *
+ * @template T
+ *
+ * @param T $what
+ *
+ * @return T
+ */
+function unproxy(mixed $what): mixed
+{
+    return ProxyGenerator::unwrap($what);
+}
+
+/**
+ * @template T of object
+ *
+ * @param T $object
+ *
+ * @return T
+ */
+function save(object $object): object
+{
+    return Configuration::instance()->persistence()->save($object);
+}
+
+/**
+ * @template T of object
+ *
+ * @param T $object
+ *
+ * @return T
+ */
+function refresh(object &$object): object
+{
+    return Configuration::instance()->persistence()->refresh($object);
+}
+
+/**
+ * @template T of object
+ *
+ * @param T $object
+ *
+ * @return T
+ */
+function delete(object $object): object
+{
+    return Configuration::instance()->persistence()->delete($object);
 }
 
 /**
@@ -119,7 +153,7 @@ function proxy(object $object): object
  */
 function flush_after(callable $callback): void
 {
-    Factory::configuration()->delayFlush($callback);
+    Configuration::instance()->persistence()->flushAfter($callback);
 }
 
 /**
@@ -127,7 +161,7 @@ function flush_after(callable $callback): void
  */
 function disable_persisting(): void
 {
-    Factory::configuration()->disablePersist();
+    Configuration::instance()->persistence()->disablePersisting();
 }
 
 /**
@@ -135,5 +169,5 @@ function disable_persisting(): void
  */
 function enable_persisting(): void
 {
-    Factory::configuration()->enablePersist();
+    Configuration::instance()->persistence()->enablePersisting();
 }

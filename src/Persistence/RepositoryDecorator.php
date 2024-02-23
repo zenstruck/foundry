@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the zenstruck/foundry package.
  *
@@ -13,70 +11,42 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Persistence;
 
-use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
-use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
-use Doctrine\Persistence\Mapping\MappingException;
-use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
 
 /**
- * @mixin EntityRepository<TObject>
- * @template TObject of object
- *
  * @author Kevin Bond <kevinbond@gmail.com>
  *
+ * @template T of object
+ * @template I of ObjectRepository
+ * @implements I<T>
+ * @implements \IteratorAggregate<array-key, T>
+ * @mixin I
+ *
  * @final
+ *
+ * @phpstan-import-type Parameters from Factory
  */
 class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Countable
 {
     /**
-     * @param ObjectRepository<TObject> $repository
+     * @internal
+     *
+     * @param class-string<T> $class
      */
-    public function __construct(private ObjectRepository $repository)
+    public function __construct(private string $class)
     {
     }
 
     /**
-     * @return list<TObject>|TObject
+     * @param mixed[] $arguments
      */
-    public function __call(string $method, array $arguments)
+    public function __call(string $name, array $arguments): mixed
     {
-        return $this->repository->{$method}(...$arguments);
-    }
-
-    /**
-     * @return ObjectRepository<TObject>
-     */
-    public function inner(): ObjectRepository
-    {
-        return $this->repository;
-    }
-
-    public function count(array $criteria = []): int
-    {
-        if ($this->repository instanceof EntityRepository) {
-            // use query to avoid loading all entities
-            return $this->repository->count($criteria);
-        }
-
-        return \count($this->findBy($criteria));
-    }
-
-    public function getIterator(): \Traversable
-    {
-        // TODO: $this->repository is set to ObjectRepository, which is not
-        //       iterable. Can this every be another RepositoryDecorator?
-        if (\is_iterable($this->repository)) {
-            return yield from $this->repository;
-        }
-
-        yield from $this->findAll();
+        return $this->inner()->{$name}(...$arguments);
     }
 
     public function assert(): RepositoryAssertions
@@ -85,15 +55,23 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
     }
 
     /**
-     * @return TObject|null
+     * @return T|null
      */
-    public function first(string $sortedField = 'id'): ?object
+    public function first(string $sortBy = 'id'): ?object
     {
-        return $this->findBy([], [$sortedField => 'ASC'], 1)[0] ?? null;
+        return $this->findBy([], [$sortBy => 'ASC'], 1)[0] ?? null;
     }
 
     /**
-     * @return TObject|null
+     * @return T
+     */
+    public function firstOrFail(string $sortBy = 'id'): object
+    {
+        return $this->first($sortBy) ?? throw new \RuntimeException(\sprintf('No "%s" objects persisted.', $this->class));
+    }
+
+    /**
+     * @return T|null
      */
     public function last(string $sortedField = 'id'): ?object
     {
@@ -101,71 +79,118 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
     }
 
     /**
-     * Remove all rows.
+     * @return T
      */
+    public function lastOrFail(string $sortBy = 'id'): object
+    {
+        return $this->last($sortBy) ?? throw new \RuntimeException(\sprintf('No "%s" objects persisted.', $this->class));
+    }
+
+    /**
+     * @return T|null
+     */
+    public function find($id): ?object
+    {
+        if (\is_array($id) && (empty($id) || !\array_is_list($id))) {
+            return $this->findOneBy($id);
+        }
+
+        return $this->inner()->find(unproxy($id));
+    }
+
+    /**
+     * @return T
+     */
+    public function findOrFail(mixed $id): object
+    {
+        return $this->find($id) ?? throw new \RuntimeException(\sprintf('No "%s" object found for "%s".', $this->class, \get_debug_type($id)));
+    }
+
+    /**
+     * @return T[]
+     */
+    public function findAll(): array
+    {
+        return $this->inner()->findAll();
+    }
+
+    /**
+     * @param ?int $limit
+     * @param ?int $offset
+     *
+     * @return T[]
+     */
+    public function findBy(array $criteria, ?array $orderBy = null, $limit = null, $offset = null): array
+    {
+        return $this->inner()->findBy($this->normalize($criteria), $orderBy, $limit, $offset);
+    }
+
+    /**
+     * @return T|null
+     */
+    public function findOneBy(array $criteria): ?object
+    {
+        return $this->inner()->findOneBy($this->normalize($criteria));
+    }
+
+    public function getClassName(): string
+    {
+        return $this->class;
+    }
+
+    /**
+     * @param Parameters $criteria
+     */
+    public function count(array $criteria = []): int
+    {
+        $inner = $this->inner();
+
+        if ($inner instanceof EntityRepository) {
+            // use query to avoid loading all entities
+            return $inner->count($this->normalize($criteria));
+        }
+
+        return \count($this->findBy($criteria));
+    }
+
     public function truncate(): void
     {
-        $om = $this->getObjectManager();
-
-        if ($om instanceof EntityManagerInterface) {
-            $om->createQuery("DELETE {$this->getClassName()} e")->execute();
-
-            return;
-        }
-
-        if ($om instanceof DocumentManager) {
-            $om->getDocumentCollection($this->getClassName())->deleteMany([]);
-        }
+        Configuration::instance()->persistence()->truncate($this->class);
     }
 
     /**
-     * Fetch one random object.
+     * @param Parameters $criteria
      *
-     * @param array $attributes The findBy criteria
-     *
-     * @return TObject
-     *
-     * @throws \RuntimeException if no objects are persisted
+     * @return T
      */
-    public function random(array $attributes = []): object
+    public function random(array $criteria = []): object
     {
-        return $this->randomSet(1, $attributes)[0];
+        return $this->randomSet(1, $criteria)[0];
     }
 
     /**
-     * Fetch a random set of objects.
+     * @param positive-int $count
+     * @param Parameters   $criteria
      *
-     * @param int   $number     The number of objects to return
-     * @param array $attributes The findBy criteria
-     *
-     * @return list<TObject>
-     *
-     * @throws \RuntimeException         if not enough persisted objects to satisfy the number requested
-     * @throws \InvalidArgumentException if number is less than zero
+     * @return T[]
      */
-    public function randomSet(int $number, array $attributes = []): array
+    public function randomSet(int $count, array $criteria = []): array
     {
-        if ($number < 0) {
-            throw new \InvalidArgumentException(\sprintf('$number must be positive (%d given).', $number));
+        if ($count < 1) {
+            throw new \InvalidArgumentException(\sprintf('$number must be positive (%d given).', $count));
         }
 
-        return $this->randomRange($number, $number, $attributes);
+        return $this->randomRange($count, $count, $criteria);
     }
 
     /**
-     * Fetch a random range of objects.
+     * @param int<0, max> $min
+     * @param int<0, max> $max
+     * @param Parameters   $criteria
      *
-     * @param int   $min        The minimum number of objects to return
-     * @param int   $max        The maximum number of objects to return
-     * @param array $attributes The findBy criteria
-     *
-     * @return list<TObject>
-     *
-     * @throws \RuntimeException         if not enough persisted objects to satisfy the max
-     * @throws \InvalidArgumentException if min is less than zero
-     * @throws \InvalidArgumentException if max is less than min
+     * @return T[]
      */
-    public function randomRange(int $min, int $max, array $attributes = []): array
+    public function randomRange(int $min, int $max, array $criteria = []): array
     {
         if ($min < 0) {
             throw new \InvalidArgumentException(\sprintf('$min must be positive (%d given).', $min));
@@ -175,154 +200,66 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
             throw new \InvalidArgumentException(\sprintf('$max (%d) cannot be less than $min (%d).', $max, $min));
         }
 
-        $all = \array_values($this->findBy($attributes));
+        $all = \array_values($this->findBy($criteria));
 
         \shuffle($all);
 
         if (\count($all) < $max) {
-            throw new \RuntimeException(\sprintf('At least %d "%s" object(s) must have been persisted (%d persisted).', $max, $this->getClassName(), \count($all)));
+            throw new NotEnoughObjects(\sprintf('At least %d "%s" object(s) must have been persisted (%d persisted).', $max, $this->getClassName(), \count($all)));
         }
 
         return \array_slice($all, 0, \random_int($min, $max)); // @phpstan-ignore-line
     }
 
     /**
-     * @param object|array|mixed $criteria
-     *
-     * @return TObject|null
-     *
-     * @phpstan-param TObject|array|mixed $criteria
-     * @phpstan-return TObject|null
+     * @return ObjectRepository<T>
      */
-    public function find($criteria)
+    private function inner(): ObjectRepository
     {
-        if ($criteria instanceof Proxy) {
-            $criteria = $criteria->_real();
-        }
+        return Configuration::instance()->persistence()->repositoryFor($this->class);
+    }
 
-        if (!\is_array($criteria)) {
-            /** @var TObject|null $result */
-            $result = $this->repository->find($criteria);
+    /**
+     * @param Parameters $criteria
+     *
+     * @return Parameters
+     */
+    private function normalize(array $criteria): array
+    {
+        $normalized = [];
 
-            return $result;
-        }
+        foreach ($criteria as $key => $value) {
+            if ($value instanceof Factory) {
+                // create factories
+                $value = $value instanceof PersistentObjectFactory ? $value->withoutPersisting()->create() : $value->create();
+            }
 
-        $normalizedCriteria = [];
-        $propertyAccessor = PropertyAccess::createPropertyAccessor();
-        foreach ($criteria as $attributeName => $attributeValue) {
-            if (!\is_object($attributeValue)) {
-                $normalizedCriteria[$attributeName] = $attributeValue;
+            if ($value instanceof Proxy) {
+                // unwrap proxies
+                $value = $value->_real();
+            }
+
+            if (!\is_object($value) || null === $embeddableProps = Configuration::instance()->persistence()->embeddablePropertiesFor($value, $this->getClassName())) {
+                $normalized[$key] = $value;
 
                 continue;
             }
 
-            if ($attributeValue instanceof Factory) {
-                $attributeValue = $attributeValue->withoutPersisting()->createAndUproxify();
-            } elseif ($attributeValue instanceof Proxy) {
-                $attributeValue = $attributeValue->_real();
-            }
-
-            try {
-                $metadataForAttribute = $this->getObjectManager()->getClassMetadata($attributeValue::class);
-            } catch (MappingException|ORMMappingException) {
-                $normalizedCriteria[$attributeName] = $attributeValue;
-
-                continue;
-            }
-
-            $isEmbedded = match ($metadataForAttribute::class) {
-                ORMClassMetadata::class => $metadataForAttribute->isEmbeddedClass,
-                ODMClassMetadata::class => $metadataForAttribute->isEmbeddedDocument,
-                default => throw new \LogicException(\sprintf('Metadata class %s is not supported.', $metadataForAttribute::class)),
-            };
-
-            // it's a regular entity
-            if (!$isEmbedded) {
-                $normalizedCriteria[$attributeName] = $attributeValue;
-
-                continue;
-            }
-
-            foreach ($metadataForAttribute->getFieldNames() as $field) {
-                $embeddableFieldValue = $propertyAccessor->getValue($attributeValue, $field);
-                if (\is_object($embeddableFieldValue)) {
-                    throw new \InvalidArgumentException('Nested embeddable objects are still not supported in "find()" method.');
-                }
-
-                $normalizedCriteria["{$attributeName}.{$field}"] = $embeddableFieldValue;
+            // expand embeddables
+            foreach ($embeddableProps as $subKey => $subValue) {
+                $normalized["{$key}.{$subKey}"] = $subValue;
             }
         }
 
-        return $this->findOneBy($normalizedCriteria);
+        return $normalized;
     }
 
-    /**
-     * @return list<TObject>
-     */
-    public function findAll(): array
+    public function getIterator(): \Traversable
     {
-        return $this->repository->findAll();
-    }
-
-    /**
-     * @param int|null $limit
-     * @param int|null $offset
-     *
-     * @return list<TObject>
-     */
-    public function findBy(array $criteria, ?array $orderBy = null, $limit = null, $offset = null): array
-    {
-        return $this->repository->findBy(self::normalizeCriteria($criteria), $orderBy, $limit, $offset);
-    }
-
-    /**
-     * @param array|null $orderBy Some ObjectRepository's (ie Doctrine\ORM\EntityRepository) add this optional parameter
-     *
-     * @return TObject|null
-     *
-     * @throws \RuntimeException if the wrapped ObjectRepository does not have the $orderBy parameter
-     */
-    public function findOneBy(array $criteria, ?array $orderBy = null): ?object
-    {
-        if (null !== $orderBy) {
-            trigger_deprecation('zenstruck\foundry', '1.38.0', 'Argument "$orderBy" of method "%s()" is deprecated and will be removed in Foundry 2.0. Use "%s::findBy()" instead if you need an order.', __METHOD__, __CLASS__);
+        if (\is_iterable($this->inner())) {
+            return yield from $this->inner();
         }
 
-        if (\is_array($orderBy)) {
-            $wrappedParams = (new \ReflectionClass($this->repository))->getMethod('findOneBy')->getParameters();
-
-            if (!isset($wrappedParams[1]) || 'orderBy' !== $wrappedParams[1]->getName() || !($type = $wrappedParams[1]->getType()) instanceof \ReflectionNamedType || 'array' !== $type->getName()) {
-                throw new \RuntimeException(\sprintf('Wrapped repository\'s (%s) findOneBy method does not have an $orderBy parameter.', $this->repository::class));
-            }
-        }
-
-        /** @var TObject|null $result */
-        $result = $this->repository->findOneBy(self::normalizeCriteria($criteria), $orderBy); // @phpstan-ignore-line
-        if (null === $result) {
-            return null;
-        }
-
-        return $result;
-    }
-
-    /**
-     * @return class-string<TObject>
-     */
-    public function getClassName(): string
-    {
-        return $this->repository->getClassName();
-    }
-
-    private static function normalizeCriteria(array $criteria): array
-    {
-        return \array_map(
-            static fn($value) => $value instanceof Proxy ? $value->_real() : $value,
-            $criteria,
-        );
-    }
-
-    private function getObjectManager(): ObjectManager
-    {
-        return Factory::configuration()->objectManagerFor($this->getClassName());
+        yield from $this->findAll();
     }
 }

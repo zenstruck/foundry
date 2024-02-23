@@ -8,49 +8,63 @@ on:
 
 jobs:
   tests:
-    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.use-dama == 1 && contains(matrix.database, 'sql') && ' (dama)' || '' }}
+    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.use-dama == 1 && contains(matrix.database, 'sql') && ' (dama)' || '' }}${{ !contains(matrix.database, 'sql') && '' || matrix.use-migrate == 1 && ' (migrate)' || ' (schema)' }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        php: [ 8.1, 8.2 ]
+        php: [ 8.1, 8.2, 8.3 ]
         deps: [ highest ]
         symfony: [ 6.4.*, 7.0.* ]
         database: [ mysql, mongo ]
         use-dama: [ 1 ]
+        use-migrate: [ 0 ]
         exclude:
           - php: 8.1
             symfony: 7.0.*
         include:
-          - php: 8.0
-            deps: lowest
-            symfony: '5.4.*'
-            database: mysql|mongo
-            use-dama: 1
-          - php: 8.2
+          - php: 8.3
             deps: highest
             symfony: '*'
             database: none
             use-dama: 1
-          - php: 8.2
+            use-migrate: 0
+          - php: 8.3
             deps: highest
             symfony: '*'
             database: mysql|mongo
             use-dama: 1
-          - php: 8.2
+            use-migrate: 0
+          - php: 8.3
             deps: highest
             symfony: '*'
             database: pgsql|mongo
             use-dama: 1
-          - php: 8.2
+            use-migrate: 0
+          - php: 8.3
             deps: highest
             symfony: '*'
             database: pgsql
             use-dama: 0
-          - php: 8.2
+            use-migrate: 0
+          - php: 8.3
             deps: highest
             symfony: '*'
             database: sqlite
             use-dama: 0
+            use-migrate: 0
+          - php: 8.3
+            deps: lowest
+            symfony: '*'
+            database: mysql
+            use-dama: 1
+            use-migrate: 0
+          - php: 8.3
+            deps: highest
+            symfony: '*'
+            database: mysql
+            use-dama: 1
+            use-migrate: 1
     env:
       DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || contains(matrix.database, 'sqlite') && 'sqlite:///%kernel.project_dir%/var/data.db' || '' }}
       MONGO_URL: ${{ contains(matrix.database, 'mongo') && 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb' || '' }}
@@ -100,7 +114,7 @@ jobs:
         run: vendor/bin/phpunit -c "${PHPUNIT_CONFIG_FILE}"
         shell: bash
         env:
-          TEST_MIGRATIONS: 1
+          DATABASE_RESET_MODE: ${{ matrix.use-migrate == 1 && 'migrate' || 'schema' }}
           PHPUNIT_CONFIG_FILE: ${{ env.USE_DAMA_DOCTRINE_TEST_BUNDLE == 1 && 'phpunit.dama.xml.dist' || 'phpunit.xml.dist' }}
 
   code-coverage:
@@ -203,41 +217,12 @@ jobs:
       - name: Run static analysis
         run: bin/tools/phpstan/vendor/phpstan/phpstan/phpstan analyse
 
-# there are some problem with psalm and bc layer, around proxy
-#      - name: Install Psalm
-#        run: composer bin psalm install
-#
-#      - name: Run Psalm on factories generated with maker
-#        run: bin/tools/psalm/vendor/vimeo/psalm/psalm
-
-  test-rector-rules:
-    name: Test rector rules
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.3
-          coverage: none
-
-      - name: Install dependencies
-        uses: ramsey/composer-install@v2
-        with:
-          composer-options: --prefer-dist
-          working-directory: "./utils/rector"
-
-      - name: Test
-        run: vendor/bin/phpunit
-        shell: bash
-        working-directory: "./utils/rector"
-
-      - name: Static analysis
-        run: vendor/bin/phpstan
-        shell: bash
-        working-directory: "./utils/rector"
+  # there are some problem with psalm and bc layer, around proxy
+  #      - name: Install Psalm
+  #        run: composer bin psalm install
+  #
+  #      - name: Run Psalm on factories generated with maker
+  #        run: bin/tools/psalm/vendor/vimeo/psalm/psalm
 
   fixcs:
     name: Run php-cs-fixer

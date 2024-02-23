@@ -12,7 +12,11 @@
 namespace Zenstruck\Foundry\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
+
 use Zenstruck\Foundry\LazyValue;
+
+use function Zenstruck\Foundry\lazy;
+use function Zenstruck\Foundry\memoize;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -22,11 +26,21 @@ final class LazyValueTest extends TestCase
     /**
      * @test
      */
-    public function executes_factory(): void
+    public function lazy(): void
     {
-        $value = LazyValue::new(fn() => 'foo');
+        $value = lazy(fn() => new \stdClass());
 
-        $this->assertSame('foo', $value());
+        $this->assertNotSame($value(), $value());
+    }
+
+    /**
+     * @test
+     */
+    public function memoize(): void
+    {
+        $value = memoize(fn() => new \stdClass());
+
+        $this->assertSame($value(), $value());
     }
 
     /**
@@ -58,36 +72,5 @@ final class LazyValueTest extends TestCase
         });
 
         $this->assertSame([5, 'foo', 6, 'foo' => ['bar' => 7, 'baz' => 'foo'], [8, 'foo']], $value());
-    }
-
-    /**
-     * @test
-     * @group legacy
-     */
-    public function does_not_memoize_value_by_default(): void
-    {
-        $value = new LazyValue(fn() => new \stdClass());
-
-        $this->assertNotSame($value(), $value());
-    }
-
-    /**
-     * @test
-     */
-    public function does_not_memoize_value(): void
-    {
-        $value = LazyValue::new(fn() => new \stdClass());
-
-        $this->assertNotSame($value(), $value());
-    }
-
-    /**
-     * @test
-     */
-    public function can_handle_memoized_value(): void
-    {
-        $value = LazyValue::memoize(fn() => new \stdClass());
-
-        $this->assertSame($value(), $value());
     }
 }

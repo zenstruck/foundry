@@ -12,169 +12,62 @@
 namespace Zenstruck\Foundry;
 
 use Faker;
-use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
-use Zenstruck\Foundry\Proxy as ProxyObject;
+use Zenstruck\Foundry\Object\Hydrator;
 
-use function Zenstruck\Foundry\Persistence\persist_proxy;
-use function Zenstruck\Foundry\Persistence\persistent_factory;
-use function Zenstruck\Foundry\Persistence\proxy_factory;
-
-/**
- * @see Factory::__construct()
- *
- * @template TObject of object
- *
- * @param class-string<TObject> $class
- *
- * @deprecated
- *
- * @return AnonymousFactory<TObject>
- */
-function factory(string $class, array|callable $defaultAttributes = []): AnonymousFactory
+function faker(): Faker\Generator
 {
-    trigger_deprecation('zenstruck\foundry', '1.30', 'Usage of "factory()" function is deprecated and will be removed in 2.0. Use the "anonymous()" or "repository()" functions instead.');
-
-    return new AnonymousFactory($class, $defaultAttributes);
+    return Configuration::instance()->faker;
 }
 
 /**
- * @see Factory::__construct()
+ * Create an anonymous factory for the given class.
  *
- * @template TObject of object
+ * @template T of object
  *
- * @param class-string<TObject> $class
+ * @param class-string<T>                                       $class
+ * @param array<string,mixed>|callable(int):array<string,mixed> $attributes
  *
- * @return Factory<TObject>
+ * @return ObjectFactory<T>
  */
-function anonymous(string $class, array|callable $defaultAttributes = []): Factory
+function factory(string $class, array|callable $attributes = []): ObjectFactory
 {
-    trigger_deprecation('zenstruck\foundry', '1.37', 'Usage of "%s()" function is deprecated and will be removed in 2.0. Use the "Zenstruck\Foundry\Persistence\proxy_factory()" function instead.', __FUNCTION__);
-
-    return proxy_factory($class, $defaultAttributes);
-}
-
-/**
- * @see Factory::create()
- *
- * @return Proxy&TObject
- *
- * @template TObject of object
- * @phpstan-param class-string<TObject> $class
- * @phpstan-return Proxy<TObject>
- *
- * @deprecated
- */
-function create(string $class, array|callable $attributes = []): Proxy
-{
-    trigger_deprecation('zenstruck\foundry', '1.38.0', 'Function "%s()" is deprecated and will be removed in Foundry 2.0. Use "Zenstruck\Foundry\Persistence\persist_proxy()" instead.', __FUNCTION__);
-
-    return persist_proxy($class, $attributes);
-}
-
-/**
- * @see Factory::createMany()
- *
- * @return Proxy[]|object[]
- *
- * @template TObject of object
- * @phpstan-param class-string<TObject> $class
- * @phpstan-return list<Proxy<TObject>>
- *
- * @deprecated
- */
-function create_many(int $number, string $class, array|callable $attributes = []): array
-{
-    trigger_deprecation('zenstruck\foundry', '1.38.0', 'Function "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __FUNCTION__);
-
-    return proxy_factory($class)->many($number)->create($attributes);
-}
-
-/**
- * Instantiate object without persisting.
- *
- * @return Proxy&TObject "unpersisted" Proxy wrapping the instantiated object
- *
- * @template TObject of object
- * @phpstan-param class-string<TObject> $class
- * @phpstan-return Proxy<TObject>
- *
- * @deprecated
- */
-function instantiate(string $class, array|callable $attributes = []): Proxy
-{
-    trigger_deprecation('zenstruck\foundry', '1.38.0', 'Function "%s()" is deprecated and will be removed in Foundry 2.0. Use "%s::object()" instead.', __FUNCTION__, __NAMESPACE__);
-
-    return new ProxyObject(object($class, $attributes));
+    return AnonymousFactoryGenerator::create($class, ObjectFactory::class)::new($attributes);
 }
 
 /**
  * Instantiate the given class.
  *
- * @return TObject "unpersisted"
+ * @template T of object
  *
- * @template TObject of object
- * @phpstan-param class-string<TObject> $class
+ * @param class-string<T>                                       $class
+ * @param array<string,mixed>|callable(int):array<string,mixed> $attributes
+ *
+ * @return T
  */
 function object(string $class, array|callable $attributes = []): object
 {
-    return persistent_factory($class)->withoutPersisting()->create($attributes);
+    return factory($class, $attributes)->create();
 }
 
 /**
- * Instantiate X objects without persisting.
- *
- * @return Proxy[]|object[] "unpersisted" Proxy's wrapping the instantiated objects
- *
- * @template TObject of object
- * @phpstan-param class-string<TObject> $class
- * @phpstan-return list<Proxy<TObject>>
- *
- * @deprecated
+ * "Force set" (using reflection) an object property.
  */
-function instantiate_many(int $number, string $class, array|callable $attributes = []): array
+function set(object $object, string $property, mixed $value): void
 {
-    trigger_deprecation('zenstruck\foundry', '1.38.0', 'Function "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __FUNCTION__);
-
-    return proxy_factory($class)->withoutPersisting()->many($number)->create($attributes);
+    Hydrator::set($object, $property, $value);
 }
 
 /**
- * @see Configuration::repositoryFor()
- *
- * @template TObject of object
- *
- * @param TObject|class-string<TObject> $objectOrClass
- *
- * @return ProxyRepositoryDecorator<TObject>
- *
- * @deprecated
+ * "Force get" (using reflection) an object property.
  */
-function repository(object|string $objectOrClass): ProxyRepositoryDecorator
+function get(object $object, string $property): mixed
 {
-    trigger_deprecation('zenstruck\foundry', '1.38.0', 'Function "%s()" is deprecated and will be removed in Foundry 2.0. Use "Zenstruck\Foundry\Persistence\repository()" instead.', __FUNCTION__);
-
-    if (\is_object($objectOrClass)) {
-        trigger_deprecation('zenstruck\foundry', '1.38.0', 'Passing objects to "%s()" is deprecated and will be removed in Foundry 2.0. Pass directly class-string instead.', __FUNCTION__);
-
-        $objectOrClass = $objectOrClass::class;
-    }
-
-    return \Zenstruck\Foundry\Persistence\proxy_repository($objectOrClass);
+    return Hydrator::get($object, $property);
 }
 
 /**
- * @see Factory::faker()
- */
-function faker(): Faker\Generator
-{
-    return Factory::configuration()->faker();
-}
-
-/**
- * @see LazyValue
- *
- * @param callable():mixed $factory
+ * Create a "lazy" factory attribute which will only be evaluated
+ * if used.
  */
 function lazy(callable $factory): LazyValue
 {
@@ -182,9 +75,8 @@ function lazy(callable $factory): LazyValue
 }
 
 /**
- * @see LazyValue::memoize
- *
- * @param callable():mixed $factory
+ * Same as {@see lazy()} but subsequent evaluations will return the
+ * same value.
  */
 function memoize(callable $factory): LazyValue
 {

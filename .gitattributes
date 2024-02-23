@@ -8,7 +8,6 @@
 /.scrutinizer.yml               export-ignore
 /.symfony.bundle.yaml           export-ignore
 /bin                            export-ignore
-/config                         export-ignore
 /docker                         export-ignore
 /docker-compose.yaml            export-ignore
 /Makefile                       export-ignore

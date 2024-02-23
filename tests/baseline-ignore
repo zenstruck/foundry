@@ -1,0 +1,3 @@
+%Subscribing to postConnect events is deprecated.%
+%The "Zenstruck\\Foundry.*\(\)" method is considered final.%
+%The "Zenstruck\\Foundry\\Persistence\\RepositoryDecorator" class is considered final.%

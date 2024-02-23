@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the zenstruck/foundry package.
  *
@@ -13,142 +11,163 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Persistence;
 
-use Zenstruck\Foundry\Exception\FoundryBootException;
+use Doctrine\Persistence\ObjectRepository;
+use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\Exception\PersistenceDisabled;
+use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
+use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\ObjectFactory;
+use Zenstruck\Foundry\Persistence\Exception\NoPersistenceStrategy;
+use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
+use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
+use Symfony\Component\VarExporter\Exception\LogicException as VarExportLogicException;
 
 /**
- * @template TModel of object
- * @template-extends ObjectFactory<TModel>
- *
- * @method static TModel[] createMany(int $number, array|callable $attributes = [])
- * @phpstan-method static list<TModel> createMany(int $number, array|callable $attributes = [])
- *
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @template T of object
+ * @extends ObjectFactory<T>
+ *
+ * @phpstan-import-type Parameters from Factory
  */
 abstract class PersistentObjectFactory extends ObjectFactory
 {
+    private bool $persist;
+
+    /** @var list<callable(T):void> */
+    private array $afterPersist = [];
+
+    /** @var list<callable(T):void> */
+    private array $tempAfterPersist = [];
+
     /**
      * @final
      *
-     * Try and find existing object for the given $attributes. If not found,
-     * instantiate and persist.
+     * @param mixed|Parameters $criteriaOrId
      *
-     * @return TModel
+     * @return T
+     *
+     * @throws \RuntimeException If no object found
      */
-    public static function findOrCreate(array $attributes): object
+    public static function find(mixed $criteriaOrId): object
+    {
+        return static::repository()->findOrFail($criteriaOrId);
+    }
+
+    /**
+     * @final
+     *
+     * @param Parameters $criteria
+     *
+     * @return T
+     */
+    public static function findOrCreate(array $criteria): object
     {
         try {
-            if ($found = static::repository()->find($attributes)) {
-                return $found;
-            }
-        } catch (FoundryBootException) {
+            $object = static::repository()->findOneBy($criteria);
+        } catch (PersistenceNotAvailable|PersistenceDisabled) {
+            $object = null;
         }
 
-        return static::new()->create($attributes, noProxy: true);
+        return $object ?? static::createOne($criteria);
     }
 
     /**
      * @final
      *
-     * @see RepositoryDecorator::first()
+     * @param Parameters $criteria
      *
-     * @return TModel
-     *
-     * @throws \RuntimeException If no entities exist
+     * @return T
      */
-    public static function first(string $sortedField = 'id'): object
-    {
-        return static::repository()->first($sortedField) ?? throw new \RuntimeException(\sprintf('No "%s" objects persisted.', static::class()));
-    }
-
-    /**
-     * @final
-     *
-     * @see RepositoryDecorator::last()
-     *
-     * @return TModel
-     *
-     * @throws \RuntimeException If no entities exist
-     */
-    public static function last(string $sortedField = 'id'): object
-    {
-        return static::repository()->last($sortedField) ?? throw new \RuntimeException(\sprintf('No "%s" objects persisted.', static::class()));
-    }
-
-    /**
-     * @final
-     *
-     * @see RepositoryDecorator::random()
-     *
-     * @return TModel
-     */
-    public static function random(array $attributes = []): object
-    {
-        return static::repository()->random($attributes);
-    }
-
-    /**
-     * @final
-     *
-     * Fetch one random object and create a new object if none exists.
-     *
-     * @return TModel
-     */
-    public static function randomOrCreate(array $attributes = []): object
+    public static function randomOrCreate(array $criteria = []): object
     {
         try {
-            return static::repository()->random($attributes);
-        } catch (\RuntimeException) {
-            return static::new()->create($attributes, noProxy: true);
+            return static::repository()->random($criteria);
+        } catch (NotEnoughObjects|PersistenceNotAvailable|PersistenceDisabled) {
+            return static::createOne($criteria);
         }
     }
 
     /**
      * @final
      *
-     * @see RepositoryDecorator::randomSet()
+     * @param positive-int $count
+     * @param Parameters   $criteria
      *
-     * @return list<TModel>
+     * @return T[]
      */
-    public static function randomSet(int $number, array $attributes = []): array
+    public static function randomSet(int $count, array $criteria = []): array
     {
-        return static::repository()->randomSet($number, $attributes);
+        return static::repository()->randomSet($count, $criteria);
     }
 
     /**
      * @final
      *
-     * @see RepositoryDecorator::randomRange()
+     * @param int<0, max> $min
+     * @param int<0, max> $max
+     * @param Parameters   $criteria
      *
-     * @return list<TModel>
+     * @return T[]
      */
-    public static function randomRange(int $min, int $max, array $attributes = []): array
+    public static function randomRange(int $min, int $max, array $criteria = []): array
     {
-        return static::repository()->randomRange($min, $max, $attributes);
-    }
-
-    /**
-     * @see RepositoryDecorator::count()
-     */
-    final public static function count(array $criteria = []): int
-    {
-        return static::repository()->count($criteria);
-    }
-
-    /**
-     * @see RepositoryDecorator::truncate()
-     */
-    final public static function truncate(): void
-    {
-        static::repository()->truncate();
+        return static::repository()->randomRange($min, $max, $criteria);
     }
 
     /**
      * @final
      *
-     * @see RepositoryDecorator::findAll()
+     * @param Parameters $criteria
      *
-     * @return list<TModel>
+     * @return T[]
+     */
+    public static function findBy(array $criteria): array
+    {
+        return static::repository()->findBy($criteria);
+    }
+
+    /**
+     * @final
+     *
+     * @param Parameters $criteria
+     *
+     * @return T
+     */
+    public static function random(array $criteria = []): object
+    {
+        return static::repository()->random($criteria);
+    }
+
+    /**
+     * @final
+     *
+     * @return T
+     *
+     * @throws \RuntimeException If no objects exist
+     */
+    public static function first(string $sortBy = 'id'): object
+    {
+        return static::repository()->firstOrFail($sortBy);
+    }
+
+    /**
+     * @final
+     *
+     * @return T
+     *
+     * @throws \RuntimeException If no objects exist
+     */
+    public static function last(string $sortBy = 'id'): object
+    {
+        return static::repository()->lastOrFail($sortBy);
+    }
+
+    /**
+     * @final
+     *
+     * @return T[]
      */
     public static function all(): array
     {
@@ -158,47 +177,178 @@ abstract class PersistentObjectFactory extends ObjectFactory
     /**
      * @final
      *
-     * @see RepositoryDecorator::find()
-     *
-     * @phpstan-param TModel|array|mixed $criteria
-     *
-     * @return TModel
-     *
-     * @throws \RuntimeException If no entity found
+     * @return RepositoryDecorator<T,ObjectRepository<T>>
      */
-    public static function find($criteria): object
+    public static function repository(): ObjectRepository
     {
-        return static::repository()->find($criteria) ?? throw new \RuntimeException(\sprintf('Could not find "%s" object.', static::class()));
-    }
+        Configuration::instance()->assertPersistanceEnabled();
 
-    /**
-     * @final
-     *
-     * @see RepositoryDecorator::findBy()
-     *
-     * @return list<TModel>
-     */
-    public static function findBy(array $attributes): array
-    {
-        return static::repository()->findBy($attributes);
+        return new RepositoryDecorator(static::class()); // @phpstan-ignore-line
     }
 
     final public static function assert(): RepositoryAssertions
     {
-        try {
-            return static::repository()->assert();
-        } catch (\Throwable $e) {
-            throw new \RuntimeException(\sprintf('Cannot create repository assertion: %s', $e->getMessage()), previous: $e);
-        }
+        return static::repository()->assert();
     }
 
     /**
-     * @phpstan-return RepositoryDecorator<TModel>
-     *
-     * @final
+     * @param Parameters $criteria
      */
-    public static function repository(): RepositoryDecorator
+    final public static function count(array $criteria = []): int
     {
-        return static::configuration()->repositoryFor(static::class(), proxy: false);
+        return static::repository()->count($criteria);
+    }
+
+    final public static function truncate(): void
+    {
+        static::repository()->truncate();
+    }
+
+    final public function create(callable|array $attributes = []): object
+    {
+        $object = parent::create($attributes);
+
+        if (!$this->isPersisting()) {
+            return $this->proxy($object);
+        }
+
+        $configuration = Configuration::instance();
+
+        if (!$configuration->isPersistenceAvailable()) {
+            throw new \LogicException('Persistence cannot be used in unit tests.');
+        }
+
+        $configuration->persistence()->save($object);
+
+        foreach ($this->tempAfterPersist as $callback) {
+            $callback($object);
+        }
+
+        $this->tempAfterPersist = [];
+
+        foreach ($this->afterPersist as $callback) {
+            $callback($object);
+        }
+
+        if ($this->afterPersist) {
+            $configuration->persistence()->save($object);
+        }
+
+        return $this->proxy($object);
+    }
+
+    final public function andPersist(): static
+    {
+        $clone = clone $this;
+        $clone->persist = true;
+
+        return $clone;
+    }
+
+    final public function withoutPersisting(): static
+    {
+        $clone = clone $this;
+        $clone->persist = false;
+
+        return $clone;
+    }
+
+    /**
+     * @param callable(T):void $callback
+     */
+    final public function afterPersist(callable $callback): static
+    {
+        $clone = clone $this;
+        $clone->afterPersist[] = $callback;
+
+        return $clone;
+    }
+
+    protected function normalizeParameter(string $field, mixed $value): mixed
+    {
+        if (!Configuration::instance()->isPersistenceAvailable()) {
+            return unproxy(parent::normalizeParameter($field, $value));
+        }
+
+        if ($value instanceof self && isset($this->persist)) {
+            $value->persist = $this->persist; // todo - breaks immutability
+        }
+
+        if ($value instanceof self && Configuration::instance()->persistence()->relationshipMetadata(static::class(), $value::class(), $field)?->isCascadePersist) {
+            $value->persist = false;
+        }
+
+        return unproxy(parent::normalizeParameter($field, $value));
+    }
+
+    protected function normalizeCollection(string $field, FactoryCollection $collection): array
+    {
+        if (!$this->isPersisting() || !$collection->factory instanceof self) {
+            return parent::normalizeCollection($field, $collection);
+        }
+
+        $pm = Configuration::instance()->persistence();
+
+        if ($inverseField = $pm->relationshipMetadata($collection->factory::class(), static::class(), $field)?->inverseField) {
+            $this->tempAfterPersist[] = static function(object $object) use ($collection, $inverseField, $pm) {
+                $collection->create([$inverseField => $object]);
+                $pm->refresh($object);
+            };
+
+            // creation delegated to afterPersist hook - return empty array here
+            return [];
+        }
+
+        return parent::normalizeCollection($field, $collection);
+    }
+
+    /**
+     * @internal
+     */
+    protected function normalizeObject(object $object): object
+    {
+        $reflectionClass = new \ReflectionClass($object::class);
+
+        if ($reflectionClass->isFinal()) {
+            return $object;
+        }
+
+        // readonly classes exist since php 8.2 and proxyHelper supports them since 8.3
+        if (80200 <= \PHP_VERSION_ID && \PHP_VERSION_ID < 80300 && $reflectionClass->isReadonly()) { // @phpstan-ignore-line
+            return $object;
+        }
+
+        try {
+            return proxy($object)->_refresh()->_real();
+        } catch (PersistenceNotAvailable|RefreshObjectFailed|NoPersistenceStrategy|VarExportLogicException) {
+            return $object;
+        }
+    }
+
+    final protected function isPersisting(): bool
+    {
+        $config = Configuration::instance();
+
+        if ($config->isPersistenceAvailable() && !$config->persistence()->isEnabled()) {
+            return false;
+        }
+
+        return $this->persist ?? $config->isPersistenceAvailable() && $config->persistence()->isEnabled() && $config->persistence()->autoPersist(static::class());
+    }
+
+    /**
+     * @param T $object
+     *
+     * @return T
+     */
+    private function proxy(object $object): object
+    {
+        if (!$this instanceof PersistentProxyObjectFactory) {
+            return $object;
+        }
+
+        $object = proxy($object);
+
+        return $this->isPersisting() ? $object : $object->_disableAutoRefresh();
     }
 }

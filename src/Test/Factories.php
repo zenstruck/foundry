@@ -11,19 +11,10 @@
 
 namespace Zenstruck\Foundry\Test;
 
-use PHPUnit\Framework\Attributes\After;
-use PHPUnit\Framework\Attributes\Before;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\ChainManagerRegistry;
-use Zenstruck\Foundry\Exception\FoundryBootException;
-use Zenstruck\Foundry\Factory;
-
-use function Zenstruck\Foundry\Persistence\disable_persisting;
-use function Zenstruck\Foundry\Persistence\enable_persisting;
+use Zenstruck\Foundry\Configuration;
 
 /**
- * @mixin KernelTestCase
- *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 trait Factories
@@ -32,69 +23,32 @@ trait Factories
      * @internal
      * @before
      */
-    #[Before]
-    public static function _setUpFactories(): void
+    public static function _bootFoundry(): void
     {
-        if (!\is_subclass_of(static::class, KernelTestCase::class)) {
-            TestState::bootFoundryForUnitTest();
+        if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore-line
+            // unit test
+            Configuration::boot(UnitTestConfig::build());
 
             return;
         }
 
-        $kernel = static::createKernel();
-        $kernel->boot();
+        // integration test
+        // @phpstan-ignore-next-line
+        Configuration::boot(static function() {
+            if (!static::getContainer()->has('.zenstruck_foundry.configuration')) { // @phpstan-ignore-line
+                throw new \LogicException('ZenstruckFoundryBundle is not enabled. Ensure it is added to your config/bundles.php.');
+            }
 
-        TestState::bootFromContainer($kernel->getContainer());
-        Factory::configuration()->setManagerRegistry(
-            new LazyManagerRegistry(static function(): ChainManagerRegistry {
-                if (!static::$booted) {
-                    static::bootKernel();
-                }
-
-                return TestState::initializeChainManagerRegistry(static::$kernel->getContainer());
-            },
-            ),
-        );
-
-        $kernel->shutdown();
+            return static::getContainer()->get('.zenstruck_foundry.configuration'); // @phpstan-ignore-line
+        });
     }
 
     /**
      * @internal
      * @after
      */
-    #[After]
-    public static function _tearDownFactories(): void
+    public static function _shutdownFoundry(): void
     {
-        try {
-            $configuration = Factory::configuration();
-
-            if ($configuration->hasManagerRegistry()) {
-                $configuration->enablePersist();
-            }
-        } catch (FoundryBootException) {
-        }
-
-        TestState::shutdownFoundry();
-    }
-
-    /**
-     * @deprecated
-     */
-    public function disablePersist(): void
-    {
-        trigger_deprecation('zenstruck\foundry', '1.38.0', 'Method "%s()" is deprecated and will be removed in Foundry 2.0. Use "Zenstruck\Foundry\Persistence\disable_persisting()" instead.', __METHOD__);
-
-        disable_persisting();
-    }
-
-    /**
-     * @deprecated
-     */
-    public function enablePersist(): void
-    {
-        trigger_deprecation('zenstruck\foundry', '1.38.0', 'Method "%s()" is deprecated and will be removed in Foundry 2.0. Use "Zenstruck\Foundry\Persistence\enable_persisting()" instead.', __METHOD__);
-
-        enable_persisting();
+        Configuration::shutdown();
     }
 }

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the zenstruck/foundry package.
  *
@@ -14,12 +12,45 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Test;
 
 use Faker;
+use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\FactoryRegistry;
 use Zenstruck\Foundry\Object\Instantiator;
+use Zenstruck\Foundry\ObjectFactory;
+use Zenstruck\Foundry\StoryRegistry;
 
+/**
+ * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @phpstan-import-type InstantiatorCallable from ObjectFactory
+ */
 final class UnitTestConfig
 {
-    public static function configure(?Instantiator $instantiator = null, ?Faker\Generator $faker = null): void
+    /** @var InstantiatorCallable|null */
+    private static $instantiator;
+    private static ?Faker\Generator $faker = null;
+
+    /**
+     * @param InstantiatorCallable|null $instantiator
+     */
+    public static function configure(Instantiator|callable|null $instantiator = null, ?Faker\Generator $faker = null): void
     {
-        TestState::configureInternal($instantiator, $faker);
+        self::$instantiator = $instantiator;
+        self::$faker = $faker;
+    }
+
+    /**
+     * @internal
+     */
+    public static function build(): Configuration
+    {
+        $faker = self::$faker ?? Faker\Factory::create();
+        $faker->unique(true);
+
+        return new Configuration(
+            new FactoryRegistry([]),
+            $faker,
+            self::$instantiator ?? Instantiator::withConstructor(),
+            new StoryRegistry([]),
+        );
     }
 }

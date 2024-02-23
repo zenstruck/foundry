@@ -14,32 +14,33 @@ use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Filesystem\Filesystem;
-use Zenstruck\Foundry\Tests\Fixtures\Kernel;
+use Zenstruck\Foundry\ORM\ORMPersistenceStrategy;
+use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 
 require \dirname(__DIR__).'/vendor/autoload.php';
-
-(new Dotenv())->usePutenv()->loadEnv(__DIR__.'/../.env');
 
 $fs = new Filesystem();
 
 $fs->remove(__DIR__.'/../var');
 
-if (\getenv('DATABASE_URL') && \getenv('TEST_MIGRATIONS')) {
-    $fs->remove(__DIR__.'/Fixtures/Migrations');
-    $fs->mkdir(__DIR__.'/Fixtures/Migrations');
+(new Dotenv())->usePutenv()->loadEnv(__DIR__.'/../.env');
 
-    $kernel = new Kernel('test', true);
+if (\getenv('DATABASE_URL') && ORMPersistenceStrategy::RESET_MODE_MIGRATE === \getenv('DATABASE_RESET_MODE')) {
+    $fs->remove(__DIR__.'/Fixture/Migrations');
+    $fs->mkdir(__DIR__.'/Fixture/Migrations');
+
+    $kernel = new TestKernel('test', true);
     $kernel->boot();
 
     $application = new Application($kernel);
     $application->setAutoExit(false);
 
-    if (!\str_starts_with(\getenv('DATABASE_URL'), 'sqlite')) {
-        $application->run(new StringInput('doctrine:database:create --if-not-exists --no-interaction'), new NullOutput());
-    }
-
-    $application->run(new StringInput('doctrine:schema:drop --force --no-interaction'), new NullOutput());
-    $application->run(new StringInput('doctrine:migrations:diff --no-interaction'), new NullOutput());
+    $application->run(new StringInput('doctrine:database:drop --if-exists --force'), new NullOutput());
+    $application->run(new StringInput('doctrine:database:create'), new NullOutput());
+    $application->run(new StringInput('doctrine:migrations:diff'), new NullOutput());
+    $application->run(new StringInput('doctrine:database:drop --force'), new NullOutput());
 
     $kernel->shutdown();
+
+    $fs->remove(__DIR__.'/../var');
 }

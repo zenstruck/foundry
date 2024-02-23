@@ -13,7 +13,8 @@
 /docker/.makefile
 /.env.local
 /docker-compose.override.yaml
-/tests/Fixtures/Migrations/
+/tests/Fixture/Migrations/
+/tests/Fixture/Maker/tmp/
 
 /utils/rector/vendor
 /utils/rector/.phpunit.result.cache

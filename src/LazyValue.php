@@ -13,29 +13,21 @@ namespace Zenstruck\Foundry;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @phpstan-import-type Parameters from Factory
  */
 final class LazyValue
 {
-    /** @var callable():mixed */
-    private $factory;
-
-    private bool $memoize;
-
-    private mixed $memoizedValue = null;
+    /** @var \Closure():mixed */
+    private \Closure $factory;
+    private mixed $memoizedValue;
 
     /**
      * @param callable():mixed $factory
-     *
-     * @deprecated directly using LazyValue's constructor is deprecated. It will be private in v2. Use named constructors instead.
      */
-    public function __construct(callable $factory, bool $memoize = false, bool $calledInternally = false)
+    private function __construct(callable $factory, private bool $memoize = false)
     {
-        $this->factory = $factory;
-        $this->memoize = $memoize;
-
-        if (!$calledInternally) {
-            trigger_deprecation('zenstruck/foundry', '1.34.0', "directly using LazyValue's constructor is deprecated. It will be private in v2. Use named constructors instead.");
-        }
+        $this->factory = $factory(...);
     }
 
     /**
@@ -43,7 +35,7 @@ final class LazyValue
      */
     public function __invoke(): mixed
     {
-        if ($this->memoize && null !== $this->memoizedValue) {
+        if ($this->memoize && isset($this->memoizedValue)) {
             return $this->memoizedValue;
         }
 
@@ -58,7 +50,7 @@ final class LazyValue
         }
 
         if ($this->memoize) {
-            $this->memoizedValue = $value;
+            return $this->memoizedValue = $value;
         }
 
         return $value;
@@ -66,18 +58,19 @@ final class LazyValue
 
     public static function new(callable $factory): self
     {
-        return new self($factory, false, true);
+        return new self($factory, false);
     }
 
     public static function memoize(callable $factory): self
     {
-        return new self($factory, true, true);
+        return new self($factory, true);
     }
 
     /**
-     * @internal
+     * @param array<array-key, mixed> $value
+     * @return array<array-key, mixed>
      */
-    public static function normalizeArray(array $value): array
+    private static function normalizeArray(array $value): array
     {
         \array_walk_recursive($value, static function(mixed &$v): void {
             if ($v instanceof self) {

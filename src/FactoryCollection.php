@@ -12,130 +12,88 @@
 namespace Zenstruck\Foundry;
 
 /**
- * @template TObject of object
- *
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @template T
+ * @implements \IteratorAggregate<Factory<T>>
+ *
+ * @phpstan-import-type Attributes from Factory
  */
 final class FactoryCollection implements \IteratorAggregate
 {
-    private ?int $min;
-
-    private ?int $max;
+    /**
+     * @param Factory<T>                      $factory
+     * @param \Closure():iterable<Attributes> $items
+     */
+    private function __construct(public readonly Factory $factory, private \Closure $items)
+    {
+    }
 
     /**
-     * @param int|null                       $max           If set, when created, the collection will be a random size between $min and $max
-     * @param iterable<array<string, mixed>> $sequence|null $sequence
+     * @param Factory<T> $factory
      *
-     * @phpstan-param Factory<TObject> $factory
-     *
-     * @param Factory<object> $factory
-     *
-     *@deprecated using directly FactoryCollection's constructor is deprecated. It will be private in v2. Use named constructors instead.
+     * @return self<T>
      */
-    public function __construct(public Factory $factory, ?int $min = null, ?int $max = null, private ?iterable $sequence = null, bool $calledInternally = false)
+    public static function many(Factory $factory, int $count): self
     {
-        if ($max && $min > $max) {
+        return new self($factory, static fn() => \array_fill(0, $count, []));
+    }
+
+    /**
+     * @param Factory<T> $factory
+     *
+     * @return self<T>
+     */
+    public static function range(Factory $factory, int $min, int $max): self
+    {
+        if ($min > $max) {
             throw new \InvalidArgumentException('Min must be less than max.');
         }
 
-        if (!$calledInternally) {
-            trigger_deprecation('zenstruck/foundry', '1.22.0', "using directly FactoryCollection's constructor is deprecated. It will be private in v2. Use named constructors instead.");
-        }
-
-        $this->min = $min;
-        $this->max = $max ?? $min;
+        return new self($factory, static fn() => \array_fill(0, \random_int($min, $max), []));
     }
 
     /**
-     * @deprecated Use FactoryCollection::many() instead
+     * @param  Factory<T>           $factory
+     * @param  iterable<Attributes> $items
+     * @return self<T>
      */
-    public static function set(Factory $factory, int $count): self
+    public static function sequence(Factory $factory, iterable $items): self
     {
-        trigger_deprecation('zenstruck/foundry', '1.38.0', 'Method %s() is deprecated and will be removed in 2.0. Use "%s::many()" instead.', __METHOD__, __CLASS__);
-
-        return self::many($factory, $count);
-    }
-
-    public static function many(Factory $factory, int $count): self
-    {
-        return new self($factory, $count, null, null, true);
-    }
-
-    public static function range(Factory $factory, int $min, int $max): self
-    {
-        return new self($factory, $min, $max, null, true);
+        return new self($factory, static fn() => $items);
     }
 
     /**
-     * @param iterable<array<string, mixed>> $sequence
-     */
-    public static function sequence(Factory $factory, iterable $sequence): self
-    {
-        return new self($factory, 0, null, $sequence, true);
-    }
-
-    /**
-     * @return list<TObject>
-     */
-    public function create(
-        array|callable $attributes = [],
-        /**
-         * @deprecated
-         * @internal
-         */
-        bool $noProxy = false,
-    ): array {
-        if (2 === \count(\func_get_args()) && !\str_starts_with(\debug_backtrace(options: \DEBUG_BACKTRACE_IGNORE_ARGS, limit: 1)[0]['class'] ?? '', 'Zenstruck\Foundry')) {
-            trigger_deprecation('zenstruck\foundry', '1.38.0', 'Parameter "$noProxy" of method "%s()" is deprecated and will be removed in Foundry 2.0.', __METHOD__);
-        }
-
-        $objects = [];
-        foreach ($this->all() as $i => $factory) {
-            $objects[] = $factory->create(
-                \is_callable($attributes) ? $attributes($i + 1) : $attributes,
-                $noProxy || !$factory->shouldUseProxy(),
-            );
-        }
-
-        return $objects;
-    }
-
-    /**
-     * @return Factory[]
+     * @param Attributes $attributes
      *
-     * @phpstan-return list<Factory<TObject>>
+     * @return T[]
+     */
+    public function create(array|callable $attributes = []): array
+    {
+        return \array_map(static fn(Factory $f) => $f->create($attributes), $this->all());
+    }
+
+    /**
+     * @return list<Factory<T>>
      */
     public function all(): array
     {
-        if (!$this->sequence) {
-            return \array_map(
-                fn(): Factory => clone $this->factory,
-                \array_fill(0, \random_int($this->min, $this->max), null),
-            );
-        }
-
         $factories = [];
-        foreach ($this->sequence as $attributes) {
-            $factories[] = (clone $this->factory)->with($attributes);
+
+        foreach (($this->items)() as $i => $attributes) {
+            $factories[] = $this->factory->with($attributes)->with(['__index' => $i + 1]);
         }
 
         return $factories;
     }
 
-    public function factory(): Factory
-    {
-        trigger_deprecation('zenstruck\foundry', '1.38.0', 'Method "%s()" is deprecated and will be removed in Foundry 2.0. Use public property %s::$factory instead', __METHOD__, __CLASS__);
-
-        return $this->factory;
-    }
-
-    public function getIterator(): \ArrayIterator
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->all());
     }
 
     /**
-     * @return \Iterator<mixed[]>
+     * @return iterable<array{Factory<T>}>
      */
     public function asDataProvider(): iterable
     {

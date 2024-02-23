@@ -53,7 +53,7 @@ final class AnonymousFactoryGenerator
                 }
                 CODE;
 
-            eval($anonymousClassCode);
+            eval($anonymousClassCode); // @phpstan-ignore-line
         }
 
         return $anonymousClassName;

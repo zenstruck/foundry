@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the zenstruck/foundry package.
  *
@@ -13,241 +11,123 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Persistence;
 
-use Zenstruck\Foundry\Exception\FoundryBootException;
+use Doctrine\Persistence\ObjectRepository;
+use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\FactoryCollection; // keep me!
 
 /**
- * @template TModel of object
- * @template-extends PersistentObjectFactory<TModel>
- *
- * @method static Proxy[]|TModel[] createMany(int $number, array|callable $attributes = [])
- *
- * @phpstan-method FactoryCollection<Proxy<TModel>> sequence(iterable<array<string, mixed>>|callable(): iterable<array<string, mixed>> $sequence)
- * @phpstan-method FactoryCollection<Proxy<TModel>> many(int $min, int|null $max = null)
- *
- * @phpstan-method static list<Proxy<TModel>> createSequence(iterable<array<string, mixed>>|callable(): iterable<array<string, mixed>> $sequence)
- * @phpstan-method static list<Proxy<TModel>> createMany(int $number, array|callable $attributes = [])
- *
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @template T of object
+ * @extends PersistentObjectFactory<T&Proxy<T>>
+ *
+ * @phpstan-type InstantiatorCallable = Instantiator|callable(Parameters,class-string<T>):T
+ * @phpstan-import-type Parameters from Factory
+ *
+ * @phpstan-method static instantiateWith(InstantiatorCallable $instantiator)
+ *
+ * @phpstan-method FactoryCollection<T&Proxy<T>> sequence(iterable<array<string, mixed>>|callable(): iterable<array<string, mixed>> $sequence)
+ * @phpstan-method FactoryCollection<T&Proxy<T>> many(int $min, int|null $max = null)
+ *
+ * @phpstan-method static list<T&Proxy<T>> createSequence(iterable<array<string, mixed>>|callable(): iterable<array<string, mixed>> $sequence)
+ * @phpstan-method static list<T&Proxy<T>> createMany(int $number, array|callable $attributes = [])
  */
 abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
 {
     /**
-     * @phpstan-return list<Proxy<TModel>>
+     * @return class-string<T>
      */
-    public static function __callStatic(string $name, array $arguments): array
+    abstract public static function class(): string;
+
+    /**
+     * @return T&Proxy<T>
+     */
+    final public static function find(mixed $criteriaOrId): object
     {
-        if ('createMany' !== $name) {
-            throw new \BadMethodCallException(\sprintf('Call to undefined static method "%s::%s".', static::class, $name));
-        }
-
-        return static::new()->many($arguments[0])->create($arguments[1] ?? [], noProxy: false);
-    }
-
-    final public static function new(array|callable|string $defaultAttributes = [], string ...$states): static
-    {
-        if ((new \ReflectionClass(static::class()))->isFinal()) {
-            trigger_deprecation(
-                'zenstruck\foundry', '1.38.0',
-                'Using a proxy factory with a final class is deprecated and will throw an error in Foundry 2.0. Use "Zenstruck\Foundry\ObjectFactory" instead (don\'t forget to remove all ->object() calls!).',
-                self::class,
-                static::class(),
-            );
-        }
-
-        return parent::new($defaultAttributes, ...$states);
+        return proxy(parent::find($criteriaOrId)); // @phpstan-ignore-line
     }
 
     /**
-     * @return Proxy<TModel>
+     * @return T&Proxy<T>
      */
-    final public function create(
-        array|callable $attributes = [],
-        /**
-         * @deprecated
-         * @internal
-         */
-        bool $noProxy = false,
-    ): object {
-        if (2 === \count(\func_get_args()) && !\str_starts_with(\debug_backtrace(options: \DEBUG_BACKTRACE_IGNORE_ARGS, limit: 1)[0]['class'] ?? '', 'Zenstruck\Foundry')) {
-            trigger_deprecation('zenstruck\foundry', '1.38.0', 'Parameter "$noProxy" of method "%s()" is deprecated and will be removed in Foundry 2.0.', __METHOD__);
-        }
-
-        return Factory::create($attributes, noProxy: false);
-    }
-
-    /**
-     * A shortcut to create a single model without states.
-     *
-     * @return Proxy<TModel>&TModel
-     * @phpstan-return Proxy<TModel>
-     */
-    final public static function createOne(array $attributes = []): Proxy
+    final public static function findOrCreate(array $criteria): object
     {
-        return static::new()->create($attributes);
+        return proxy(parent::findOrCreate($criteria)); // @phpstan-ignore-line
     }
 
     /**
-     * A shortcut to create multiple models, based on a sequence, without states.
-     *
-     * @param iterable<array<string, mixed>>|callable(): iterable<array<string, mixed>> $sequence
-     *
-     * @return list<TModel&Proxy<TModel>>
-     * @phpstan-return list<Proxy<TModel>>
+     * @return T&Proxy<T>
      */
-    final public static function createSequence(iterable|callable $sequence): array
+    final public static function randomOrCreate(array $criteria = []): object
     {
-        return static::new()->sequence($sequence)->create();
+        return proxy(parent::randomOrCreate($criteria)); // @phpstan-ignore-line
     }
 
     /**
-     * Try and find existing object for the given $attributes. If not found,
-     * instantiate and persist.
-     *
-     * @return Proxy<TModel>&TModel
-     * @phpstan-return Proxy<TModel>
+     * @return list<T&Proxy<T>>
      */
-    final public static function findOrCreate(array $attributes): Proxy
+    final public static function randomSet(int $count, array $criteria = []): array
     {
-        try {
-            if ($found = static::repository()->find($attributes)) {
-                return $found;
-            }
-        } catch (FoundryBootException) {
-        }
-
-        return static::new()->create($attributes);
+        return \array_map(proxy(...), parent::randomSet($count, $criteria)); // @phpstan-ignore-line
     }
 
     /**
-     * @see ProxyRepositoryDecorator::first()
-     *
-     * @return Proxy<TModel>&TModel
-     * @phpstan-return Proxy<TModel>
-     *
-     * @throws \RuntimeException If no entities exist
+     * @return list<T&Proxy<T>>
      */
-    final public static function first(string $sortedField = 'id'): Proxy
+    final public static function randomRange(int $min, int $max, array $criteria = []): array
     {
-        if (null === $proxy = static::repository()->first($sortedField)) {
-            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', static::class()));
-        }
-
-        return $proxy;
+        return \array_map(proxy(...), parent::randomRange($min, $max, $criteria)); // @phpstan-ignore-line
     }
 
     /**
-     * @see ProxyRepositoryDecorator::last()
-     *
-     * @return Proxy<TModel>&TModel
-     * @phpstan-return Proxy<TModel>
-     *
-     * @throws \RuntimeException If no entities exist
+     * @return list<T&Proxy<T>>
      */
-    final public static function last(string $sortedField = 'id'): Proxy
+    final public static function findBy(array $criteria): array
     {
-        if (null === $proxy = static::repository()->last($sortedField)) {
-            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', static::class()));
-        }
-
-        return $proxy;
+        return \array_map(proxy(...), parent::findBy($criteria)); // @phpstan-ignore-line
     }
 
     /**
-     * @see ProxyRepositoryDecorator::random()
-     *
-     * @return Proxy<TModel>&TModel
-     * @phpstan-return Proxy<TModel>
+     * @return T&Proxy<T>
      */
-    final public static function random(array $attributes = []): Proxy
+    final public static function random(array $criteria = []): object
     {
-        return static::repository()->random($attributes);
+        return proxy(parent::random($criteria)); // @phpstan-ignore-line
     }
 
     /**
-     * Fetch one random object and create a new object if none exists.
-     *
-     * @return Proxy<TModel>&TModel
-     * @phpstan-return Proxy<TModel>
+     * @return T&Proxy<T>
      */
-    final public static function randomOrCreate(array $attributes = []): Proxy
+    final public static function first(string $sortBy = 'id'): object
     {
-        try {
-            return static::repository()->random($attributes);
-        } catch (\RuntimeException) {
-            return static::new()->create($attributes);
-        }
+        return proxy(parent::first($sortBy)); // @phpstan-ignore-line
     }
 
     /**
-     * @see ProxyRepositoryDecorator::randomSet()
-     *
-     * @return list<TModel&Proxy<TModel>>
-     * @phpstan-return list<Proxy<TModel>>
+     * @return T&Proxy<T>
      */
-    final public static function randomSet(int $number, array $attributes = []): array
+    final public static function last(string $sortBy = 'id'): object
     {
-        return static::repository()->randomSet($number, $attributes);
+        return proxy(parent::last($sortBy)); // @phpstan-ignore-line
     }
 
     /**
-     * @see ProxyRepositoryDecorator::randomRange()
-     *
-     * @return list<TModel&Proxy<TModel>>
-     * @phpstan-return list<Proxy<TModel>>
-     */
-    final public static function randomRange(int $min, int $max, array $attributes = []): array
-    {
-        return static::repository()->randomRange($min, $max, $attributes);
-    }
-
-    /**
-     * @see ProxyRepositoryDecorator::findAll()
-     *
-     * @return list<TModel&Proxy<TModel>>
-     * @phpstan-return list<Proxy<TModel>>
+     * @return list<T&Proxy<T>>
      */
     final public static function all(): array
     {
-        return static::repository()->findAll();
+        return \array_map(proxy(...), parent::all()); // @phpstan-ignore-line
     }
 
     /**
-     * @see ProxyRepositoryDecorator::find()
-     *
-     * @phpstan-param Proxy<TModel>|array|mixed $criteria
-     * @phpstan-return Proxy<TModel>
-     *
-     * @return Proxy<TModel>&TModel
-     *
-     * @throws \RuntimeException If no entity found
+     * @return ProxyRepositoryDecorator<T,ObjectRepository<T>>
      */
-    final public static function find($criteria): Proxy
+    final public static function repository(): ObjectRepository
     {
-        if (null === $proxy = static::repository()->find($criteria)) {
-            throw new \RuntimeException(\sprintf('Could not find "%s" object.', static::class()));
-        }
+        Configuration::instance()->assertPersistanceEnabled();
 
-        return $proxy;
-    }
-
-    /**
-     * @see ProxyRepositoryDecorator::findBy()
-     *
-     * @return list<TModel&Proxy<TModel>>
-     * @phpstan-return list<Proxy<TModel>>
-     */
-    final public static function findBy(array $attributes): array
-    {
-        return static::repository()->findBy($attributes);
-    }
-
-    /**
-     * @phpstan-return ProxyRepositoryDecorator<TModel>
-     */
-    final public static function repository(): ProxyRepositoryDecorator
-    {
-        return static::configuration()->repositoryFor(static::class(), proxy: true);
+        return new ProxyRepositoryDecorator(static::class()); // @phpstan-ignore-line
     }
 }

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the zenstruck/foundry package.
  *
@@ -13,348 +11,215 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Object;
 
-use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
-
-use function Symfony\Component\String\u;
+use Zenstruck\Foundry\Factory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
- * @final
+ * @immutable
  *
- * @method static self withoutConstructor()
+ * @phpstan-import-type Parameters from Factory
  */
-class Instantiator
+final class Instantiator
 {
-    private static ?PropertyAccessor $propertyAccessor = null;
+    private const WITH_CONSTRUCTOR = '_with_constructor';
+    private const WITHOUT_CONSTRUCTOR = '_without_constructor';
 
-    private bool $useConstructor = true;
+    private Hydrator $hydrator;
+    private bool $hydration = true;
 
-    private bool $allowExtraAttributes = false;
-
-    private array $extraAttributes = [];
-
-    private bool $alwaysForceProperties = false;
-
-    /** @var string[] */
-    private array $forceProperties = [];
-
-    public function __construct(bool $calledInternally = false)
+    private function __construct(private string|\Closure $mode)
     {
-        if (!$calledInternally) {
-            trigger_deprecation('zenstruck\foundry', '1.38.0', '%1$s constructor will be private in Foundry 2.0. Use either "%1$s::withConstructor()" or "%1$s::withoutConstructor()"', self::class);
-        }
+        $this->hydrator = new Hydrator();
     }
 
     /**
-     * @param class-string $class
+     * @template T of object
+     *
+     * @param Parameters      $parameters
+     * @param class-string<T> $class
+     *
+     * @return T
      */
-    public function __invoke(array $attributes, string $class): object
+    public function __invoke(array $parameters, string $class): object
     {
-        $object = $this->instantiate($class, $attributes);
+        $object = $this->instantiate($parameters, $class);
 
-        foreach ($attributes as $attribute => $value) {
-            if (0 === \mb_strpos($attribute, 'optional:')) {
-                trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using "optional:" attribute prefixes is deprecated, use Instantiator::allowExtra() instead (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#instantiation).');
-                continue;
-            }
+        return $this->hydration ? ($this->hydrator)($object, $parameters) : $object;
+    }
 
-            if (\in_array($attribute, $this->extraAttributes, true)) {
-                continue;
-            }
+    public static function withConstructor(): self
+    {
+        return new self(self::WITH_CONSTRUCTOR);
+    }
 
-            if ($this->alwaysForceProperties || \in_array($attribute, $this->forceProperties, true)) {
-                try {
-                    self::forceSet($object, $attribute, $value, calledInternally: true);
-                } catch (\InvalidArgumentException $e) {
-                    if (!$this->allowExtraAttributes) {
-                        throw $e;
-                    }
+    public static function withoutConstructor(): self
+    {
+        return new self(self::WITHOUT_CONSTRUCTOR);
+    }
+
+    public static function namedConstructor(string $method): self
+    {
+        return new self($method);
+    }
+
+    public static function use(callable $factory): self
+    {
+        return new self($factory(...));
+    }
+
+    /**
+     * Ignore attributes that can't be set to object.
+     *
+     * @param string ...$parameters The parameters you'd like the hydrator to ignore (if empty, ignore any extra)
+     */
+    public function allowExtra(string ...$parameters): self
+    {
+        $clone = clone $this;
+        $clone->hydrator = $clone->hydrator->allowExtra(...$parameters);
+        $clone->hydration = true;
+
+        return $clone;
+    }
+
+    /**
+     * Always force properties, never use setters (still uses constructor unless disabled).
+     *
+     * @param string ...$properties The properties you'd like the hydrator to "force set" (if empty, force set all)
+     */
+    public function alwaysForce(string ...$properties): self
+    {
+        $clone = clone $this;
+        $clone->hydrator = $clone->hydrator->alwaysForce(...$properties);
+        $clone->hydration = true;
+
+        return $clone;
+    }
+
+    public function enableHydration(): self
+    {
+        $clone = clone $this;
+        $clone->hydration = true;
+
+        return $clone;
+    }
+
+    public function disableHydration(): self
+    {
+        $clone = clone $this;
+        $clone->hydration = false;
+
+        return $clone;
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param Parameters      $parameters
+     * @param class-string<T> $class
+     *
+     * @return T
+     */
+    private function instantiate(array &$parameters, string $class): object
+    {
+        $refClass = new \ReflectionClass($class);
+
+        if (self::WITHOUT_CONSTRUCTOR === $this->mode) {
+            return $refClass->newInstanceWithoutConstructor();
+        }
+
+        if (!$factory = $this->factoryFor($refClass)) {
+            return $refClass->newInstance();
+        }
+
+        $arguments = [];
+
+        /** @var \ReflectionParameter $parameter */
+        foreach ($factory->getParameters() as $parameter) {
+            if (\array_key_exists($parameter->name, $parameters)) {
+                if ($parameter->isVariadic()) {
+                    $arguments = \array_merge($arguments, $parameters[$parameter->name]);
+                } else {
+                    $arguments[] = $parameters[$parameter->name];
                 }
 
-                continue;
-            }
-
-            if (0 === \mb_strpos($attribute, 'force:')) {
-                trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using "force:" property prefixes is deprecated, use Instantiator::alwaysForce() instead (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#instantiation).');
-
-                self::forceSet($object, \mb_substr($attribute, 6), $value, calledInternally: true);
+                unset($parameters[$parameter->name]);
 
                 continue;
             }
 
-            try {
-                self::propertyAccessor()->setValue($object, $attribute, $value);
-            } catch (NoSuchPropertyException $e) {
-                // see if attribute was snake/kebab cased
-                try {
-                    self::propertyAccessor()->setValue($object, self::camel($attribute), $value);
-                    trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using a differently cased attribute is deprecated, use the same case as the object property instead.');
-                } catch (NoSuchPropertyException $e) {
-                    if (!$this->allowExtraAttributes) {
-                        throw new \InvalidArgumentException(\sprintf('Cannot set attribute "%s" for object "%s" (not public and no setter).', $attribute, $class), 0, $e);
-                    }
-                }
+            if ($parameter->isDefaultValueAvailable()) {
+                $arguments[] = $parameter->getDefaultValue();
+                continue;
             }
+
+            throw new \LogicException(\sprintf('Missing required argument "%s" for "%s::%s()".', $parameter->name, $class, $factory->name));
+        }
+
+        if ($factory instanceof \ReflectionMethod && $factory->isConstructor()) {
+            return $refClass->newInstance(...$arguments);
+        }
+
+        $object = $factory instanceof \ReflectionMethod ? $factory->invoke(null, ...$arguments) : $factory->invoke(...$arguments);
+
+        if (!$object instanceof $class) {
+            throw new \LogicException(\sprintf('Named constructor "%s" for "%s" must return an instance of "%s".', $factory->name, $class, $class));
         }
 
         return $object;
     }
 
-    public function __call(string $name, array $arguments): self
+    /**
+     * @param \ReflectionClass<object> $class
+     */
+    private function factoryFor(\ReflectionClass $class): \ReflectionFunction|\ReflectionMethod|null
     {
-        if ('withoutConstructor' !== $name) {
-            throw new \BadMethodCallException(\sprintf('Call to undefined method "%s::%s".', static::class, $name));
+        if ($this->mode instanceof \Closure) {
+            return new \ReflectionFunction(($this->mode)(...));
         }
 
-        trigger_deprecation('zenstruck/foundry', '1.38.0', 'Calling instance method "%1$s::withoutConstructor()" is deprecated and will be removed in 2.0. Use static call instead: "%1$s::withoutConstructor()" instead.', static::class);
-
-        $this->useConstructor = false;
-
-        return $this;
-    }
-
-    public static function __callStatic(string $name, array $arguments): self
-    {
-        if ('withoutConstructor' !== $name) {
-            throw new \BadMethodCallException(\sprintf('Call to undefined method "%s::%s".', static::class, $name));
+        if (self::WITH_CONSTRUCTOR === $this->mode) {
+            return self::constructorFor($class);
         }
 
-        $instance = new self(calledInternally: true);
-
-        $instance->useConstructor = false;
-
-        return $instance;
-    }
-
-    public static function withConstructor(): self
-    {
-        return new self(calledInternally: true);
+        return self::namedConstructorFor($class, $this->mode);
     }
 
     /**
-     * Ignore attributes that can't be set to object.
-     *
-     * @param string[] $attributes The attributes you'd like the instantiator to ignore (if empty, ignore any extra)
-     *
-     * @deprecated Use self::allowExtra() instead
+     * @param \ReflectionClass<object> $class
      */
-    public function allowExtraAttributes(array $attributes = []): self
-    {
-        trigger_deprecation('zenstruck/foundry', '1.38.0', 'Method "Instantiator::allowExtraAttributes()" is deprecated. Please use "Instantiator::allowExtra()" instead.');
-
-        return $this->allowExtra(...$attributes);
-    }
-
-    /**
-     * Ignore attributes that can't be set to object.
-     *
-     * @param string $parameters The attributes you'd like the instantiator to ignore (if empty, ignore any extra)
-     */
-    public function allowExtra(string ...$parameters): self
-    {
-        if (empty($parameters)) {
-            $this->allowExtraAttributes = true;
-        }
-
-        $this->extraAttributes = $parameters;
-
-        return $this;
-    }
-
-    /**
-     * Always force properties, never use setters (still uses constructor unless disabled).
-     *
-     * @param string[] $properties The properties you'd like the instantiator to "force set" (if empty, force set all)
-     *
-     * @deprecated Use self::alwaysForce() instead
-     */
-    public function alwaysForceProperties(array $properties = []): self
-    {
-        trigger_deprecation('zenstruck/foundry', '1.38.0', 'Method "Instantiator::alwaysForceProperties()" is deprecated. Please use "Instantiator::alwaysForce()" instead.');
-
-        return $this->alwaysForce(...$properties);
-    }
-
-    /**
-     * Always force properties, never use setters (still uses constructor unless disabled).
-     *
-     * @param string $properties The properties you'd like the instantiator to "force set" (if empty, force set all)
-     */
-    public function alwaysForce(string ...$properties): self
-    {
-        if (empty($properties)) {
-            $this->alwaysForceProperties = true;
-        }
-
-        $this->forceProperties = $properties;
-
-        return $this;
-    }
-
-    /**
-     * @deprecated
-     * @throws \InvalidArgumentException if property does not exist for $object
-     */
-    public static function forceSet(
-        object $object,
-        string $property,
-        mixed $value,
-        /**
-         * @internal
-         */
-        bool $calledInternally = false): void
-    {
-        if (!$calledInternally) {
-            trigger_deprecation('zenstruck\foundry', '1.38.0', 'Method "%s()" is deprecated with no replacement.', __METHOD__);
-        }
-
-        self::accessibleProperty($object, $property)->setValue($object, $value);
-    }
-
-    /**
-     * @deprecated
-     * @return mixed
-     */
-    public static function forceGet(
-        object $object,
-        string $property,
-        /**
-         * @internal
-         */
-        bool $calledInternally = false,
-    ) {
-        if (!$calledInternally) {
-            trigger_deprecation('zenstruck\foundry', '1.38.0', 'Method "%s()" is deprecated with no replacement.', __METHOD__);
-        }
-
-        return self::accessibleProperty($object, $property)->getValue($object);
-    }
-
-    private static function propertyAccessor(): PropertyAccessor
-    {
-        return self::$propertyAccessor ?: self::$propertyAccessor = PropertyAccess::createPropertyAccessor();
-    }
-
-    private static function accessibleProperty(object $object, string $name): \ReflectionProperty
-    {
-        $class = new \ReflectionClass($object);
-
-        // try fetching first by exact name, if not found, try camel-case
-        $property = self::reflectionProperty($class, $name);
-
-        if (!$property && $property = self::reflectionProperty($class, self::camel($name))) {
-            trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using a differently cased attribute is deprecated, use the same case as the object property instead.');
-        }
-
-        if (!$property) {
-            throw new \InvalidArgumentException(\sprintf('Class "%s" does not have property "%s".', $class->getName(), $name));
-        }
-
-        if (!$property->isPublic()) {
-            $property->setAccessible(true);
-        }
-
-        return $property;
-    }
-
-    private static function reflectionProperty(\ReflectionClass $class, string $name): ?\ReflectionProperty
+    private static function namedConstructorFor(\ReflectionClass $class, string $name): \ReflectionMethod
     {
         try {
-            return $class->getProperty($name);
+            $method = $class->getMethod($name);
         } catch (\ReflectionException) {
-            if ($class = $class->getParentClass()) {
-                return self::reflectionProperty($class, $name);
-            }
+            throw new \LogicException(\sprintf('Named constructor "%s" for "%s" does not exist.', $name, $class->getName()));
         }
 
-        return null;
+        if (!$method->isPublic()) {
+            throw new \LogicException(\sprintf('Named constructor "%s" for "%s" is not public.', $name, $class->getName()));
+        }
+
+        if (!$method->isStatic()) {
+            throw new \LogicException(\sprintf('Named constructor "%s" for "%s" is not static.', $name, $class->getName()));
+        }
+
+        return $method;
     }
 
     /**
-     * Check if parameter value was passed as the exact name - if not, try snake-cased, then kebab-cased versions.
+     * @param \ReflectionClass<object> $class
      */
-    private static function attributeNameForParameter(\ReflectionParameter $parameter, array $attributes): ?string
+    private static function constructorFor(\ReflectionClass $class): ?\ReflectionMethod
     {
-        // try exact
-        $name = $parameter->getName();
-
-        if (\array_key_exists($name, $attributes)) {
-            return $name;
+        if (!$constructor = $class->getConstructor()) {
+            return null;
         }
 
-        // try snake case
-        $name = self::snake($name);
-
-        if (\array_key_exists($name, $attributes)) {
-            trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using a differently cased attribute is deprecated, use the same case as the object property instead.');
-
-            return $name;
+        if (!$constructor->isPublic()) {
+            throw new \LogicException(\sprintf('Constructor for "%s" is not public.', $class->getName()));
         }
 
-        // try kebab case
-        $name = \str_replace('_', '-', $name);
-
-        if (\array_key_exists($name, $attributes)) {
-            trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using a differently cased attribute is deprecated, use the same case as the object property instead.');
-
-            return $name;
-        }
-
-        return null;
-    }
-
-    private static function camel(string $string): string
-    {
-        return u($string)->camel()->toString();
-    }
-
-    private static function snake(string $string): string
-    {
-        return u($string)->snake()->toString();
-    }
-
-    /**
-     * @param class-string $class
-     */
-    private function instantiate(string $class, array &$attributes): object
-    {
-        $class = new \ReflectionClass($class);
-        $constructor = $class->getConstructor();
-
-        if (!$this->useConstructor || !$constructor || !$constructor->isPublic()) {
-            if ($this->useConstructor && $constructor && !$constructor->isPublic()) {
-                trigger_deprecation('zenstruck\foundry', '1.38.0', 'Instantiator was created to instantiate "%s" by calling the constructor whereas the constructor is not public. This is deprecated and will throw an exception in Foundry 2.0. Use "%s::withoutConstructor()" instead or make constructor public.', $class->getName(), self::class);
-            }
-
-            return $class->newInstanceWithoutConstructor();
-        }
-
-        $arguments = [];
-
-        foreach ($constructor->getParameters() as $parameter) {
-            $name = self::attributeNameForParameter($parameter, $attributes);
-
-            if ($name && \array_key_exists($name, $attributes)) {
-                if ($parameter->isVariadic()) {
-                    $arguments = \array_merge($arguments, $attributes[$name]);
-                } else {
-                    $arguments[] = $attributes[$name];
-                }
-            } elseif ($parameter->isDefaultValueAvailable()) {
-                $arguments[] = $parameter->getDefaultValue();
-            } else {
-                throw new \InvalidArgumentException(\sprintf('Missing constructor argument "%s" for "%s".', $parameter->getName(), $class->getName()));
-            }
-
-            // unset attribute so it isn't used when setting object properties
-            unset($attributes[$name]);
-        }
-
-        return $class->newInstance(...$arguments);
+        return $constructor;
     }
 }
-
-\class_exists(\Zenstruck\Foundry\Instantiator::class);

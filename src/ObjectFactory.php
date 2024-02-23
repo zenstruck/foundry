@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the zenstruck/foundry package.
  *
@@ -13,156 +11,92 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry;
 
-use Zenstruck\Foundry\Exception\FoundryBootException;
-use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+use Zenstruck\Foundry\Object\Instantiator;
 
 /**
- * @template TModel of object
- * @template-extends Factory<TModel>
- *
- * @method static TModel[] createMany(int $number, array|callable $attributes = [])
- * @phpstan-method static list<TModel> createMany(int $number, array|callable $attributes = [])
- *
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @template T of object
+ * @extends Factory<T>
+ *
+ * @phpstan-type InstantiatorCallable = Instantiator|callable(Parameters,class-string<T>):T
+ * @phpstan-import-type Parameters from Factory
+ * @phpstan-import-type Attributes from Factory
  */
 abstract class ObjectFactory extends Factory
 {
-    public function __construct()
-    {
-        parent::__construct(static::class());
-    }
+    /** @var list<callable(Parameters,class-string<T>):Parameters> */
+    private array $beforeInstantiate = [];
+
+    /** @var list<callable(T,Parameters):void> */
+    private array $afterInstantiate = [];
+
+    /** @var InstantiatorCallable|null */
+    private $instantiator;
 
     /**
-     * @phpstan-return list<TModel>
+     * @return class-string<T>
      */
-    public static function __callStatic(string $name, array $arguments): array
-    {
-        if ('createMany' !== $name) {
-            throw new \BadMethodCallException(\sprintf('Call to undefined static method "%s::%s".', static::class, $name));
-        }
-
-        return static::new()->many($arguments[0])->create($arguments[1] ?? [], noProxy: true);
-    }
-
-    /**
-     * @final
-     *
-     * @param array|callable|string $defaultAttributes If string, assumes state
-     * @param string                ...$states         Optionally pass default states (these must be methods on your ObjectFactory with no arguments)
-     */
-    public static function new(array|callable|string $defaultAttributes = [], string ...$states): static
-    {
-        if (\is_string($defaultAttributes) || \count($states)) {
-            trigger_deprecation('zenstruck\foundry', '1.38.0', 'Passing states as strings to "Factory::new()" is deprecated and will throw an exception in Foundry 2.0.');
-        }
-
-        if (\is_string($defaultAttributes)) {
-            $states = \array_merge([$defaultAttributes], $states);
-            $defaultAttributes = [];
-        }
-
-        try {
-            $factory = self::isBooted() ? self::configuration()->factories()->create(static::class) : new static();
-        } catch (\ArgumentCountError $e) {
-            throw new \RuntimeException('Model Factories with dependencies (Model Factory services) cannot be created before foundry is booted.', 0, $e);
-        }
-
-        $factory = $factory
-            ->with(static fn(): array|callable => $factory->defaults())
-            ->with($defaultAttributes);
-
-        try {
-            if (!\is_a(static::class, PersistentObjectFactory::class, true) || !Factory::configuration()->isPersistEnabled()) {
-                $factory = $factory->withoutPersisting(calledInternally: true);
-            }
-        } catch (FoundryBootException) {
-        }
-
-        $factory = $factory->initialize();
-
-        if (!$factory instanceof static) {
-            throw new \TypeError(\sprintf('"%1$s::initialize()" must return an instance of "%1$s".', static::class));
-        }
-
-        foreach ($states as $state) {
-            $factory = $factory->{$state}();
-        }
-
-        return $factory;
-    }
-
-    /**
-     * @final
-     *
-     * @return TModel
-     */
-    public function create(
-        array|callable $attributes = [],
-        /**
-         * @deprecated
-         * @internal
-         */
-        bool $noProxy = false,
-    ): object {
-        if (2 === \count(\func_get_args()) && !\str_starts_with(\debug_backtrace(options: \DEBUG_BACKTRACE_IGNORE_ARGS, limit: 1)[0]['class'] ?? '', 'Zenstruck\Foundry')) {
-            trigger_deprecation('zenstruck\foundry', '1.38.0', \sprintf('Parameter "$noProxy" of method "%s()" is deprecated and will be removed in Foundry 2.0.', __METHOD__));
-        }
-
-        return parent::create(
-            $attributes,
-            noProxy: true,
-        );
-    }
-
-    /**
-     * @final
-     *
-     * A shortcut to create a single model without states.
-     *
-     * @return TModel
-     */
-    public static function createOne(array $attributes = []): object
-    {
-        return static::new()->create($attributes, noProxy: true);
-    }
-
-    /**
-     * @final
-     *
-     * A shortcut to create multiple models, based on a sequence, without states.
-     *
-     * @param iterable<array<string, mixed>>|callable(): iterable<array<string, mixed>> $sequence
-     *
-     * @return list<TModel>
-     */
-    public static function createSequence(iterable|callable $sequence): array
-    {
-        return static::new()->sequence($sequence)->create(noProxy: true);
-    }
-
-    /** @phpstan-return class-string<TModel> */
     abstract public static function class(): string;
 
     /**
-     * Override to add default instantiator and default afterInstantiate/afterPersist events.
-     *
-     * @return static
+     * @final
      */
-    #[\ReturnTypeWillChange]
-    protected function initialize()
+    public function create(callable|array $attributes = []): object
     {
-        return $this;
+        $parameters = $this->normalizeAttributes($attributes);
+
+        foreach ($this->beforeInstantiate as $hook) {
+            $parameters = $hook($parameters, static::class());
+
+            if (!\is_array($parameters)) {
+                throw new \LogicException('Before Instantiate hook callback must return a parameter array.');
+            }
+        }
+
+        $parameters = $this->normalizeParameters($parameters);
+        $instantiator = $this->instantiator ?? Configuration::instance()->instantiator;
+        $object = $instantiator($parameters, static::class());
+
+        foreach ($this->afterInstantiate as $hook) {
+            $hook($object, $parameters);
+        }
+
+        return $object;
     }
 
     /**
-     * @deprecated use with() instead
+     * @param InstantiatorCallable $instantiator
      */
-    final protected function addState(array|callable $attributes = []): static
+    final public function instantiateWith(callable $instantiator): static
     {
-        trigger_deprecation('zenstruck\foundry', '1.38.0', \sprintf('Method "%s()" is deprecated and will be removed in version 2.0. Use "%s::with()" instead.', __METHOD__, Factory::class));
+        $clone = clone $this;
+        $clone->instantiator = $instantiator;
 
-        return $this->with($attributes);
+        return $clone;
     }
 
-    abstract protected function defaults(): array|callable;
+    /**
+     * @param callable(Parameters,class-string<T>):Parameters $callback
+     */
+    final public function beforeInstantiate(callable $callback): static
+    {
+        $clone = clone $this;
+        $clone->beforeInstantiate[] = $callback;
+
+        return $clone;
+    }
+
+    /**
+     * @final
+     *
+     * @param callable(T,Parameters):void $callback
+     */
+    public function afterInstantiate(callable $callback): static
+    {
+        $clone = clone $this;
+        $clone->afterInstantiate[] = $callback;
+
+        return $clone;
+    }
 }

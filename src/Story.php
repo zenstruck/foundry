@@ -11,52 +11,42 @@
 
 namespace Zenstruck\Foundry;
 
-use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\Proxy as ProxyObject;
-
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @method static Proxy get(string $name)
  */
 abstract class Story
 {
-    /** @var array<string, Proxy> */
-    private array $objects = [];
+    /** @var array<string,mixed> */
+    private array $state = [];
 
-    /** @var array<string, Proxy[]> */
+    /** @var array<string, mixed[]> */
     private array $pools = [];
 
-    final public function __call(string $method, array $arguments): Proxy
+    /**
+     * @param mixed[] $arguments
+     */
+    final public function __call(string $method, array $arguments): mixed
     {
-        if ('get' !== $method) {
-            return $this->getState($method);
-        }
-
-        trigger_deprecation('zenstruck/foundry', '1.24', 'Calling instance method "%1$s::get()" is deprecated and will be removed in 2.0, use the static "%1$s::get()" method instead.', static::class);
-
-        return $this->getState($arguments[0]);
+        return $this->getState($method);
     }
 
-    final public static function __callStatic(string $name, array $arguments): Proxy
+    /**
+     * @param mixed[] $arguments
+     */
+    final public static function __callStatic(string $name, array $arguments): mixed
     {
-        if ('get' !== $name) {
-            return static::load()->getState($name);
-        }
-
-        return static::load()->getState($arguments[0]);
+        return static::get($name);
     }
 
-    final public static function load(): static
+    final public static function get(string $state): mixed
     {
-        /** @phpstan-ignore-next-line */
-        return Factory::configuration()->stories()->load(static::class);
+        return static::load()->getState($state);
     }
 
     /**
      * Get all the items in a pool.
      *
-     * @return Proxy[]
+     * @return mixed[]
      */
     final public static function getPool(string $pool): array
     {
@@ -66,7 +56,7 @@ abstract class Story
     /**
      * Get a random item from a pool.
      */
-    final public static function getRandom(string $pool): Proxy
+    final public static function getRandom(string $pool): mixed
     {
         return static::getRandomSet($pool, 1)[0];
     }
@@ -74,7 +64,7 @@ abstract class Story
     /**
      * Get a random set of items from a pool.
      *
-     * @return Proxy[]
+     * @return mixed[]
      */
     final public static function getRandomSet(string $pool, int $number): array
     {
@@ -88,7 +78,7 @@ abstract class Story
     /**
      * Get a random range of items from a pool.
      *
-     * @return Proxy[]
+     * @return mixed[]
      */
     final public static function getRandomRange(string $pool, int $min, int $max): array
     {
@@ -111,84 +101,54 @@ abstract class Story
         return \array_slice($values, 0, \random_int($min, $max)); // @phpstan-ignore-line
     }
 
-    /**
-     * @param object|Proxy|Factory $object
-     */
-    final public function add(string $name, object $object): static
+    final public static function load(): static
     {
-        trigger_deprecation('zenstruck\foundry', '1.17.0', 'Using Story::add() is deprecated, use Story::addState().');
-
-        return $this->addState($name, $object);
+        return Configuration::instance()->stories->load(static::class);
     }
 
     abstract public function build(): void;
 
-    /**
-     * @param object|Proxy|Factory|object[]|Proxy[]|Factory[]|FactoryCollection $objects
-     *
-     * @return static
-     */
-    final protected function addToPool(string $pool, $objects): self
+    final protected function addState(string $name, mixed $value, ?string $pool = null): static
     {
-        if ($objects instanceof FactoryCollection) {
-            $objects = $objects->create();
-        }
+        $value = self::normalizeFactory($value);
 
-        if (!\is_array($objects)) {
-            $objects = [$objects];
-        }
-
-        foreach ($objects as $object) {
-            $this->pools[$pool][] = self::normalizeObject($object);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param object|Proxy|Factory $object
-     *
-     * @return static
-     */
-    final protected function addState(string $name, object $object, ?string $pool = null): self
-    {
-        $proxy = self::normalizeObject($object);
-
-        $this->objects[$name] = $proxy;
+        $this->state[$name] = $value;
 
         if ($pool) {
-            $this->addToPool($pool, $proxy);
+            $this->addToPool($pool, $value);
         }
 
         return $this;
     }
 
-    final protected function getState(string $name): Proxy
+    final protected function getState(string $name): mixed
     {
-        if (!\array_key_exists($name, $this->objects)) {
+        if (!\array_key_exists($name, $this->state)) {
             throw new \InvalidArgumentException(\sprintf('"%s" was not registered. Did you forget to call "%s::addState()"?', $name, static::class));
         }
 
-        return $this->objects[$name];
+        return $this->state[$name];
     }
 
-    private static function normalizeObject(object $object): Proxy
+    final protected function addToPool(string $pool, mixed $value): self
     {
-        // ensure factories are persisted
-        if ($object instanceof Factory) {
-            $object = $object->create();
+        if ($value instanceof FactoryCollection) {
+            $value = $value->create();
         }
 
-        // ensure objects are proxied
-        if (!$object instanceof ProxyObject) {
-            $object = new ProxyObject($object);
+        if (!\is_array($value)) {
+            $value = [$value];
         }
 
-        // ensure proxies are persisted
-        if (!$object->isPersisted(calledInternally: true)) {
-            $object->_save();
+        foreach ($value as $item) {
+            $this->pools[$pool][] = self::normalizeFactory($item);
         }
 
-        return $object;
+        return $this;
+    }
+
+    private static function normalizeFactory(mixed $value): mixed
+    {
+        return $value instanceof Factory ? $value->create() : $value;
     }
 }
