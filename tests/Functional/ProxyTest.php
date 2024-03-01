@@ -17,6 +17,8 @@ use Zenstruck\Assert;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory as ORMPostFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\PostFactory as ODMPostFactory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -290,6 +292,7 @@ abstract class ProxyTest extends KernelTestCase
         $this->assertSame('another new body', $post->getBody());
     }
 
+    /** @return class-string<ODMPostFactory|ORMPostFactory> */
     abstract protected function postFactoryClass(): string;
 
     abstract protected function postClass(): string;
