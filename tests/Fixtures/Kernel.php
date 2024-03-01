@@ -41,13 +41,13 @@ class Kernel extends BaseKernel
     private string $ormResetMode = ORMDatabaseResetter::RESET_MODE_SCHEMA;
 
     private array $factoriesRegistered = [];
-    private string|null $defaultMakeFactoryNamespace = null;
+    private ?string $defaultMakeFactoryNamespace = null;
 
     public static function create(
         bool $enableDoctrine = true,
         string $ormResetMode = ORMDatabaseResetter::RESET_MODE_SCHEMA,
         array $factoriesRegistered = [],
-        string|null $defaultMakeFactoryNamespace = null,
+        ?string $defaultMakeFactoryNamespace = null,
     ): self {
         $kernel = new self('test', true);
 

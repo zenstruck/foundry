@@ -17,7 +17,7 @@ final class SomeObject
 {
     public $propertyWithoutType;
     public string $stringMandatory;
-    public string|null $stringNullable;
+    public ?string $stringNullable;
     public string $stringWithDefault = '';
     public int $intMandatory;
     public float $floatMandatory;

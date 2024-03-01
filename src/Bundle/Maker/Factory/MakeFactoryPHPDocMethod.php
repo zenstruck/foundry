@@ -16,7 +16,7 @@ namespace Zenstruck\Foundry\Bundle\Maker\Factory;
  */
 final class MakeFactoryPHPDocMethod
 {
-    public function __construct(private string $objectName, private string $prototype, private bool $returnsCollection, private bool $isStatic = true, private string|null $repository = null)
+    public function __construct(private string $objectName, private string $prototype, private bool $returnsCollection, private bool $isStatic = true, private ?string $repository = null)
     {
     }
 
@@ -52,7 +52,7 @@ final class MakeFactoryPHPDocMethod
         return $methods;
     }
 
-    public function toString(string|null $staticAnalysisTool = null): string
+    public function toString(?string $staticAnalysisTool = null): string
     {
         $annotation = $staticAnalysisTool ? "{$staticAnalysisTool}-method" : 'method';
         $static = $this->isStatic ? 'static' : '      ';

@@ -85,7 +85,7 @@ class ObjectDefaultPropertiesGuesser extends AbstractDefaultPropertyGuesser
         return $property->hasType();
     }
 
-    private function getPropertyType(\ReflectionProperty $property): string|null
+    private function getPropertyType(\ReflectionProperty $property): ?string
     {
         if (!$property->hasType()) {
             $type = $this->getConstructorParameterForProperty($property)?->getType();
@@ -100,7 +100,7 @@ class ObjectDefaultPropertiesGuesser extends AbstractDefaultPropertyGuesser
         return $type->getName();
     }
 
-    private function getConstructorParameterForProperty(\ReflectionProperty $property): \ReflectionParameter|null
+    private function getConstructorParameterForProperty(\ReflectionProperty $property): ?\ReflectionParameter
     {
         if ($constructor = $property->getDeclaringClass()->getConstructor()) {
             foreach ($constructor->getParameters() as $parameter) {

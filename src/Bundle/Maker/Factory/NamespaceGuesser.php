@@ -62,7 +62,7 @@ final class NamespaceGuesser
         return $baseNamespace;
     }
 
-    private function namespaceSuffixFromDoctrineMapping(string $originalClass): string|null
+    private function namespaceSuffixFromDoctrineMapping(string $originalClass): ?string
     {
         $originalClassNamespace = Str::getNamespace($originalClass);
 

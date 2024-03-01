@@ -447,7 +447,7 @@ class Factory
      *
      * @return array{cascade: bool, inversedField: ?string, inverseIsCollection: bool, isOwningSide: bool}|null
      */
-    private static function getRelationshipMetadata(EntityManagerInterface $entityManager, string $factoryClass, string $relationshipName): array|null
+    private static function getRelationshipMetadata(EntityManagerInterface $entityManager, string $factoryClass, string $relationshipName): ?array
     {
         $metadata = $entityManager->getClassMetadata($factoryClass);
 
