@@ -177,7 +177,7 @@ final class Configuration
      * @phpstan-param Proxy<TObject>|TObject|class-string<TObject> $objectOrClass
      * @phpstan-return RepositoryProxy<TObject>
      */
-    public function repositoryFor(object|string $objectOrClass): RepositoryProxy
+    public function repositoryFor(object|string $objectOrClass, string|null $persistentManagerName = null): RepositoryProxy
     {
         if (!$this->isPersistEnabled()) {
             throw new \RuntimeException('Cannot get repository when persist is disabled.');
@@ -192,7 +192,7 @@ final class Configuration
         }
 
         /** @var EntityRepository<TObject>|null $repository */
-        $repository = $this->managerRegistry()?->getRepository($objectOrClass);
+        $repository = $this->managerRegistry()?->getRepository($objectOrClass, $persistentManagerName);
 
         if (!$repository) {
             throw new \RuntimeException(\sprintf('No repository registered for "%s".', $objectOrClass));
