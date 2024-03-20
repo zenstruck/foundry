@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## [v1.37.0](https://github.com/zenstruck/foundry/releases/tag/v1.37.0)
+
+March 20th, 2024 - [v1.36.1...v1.37.0](https://github.com/zenstruck/foundry/compare/v1.36.1...v1.37.0)
+
+* 4a9b00e feat: support `doctrine/orm` 3 (#569) by @nikophil
+* 68148e1 use phpunit attributes (#562) by @jrushlow
+* f803868 fix: only run maker test on php > 8.0 (#570) by @nikophil
+* 669bc2d chore: drop SF 6.3 from matrix (#558) by @kbond
+* cf87b97 minor: add sqlite to CI (#557) by @kbond
+
 ## [v1.36.1](https://github.com/zenstruck/foundry/releases/tag/v1.36.1)
 
 December 14th, 2023 - [v1.36.0...v1.36.1](https://github.com/zenstruck/foundry/compare/v1.36.0...v1.36.1)
