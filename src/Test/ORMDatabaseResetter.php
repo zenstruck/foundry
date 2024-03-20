@@ -12,7 +12,7 @@
 namespace Zenstruck\Foundry\Test;
 
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
@@ -70,13 +70,7 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
         }
 
         foreach ($this->objectManagersToReset() as $manager) {
-            $this->runCommand(
-                $this->application,
-                'doctrine:schema:create',
-                [
-                    '--em' => $manager,
-                ],
-            );
+            $this->runCommand($this->application, 'doctrine:schema:create', ['--em' => $manager,]);
         }
     }
 
@@ -89,14 +83,7 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
         }
 
         foreach ($this->objectManagersToReset() as $manager) {
-            $this->runCommand(
-                $this->application,
-                'doctrine:schema:drop',
-                [
-                    '--em' => $manager,
-                    '--force' => true,
-                ],
-            );
+            $this->runCommand($this->application, 'doctrine:schema:drop', ['--em' => $manager, '--force' => true,]);
         }
     }
 
@@ -120,20 +107,17 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
 
             $dropParams = ['--connection' => $connection, '--force' => true];
 
-            if (!$databasePlatform instanceof SqlitePlatform) {
+            if (!$databasePlatform instanceof SQLitePlatform) {
                 // sqlite does not support "--if-exists" (ref: https://github.com/doctrine/dbal/pull/2402)
                 $dropParams['--if-exists'] = true;
             }
 
             $this->runCommand($this->application, 'doctrine:database:drop', $dropParams);
 
-            $this->runCommand(
-                $this->application,
-                'doctrine:database:create',
-                [
-                    '--connection' => $connection,
-                ],
-            );
+            if (!$databasePlatform instanceof SQLitePlatform) {
+                // d:d:create not supported on SQLite
+                $this->runCommand($this->application, 'doctrine:database:create', ['--connection' => $connection,]);
+            }
         }
     }
 

@@ -16,6 +16,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * @internal
+ *
+ * @phpstan-import-type AssociationFieldMapping from ODMClassMetadata
  */
 class ODMDefaultPropertiesGuesser extends AbstractDoctrineDefaultPropertiesGuesser
 {

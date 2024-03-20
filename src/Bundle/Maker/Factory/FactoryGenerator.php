@@ -12,7 +12,7 @@
 namespace Zenstruck\Foundry\Bundle\Maker\Factory;
 
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
-use Doctrine\ORM\Mapping\ClassMetadataInfo as ORMClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 use Symfony\Bundle\MakerBundle\Generator;

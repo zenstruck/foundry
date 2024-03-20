@@ -20,6 +20,13 @@
             <tag name="foundry.make_factory.default_properties_guesser" />
         </service>
 
+        <service id=".zenstruck_foundry.maker.factory.legacy_orm_default_properties_guesser" class="Zenstruck\Foundry\Bundle\Maker\Factory\LegacyORMDefaultPropertiesGuesser">
+            <argument type="service" id=".zenstruck_foundry.chain_manager_registry" />
+            <argument type="service" id=".zenstruck_foundry.maker.factory.factory_class_map" />
+            <argument type="service" id=".zenstruck_foundry.maker.factory.generator" />
+            <tag name="foundry.make_factory.default_properties_guesser" />
+        </service>
+
         <service id=".zenstruck_foundry.maker.factory.odm_default_properties_guesser" class="Zenstruck\Foundry\Bundle\Maker\Factory\ODMDefaultPropertiesGuesser">
             <argument type="service" id=".zenstruck_foundry.chain_manager_registry" />
             <argument type="service" id=".zenstruck_foundry.maker.factory.factory_class_map" />

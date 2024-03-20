@@ -34,7 +34,10 @@ if (\getenv('DATABASE_URL') && \getenv('TEST_MIGRATIONS')) {
     $application = new Application($kernel);
     $application->setAutoExit(false);
 
-    $application->run(new StringInput('doctrine:database:create --if-not-exists --no-interaction'), new NullOutput());
+    if (!str_starts_with(\getenv('DATABASE_URL'), 'sqlite')) {
+        $application->run(new StringInput('doctrine:database:create --if-not-exists --no-interaction'), new NullOutput());
+    }
+
     $application->run(new StringInput('doctrine:schema:drop --force --no-interaction'), new NullOutput());
     $application->run(new StringInput('doctrine:migrations:diff --no-interaction'), new NullOutput());
 
