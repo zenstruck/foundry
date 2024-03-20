@@ -13,7 +13,9 @@ namespace Zenstruck\Foundry;
 
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\AssociationMapping;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
+use Doctrine\ORM\Mapping\OwningSideMapping;
 use Faker;
 use Zenstruck\Foundry\Exception\FoundryBootException;
 use Zenstruck\Foundry\Persistence\InversedRelationshipPostPersistCallback;
@@ -457,10 +459,30 @@ class Factory
             return null;
         }
 
+        if ($relationshipMetadata instanceof AssociationMapping) {
+            $inversedField = $relationshipMetadata instanceof OwningSideMapping ? $relationshipMetadata->inversedBy : $relationshipMetadata->mappedBy;
+
+            return [
+                'cascade' => $relationshipMetadata->isCascadePersist(),
+                'inversedField' => $inversedField,
+                'inverseIsCollection' => $inversedField && $entityManager
+                    ->getClassMetadata($relationshipMetadata->targetEntity)
+                    ->isCollectionValuedAssociation($inversedField),
+                'isOwningSide' => $relationshipMetadata->isOwningSide(),
+            ];
+        }
+
+        // doctrine/orm 2 compatibility follows...
+
+        // @phpstan-ignore-next-line
+        $inversedField = $relationshipMetadata['inversedBy'] ?? $relationshipMetadata['mappedBy'] ?? null;
+
         return [
             'cascade' => $relationshipMetadata['isCascadePersist'],
-            'inversedField' => $relationshipMetadata['inversedBy'] ?? $relationshipMetadata['mappedBy'] ?? null,
-            'inverseIsCollection' => $entityManager->getClassMetadata($relationshipMetadata['targetEntity'])->isCollectionValuedAssociation($relationshipMetadata['inversedBy'] ?? $relationshipMetadata['mappedBy']),
+            'inversedField' => $inversedField,
+            'inverseIsCollection' => $inversedField && $entityManager
+                ->getClassMetadata($relationshipMetadata['targetEntity'])
+                ->isCollectionValuedAssociation($inversedField),
             'isOwningSide' => $relationshipMetadata['isOwningSide'],
         ];
     }

@@ -597,7 +597,7 @@ final class ORMModelFactoryTest extends ModelFactoryTest
     public function can_find_or_create_from_object(): void
     {
         $user = UserFactory::createOne();
-        $comment = CommentFactory::findOrCreate($attributes = ['user' => $user->object(), 'createdAt' => new \DateTimeImmutable('2023-01-01')]);
+        $comment = CommentFactory::findOrCreate($attributes = ['user' => $user->object(), 'createdAt' => new \DateTime('2023-01-01')]);
 
         self::assertSame($user->object(), $comment->getUser());
         CommentFactory::assert()->count(1);

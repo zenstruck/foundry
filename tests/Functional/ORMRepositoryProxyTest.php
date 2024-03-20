@@ -11,7 +11,8 @@
 
 namespace Zenstruck\Foundry\Tests\Functional;
 
-use Doctrine\Common\Proxy\Proxy as DoctrineProxy;
+use Doctrine\Common\Proxy\Proxy as LegacyDoctrineProxy;
+use Doctrine\Persistence\Proxy as DoctrineProxy;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
@@ -58,7 +59,12 @@ final class ORMRepositoryProxyTest extends RepositoryProxyTest
         $category = CategoryFactory::random()->object();
 
         // ensure the category is a "doctrine proxy" and a Category
-        $this->assertInstanceOf(DoctrineProxy::class, $category);
+        if (interface_exists(DoctrineProxy::class)) {
+            $this->assertInstanceOf(DoctrineProxy::class, $category);
+        } else {
+            $this->assertInstanceOf(LegacyDoctrineProxy::class, $category);
+        }
+
         $this->assertInstanceOf(Category::class, $category);
     }
 
