@@ -12,6 +12,8 @@
 namespace Zenstruck\Foundry\Test;
 
 use DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver;
+use PHPUnit\Framework\Attributes\Before;
+use PHPUnit\Framework\Attributes\BeforeClass;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -28,6 +30,7 @@ trait ResetDatabase
      * @internal
      * @beforeClass
      */
+    #[BeforeClass]
     public static function _resetDatabase(): void
     {
         if (!\is_subclass_of(static::class, KernelTestCase::class)) {
@@ -65,6 +68,7 @@ trait ResetDatabase
      * @internal
      * @before
      */
+    #[Before]
     public static function _resetSchema(): void
     {
         if (!\is_subclass_of(static::class, KernelTestCase::class)) {
