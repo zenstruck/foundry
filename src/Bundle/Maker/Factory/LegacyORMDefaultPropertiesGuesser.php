@@ -17,7 +17,7 @@ use Zenstruck\Foundry\Persistence\DoctrineVersionGuesser;
 
 /**
  * @internal
- * @see \Zenstruck\Foundry\Bundle\Maker\Factory\ORMDefaultPropertiesGuesser
+ * @see ORMDefaultPropertiesGuesser
  *
  * This file is basically a copy/paste of ORMDefaultPropertiesGuesser, but offers doctrine/orm 2 compatibility
  */

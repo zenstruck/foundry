@@ -70,7 +70,7 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
         }
 
         foreach ($this->objectManagersToReset() as $manager) {
-            $this->runCommand($this->application, 'doctrine:schema:create', ['--em' => $manager,]);
+            $this->runCommand($this->application, 'doctrine:schema:create', ['--em' => $manager]);
         }
     }
 
@@ -83,7 +83,7 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
         }
 
         foreach ($this->objectManagersToReset() as $manager) {
-            $this->runCommand($this->application, 'doctrine:schema:drop', ['--em' => $manager, '--force' => true,]);
+            $this->runCommand($this->application, 'doctrine:schema:drop', ['--em' => $manager, '--force' => true]);
         }
     }
 
@@ -116,7 +116,7 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
 
             if (!$databasePlatform instanceof SQLitePlatform) {
                 // d:d:create not supported on SQLite
-                $this->runCommand($this->application, 'doctrine:database:create', ['--connection' => $connection,]);
+                $this->runCommand($this->application, 'doctrine:database:create', ['--connection' => $connection]);
             }
         }
     }

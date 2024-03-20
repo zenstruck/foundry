@@ -59,7 +59,7 @@ final class ORMRepositoryProxyTest extends RepositoryProxyTest
         $category = CategoryFactory::random()->object();
 
         // ensure the category is a "doctrine proxy" and a Category
-        if (interface_exists(DoctrineProxy::class)) {
+        if (\interface_exists(DoctrineProxy::class)) {
             $this->assertInstanceOf(DoctrineProxy::class, $category);
         } else {
             $this->assertInstanceOf(LegacyDoctrineProxy::class, $category);

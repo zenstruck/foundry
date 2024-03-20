@@ -154,7 +154,7 @@ class Kernel extends BaseKernel
                     'dbal' => [
                         'url' => '%env(resolve:DATABASE_URL)%',
                         'use_savepoints' => true,
-                        'schema_filter' => '~^(?!(doctrine_migration_versions)$)~'
+                        'schema_filter' => '~^(?!(doctrine_migration_versions)$)~',
                     ],
                     'orm' => [
                         'auto_generate_proxy_classes' => true,
