@@ -4,9 +4,17 @@ namespace Zenstruck\Foundry\Utils\Rector\Tests\Fixtures;
 
 use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject;
 use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Proxy;
 
 /**
  * @extends ModelFactory<DummyObject>
+ *
+ * @method        DummyObject|Proxy     create(array|callable $attributes = [])
+ * @method static DummyObject|Proxy     createOne(array $attributes = [])
+ * @method static DummyObject[]|Proxy[] createMany(int $number, array|callable $attributes = [])
+ * @method static DummyObject[]|Proxy[] createSequence(iterable|callable $sequence)
+ *
+ * @method customMethod()
  */
 final class DummyObjectModelFactory extends ModelFactory
 {
@@ -25,7 +33,6 @@ final class DummyObjectModelFactory extends ModelFactory
         return DummyObject::class;
     }
 }
-
 ?>
 -----
 <?php
@@ -34,26 +41,29 @@ namespace Zenstruck\Foundry\Utils\Rector\Tests\Fixtures;
 
 use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject;
 use Zenstruck\Foundry\ModelFactory;
+use Zenstruck\Foundry\Proxy;
 
 /**
- * @extends \Zenstruck\Foundry\ObjectFactory<\Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject>
+ * @extends ModelFactory<DummyObject>
+ *
+ *
+ * @method customMethod()
  */
-final class DummyObjectModelFactory extends \Zenstruck\Foundry\ObjectFactory
+final class DummyObjectModelFactory extends ModelFactory
 {
-    protected function defaults(): array
+    protected function getDefaults(): array
     {
         return [];
     }
 
-    protected function initialize(): static
+    protected function initialize(): self
     {
         return $this;
     }
 
-    public static function class(): string
+    protected static function getClass(): string
     {
         return DummyObject::class;
     }
 }
-
 ?>

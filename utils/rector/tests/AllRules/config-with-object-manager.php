@@ -12,13 +12,18 @@ declare(strict_types=1);
  */
 
 use Rector\Config\RectorConfig;
-use Zenstruck\Foundry\Utils\Rector\ChangeFactoryBaseClass;
+use Zenstruck\Foundry\Utils\Rector\FoundrySetList;
 use Zenstruck\Foundry\Utils\Rector\PersistenceResolver;
 
 return static function(RectorConfig $rectorConfig): void {
+    $rectorConfig->removeUnusedImports();
+    $rectorConfig->importNames();
+    $rectorConfig->importShortClasses(false);
+
+    $rectorConfig->sets([FoundrySetList::UP_TO_FOUNDRY_2]);
+
     $rectorConfig->singleton(
         PersistenceResolver::class,
         static fn() => new PersistenceResolver(__DIR__.'/entity-manager.php')
     );
-    $rectorConfig->rule(ChangeFactoryBaseClass::class);
 };

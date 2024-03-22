@@ -31,6 +31,8 @@ use Zenstruck\Foundry\ObjectFactory;
  * which can read any Doctrine's mapping (even the ones declared outside the entities)
  *
  * @see https://github.com/phpstan/phpstan-doctrine#configuration
+ *
+ * todo: rename some methods
  */
 final class PersistenceResolver
 {

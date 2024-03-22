@@ -29,6 +29,7 @@ use Zenstruck\Foundry\Utils\Rector\ChangeStaticFactoryFakerCalls;
 use Zenstruck\Foundry\Utils\Rector\PersistenceResolver;
 use Zenstruck\Foundry\Utils\Rector\RemoveProxyRealObjectMethodCallsForNotProxifiedObjects;
 use Zenstruck\Foundry\Utils\Rector\RemoveUnproxifyArrayMap;
+use Zenstruck\Foundry\Utils\Rector\RewriteFactoryPhpDoc\RewriteFactoryPhpDoc;
 use Zenstruck\Foundry\Utils\Rector\RuleRequirementsChecker;
 
 return static function(RectorConfig $rectorConfig): void {
@@ -41,6 +42,7 @@ return static function(RectorConfig $rectorConfig): void {
     $rectorConfig->singleton(PersistenceResolver::class);
 
     $rectorConfig->rules([
+        RewriteFactoryPhpDoc::class,
         ChangeFactoryBaseClass::class,
         ChangeLegacyClassImports::class,
         RemoveProxyRealObjectMethodCallsForNotProxifiedObjects::class,
