@@ -55,9 +55,9 @@ use Zenstruck\Foundry\Proxy;
  * @method static \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject[]|\Zenstruck\Foundry\Persistence\Proxy[] findBy(array $attributes)
  * @method static \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject[]|\Zenstruck\Foundry\Persistence\Proxy[] randomRange(int $min, int $max, array $attributes = [])
  * @method static \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject[]|\Zenstruck\Foundry\Persistence\Proxy[] randomSet(int $number, array $attributes = [])
- * @method \Zenstruck\Foundry\FactoryCollection<\Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject|\Zenstruck\Foundry\Persistence\Proxy> many(int $min, int|null $max)
+ * @method \Zenstruck\Foundry\FactoryCollection<\Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject|\Zenstruck\Foundry\Persistence\Proxy> many(int $min, int|null $max = null)
  * @method \Zenstruck\Foundry\FactoryCollection<\Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject|\Zenstruck\Foundry\Persistence\Proxy> sequence(iterable|callable $sequence)
- * @method \Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator<\Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject, \Doctrine\ORM\EntityRepository> repository()
+ * @method static \Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator<\Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject, \Doctrine\ORM\EntityRepository> repository()
  *
  * @phpstan-method \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject&\Zenstruck\Foundry\Persistence\Proxy<\Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject> create(array|callable $attributes = [])
  * @phpstan-method static \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject&\Zenstruck\Foundry\Persistence\Proxy<\Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject> createOne(array $attributes = [])
@@ -73,7 +73,7 @@ use Zenstruck\Foundry\Proxy;
  * @phpstan-method static list<\Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject&\Zenstruck\Foundry\Persistence\Proxy<\Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject>> findBy(array $attributes)
  * @phpstan-method static list<\Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject&\Zenstruck\Foundry\Persistence\Proxy<\Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject>> randomRange(int $min, int $max, array $attributes = [])
  * @phpstan-method static list<\Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject&\Zenstruck\Foundry\Persistence\Proxy<\Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject>> randomSet(int $number, array $attributes = [])
- * @phpstan-method \Zenstruck\Foundry\FactoryCollection<\Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject&\Zenstruck\Foundry\Persistence\Proxy<\Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject>> many(int $min, int|null $max)
+ * @phpstan-method \Zenstruck\Foundry\FactoryCollection<\Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject&\Zenstruck\Foundry\Persistence\Proxy<\Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject>> many(int $min, int|null $max = null)
  * @phpstan-method \Zenstruck\Foundry\FactoryCollection<\Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject&\Zenstruck\Foundry\Persistence\Proxy<\Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject>> sequence(iterable|callable $sequence)
  */
 final class DummyPersistentModelFactory extends ModelFactory

@@ -231,6 +231,7 @@ final class MethodTagFactory
                         new IdentifierTypeNode('null'),
                     ]
                 ),
+                default: new ConstExprStringNode('null')
             ),
         };
     }

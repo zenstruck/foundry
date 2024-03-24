@@ -67,9 +67,9 @@ use Zenstruck\Foundry\Persistence\Proxy;
  * @method static DummyPersistentObject[]|Proxy[] findBy(array $attributes)
  * @method static DummyPersistentObject[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
  * @method static DummyPersistentObject[]|Proxy[] randomSet(int $number, array $attributes = [])
- * @method FactoryCollection<DummyPersistentObject|Proxy> many(int $min, int|null $max)
+ * @method FactoryCollection<DummyPersistentObject|Proxy> many(int $min, int|null $max = null)
  * @method FactoryCollection<DummyPersistentObject|Proxy> sequence(iterable|callable $sequence)
- * @method ProxyRepositoryDecorator<DummyPersistentObject, EntityRepository> repository()
+ * @method static ProxyRepositoryDecorator<DummyPersistentObject, EntityRepository> repository()
  *
  * @phpstan-method DummyPersistentObject&Proxy<DummyPersistentObject> create(array|callable $attributes = [])
  * @phpstan-method static DummyPersistentObject&Proxy<DummyPersistentObject> createOne(array $attributes = [])
@@ -85,7 +85,7 @@ use Zenstruck\Foundry\Persistence\Proxy;
  * @phpstan-method static list<DummyPersistentObject&Proxy<DummyPersistentObject>> findBy(array $attributes)
  * @phpstan-method static list<DummyPersistentObject&Proxy<DummyPersistentObject>> randomRange(int $min, int $max, array $attributes = [])
  * @phpstan-method static list<DummyPersistentObject&Proxy<DummyPersistentObject>> randomSet(int $number, array $attributes = [])
- * @phpstan-method FactoryCollection<DummyPersistentObject&Proxy<DummyPersistentObject>> many(int $min, int|null $max)
+ * @phpstan-method FactoryCollection<DummyPersistentObject&Proxy<DummyPersistentObject>> many(int $min, int|null $max = null)
  * @phpstan-method FactoryCollection<DummyPersistentObject&Proxy<DummyPersistentObject>> sequence(iterable|callable $sequence)
  * @extends PersistentProxyObjectFactory<DummyPersistentObject>
  */
