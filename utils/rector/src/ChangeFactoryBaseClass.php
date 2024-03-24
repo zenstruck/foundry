@@ -16,18 +16,13 @@ namespace Zenstruck\Foundry\Utils\Rector;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PHPStan\Analyser\MutatingScope;
-use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
-use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueParameterNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\ExtendsTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
-use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
-use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\Type\ObjectType;
 use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfoFactory;
 use Rector\BetterPhpDocParser\PhpDocManipulator\PhpDocTagRemover;
-use Rector\BetterPhpDocParser\ValueObject\Type\BracketsAwareIntersectionTypeNode;
-use Rector\BetterPhpDocParser\ValueObject\Type\BracketsAwareUnionTypeNode;
 use Rector\BetterPhpDocParser\ValueObject\Type\FullyQualifiedIdentifierTypeNode;
-use Rector\BetterPhpDocParser\ValueObject\Type\SpacingAwareArrayTypeNode;
 use Rector\Comments\NodeDocBlock\DocBlockUpdater;
 use Rector\Rector\AbstractRector;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
@@ -35,10 +30,11 @@ use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 
 final class ChangeFactoryBaseClass extends AbstractRector
 {
+    private array $traversedClasses = [];
+
     public function __construct(
         private PhpDocTagRemover $phpDocTagRemover,
         private PhpDocInfoFactory $phpDocInfoFactory,
@@ -56,21 +52,13 @@ final class ChangeFactoryBaseClass extends AbstractRector
                       - `ObjectFactory` will be chosen if target class is not an entity (ORM) or a document (ODM)
                       - `PersistentProxyObjectFactory` will be chosen otherwise (this rector currently doesn't use `PersistentProxyObjectFactory`)
                   - migrates `getDefaults()`, `class()` and `initialize()` methods to new name/prototype
-                  - modifies PhpDoc:
-                    - updates `@extends` annotation
-                    - removes `@method` annotations when using `ObjectFactory`
-                    - change `@method` annotations for method `repository()` when using `PersistentProxyObjectFactory`. Otherwise it breaks type system
+                  - add or updates `@extends` php doc tag
                 DESCRIPTION,
             [
                 new CodeSample(
                     <<<'CODE_SAMPLE'
                         /**
                          * @extends ModelFactory<DummyObject>
-                         *
-                         * @method        DummyObject|Proxy     create(array|callable $attributes = [])
-                         * @method static DummyObject|Proxy     createOne(array $attributes = [])
-                         * @method static DummyObject[]|Proxy[] createMany(int $number, array|callable $attributes = [])
-                         * @method static DummyObject[]|Proxy[] createSequence(iterable|callable $sequence)
                          */
                         final class DummyObjectFactory extends ModelFactory
                         {
@@ -117,14 +105,6 @@ final class ChangeFactoryBaseClass extends AbstractRector
                     <<<'CODE_SAMPLE'
                         /**
                          * @extends ModelFactory<DummyPersistentObject>
-                         *
-                         * @method static RepositoryProxy|EntityRepository repository()
-                         * @method static RepositoryProxy repository()
-                         * @method        DummyPersistentObject|Proxy create(array|callable $attributes = [])
-                         *
-                         * @phpstan-method Proxy<DummyPersistentObject> create(array|callable $attributes = [])
-                         * @phpstan-method static Proxy<DummyPersistentObject> createOne(array $attributes = [])
-                         * @phpstan-method static RepositoryProxy<DummyPersistentObject> repository()
                          */
                         final class DummyPersistentProxyFactory extends ModelFactory
                         {
@@ -147,14 +127,6 @@ final class ChangeFactoryBaseClass extends AbstractRector
                     <<<'CODE_SAMPLE'
                         /**
                          * @extends \Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory<DummyPersistentObject>
-                         *
-                         * @method static EntityRepository|\Zenstruck\Foundry\Persistence\RepositoryDecorator repository()
-                         * @method static \Zenstruck\Foundry\Persistence\RepositoryDecorator repository()
-                         * @method        DummyPersistentObject|Proxy create(array|callable $attributes = [])
-                         *
-                         * @phpstan-method Proxy<DummyPersistentObject> create(array|callable $attributes = [])
-                         * @phpstan-method static Proxy<DummyPersistentObject> createOne(array $attributes = [])
-                         * @phpstan-method static \Zenstruck\Foundry\Persistence\RepositoryDecorator<DummyPersistentObject> repository()
                          */
                         final class DummyPersistentProxyFactory extends \Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory
                         {
@@ -196,151 +168,106 @@ final class ChangeFactoryBaseClass extends AbstractRector
             return null;
         }
 
-        $this->changeBaseClass($node);
-        $this->changeFactoryMethods($node);
+        if (isset($this->traversedClasses[$this->getName($node)])) {
+            return null;
+        }
 
-        return $node;
+        $this->traversedClasses[$this->getName($node)] = true;
+
+        $baseClassChanged = $this->changeBaseClass($node);
+        $methodChanged = $this->changeFactoryMethods($node);
+        
+        return $methodChanged || $baseClassChanged ? $node : null;
     }
 
-    private function changeBaseClass(Class_ $node): ?Class_
+    private function changeBaseClass(Class_ $node): bool
     {
         /** @var MutatingScope $mutatingScope */
         $mutatingScope = $node->getAttribute('scope');
         $parentFactoryReflection = $mutatingScope->getClassReflection()?->getParentClass();
 
         if (!$parentFactoryReflection) {
-            return null;
+            return false;
         }
 
-        if (
-            !\str_starts_with($parentFactoryReflection->getName(), 'Zenstruck\Foundry')
-            || \str_starts_with($parentFactoryReflection->getName(), 'Zenstruck\Foundry\Utils\Rector')
-        ) {
-            $newFactoryClass = $parentFactoryReflection->getName();
-        } elseif ($this->persistenceResolver->shouldTransformFactoryIntoObjectFactory($this->getName($node))) { // @phpstan-ignore-line
+        if ($parentFactoryReflection->getName() !== ModelFactory::class) {
+            return false;
+        }
+        
+        if ($this->persistenceResolver->shouldTransformFactoryIntoObjectFactory($this->getName($node))) { // @phpstan-ignore-line
             $newFactoryClass = ObjectFactory::class;
-            $node->extends = new Node\Name\FullyQualified($newFactoryClass);
         } else {
             $newFactoryClass = PersistentProxyObjectFactory::class;
-            $node->extends = new Node\Name\FullyQualified($newFactoryClass);
         }
 
-        $this->updatePhpDoc($node, $newFactoryClass);
-        $this->docBlockUpdater->updateRefactoredNodeWithPhpDocInfo($node);
+        $node->extends = new Node\Name\FullyQualified($newFactoryClass);
+        $this->updateExtendsPhpDoc($node, $newFactoryClass);
 
-        return $node;
+        return true;
     }
 
-    /**
-     * - updates `@extends` annotation
-     * - removes `@method` annotations when not using proxies anymore
-     * - change `@[phpstan|psalm]-method` annotations and rewrite them.
-     */
-    private function updatePhpDoc(Class_ $node, string $newFactoryClass): void
+    private function updateExtendsPhpDoc(Class_ $node, string $newFactoryClass): void
     {
-        $phpDocInfo = $this->phpDocInfoFactory->createFromNode($node);
-
-        if (!$phpDocInfo) {
-            return;
-        }
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($node);
 
         $phpDocNode = $phpDocInfo->getPhpDocNode();
 
-        $extendsDocNode = $phpDocNode->getExtendsTagValues()[0] ?? null;
-        if ($extendsDocNode) {
-            $extendsDocNode->type->type = new FullyQualifiedIdentifierTypeNode($newFactoryClass);
+        $extendsPhpDocNodes = [
+            ...$phpDocNode->getExtendsTagValues(),
+            ...$phpDocNode->getExtendsTagValues('@phpstan-extends'),
+            ...$phpDocNode->getExtendsTagValues('@psalm-extends'),
+        ];
+
+        // first, remove all @extends tags
+        foreach ($extendsPhpDocNodes as $extendsPhpDocNode) {
+            $this->phpDocTagRemover->removeTagValueFromNode($phpDocInfo, $extendsPhpDocNode);
         }
 
-        if ($newFactoryClass === ObjectFactory::class) {
-            $this->phpDocTagRemover->removeByName($phpDocInfo, 'method');
-            $this->phpDocTagRemover->removeByName($phpDocInfo, 'phpstan-method');
-            $this->phpDocTagRemover->removeByName($phpDocInfo, 'psalm-method');
-        } else {
-            $targetClassName = $this->persistenceResolver->targetClass($this->getName($node->namespacedName)); // @phpstan-ignore-line
-
-            /** @var MethodTagValueNode[] $methodNodes */
-            $methodNodes = [
-                ...$phpDocNode->getMethodTagValues(),
-                ...$phpDocNode->getMethodTagValues('@phpstan-method'),
-                ...$phpDocNode->getMethodTagValues('@psalm-method'),
-            ];
-
-            foreach ($methodNodes as $methodNode) {
-                if (\in_array($methodNode->methodName, ['create', 'createOne', 'find', 'findOrCreate', 'first', 'last', 'random', 'randomOrCreate'], true)) {
-                    if (\str_contains($methodNode->getAttribute('parent')->name, '-method')) {
-                        $methodNode->returnType = new BracketsAwareIntersectionTypeNode(
-                            [
-                                new FullyQualifiedIdentifierTypeNode($targetClassName),
-                                new GenericTypeNode(new IdentifierTypeNode('Proxy'), [new FullyQualifiedIdentifierTypeNode($targetClassName)]),
-                            ]
-                        );
-                    } else {
-                        $methodNode->returnType = new BracketsAwareUnionTypeNode(
-                            [
-                                new FullyQualifiedIdentifierTypeNode($targetClassName),
-                                new IdentifierTypeNode('Proxy'),
-                            ]
-                        );
-                    }
-                } elseif (\in_array($methodNode->methodName, ['all', 'createMany', 'createSequence', 'findBy', 'randomRange', 'randomSet'], true)) {
-                    if (\str_contains($methodNode->getAttribute('parent')->name, '-method')) {
-                        $methodNode->returnType = new GenericTypeNode(
-                            new IdentifierTypeNode('list'),
-                            [
-                                new BracketsAwareIntersectionTypeNode(
-                                    [
-                                        new FullyQualifiedIdentifierTypeNode($targetClassName),
-                                        new GenericTypeNode(new IdentifierTypeNode('Proxy'), [new FullyQualifiedIdentifierTypeNode($targetClassName)]),
-                                    ]
-                                ),
-                            ]
-                        );
-                    } else {
-                        $methodNode->returnType = new BracketsAwareUnionTypeNode(
-                            [
-                                new SpacingAwareArrayTypeNode(new FullyQualifiedIdentifierTypeNode($targetClassName)),
-                                new SpacingAwareArrayTypeNode(new IdentifierTypeNode('Proxy')),
-                            ]
-                        );
-                    }
-                } elseif ('repository' === $methodNode->methodName) {
-                    $methodNode->returnType = new GenericTypeNode(
-                        new FullyQualifiedIdentifierTypeNode(ProxyRepositoryDecorator::class),
+        // then rewrite the good one
+        $phpDocInfo->addPhpDocTagNode(
+            new PhpDocTagNode(
+                '@extends',
+                new ExtendsTagValueNode(
+                    type: new GenericTypeNode(
+                        new FullyQualifiedIdentifierTypeNode($newFactoryClass),
                         [
-                            new FullyQualifiedIdentifierTypeNode($targetClassName),
-                            new FullyQualifiedIdentifierTypeNode($this->persistenceResolver->geRepositoryClass($targetClassName)),
+                            new FullyQualifiedIdentifierTypeNode(
+                                $this->persistenceResolver->targetClass($this->getName($node) ?? '') // @phpstan-ignore-line
+                            ),
                         ]
-                    );
-                }
+                    ),
+                    description: ''
+                )
+            )
+        );
 
-                // handle case when @method parameter is UnionType
-                // this prevents to render it with brackets, which creates parsing error
-                foreach ($methodNode->parameters as $parameter) {
-                    if ($parameter instanceof MethodTagValueParameterNode && $parameter->type instanceof UnionTypeNode) {
-                        $parameter->type = new BracketsAwareUnionTypeNode($parameter->type->types);
-                    }
-                }
-            }
-        }
+        $this->docBlockUpdater->updateRefactoredNodeWithPhpDocInfo($node);
     }
 
-    private function changeFactoryMethods(Class_ $node): void
+    private function changeFactoryMethods(Class_ $node): bool
     {
+        $modified  = false;
+
         foreach ($node->getMethods() as $method) {
             $methodName = $this->getName($method);
 
             if ('getDefaults' == $methodName) {
                 $method->name = new Node\Identifier('defaults');
+                $modified = true;
             }
 
             if ('getClass' == $methodName) {
                 $method->name = new Node\Identifier('class');
                 $method->flags = Class_::MODIFIER_PUBLIC | Class_::MODIFIER_STATIC;
+                $modified = true;
             }
 
             if ('initialize' == $methodName) {
                 $method->returnType = new Node\Identifier('static');
+                $modified = true;
             }
         }
+
+        return $modified;
     }
 }

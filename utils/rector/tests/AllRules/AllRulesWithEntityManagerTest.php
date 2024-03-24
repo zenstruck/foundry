@@ -15,7 +15,7 @@ namespace Zenstruck\Foundry\Utils\Rector\Tests\AddRules;
 
 use Rector\Testing\PHPUnit\AbstractRectorTestCase;
 
-final class AllRulesTest extends AbstractRectorTestCase
+final class AllRulesWithEntityManagerTest extends AbstractRectorTestCase
 {
     /**
      * @dataProvider provideData
@@ -34,6 +34,6 @@ final class AllRulesTest extends AbstractRectorTestCase
 
     public function provideConfigFilePath(): string
     {
-        return __DIR__.'/config.php';
+        return __DIR__.'/config-with-object-manager.php';
     }
 }

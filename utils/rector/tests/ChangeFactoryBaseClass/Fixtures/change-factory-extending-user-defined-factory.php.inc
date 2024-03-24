@@ -3,8 +3,6 @@
 namespace Zenstruck\Foundry\Utils\Rector\Tests\Fixtures;
 
 use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject;
-use Zenstruck\Foundry\ModelFactory;
-use Zenstruck\Foundry\Proxy;
 
 final class DummyModelFactoryExtendingUserFactory extends DummyObjectModelFactory
 {
@@ -30,8 +28,6 @@ final class DummyModelFactoryExtendingUserFactory extends DummyObjectModelFactor
 namespace Zenstruck\Foundry\Utils\Rector\Tests\Fixtures;
 
 use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject;
-use Zenstruck\Foundry\ModelFactory;
-use Zenstruck\Foundry\Proxy;
 
 final class DummyModelFactoryExtendingUserFactory extends DummyObjectModelFactory
 {

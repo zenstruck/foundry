@@ -11,11 +11,11 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\Utils\Rector\Tests\ChangeFactoryBaseClass;
+namespace Zenstruck\Foundry\Utils\Rector\Tests\AddProxyToFactoryCollectionTypeInPhpDoc;
 
 use Rector\Testing\PHPUnit\AbstractRectorTestCase;
 
-final class ChangeFactoryBaseClassWithObjectManagerTest extends AbstractRectorTestCase
+final class RewriteFactoryPhpDocTest extends AbstractRectorTestCase
 {
     /**
      * @dataProvider provideData
@@ -27,13 +27,13 @@ final class ChangeFactoryBaseClassWithObjectManagerTest extends AbstractRectorTe
         $this->doTestFile($filePath);
     }
 
-    public static function provideData(): \Iterator
+    public static function provideData(): iterable
     {
         return self::yieldFilesFromDirectory(__DIR__.'/Fixtures');
     }
 
     public function provideConfigFilePath(): string
     {
-        return __DIR__.'/config-with-object-manager.php';
+        return __DIR__.'/config.php';
     }
 }
