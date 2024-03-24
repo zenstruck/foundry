@@ -22,30 +22,6 @@ use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 
-/**
- * [
- * 'create',
- * 'createOne',
- * 'find',
- * 'findOrCreate',
- * 'first',
- * 'last',
- * 'random',
- * 'randomOrCreate',
- *
- * 'all',
- * 'createMany',
- * 'createSequence',
- * 'findBy',
- * 'randomRange',
- * 'randomSet',
- *
- * 'many',
- * 'sequence',
- *
- * 'repository',
- * ]
- */
 final class MethodTagFactory
 {
     /**
@@ -131,7 +107,7 @@ final class MethodTagFactory
         return new PhpDocTagNode(
             '@method',
             new MethodTagValueNode(
-                isStatic: false,
+                isStatic: true,
                 returnType: new GenericTypeNode(
                     new FullyQualifiedIdentifierTypeNode(ProxyRepositoryDecorator::class),
                     [
