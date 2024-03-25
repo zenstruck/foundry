@@ -13,7 +13,6 @@ namespace Zenstruck\Foundry\Maker\Factory;
 
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\Str;
@@ -34,7 +33,7 @@ final class FactoryGenerator
 
     /** @param \Traversable<int, DefaultPropertiesGuesser> $defaultPropertiesGuessers */
     public function __construct(
-        private PersistenceManager|null $persistenceManager,
+        private ?PersistenceManager $persistenceManager,
         private KernelInterface $kernel,
         private \Traversable $defaultPropertiesGuessers,
         private FactoryClassMap $factoryClassMap,

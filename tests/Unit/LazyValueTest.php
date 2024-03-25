@@ -12,7 +12,6 @@
 namespace Zenstruck\Foundry\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
-
 use Zenstruck\Foundry\LazyValue;
 
 use function Zenstruck\Foundry\lazy;

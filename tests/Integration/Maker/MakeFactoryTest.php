@@ -394,7 +394,7 @@ final class MakeFactoryTest extends MakerTestCase
 
         $tester->execute(['class' => $objectClass, '--all-fields' => true]);
 
-        $this->assertFileExists(self::tempFile("src/Factory/EmbeddableFactory.php"));
+        $this->assertFileExists(self::tempFile('src/Factory/EmbeddableFactory.php'));
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile("src/Factory/{$objectFactoryName}.php"));
     }
 
@@ -421,7 +421,7 @@ final class MakeFactoryTest extends MakerTestCase
 
         $tester->execute(['class' => ObjectWithEnum::class, '--no-persistence' => true]);
 
-        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile("src/Factory/ObjectWithEnumFactory.php"));
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/ObjectWithEnumFactory.php'));
     }
 
     private function emulateSCAToolEnabled(string $scaToolFilePath): void

@@ -22,7 +22,7 @@ use Zenstruck\Foundry\Persistence\PersistenceStrategy;
  *
  * @internal
  *
- * @method DocumentManager objectManagerFor(string $class)
+ * @method DocumentManager       objectManagerFor(string $class)
  * @method list<DocumentManager> objectManagers()
  */
 final class MongoPersistenceStrategy extends PersistenceStrategy
@@ -61,7 +61,7 @@ final class MongoPersistenceStrategy extends PersistenceStrategy
             $namespaces[] = $objectManager->getConfiguration()->getDocumentNamespaces();
         }
 
-        return array_values(array_merge(...$namespaces));
+        return \array_values(\array_merge(...$namespaces));
     }
 
     public function embeddablePropertiesFor(object $object, string $owner): ?array

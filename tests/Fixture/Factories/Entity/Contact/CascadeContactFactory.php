@@ -32,7 +32,7 @@ final class CascadeContactFactory extends PersistentObjectFactory
     {
         return [
             'name' => self::faker()->word(),
-//            'category' => CascadeCategoryFactory::new(),
+            //            'category' => CascadeCategoryFactory::new(),
             'address' => CascadeAddressFactory::new(),
         ];
     }

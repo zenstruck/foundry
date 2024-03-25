@@ -91,7 +91,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
      */
     public function find($id): ?object
     {
-        if (\is_array($id) && (empty($id) || !\array_is_list($id))) {
+        if (\is_array($id) && (empty($id) || !array_is_list($id))) {
             return $this->findOneBy($id);
         }
 
@@ -186,7 +186,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
     /**
      * @param int<0, max> $min
      * @param int<0, max> $max
-     * @param Parameters   $criteria
+     * @param Parameters  $criteria
      *
      * @return T[]
      */
@@ -209,6 +209,15 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
         }
 
         return \array_slice($all, 0, \random_int($min, $max)); // @phpstan-ignore-line
+    }
+
+    public function getIterator(): \Traversable
+    {
+        if (\is_iterable($this->inner())) {
+            return yield from $this->inner();
+        }
+
+        yield from $this->findAll();
     }
 
     /**
@@ -252,14 +261,5 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
         }
 
         return $normalized;
-    }
-
-    public function getIterator(): \Traversable
-    {
-        if (\is_iterable($this->inner())) {
-            return yield from $this->inner();
-        }
-
-        yield from $this->findAll();
     }
 }

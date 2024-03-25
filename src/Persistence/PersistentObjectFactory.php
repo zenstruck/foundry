@@ -12,6 +12,7 @@
 namespace Zenstruck\Foundry\Persistence;
 
 use Doctrine\Persistence\ObjectRepository;
+use Symfony\Component\VarExporter\Exception\LogicException as VarExportLogicException;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\PersistenceDisabled;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
@@ -21,7 +22,6 @@ use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\Exception\NoPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
-use Symfony\Component\VarExporter\Exception\LogicException as VarExportLogicException;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -107,7 +107,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
      *
      * @param int<0, max> $min
      * @param int<0, max> $max
-     * @param Parameters   $criteria
+     * @param Parameters  $criteria
      *
      * @return T[]
      */

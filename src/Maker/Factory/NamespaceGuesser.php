@@ -30,7 +30,7 @@ final class NamespaceGuesser
     /** @var list<string> */
     private array $doctrineNamespaces;
 
-    public function __construct(PersistenceManager|null $persistenceManager)
+    public function __construct(?PersistenceManager $persistenceManager)
     {
         $this->doctrineNamespaces = $persistenceManager?->managedNamespaces() ?? [];
     }

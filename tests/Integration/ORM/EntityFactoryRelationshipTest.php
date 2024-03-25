@@ -43,7 +43,7 @@ class EntityFactoryRelationshipTest extends KernelTestCase
     public function many_to_one(): void
     {
         $contact = $this->contactFactory()::createOne([
-            'category' => $this->categoryFactory()
+            'category' => $this->categoryFactory(),
         ]);
 
         $this->contactFactory()::repository()->assert()->count(1);
@@ -60,7 +60,7 @@ class EntityFactoryRelationshipTest extends KernelTestCase
     {
         $contact = $this->contactFactory()->withoutPersisting()->create([
             'tags' => $this->tagFactory()->many(3),
-            'category' => $this->categoryFactory()
+            'category' => $this->categoryFactory(),
         ]);
 
         $this->contactFactory()::repository()->assert()->empty();
@@ -263,7 +263,7 @@ class EntityFactoryRelationshipTest extends KernelTestCase
     public function can_use_adder_as_attributes(): void
     {
         $category = $this->categoryFactory()->create([
-            'addContact' => $this->contactFactory()->with(['name' => 'foo'])
+            'addContact' => $this->contactFactory()->with(['name' => 'foo']),
         ]);
 
         self::assertCount(1, $category->getContacts());

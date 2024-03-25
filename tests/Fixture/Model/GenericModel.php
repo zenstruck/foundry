@@ -35,7 +35,7 @@ abstract class GenericModel
 
     #[ORM\Column(nullable: true)]
     #[MongoDB\Field(type: 'date_immutable', nullable: true)]
-    private \DateTimeImmutable|null $date = null;
+    private ?\DateTimeImmutable $date = null;
 
     public function __construct(string $prop1)
     {

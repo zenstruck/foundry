@@ -14,7 +14,6 @@ namespace Zenstruck\Foundry\Tests\Fixture\Entity\Tag;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact\CascadeContact;
-use Zenstruck\Foundry\Tests\Fixture\Entity\Contact\StandardContact;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Tag;
 
 /**

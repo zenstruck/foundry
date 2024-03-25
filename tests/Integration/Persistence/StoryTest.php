@@ -23,10 +23,9 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
 use Zenstruck\Foundry\Tests\Fixture\Stories\DocumentPoolStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\DocumentStory;
+use Zenstruck\Foundry\Tests\Fixture\Stories\EntityPoolStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\EntityStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\GlobalStory;
-
-use Zenstruck\Foundry\Tests\Fixture\Stories\EntityPoolStory;
 
 use function Zenstruck\Foundry\Persistence\repository;
 

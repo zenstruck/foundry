@@ -35,7 +35,7 @@ final class CascadeEntityFactoryRelationshipTest extends EntityFactoryRelationsh
             })
             ->create([
                 'tags' => $this->tagFactory()->many(3),
-                'category' => $this->categoryFactory()
+                'category' => $this->categoryFactory(),
             ])
         ;
 

@@ -16,7 +16,6 @@ use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
-use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\Mapping\MappingException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -29,7 +28,7 @@ use Zenstruck\Foundry\Persistence\RelationshipMetadata;
  *
  * @internal
  *
- * @method EntityManagerInterface objectManagerFor(string $class)
+ * @method EntityManagerInterface       objectManagerFor(string $class)
  * @method list<EntityManagerInterface> objectManagers()
  *
  * @phpstan-import-type AssociationMapping from \Doctrine\ORM\Mapping\ClassMetadata
@@ -151,11 +150,11 @@ final class ORMPersistenceStrategy extends PersistenceStrategy
                 return null;
             }
 
-            if (!is_a($parent, $inversedAssociation['targetEntity'], allow_string: true)) { // is_a() handles inheritance as well
-                throw new \LogicException("Cannot find correct association named \"$field\" between classes [parent: \"$parent\", child: \"$child\"]");
+            if (!\is_a($parent, $inversedAssociation['targetEntity'], allow_string: true)) { // is_a() handles inheritance as well
+                throw new \LogicException("Cannot find correct association named \"{$field}\" between classes [parent: \"{$parent}\", child: \"{$child}\"]");
             }
 
-            if ($inversedAssociation['type'] !== ClassMetadataInfo::ONE_TO_MANY || !isset($inversedAssociation['mappedBy'])) {
+            if (ClassMetadataInfo::ONE_TO_MANY !== $inversedAssociation['type'] || !isset($inversedAssociation['mappedBy'])) {
                 return null;
             }
 
@@ -176,15 +175,15 @@ final class ORMPersistenceStrategy extends PersistenceStrategy
             $namespaces[] = $objectManager->getConfiguration()->getEntityNamespaces();
         }
 
-        return array_values(array_merge(...$namespaces));
+        return \array_values(\array_merge(...$namespaces));
     }
 
     /**
-     * @param class-string $entityClass
+     * @param  class-string $entityClass
      * @return array[]|null
      * @phpstan-return AssociationMapping|null
      */
-    private function getAssociationMapping(string $entityClass, string $field): array|null
+    private function getAssociationMapping(string $entityClass, string $field): ?array
     {
         try {
             return $this->objectManagerFor($entityClass)->getClassMetadata($entityClass)->getAssociationMapping($field);

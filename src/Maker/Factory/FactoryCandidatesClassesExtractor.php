@@ -21,7 +21,7 @@ use Zenstruck\Foundry\Persistence\PersistenceManager;
  */
 final class FactoryCandidatesClassesExtractor
 {
-    public function __construct(private PersistenceManager|null $persistenceManager, private FactoryClassMap $factoryClassMap)
+    public function __construct(private ?PersistenceManager $persistenceManager, private FactoryClassMap $factoryClassMap)
     {
     }
 
@@ -34,7 +34,7 @@ final class FactoryCandidatesClassesExtractor
 
         $embeddedClasses = [];
 
-        foreach ($this->persistenceManager?->allMetadata() ??[] as $metadata) {
+        foreach ($this->persistenceManager?->allMetadata() ?? [] as $metadata) {
             if ($metadata->getReflectionClass()->isAbstract()) {
                 continue;
             }

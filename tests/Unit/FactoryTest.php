@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Tests\Unit;
 
 use Faker;
@@ -28,6 +37,13 @@ use function Zenstruck\Foundry\Persistence\proxy_factory;
 final class FactoryTest extends TestCase
 {
     use Factories;
+
+    protected function tearDown(): void
+    {
+        // neutralize custom configuration added in some tests
+        UnitTestConfig::configure();
+        Configuration::boot(UnitTestConfig::build());
+    }
 
     /**
      * @test
@@ -129,12 +145,5 @@ final class FactoryTest extends TestCase
         ]);
 
         $this->assertInstanceOf(StandardCategory::class, $object->getCategory());
-    }
-
-    protected function tearDown(): void
-    {
-        // neutralize custom configuration added in some tests
-        UnitTestConfig::configure();
-        Configuration::boot(UnitTestConfig::build());
     }
 }

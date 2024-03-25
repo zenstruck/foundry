@@ -54,7 +54,6 @@ final class NoPersistenceObjectsAutoCompleter
                 }
 
                 /** @var class-string $class */
-
                 if (!$reflection->isInstantiable()) {
                     // remove abstract classes / interfaces / traits
                     continue;

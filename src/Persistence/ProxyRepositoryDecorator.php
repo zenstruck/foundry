@@ -104,22 +104,22 @@ final class ProxyRepositoryDecorator extends RepositoryDecorator // @phpstan-ign
     }
 
     /**
-     * @param array<T> $objects
+     * @param  array<T>          $objects
      * @return array<T&Proxy<T>>
      */
     private function proxyArray(array $objects): array
     {
-        return array_map(
+        return \array_map(
             static fn(object $object) => proxy($object),
             $objects
         );
     }
 
     /**
-     * @param T|null $object
+     * @param  T|null            $object
      * @return (T&Proxy<T>)|null
      */
-    private function proxyNullableObject(object|null $object): object|null
+    private function proxyNullableObject(?object $object): ?object
     {
         if (null === $object) {
             return null;

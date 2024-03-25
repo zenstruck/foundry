@@ -22,9 +22,9 @@ use Zenstruck\Foundry\Tests\Fixture\Model\Base;
 #[ORM\MappedSuperclass]
 abstract class Contact extends Base
 {
-    protected Category|null $category = null;
+    protected ?Category $category = null;
 
-    protected Category|null $secondaryCategory = null;
+    protected ?Category $secondaryCategory = null;
 
     /** @var Collection<int,Tag> */
     protected Collection $tags;

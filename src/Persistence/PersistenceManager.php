@@ -337,7 +337,7 @@ final class PersistenceManager
             $namespaces[] = $strategy->managedNamespaces();
         }
 
-        return array_values(array_unique(array_merge(...$namespaces)));
+        return \array_values(\array_unique(\array_merge(...$namespaces)));
     }
 
     /**

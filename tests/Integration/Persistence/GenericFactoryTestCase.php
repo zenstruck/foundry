@@ -14,7 +14,6 @@ namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\PersistenceDisabled;
-use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Test\Factories;
