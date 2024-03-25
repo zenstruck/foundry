@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 use Zenstruck\Foundry\Object\Instantiator;
-use Zenstruck\Foundry\ORM\ORMPersistenceStrategy;
+use Zenstruck\Foundry\ORM\AbstractORMPersistenceStrategy;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -111,8 +111,8 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                                 ->end()
                                 ->enumNode('mode')
                                     ->info('Reset mode to use with ResetDatabase trait')
-                                    ->defaultValue(ORMPersistenceStrategy::RESET_MODE_SCHEMA)
-                                    ->values([ORMPersistenceStrategy::RESET_MODE_SCHEMA, ORMPersistenceStrategy::RESET_MODE_MIGRATE])
+                                    ->defaultValue(AbstractORMPersistenceStrategy::RESET_MODE_SCHEMA)
+                                    ->values([AbstractORMPersistenceStrategy::RESET_MODE_SCHEMA, AbstractORMPersistenceStrategy::RESET_MODE_MIGRATE])
                                 ->end()
                             ->end()
                         ->end()

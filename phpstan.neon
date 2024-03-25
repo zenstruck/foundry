@@ -14,3 +14,7 @@ parameters:
         - tests/Fixture/Maker/expected/can_create_factory_interactively.php
         - tests/Fixture/Maker/expected/can_create_factory_with_embeddable_with_data_set_odm.php
         - tests/Fixture/Maker/expected/can_create_factory_with_embeddable_with_data_set_orm.php
+
+        # phpstan runs with orm 3 - there are too many failures in these files which are compatible with orm 2
+        - ./src/Bundle/Maker/Factory/LegacyORMDefaultPropertiesGuesser.php
+        - ./src/Bundle/Maker/Factory/DoctrineScalarFieldsDefaultPropertiesGuesser.php

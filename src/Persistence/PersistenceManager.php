@@ -18,7 +18,7 @@ use Doctrine\Persistence\ObjectRepository;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
-use Zenstruck\Foundry\ORM\ORMPersistenceStrategy;
+use Zenstruck\Foundry\ORM\AbstractORMPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\NoPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
 use Zenstruck\Foundry\Tests\Fixture\TestKernel;
@@ -84,7 +84,7 @@ final class PersistenceManager
             $strategyClasses[] = $strategy::class;
         }
 
-        if ([ORMPersistenceStrategy::class] === $strategyClasses) {
+        if ([AbstractORMPersistenceStrategy::class] === $strategyClasses) {
             // enable skipping booting the kernel for resetSchema()
             self::$ormOnly = true;
         }

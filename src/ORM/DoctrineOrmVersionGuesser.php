@@ -11,13 +11,13 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\Persistence;
+namespace Zenstruck\Foundry\ORM;
 
 use Doctrine\ORM\Mapping\FieldMapping;
 
-final class DoctrineVersionGuesser
+final class DoctrineOrmVersionGuesser
 {
-    public static function isOrmV4(): bool
+    public static function isOrmV3(): bool
     {
         return \class_exists(FieldMapping::class);
     }
