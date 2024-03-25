@@ -16,6 +16,12 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Faker;
 use Zenstruck\Foundry\Exception\FoundryBootException;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
+use Zenstruck\Foundry\Persistence\RepositoryDecorator;
+use Zenstruck\Foundry\Test\ResetDatabase;
 
 /**
  * @internal
@@ -53,7 +59,7 @@ final class Configuration
         $this->stories = new StoryManager([]);
         $this->factories = new ModelFactoryManager([]);
         $this->faker = Faker\Factory::create();
-        $this->instantiator = new Instantiator();
+        $this->instantiator = Instantiator::withConstructor();
     }
 
     public function stories(): StoryManager
@@ -83,8 +89,6 @@ final class Configuration
         }
 
         if (null === $this->defaultProxyAutoRefresh) {
-            trigger_deprecation('zenstruck\foundry', '1.9', 'Not explicitly configuring the default proxy auto-refresh is deprecated and will default to "true" in 2.0. Use "zenstruck_foundry.auto_refresh_proxies" in the bundle config or TestState::enableDefaultProxyAutoRefresh()/disableDefaultProxyAutoRefresh().');
-
             $this->defaultProxyAutoRefresh = false;
         }
 
@@ -135,6 +139,17 @@ final class Configuration
 
     public function disableDefaultProxyAutoRefresh(): self
     {
+        trigger_deprecation(
+            'zenstruck\foundry',
+            '1.38.0',
+            <<<MESSAGE
+                Configuring the default proxy auto-refresh to false is deprecated. You should set it to "true", which will be the default value in 2.0.
+                If you still want to disable auto refresh, make your factory implement "%s" instead of "%s".
+                MESSAGE,
+            PersistentObjectFactory::class,
+            PersistentProxyObjectFactory::class,
+        );
+
         $this->defaultProxyAutoRefresh = false;
 
         return $this;
@@ -147,6 +162,8 @@ final class Configuration
 
     public function disableDatabaseReset(): self
     {
+        trigger_deprecation('zenstruck\foundry', '1.38.0', 'Disabling database reset via bundle configuration is deprecated and will be removed in 2.0. Instead you should not use "%s" trait in your test.', ResetDatabase::class);
+
         $this->databaseResetEnabled = false;
 
         return $this;
@@ -175,16 +192,16 @@ final class Configuration
     /**
      * @template TObject of object
      * @phpstan-param Proxy<TObject>|TObject|class-string<TObject> $objectOrClass
-     * @phpstan-return RepositoryProxy<TObject>
+     * @phpstan-return ($proxy is true ? ProxyRepositoryDecorator<TObject> : RepositoryDecorator<TObject>)
      */
-    public function repositoryFor(object|string $objectOrClass): RepositoryProxy
+    public function repositoryFor(object|string $objectOrClass, bool $proxy): RepositoryDecorator
     {
         if (!$this->isPersistEnabled()) {
             throw new \RuntimeException('Cannot get repository when persist is disabled.');
         }
 
         if ($objectOrClass instanceof Proxy) {
-            $objectOrClass = $objectOrClass->object();
+            $objectOrClass = $objectOrClass->_real();
         }
 
         if (!\is_string($objectOrClass)) {
@@ -198,7 +215,7 @@ final class Configuration
             throw new \RuntimeException(\sprintf('No repository registered for "%s".', $objectOrClass));
         }
 
-        return new RepositoryProxy($repository);
+        return $proxy ? new ProxyRepositoryDecorator($repository) : new RepositoryDecorator($repository);
     }
 
     public function objectManagerFor(object|string $objectOrClass): ObjectManager
@@ -249,11 +266,19 @@ final class Configuration
 
     public function disablePersist(): void
     {
+        if (!self::hasManagerRegistry()) {
+            trigger_deprecation('zenstruck\foundry', '1.38.0', 'Calling function "disable_persisting()" when Foundry is booted without doctrine is deprecated and will throw an exception in 2.0.');
+        }
+
         $this->persistEnabled = false;
     }
 
     public function enablePersist(): void
     {
+        if (!self::hasManagerRegistry()) {
+            trigger_deprecation('zenstruck\foundry', '1.38.0', 'Calling function "enable_persisting()" when Foundry is booted without doctrine is deprecated and will throw an exception in 2.0.');
+        }
+
         $this->persistEnabled = true;
     }
 

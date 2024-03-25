@@ -14,7 +14,7 @@ namespace Zenstruck\Foundry\Tests\Fixtures\Factories;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class PostFactoryWithNullInitialize extends PostFactory
+final class PostFactoryWithNullInitialize extends LegacyPostFactory
 {
     protected function initialize()
     {

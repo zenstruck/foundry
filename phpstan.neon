@@ -37,8 +37,3 @@ parameters:
         # phpstan runs with orm 3 - there are too many failures in these files which are compatible with orm 2
         - ./src/Bundle/Maker/Factory/LegacyORMDefaultPropertiesGuesser.php
         - ./src/Bundle/Maker/Factory/DoctrineScalarFieldsDefaultPropertiesGuesser.php
-
-    ignoreErrors:
-        -
-            message: '#Unsafe usage of new static\(\).*#'
-            path: ./src/ModelFactory.php

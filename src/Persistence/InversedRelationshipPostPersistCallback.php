@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Persistence;
 
 use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\Proxy;
 
 /**
  * @internal
@@ -34,6 +33,6 @@ final class InversedRelationshipPostPersistCallback implements PostPersistCallba
             $this->relationshipField => $this->isCollection ? [$proxy] : $proxy,
         ]);
 
-        $proxy->refresh();
+        $proxy->_refresh();
     }
 }

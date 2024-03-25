@@ -11,6 +11,11 @@
 
 namespace Zenstruck\Foundry;
 
+use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
+use Zenstruck\Foundry\Persistence\RepositoryAssertions;
+use Zenstruck\Foundry\Persistence\RepositoryDecorator;
+
 /**
  * @template TModel of object
  * @template-extends Factory<TModel>
@@ -21,8 +26,15 @@ namespace Zenstruck\Foundry;
  */
 final class AnonymousFactory extends Factory implements \Countable, \IteratorAggregate
 {
+    /**
+     * @var class-string<TModel>
+     */
+    private string $class;
+
     public function __construct(string $class, array|callable $defaultAttributes = [])
     {
+        $this->class = $class;
+
         trigger_deprecation('zenstruck\foundry', '1.30', 'Class "AnonymousFactory" is deprecated and will be removed in 2.0. Use the "anonymous()" or "repository()" functions instead.');
 
         parent::__construct($class, $defaultAttributes);
@@ -55,35 +67,35 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
-     * @see RepositoryProxy::first()
+     * @see RepositoryDecorator::first()
      *
      * @throws \RuntimeException If no entities exist
      */
     public function first(string $sortedField = 'id'): Proxy
     {
         if (null === $proxy = $this->repository()->first($sortedField)) {
-            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', $this->class()));
+            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', $this->class));
         }
 
         return $proxy;
     }
 
     /**
-     * @see RepositoryProxy::last()
+     * @see RepositoryDecorator::last()
      *
      * @throws \RuntimeException If no entities exist
      */
     public function last(string $sortedField = 'id'): Proxy
     {
         if (null === $proxy = $this->repository()->last($sortedField)) {
-            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', $this->class()));
+            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', $this->class));
         }
 
         return $proxy;
     }
 
     /**
-     * @see RepositoryProxy::random()
+     * @see RepositoryDecorator::random()
      */
     public function random(array $attributes = []): Proxy
     {
@@ -106,7 +118,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
-     * @see RepositoryProxy::randomSet()
+     * @see RepositoryDecorator::randomSet()
      *
      * @return object[]
      */
@@ -116,7 +128,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
-     * @see RepositoryProxy::randomRange()
+     * @see RepositoryDecorator::randomRange()
      *
      * @return object[]
      */
@@ -126,7 +138,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
-     * @see RepositoryProxy::count()
+     * @see RepositoryDecorator::count()
      */
     public function count(): int
     {
@@ -139,7 +151,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
-     * @see RepositoryProxy::truncate()
+     * @see RepositoryDecorator::truncate()
      */
     public function truncate(): void
     {
@@ -147,7 +159,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
-     * @see RepositoryProxy::findAll()
+     * @see RepositoryDecorator::findAll()
      *
      * @return object[]
      */
@@ -157,7 +169,7 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
-     * @see RepositoryProxy::find()
+     * @see RepositoryDecorator::find()
      *
      * @phpstan-param Proxy<TModel>|array|mixed $criteria
      *
@@ -166,14 +178,14 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     public function find($criteria): Proxy
     {
         if (null === $proxy = $this->repository()->find($criteria)) {
-            throw new \RuntimeException(\sprintf('Could not find "%s" object.', $this->class()));
+            throw new \RuntimeException(\sprintf('Could not find "%s" object.', $this->class));
         }
 
         return $proxy;
     }
 
     /**
-     * @see RepositoryProxy::findBy()
+     * @see RepositoryDecorator::findBy()
      *
      * @return object[]
      */
@@ -188,10 +200,10 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
-     * @phpstan-return RepositoryProxy<TModel>
+     * @phpstan-return ProxyRepositoryDecorator<TModel>
      */
-    public function repository(): RepositoryProxy
+    public function repository(): ProxyRepositoryDecorator
     {
-        return self::configuration()->repositoryFor($this->class());
+        return self::configuration()->repositoryFor($this->class, proxy: true);
     }
 }

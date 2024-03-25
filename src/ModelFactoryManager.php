@@ -19,16 +19,16 @@ namespace Zenstruck\Foundry;
 final class ModelFactoryManager
 {
     /**
-     * @param ModelFactory[] $factories
+     * @param ObjectFactory[] $factories
      */
     public function __construct(private iterable $factories)
     {
     }
 
     /**
-     * @param class-string<ModelFactory> $class
+     * @param class-string<ObjectFactory> $class
      */
-    public function create(string $class): ModelFactory
+    public function create(string $class): ObjectFactory
     {
         foreach ($this->factories as $factory) {
             if ($class === $factory::class) {

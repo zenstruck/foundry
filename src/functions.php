@@ -12,6 +12,13 @@
 namespace Zenstruck\Foundry;
 
 use Faker;
+use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
+use Zenstruck\Foundry\Proxy as ProxyObject;
+
+use function Zenstruck\Foundry\Persistence\persist_proxy;
+use function Zenstruck\Foundry\Persistence\persistent_factory;
+use function Zenstruck\Foundry\Persistence\proxy_factory;
 
 /**
  * @see Factory::__construct()
@@ -42,7 +49,9 @@ function factory(string $class, array|callable $defaultAttributes = []): Anonymo
  */
 function anonymous(string $class, array|callable $defaultAttributes = []): Factory
 {
-    return new class($class, $defaultAttributes) extends Factory {};
+    trigger_deprecation('zenstruck\foundry', '1.37', 'Usage of "%s()" function is deprecated and will be removed in 2.0. Use the "Zenstruck\Foundry\Persistence\proxy_factory()" function instead.', __FUNCTION__);
+
+    return proxy_factory($class, $defaultAttributes);
 }
 
 /**
@@ -53,10 +62,14 @@ function anonymous(string $class, array|callable $defaultAttributes = []): Facto
  * @template TObject of object
  * @phpstan-param class-string<TObject> $class
  * @phpstan-return Proxy<TObject>
+ *
+ * @deprecated
  */
 function create(string $class, array|callable $attributes = []): Proxy
 {
-    return anonymous($class)->create($attributes);
+    trigger_deprecation('zenstruck\foundry', '1.38.0', 'Function "%s()" is deprecated and will be removed in Foundry 2.0. Use "Zenstruck\Foundry\Persistence\persist_proxy()" instead.', __FUNCTION__);
+
+    return persist_proxy($class, $attributes);
 }
 
 /**
@@ -67,10 +80,14 @@ function create(string $class, array|callable $attributes = []): Proxy
  * @template TObject of object
  * @phpstan-param class-string<TObject> $class
  * @phpstan-return list<Proxy<TObject>>
+ *
+ * @deprecated
  */
 function create_many(int $number, string $class, array|callable $attributes = []): array
 {
-    return anonymous($class)->many($number)->create($attributes);
+    trigger_deprecation('zenstruck\foundry', '1.38.0', 'Function "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __FUNCTION__);
+
+    return proxy_factory($class)->many($number)->create($attributes);
 }
 
 /**
@@ -81,10 +98,27 @@ function create_many(int $number, string $class, array|callable $attributes = []
  * @template TObject of object
  * @phpstan-param class-string<TObject> $class
  * @phpstan-return Proxy<TObject>
+ *
+ * @deprecated
  */
 function instantiate(string $class, array|callable $attributes = []): Proxy
 {
-    return anonymous($class)->withoutPersisting()->create($attributes);
+    trigger_deprecation('zenstruck\foundry', '1.38.0', 'Function "%s()" is deprecated and will be removed in Foundry 2.0. Use "%s::object()" instead.', __FUNCTION__, __NAMESPACE__);
+
+    return new ProxyObject(object($class, $attributes));
+}
+
+/**
+ * Instantiate the given class.
+ *
+ * @return TObject "unpersisted"
+ *
+ * @template TObject of object
+ * @phpstan-param class-string<TObject> $class
+ */
+function object(string $class, array|callable $attributes = []): object
+{
+    return persistent_factory($class)->withoutPersisting()->create($attributes);
 }
 
 /**
@@ -95,10 +129,14 @@ function instantiate(string $class, array|callable $attributes = []): Proxy
  * @template TObject of object
  * @phpstan-param class-string<TObject> $class
  * @phpstan-return list<Proxy<TObject>>
+ *
+ * @deprecated
  */
 function instantiate_many(int $number, string $class, array|callable $attributes = []): array
 {
-    return anonymous($class)->withoutPersisting()->many($number)->create($attributes);
+    trigger_deprecation('zenstruck\foundry', '1.38.0', 'Function "%s()" is deprecated and will be removed in Foundry 2.0 without replacement.', __FUNCTION__);
+
+    return proxy_factory($class)->withoutPersisting()->many($number)->create($attributes);
 }
 
 /**
@@ -108,11 +146,21 @@ function instantiate_many(int $number, string $class, array|callable $attributes
  *
  * @param TObject|class-string<TObject> $objectOrClass
  *
- * @return RepositoryProxy<TObject>
+ * @return ProxyRepositoryDecorator<TObject>
+ *
+ * @deprecated
  */
-function repository(object|string $objectOrClass): RepositoryProxy
+function repository(object|string $objectOrClass): ProxyRepositoryDecorator
 {
-    return Factory::configuration()->repositoryFor($objectOrClass);
+    trigger_deprecation('zenstruck\foundry', '1.38.0', 'Function "%s()" is deprecated and will be removed in Foundry 2.0. Use "Zenstruck\Foundry\Persistence\repository()" instead.', __FUNCTION__);
+
+    if (\is_object($objectOrClass)) {
+        trigger_deprecation('zenstruck\foundry', '1.38.0', 'Passing objects to "%s()" is deprecated and will be removed in Foundry 2.0. Pass directly class-string instead.', __FUNCTION__);
+
+        $objectOrClass = $objectOrClass::class;
+    }
+
+    return \Zenstruck\Foundry\Persistence\proxy_repository($objectOrClass);
 }
 
 /**
@@ -120,7 +168,7 @@ function repository(object|string $objectOrClass): RepositoryProxy
  */
 function faker(): Faker\Generator
 {
-    return Factory::faker();
+    return Factory::configuration()->faker();
 }
 
 /**

@@ -13,7 +13,7 @@ namespace Zenstruck\Foundry\Tests\Functional;
 
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
@@ -233,8 +233,8 @@ final class StoryTest extends KernelTestCase
         $item = StoryWhichReadsItsOwnPool::get('random-from-own-pool');
 
         self::assertInstanceOf(Proxy::class, $item);
-        self::assertInstanceOf(Category::class, $item->object());
+        self::assertInstanceOf(Category::class, $item->_real());
 
-        self::assertContains($item->object()->getName(), ['php', 'symfony']);
+        self::assertContains($item->_real()->getName(), ['php', 'symfony']);
     }
 }

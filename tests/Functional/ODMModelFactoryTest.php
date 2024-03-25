@@ -11,7 +11,8 @@
 
 namespace Zenstruck\Foundry\Tests\Functional;
 
-use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMCategory;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMComment;
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMPost;
@@ -40,9 +41,8 @@ final class ODMModelFactoryTest extends ModelFactoryTest
     {
         $proxyObject = CommentFactory::createOne(['user' => new ODMUser('some user'), 'body' => 'some body']);
         self::assertInstanceOf(Proxy::class, $proxyObject);
-        self::assertFalse($proxyObject->isPersisted());
 
-        $comment = $proxyObject->object();
+        $comment = $proxyObject->_real();
         self::assertInstanceOf(ODMComment::class, $comment);
         self::assertEquals(new ODMUser('some user'), $comment->getUser());
         self::assertSame('some body', $comment->getBody());
@@ -61,7 +61,7 @@ final class ODMModelFactoryTest extends ModelFactoryTest
         $posts = PostFactory::findBy(['title' => 'foo']);
         self::assertCount(1, $posts);
 
-        $post = $posts[0]->object();
+        $post = $posts[0]->_real();
         self::assertInstanceOf(ODMPost::class, $post);
         self::assertCount(4, $post->getComments());
         self::assertContainsOnlyInstancesOf(ODMComment::class, $post->getComments());
@@ -90,41 +90,49 @@ final class ODMModelFactoryTest extends ModelFactoryTest
         $post2 = PostFactory::findOrCreate(['title' => 'foo', 'user' => new ODMUser('some user')]);
         PostFactory::assert()->count(1);
 
-        self::assertSame($post->object(), $post2->object());
+        self::assertSame($post->_real(), $post2->_real());
     }
 
     /**
      * @test
+     * @group legacy
      */
     public function can_find_or_create_from_object(): void
     {
-        $user = UserFactory::createOne(['name' => 'some user']);
-        $post = PostFactory::findOrCreate($attributes = ['user' => $user->object()]);
+        // must disable auto refresh proxy: otherwise doctrine would update post from db and recreate the user object.
+        Factory::configuration()->disableDefaultProxyAutoRefresh();
 
-        self::assertSame($user->object(), $post->getUser());
+        $user = UserFactory::createOne(['name' => 'some user']);
+        $post = PostFactory::findOrCreate($attributes = ['user' => $user->_real()]);
+
+        self::assertSame($user->_real(), $post->getUser());
         PostFactory::assert()->count(1);
 
         $post2 = PostFactory::findOrCreate($attributes);
         PostFactory::assert()->count(1);
 
-        self::assertSame($post->object(), $post2->object());
+        self::assertSame($post->_real(), $post2->_real());
     }
 
     /**
      * @test
+     * @group legacy
      */
     public function can_find_or_create_from_proxy_of_object(): void
     {
+        // must disable auto refresh proxy: otherwise doctrine would update post from db and recreate the user object.
+        Factory::configuration()->disableDefaultProxyAutoRefresh();
+
         $user = UserFactory::createOne(['name' => 'some user']);
         $post = PostFactory::findOrCreate($attributes = ['user' => $user]);
 
-        self::assertSame($user->object(), $post->getUser());
+        self::assertSame($user->_real(), $post->getUser());
         PostFactory::assert()->count(1);
 
         $post2 = PostFactory::findOrCreate($attributes);
         PostFactory::assert()->count(1);
 
-        self::assertSame($post->object(), $post2->object());
+        self::assertSame($post->_real(), $post2->_real());
     }
 
     /**

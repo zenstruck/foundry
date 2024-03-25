@@ -1,0 +1,32 @@
+{
+    "name": "zenstruck/foundry-rector",
+    "autoload": {
+        "psr-4": {
+            "Zenstruck\\Foundry\\Utils\\Rector\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Zenstruck\\Foundry\\Utils\\Rector\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Nicolas PHILIPPE",
+            "email": "nikophil@gmail.com"
+        }
+    ],
+    "require-dev": {
+        "rector/rector": "^1.0",
+        "phpunit/phpunit": "^10.5",
+        "phpstan/phpstan-doctrine": "^1.3",
+        "zenstruck/foundry": "dev-1.x-bc",
+        "symfony/var-dumper": "^7.0",
+        "doctrine/orm": "^2.17",
+        "symfony/framework-bundle": "^7.0",
+        "doctrine/mongodb-odm": "^2.6"
+    },
+    "require": {
+        "symfony/cache": "^7.0"
+    }
+}
