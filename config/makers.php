@@ -6,6 +6,7 @@ use Zenstruck\Foundry\Maker\Factory\DoctrineScalarFieldsDefaultPropertiesGuesser
 use Zenstruck\Foundry\Maker\Factory\FactoryCandidatesClassesExtractor;
 use Zenstruck\Foundry\Maker\Factory\FactoryClassMap;
 use Zenstruck\Foundry\Maker\Factory\FactoryGenerator;
+use Zenstruck\Foundry\Maker\Factory\LegacyORMDefaultPropertiesGuesser;
 use Zenstruck\Foundry\Maker\Factory\NamespaceGuesser;
 use Zenstruck\Foundry\Maker\Factory\NoPersistenceObjectsAutoCompleter;
 use Zenstruck\Foundry\Maker\Factory\ObjectDefaultPropertiesGuesser;
@@ -13,6 +14,7 @@ use Zenstruck\Foundry\Maker\Factory\ODMDefaultPropertiesGuesser;
 use Zenstruck\Foundry\Maker\Factory\ORMDefaultPropertiesGuesser;
 use Zenstruck\Foundry\Maker\MakeFactory;
 use Zenstruck\Foundry\Maker\MakeStory;
+use Zenstruck\Foundry\ORM\DoctrineOrmVersionGuesser;
 
 return static function (ContainerConfigurator $container): void {
     $container->services()
@@ -28,7 +30,7 @@ return static function (ContainerConfigurator $container): void {
             ])
             ->tag('maker.command')
 
-        ->set('.zenstruck_foundry.maker.factory.orm_default_properties_guesser', ORMDefaultPropertiesGuesser::class)
+        ->set('.zenstruck_foundry.maker.factory.orm_default_properties_guesser', DoctrineOrmVersionGuesser::isOrmV3() ? ORMDefaultPropertiesGuesser::class : LegacyORMDefaultPropertiesGuesser::class)
             ->args([
                 service('.zenstruck_foundry.persistence_manager')->nullOnInvalid(),
                 service('.zenstruck_foundry.maker.factory.factory_class_map'),

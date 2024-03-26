@@ -11,7 +11,7 @@
 
 namespace Zenstruck\Foundry\Maker\Factory;
 
-use Doctrine\ORM\Mapping\ClassMetadataInfo as ORMClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 use Zenstruck\Foundry\Persistence\PersistenceManager;

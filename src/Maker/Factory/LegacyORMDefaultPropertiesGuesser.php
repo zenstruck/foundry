@@ -1,30 +1,25 @@
 <?php
 
-/*
- * This file is part of the zenstruck/foundry package.
- *
- * (c) Kevin Bond <kevinbond@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Maker\Factory;
 
-use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
-use Doctrine\ORM\Mapping\ToOneAssociationMapping;
+use Doctrine\ORM\Mapping\ClassMetadataInfo as ORMClassMetadata;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Zenstruck\Foundry\ORM\DoctrineOrmVersionGuesser;
 use Zenstruck\Foundry\Persistence\Exception\NoPersistenceStrategy;
 
 /**
  * @internal
+ * @see \Zenstruck\Foundry\Maker\Factory\ORMDefaultPropertiesGuesser
+ *
+ * This file is basically a copy/paste of ORMDefaultPropertiesGuesser, but offers doctrine/orm 2 compatibility
  */
-final class ORMDefaultPropertiesGuesser extends AbstractDoctrineDefaultPropertiesGuesser
+final class LegacyORMDefaultPropertiesGuesser extends AbstractDoctrineDefaultPropertiesGuesser
 {
     public function __invoke(SymfonyStyle $io, MakeFactoryData $makeFactoryData, MakeFactoryQuery $makeFactoryQuery): void
     {
-        if (!DoctrineOrmVersionGuesser::isOrmV3()) {
+        if (DoctrineOrmVersionGuesser::isOrmV3()) {
             return;
         }
 
@@ -52,16 +47,17 @@ final class ORMDefaultPropertiesGuesser extends AbstractDoctrineDefaultPropertie
     private function guessDefaultValueForORMAssociativeFields(SymfonyStyle $io, MakeFactoryData $makeFactoryData, MakeFactoryQuery $makeFactoryQuery, ORMClassMetadata $metadata): void
     {
         foreach ($metadata->associationMappings as $item) {
-            if (!$item instanceof ToOneAssociationMapping) {
+            // if joinColumns is not written entity is default nullable ($nullable = true;)
+            if (true === ($item['joinColumns'][0]['nullable'] ?? true)) {
+                continue;
+            }
+
+            if (isset($item['mappedBy']) || isset($item['joinTable'])) {
                 // we don't want to add defaults for X-To-Many relationships
                 continue;
             }
 
-            if ($item->joinColumns[0]->nullable ?? true) {
-                continue;
-            }
-
-            $this->addDefaultValueUsingFactory($io, $makeFactoryData, $makeFactoryQuery, $item->fieldName, $item->targetEntity);
+            $this->addDefaultValueUsingFactory($io, $makeFactoryData, $makeFactoryQuery, $item['fieldName'], $item['targetEntity']);
         }
     }
 
@@ -74,7 +70,7 @@ final class ORMDefaultPropertiesGuesser extends AbstractDoctrineDefaultPropertie
                 continue;
             }
 
-            $this->addDefaultValueUsingFactory($io, $makeFactoryData, $makeFactoryQuery, $fieldName, $item->class);
+            $this->addDefaultValueUsingFactory($io, $makeFactoryData, $makeFactoryQuery, $fieldName, $item['class']);
         }
     }
 }

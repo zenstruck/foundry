@@ -314,7 +314,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
         }
 
         // readonly classes exist since php 8.2 and proxyHelper supports them since 8.3
-        if (80200 <= \PHP_VERSION_ID && \PHP_VERSION_ID < 80300 && $reflectionClass->isReadonly()) { // @phpstan-ignore-line
+        if (80200 <= \PHP_VERSION_ID && \PHP_VERSION_ID < 80300 && $reflectionClass->isReadonly()) {
             return $object;
         }
 

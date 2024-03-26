@@ -25,11 +25,11 @@ abstract class WithEmbeddable extends Base
 {
     #[ORM\Embedded(class: Embeddable::class)]
     #[MongoDB\EmbedOne(targetDocument: Embeddable::class)]
-    private Embeddable $embeddable;
+    protected Embeddable $embeddable;
 
     /** @var Collection<int,Embeddable> */
     #[MongoDB\EmbedMany(targetDocument: Embeddable::class)]
-    private Collection $embeddables;
+    protected Collection $embeddables;
 
     public function __construct(Embeddable $embeddable)
     {

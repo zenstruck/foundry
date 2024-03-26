@@ -12,7 +12,8 @@
 namespace Zenstruck\Foundry\Maker\Factory;
 
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
-use Doctrine\ORM\Mapping\ClassMetadataInfo as ORMClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
+use Doctrine\ORM\Mapping\FieldMapping;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
@@ -56,12 +57,12 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
         $ids = $metadata->getIdentifierFieldNames();
 
         foreach ($metadata->fieldMappings as $property) {
-            if ($property['embedded'] ?? false) {
+            if (is_array($property) && ($property['embedded'] ?? false)) {
                 // skip ODM embedded
                 continue;
             }
 
-            $fieldName = $property['fieldName']; // @phpstan-ignore-line
+            $fieldName = $this->extractFieldMappingData($property, 'fieldName');
 
             if (\str_contains($fieldName, '.')) {
                 // this is a "subfield" of an ORM embeddable field.
@@ -69,19 +70,19 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
             }
 
             // ignore identifiers and nullable fields
-            if ((!$makeFactoryQuery->isAllFields() && ($property['nullable'] ?? false)) || \in_array($fieldName, $ids, true)) {
+            if ((!$makeFactoryQuery->isAllFields() && $this->extractFieldMappingData($property, 'nullable', false)) || \in_array($fieldName, $ids, true)) {
                 continue;
             }
 
-            $type = \mb_strtoupper($property['type']); // @phpstan-ignore-line
-            if (isset($property['enumType'])) {
-                $makeFactoryData->addEnumDefaultProperty($fieldName, $property['enumType']);
+            $type = \mb_strtoupper($this->extractFieldMappingData($property, 'type'));
+            if ($this->extractFieldMappingData($property, 'enumType')) {
+                $makeFactoryData->addEnumDefaultProperty($fieldName, $this->extractFieldMappingData($property, 'enumType'));
 
                 continue;
             }
 
             $value = "null, // TODO add {$type} type manually";
-            $length = $property['length'] ?? '';
+            $length = $this->extractFieldMappingData($property, 'length', '');
 
             if (\array_key_exists($type, self::DEFAULTS)) {
                 $value = self::DEFAULTS[$type];
@@ -94,5 +95,15 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
     public function supports(MakeFactoryData $makeFactoryData): bool
     {
         return $makeFactoryData->isPersisted();
+    }
+
+    // handles both ORM 3 & 4
+    private function extractFieldMappingData(FieldMapping|array $fieldMapping, string $field, mixed $default = null): mixed
+    {
+        if ($fieldMapping instanceof FieldMapping) {
+            return $fieldMapping->{$field};
+        } else {
+            return $fieldMapping[$field] ?? $default;
+        }
     }
 }

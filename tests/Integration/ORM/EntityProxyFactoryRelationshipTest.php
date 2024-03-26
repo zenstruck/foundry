@@ -11,7 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
-use Doctrine\Common\Proxy\Proxy as DoctrineProxy;
+use Doctrine\Persistence\Proxy as DoctrineProxy;
 use Doctrine\ORM\EntityManagerInterface;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
@@ -46,7 +46,7 @@ final class EntityProxyFactoryRelationshipTest extends EntityFactoryRelationship
 
         // ensure the category is a "doctrine proxy" and a Category
         $this->assertInstanceOf(Proxy::class, $category);
-        $this->assertInstanceOf(DoctrineProxy::class, $category);
+        $this->assertInstanceOf(DoctrineProxy::class, $category->_real());
         $this->assertInstanceOf(StandardCategory::class, $category);
     }
 

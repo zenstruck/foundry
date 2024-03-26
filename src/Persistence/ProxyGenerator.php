@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Persistence;
 
+use Doctrine\Persistence\Proxy as DoctrineProxy;
 use Symfony\Component\VarExporter\LazyObjectInterface;
 use Symfony\Component\VarExporter\ProxyHelper;
 
@@ -74,14 +75,16 @@ final class ProxyGenerator
      */
     private static function generateClassFor(object $object): string
     {
-        $proxyClass = \str_replace('\\', '', $object::class).'Proxy';
+        /** @var class-string $class */
+        $class = $object instanceof DoctrineProxy ? \get_parent_class($object) : $object::class;
+        $proxyClass = \str_replace('\\', '', $class).'Proxy';
 
         /** @var class-string<LazyObjectInterface&Proxy<T>&T> $proxyClass */
         if (\class_exists($proxyClass, autoload: false)) {
             return $proxyClass;
         }
 
-        $proxyCode = 'class '.$proxyClass.ProxyHelper::generateLazyProxy(new \ReflectionClass($object::class));
+        $proxyCode = 'class '.$proxyClass.ProxyHelper::generateLazyProxy(new \ReflectionClass($class));
         $proxyCode = \str_replace(
             [
                 'implements \Symfony\Component\VarExporter\LazyObjectInterface',

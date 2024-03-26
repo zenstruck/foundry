@@ -56,6 +56,12 @@ jobs:
           - php: 8.3
             deps: lowest
             symfony: '*'
+            database: sqlite
+            use-dama: 0
+            use-migrate: 0
+          - php: 8.3
+            deps: lowest
+            symfony: '*'
             database: mysql
             use-dama: 1
             use-migrate: 0
@@ -161,7 +167,6 @@ jobs:
         run: vendor/bin/phpunit -c phpunit.dama.xml.dist --coverage-text --coverage-clover coverage.xml
         shell: bash
         env:
-          USE_FOUNDRY_BUNDLE: 0
           SYMFONY_DEPRECATIONS_HELPER: disabled
 
       - name: Publish coverage report to Codecov
@@ -203,7 +208,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.1
+          php-version: 8.3
           coverage: none
 
       - name: Install dependencies
