@@ -93,6 +93,11 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
         foreach ($this->connections() as $connection) {
             $databasePlatform = $this->registry->getConnection($connection)->getDatabasePlatform(); // @phpstan-ignore-line
 
+            if ($databasePlatform instanceof SQLitePlatform) {
+                // we don't need to create the sqlite database - it's created when the schema is created
+                continue;
+            }
+
             if ($databasePlatform instanceof PostgreSQLPlatform) {
                 // let's drop all connections to the database to be able to drop it
                 self::runCommand(
@@ -106,19 +111,12 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
                 );
             }
 
-            $dropParams = ['--connection' => $connection, '--force' => true];
-
-            if (!$databasePlatform instanceof SQLitePlatform) {
-                // sqlite does not support "--if-exists" (ref: https://github.com/doctrine/dbal/pull/2402)
-                $dropParams['--if-exists'] = true;
-            }
-
-            self::runCommand($application, 'doctrine:database:drop', $dropParams);
-
-            if (!$databasePlatform instanceof SQLitePlatform) {
-                // d:d:create not supported on SQLite
-                self::runCommand($application, 'doctrine:database:create', ['--connection' => $connection]);
-            }
+            self::runCommand($application, 'doctrine:database:drop', [
+                '--connection' => $connection,
+                '--force' => true,
+                '--if-exists' => true,
+            ]);
+            self::runCommand($application, 'doctrine:database:create', ['--connection' => $connection]);
         }
 
         $this->createSchema($application);
