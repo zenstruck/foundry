@@ -30,7 +30,7 @@ return static function (ContainerConfigurator $container): void {
             ])
             ->tag('maker.command')
 
-        ->set('.zenstruck_foundry.maker.factory.legacy_orm_default_properties_guesser', DoctrineOrmVersionGuesser::isOrmV3() ? ORMDefaultPropertiesGuesser::class : LegacyORMDefaultPropertiesGuesser::class)
+        ->set('.zenstruck_foundry.maker.factory.orm_default_properties_guesser', DoctrineOrmVersionGuesser::isOrmV3() ? ORMDefaultPropertiesGuesser::class : LegacyORMDefaultPropertiesGuesser::class)
             ->args([
                 service('.zenstruck_foundry.persistence_manager')->nullOnInvalid(),
                 service('.zenstruck_foundry.maker.factory.factory_class_map'),

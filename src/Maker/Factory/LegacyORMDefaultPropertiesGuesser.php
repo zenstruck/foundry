@@ -7,6 +7,7 @@ namespace Zenstruck\Foundry\Maker\Factory;
 use Doctrine\ORM\Mapping\ClassMetadataInfo as ORMClassMetadata;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Zenstruck\Foundry\ORM\DoctrineOrmVersionGuesser;
+use Zenstruck\Foundry\Persistence\Exception\NoPersistenceStrategy;
 
 /**
  * @internal
@@ -38,7 +39,7 @@ final class LegacyORMDefaultPropertiesGuesser extends AbstractDoctrineDefaultPro
             $metadata = $this->getClassMetadata($makeFactoryData);
 
             return $metadata instanceof ORMClassMetadata;
-        } catch (\InvalidArgumentException) {
+        } catch (NoPersistenceStrategy) {
             return false;
         }
     }
