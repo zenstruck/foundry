@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Maker\Factory;
 
 use Doctrine\ORM\Mapping\ClassMetadataInfo as ORMClassMetadata;
@@ -11,7 +20,7 @@ use Zenstruck\Foundry\Persistence\Exception\NoPersistenceStrategy;
 
 /**
  * @internal
- * @see \Zenstruck\Foundry\Maker\Factory\ORMDefaultPropertiesGuesser
+ * @see ORMDefaultPropertiesGuesser
  *
  * This file is basically a copy/paste of ORMDefaultPropertiesGuesser, but offers doctrine/orm 2 compatibility
  */

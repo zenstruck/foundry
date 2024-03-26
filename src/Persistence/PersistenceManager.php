@@ -84,7 +84,7 @@ final class PersistenceManager
             $strategyClasses[] = $strategy::class;
         }
 
-        if (count($strategyClasses) === 1 && is_a($strategyClasses[0], AbstractORMPersistenceStrategy::class, allow_string: true)) {
+        if (1 === \count($strategyClasses) && \is_a($strategyClasses[0], AbstractORMPersistenceStrategy::class, allow_string: true)) {
             // enable skipping booting the kernel for resetSchema()
             self::$ormOnly = true;
         }

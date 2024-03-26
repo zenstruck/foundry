@@ -11,8 +11,8 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
-use Doctrine\Persistence\Proxy as DoctrineProxy;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\Proxy as DoctrineProxy;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Category\StandardCategory;

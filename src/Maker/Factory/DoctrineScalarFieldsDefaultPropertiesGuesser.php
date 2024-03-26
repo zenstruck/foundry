@@ -57,7 +57,7 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
         $ids = $metadata->getIdentifierFieldNames();
 
         foreach ($metadata->fieldMappings as $property) {
-            if (is_array($property) && ($property['embedded'] ?? false)) {
+            if (\is_array($property) && ($property['embedded'] ?? false)) {
                 // skip ODM embedded
                 continue;
             }
