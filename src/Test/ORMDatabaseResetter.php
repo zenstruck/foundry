@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Test;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\Persistence\ManagerRegistry;
@@ -46,6 +47,17 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
 
     public function resetDatabase(): void
     {
+        if (DatabaseResetter::isDAMADoctrineTestBundleEnabled(true) && $this->isResetUsingMigrations()) {
+            try{
+                $this->runCommand($this->application, 'doctrine:migrations:up-to-date', ['--fail-on-unregistered' => true]);
+                $this->truncateAllTables();
+
+                // not required as the database schema is already up-to-date and all tables were truncated
+                return;
+            }catch(\Throwable $e){
+            }
+        }
+
         $this->dropAndResetDatabase();
         $this->createSchema();
     }
@@ -154,5 +166,52 @@ final class ORMDatabaseResetter extends AbstractSchemaResetter
         }
 
         return self::RESET_MODE_MIGRATE === $this->resetMode;
+    }
+
+    private function truncateAllTables(): void {
+        foreach ($this->connectionsToReset() as $connectionName) {
+            /** @var Connection $connection */
+            $connection = $this->registry->getConnection($connectionName);
+            $tables = $connection->getSchemaManager()->listTableNames();
+
+            if(count($tables) === 0) {
+                continue;
+            }
+
+            $databasePlatform = $connection->getDatabasePlatform()->getName();
+            $truncateStatement = match($databasePlatform) {
+                'postgresql' => 'TRUNCATE %s RESTART IDENTITY CASCADE;',
+                'mysql' => 'TRUNCATE %s;',
+                'sqlite' => 'DELETE FROM %s;',
+                // fallback to dropping and recreating schema
+                default => throw new \RuntimeException('Database platform not supported')
+            };
+
+            $statements = "";
+            foreach ($tables as $tableName)
+            {
+                if ($tableName === 'doctrine_migration_versions') {
+                    continue;
+                }
+                $statements .= sprintf($truncateStatement, $tableName);
+            }
+
+            $disableForeignKeyChecks = match($databasePlatform) {
+                'mysql' => 'SET FOREIGN_KEY_CHECKS = 0; %s SET FOREIGN_KEY_CHECKS = 1;',
+                'sqlite' => 'PRAGMA foreign_keys = OFF; %s PRAGMA foreign_keys = ON;',
+                default => '%s',
+            };
+
+            try {
+                $connection->beginTransaction();
+                $connection->executeStatement(sprintf($disableForeignKeyChecks, $statements));
+                $connection->commit();
+            }catch(\Throwable $e) {
+                $connection->rollBack();
+                throw new \RuntimeException('Failed to reset database', 0, $e);
+            }
+
+            unset($connection);
+        }
     }
 }

@@ -26,15 +26,21 @@ use Zenstruck\Foundry\Factory;
 final class DatabaseResetter
 {
     private static bool $hasBeenReset = false;
+    private static bool $isDAMADoctrineTestBundleEnabled = false;
 
     public static function hasBeenReset(): bool
     {
         return self::$hasBeenReset;
     }
 
-    public static function isDAMADoctrineTestBundleEnabled(): bool
+    public static function isDAMADoctrineTestBundleEnabled(bool $cached = false): bool
     {
-        return \class_exists(StaticDriver::class) && StaticDriver::isKeepStaticConnections();
+        if($cached) {
+            return self::$isDAMADoctrineTestBundleEnabled;
+        }
+
+        self::$isDAMADoctrineTestBundleEnabled = \class_exists(StaticDriver::class) && StaticDriver::isKeepStaticConnections();
+        return self::$isDAMADoctrineTestBundleEnabled;
     }
 
     public static function resetDatabase(KernelInterface $kernel, bool $damaIsEnabled): void
