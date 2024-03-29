@@ -56,7 +56,7 @@ trait Factories
             ),
         );
 
-        $kernel->shutdown();
+        KernelHelper::shutdownKernel($kernel);
     }
 
     /**

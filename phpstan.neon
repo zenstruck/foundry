@@ -33,6 +33,7 @@ parameters:
                     - var_dump
     excludePaths:
         - ./src/Bundle/Resources
+        - ./src/Test/KernelHelper.php
 
         # phpstan runs with orm 3 - there are too many failures in these files which are compatible with orm 2
         - ./src/Bundle/Maker/Factory/LegacyORMDefaultPropertiesGuesser.php

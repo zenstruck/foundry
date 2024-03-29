@@ -61,7 +61,7 @@ trait ResetDatabase
             StaticDriver::setKeepStaticConnections(true);
         }
 
-        $kernel->shutdown();
+        KernelHelper::shutdownKernel($kernel);
     }
 
     /**
@@ -80,7 +80,7 @@ trait ResetDatabase
 
         DatabaseResetter::resetSchema($kernel);
 
-        $kernel->shutdown();
+        KernelHelper::shutdownKernel($kernel);
     }
 
     private static function shouldReset(KernelInterface $kernel): bool
