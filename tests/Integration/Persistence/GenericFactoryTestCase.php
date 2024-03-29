@@ -497,6 +497,18 @@ abstract class GenericFactoryTestCase extends KernelTestCase
 
     /**
      * @test
+     */
+    public function can_persist_object_with_sequence(): void
+    {
+        $this->factory()->sequence([['prop1' => 'foo'], ['prop1' => 'bar']])->create();
+
+        $this->factory()::assert()->count(2);
+        $this->factory()::assert()->exists(['prop1' => 'foo']);
+        $this->factory()::assert()->exists(['prop1' => 'bar']);
+    }
+
+    /**
+     * @test
      * @depends cannot_access_repository_method_when_persist_disabled
      */
     public function assert_persist_is_re_enabled_automatically(): void
