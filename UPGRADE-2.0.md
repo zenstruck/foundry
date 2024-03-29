@@ -5,14 +5,14 @@ The global philosophy is still the same.
 The main change is that we've introduced a separation between "object" factories,
 "persistence" factories and "persistence with proxy" factories.
 
-When Foundry 1.x was "persistence first", Foundry 2 is "object first".
+While Foundry 1.x was "persistence first", Foundry 2 is "object first".
 This would allow more decoupling from the persistence layer.
 
 ## How to
 
 Every modification needed for a 1.x to 2.0 migration is covered by a deprecation.
-You'll to upgrade to the latest 1.x version, and to activate the deprecation helper, make the tests run, and
-fix all the deprecations reported.
+You'll need to upgrade to the latest 1.x version, activate the deprecation helper,
+make the tests run, and fix all the deprecations reported.
 
 Here is an example of how the deprecation helper can be activated.
 You should set the `SYMFONY_DEPRECATIONS_HELPER` variable in `phpunit.xml` or `.env.local` file:
@@ -62,11 +62,11 @@ vendor/bin/rector process
 > and then fix all deprecations left.
 
 > [!TIP]
-> You can try to run twice these rules. Sometimes, the second run will find some difference that it could not spot on
+> You can try to run these rules twice. Sometimes, the second run will find differences that it could not spot on
 > the first run.
 
 > [!NOTE]
-> Once you've finished the migration to 2.0, it is not necessary anymore to keep the Foundry's rule set in your Rector
+> Once you've finished the migration to 2.0, it is not necessary to keep the Foundry rule set in your Rector
 > config.
 
 ### Doctrine's mapping
@@ -91,7 +91,7 @@ $kernel->boot();
 return $kernel->getContainer()->get('doctrine')->getManager();
 ```
 
-2. Provide this file path to Rector's config:
+2. Set this file path in Rector's config:
 
 ```php
 <?php
@@ -156,13 +156,13 @@ You should choose between:
 - `\Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory`: same as above, but returns a "proxy" version of the object.
   This last class basically acts the same way as the old `ModelFactory`.
 
-As a rule of thumb to help you to choose between these two new factory parent classes:
+As a rule of thumb to help you choose between these two new factory parent classes:
 - using `ObjectFactory` is straightforward: if the object cannot be persisted, you must use this one
 - only entities (ORM) or documents (ODM) should use `PersistentObjectFactory` or `PersistentProxyObjectFactory`
 - you should only use `PersistentProxyObjectFactory` if you want to leverage "auto refresh" behavior
 
 > [!WARNING]
-> nor `PersistentObjectFactory` or `PersistentProxyObjectFactory` should be chosen to create not persistent objects.
+> Neither `PersistentObjectFactory` or `PersistentProxyObjectFactory` should be chosen to create not persistent objects.
 > This will throw a deprecation in 1.x and will create an error in 2.0
 
 > [!IMPORTANT]
@@ -216,8 +216,8 @@ protected function initialize(); static
 
 ### Proxy
 
-Foundry 2.0 will completely change how `Proxy` system works, by leveraging Symfony's lazy proxy mechanism.
-`Proxy` won't be anymore a wrapper class, but a "real" proxy, meaning your objects will be of the desired class AND `Proxy` object.
+Foundry 2.0 will completely change how the `Proxy` system works, by leveraging Symfony's lazy proxy mechanism.
+`Proxy` will no longer be a wrapper class, but a "real" proxy, meaning your objects will be of the desired class AND `Proxy` object.
 This implies that calling `->object()` (or, now, `_real()`) everywhere to satisfy the type system won't be needed anymore!
 
 `Proxy` class comes with deprecations as well:
