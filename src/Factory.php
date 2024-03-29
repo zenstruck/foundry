@@ -21,6 +21,7 @@ use Faker;
  * @template T
  * @phpstan-type Parameters = array<string,mixed>
  * @phpstan-type Attributes = Parameters|callable(int):Parameters
+ * @phpstan-type Sequence = iterable<Parameters>|callable(): iterable<Parameters>
  */
 abstract class Factory
 {
@@ -82,14 +83,13 @@ abstract class Factory
     }
 
     /**
-     * @param iterable<Attributes> $items
-     * @param Attributes           $attributes
+     * @param Sequence $sequence
      *
      * @return T[]
      */
-    final public static function createSequence(iterable $items, array|callable $attributes = []): array
+    final public static function createSequence(iterable|callable $sequence): array
     {
-        return static::new()->sequence($items)->create($attributes);
+        return static::new()->sequence($sequence)->create();
     }
 
     /**
@@ -116,12 +116,16 @@ abstract class Factory
     }
 
     /**
-     * @param  iterable<Attributes> $items
+     * @param  Sequence $sequence
      * @return FactoryCollection<T>
      */
-    final public function sequence(iterable $items): FactoryCollection
+    final public function sequence(iterable|callable $sequence): FactoryCollection
     {
-        return FactoryCollection::sequence($this, $items);
+        if (\is_callable($sequence)) {
+            $sequence = $sequence();
+        }
+
+        return FactoryCollection::sequence($this, $sequence);
     }
 
     /**

@@ -12,6 +12,7 @@
 namespace Zenstruck\Foundry\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
+use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
@@ -25,6 +26,8 @@ use function Zenstruck\Foundry\set;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @phpstan-import-type Sequence from Factory
  */
 final class ObjectFactoryTest extends TestCase
 {
@@ -332,11 +335,58 @@ final class ObjectFactoryTest extends TestCase
     }
 
     /**
+     * @dataProvider sequenceDataProvider
+     *
+     * @param Sequence $sequence
+     *
      * @test
      */
-    public function sequences(): void
+    public function can_create_sequence(iterable|callable $sequence): void
     {
-        $this->markTestIncomplete();
+        self::assertEquals(
+            [
+                new Object1('foo1', 'bar1'),
+                new Object1('foo2', 'bar2'),
+            ],
+            Object1Factory::createSequence($sequence),
+        );
+    }
+
+    /**
+     * @return iterable<string, array{Sequence}>
+     */
+    public static function sequenceDataProvider(): iterable
+    {
+        yield 'sequence as array' => [
+            [
+                [
+                    'prop1' => 'foo1',
+                    'prop2' => 'bar1',
+                ],
+                [
+                    'prop1' => 'foo2',
+                    'prop2' => 'bar2',
+                ],
+            ],
+        ];
+
+        yield 'sequence as iterable which returns array' => [
+            static fn() => array_map(
+                static fn(int $i) => ['prop1' => "foo{$i}", 'prop2' => "bar{$i}"],
+                range(1, 2)
+            )
+        ];
+
+        yield 'sequence as iterable which returns generator' => [
+            static function () {
+                foreach (range(1, 2) as $i) {
+                    yield [
+                        'prop1' => "foo{$i}",
+                        'prop2' => "bar{$i}",
+                    ];
+                }
+            }
+        ];
     }
 
     /**
