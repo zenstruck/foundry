@@ -10,6 +10,8 @@ parameters:
         - message: '#Return type of call to function Zenstruck\\Foundry\\Persistence\\proxy contains unresolvable type#'
           path: src/Persistence/ProxyRepositoryDecorator.php
 
+        - message: '#Attribute class PHPUnit\\Framework\\Attributes\\(.*) does not exist.#'
+
     excludePaths:
         - tests/Fixture/Maker/expected/can_create_factory_interactively.php
         - tests/Fixture/Maker/expected/can_create_factory_with_embeddable_with_data_set_odm.php
