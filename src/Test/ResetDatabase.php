@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Foundry\Test;
 
+use PHPUnit\Framework\Attributes\Before;
+use PHPUnit\Framework\Attributes\BeforeClass;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
 
@@ -23,6 +25,7 @@ trait ResetDatabase
      * @internal
      * @beforeClass
      */
+    #[BeforeClass]
     public static function _resetDatabase(): void
     {
         if (!\is_subclass_of(static::class, KernelTestCase::class)) {
@@ -39,6 +42,7 @@ trait ResetDatabase
      * @internal
      * @before
      */
+    #[Before]
     public static function _resetSchema(): void
     {
         if (!\is_subclass_of(static::class, KernelTestCase::class)) {

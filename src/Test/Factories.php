@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Foundry\Test;
 
+use PHPUnit\Framework\Attributes\After;
+use PHPUnit\Framework\Attributes\Before;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
 
@@ -23,6 +25,7 @@ trait Factories
      * @internal
      * @before
      */
+    #[Before]
     public static function _bootFoundry(): void
     {
         if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore-line
@@ -47,6 +50,7 @@ trait Factories
      * @internal
      * @after
      */
+    #[After]
     public static function _shutdownFoundry(): void
     {
         Configuration::shutdown();
