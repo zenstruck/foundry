@@ -19,8 +19,10 @@ use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\CategoryPoolStory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\CategoryStory;
+use Zenstruck\Foundry\Tests\Fixtures\Stories\LegacyObjectStory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\PostStory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\ServiceStory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\StoryWhichReadsItsOwnPool;
@@ -236,5 +238,15 @@ final class StoryTest extends KernelTestCase
         self::assertInstanceOf(Category::class, $item->_real());
 
         self::assertContains($item->_real()->getName(), ['php', 'symfony']);
+    }
+
+    /**
+     * @test
+     */
+    public function story_does_not_persist_legacy_object(): void
+    {
+        LegacyObjectStory::load();
+
+        self::assertInstanceOf(Proxy::class, LegacyObjectStory::simpleObject());
     }
 }

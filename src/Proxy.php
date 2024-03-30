@@ -50,6 +50,8 @@ final class Proxy implements \Stringable, ProxyBase
     public function __construct(
         /** @param TProxiedObject $object */
         private object $object,
+
+        private bool $shouldPersist = true,
     ) {
         if ((new \ReflectionClass($object::class))->isFinal()) {
             trigger_deprecation(
@@ -174,6 +176,10 @@ final class Proxy implements \Stringable, ProxyBase
 
     public function _save(): static
     {
+        if (!$this->shouldPersist) {
+            return $this;
+        }
+
         $this->objectManager()->persist($this->object);
 
         if (Factory::configuration()->isFlushingEnabled()) {

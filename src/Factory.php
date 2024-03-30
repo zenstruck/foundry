@@ -59,6 +59,8 @@ class Factory
     /** @var callable[] */
     private array $afterPersist = [];
 
+    private bool $shouldPersist = true;
+
     /**
      * @param class-string<TObject> $class
      */
@@ -156,10 +158,10 @@ class Factory
         }
 
         if (!$this->isPersisting(calledInternally: true)) {
-            return $noProxy ? $object : new ProxyObject($object);
+            return $noProxy ? $object : new ProxyObject($object, $this->shouldPersist);
         }
 
-        $proxy = new ProxyObject($object);
+        $proxy = new ProxyObject($object, $this->shouldPersist);
 
         if ($this->cascadePersist && !$postPersistCallbacks) {
             return $proxy;
@@ -228,6 +230,7 @@ class Factory
 
         $cloned = clone $this;
         $cloned->persist = false;
+        $cloned->shouldPersist = false;
 
         return $cloned;
     }
