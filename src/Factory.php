@@ -383,7 +383,7 @@ class Factory
      *
      * @return TObject
      */
-    public function createAndUproxify(): object
+    public function createAndUnproxify(): object
     {
         $object = $this->create(
             noProxy: !$this->shouldUseProxy(),
@@ -469,7 +469,7 @@ class Factory
         }
 
         if (!self::configuration()->hasManagerRegistry()) {
-            return $value->createAndUproxify();
+            return $value->createAndUnproxify();
         }
 
         try {
@@ -477,17 +477,17 @@ class Factory
 
             if (!$objectManager instanceof EntityManagerInterface || $objectManager->getClassMetadata($value->class)->isEmbeddedClass) {
                 // we may deal with ODM document or ORM\Embedded
-                return $value->createAndUproxify();
+                return $value->createAndUnproxify();
             }
         } catch (\Throwable) {
             // not persisted object
-            return $value->createAndUproxify();
+            return $value->createAndUnproxify();
         }
 
         $relationshipMetadata = self::getRelationshipMetadata($objectManager, $this->class, $name);
 
         if (!$relationshipMetadata) {
-            return $value->createAndUproxify();
+            return $value->createAndUnproxify();
         }
 
         if ($relationshipMetadata['isOwningSide']) {
@@ -506,7 +506,7 @@ class Factory
             $value = $value->withCascadePersist();
         }
 
-        return $value->createAndUproxify();
+        return $value->createAndUnproxify();
     }
 
     private static function normalizeObject(object $object): object

@@ -16,7 +16,12 @@ parameters:
 			path: src/Configuration.php
 
 		-
-			message: "#^Method Zenstruck\\\\Foundry\\\\Factory\\:\\:createAndUproxify\\(\\) should return TObject of object but returns object\\.$#"
+			message: "#^Method Zenstruck\\\\Foundry\\\\Factory\\:\\:__call\\(\\) should return array\\<int, \\(TObject of object\\)\\|Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TObject of object\\>\\> but returns array\\<int, \\(TObject of object\\)\\|Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TObject of object\\>\\|Zenstruck\\\\Foundry\\\\Proxy\\<Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TObject of object\\>\\>\\>\\.$#"
+			count: 1
+			path: src/Factory.php
+
+		-
+			message: "#^Method Zenstruck\\\\Foundry\\\\Factory\\:\\:createAndUnproxify\\(\\) should return TObject of object but returns object\\.$#"
 			count: 1
 			path: src/Factory.php
 
@@ -26,7 +31,7 @@ parameters:
 			path: src/Factory.php
 
 		-
-			message: "#^Method Zenstruck\\\\Foundry\\\\FactoryCollection\\:\\:create\\(\\) should return array\\<int, TObject of object\\> but returns array\\<int\\<0, max\\>, \\(TObject of object\\)\\|Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TObject of object\\>\\>\\.$#"
+			message: "#^Method Zenstruck\\\\Foundry\\\\FactoryCollection\\:\\:create\\(\\) should return array\\<int, \\(TObject of object\\)\\|Zenstruck\\\\Foundry\\\\Proxy\\<TObject of object\\>\\> but returns array\\<int\\<0, max\\>, \\(TObject of object\\)\\|Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TObject of object\\>\\>\\.$#"
 			count: 1
 			path: src/FactoryCollection.php
 
@@ -56,12 +61,12 @@ parameters:
 			path: src/Instantiator.php
 
 		-
-			message: "#^Method Zenstruck\\\\Foundry\\\\ObjectFactory\\:\\:__callStatic\\(\\) should return array\\<int, TModel of object\\> but returns array\\<int, \\(TModel of object\\)\\|Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TModel of object\\>\\>\\.$#"
+			message: "#^Method Zenstruck\\\\Foundry\\\\ObjectFactory\\:\\:__callStatic\\(\\) should return array\\<int, TModel of object\\> but returns array\\<int, \\(TModel of object\\)\\|Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TModel of object\\>\\|Zenstruck\\\\Foundry\\\\Proxy\\<Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TModel of object\\>\\>\\>\\.$#"
 			count: 1
 			path: src/ObjectFactory.php
 
 		-
-			message: "#^Method Zenstruck\\\\Foundry\\\\ObjectFactory\\:\\:createSequence\\(\\) should return array\\<int, TModel of object\\> but returns array\\<int, \\(TModel of object\\)\\|Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TModel of object\\>\\>\\.$#"
+			message: "#^Method Zenstruck\\\\Foundry\\\\ObjectFactory\\:\\:createSequence\\(\\) should return array\\<int, TModel of object\\> but returns array\\<int, \\(TModel of object\\)\\|Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TModel of object\\>\\|Zenstruck\\\\Foundry\\\\Proxy\\<Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TModel of object\\>\\>\\>\\.$#"
 			count: 1
 			path: src/ObjectFactory.php
 
@@ -74,6 +79,16 @@ parameters:
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: src/ObjectFactory.php
+
+		-
+			message: "#^Method Zenstruck\\\\Foundry\\\\Persistence\\\\PersistentProxyObjectFactory\\:\\:__callStatic\\(\\) should return array\\<int, Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TModel of object\\>\\> but returns array\\<int, Zenstruck\\\\Foundry\\\\Proxy\\<Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TModel of object\\>\\>\\>\\.$#"
+			count: 1
+			path: src/Persistence/PersistentProxyObjectFactory.php
+
+		-
+			message: "#^Method Zenstruck\\\\Foundry\\\\Persistence\\\\PersistentProxyObjectFactory\\:\\:createSequence\\(\\) should return array\\<int, Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TModel of object\\>\\> but returns array\\<int, Zenstruck\\\\Foundry\\\\Proxy\\<Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TModel of object\\>\\>\\>\\.$#"
+			count: 1
+			path: src/Persistence/PersistentProxyObjectFactory.php
 
 		-
 			message: "#^Should not use function \"debug_backtrace\", please change the code\\.$#"
@@ -149,3 +164,13 @@ parameters:
 			message: "#^Parameter \\#1 \\$configuration of static method Zenstruck\\\\Foundry\\\\Factory\\<object\\>\\:\\:boot\\(\\) expects Zenstruck\\\\Foundry\\\\Configuration, object\\|null given\\.$#"
 			count: 1
 			path: src/ZenstruckFoundryBundle.php
+
+		-
+			message: "#^Function Zenstruck\\\\Foundry\\\\create_many\\(\\) should return array\\<int, Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TObject of object\\>\\> but returns array\\<int, Zenstruck\\\\Foundry\\\\Proxy\\<Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TObject of object\\>\\>\\>\\.$#"
+			count: 1
+			path: src/functions.php
+
+		-
+			message: "#^Function Zenstruck\\\\Foundry\\\\instantiate_many\\(\\) should return array\\<int, Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TObject of object\\>\\> but returns array\\<int, Zenstruck\\\\Foundry\\\\Proxy\\<Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TObject of object\\>\\>\\>\\.$#"
+			count: 1
+			path: src/functions.php
