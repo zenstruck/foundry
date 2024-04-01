@@ -301,7 +301,7 @@ class ProxyRepositoryDecorator extends RepositoryDecorator
             }
 
             if ($attributeValue instanceof Factory) {
-                $attributeValue = $attributeValue->withoutPersisting()->createAndUproxify();
+                $attributeValue = $attributeValue->withoutPersisting()->createAndUnproxify();
             } elseif ($attributeValue instanceof Proxy) {
                 $attributeValue = $attributeValue->_real();
             }

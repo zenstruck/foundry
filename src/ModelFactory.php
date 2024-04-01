@@ -13,7 +13,6 @@ namespace Zenstruck\Foundry;
 
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Persistence\Proxy;
 
 /**
  * @template TModel of object
@@ -21,11 +20,26 @@ use Zenstruck\Foundry\Persistence\Proxy;
  *
  * @method static Proxy[]|TModel[] createMany(int $number, array|callable $attributes = [])
  *
- * @phpstan-method FactoryCollection<Proxy<TModel>> sequence(iterable<array<string, mixed>>|callable(): iterable<array<string, mixed>> $sequence)
- * @phpstan-method FactoryCollection<Proxy<TModel>> many(int $min, int|null $max = null)
+ * @phpstan-method Proxy<TModel> create(array|callable $attributes = [])
+ * @phpstan-method static Proxy<TModel> createOne(array $attributes = [])
+ * @phpstan-method static Proxy<TModel> find(object|array|mixed $criteria)
+ * @phpstan-method static Proxy<TModel> findOrCreate(array $attributes)
+ * @phpstan-method static Proxy<TModel> first(string $sortedField = 'id')
+ * @phpstan-method static Proxy<TModel> last(string $sortedField = 'id')
+ * @phpstan-method static Proxy<TModel> random(array $attributes = [])
+ * @phpstan-method static Proxy<TModel> randomOrCreate(array $attributes = [])
  *
+ * @phpstan-method FactoryCollection<TModel> sequence(iterable<array<string, mixed>>|callable(): iterable<array<string, mixed>> $sequence)
+ * @phpstan-method FactoryCollection<TModel> many(int $min, int|null $max = null)
+ *
+ * @phpstan-method static list<Proxy<TModel>> all()
  * @phpstan-method static list<Proxy<TModel>> createSequence(iterable<array<string, mixed>>|callable(): iterable<array<string, mixed>> $sequence)
  * @phpstan-method static list<Proxy<TModel>> createMany(int $number, array|callable $attributes = [])
+ * @phpstan-method static list<Proxy<TModel>> createMany(int $number, array|callable $attributes = [])
+ * @phpstan-method static list<Proxy<TModel>> createSequence(array|callable $sequence)
+ * @phpstan-method static list<Proxy<TModel>> findBy(array $attributes)
+ * @phpstan-method static list<Proxy<TModel>> randomRange(int $min, int $max, array $attributes = [])
+ * @phpstan-method static list<Proxy<TModel>> randomSet(int $number, array $attributes = [])
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  *
