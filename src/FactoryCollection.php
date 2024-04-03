@@ -75,7 +75,7 @@ final class FactoryCollection implements \IteratorAggregate
     }
 
     /**
-     * @return ($noProxy is true ? list<TObject> : list<Proxy<TObject>>)
+     * @return list<TObject>
      */
     public function create(
         array|callable $attributes = [],
