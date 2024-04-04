@@ -11,6 +11,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
+use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
@@ -27,10 +28,10 @@ $metadataDriver->addDriver(new AttributeDriver([]), 'Zenstruck\\Foundry\\Utils\\
 
 $config->setMetadataDriverImpl($metadataDriver);
 
-return EntityManager::create(
-    [
+return new EntityManager(
+    DriverManager::getConnection([
         'driver' => 'pdo_sqlite',
         'memory' => true,
-    ],
+    ]),
     $config
 );

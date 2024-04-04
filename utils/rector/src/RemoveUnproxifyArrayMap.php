@@ -102,7 +102,7 @@ final class RemoveUnproxifyArrayMap extends AbstractRector
 
         $paramType = $this->getType($callable->getParams()[0]);
 
-        if (!$paramType instanceof FullyQualifiedObjectType || !\is_a($paramType->getClassName(), Proxy::class, allow_string: true)) {
+        if (!$paramType instanceof TypeWithClassName || !\is_a($paramType->getClassName(), Proxy::class, allow_string: true)) {
             return false; // let's only handle param when it is fully typed as a Proxy
         }
 

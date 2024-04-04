@@ -29,8 +29,8 @@ use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
  * @phpstan-method static Proxy<TModel> random(array $attributes = [])
  * @phpstan-method static Proxy<TModel> randomOrCreate(array $attributes = [])
  *
- * @phpstan-method FactoryCollection<TModel> sequence(iterable<array<string, mixed>>|callable(): iterable<array<string, mixed>> $sequence)
- * @phpstan-method FactoryCollection<TModel> many(int $min, int|null $max = null)
+ * @phpstan-method FactoryCollection<Proxy<TModel>> sequence(iterable<array<string, mixed>>|callable(): iterable<array<string, mixed>> $sequence)
+ * @phpstan-method FactoryCollection<Proxy<TModel>> many(int $min, int|null $max = null)
  *
  * @phpstan-method static list<Proxy<TModel>> all()
  * @phpstan-method static list<Proxy<TModel>> createSequence(iterable<array<string, mixed>>|callable(): iterable<array<string, mixed>> $sequence)

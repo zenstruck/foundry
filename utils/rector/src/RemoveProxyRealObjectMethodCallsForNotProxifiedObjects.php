@@ -18,6 +18,7 @@ use PHPStan\Analyser\MutatingScope;
 use PHPStan\Type\Generic\GenericObjectType;
 use PHPStan\Type\NullType;
 use PHPStan\Type\ObjectType;
+use PHPStan\Type\TypeWithClassName;
 use PHPStan\Type\UnionType;
 use Rector\Rector\AbstractRector;
 use Rector\StaticTypeMapper\ValueObject\Type\FullyQualifiedObjectType;
@@ -152,7 +153,7 @@ final class RemoveProxyRealObjectMethodCallsForNotProxifiedObjects extends Abstr
     {
         $type = $this->getType($node->var);
 
-        if (!$type instanceof FullyQualifiedObjectType) {
+        if (!$type instanceof TypeWithClassName) {
             return false;
         }
 

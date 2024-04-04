@@ -63,7 +63,8 @@
         "psr-4": {
             "Zenstruck\\Foundry\\Tests\\": "tests/",
             "App\\": "tests/Fixtures/tmp/src",
-            "App\\Tests\\": "tests/Fixtures/tmp/tests"
+            "App\\Tests\\": "tests/Fixtures/tmp/tests",
+            "Zenstruck\\Foundry\\Utils\\Rector\\Tests\\": "utils/rector/tests/"
         }
     },
     "extra": {
