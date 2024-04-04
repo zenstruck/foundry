@@ -12,6 +12,7 @@
 namespace App\Factory;
 
 use Zenstruck\Foundry\ObjectFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Object\ObjectServiceFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject;
 
 /**
@@ -47,7 +48,7 @@ final class SomeObjectFactory extends ObjectFactory
             'floatMandatory' => self::faker()->randomFloat(),
             'intMandatory' => self::faker()->randomNumber(),
             'someMandatoryPropertyWithUnionType' => null, // TODO add value manually
-            'someOtherObjectMandatory' => SomeOtherObjectFactory::new(),
+            'someOtherObjectMandatory' => ObjectServiceFactory::new(),
             'stringMandatory' => self::faker()->sentence(),
             'stringNullable' => self::faker()->sentence(),
         ];

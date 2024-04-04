@@ -12,7 +12,7 @@
 namespace Zenstruck\Foundry\Bundle\Maker\Factory;
 
 use Zenstruck\Foundry\Bundle\Maker\Factory\Exception\FactoryClassAlreadyExistException;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\ObjectFactory;
 
 /**
  * @internal
@@ -24,13 +24,13 @@ final class FactoryClassMap
      */
     private array $classesWithFactories;
 
-    /** @param \Traversable<PersistentProxyObjectFactory> $factories */
+    /** @param \Traversable<ObjectFactory> $factories */
     public function __construct(\Traversable $factories)
     {
         $this->classesWithFactories = \array_unique(
             \array_reduce(
                 \iterator_to_array($factories, preserve_keys: true),
-                static function(array $carry, PersistentProxyObjectFactory $factory): array {
+                static function(array $carry, ObjectFactory $factory): array {
                     $carry[$factory::class] = $factory::class();
 
                     return $carry;

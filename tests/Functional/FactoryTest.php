@@ -19,6 +19,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Tag;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
+use Zenstruck\Foundry\Tests\Fixtures\Object\ObjectServiceFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObject;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeObjectFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Object\SomeOtherObject;
@@ -202,6 +203,21 @@ final class FactoryTest extends KernelTestCase
         $notPersistedObject = SomeObjectFactory::new()->create();
         self::assertInstanceOf(SomeObject::class, $notPersistedObject);
         self::assertInstanceOf(SomeOtherObject::class, $notPersistedObject->someOtherObjectMandatory);
+    }
+
+    /**
+     * @test
+     */
+    public function can_use_object_factory_as_services(): void
+    {
+        if (!\getenv('USE_FOUNDRY_BUNDLE')) {
+            $this->markTestSkipped('ZenstruckFoundryBundle not enabled.');
+        }
+        
+        self::assertSame(
+            self::getContainer()->getParameter('kernel.project_dir'),
+            ObjectServiceFactory::new()->create()->foo
+        );
     }
 
     /**

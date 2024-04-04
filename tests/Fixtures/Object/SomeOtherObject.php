@@ -15,4 +15,9 @@ namespace Zenstruck\Foundry\Tests\Fixtures\Object;
 
 final class SomeOtherObject
 {
+    public function __construct(
+        public string|null $foo = null
+    )
+    {
+    }
 }

@@ -22,6 +22,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Zenstruck\Foundry\Test\ORMDatabaseResetter;
+use Zenstruck\Foundry\Tests\Fixtures\Object\ObjectServiceFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\ODMTagStory;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\ODMTagStoryAsAService;
 use Zenstruck\Foundry\Tests\Fixtures\Stories\ServiceStory;
@@ -112,6 +113,10 @@ class Kernel extends BaseKernel
         $c->register(ServiceStory::class)
             ->setAutoconfigured(true)
             ->setAutowired(true)
+        ;
+        $c->register(ObjectServiceFactory::class)
+            ->setAutoconfigured(true)
+            ->setArguments(['$kernelProjectDir' => $c->getParameter('kernel.project_dir')])
         ;
         $c->register(CustomFakerProvider::class)->addTag('foundry.faker_provider');
 
