@@ -213,7 +213,7 @@ final class FactoryTest extends KernelTestCase
         if (!\getenv('USE_FOUNDRY_BUNDLE')) {
             $this->markTestSkipped('ZenstruckFoundryBundle not enabled.');
         }
-        
+
         self::assertSame(
             self::getContainer()->getParameter('kernel.project_dir'),
             ObjectServiceFactory::new()->create()->foo
