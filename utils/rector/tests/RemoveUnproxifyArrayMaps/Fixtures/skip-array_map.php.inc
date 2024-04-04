@@ -16,6 +16,12 @@ array_map(
     DummyPersistentModelFactory::createMany(2)
 );
 
+// param is a proxy
+array_map(
+    static fn (Proxy $proxy) => $proxy->object(),
+    DummyPersistentModelFactory::new()->many(5)->create()
+);
+
 // not a object/_real method call
 array_map(
     static fn (Proxy $proxy) => $proxy->method(),

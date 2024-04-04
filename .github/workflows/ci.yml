@@ -227,17 +227,19 @@ jobs:
         uses: ramsey/composer-install@v2
         with:
           composer-options: --prefer-dist
-          working-directory: "./utils/rector"
+
+      - name: Install Rector & PHPStan
+        run: |
+          composer bin phpstan install
+          composer bin rector install
 
       - name: Test
-        run: vendor/bin/phpunit
+        run: vendor/bin/phpunit -c phpunit-rector.xml.dist
         shell: bash
-        working-directory: "./utils/rector"
 
       - name: Static analysis
-        run: vendor/bin/phpstan
+        run: bin/tools/phpstan/vendor/phpstan/phpstan/phpstan analyse -c utils/rector/phpstan.neon
         shell: bash
-        working-directory: "./utils/rector"
 
   fixcs:
     name: Run php-cs-fixer
