@@ -16,6 +16,8 @@ use PHPUnit\Framework\Attributes\BeforeClass;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
 
+use function Zenstruck\Foundry\restorePhpUnitErrorHandler;
+
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
@@ -34,7 +36,10 @@ trait ResetDatabase
 
         PersistenceManager::resetDatabase(
             static fn() => static::bootKernel(),
-            static fn() => static::ensureKernelShutdown(),
+            static function (): void {
+                static::ensureKernelShutdown();
+                restorePhpUnitErrorHandler();
+            },
         );
     }
 
@@ -51,7 +56,10 @@ trait ResetDatabase
 
         PersistenceManager::resetSchema(
             static fn() => static::bootKernel(),
-            static fn() => static::ensureKernelShutdown(),
+            static function (): void {
+                static::ensureKernelShutdown();
+                restorePhpUnitErrorHandler();
+            },
         );
     }
 }
