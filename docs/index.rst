@@ -207,6 +207,8 @@ This command will generate a ``PostFactory`` class that looks like this:
                 zenstruck_foundry:
                     make_factory:
                         default_namespace: 'App\\MyFactories'
+                    make_story:
+                        default_namespace: 'App\\MyStories'
 
     You can override this configuration by using the ``--namespace`` option.
 
@@ -2110,6 +2112,10 @@ Full Default Bundle Configuration
                 # Namespace to use for make:factory. Is overridden by --namespace option
                 default_namespace: 'Factory'
 
+            # Configure Foundry's make:story command
+            make_story:
+                # Namespace to use for make:story. Is overridden by --namespace option
+                default_namespace: 'App\\MyStories'
     .. code-block:: php
 
         $config->extension('zenstruck_foundry', [
@@ -2179,5 +2185,11 @@ Full Default Bundle Configuration
 
                 // Namespace to use for make:factory. Is overridden by --namespace option
                 'default_namespace' => 'Factory'
+            ],
+
+            'make_story' => [
+
+                // Namespace to use for make:story. Is overridden by --namespace option
+                'default_namespace' => 'Story'
             ]
         ]);
