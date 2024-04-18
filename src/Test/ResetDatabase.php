@@ -36,7 +36,7 @@ trait ResetDatabase
 
         PersistenceManager::resetDatabase(
             static fn() => static::bootKernel(),
-            static function (): void {
+            static function(): void {
                 static::ensureKernelShutdown();
                 restorePhpUnitErrorHandler();
             },
@@ -56,7 +56,7 @@ trait ResetDatabase
 
         PersistenceManager::resetSchema(
             static fn() => static::bootKernel(),
-            static function (): void {
+            static function(): void {
                 static::ensureKernelShutdown();
                 restorePhpUnitErrorHandler();
             },
