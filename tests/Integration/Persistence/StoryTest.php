@@ -17,15 +17,19 @@ use Zenstruck\Foundry\Story;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Document\GlobalDocument;
+use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GlobalEntity;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericDocumentFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
+use Zenstruck\Foundry\Tests\Fixture\Object1;
 use Zenstruck\Foundry\Tests\Fixture\Stories\DocumentPoolStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\DocumentStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\EntityPoolStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\EntityStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\GlobalStory;
+use Zenstruck\Foundry\Tests\Fixture\Stories\ObjectStory;
+use Zenstruck\Foundry\Tests\Fixture\Stories\PersistenceDisabledStory;
 
 use function Zenstruck\Foundry\Persistence\repository;
 
@@ -234,5 +238,23 @@ final class StoryTest extends KernelTestCase
         self::assertInstanceOf(GenericModel::class, $item);
 
         self::assertContains($item->getProp1(), ['foo', 'default1']);
+    }
+
+    /**
+     * @test
+     */
+    public function can_use_story_with_simple_object(): void
+    {
+        ObjectStory::load();
+        self::assertInstanceOf(Object1::class, ObjectStory::foo());
+    }
+
+    /**
+     * @test
+     */
+    public function can_use_story_with_persistence_disabled(): void
+    {
+        PersistenceDisabledStory::load();
+        self::assertInstanceOf(GenericEntity::class, PersistenceDisabledStory::foo());
     }
 }

@@ -12,6 +12,7 @@
         <ini name="error_reporting" value="-1" />
         <server name="KERNEL_CLASS" value="Zenstruck\Foundry\Tests\Fixture\TestKernel" />
         <server name="SHELL_VERBOSITY" value="-1" />
+        <server name="APP_ENV" value="test" force="true" />
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0&amp;max[direct]=0&amp;quiet[]=indirect&amp;quiet[]=other&amp;ignoreFile=./tests/baseline-ignore"/>
     </php>
 
