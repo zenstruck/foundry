@@ -17,7 +17,6 @@ use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
 use Symfony\Bundle\MakerBundle\MakerBundle;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader\FileLoader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Zenstruck\Foundry\Bundle\Command\StubMakeFactory;
@@ -160,7 +159,7 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
 
     private function configureMakeFactory(array $makerConfig, ContainerBuilder $container, bool $hasMakerBundle): void
     {
-        if ($hasMakerBundle === true) {
+        if (true === $hasMakerBundle) {
             $makeFactoryDefinition = $container->getDefinition('.zenstruck_foundry.maker.factory');
             $makeFactoryDefinition->setArgument('$defaultNamespace', $makerConfig['default_namespace']);
         } else {
@@ -170,7 +169,7 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
 
     private function configureStoryFactory(array $makerConfig, ContainerBuilder $container, bool $hasMakerBundle): void
     {
-        if ($hasMakerBundle === true) {
+        if (true === $hasMakerBundle) {
             $makeFactoryDefinition = $container->getDefinition('.zenstruck_foundry.maker.story');
             $makeFactoryDefinition->setArgument('$defaultNamespace', $makerConfig['default_namespace']);
         } else {
@@ -189,7 +188,7 @@ final class ZenstruckFoundryExtension extends ConfigurableExtension
 
     private function configureServices(XmlFileLoader $loader, bool $hasMakerBundle): void
     {
-        if ($hasMakerBundle === true) {
+        if (true === $hasMakerBundle) {
             $loader->load('maker.xml');
         }
     }

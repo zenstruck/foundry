@@ -20,7 +20,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Zenstruck\Foundry\Bundle\Maker\Factory\FactoryGenerator;
 use Zenstruck\Foundry\Bundle\Maker\Factory\NamespaceGuesser;
 
 /**
@@ -31,9 +30,7 @@ final class MakeStory extends AbstractMaker
     public function __construct(
         private NamespaceGuesser $namespaceGuesser,
         private string $defaultNamespace,
-
-    )
-    {
+    ) {
     }
 
     public static function getCommandName(): string
