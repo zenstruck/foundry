@@ -188,6 +188,16 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('make_story')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('default_namespace')
+                            ->info('Default namespace where stories will be created by maker.')
+                            ->defaultValue('Story')
+                            ->cannotBeEmpty()
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ;
 

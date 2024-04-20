@@ -48,6 +48,7 @@
         </service>
 
         <service id=".zenstruck_foundry.maker.story" class="Zenstruck\Foundry\Bundle\Maker\MakeStory">
+            <argument type="service" id=".zenstruck_foundry.maker.factory.namespace_guesser" />
             <tag name="maker.command" />
         </service>
 
