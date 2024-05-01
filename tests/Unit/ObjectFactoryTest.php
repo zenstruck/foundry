@@ -370,7 +370,7 @@ final class ObjectFactoryTest extends TestCase
             ],
         ];
 
-        yield 'sequence as iterable which returns array' => [
+        yield 'sequence as callable which returns array' => [
             static fn() => array_map(
                 static fn(int $i) => ['prop1' => "foo{$i}", 'prop2' => "bar{$i}"],
                 range(1, 2)
@@ -387,6 +387,29 @@ final class ObjectFactoryTest extends TestCase
                 }
             }
         ];
+    }
+
+    /**
+     * @test
+     */
+    public function can_use_sequence_with_associative_array(): void
+    {
+        self::assertEquals(
+            [
+                new Object1('foo1', 'bar1'),
+                new Object1('foo2', 'bar2'),
+            ],
+            Object1Factory::createSequence([
+                'object 1' => [
+                    'prop1' => 'foo1',
+                    'prop2' => 'bar1',
+                ],
+                'object 2' => [
+                    'prop1' => 'foo2',
+                    'prop2' => 'bar2',
+                ],
+            ]),
+        );
     }
 
     /**
