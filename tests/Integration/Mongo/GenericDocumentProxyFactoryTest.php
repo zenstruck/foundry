@@ -12,9 +12,11 @@
 namespace Zenstruck\Foundry\Tests\Integration\Mongo;
 
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericProxyDocumentFactory;
 use Zenstruck\Foundry\Tests\Integration\Persistence\GenericProxyFactoryTestCase;
 use Zenstruck\Foundry\Tests\Integration\RequiresMongo;
+use function Zenstruck\Foundry\Persistence\proxy_factory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -26,5 +28,13 @@ final class GenericDocumentProxyFactoryTest extends GenericProxyFactoryTestCase
     protected function factory(): PersistentProxyObjectFactory
     {
         return GenericProxyDocumentFactory::new();
+    }
+
+    /**
+     * @return PersistentProxyObjectFactory<DocumentWithReadonly>
+     */
+    protected function objectWithReadonlyFactory(): PersistentProxyObjectFactory // @phpstan-ignore-line
+    {
+        return proxy_factory(DocumentWithReadonly::class);
     }
 }

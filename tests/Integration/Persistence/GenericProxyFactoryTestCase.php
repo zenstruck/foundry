@@ -13,7 +13,11 @@ namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithReadonly;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithReadonly\EntityWithReadonly;
+use Zenstruck\Foundry\Tests\Fixture\Model\Embeddable;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
+use function Zenstruck\Foundry\factory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -229,11 +233,33 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
 
         self::assertInstanceOf(GenericModel::class, $real = $object->_real());
         self::assertSame('foo', $real->getProp1());
+    }
 
+    /**
+     * @test
+     */
+    public function can_create_object_with_readonly_properties(): void
+    {
+        $factory = $this->objectWithReadonlyFactory();
+
+        $objectWithReadOnly = $factory::createOne([
+            'prop' => 1,
+            'embedded' => factory(Embeddable::class, ['prop1' => 'value1']),
+            'date' => new \DateTimeImmutable()
+        ]);
+
+        $objectWithReadOnly->_refresh();
+
+        $factory::assert()->count(1);
     }
 
     /**
      * @return PersistentProxyObjectFactory<GenericModel>
      */
     abstract protected function factory(): PersistentProxyObjectFactory; // @phpstan-ignore-line
+
+    /**
+     * @return PersistentProxyObjectFactory<DocumentWithReadonly|EntityWithReadonly>
+     */
+    abstract protected function objectWithReadonlyFactory(): PersistentProxyObjectFactory;
 }
