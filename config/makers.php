@@ -7,18 +7,21 @@ use Zenstruck\Foundry\Maker\Factory\FactoryCandidatesClassesExtractor;
 use Zenstruck\Foundry\Maker\Factory\FactoryClassMap;
 use Zenstruck\Foundry\Maker\Factory\FactoryGenerator;
 use Zenstruck\Foundry\Maker\Factory\LegacyORMDefaultPropertiesGuesser;
-use Zenstruck\Foundry\Maker\Factory\NamespaceGuesser;
 use Zenstruck\Foundry\Maker\Factory\NoPersistenceObjectsAutoCompleter;
 use Zenstruck\Foundry\Maker\Factory\ObjectDefaultPropertiesGuesser;
 use Zenstruck\Foundry\Maker\Factory\ODMDefaultPropertiesGuesser;
 use Zenstruck\Foundry\Maker\Factory\ORMDefaultPropertiesGuesser;
 use Zenstruck\Foundry\Maker\MakeFactory;
 use Zenstruck\Foundry\Maker\MakeStory;
+use Zenstruck\Foundry\Maker\NamespaceGuesser;
 use Zenstruck\Foundry\ORM\DoctrineOrmVersionGuesser;
 
 return static function (ContainerConfigurator $container): void {
     $container->services()
-        ->set('.zenstruck_foundry.make_story', MakeStory::class)
+        ->set('.zenstruck_foundry.maker.story', MakeStory::class)
+            ->args([
+                service('.zenstruck_foundry.maker.namespace_guesser')
+            ])
             ->tag('maker.command')
 
         ->set('.zenstruck_foundry.maker.factory', MakeFactory::class)
@@ -72,7 +75,7 @@ return static function (ContainerConfigurator $container): void {
                 service('kernel'),
                 tagged_iterator('foundry.make_factory.default_properties_guesser'),
                 service('.zenstruck_foundry.maker.factory.factory_class_map'),
-                service('.zenstruck_foundry.maker.factory.namespace_guesser'),
+                service('.zenstruck_foundry.maker.namespace_guesser'),
             ])
 
         ->set('.zenstruck_foundry.maker.factory.autoCompleter', NoPersistenceObjectsAutoCompleter::class)
@@ -86,7 +89,7 @@ return static function (ContainerConfigurator $container): void {
                 service('.zenstruck_foundry.maker.factory.factory_class_map'),
             ])
 
-        ->set('.zenstruck_foundry.maker.factory.namespace_guesser', NamespaceGuesser::class)
+        ->set('.zenstruck_foundry.maker.namespace_guesser', NamespaceGuesser::class)
             ->args([
                 service('.zenstruck_foundry.persistence_manager')->nullOnInvalid(),
             ])

@@ -148,6 +148,16 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('make_story')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('default_namespace')
+                            ->info('Default namespace where stories will be created by maker.')
+                            ->defaultValue('Story')
+                            ->cannotBeEmpty()
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ;
     }
@@ -176,6 +186,9 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
 
             $makeFactoryDefinition = $container->getDefinition('.zenstruck_foundry.maker.factory');
             $makeFactoryDefinition->setArgument('$defaultNamespace', $config['make_factory']['default_namespace']);
+
+            $makeStoryDefinition = $container->getDefinition('.zenstruck_foundry.maker.story');
+            $makeStoryDefinition->setArgument('$defaultNamespace', $config['make_story']['default_namespace']);
 
             if (!isset($bundles['DoctrineBundle'])) {
                 $container->removeDefinition('.zenstruck_foundry.maker.factory.orm_default_properties_guesser');

@@ -205,4 +205,32 @@ final class MakeStoryTest extends MakerTestCase
         yield ['FooBar'];
         yield ['FooBarStory'];
     }
+
+    /**
+     * @test
+     * @dataProvider namespaceProvider
+     * @param array<string, mixed> $commandOptions
+     */
+    public function can_customize_namespace(string $filePath, array $commandOptions, string $expectedFullNamespace): void
+    {
+        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:story'));
+
+        $this->assertFileDoesNotExist(self::tempFile($filePath));
+
+        $tester->execute(['name' => 'FooBar'] + $commandOptions);
+
+        $this->assertFileExists(self::tempFile($filePath));
+        self::assertStringContainsString("namespace $expectedFullNamespace", file_get_contents(self::tempFile($filePath))); // @phpstan-ignore-line
+    }
+
+    /**
+     * @return iterable<array{string, array<string, mixed>, string}>
+     */
+    public static function namespaceProvider(): iterable
+    {
+        yield ['src/Some/Namespace/FooBarStory.php', ['--namespace' => 'Some\\Namespace'], 'App\\Some\\Namespace'];
+        yield ['src/Some/Namespace/FooBarStory.php', ['--namespace' => 'App\\Some\\Namespace'], 'App\\Some\\Namespace'];
+        yield ['tests/Some/Namespace/FooBarStory.php', ['--namespace' => 'Some\\Namespace', '--test' => true], 'App\\Tests\\Some\\Namespace'];
+        yield ['tests/Some/Namespace/FooBarStory.php', ['--namespace' => 'App\\Tests\\Some\\Namespace', '--test' => true], 'App\\Tests\\Some\\Namespace'];
+    }
 }
