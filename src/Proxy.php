@@ -240,7 +240,13 @@ final class Proxy implements \Stringable, ProxyBase
         }
 
         if ($this->objectManager()->contains($this->object)) {
-            $this->objectManager()->refresh($this->object);
+            try {
+                $this->objectManager()->refresh($this->object);
+            } catch (\LogicException|\Error) {
+                // prevent entities/documents with readonly properties to create an error
+                // LogicException is for ORM / Error is for ODM
+                // @see https://github.com/doctrine/orm/issues/9505
+            }
 
             return $this;
         }

@@ -12,6 +12,7 @@
 namespace Zenstruck\Foundry\Tests\Functional;
 
 use Zenstruck\Foundry\Tests\Fixtures\Document\ODMPost;
+use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\DocumentWithReadonlyFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\ODM\PostFactory;
 
 /**
@@ -39,5 +40,10 @@ final class ODMProxyTest extends ProxyTest
     protected function registryServiceId(): string
     {
         return 'doctrine_mongodb';
+    }
+
+    protected function withReadonlyFactory(): string
+    {
+        return DocumentWithReadonlyFactory::class;
     }
 }
