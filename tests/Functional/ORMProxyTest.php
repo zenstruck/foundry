@@ -17,6 +17,7 @@ use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\EntityWithReadonlyFactory;
 use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
+
 use function Zenstruck\Foundry\Persistence\proxy_factory;
 
 /**

@@ -14,15 +14,11 @@ namespace Zenstruck\Foundry\Tests\Functional;
 use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Assert;
-use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
-use Zenstruck\Foundry\Tests\Fixtures\Factories\EntityWithReadonlyFactory;
-use function Zenstruck\Foundry\anonymous;
-use function Zenstruck\Foundry\Persistence\proxy_factory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -295,7 +291,6 @@ abstract class ProxyTest extends KernelTestCase
         $objectWithReadOnly->_refresh();
 
         $factory::assert()->count(1);
-
     }
 
     /** @return class-string<PersistentProxyObjectFactory> */
