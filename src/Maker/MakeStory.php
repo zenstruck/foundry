@@ -32,8 +32,7 @@ final class MakeStory extends AbstractMaker
     public function __construct(
         private NamespaceGuesser $namespaceGuesser,
         private string $defaultNamespace,
-    )
-    {
+    ) {
     }
 
     public static function getCommandName(): string

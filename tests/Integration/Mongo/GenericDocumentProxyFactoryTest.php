@@ -16,6 +16,7 @@ use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericProxyDocumentFactory;
 use Zenstruck\Foundry\Tests\Integration\Persistence\GenericProxyFactoryTestCase;
 use Zenstruck\Foundry\Tests\Integration\RequiresMongo;
+
 use function Zenstruck\Foundry\Persistence\proxy_factory;
 
 /**

@@ -16,6 +16,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithReadonly\EntityWi
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericProxyEntityFactory;
 use Zenstruck\Foundry\Tests\Integration\Persistence\GenericProxyFactoryTestCase;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
+
 use function Zenstruck\Foundry\Persistence\proxy_factory;
 
 /**

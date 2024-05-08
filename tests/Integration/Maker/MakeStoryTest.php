@@ -220,7 +220,7 @@ final class MakeStoryTest extends MakerTestCase
         $tester->execute(['name' => 'FooBar'] + $commandOptions);
 
         $this->assertFileExists(self::tempFile($filePath));
-        self::assertStringContainsString("namespace $expectedFullNamespace", file_get_contents(self::tempFile($filePath))); // @phpstan-ignore-line
+        self::assertStringContainsString("namespace {$expectedFullNamespace}", \file_get_contents(self::tempFile($filePath))); // @phpstan-ignore-line
     }
 
     /**
