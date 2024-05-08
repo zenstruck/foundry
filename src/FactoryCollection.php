@@ -80,8 +80,9 @@ final class FactoryCollection implements \IteratorAggregate
     {
         $factories = [];
 
-        foreach (($this->items)() as $i => $attributes) {
-            $factories[] = $this->factory->with($attributes)->with(['__index' => $i + 1]);
+        $i = 1;
+        foreach (($this->items)() as $attributes) {
+            $factories[] = $this->factory->with($attributes)->with(['__index' => $i++]);
         }
 
         return $factories;
