@@ -20,6 +20,7 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Maker\Factory\Exception\FactoryClassAlreadyExistException;
+use Zenstruck\Foundry\Maker\NamespaceGuesser;
 use Zenstruck\Foundry\Persistence\Exception\NoPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
 

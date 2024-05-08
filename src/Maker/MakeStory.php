@@ -29,6 +29,13 @@ use Symfony\Component\Console\Input\InputOption;
  */
 final class MakeStory extends AbstractMaker
 {
+    public function __construct(
+        private NamespaceGuesser $namespaceGuesser,
+        private string $defaultNamespace,
+    )
+    {
+    }
+
     public static function getCommandName(): string
     {
         return 'make:story';
@@ -45,6 +52,7 @@ final class MakeStory extends AbstractMaker
             ->setDescription(self::getCommandDescription())
             ->addArgument('name', InputArgument::OPTIONAL, 'The name of the story class (e.g. <fg=yellow>DefaultCategoriesStory</>)')
             ->addOption('test', null, InputOption::VALUE_NONE, 'Create in <fg=yellow>tests/</> instead of <fg=yellow>src/</>')
+            ->addOption('namespace', null, InputOption::VALUE_REQUIRED, 'Customize the namespace for generated factories')
         ;
 
         $inputConfig->setArgumentAsNonInteractive('name');
@@ -68,9 +76,12 @@ final class MakeStory extends AbstractMaker
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
+        $class = $input->getArgument('name');
+        $namespace = ($this->namespaceGuesser)($generator, $class, $input->getOption('namespace') ?? $this->defaultNamespace, $input->getOption('test'));
+
         $storyClassNameDetails = $generator->createClassNameDetails(
             $input->getArgument('name'),
-            $input->getOption('test') ? 'Tests\\Story' : 'Story',
+            $namespace,
             'Story'
         );
 
