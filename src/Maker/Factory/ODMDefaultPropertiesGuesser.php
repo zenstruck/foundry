@@ -29,8 +29,8 @@ class ODMDefaultPropertiesGuesser extends AbstractDoctrineDefaultPropertiesGuess
         }
 
         foreach ($metadata->associationMappings as $item) {
-            /** @phpstan-ignore-next-line */
-            if (!$item['embedded'] || !$item['targetDocument']) {
+            // @phpstan-ignore-next-line
+            if (!($item['embedded'] ?? false) || !($item['targetDocument'] ?? false)) {
                 // foundry does not support ODM references
                 continue;
             }
