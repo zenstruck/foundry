@@ -15,6 +15,7 @@ use Symfony\Component\VarExporter\Internal\LazyObjectState;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\Object\Hydrator;
+use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -114,14 +115,19 @@ trait IsProxy
 
     private function _autoRefresh(): void
     {
-        if (!$this->_autoRefresh) {
+        // "??=" fixes in ProxyHelper where object gets created without any props initialized
+        if (!($this->_autoRefresh ??= true)) {
             return;
         }
 
         try {
-            // we don't want that "transparent" calls to _refresh() to trigger a PersistenceNotAvailable
+            // we don't want that "transparent" calls to _refresh() to trigger a PersistenceNotAvailable exception
+            // or a RefreshObjectFailed exception when the object was deleted
             $this->_refresh();
-        } catch (PersistenceNotAvailable) {
+        } catch (PersistenceNotAvailable|RefreshObjectFailed $e) {
+            if ($e instanceof RefreshObjectFailed && $e->objectWasDeleted() === false) {
+                throw $e;
+            }
         }
     }
 }
