@@ -11,30 +11,11 @@
 
 namespace App\Factory\Category;
 
-use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Category\StandardCategory;
 
 /**
  * @extends PersistentProxyObjectFactory<StandardCategory>
- *
- * @method        StandardCategory|Proxy                    create(array|callable $attributes = [])
- * @method static StandardCategory|Proxy                    createOne(array $attributes = [])
- * @method static StandardCategory|Proxy                    find(object|array|mixed $criteria)
- * @method static StandardCategory|Proxy                    findOrCreate(array $attributes)
- * @method static StandardCategory|Proxy                    first(string $sortedField = 'id')
- * @method static StandardCategory|Proxy                    last(string $sortedField = 'id')
- * @method static StandardCategory|Proxy                    random(array $attributes = [])
- * @method static StandardCategory|Proxy                    randomOrCreate(array $attributes = [])
- * @method static EntityRepository|ProxyRepositoryDecorator repository()
- * @method static StandardCategory[]|Proxy[]                all()
- * @method static StandardCategory[]|Proxy[]                createMany(int $number, array|callable $attributes = [])
- * @method static StandardCategory[]|Proxy[]                createSequence(iterable|callable $sequence)
- * @method static StandardCategory[]|Proxy[]                findBy(array $attributes)
- * @method static StandardCategory[]|Proxy[]                randomRange(int $min, int $max, array $attributes = [])
- * @method static StandardCategory[]|Proxy[]                randomSet(int $number, array $attributes = [])
  */
 final class StandardCategoryFactory extends PersistentProxyObjectFactory
 {

@@ -68,6 +68,7 @@ final class MakeFactory extends AbstractMaker
             ->addOption('test', null, InputOption::VALUE_NONE, 'Create in <fg=yellow>tests/</> instead of <fg=yellow>src/</>')
             ->addOption('all-fields', null, InputOption::VALUE_NONE, 'Create defaults for all entity fields, not only required fields')
             ->addOption('no-persistence', null, InputOption::VALUE_NONE, 'Create a factory for an object not managed by Doctrine')
+            ->addOption('with-phpdoc', null, InputOption::VALUE_NONE, 'Adds @method and @phpstan-method to the Factory (can help with autocompletion in some cases)')
         ;
 
         $inputConfig->setArgumentAsNonInteractive('class');

@@ -13,6 +13,7 @@ parameters:
         - message: '#Attribute class PHPUnit\\Framework\\Attributes\\(.*) does not exist.#'
 
     excludePaths:
+        - tests/Fixture/Maker/expected/can_create_factory_with_auto_activated_not_persisted_option.php
         - tests/Fixture/Maker/expected/can_create_factory_interactively.php
         - tests/Fixture/Maker/expected/can_create_factory_with_embeddable_with_data_set_odm.php
         - tests/Fixture/Maker/expected/can_create_factory_with_embeddable_with_data_set_orm.php

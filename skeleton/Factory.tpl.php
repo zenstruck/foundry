@@ -1,4 +1,4 @@
-<?php /** @var Zenstruck\Foundry\Bundle\Maker\Factory\MakeFactoryData $makeFactoryData */ ?><?php echo "<?php\n"; ?>
+<?php /** @var \Zenstruck\Foundry\Maker\Factory\MakeFactoryData $makeFactoryData */ ?><?php echo "<?php\n"; ?>
 
 namespace <?php echo $namespace; ?>;
 
@@ -11,18 +11,16 @@ foreach ($makeFactoryData->getUses() as $use) {
 /**
  * @extends <?php echo $makeFactoryData->getFactoryClassShortName(); ?><<?php echo $makeFactoryData->getObjectShortName(); ?>>
 <?php
-if ($makeFactoryData->isPersisted()) {
+if (count($makeFactoryData->getMethodsPHPDoc())) {
     echo " *\n";
     foreach ($makeFactoryData->getMethodsPHPDoc() as $methodPHPDoc) {
         echo "{$methodPHPDoc->toString()}\n";
     }
 
-    if ($makeFactoryData->hasStaticAnalysisTool()) {
-        echo " *\n";
+    echo " *\n";
 
-        foreach ($makeFactoryData->getMethodsPHPDoc() as $methodPHPDoc) {
-            echo "{$methodPHPDoc->toString($makeFactoryData->staticAnalysisTool())}\n";
-        }
+    foreach ($makeFactoryData->getMethodsPHPDoc() as $methodPHPDoc) {
+        echo "{$methodPHPDoc->toString($makeFactoryData->staticAnalysisTool())}\n";
     }
 }
 ?>

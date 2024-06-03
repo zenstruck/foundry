@@ -172,6 +172,8 @@ abstract class Factory
 
     /**
      * Override to adjust default attributes & config.
+     *
+     * @return static
      */
     protected function initialize(): static
     {
