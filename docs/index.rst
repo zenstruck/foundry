@@ -198,6 +198,11 @@ This command will generate a ``PostFactory`` class that looks like this:
 
 .. tip::
 
+    You can also inherit from `Zenstruck\Foundry\Persistence\PersistentObjectFactory`. Which will create regular objects
+    without proxy (see :ref:`Proxy object section <object-proxy>` for more information).
+
+.. tip::
+
     You can globally configure which namespace the factories will be generated in:
 
     .. configuration-block::
@@ -211,6 +216,38 @@ This command will generate a ``PostFactory`` class that looks like this:
                         default_namespace: 'App\\MyFactories'
 
     You can override this configuration by using the ``--namespace`` option.
+
+.. note::
+
+    The generated ``@method`` docblocks above enable autocompletion with PhpStorm but
+    causes errors with PHPStan. To support PHPStan for your factory's, you need to *also*
+    add the following dockblocks:
+
+    .. code-block:: php
+
+        /**
+         * ...
+         *
+         * @phpstan-method Proxy<Post> create(array|callable $attributes = [])
+         * @phpstan-method static Proxy<Post> createOne(array $attributes = [])
+         * @phpstan-method static Proxy<Post> find(object|array|mixed $criteria)
+         * @phpstan-method static Proxy<Post> findOrCreate(array $attributes)
+         * @phpstan-method static Proxy<Post> first(string $sortedField = 'id')
+         * @phpstan-method static Proxy<Post> last(string $sortedField = 'id')
+         * @phpstan-method static Proxy<Post> random(array $attributes = [])
+         * @phpstan-method static Proxy<Post> randomOrCreate(array $attributes = [])
+         * @phpstan-method static list<Proxy<Post>> all()
+         * @phpstan-method static list<Proxy<Post>> createMany(int $number, array|callable $attributes = [])
+         * @phpstan-method static list<Proxy<Post>> createSequence(array|callable $sequence)
+         * @phpstan-method static list<Proxy<Post>> findBy(array $attributes)
+         * @phpstan-method static list<Proxy<Post>> randomRange(int $min, int $max, array $attributes = [])
+         * @phpstan-method static list<Proxy<Post>> randomSet(int $number, array $attributes = [])
+         * @phpstan-method static RepositoryProxy<Post> repository()
+         */
+        final class PostFactory extends ModelFactory
+        {
+            // ...
+        }
 
 In the ``defaults()``, you can return an array of all default values that any new object
 should have. `Faker`_ is available to easily get random data:
@@ -974,12 +1011,19 @@ once. To do this, wrap the operations in a ``flush_after()`` callback:
 
 .. _without-persisting:
 
+Not-persisted objects factory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When dealing with objects which are not aimed to be persisted, you can make your factory inherit from
+`Zenstruck\Foundry\ObjectFactory`. This will create plain objects, that does not interact with database (these objects
+won't be wrapped with a :ref:`proxy object <object-proxy>`).
+
 Without Persisting
 ~~~~~~~~~~~~~~~~~~
 
-Factories can also create objects without persisting them. This can be useful for unit tests where you just want to test
-the behaviour of the actual object or for creating objects that are not entities. When created, they are still wrapped
-in a ``Proxy`` to optionally save later.
+"Persitent factories" can also create objects without persisting them. This can be useful for unit tests where you just
+want to test the behaviour of the actual object or for creating objects that are not entities. When created, they are
+still wrapped in a ``Proxy`` to optionally save later.
 
 .. code-block:: php
 
@@ -1213,6 +1257,8 @@ bundle's configuration:
                             - odm_object_manager_1
                             - odm_object_manager_2
 
+.. _object-proxy:
+
 Object Proxy
 ~~~~~~~~~~~~
 
@@ -1261,7 +1307,8 @@ Auto-Refresh
 
 Object proxies have the option to enable *auto refreshing* that removes the need to call ``->_refresh()`` before calling
 methods on the underlying object. When auto-refresh is enabled, most calls to proxy objects first refresh the wrapped
-object from the database.
+object from the database. This is mainly useful with "integration" test which interacts with your database and Symfony's
+kernel.
 
 .. code-block:: php
 
@@ -1338,6 +1385,17 @@ Without auto-refreshing enabled, the above call to ``$post->getTitle()`` would r
             when@dev: # see Bundle Configuration section about sharing this in the test environment
                 zenstruck_foundry:
                     auto_refresh_proxies: true/false
+
+Factory without proxy
+.....................
+
+It is possible to create factories which do not create "proxified" objects. Instead of making your factory inherit from
+`PersistentProxyObjectFactory`, you can inherit from `PersistentObjectFactory`. Your factory will then directly return
+the "real" object, which won't be wrapped by `Proxy` class.
+
+.. warning::
+
+    Be aware that your object won't refresh automatically if they are not wrapped with a proxy.
 
 Repository Proxy
 ~~~~~~~~~~~~~~~~
