@@ -254,6 +254,17 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
     }
 
     /**
+     * @test
+     */
+    public function can_delete_proxified_object_and_still_access_its_methods(): void
+    {
+        $object = $this->factory()->create();
+        $object->_delete();
+
+        $this->assertSame('default1', $object->getProp1());
+    }
+
+    /**
      * @return PersistentProxyObjectFactory<GenericModel>
      */
     abstract protected function factory(): PersistentProxyObjectFactory; // @phpstan-ignore-line
