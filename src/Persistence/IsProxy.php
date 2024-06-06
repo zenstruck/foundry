@@ -125,7 +125,7 @@ trait IsProxy
             // or a RefreshObjectFailed exception when the object was deleted
             $this->_refresh();
         } catch (PersistenceNotAvailable|RefreshObjectFailed $e) {
-            if ($e instanceof RefreshObjectFailed && $e->objectWasDeleted() === false) {
+            if ($e instanceof RefreshObjectFailed && false === $e->objectWasDeleted()) {
                 throw $e;
             }
         }
