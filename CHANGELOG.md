@@ -1,5 +1,29 @@
 # CHANGELOG
 
+## [v2.0.0](https://github.com/zenstruck/foundry/releases/tag/v2.0.0)
+
+June 7th, 2024 - [v1.38.0...v2.0.0](https://github.com/zenstruck/foundry/compare/v1.38.0...v2.0.0)
+
+* 1393c13 docs: update docs for foundry v2 (#613) by @nikophil
+* 0034c78 feat(2.x, make:facotry): add phpdoc conditionnally with --with-phpdoc option (#611) by @nikophil
+* a3ec473 fix: prevent refresh error with autorefresh (#610) by @nikophil
+* ca8258a minor(make:factory): default false for ODM mapping (#605) by @nikophil
+* df5bb6b minor(2.x): remove APP_ENV=test from phpunit.xml (#603) by @nikophil
+* 0479ddf fix(2.x): allow sequence with associative arrays (#595) by @nikophil
+* d1509fb fix(2.x): support readonly entities (#599) by @nikophil
+* 2c8e048 feat(2.x): allow to configure default namespace fo make:factory (#600) by @nikophil
+* 9174dc6 fix: restore PHPUnit error handler (#587) by @nikophil
+* 4156302 tests: asserts story works without persistence (#589) by @nikophil
+* ec2c895 minor: add phpunit attributes (#576) by @nikophil
+* 90cc839 feat(sequence): sequence attributes should be compatible with 1.x (#575) by @nikophil
+* 60ec275 fix: sqlite with orm v2 (#574) by @kbond
+* ae82186 feat: compatibility with ORM v3 (#572) by @nikophil, @kbond
+* 624e8d2 feat: foundry 2.0 🎉 by @nikophil
+* e74f6b9 fix(rector) second argument for many() is optional (#515) by @nikophil
+* a555474 fix(rector): repository method is static (#515) by @nikophil
+* 53f25a2 rector: rewrite phpdoc (#571) by @nikophil
+* ecbc615 refactor: Foundry 2 BC layer (#515) by @nikophil
+
 ## [v1.38.0](https://github.com/zenstruck/foundry/releases/tag/v1.38.0)
 
 June 7th, 2024 - [v1.37.0...v1.38.0](https://github.com/zenstruck/foundry/compare/v1.37.0...v1.38.0)
