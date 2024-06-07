@@ -24,6 +24,15 @@ SYMFONY_DEPRECATIONS_HELPER="max[self]=0&amp;max[direct]=0&amp;quiet[]=indirect&
 > Some deprecations can also be sent during compilation step.
 > These deprecations can be displayed by using the command: `$ bin/console debug:container --deprecations`
 
+> [!WARNING]
+> If using PHPUnit 10 or above, Symfony's PHPUnit bridge is not compatible, and configuring `SYMFONY_DEPRECATIONS_HELPER`
+> is not useful. Instead, you'll need to add `ignoreSuppressionOfDeprecations=true` to the `<source>` tag in `phpunit.xml`
+> and run PHPUnit with the `--display-deprecations` option.
+
+> [!TIP]
+> PHPStan plugin [`phpstan/phpstan-deprecation-rules`](https://github.com/phpstan/phpstan-deprecation-rules) might also
+> be useful to detect the remaining deprecations.
+
 ## Rector rules
 
 In the latest 1.x version, you'll find [rector rules](https://getrector.org/) which will help with the migration path.
