@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## [v1.38.0](https://github.com/zenstruck/foundry/releases/tag/v1.38.0)
+
+June 7th, 2024 - [v1.37.0...v1.38.0](https://github.com/zenstruck/foundry/compare/v1.37.0...v1.38.0)
+
+* b3adc86 docs(v1): improve upgrade guide (#614) by @nikophil
+* 691741f doc: update (#594) by @kbond, @nikophil
+* 431afa3 minor(make:factory): default false for `embedded` and `targetDocument` mappings (#602) by @melkamar
+* 6102488 fix(1.x): support entities with readonly properties (#598) by @nikophil
+* 5af3f0f feat: Configure default_namespace for make_story (#592) by @dmitryuk, a.dmitryuk
+* 00e6b86 fix(rector): misc fixes in rector rules (#586) by @nikophil
+* afad017 fix: can use ObjectFactories as service (#585) by @nikophil
+* b66ed4c fix: restore factory collection type (#584) by @nikophil
+* 7cfab99 fix: restore error handler in Foundry's traits (#577) by @nikophil
+* d55c728 fix(sca): fix type system with legacy FactoryCollection (#583) by @nikophil
+* d38568f docs: typo fixes (#578) by @jrushlow
+* bbcef6a refactor: add a BC layer for 2.x (#515) by @nikophil
+
 ## [v1.37.0](https://github.com/zenstruck/foundry/releases/tag/v1.37.0)
 
 March 20th, 2024 - [v1.36.1...v1.37.0](https://github.com/zenstruck/foundry/compare/v1.36.1...v1.37.0)
