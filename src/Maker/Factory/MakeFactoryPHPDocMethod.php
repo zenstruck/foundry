@@ -24,7 +24,7 @@ final class MakeFactoryPHPDocMethod
     }
 
     /** @return non-empty-list<self> */
-    public static function createAll(MakeFactoryData $makeFactoryData): array
+    public static function  createAll(MakeFactoryData $makeFactoryData): array
     {
         $methods = [];
 

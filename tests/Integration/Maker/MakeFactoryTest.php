@@ -132,28 +132,9 @@ final class MakeFactoryTest extends MakerTestCase
 
         $tester = $this->makeFactoryCommandTester();
 
-        $tester->execute(['class' => StandardCategory::class, '--test' => true]);
+        $tester->execute(['class' => StandardCategory::class, '--test' => true, '--with-phpdoc' => true]);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('tests/Factory/Category/StandardCategoryFactory.php'));
-    }
-
-    /**
-     * @test
-     * @dataProvider scaToolProvider
-     */
-    public function can_create_factory_for_entity_with_repository(string $scaTool): void
-    {
-        if (!\getenv('DATABASE_URL')) {
-            self::markTestSkipped('doctrine/orm not enabled.');
-        }
-
-        $this->emulateSCAToolEnabled($scaTool);
-
-        $tester = $this->makeFactoryCommandTester();
-
-        $tester->execute(['class' => GenericEntity::class]);
-
-        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/GenericEntityFactory.php'));
     }
 
     /**
@@ -163,6 +144,22 @@ final class MakeFactoryTest extends MakerTestCase
     {
         yield 'phpstan' => [self::PHPSTAN_PATH];
         yield 'psalm' => [self::PSALM_PATH];
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_factory_for_entity_with_repository(): void
+    {
+        if (!\getenv('DATABASE_URL')) {
+            self::markTestSkipped('doctrine/orm not enabled.');
+        }
+
+        $tester = $this->makeFactoryCommandTester();
+
+        $tester->execute(['class' => GenericEntity::class, '--with-phpdoc' => true]);
+
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/GenericEntityFactory.php'));
     }
 
     /**

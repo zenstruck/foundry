@@ -12,30 +12,11 @@
 namespace App\Factory\Contact;
 
 use App\Factory\Address\StandardAddressFactory;
-use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact\StandardContact;
 
 /**
  * @extends PersistentProxyObjectFactory<StandardContact>
- *
- * @method        StandardContact|Proxy                     create(array|callable $attributes = [])
- * @method static StandardContact|Proxy                     createOne(array $attributes = [])
- * @method static StandardContact|Proxy                     find(object|array|mixed $criteria)
- * @method static StandardContact|Proxy                     findOrCreate(array $attributes)
- * @method static StandardContact|Proxy                     first(string $sortedField = 'id')
- * @method static StandardContact|Proxy                     last(string $sortedField = 'id')
- * @method static StandardContact|Proxy                     random(array $attributes = [])
- * @method static StandardContact|Proxy                     randomOrCreate(array $attributes = [])
- * @method static EntityRepository|ProxyRepositoryDecorator repository()
- * @method static StandardContact[]|Proxy[]                 all()
- * @method static StandardContact[]|Proxy[]                 createMany(int $number, array|callable $attributes = [])
- * @method static StandardContact[]|Proxy[]                 createSequence(iterable|callable $sequence)
- * @method static StandardContact[]|Proxy[]                 findBy(array $attributes)
- * @method static StandardContact[]|Proxy[]                 randomRange(int $min, int $max, array $attributes = [])
- * @method static StandardContact[]|Proxy[]                 randomSet(int $number, array $attributes = [])
  */
 final class StandardContactFactory extends PersistentProxyObjectFactory
 {

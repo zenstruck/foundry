@@ -12,29 +12,10 @@
 namespace App\Factory;
 
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
-use Zenstruck\Foundry\Tests\Fixture\Entity\Repository\GenericEntityRepository;
 
 /**
  * @extends PersistentProxyObjectFactory<GenericEntity>
- *
- * @method        GenericEntity|Proxy                              create(array|callable $attributes = [])
- * @method static GenericEntity|Proxy                              createOne(array $attributes = [])
- * @method static GenericEntity|Proxy                              find(object|array|mixed $criteria)
- * @method static GenericEntity|Proxy                              findOrCreate(array $attributes)
- * @method static GenericEntity|Proxy                              first(string $sortedField = 'id')
- * @method static GenericEntity|Proxy                              last(string $sortedField = 'id')
- * @method static GenericEntity|Proxy                              random(array $attributes = [])
- * @method static GenericEntity|Proxy                              randomOrCreate(array $attributes = [])
- * @method static GenericEntityRepository|ProxyRepositoryDecorator repository()
- * @method static GenericEntity[]|Proxy[]                          all()
- * @method static GenericEntity[]|Proxy[]                          createMany(int $number, array|callable $attributes = [])
- * @method static GenericEntity[]|Proxy[]                          createSequence(iterable|callable $sequence)
- * @method static GenericEntity[]|Proxy[]                          findBy(array $attributes)
- * @method static GenericEntity[]|Proxy[]                          randomRange(int $min, int $max, array $attributes = [])
- * @method static GenericEntity[]|Proxy[]                          randomSet(int $number, array $attributes = [])
  */
 final class GenericEntityFactory extends PersistentProxyObjectFactory
 {

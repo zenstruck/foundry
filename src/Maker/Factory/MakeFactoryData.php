@@ -33,12 +33,18 @@ final class MakeFactoryData
     private array $uses;
     /** @var array<string, string> */
     private array $defaultProperties = [];
-    /** @var non-empty-list<MakeFactoryPHPDocMethod> */
+    /** @var list<MakeFactoryPHPDocMethod> */
     private array $methodsInPHPDoc;
 
     // @phpstan-ignore-next-line
-    public function __construct(private \ReflectionClass $object, private ClassNameDetails $factoryClassNameDetails, private ?\ReflectionClass $repository, private string $staticAnalysisTool, private bool $persisted)
-    {
+    public function __construct(
+        private \ReflectionClass $object,
+        private ClassNameDetails $factoryClassNameDetails,
+        private ?\ReflectionClass $repository,
+        private string $staticAnalysisTool,
+        private bool $persisted,
+        bool $withPhpDoc
+    ) {
         $this->uses = [
             $this->getFactoryClass(),
             $object->getName(),
@@ -56,7 +62,7 @@ final class MakeFactoryData
             }
         }
 
-        $this->methodsInPHPDoc = MakeFactoryPHPDocMethod::createAll($this);
+        $this->methodsInPHPDoc = $withPhpDoc ? MakeFactoryPHPDocMethod::createAll($this) : [];
     }
 
     // @phpstan-ignore-next-line
@@ -104,13 +110,13 @@ final class MakeFactoryData
         return $this->persisted;
     }
 
-    public function hasStaticAnalysisTool(): bool
-    {
-        return self::STATIC_ANALYSIS_TOOL_NONE !== $this->staticAnalysisTool;
-    }
-
     public function staticAnalysisTool(): string
     {
+        // if none was detected, let's fallback on phpstan: both psalm and phpstan can read `@phpstan` annotations
+        if (self::STATIC_ANALYSIS_TOOL_NONE === $this->staticAnalysisTool) {
+            return self::STATIC_ANALYSIS_TOOL_PHPSTAN;
+        }
+
         return $this->staticAnalysisTool;
     }
 

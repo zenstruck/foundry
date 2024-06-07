@@ -11,30 +11,11 @@
 
 namespace App\Factory;
 
-use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 use Zenstruck\Foundry\Tests\Fixture\Document\WithEmbeddableDocument;
 
 /**
  * @extends PersistentProxyObjectFactory<WithEmbeddableDocument>
- *
- * @method        WithEmbeddableDocument|Proxy                create(array|callable $attributes = [])
- * @method static WithEmbeddableDocument|Proxy                createOne(array $attributes = [])
- * @method static WithEmbeddableDocument|Proxy                find(object|array|mixed $criteria)
- * @method static WithEmbeddableDocument|Proxy                findOrCreate(array $attributes)
- * @method static WithEmbeddableDocument|Proxy                first(string $sortedField = 'id')
- * @method static WithEmbeddableDocument|Proxy                last(string $sortedField = 'id')
- * @method static WithEmbeddableDocument|Proxy                random(array $attributes = [])
- * @method static WithEmbeddableDocument|Proxy                randomOrCreate(array $attributes = [])
- * @method static DocumentRepository|ProxyRepositoryDecorator repository()
- * @method static WithEmbeddableDocument[]|Proxy[]            all()
- * @method static WithEmbeddableDocument[]|Proxy[]            createMany(int $number, array|callable $attributes = [])
- * @method static WithEmbeddableDocument[]|Proxy[]            createSequence(iterable|callable $sequence)
- * @method static WithEmbeddableDocument[]|Proxy[]            findBy(array $attributes)
- * @method static WithEmbeddableDocument[]|Proxy[]            randomRange(int $min, int $max, array $attributes = [])
- * @method static WithEmbeddableDocument[]|Proxy[]            randomSet(int $number, array $attributes = [])
  */
 final class WithEmbeddableDocumentFactory extends PersistentProxyObjectFactory
 {

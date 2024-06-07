@@ -146,6 +146,7 @@ final class FactoryGenerator
             $repository ?? null,
             $this->staticAnalysisTool(),
             $persisted ?? false,
+            $makeFactoryQuery->addPhpDoc(),
         );
     }
 

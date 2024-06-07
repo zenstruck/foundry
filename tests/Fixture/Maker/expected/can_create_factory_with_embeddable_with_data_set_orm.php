@@ -11,30 +11,11 @@
 
 namespace App\Factory;
 
-use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithEmbeddableEntity;
 
 /**
  * @extends PersistentProxyObjectFactory<WithEmbeddableEntity>
- *
- * @method        WithEmbeddableEntity|Proxy                create(array|callable $attributes = [])
- * @method static WithEmbeddableEntity|Proxy                createOne(array $attributes = [])
- * @method static WithEmbeddableEntity|Proxy                find(object|array|mixed $criteria)
- * @method static WithEmbeddableEntity|Proxy                findOrCreate(array $attributes)
- * @method static WithEmbeddableEntity|Proxy                first(string $sortedField = 'id')
- * @method static WithEmbeddableEntity|Proxy                last(string $sortedField = 'id')
- * @method static WithEmbeddableEntity|Proxy                random(array $attributes = [])
- * @method static WithEmbeddableEntity|Proxy                randomOrCreate(array $attributes = [])
- * @method static EntityRepository|ProxyRepositoryDecorator repository()
- * @method static WithEmbeddableEntity[]|Proxy[]            all()
- * @method static WithEmbeddableEntity[]|Proxy[]            createMany(int $number, array|callable $attributes = [])
- * @method static WithEmbeddableEntity[]|Proxy[]            createSequence(iterable|callable $sequence)
- * @method static WithEmbeddableEntity[]|Proxy[]            findBy(array $attributes)
- * @method static WithEmbeddableEntity[]|Proxy[]            randomRange(int $min, int $max, array $attributes = [])
- * @method static WithEmbeddableEntity[]|Proxy[]            randomSet(int $number, array $attributes = [])
  */
 final class WithEmbeddableEntityFactory extends PersistentProxyObjectFactory
 {

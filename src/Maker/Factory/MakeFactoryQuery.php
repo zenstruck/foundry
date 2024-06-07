@@ -19,8 +19,16 @@ use Symfony\Component\Console\Input\InputInterface;
  */
 final class MakeFactoryQuery
 {
-    private function __construct(private string $namespace, private bool $test, private bool $persisted, private bool $allFields, private string $class, private bool $generateAllFactories, private Generator $generator)
-    {
+    private function __construct(
+        private string $namespace,
+        private bool $test,
+        private bool $persisted,
+        private bool $allFields,
+        private bool $withPhpDoc,
+        private string $class,
+        private bool $generateAllFactories,
+        private Generator $generator
+    ) {
     }
 
     public static function fromInput(InputInterface $input, string $class, bool $generateAllFactories, Generator $generator, string $defaultNamespace): self
@@ -30,6 +38,7 @@ final class MakeFactoryQuery
             test: (bool) $input->getOption('test'),
             persisted: !$input->getOption('no-persistence'),
             allFields: (bool) $input->getOption('all-fields'),
+            withPhpDoc: (bool) $input->getOption('with-phpdoc'),
             class: $class,
             generateAllFactories: $generateAllFactories,
             generator: $generator,
@@ -54,6 +63,11 @@ final class MakeFactoryQuery
     public function isAllFields(): bool
     {
         return $this->allFields;
+    }
+
+    public function addPhpDoc(): bool
+    {
+        return $this->withPhpDoc;
     }
 
     public function getClass(): string
