@@ -27,7 +27,7 @@ final class MakeFactoryQuery
         private bool $withPhpDoc,
         private string $class,
         private bool $generateAllFactories,
-        private Generator $generator
+        private Generator $generator,
     ) {
     }
 

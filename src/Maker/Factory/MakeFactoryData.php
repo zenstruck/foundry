@@ -43,7 +43,7 @@ final class MakeFactoryData
         private ?\ReflectionClass $repository,
         private string $staticAnalysisTool,
         private bool $persisted,
-        bool $withPhpDoc
+        bool $withPhpDoc,
     ) {
         $this->uses = [
             $this->getFactoryClass(),
