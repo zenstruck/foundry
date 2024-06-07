@@ -109,7 +109,7 @@ class Instantiator
             throw new \BadMethodCallException(\sprintf('Call to undefined method "%s::%s".', static::class, $name));
         }
 
-        trigger_deprecation('zenstruck/foundry', '1.38.0', 'Calling instance method "%1$s::withoutConstructor()" is deprecated and will be removed in 2.0. Use static call instead: "%1$s::withoutConstructor()" instead.', static::class);
+        trigger_deprecation('zenstruck/foundry', '1.38.0', 'Calling instance method "$instantiator->withoutConstructor()" is deprecated and will be removed in 2.0. Use static call instead: "%s::withoutConstructor()" instead.', static::class);
 
         $this->useConstructor = false;
 
