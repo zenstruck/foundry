@@ -13,6 +13,12 @@ or a combination of these.
 
 Want to watch a screencast 🎥 about it? Check out https://symfonycasts.com/foundry
 
+.. warning::
+
+    You're reading the documentation for Foundry v2 which is brand new.
+    You might want to look at `Foundry v1 documentation <https://symfony.com/bundles/ZenstruckFoundryBundle/1.x/index.html>`_
+    or `the upgrade guide to v2 <https://github.com/zenstruck/foundry/blob/1.x/UPGRADE-2.0.md>`
+
 Installation
 ------------
 
@@ -96,17 +102,17 @@ For the remainder of the documentation, the following sample entities will be us
         // ... getters/setters
     }
 
-Model Factories
----------------
+Factories
+---------
 
-The nicest way to use Foundry is to generate one *factory* class per entity. You can skip this
-and use `Anonymous Factories`_, but *model factories* give you IDE auto-completion
-and access to other useful features.
+The nicest way to use Foundry is to generate one *factory* class per ORM entity or MongoDB document.
+You can skip this and use `Anonymous Factories`_, but *persistent object factories* give you IDE
+auto-completion and access to other useful features.
 
 Generate
 ~~~~~~~~
 
-Create a model factory for one of your entities with the maker command:
+Create a persistent object factory for one of your entities with the maker command:
 
 .. code-block:: terminal
 
@@ -129,70 +135,61 @@ This command will generate a ``PostFactory`` class that looks like this:
 
     use App\Entity\Post;
     use App\Repository\PostRepository;
-    use Zenstruck\Foundry\RepositoryProxy;
-    use Zenstruck\Foundry\ModelFactory;
-    use Zenstruck\Foundry\Proxy;
+    use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+    use Zenstruck\Foundry\Persistence\Proxy;
+    use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 
     /**
-     * @extends ModelFactory<Post>
-     *
-     * @method        Post|Proxy create(array|callable $attributes = [])
-     * @method static Post|Proxy createOne(array $attributes = [])
-     * @method static Post|Proxy find(object|array|mixed $criteria)
-     * @method static Post|Proxy findOrCreate(array $attributes)
-     * @method static Post|Proxy first(string $sortedField = 'id')
-     * @method static Post|Proxy last(string $sortedField = 'id')
-     * @method static Post|Proxy random(array $attributes = [])
-     * @method static Post|Proxy randomOrCreate(array $attributes = []))
-     * @method static PostRepository|RepositoryProxy repository()
-     * @method static Post[]|Proxy[] all()
-     * @method static Post[]|Proxy[] createMany(int $number, array|callable $attributes = [])
-     * @method static Post[]&Proxy[] createSequence(iterable|callable $sequence)
-     * @method static Post[]|Proxy[] findBy(array $attributes)
-     * @method static Post[]|Proxy[] randomRange(int $min, int $max, array $attributes = []))
-     * @method static Post[]|Proxy[] randomSet(int $number, array $attributes = []))
+     * @extends PersistentProxyObjectFactory<Post>
      */
-    final class PostFactory extends ModelFactory
+    final class PostFactory extends PersistentProxyObjectFactory
     {
         /**
-         * @see https://github.com/zenstruck/foundry#factories-as-services
+         * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
          *
          * @todo inject services if required
          */
         public function __construct()
         {
-            parent::__construct();
+        }
+
+        public static function class(): string
+        {
+            return Post::class;
         }
 
         /**
-         * @see https://github.com/zenstruck/foundry#model-factories
+         * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
          *
          * @todo add your default values here
          */
-        protected function getDefaults(): array
+        protected function defaults(): array|callable
         {
-            return [];
+            return [
+                'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
+                'title' => self::faker()->text(255),
+            ];
         }
 
         /**
-         * @see https://github.com/zenstruck/foundry#initialization
+         * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
          */
-        protected function initialize(): self
+        protected function initialize(): static
         {
             return $this
-                // ->afterInstantiate(function(Post $post) {})
+                // ->afterInstantiate(function(Post $post): void {})
             ;
-        }
-
-        protected static function getClass(): string
-        {
-            return Post::class;
         }
     }
 
 .. tip::
 
     Using ``make:factory --test`` will generate the factory in ``tests/Factory``.
+
+.. tip::
+
+    You can also inherit from `Zenstruck\Foundry\Persistence\PersistentObjectFactory`. Which will create regular objects
+    without proxy (see :ref:`Proxy object section <object-proxy>` for more information).
 
 .. tip::
 
@@ -210,19 +207,31 @@ This command will generate a ``PostFactory`` class that looks like this:
 
     You can override this configuration by using the ``--namespace`` option.
 
-
 .. note::
 
-    The generated ``@method`` docblocks above enable autocompletion with PhpStorm but
-    cause errors with PHPStan and Psalm. To support PHPStan or Psalm for your factory's, you need to *also*
-    add the following dockblocks (replace ``phpstan-`` prefix by ``psalm-`` accordingly to your static analysis tool):
+    You can add the option ``--with-phpdoc`` in order to add the following ``@method`` docblocks.
+    This would ease autocompletion in your IDE (might be not useful anymore since Foundry v2, at least in PHPStorm):
 
     .. code-block:: php
 
         /**
-         * ...
+         * @method        Post|Proxy create(array|callable $attributes = [])
+         * @method static Post|Proxy createOne(array $attributes = [])
+         * @method static Post|Proxy find(object|array|mixed $criteria)
+         * @method static Post|Proxy findOrCreate(array $attributes)
+         * @method static Post|Proxy first(string $sortedField = 'id')
+         * @method static Post|Proxy last(string $sortedField = 'id')
+         * @method static Post|Proxy random(array $attributes = [])
+         * @method static Post|Proxy randomOrCreate(array $attributes = []))
+         * @method static PostRepository|RepositoryProxy repository()
+         * @method static Post[]|Proxy[] all()
+         * @method static Post[]|Proxy[] createMany(int $number, array|callable $attributes = [])
+         * @method static Post[]&Proxy[] createSequence(iterable|callable $sequence)
+         * @method static Post[]|Proxy[] findBy(array $attributes)
+         * @method static Post[]|Proxy[] randomRange(int $min, int $max, array $attributes = []))
+         * @method static Post[]|Proxy[] randomSet(int $number, array $attributes = []))
          *
-         * @phpstan-method        Proxy<Post> create(array|callable $attributes = [])
+         * @phpstan-method Proxy<Post> create(array|callable $attributes = [])
          * @phpstan-method static Proxy<Post> createOne(array $attributes = [])
          * @phpstan-method static Proxy<Post> find(object|array|mixed $criteria)
          * @phpstan-method static Proxy<Post> findOrCreate(array $attributes)
@@ -230,25 +239,25 @@ This command will generate a ``PostFactory`` class that looks like this:
          * @phpstan-method static Proxy<Post> last(string $sortedField = 'id')
          * @phpstan-method static Proxy<Post> random(array $attributes = [])
          * @phpstan-method static Proxy<Post> randomOrCreate(array $attributes = [])
-         * @phpstan-method static RepositoryProxy<Post> repository()
          * @phpstan-method static list<Proxy<Post>> all()
          * @phpstan-method static list<Proxy<Post>> createMany(int $number, array|callable $attributes = [])
-         * @phpstan-method static list<Proxy<Post>> createSequence(iterable|callable $sequence)
+         * @phpstan-method static list<Proxy<Post>> createSequence(array|callable $sequence)
          * @phpstan-method static list<Proxy<Post>> findBy(array $attributes)
          * @phpstan-method static list<Proxy<Post>> randomRange(int $min, int $max, array $attributes = [])
          * @phpstan-method static list<Proxy<Post>> randomSet(int $number, array $attributes = [])
+         * @phpstan-method static RepositoryProxy<Post> repository()
          */
-        final class PostFactory extends ModelFactory
+        final class PostFactory extends PersistentProxyObjectFactory
         {
             // ...
         }
 
-In the ``getDefaults()``, you can return an array of all default values that any new object
+In the ``defaults()``, you can return an array of all default values that any new object
 should have. `Faker`_ is available to easily get random data:
 
 .. code-block:: php
 
-    protected function getDefaults(): array
+    protected function defaults(): array
     {
         return [
             // Symfony's property-access component is used to populate the properties
@@ -260,7 +269,7 @@ should have. `Faker`_ is available to easily get random data:
 
 .. tip::
 
-    It is best to have ``getDefaults()`` return the attributes to persist a valid object
+    It is best to have ``defaults()`` return the attributes to persist a valid object
     (all non-nullable fields).
 
 .. tip::
@@ -270,8 +279,8 @@ should have. `Faker`_ is available to easily get random data:
 
 .. note::
 
-    ``getDefaults()`` is called everytime a factory is instantiated (even if you don't end up
-    creating it). `Lazy values`_ allows you to ensure the value is only calculated when/if it's needed.
+    ``defaults()`` is called everytime a factory is instantiated (even if you don't end up
+    creating it). `Lazy Values`_ allows you to ensure the value is only calculated when/if it's needed.
 
 Using your Factory
 ~~~~~~~~~~~~~~~~~~
@@ -280,7 +289,7 @@ Using your Factory
 
     use App\Factory\PostFactory;
 
-    // create/persist Post with random data from `getDefaults()`
+    // create/persist Post with random data from `defaults()`
     PostFactory::createOne();
 
     // or provide values for some properties (others will be random)
@@ -292,10 +301,10 @@ Using your Factory
     // the "Proxy" magically calls the underlying Post methods and is type-hinted to "Post"
     $title = $post->getTitle(); // getTitle() can be autocompleted by your IDE!
 
-    // if you need the actual Post object, use ->object()
-    $realPost = $post->object();
+    // if you need the actual Post object, use ->_real()
+    $realPost = $post->_real();
 
-    // create/persist 5 Posts with random data from getDefaults()
+    // create/persist 5 Posts with random data from defaults()
     PostFactory::createMany(5); // returns Post[]|Proxy[]
     PostFactory::createMany(5, ['title' => 'My Title']);
 
@@ -343,37 +352,32 @@ Using your Factory
     $posts = PostFactory::randomRange(0, 5); // array containing 0-5 "Post|Proxy" objects
     $posts = PostFactory::randomRange(0, 5, ['author' => 'kevin']); // filter by the passed attributes
 
-Reusable Model Factory "States"
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Reusable Factory "States"
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can add any methods you want to your model factories (i.e. static methods that create an object in a certain way) but
+You can add any methods you want to your factories (i.e. static methods that create an object in a certain way) but
 you can also add *states*:
 
 .. code-block:: php
 
-    namespace App\Factory;
-
-    use App\Entity\Post;
-    use Zenstruck\Foundry\ModelFactory;
-
-    final class PostFactory extends ModelFactory
+    final class PostFactory extends PersistentProxyObjectFactory
     {
         // ...
 
         public function published(): self
         {
             // call setPublishedAt() and pass a random DateTime
-            return $this->addState(['published_at' => self::faker()->dateTime()]);
+            return $this->with(['published_at' => self::faker()->dateTime()]);
         }
 
         public function unpublished(): self
         {
-            return $this->addState(['published_at' => null]);
+            return $this->with(['published_at' => null]);
         }
 
         public function withViewCount(int $count = null): self
         {
-            return $this->addState(function () use ($count) {
+            return $this->with(function () use ($count) {
                 return ['view_count' => $count ?? self::faker()->numberBetween(0, 10000)];
             });
         }
@@ -416,19 +420,19 @@ instantiation.
     use function Zenstruck\Foundry\faker;
 
     // The first argument to "new()" allows you to overwrite the default
-    // values that are defined in the `PostFactory::getDefaults()`
+    // values that are defined in the `PostFactory::defaults()`
     $posts = PostFactory::new(['title' => 'Post A'])
-        ->withAttributes([
+        ->with([
             'body' => 'Post Body...',
 
             // CategoryFactory will be used to create a new Category for each Post
             'category' => CategoryFactory::new(['name' => 'php']),
         ])
-        ->withAttributes([
+        ->with([
             // Proxies are automatically converted to their wrapped object
             'category' => CategoryFactory::createOne(),
         ])
-        ->withAttributes(function() { return ['createdAt' => faker()->dateTime()]; }) // see faker section below
+        ->with(function() { return ['createdAt' => faker()->dateTime()]; }) // see faker section below
 
         // create "2" Post's
         ->many(2)->create(['title' => 'Different Title'])
@@ -448,9 +452,8 @@ instantiation.
 
 .. note::
 
-    Attributes passed to the ``create*`` methods are merged with any attributes set via ``getDefaults()``
-    and ``withAttributes()``.
-
+    Attributes passed to the ``create*`` methods are merged with any attributes set via ``defaults()``
+    and ``with()``.
 
 Sequences
 ~~~~~~~~~
@@ -496,12 +499,8 @@ random data for your factories:
 
 .. code-block:: php
 
-    use Zenstruck\Foundry\Factory;
     use function Zenstruck\Foundry\faker;
 
-    Factory::faker()->name(); // random name
-
-    // alternatively, use the helper function
     faker()->email(); // random email
 
 .. note::
@@ -583,11 +582,11 @@ they were added.
         ->afterPersist(function() {})
     ;
 
-You can also add hooks directly in your model factory class:
+You can also add hooks directly in your factory class:
 
 .. code-block:: php
 
-    protected function initialize(): self
+    protected function initialize(): static
     {
         return $this
             ->afterPersist(function() {})
@@ -599,20 +598,15 @@ Read `Initialization`_ to learn more about the ``initialize()`` method.
 Initialization
 ~~~~~~~~~~~~~~
 
-You can override your model factory's ``initialize()`` method to add default state/logic:
+You can override your factory's ``initialize()`` method to add default state/logic:
 
 .. code-block:: php
 
-    namespace App\Factory;
-
-    use App\Entity\Post;
-    use Zenstruck\Foundry\ModelFactory;
-
-    final class PostFactory extends ModelFactory
+    final class PostFactory extends PersistentProxyObjectFactory
     {
         // ...
 
-        protected function initialize(): self
+        protected function initialize(): static
         {
             return $this
                 ->published() // published by default
@@ -640,27 +634,27 @@ You can customize the instantiator in several ways:
 
     use App\Entity\Post;
     use App\Factory\PostFactory;
-    use Zenstruck\Foundry\Instantiator;
+    use Zenstruck\Foundry\Object\Instantiator;
 
     // set the instantiator for the current factory
     PostFactory::new()
         // instantiate the object without calling the constructor
-        ->instantiateWith((new Instantiator())->withoutConstructor())
+        ->instantiateWith(Instantiator::withoutConstructor())
 
         // "foo" and "bar" attributes are ignored when instantiating
-        ->instantiateWith((new Instantiator())->allowExtraAttributes(['foo', 'bar']))
+        ->instantiateWith(Instantiator::withConstructor()->allowExtra(['foo', 'bar']))
 
         // all extra attributes are ignored when instantiating
-        ->instantiateWith((new Instantiator())->allowExtraAttributes())
+        ->instantiateWith(Instantiator::withConstructor()->allowExtra())
 
         // force set "title" and "body" when instantiating
-        ->instantiateWith((new Instantiator())->alwaysForceProperties(['title', 'body']))
+        ->instantiateWith(Instantiator::withConstructor()->alwaysForce(['title', 'body']))
 
         // never use setters, always "force set" properties (even private/protected, does not use setter)
-        ->instantiateWith((new Instantiator())->alwaysForceProperties())
+        ->instantiateWith(Instantiator::withConstructor()->alwaysForce())
 
         // can combine the different "modes"
-        ->instantiateWith((new Instantiator())->withoutConstructor()->allowExtraAttributes()->alwaysForceProperties())
+        ->instantiateWith(Instantiator::withoutConstructor()->allowExtra()->alwaysForce())
 
         // the instantiator is just a callable, you can provide your own
         ->instantiateWith(function(array $attributes, string $class): object {
@@ -677,7 +671,7 @@ instantiators):
     when@dev: # see Bundle Configuration section about sharing this in the test environment
         zenstruck_foundry:
             instantiator:
-                without_constructor: true # always instantiate objects without calling the constructor
+                use_constructor: false # always instantiate objects without calling the constructor
                 allow_extra_attributes: true # always ignore extra attributes
                 always_force_properties: true # always "force set" properties
                 # or
@@ -693,7 +687,7 @@ Factory's are immutable:
     use App\Factory\PostFactory;
 
     $factory = PostFactory::new();
-    $factory1 = $factory->withAttributes([]); // returns a new PostFactory object
+    $factory1 = $factory->with([]); // returns a new PostFactory object
     $factory2 = $factory->instantiateWith(function () {}); // returns a new PostFactory object
     $factory3 = $factory->beforeInstantiate(function () {}); // returns a new PostFactory object
     $factory4 = $factory->afterInstantiate(function () {}); // returns a new PostFactory object
@@ -750,17 +744,17 @@ The following assumes the ``Comment`` entity has a many-to-one relationship with
 
 .. tip::
 
-    It is recommended that the only relationship you define in ``ModelFactory::getDefaults()`` is non-null
+    It is recommended that the only relationship you define in ``defaults()`` is non-null
     Many-to-One's.
 
 .. tip::
 
-    It is also recommended that your ``ModelFactory::getDefaults()`` return a ``Factory`` and not the created entity.
-    However, you can use `Lazy values`_ if you need to create the entity in the ``getDefaults()`` method.
+    It is also recommended that your ``defaults()`` return a ``Factory`` and not the created entity.
+    However, you can use `Lazy Values`_ if you need to create the entity in the ``defaults()`` method.
 
     .. code-block:: php
 
-        protected function getDefaults(): array
+        protected function defaults(): array
         {
             return [
                 // RECOMMENDED
@@ -838,10 +832,10 @@ The following assumes the ``Post`` entity has a many-to-many relationship with `
     // Example 5: create 3 Posts each with between 0 and 3 unique Tags
     PostFactory::createMany(3, ['tags' => TagFactory::new()->many(0, 3)]);
 
-Lazy values
+Lazy Values
 ~~~~~~~~~~~
 
-The ``getDefaults()`` method is called everytime a factory is instantiated (even if you don't end up
+The ``defaults()`` method is called everytime a factory is instantiated (even if you don't end up
 creating it). Sometimes, you might not want your value calculated every time. For example, if you have a value for one
 of your attributes that:
 
@@ -855,11 +849,11 @@ the LazyValue can be `memoized <https://en.wikipedia.org/wiki/Memoization>`_ so 
 
         use Zenstruck\Foundry\Attributes\LazyValue;
 
-        class TaskFactory extends ModelFactory
+        class TaskFactory extends PersistentProxyObjectFactory
         {
             // ...
 
-            protected function getDefaults(): array
+            protected function defaults(): array
             {
                 $owner = LazyValue::memoize(fn() => UserFactory::createOne());
 
@@ -870,11 +864,6 @@ the LazyValue can be `memoized <https://en.wikipedia.org/wiki/Memoization>`_ so 
                     'project' => ProjectFactory::new(['users' => [$owner]]),
                     'owner'   => $owner,
                 ];
-            }
-
-            protected static function getClass(): string
-            {
-                return Task::class;
             }
         }
 
@@ -893,13 +882,9 @@ common use-case: encoding a password with the ``UserPasswordHasherInterface`` se
 
     // src/Factory/UserFactory.php
 
-    namespace App\Factory;
-
-    use App\Entity\User;
     use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-    use Zenstruck\Foundry\ModelFactory;
 
-    final class UserFactory extends ModelFactory
+    final class UserFactory extends PersistentProxyObjectFactory
     {
         private $passwordHasher;
 
@@ -910,7 +895,12 @@ common use-case: encoding a password with the ``UserPasswordHasherInterface`` se
             $this->passwordHasher = $passwordHasher;
         }
 
-        protected function getDefaults(): array
+        public static function class(): string
+        {
+            return User::class;
+        }
+
+        protected function defaults(): array
         {
             return [
                 'email' => self::faker()->unique()->safeEmail(),
@@ -918,18 +908,13 @@ common use-case: encoding a password with the ``UserPasswordHasherInterface`` se
             ];
         }
 
-        protected function initialize(): self
+        protected function initialize(): static
         {
             return $this
                 ->afterInstantiate(function(User $user) {
                     $user->setPassword($this->passwordHasher->hashPassword($user, $user->getPassword()));
                 })
             ;
-        }
-
-        protected static function getClass(): string
-        {
-            return User::class;
         }
     }
 
@@ -956,19 +941,18 @@ Use the factory as normal:
 Anonymous Factories
 ~~~~~~~~~~~~~~~~~~~
 
-Foundry can be used to create factories for entities that you don't have model factories for:
+Foundry can be used to create factories for entities that you don't have factories for:
 
 .. code-block:: php
 
     use App\Entity\Post;
-    use function Zenstruck\Foundry\anonymous;
-    use function Zenstruck\Foundry\create;
-    use function Zenstruck\Foundry\create_many;
-    use function Zenstruck\Foundry\repository;
+    use function Zenstruck\Foundry\Persistence\proxy_factory;
+    use function Zenstruck\Foundry\Persistence\persist_proxy;
+    use function Zenstruck\Foundry\Persistence\repository;
 
-    $factory = anonymous(Post::class);
+    $factory = proxy_factory(Post::class);
 
-    // has the same API as ModelFactory's
+    // has the same API as non-anonymous factories
     $factory->create(['field' => 'value']);
     $factory->many(5)->create(['field' => 'value']);
     $factory->instantiateWith(function () {});
@@ -1006,45 +990,50 @@ Foundry can be used to create factories for entities that you don't have model f
     $repository->randomRange(0, 5, ['author' => 'kevin']); // filter by the passed attributes
 
     // convenience functions
-    $entity = create(Post::class, ['field' => 'value']);
-    $entities = create_many(Post::class, 5, ['field' => 'value']);
+    $entity = persist_proxy(Post::class, ['field' => 'value']);
 
 .. note::
 
-    If your anonymous factory code is getting too complex, this could be a sign you need an explicit model factory class.
+    If your anonymous factory code is getting too complex, this could be a sign you need an explicit factory class.
 
 Delay Flush
 ~~~~~~~~~~~
 
-When creating/persisting many factories at once, it can be improve performance
+When creating/persisting many factories at once, it can improve performance
 to instantiate them all without saving to the database, then flush them all at
-once. To do this, wrap the operations in a ``Factory::delayFlush()`` callback:
+once. To do this, wrap the operations in a ``flush_after()`` callback:
 
 .. code-block:: php
 
-    use Zenstruck\Foundry\Factory;
+    use function Zenstruck\Foundry\Persistence\flush_after;
 
-    Factory::delayFlush(function() {
+    flush_after(function() {
         CategoryFactory::createMany(100); // instantiated/persisted but not flushed
         TagFactory::createMany(200); // instantiated/persisted but not flushed
     }); // single flush
 
 .. _without-persisting:
 
+Not-persisted objects factory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When dealing with objects which are not aimed to be persisted, you can make your factory inherit from
+`Zenstruck\Foundry\ObjectFactory`. This will create plain objects, that does not interact with database (these objects
+won't be wrapped with a :ref:`proxy object <object-proxy>`).
+
 Without Persisting
 ~~~~~~~~~~~~~~~~~~
 
-Factories can also create objects without persisting them. This can be useful for unit tests where you just want to test
-the behaviour of the actual object or for creating objects that are not entities. When created, they are still wrapped
-in a ``Proxy`` to optionally save later.
+"Persitent factories" can also create objects without persisting them. This can be useful for unit tests where you just
+want to test the behaviour of the actual object or for creating objects that are not entities. When created, they are
+still wrapped in a ``Proxy`` to optionally save later.
 
 .. code-block:: php
 
     use App\Factory\PostFactory;
     use App\Entity\Post;
-    use Zenstruck\Foundry\anonymous;
-    use function Zenstruck\Foundry\instantiate;
-    use function Zenstruck\Foundry\instantiate_many;
+    use function Zenstruck\Foundry\Persistence\proxy_factory;
+    use function Zenstruck\Foundry\object;
 
     $post = PostFactory::new()->withoutPersisting()->create(); // returns Post|Proxy
     $post->setTitle('something else'); // do something with object
@@ -1055,7 +1044,7 @@ in a ``Proxy`` to optionally save later.
     $posts = PostFactory::new()->withoutPersisting()->many(5)->create(); // returns Post[]|Proxy[]
 
     // anonymous factories:
-    $factory = anonymous(Post::class);
+    $factory = proxy_factory(Post::class);
 
     $entity = $factory->withoutPersisting()->create(['field' => 'value']); // returns Post|Proxy
 
@@ -1064,29 +1053,53 @@ in a ``Proxy`` to optionally save later.
     $entities = $factory->withoutPersisting()->many(5)->create(['field' => 'value']); // returns Post[]|Proxy[]
 
     // convenience functions
-    $entity = instantiate(Post::class, ['field' => 'value']);
-    $entities = instantiate_many(Post::class, 5, ['field' => 'value']);
+    $entity = object(Post::class, ['field' => 'value']);
 
-If you'd like your model factory to not persist by default, override its ``initialize()`` method to add this behaviour:
+If you'd like your factory to not persist by default, override its ``initialize()`` method to add this behaviour:
 
 .. code-block:: php
 
-    protected function initialize(): self
+    protected function initialize(): static
     {
         return $this
             ->withoutPersisting()
         ;
     }
 
-Now, after creating objects using this factory, you'd have to call ``->save()`` to actually persist them to the database.
+Now, after creating objects using this factory, you'd have to call ``->_save()`` to actually persist them to the database.
 
 .. tip::
 
-    If you'd like to disable persisting by default for all your model factories:
+    If you'd like to disable persisting by default for all your object factories:
 
-    1. Create an abstract model factory that extends ``Zenstruck\Foundry\ModelFactory``.
+    1. Create an abstract factory that extends ``PersistentProxyObjectFactory``.
     2. Override the ``initialize()`` method as shown above.
-    3. Have all your model factories extend from this.
+    3. Have all your factories extend from this.
+
+Array factories
+~~~~~~~~~~~~~~~
+
+You can even create associative arrays, with the nice DX provided by Foundry:
+
+.. code-block:: php
+
+    use Zenstruck\Foundry\ArrayFactory;
+
+    final class SomeArrayFactory extends ArrayFactory
+    {
+        protected function defaults(): array|callable
+        {
+            return [
+                'prop1' => 'default value 1',
+                'prop2' => 'default value 2',
+            ];
+        }
+    }
+
+    // somewhere in a test
+
+    // will create ['prop1' => 'foo', 'prop2' => 'default value 2']
+    $array = SomeArrayFactory::createOne(['prop1' => 'foo']);
 
 Using with DoctrineFixturesBundle
 ---------------------------------
@@ -1165,7 +1178,6 @@ Let's look at an example:
         $this->assertCount(0, $post->getComments());
 
         // 2. "Act"
-        static::ensureKernelShutdown(); // creating factories boots the kernel; shutdown before creating the client
         $client = static::createClient();
         $client->request('GET', '/posts/post-a'); // Note the slug from the arrange step
         $client->submitForm('Add', [
@@ -1176,7 +1188,7 @@ Let's look at an example:
         // 3. "Assert"
         self::assertResponseRedirects('/posts/post-a');
 
-        $this->assertCount(1, $post->refresh()->getComments()); // Refresh $post from the database and call ->getComments()
+        $this->assertCount(1, $post->_refresh()->getComments()); // Refresh $post from the database and call ->getComments()
 
         CommentFactory::assert()->exists([ // Doctrine repository assertions
             'name' => 'John',
@@ -1268,10 +1280,12 @@ bundle's configuration:
                             - orm_object_manager_1
                             - orm_object_manager_2
                         reset_mode: schema
-                    odm:
+                    mongo:
                         object_managers:
                             - odm_object_manager_1
                             - odm_object_manager_2
+
+.. _object-proxy:
 
 Object Proxy
 ~~~~~~~~~~~~
@@ -1286,22 +1300,22 @@ to have `Active Record <https://en.wikipedia.org/wiki/Active_record_pattern>`_ *
     $post = PostFactory::createOne(['title' => 'My Title']); // instance of Zenstruck\Foundry\Proxy
 
     // get the wrapped object
-    $realPost = $post->object(); // instance of Post
+    $realPost = $post->_real(); // instance of Post
 
     // call any Post method
     $post->getTitle(); // "My Title"
 
     // set property and save to the database
     $post->setTitle('New Title');
-    $post->save();
+    $post->_save();
 
     // refresh from the database
-    $post->refresh();
+    $post->_refresh();
 
     // delete from the database
-    $post->remove();
+    $post->_delete();
 
-    $post->repository(); // repository proxy wrapping PostRepository (see Repository Proxy section below)
+    $post->_repository(); // repository proxy wrapping PostRepository (see Repository Proxy section below)
 
 Force Setting
 .............
@@ -1311,17 +1325,18 @@ Object proxies have helper methods to access non-public properties of the object
 .. code-block:: php
 
     // set private/protected properties
-    $post->forceSet('createdAt', new \DateTime());
+    $post->_set('createdAt', new \DateTime());
 
     // get private/protected properties
-    $post->forceGet('createdAt');
+    $post->_get('createdAt');
 
 Auto-Refresh
 ............
 
-Object proxies have the option to enable *auto refreshing* that removes the need to call ``->refresh()`` before calling
+Object proxies have the option to enable *auto refreshing* that removes the need to call ``->_refresh()`` before calling
 methods on the underlying object. When auto-refresh is enabled, most calls to proxy objects first refresh the wrapped
-object from the database.
+object from the database. This is mainly useful with "integration" test which interacts with your database and Symfony's
+kernel.
 
 .. code-block:: php
 
@@ -1329,12 +1344,12 @@ object from the database.
 
     $post = PostFactory::new(['title' => 'Original Title'])
         ->create()
-        ->enableAutoRefresh()
+        ->_enableAutoRefresh()
     ;
 
     // ... logic that changes the $post title to "New Title" (like your functional test)
 
-    $post->getTitle(); // "New Title" (equivalent to $post->refresh()->getTitle())
+    $post->getTitle(); // "New Title" (equivalent to $post->_refresh()->getTitle())
 
 Without auto-refreshing enabled, the above call to ``$post->getTitle()`` would return "Original Title".
 
@@ -1350,7 +1365,7 @@ Without auto-refreshing enabled, the above call to ``$post->getTitle()`` would r
 
         $post = PostFactory::new(['title' => 'Original Title', 'body' => 'Original Body'])
             ->create()
-            ->enableAutoRefresh()
+            ->_enableAutoRefresh()
         ;
 
         $post->setTitle('New Title');
@@ -1365,46 +1380,36 @@ Without auto-refreshing enabled, the above call to ``$post->getTitle()`` would r
 
         $post = PostFactory::new(['title' => 'Original Title', 'body' => 'Original Body'])
             ->create()
-            ->enableAutoRefresh()
+            ->_enableAutoRefresh()
         ;
 
-        $post->disableAutoRefresh();
+        $post->_disableAutoRefresh();
         $post->setTitle('New Title'); // or using ->forceSet('title', 'New Title')
         $post->setBody('New Body'); // or using ->forceSet('body', 'New Body')
-        $post->enableAutoRefresh();
+        $post->_enableAutoRefresh();
         $post->save();
 
         $post->getBody(); // "New Body"
         $post->getTitle(); // "New Title"
 
-        // alternatively, use the ->withoutAutoRefresh() helper which first disables auto-refreshing, then re-enables after
+        // alternatively, use the ->_withoutAutoRefresh() helper which first disables auto-refreshing, then re-enables after
         // executing the callback.
-        $post->withoutAutoRefresh(function (Post $post) { // can pass either Post or Proxy to the callback
+        $post->_withoutAutoRefresh(function (Post $post) { // can pass either Post or Proxy to the callback
             $post->setTitle('New Title');
             $post->setBody('New Body');
         });
-        $post->save();
+        $post->_save();
 
-        // if force-setting properties, you can use the ->forceSetAll() helper:
-        $post->forceSetAll([
-            'title' => 'New Title',
-            'body' => 'New Body',
-        ]);
-        $post->save();
+Factory without proxy
+.....................
 
-.. note::
+It is possible to create factories which do not create "proxified" objects. Instead of making your factory inherit from
+`PersistentProxyObjectFactory`, you can inherit from `PersistentObjectFactory`. Your factory will then directly return
+the "real" object, which won't be wrapped by `Proxy` class.
 
-    You can enable/disable auto-refreshing globally to have every proxy auto-refreshable by default or not. When
-    enabled, you will have to *opt-out* of auto-refreshing.
+.. warning::
 
-    .. configuration-block::
-
-        .. code-block:: yaml
-
-            # config/packages/zenstruck_foundry.yaml
-            when@dev: # see Bundle Configuration section about sharing this in the test environment
-                zenstruck_foundry:
-                    auto_refresh_proxies: true/false
+    Be aware that your object won't refresh automatically if they are not wrapped with a proxy.
 
 Repository Proxy
 ~~~~~~~~~~~~~~~~
@@ -1415,12 +1420,12 @@ This library provides a *Repository Proxy* that wraps your object repositories t
 
     use App\Entity\Post;
     use App\Factory\PostFactory;
-    use function Zenstruck\Foundry\repository;
+    use function Zenstruck\Foundry\Persistence\repository;
 
     // instance of RepositoryProxy that wraps PostRepository
     $repository = PostFactory::repository();
 
-    // alternative to above for proxying repository you haven't created model factories for
+    // alternative to above for proxying repository you haven't created factories for
     $repository = repository(Post::class);
 
     // helpful methods - all returned object(s) are proxied
@@ -1453,16 +1458,11 @@ This library provides a *Repository Proxy* that wraps your object repositories t
 Assertions
 ~~~~~~~~~~
 
-Both object proxies and your ModelFactory have helpful PHPUnit assertions:
+Your object factory's have helpful PHPUnit assertions:
 
 .. code-block:: php
 
     use App\Factory\PostFactory;
-
-    $post = PostFactory::createOne();
-
-    $post->assertPersisted();
-    $post->assertNotPersisted();
 
     PostFactory::assert()->empty();
     PostFactory::assert()->count(3);
@@ -1537,7 +1537,7 @@ It is possible to use factories in
 
 .. note::
 
-    Be sure your data provider returns only instances of ``ModelFactory`` and you do not try to call ``->create()`` on them.
+    Be sure your data provider returns only instances of ``Factory`` and you do not try to call ``->create()`` on them.
     Data providers are computed early in the phpunit process before Foundry is booted.
 
 .. note::
@@ -1547,7 +1547,7 @@ It is possible to use factories in
 
 .. note::
 
-    Still for the same reason, if `Faker`_ is needed along with ``->withAttributes()`` within a data provider, you'll need
+    Still for the same reason, if `Faker`_ is needed along with ``->with()`` within a data provider, you'll need
     to pass attributes as a *callable*.
 
     Given the data provider of the previous example, here is ``PostFactory::published()``
@@ -1557,10 +1557,10 @@ It is possible to use factories in
         public function published(): self
         {
             // This won't work in a data provider!
-            // return $this->withAttributes(['published_at' => self::faker()->dateTime()]);
+            // return $this->with(['published_at' => self::faker()->dateTime()]);
 
             // use this instead:
-            return $this->withAttributes(
+            return $this->with(
                 static fn() => [
                     'published_at' => self::faker()->dateTime()
                 ]
@@ -1569,7 +1569,7 @@ It is possible to use factories in
 
 .. tip::
 
-    ``ModelFactory::new()->many()`` and ``ModelFactory::new()->sequence()`` return a special ``FactoryCollection`` object
+    ``ObjectFactory::new()->many()`` and ``ObjectFactory::new()->sequence()`` return a special ``FactoryCollection`` object
     which can be used to generate data providers:
 
     .. code-block:: php
@@ -1737,15 +1737,15 @@ Pre-Encode Passwords
 ....................
 
 Pre-encode user passwords with a known value via ``bin/console security:encode-password`` and set this in
-``ModelFactory::getDefaults()``. Add the known value as a ``const`` on your factory:
+``defaults()``. Add the known value as a ``const`` on your factory:
 
 .. code-block:: php
 
-    class UserFactory extends ModelFactory
+    class UserFactory extends PersistentProxyObjectFactory
     {
         public const DEFAULT_PASSWORD = '1234'; // the password used to create the pre-encoded version below
 
-        protected function getDefaults(): array
+        protected function defaults(): array
         {
             return [
                 // ...
@@ -1791,11 +1791,10 @@ You will need to configure manually Foundry. Unfortunately, this may mean duplic
     // tests/bootstrap.php
     // ...
 
-    Zenstruck\Foundry\Test\TestState::configure(
-        instantiator: (new Zenstruck\Foundry\Instantiator())
-            ->withoutConstructor()
-            ->allowExtraAttributes()
-            ->alwaysForceProperties(),
+    Zenstruck\Foundry\Test\UnitTestConfig::configure(
+        instantiator: Zenstruck\Foundry\Object\Instantiator::withoutConstructor()
+            ->allowExtra()
+            ->alwaysForce(),
         faker: Faker\Factory::create('fr_FR')
     );
 
@@ -1909,10 +1908,6 @@ If your stories require dependencies, you can define them as a service:
 
 If using a standard Symfony Flex app, this will be autowired/autoconfigured. If not, register the service and tag
 with ``foundry.story``.
-
-.. note::
-
-    The provided bundle is required for stories as services.
 
 Story State
 ~~~~~~~~~~~
@@ -2044,140 +2039,70 @@ This way, there is just one place to set your config.
 Full Default Bundle Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. configuration-block::
+.. code-block:: yaml
 
-    .. code-block:: yaml
+    zenstruck_foundry:
 
-        zenstruck_foundry:
+        # Configure faker to be used by your factories.
+        faker:
 
-            # Whether to auto-refresh proxies by default (https://github.com/zenstruck/foundry#auto-refresh)
-            auto_refresh_proxies: true
+            # Change the default faker locale.
+            locale:               null # Example: fr_FR
 
-            # Configure faker to be used by your factories.
-            faker:
+            # Random number generator seed to produce the same fake values every run
+            seed:                 null # Example: '1234'
 
-                # Change the default faker locale.
-                locale:               null # Example: fr_FR
+            # Customize the faker service.
+            service:              null # Example: my_faker
 
-                # Random number generator seed to produce the same fake values every run
-                seed:                 null # Example: 1234
+        # Configure the default instantiator used by your factories.
+        instantiator:
 
-                # Customize the faker service.
-                service:              null # Example: my_faker
+            # Use the constructor to instantiate objects.
+            use_constructor:      ~
 
-            # Configure the default instantiator used by your factories.
-            instantiator:
+            # Whether or not to allow extra attributes.
+            allow_extra_attributes: false
 
-                # Whether or not to call an object's constructor during instantiation.
-                without_constructor: false
+            # Whether or not to skip setters and force set object properties (public/private/protected) directly.
+            always_force_properties: false
 
-                # Whether or not to allow extra attributes.
-                allow_extra_attributes: false
+            # Customize the instantiator service.
+            service:              null # Example: my_instantiator
+        orm:
+            reset:
 
-                # Whether or not to skip setters and force set object properties (public/private/protected) directly.
-                always_force_properties: false
+                # DBAL connections to reset with ResetDatabase trait
+                connections:
 
-                # Customize the instantiator service.
-                service:              null # Example: my_instantiator
+                    # Default:
+                    - default
 
-            # Configure the database reset mechanism
-            database_resetter:
+                # Entity Managers to reset with ResetDatabase trait
+                entity_managers:
 
-                # Config related to ORM
-                orm:
+                    # Default:
+                    - default
 
-                    # Connections to reset. If empty, the default connection is used.
-                    connections: []
+                # Reset mode to use with ResetDatabase trait
+                mode:                 schema # One of "schema"; "migrate"
+        mongo:
+            reset:
 
-                    # Object managers to reset. If empty, the default manager is used.
-                    object_managers: []
+                # Document Managers to reset with ResetDatabase trait
+                document_managers:
 
-                    # Whether to use doctrine:schema:update or migrations when resetting schema.
-                    reset_mode: schema # "schema" or "migrate"
+                    # Default:
+                    - default
 
-                # Config related to ODM
-                odm:
+        # Array of stories that should be used as global state.
+        global_state:         []
 
-                    # Object managers to reset. If empty, the default manager is used.
-                    object_managers: []
+        make_factory:
 
-            # Add global state.
-            global_state: []
+            # Default namespace where factories will be created by maker.
+            default_namespace:    Factory
+        make_story:
 
-            # Configure Foundry's make:factory command
-            make_factory:
-
-                # Namespace to use for make:factory. Is overridden by --namespace option
-                default_namespace: 'Factory'
-
-    .. code-block:: php
-
-        $config->extension('zenstruck_foundry', [
-
-            // Whether to auto-refresh proxies by default (https://github.com/zenstruck/foundry#auto-refresh)
-            'auto_refresh_proxies' => false,
-
-            // Configure faker to be used by your factories.
-            'faker' => [
-
-                // Change the default faker locale.
-                'locale' => null,
-
-                // Random number generator seed to produce the same fake values every run
-                'seed' => null,
-
-                // Customize the faker service.
-                'service' => null
-            ],
-
-            // Configure the default instantiator used by your factories.
-            'instantiator' => [
-
-                // Whether or not to call an object's constructor during instantiation.
-                'without_constructor' => false,
-
-                // Whether or not to allow extra attributes.
-                'allow_extra_attributes' => false,
-
-                // Whether or not to skip setters and force set object properties (public/private/protected) directly.
-                'always_force_properties' => false,
-
-                // Customize the instantiator service.
-                'service' => null
-            ]
-
-            // Configure the database reset mechanism
-            'database_resetter' => [
-
-                // Config related to ORM
-                'orm' => [
-
-                    // Connections to reset. If empty, the default connection is used.
-                    'connections' => [],
-
-                    // Whether or not to allow extra attributes.
-                    'object_managers' => false,
-
-                    // Whether to use doctrine:schema:update or migrations when resetting schema.
-                    'reset_mode' => 'schema', // 'schema' or 'migration'
-                ],
-
-                // Config related to ODM
-                'odm' => [
-
-                    // Whether or not to allow extra attributes.
-                    'object_managers' => false,
-                ],
-
-            ],
-
-            // Add global state
-            'global_state' => [],
-
-            // Configure Foundry's make:factory command
-            'make_factory' => [
-
-                // Namespace to use for make:factory. Is overridden by --namespace option
-                'default_namespace' => 'Factory'
-            ]
-        ]);
+            # Default namespace where stories will be created by maker.
+            default_namespace:    Story

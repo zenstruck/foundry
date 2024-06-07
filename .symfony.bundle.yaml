@@ -1,3 +1,3 @@
-branches: ["1.x", "1.23.x"]
-maintained_branches: ["1.x", "1.23.x"]
+branches: ["2.x", "1.x"]
+maintained_branches: ["2.x", "1.x"]
 doc_dir: "docs/"
