@@ -90,6 +90,36 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
     {
         $application = self::application($kernel);
 
+        $this->dropAndResetDatabase($application);
+        $this->createSchema($application);
+    }
+
+    final public function resetSchema(KernelInterface $kernel): void
+    {
+        if (PersistenceManager::isDAMADoctrineTestBundleEnabled()) {
+            // not required as the DAMADoctrineTestBundle wraps each test in a transaction
+            return;
+        }
+
+        $application = self::application($kernel);
+
+        $this->dropSchema($application);
+        $this->createSchema($application);
+    }
+
+    final public function managedNamespaces(): array
+    {
+        $namespaces = [];
+
+        foreach ($this->objectManagers() as $objectManager) {
+            $namespaces[] = $objectManager->getConfiguration()->getEntityNamespaces();
+        }
+
+        return \array_values(\array_merge(...$namespaces));
+    }
+
+    private function dropAndResetDatabase(Application $application): void
+    {
         foreach ($this->connections() as $connection) {
             $databasePlatform = $this->registry->getConnection($connection)->getDatabasePlatform(); // @phpstan-ignore-line
 
@@ -118,32 +148,6 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
             ]);
             self::runCommand($application, 'doctrine:database:create', ['--connection' => $connection]);
         }
-
-        $this->createSchema($application);
-    }
-
-    final public function resetSchema(KernelInterface $kernel): void
-    {
-        if (PersistenceManager::isDAMADoctrineTestBundleEnabled()) {
-            // not required as the DAMADoctrineTestBundle wraps each test in a transaction
-            return;
-        }
-
-        $application = self::application($kernel);
-
-        $this->dropSchema($application);
-        $this->createSchema($application);
-    }
-
-    final public function managedNamespaces(): array
-    {
-        $namespaces = [];
-
-        foreach ($this->objectManagers() as $objectManager) {
-            $namespaces[] = $objectManager->getConfiguration()->getEntityNamespaces();
-        }
-
-        return \array_values(\array_merge(...$namespaces));
     }
 
     private function createSchema(Application $application): void
@@ -166,6 +170,12 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
 
     private function dropSchema(Application $application): void
     {
+        if (self::RESET_MODE_MIGRATE === $this->config['reset']['mode']) {
+            $this->dropAndResetDatabase($application);
+
+            return;
+        }
+
         foreach ($this->managers() as $manager) {
             self::runCommand($application, 'doctrine:schema:drop', [
                 '--em' => $manager,
