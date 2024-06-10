@@ -642,7 +642,7 @@ You can customize the instantiator in several ways:
         ->instantiateWith(Instantiator::withoutConstructor())
 
         // "foo" and "bar" attributes are ignored when instantiating
-        ->instantiateWith(Instantiator::withConstructor()->allowExtra(['foo', 'bar']))
+        ->instantiateWith(Instantiator::withConstructor()->allowExtra('foo', 'bar'))
 
         // all extra attributes are ignored when instantiating
         ->instantiateWith(Instantiator::withConstructor()->allowExtra())
