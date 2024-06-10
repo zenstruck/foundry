@@ -51,7 +51,11 @@ use Rector\Config\RectorConfig;
 use Zenstruck\Foundry\Utils\Rector\FoundrySetList;
 
 return RectorConfig::configure()
-    ->withPaths(['tests']) // add all paths where Foundry is used
+    ->withPaths([
+        // add all paths where your factories are defined and where Foundry is used
+        'src/Factory'
+        'tests'
+    ])
     ->withSets([FoundrySetList::UP_TO_FOUNDRY_2])
 ;
 ```
