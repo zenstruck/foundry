@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [v2.0.1](https://github.com/zenstruck/foundry/releases/tag/v2.0.1)
+
+June 10th, 2024 - [v2.0.0...v2.0.1](https://github.com/zenstruck/foundry/compare/v2.0.0...v2.0.1)
+
+* 5f0ce76 Fix `Instantiator::allowExtra` example (#616) by @norkunas
+* c2cbcbc fix(orm): reset database instead of dropping the schema when using migrations (#615) by @vincentchalamon
+
 ## [v2.0.0](https://github.com/zenstruck/foundry/releases/tag/v2.0.0)
 
 June 7th, 2024 - [v1.38.0...v2.0.0](https://github.com/zenstruck/foundry/compare/v1.38.0...v2.0.0)
