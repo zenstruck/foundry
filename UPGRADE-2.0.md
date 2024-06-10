@@ -221,7 +221,7 @@ protected function initialize()
 }
 
 // after
-protected function initialize(); static
+protected function initialize(): static
 {
     // ...
 }
