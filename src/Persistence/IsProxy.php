@@ -11,7 +11,7 @@
 
 namespace Zenstruck\Foundry\Persistence;
 
-use Symfony\Component\VarExporter\Internal\LazyObjectState;
+use Symfony\Component\VarExporter\LazyProxyTrait;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\Object\Hydrator;
@@ -22,35 +22,34 @@ use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
  *
  * @internal
  *
- * @property LazyObjectState $lazyObjectState
- * @method   object          initializeLazyObject()
+ * @mixin LazyProxyTrait
  */
 trait IsProxy
 {
-    private bool $_autoRefresh = true;
+    private static array $_autoRefresh = [];
 
     public function _enableAutoRefresh(): static
     {
-        $this->_autoRefresh = true;
+        $this->_setAutoRefresh(true);
 
         return $this;
     }
 
     public function _disableAutoRefresh(): static
     {
-        $this->_autoRefresh = false;
+        $this->_setAutoRefresh(false);
 
         return $this;
     }
 
     public function _withoutAutoRefresh(callable $callback): static
     {
-        $original = $this->_autoRefresh;
-        $this->_autoRefresh = false;
+        $original = $this->_getAutoRefresh();
+        $this->_setAutoRefresh(false);
 
         $callback($this);
 
-        $this->_autoRefresh = $original;
+        $this->_setAutoRefresh($original);
 
         return $this;
     }
@@ -115,8 +114,7 @@ trait IsProxy
 
     private function _autoRefresh(): void
     {
-        // "??=" fixes in ProxyHelper where object gets created without any props initialized
-        if (!($this->_autoRefresh ??= true)) {
+        if (!$this->_getAutoRefresh()) {
             return;
         }
 
@@ -129,5 +127,21 @@ trait IsProxy
                 throw $e;
             }
         }
+    }
+
+    private function _getAutoRefresh(): bool
+    {
+        $real = $this->initializeLazyObject();
+
+        static::$_autoRefresh[spl_object_id($real)] ??= true;
+
+        return static::$_autoRefresh[spl_object_id($real)];
+    }
+
+    private function _setAutoRefresh(bool $autoRefresh): void
+    {
+        $real = $this->initializeLazyObject();
+
+        static::$_autoRefresh[spl_object_id($real)] = $autoRefresh;
     }
 }
