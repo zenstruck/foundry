@@ -562,14 +562,6 @@ they were added.
             // $object is the instantiated object
             // $attributes contains the attributes used to instantiate the object and any extras
         })
-        ->afterPersist(function(Proxy $proxy, array $attributes) {
-            /* @var Post $proxy */
-            // this event is only called if the object was persisted
-            // $proxy is a Proxy wrapping the persisted object
-            // $attributes contains the attributes used to instantiate the object and any extras
-        })
-
-        // if the first argument is type-hinted as the object, it will be passed to the closure (and not the proxy)
         ->afterPersist(function(Post $object, array $attributes) {
             // this event is only called if the object was persisted
             // $object is the persisted Post object

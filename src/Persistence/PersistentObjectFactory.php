@@ -35,7 +35,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
 {
     private bool $persist;
 
-    /** @var list<callable(T):void> */
+    /** @var list<callable(T, Parameters):void> */
     private array $afterPersist = [];
 
     /** @var list<callable(T):void> */
@@ -226,11 +226,13 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
         $this->tempAfterPersist = [];
 
-        foreach ($this->afterPersist as $callback) {
-            $callback($object);
-        }
-
         if ($this->afterPersist) {
+            $attributes = $this->normalizeAttributes($attributes);
+
+            foreach ($this->afterPersist as $callback) {
+                $callback($object, $attributes);
+            }
+
             $configuration->persistence()->save($object);
         }
 
@@ -254,7 +256,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
-     * @param callable(T):void $callback
+     * @param callable(T, Parameters):void $callback
      */
     final public function afterPersist(callable $callback): static
     {
