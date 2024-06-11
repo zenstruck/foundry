@@ -15,6 +15,7 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Filesystem\Filesystem;
 use Zenstruck\Foundry\ORM\AbstractORMPersistenceStrategy;
+use Symfony\Component\Finder\Finder;
 use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 
 require \dirname(__DIR__).'/vendor/autoload.php';
@@ -39,6 +40,13 @@ if (\getenv('DATABASE_URL') && AbstractORMPersistenceStrategy::RESET_MODE_MIGRAT
     $application->run(new StringInput('doctrine:database:create'), new NullOutput());
     $application->run(new StringInput('doctrine:migrations:diff'), new NullOutput());
     $application->run(new StringInput('doctrine:database:drop --force'), new NullOutput());
+
+    // restore custom migrations
+    // this must be after "doctrine:migrations:diff" otherwise
+    // Doctrine is not able to run its diff command
+    foreach ((new Finder())->files()->in(__DIR__.'/Fixture/CustomMigrations') as $customMigrationFile) {
+        $fs->copy($customMigrationFile->getRealPath(), __DIR__.'/Fixture/Migrations/'.$customMigrationFile->getFilename());
+    }
 
     $kernel->shutdown();
 
