@@ -26,7 +26,7 @@ use Zenstruck\Foundry\FactoryCollection; // keep me!
  * @phpstan-type InstantiatorCallable = Instantiator|callable(Parameters,class-string<T>):T
  * @phpstan-import-type Parameters from Factory
  *
- * @phpstan-method static instantiateWith(InstantiatorCallable $instantiator)
+ * @phpstan-method $this instantiateWith(InstantiatorCallable $instantiator)
  *
  * @phpstan-method FactoryCollection<T&Proxy<T>> sequence(iterable<array<string, mixed>>|callable(): iterable<array<string, mixed>> $sequence)
  * @phpstan-method FactoryCollection<T&Proxy<T>> many(int $min, int|null $max = null)

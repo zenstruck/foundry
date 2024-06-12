@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
+use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithReadonly;
@@ -262,6 +263,21 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
         $object->_delete();
 
         $this->assertSame('default1', $object->getProp1());
+    }
+
+    /**
+     * @test
+     */
+    public function can_use_after_persist_with_attributes(): void
+    {
+        $object = $this->factory()
+            ->instantiateWith(Instantiator::withConstructor()->allowExtra('extra'))
+            ->afterPersist(function (GenericModel $object, array $attributes) {
+                $object->setProp1($attributes['extra']);
+            })
+            ->create(['extra' => $value = 'value set with after persist']);
+
+        $this->assertSame($value, $object->getProp1());
     }
 
     /**

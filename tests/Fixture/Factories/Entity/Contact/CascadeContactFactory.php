@@ -14,7 +14,6 @@ namespace Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact\CascadeContact;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\CascadeAddressFactory;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CascadeCategoryFactory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
