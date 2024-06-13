@@ -85,18 +85,14 @@ final class ProxyGenerator
         }
 
         $proxyCode = 'class '.$proxyClass.ProxyHelper::generateLazyProxy(new \ReflectionClass($class));
-        $proxyCode = \str_replace(
+        $proxyCode = \strtr(
+            $proxyCode,
             [
-                'implements \Symfony\Component\VarExporter\LazyObjectInterface',
-                'use \Symfony\Component\VarExporter\LazyProxyTrait;',
-                'if (isset($this->lazyObjectState)) {',
+                'implements \Symfony\Component\VarExporter\LazyObjectInterface' => \sprintf('implements \%s, \Symfony\Component\VarExporter\LazyObjectInterface', Proxy::class),
+                'use \Symfony\Component\VarExporter\LazyProxyTrait;' => \sprintf('use \\%s, \\Symfony\\Component\\VarExporter\\LazyProxyTrait;', IsProxy::class),
+                'if (isset($this->lazyObjectState)) {' => "\$this->_autoRefresh();\n\n        if (isset(\$this->lazyObjectReal)) {",
+                '\func_get_args()' => '$this->unproxyArgs(\func_get_args())',
             ],
-            [
-                \sprintf('implements \%s, \Symfony\Component\VarExporter\LazyObjectInterface', Proxy::class),
-                \sprintf('use \\%s, \\Symfony\\Component\\VarExporter\\LazyProxyTrait;', IsProxy::class),
-                "\$this->_autoRefresh();\n\n        if (isset(\$this->lazyObjectReal)) {",
-            ],
-            $proxyCode
         );
 
         eval($proxyCode); // @phpstan-ignore-line

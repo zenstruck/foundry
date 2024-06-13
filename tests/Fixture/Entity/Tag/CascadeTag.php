@@ -22,7 +22,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Tag;
 #[ORM\Entity]
 class CascadeTag extends Tag
 {
-    #[ORM\ManyToMany(targetEntity: CascadeContact::class, mappedBy: 'tags', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToMany(targetEntity: CascadeContact::class, mappedBy: 'tags', cascade: ['persist', 'remove'], fetch: 'EAGER')]
     protected Collection $contacts;
 
     #[ORM\ManyToMany(targetEntity: CascadeContact::class, mappedBy: 'secondaryTags', cascade: ['persist', 'remove'])]

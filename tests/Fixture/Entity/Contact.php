@@ -50,11 +50,9 @@ abstract class Contact extends Base
         return $this->name;
     }
 
-    public function setName(string $name): static
+    public function setName(string $name): void
     {
         $this->name = $name;
-
-        return $this;
     }
 
     public function getCategory(): ?Category
@@ -62,11 +60,9 @@ abstract class Contact extends Base
         return $this->category;
     }
 
-    public function setCategory(?Category $category): static
+    public function setCategory(?Category $category): void
     {
         $this->category = $category;
-
-        return $this;
     }
 
     public function getSecondaryCategory(): ?Category
@@ -87,20 +83,16 @@ abstract class Contact extends Base
         return $this->tags;
     }
 
-    public function addTag(Tag $tag): static
+    public function addTag(Tag $tag): void
     {
         if (!$this->tags->contains($tag)) {
             $this->tags->add($tag);
         }
-
-        return $this;
     }
 
-    public function removeTag(Tag $tag): static
+    public function removeTag(Tag $tag): void
     {
         $this->tags->removeElement($tag);
-
-        return $this;
     }
 
     /**
@@ -130,10 +122,8 @@ abstract class Contact extends Base
         return $this->address;
     }
 
-    public function setAddress(Address $address): static
+    public function setAddress(Address $address): void
     {
         $this->address = $address;
-
-        return $this;
     }
 }

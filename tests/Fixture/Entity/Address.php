@@ -33,10 +33,8 @@ abstract class Address extends Base
         return $this->city;
     }
 
-    public function setCity(string $city): static
+    public function setCity(string $city): void
     {
         $this->city = $city;
-
-        return $this;
     }
 }
