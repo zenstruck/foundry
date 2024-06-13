@@ -1170,6 +1170,7 @@ Let's look at an example:
         $this->assertCount(0, $post->getComments());
 
         // 2. "Act"
+        static::ensureKernelShutdown(); // Note kernel must be shutdown if you use factories before create client
         $client = static::createClient();
         $client->request('GET', '/posts/post-a'); // Note the slug from the arrange step
         $client->submitForm('Add', [
