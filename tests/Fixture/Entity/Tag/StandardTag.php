@@ -22,7 +22,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Tag;
 #[ORM\Entity]
 class StandardTag extends Tag
 {
-    #[ORM\ManyToMany(targetEntity: StandardContact::class, mappedBy: 'tags')]
+    #[ORM\ManyToMany(targetEntity: StandardContact::class, mappedBy: 'tags', fetch: 'EAGER')]
     protected Collection $contacts;
 
     #[ORM\ManyToMany(targetEntity: StandardContact::class, mappedBy: 'secondaryTags')]

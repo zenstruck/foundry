@@ -17,7 +17,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericProxyEntityFactory;
 use Zenstruck\Foundry\Tests\Integration\Persistence\GenericRepositoryDecoratorTestCase;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
-final class GenericProxyEntityRepositoryDecoratorTest extends GenericRepositoryDecoratorTestCase
+final class ProxyGenericEntityRepositoryDecoratorTest extends GenericRepositoryDecoratorTestCase
 {
     use RequiresORM;
 

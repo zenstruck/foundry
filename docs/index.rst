@@ -231,21 +231,21 @@ This command will generate a ``PostFactory`` class that looks like this:
          * @method static Post[]|Proxy[] randomRange(int $min, int $max, array $attributes = []))
          * @method static Post[]|Proxy[] randomSet(int $number, array $attributes = []))
          *
-         * @phpstan-method Proxy<Post> create(array|callable $attributes = [])
-         * @phpstan-method static Proxy<Post> createOne(array $attributes = [])
-         * @phpstan-method static Proxy<Post> find(object|array|mixed $criteria)
-         * @phpstan-method static Proxy<Post> findOrCreate(array $attributes)
-         * @phpstan-method static Proxy<Post> first(string $sortedField = 'id')
-         * @phpstan-method static Proxy<Post> last(string $sortedField = 'id')
-         * @phpstan-method static Proxy<Post> random(array $attributes = [])
-         * @phpstan-method static Proxy<Post> randomOrCreate(array $attributes = [])
-         * @phpstan-method static list<Proxy<Post>> all()
-         * @phpstan-method static list<Proxy<Post>> createMany(int $number, array|callable $attributes = [])
-         * @phpstan-method static list<Proxy<Post>> createSequence(array|callable $sequence)
-         * @phpstan-method static list<Proxy<Post>> findBy(array $attributes)
-         * @phpstan-method static list<Proxy<Post>> randomRange(int $min, int $max, array $attributes = [])
-         * @phpstan-method static list<Proxy<Post>> randomSet(int $number, array $attributes = [])
-         * @phpstan-method static RepositoryProxy<Post> repository()
+         * @phpstan-method Proxy<Post>&Post create(array|callable $attributes = [])
+         * @phpstan-method static Proxy<Post>&Post createOne(array $attributes = [])
+         * @phpstan-method static Proxy<Post>&Post find(object|array|mixed $criteria)
+         * @phpstan-method static Proxy<Post>&Post findOrCreate(array $attributes)
+         * @phpstan-method static Proxy<Post>&Post first(string $sortedField = 'id')
+         * @phpstan-method static Proxy<Post>&Post last(string $sortedField = 'id')
+         * @phpstan-method static Proxy<Post>&Post random(array $attributes = [])
+         * @phpstan-method static Proxy<Post>&Post randomOrCreate(array $attributes = [])
+         * @phpstan-method static list<Proxy<Post>&Post> all()
+         * @phpstan-method static list<Proxy<Post>&Post> createMany(int $number, array|callable $attributes = [])
+         * @phpstan-method static list<Proxy<Post>&Post> createSequence(array|callable $sequence)
+         * @phpstan-method static list<Proxy<Post>&Post> findBy(array $attributes)
+         * @phpstan-method static list<Proxy<Post>&Post> randomRange(int $min, int $max, array $attributes = [])
+         * @phpstan-method static list<Proxy<Post>&Post> randomSet(int $number, array $attributes = [])
+         * @phpstan-method static RepositoryProxy<Post>&Post repository()
          */
         final class PostFactory extends PersistentProxyObjectFactory
         {
@@ -1392,6 +1392,21 @@ Without auto-refreshing enabled, the above call to ``$post->getTitle()`` would r
             $post->setBody('New Body');
         });
         $post->_save();
+
+Proxy objects pitfalls
+......................
+
+Proxified objects may have some pitfalls when dealing with Doctrine's entity manager. You may encounter this error:
+
+> Doctrine\ORM\ORMInvalidArgumentException: A new entity was found through the relationship
+'App\Entity\Post#category' that was not configured to cascade persist operations for entity: AppEntityCategoryProxy@3082.
+To solve this issue: Either explicitly call EntityManager#persist() on this unknown entity or configure cascade persist
+this association in the mapping for example @ManyToOne(..,cascade={"persist"}). If you cannot find out which entity
+causes the problem implement 'App\Entity\Category#__toString()' to get a clue.
+
+The problem will occur if a proxy has been passed to ``EntityManager::persist()``. To fix this, you should pass the "real"
+object, by calling ``$proxyfiedObject->_real()``.
+
 
 Factory without proxy
 .....................

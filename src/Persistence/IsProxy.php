@@ -144,4 +144,10 @@ trait IsProxy
 
         static::$_autoRefresh[\spl_object_id($real)] = $autoRefresh;
     }
+
+    // used in ProxyGenerator
+    private function unproxyArgs(array $args): array
+    {
+        return \array_map(unproxy(...), $args);
+    }
 }
