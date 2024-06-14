@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## [v2.0.2](https://github.com/zenstruck/foundry/releases/tag/v2.0.2)
+
+June 14th, 2024 - [v2.0.1...v2.0.2](https://github.com/zenstruck/foundry/compare/v2.0.1...v2.0.2)
+
+* b76c294 fix(2.x): support Symfony 7.1 (#622) by @nikophil
+* 9cd97b7 docs: Improve DX for tests (#636) by @matthieumota
+* 17b0228 fix(2.x): add back second parameter for after persist callbacks (#631) by @nikophil
+* 0c7b3af docs: Fix typo in the upgrade guide (#624) by @stof
+* 933ebbd docs: upgrade readme with a link to upgrade guide (#620) by @nikophil
+
 ## [v2.0.1](https://github.com/zenstruck/foundry/releases/tag/v2.0.1)
 
 June 10th, 2024 - [v2.0.0...v2.0.1](https://github.com/zenstruck/foundry/compare/v2.0.0...v2.0.1)
