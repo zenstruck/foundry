@@ -133,15 +133,15 @@ trait IsProxy
     {
         $real = $this->initializeLazyObject();
 
-        static::$_autoRefresh[spl_object_id($real)] ??= true;
+        static::$_autoRefresh[\spl_object_id($real)] ??= true;
 
-        return static::$_autoRefresh[spl_object_id($real)];
+        return static::$_autoRefresh[\spl_object_id($real)];
     }
 
     private function _setAutoRefresh(bool $autoRefresh): void
     {
         $real = $this->initializeLazyObject();
 
-        static::$_autoRefresh[spl_object_id($real)] = $autoRefresh;
+        static::$_autoRefresh[\spl_object_id($real)] = $autoRefresh;
     }
 }
