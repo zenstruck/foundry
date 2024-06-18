@@ -3,9 +3,7 @@ includes:
 
 parameters:
     inferPrivatePropertyTypeFromConstructor: true
-    checkMissingIterableValueType: false
     checkUninitializedProperties: true
-    checkGenericClassInNonGenericObjectType: false
     paths:
         - ./src
 
@@ -15,6 +13,10 @@ parameters:
     level: 8
     bootstrapFiles:
         - ./vendor/autoload.php
+    ignoreErrors:
+        - identifier: missingType.iterableValue
+        - identifier: missingType.generics
+
     banned_code:
         nodes:
             # enable detection of die/exit
