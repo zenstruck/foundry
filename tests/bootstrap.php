@@ -14,8 +14,8 @@ use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Filesystem\Filesystem;
-use Zenstruck\Foundry\ORM\AbstractORMPersistenceStrategy;
 use Symfony\Component\Finder\Finder;
+use Zenstruck\Foundry\ORM\AbstractORMPersistenceStrategy;
 use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 
 require \dirname(__DIR__).'/vendor/autoload.php';
