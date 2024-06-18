@@ -104,6 +104,22 @@ final class TestKernel extends Kernel
                 ],
             ]);
 
+            if (AbstractORMPersistenceStrategy::RESET_MODE_MIGRATE === \getenv('DATABASE_RESET_MODE')) {
+                $c->loadFromExtension('doctrine', [
+                    'orm' => [
+                        'mappings' => [
+                            'Migrate' => [
+                                'is_bundle' => false,
+                                'type' => 'attribute',
+                                'dir' => '%kernel.project_dir%/tests/Fixture/EdgeCases/Migrate/ORM',
+                                'prefix' => 'Zenstruck\Foundry\Tests\Fixture\EdgeCases\Migrate\ORM',
+                                'alias' => 'Migrate',
+                            ],
+                        ],
+                    ],
+                ]);
+            }
+
             $c->loadFromExtension('doctrine_migrations', [
                 'migrations_paths' => [
                     'Zenstruck\\Foundry\\Tests\\Fixture\\Migrations' => '%kernel.project_dir%/tests/Fixture/Migrations',
