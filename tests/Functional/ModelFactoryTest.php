@@ -14,7 +14,6 @@ namespace Zenstruck\Foundry\Tests\Functional;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\FactoryCollection;
-use Zenstruck\Foundry\RepositoryAssertions;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 

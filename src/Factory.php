@@ -64,7 +64,6 @@ class Factory
      */
     public function __construct(string $class, array|callable $defaultAttributes = [])
     {
-        /** @phpstan-ignore-next-line */
         if (self::class === static::class) {
             trigger_deprecation('zenstruck/foundry', '1.9', 'Instantiating "%s" directly is deprecated and this class will be abstract in 2.0, use "anonymous()" function instead.', self::class);
         }
@@ -149,7 +148,7 @@ class Factory
 
         // instantiate the object with the users instantiator or if not set, the default instantiator
         /** @var TObject $object */
-        $object = ($this->instantiator ?? self::configuration()->instantiator())($attributes, $this->class);
+        $object = ($this->instantiator ?? self::configuration()->instantiator())($attributes, $this->guessClass());
 
         foreach ($this->afterInstantiate as $callback) {
             $callback($object, $attributes);
@@ -418,7 +417,7 @@ class Factory
         }
 
         try {
-            $classMetadata = self::configuration()->objectManagerFor($this->class)->getClassMetadata($this->class);
+            $classMetadata = self::configuration()->objectManagerFor($this->guessClass())->getClassMetadata($this->guessClass());
         } catch (\RuntimeException) {
             // entity not managed (perhaps Embeddable)
             return false;
@@ -473,9 +472,9 @@ class Factory
         }
 
         try {
-            $objectManager = self::configuration()->objectManagerFor($this->class);
+            $objectManager = self::configuration()->objectManagerFor($this->guessClass());
 
-            if (!$objectManager instanceof EntityManagerInterface || $objectManager->getClassMetadata($value->class)->isEmbeddedClass) {
+            if (!$objectManager instanceof EntityManagerInterface || $objectManager->getClassMetadata($value->guessClass())->isEmbeddedClass) {
                 // we may deal with ODM document or ORM\Embedded
                 return $value->createAndUnproxify();
             }
@@ -484,7 +483,7 @@ class Factory
             return $value->createAndUnproxify();
         }
 
-        $relationshipMetadata = self::getRelationshipMetadata($objectManager, $this->class, $name);
+        $relationshipMetadata = self::getRelationshipMetadata($objectManager, $this->guessClass(), $name);
 
         if (!$relationshipMetadata) {
             return $value->createAndUnproxify();
@@ -571,5 +570,19 @@ class Factory
         $cloned->cascadePersist = true;
 
         return $cloned;
+    }
+
+    /**
+     * @return class-string<TObject>
+     */
+    private function guessClass(): string
+    {
+        if ($this instanceof ObjectFactory) {
+            // a lot of factories in the wild have empty constructor, which does not call parent::__construct()
+            // let's mitigate this here
+            return $this->class ??= static::class(); // @phpstan-ignore staticMethod.notFound
+        }
+
+        return $this->class;
     }
 }
