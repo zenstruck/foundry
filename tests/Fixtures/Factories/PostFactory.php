@@ -23,7 +23,7 @@ class PostFactory extends PersistentProxyObjectFactory
     public function __construct()
     {
     }
-    
+
     public function published(): static
     {
         return $this->with(static fn(): array => ['published_at' => self::faker()->dateTime()]);
