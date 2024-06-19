@@ -28,6 +28,14 @@ abstract class Factory
     /** @phpstan-var Attributes[] */
     private array $attributes;
 
+    /**
+     * Memoization of normalized parameters
+     *
+     * @internal
+     * @var Parameters|null
+     */
+    protected array|null $normalizedParameters = null;
+
     // keep an empty constructor for BC
     public function __construct()
     {
@@ -149,6 +157,16 @@ abstract class Factory
     }
 
     /**
+     * Override to adjust default attributes & config.
+     *
+     * @return static
+     */
+    protected function initialize(): static
+    {
+        return $this;
+    }
+
+    /**
      * @internal
      *
      * @phpstan-param Attributes $attributes
@@ -175,14 +193,6 @@ abstract class Factory
     }
 
     /**
-     * Override to adjust default attributes & config.
-     */
-    protected function initialize(): static
-    {
-        return $this;
-    }
-
-    /**
      * @internal
      *
      * @phpstan-param Parameters $parameters
@@ -191,7 +201,7 @@ abstract class Factory
      */
     protected function normalizeParameters(array $parameters): array
     {
-        return array_combine(
+        return $this->normalizedParameters = array_combine(
             array_keys($parameters),
             \array_map($this->normalizeParameter(...), array_keys($parameters), $parameters)
         );

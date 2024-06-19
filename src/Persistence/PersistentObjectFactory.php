@@ -217,7 +217,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
         $this->tempAfterPersist = [];
 
         if ($this->afterPersist) {
-            $attributes = $this->normalizeAttributes($attributes);
+            $attributes = $this->normalizedParameters ?? throw new \LogicException('Factory::$normalizedParameters has not been initialized.');
 
             foreach ($this->afterPersist as $callback) {
                 $callback($object, $attributes);

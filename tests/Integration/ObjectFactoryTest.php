@@ -44,4 +44,20 @@ final class ObjectFactoryTest extends KernelTestCase
 
         $this->assertSame('router-constructor', $object->object->getProp1());
     }
+
+    /**
+     * @test
+     */
+    public function can_create_different_objects_based_on_same_factory(): void
+    {
+        $factory = Object1Factory::new(['prop1' => 'first object']);
+        $object1 = $factory->create();
+        self::assertSame('first object-constructor', $object1->getProp1());
+
+        $object2 = $factory->create(['prop1' => 'second object']);
+        self::assertSame('second object-constructor', $object2->getProp1());
+
+        $object3 = $factory->with(['prop1' => 'third object'])->create();
+        self::assertSame('third object-constructor', $object3->getProp1());
+    }
 }
