@@ -80,7 +80,7 @@ trait ResetDatabase
 
         DatabaseResetter::resetSchema($kernel);
 
-        KernelHelper::shutdownKernel($kernel);
+        $kernel->shutdown();
     }
 
     private static function shouldReset(KernelInterface $kernel): bool
