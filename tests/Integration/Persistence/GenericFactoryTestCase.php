@@ -537,7 +537,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     public function it_should_not_create_proxy_for_not_persistable_objects(): void
     {
         $this->factory()->create(['date' => new \DateTimeImmutable()]);
-        self::assertFalse(class_exists(ProxyGenerator::proxyClassNameFor(\DateTimeImmutable::class)));
+        self::assertFalse(\class_exists(ProxyGenerator::proxyClassNameFor(\DateTimeImmutable::class)));
     }
 
     /**
