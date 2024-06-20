@@ -14,20 +14,16 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\RichDomainMandatoryRelationship;
 
 use Doctrine\ORM\Mapping as ORM;
-use Zenstruck\Foundry\Tests\Fixture\Model\Base;
 
-#[ORM\MappedSuperclass]
-#[ORM\Table(name: 'rich_domain_mandatory_relationship_owning_side_entity')]
-abstract class OwningSideEntity extends Base
+#[ORM\Entity]
+class CascadeOwningSideEntity extends OwningSideEntity
 {
-    public function __construct(
-        protected InversedSideEntity $main,
-    ) {
-        $main->addRelation($this);
-    }
+    #[ORM\ManyToOne(targetEntity: CascadeInversedSideEntity::class, cascade: ['persist'], inversedBy: 'relations')]
+    protected InversedSideEntity $main;
 
-    public function getMain(): InversedSideEntity
-    {
-        return $this->main;
+    public function __construct(
+        InversedSideEntity $main
+    ) {
+        parent::__construct($main);
     }
 }

@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Foundry\Object;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Zenstruck\Foundry\Factory;
@@ -92,6 +94,13 @@ final class Hydrator
 
     public static function set(object $object, string $property, mixed $value): void
     {
+        if (
+            self::isDoctrineCollection($object, $property)
+            && is_array($value)
+        ) {
+            $value = new ArrayCollection($value);
+        }
+
         self::accessibleProperty($object, $property)->setValue($object, $value);
     }
 
@@ -125,5 +134,16 @@ final class Hydrator
         }
 
         return null;
+    }
+
+    private static function isDoctrineCollection(object $object, string $property): bool
+    {
+        $reflectionType = self::reflectionProperty(new \ReflectionClass($object), $property)?->getType();
+
+        if (!$reflectionType instanceof \ReflectionNamedType) {
+            return false;
+        }
+
+        return $reflectionType->getName() === Collection::class;
     }
 }

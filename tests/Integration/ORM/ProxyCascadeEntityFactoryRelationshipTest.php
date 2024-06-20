@@ -44,9 +44,4 @@ final class ProxyCascadeEntityFactoryRelationshipTest extends ProxyEntityFactory
     {
         return ProxyCascadeAddressFactory::new(); // @phpstan-ignore-line
     }
-
-    protected function relationshipWithGlobalEntityFactory(): PersistentObjectFactory
-    {
-        return proxy_factory(CascadeRelationshipWithGlobalEntity::class); // @phpstan-ignore-line
-    }
 }

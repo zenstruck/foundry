@@ -44,9 +44,4 @@ class StandardEntityFactoryRelationshipTest extends EntityFactoryRelationshipTes
     {
         return StandardAddressFactory::new(); // @phpstan-ignore-line
     }
-
-    protected function relationshipWithGlobalEntityFactory(): PersistentObjectFactory
-    {
-        return persistent_factory(StandardRelationshipWithGlobalEntity::class); // @phpstan-ignore-line
-    }
 }

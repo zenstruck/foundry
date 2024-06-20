@@ -18,13 +18,12 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Zenstruck\Foundry\Tests\Fixture\Model\Base;
 
-#[ORM\Entity()]
+#[ORM\MappedSuperclass]
 #[ORM\Table(name: 'rich_domain_mandatory_relationship_inversed_side_entity')]
-class InversedSideEntity extends Base
+abstract class InversedSideEntity extends Base
 {
     /** @var Collection<int,OwningSideEntity> */
-    #[ORM\OneToMany(mappedBy: 'main', targetEntity: OwningSideEntity::class, cascade: ['persist', 'remove'])]
-    private Collection $relations;
+    protected Collection $relations;
 
     public function __construct()
     {
@@ -50,7 +49,9 @@ class InversedSideEntity extends Base
 
     public function removeRelation(OwningSideEntity $relation): static
     {
-        $this->relations->removeElement($relation);
+        if ($this->relations->contains($relation)) {
+            $this->relations->removeElement($relation);
+        }
 
         return $this;
     }

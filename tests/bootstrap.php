@@ -50,8 +50,6 @@ if (\getenv('DATABASE_URL') && AbstractORMPersistenceStrategy::RESET_MODE_MIGRAT
     }
 
     $kernel->shutdown();
-
-    $fs->remove(__DIR__.'/../var');
 }
 
 \set_exception_handler([new ErrorHandler(), 'handleException']);
