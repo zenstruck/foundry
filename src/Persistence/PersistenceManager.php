@@ -362,6 +362,15 @@ final class PersistenceManager
         }
     }
 
+    public function hasPersistenceFor(object $object): bool
+    {
+        try {
+            return (bool) $this->strategyFor($object::class);
+        } catch (NoPersistenceStrategy) {
+            return false;
+        }
+    }
+
     private static function canSkipSchemaReset(): bool
     {
         return self::$ormOnly && self::isDAMADoctrineTestBundleEnabled();

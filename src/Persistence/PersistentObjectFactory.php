@@ -19,7 +19,6 @@ use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\ObjectFactory;
-use Zenstruck\Foundry\Persistence\Exception\NoPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
 
@@ -320,9 +319,15 @@ abstract class PersistentObjectFactory extends ObjectFactory
             return $object;
         }
 
+        $configuration = Configuration::instance();
+
+        if (!$configuration->isPersistenceAvailable() || !$configuration->persistence()->hasPersistenceFor($object)) {
+            return $object;
+        }
+
         try {
             return proxy($object)->_refresh()->_real();
-        } catch (PersistenceNotAvailable|RefreshObjectFailed|NoPersistenceStrategy|VarExportLogicException) {
+        } catch (RefreshObjectFailed|VarExportLogicException) {
             return $object;
         }
     }
