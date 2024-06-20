@@ -13,6 +13,7 @@ namespace Zenstruck\Foundry\Persistence;
 
 use Doctrine\Persistence\Proxy as DoctrineProxy;
 use Symfony\Component\VarExporter\LazyObjectInterface;
+use Symfony\Component\VarExporter\LazyProxyTrait;
 use Symfony\Component\VarExporter\ProxyHelper;
 
 /**
@@ -84,19 +85,62 @@ final class ProxyGenerator
             return $proxyClass;
         }
 
-        $proxyCode = 'class '.$proxyClass.ProxyHelper::generateLazyProxy(new \ReflectionClass($class));
+        $proxyCode = 'class '.$proxyClass.ProxyHelper::generateLazyProxy($reflectionClass = new \ReflectionClass($class));
         $proxyCode = \strtr(
             $proxyCode,
             [
                 'implements \Symfony\Component\VarExporter\LazyObjectInterface' => \sprintf('implements \%s, \Symfony\Component\VarExporter\LazyObjectInterface', Proxy::class),
-                'use \Symfony\Component\VarExporter\LazyProxyTrait;' => \sprintf('use \\%s, \\Symfony\\Component\\VarExporter\\LazyProxyTrait;', IsProxy::class),
+                'use \Symfony\Component\VarExporter\LazyProxyTrait;' => \sprintf("use \\%s;\n    use \\%s;", IsProxy::class, LazyProxyTrait::class),
                 'if (isset($this->lazyObjectState)) {' => "\$this->_autoRefresh();\n\n        if (isset(\$this->lazyObjectReal)) {",
                 '\func_get_args()' => '$this->unproxyArgs(\func_get_args())',
             ],
         );
 
+        $proxyCode = self::handleContravarianceInUnserializeMethod($reflectionClass, $proxyCode);
+
         eval($proxyCode); // @phpstan-ignore-line
 
         return $proxyClass;
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param \ReflectionClass<T> $class
+     *
+     * Monkey patch for https://github.com/symfony/symfony/pull/57460, until the PR is released.
+     */
+    private static function handleContravarianceInUnserializeMethod(\ReflectionClass $class, string $proxyCode): string
+    {
+        if (
+            !str_contains($proxyCode, '__doUnserialize')
+            && $class->hasMethod('__unserialize')
+            && null !== ($unserializeParameter = $class->getMethod('__unserialize')->getParameters()[0] ?? null)
+            && null === $unserializeParameter->getType()
+        ) {
+            $proxyCode = str_replace(
+                'use \Symfony\Component\VarExporter\LazyProxyTrait;',
+                <<<EOPHP
+                use \Symfony\Component\VarExporter\LazyProxyTrait {
+                        __unserialize as private _doUnserialize;
+                    }
+                EOPHP,
+                $proxyCode
+            );
+
+            $unserializeMethod = <<<EOPHP
+
+                public function __unserialize(\$data): void
+                {
+                    \$this->_doUnserialize(\$data);
+                }
+
+            EOPHP;
+
+            $lastCurlyBraceOffset = strrpos($proxyCode, '}') ?: throw new \LogicException('Last curly brace offset not found.');
+            $proxyCode = substr_replace($proxyCode, $unserializeMethod."}", $lastCurlyBraceOffset, 1);
+        }
+
+        return $proxyCode;
     }
 }
