@@ -13,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Dotenv\Dotenv;
+use Symfony\Component\ErrorHandler\ErrorHandler;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Zenstruck\Foundry\ORM\AbstractORMPersistenceStrategy;
@@ -52,3 +53,5 @@ if (\getenv('DATABASE_URL') && AbstractORMPersistenceStrategy::RESET_MODE_MIGRAT
 
     $fs->remove(__DIR__.'/../var');
 }
+
+set_exception_handler([new ErrorHandler(), 'handleException']);

@@ -1,6 +1,7 @@
 /composer.lock
 /phpunit.xml
 /phpunit-dama-doctrine.xml
+/phpunit-10.xml
 /vendor/
 /bin/tools/*/vendor/
 /bin/tools/php-cs-fixer/composer.lock
@@ -15,7 +16,3 @@
 /docker-compose.override.yaml
 /tests/Fixture/Migrations/
 /tests/Fixture/Maker/tmp/
-
-/utils/rector/vendor
-/utils/rector/.phpunit.result.cache
-/utils/rector/composer.lock

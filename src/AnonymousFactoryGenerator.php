@@ -43,7 +43,7 @@ final class AnonymousFactoryGenerator
                 {
                     public static function class(): string
                     {
-                        return "{$class}";
+                        return '{$class}';
                     }
 
                     protected function defaults(): array
