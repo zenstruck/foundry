@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Unit\Persistence;
 
 use PHPUnit\Framework\TestCase;
@@ -19,7 +28,7 @@ final class ProxyGeneratorTest extends TestCase
     public function it_can_generate_proxy_for_class_with_unserialize_magic_method(object $obj): void
     {
         $proxyfiedObj = ProxyGenerator::wrap($obj);
-        self::assertEquals(unserialize(serialize($proxyfiedObj))->_real(), $proxyfiedObj->_real());
+        self::assertEquals(\unserialize(\serialize($proxyfiedObj))->_real(), $proxyfiedObj->_real());
 
         // if this assertion fails, https://github.com/symfony/symfony/pull/57460 have been released
         // so, the monkey patch around contravariance problem could be removed
