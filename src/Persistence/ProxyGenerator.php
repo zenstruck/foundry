@@ -78,7 +78,7 @@ final class ProxyGenerator
     {
         /** @var class-string $class */
         $class = $object instanceof DoctrineProxy ? \get_parent_class($object) : $object::class;
-        $proxyClass = \str_replace('\\', '', $class).'Proxy';
+        $proxyClass = self::proxyClassNameFor($class);
 
         /** @var class-string<LazyObjectInterface&Proxy<T>&T> $proxyClass */
         if (\class_exists($proxyClass, autoload: false)) {
@@ -142,5 +142,13 @@ final class ProxyGenerator
         }
 
         return $proxyCode;
+    }
+
+    /**
+     * @param class-string $class
+     */
+    public static function proxyClassNameFor(string $class): string
+    {
+        return \str_replace('\\', '', $class).'Proxy';
     }
 }
