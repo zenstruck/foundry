@@ -430,7 +430,8 @@ instantiation.
         ])
         ->with([
             // Proxies are automatically converted to their wrapped object
-            'category' => CategoryFactory::createOne(),
+            // will override previous category
+            'category' => CategoryFactory::createOne(['name' => 'Symfony']),
         ])
         ->with(function() { return ['createdAt' => faker()->dateTime()]; }) // see faker section below
 
@@ -440,13 +441,13 @@ instantiation.
 
     $posts[0]->getTitle(); // "Different Title"
     $posts[0]->getBody(); // "Post Body..."
-    $posts[0]->getCategory(); // random Category
+    $posts[0]->getCategory(); // Category with name "Symfony"
     $posts[0]->getPublishedAt(); // \DateTime('last week')
     $posts[0]->getCreatedAt(); // random \DateTime
 
     $posts[1]->getTitle(); // "Different Title"
     $posts[1]->getBody(); // "Post Body..."
-    $posts[1]->getCategory(); // random Category (different than above)
+    $posts[1]->getCategory(); // Category with name "Symfony" (same object than above)
     $posts[1]->getPublishedAt(); // \DateTime('last week')
     $posts[1]->getCreatedAt(); // random \DateTime (different than above)
 
