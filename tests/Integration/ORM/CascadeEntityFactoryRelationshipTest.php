@@ -12,15 +12,17 @@
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\RelationshipWithGlobalEntity\CascadeRelationshipWithGlobalEntity;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\CascadeAddressFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CascadeCategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\CascadeContactFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Tag\CascadeTagFactory;
+use function Zenstruck\Foundry\Persistence\persistent_factory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class CascadeEntityFactoryRelationshipTest extends EntityFactoryRelationshipTest
+final class CascadeEntityFactoryRelationshipTest extends EntityFactoryRelationshipTestCase
 {
     /**
      * @test
@@ -112,5 +114,10 @@ final class CascadeEntityFactoryRelationshipTest extends EntityFactoryRelationsh
     protected function addressFactory(): PersistentObjectFactory
     {
         return CascadeAddressFactory::new(); // @phpstan-ignore-line
+    }
+
+    protected function relationshipWithGlobalEntityFactory(): PersistentObjectFactory
+    {
+        return persistent_factory(CascadeRelationshipWithGlobalEntity::class); // @phpstan-ignore-line
     }
 }

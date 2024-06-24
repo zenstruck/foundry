@@ -205,9 +205,9 @@ final class PersistenceManager
      *
      * @return T
      */
-    public function refresh(object &$object): object
+    public function refresh(object &$object, bool $force = false): object
     {
-        if (!$this->flush) {
+        if (!$this->flush && !$force) {
             return $object;
         }
 

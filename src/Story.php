@@ -11,6 +11,10 @@
 
 namespace Zenstruck\Foundry;
 
+use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
+use Zenstruck\Foundry\Persistence\Exception\NoPersistenceStrategy;
+use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
+
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
@@ -127,7 +131,11 @@ abstract class Story
             throw new \InvalidArgumentException(\sprintf('"%s" was not registered. Did you forget to call "%s::addState()"?', $name, static::class));
         }
 
-        return $this->state[$name];
+        try {
+            return Configuration::instance()->persistence()->refresh($this->state[$name], force: true); // @phpstan-ignore argument.templateType
+        } catch (PersistenceNotAvailable|NoPersistenceStrategy|RefreshObjectFailed) {
+            return $this->state[$name];
+        }
     }
 
     final protected function addToPool(string $pool, mixed $value): self

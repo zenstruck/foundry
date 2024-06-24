@@ -17,7 +17,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ChildContactFactory
 /**
  * tests behavior with inheritance.
  */
-class PolymorphicEntityFactoryRelationshipTest extends EntityFactoryRelationshipTest
+class PolymorphicEntityFactoryRelationshipTest extends StandardEntityFactoryRelationshipTest
 {
     protected function contactFactory(): PersistentObjectFactory
     {
