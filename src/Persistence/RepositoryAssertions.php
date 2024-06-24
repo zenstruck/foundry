@@ -54,7 +54,7 @@ final class RepositoryAssertions
     /**
      * @param Parameters $criteria
      */
-    public function count(int $expectedCount, array $criteria = [], string $message = 'Expected count of {entity} repository ({actual}) to be {expected}.'): self
+    public function count(int $expectedCount, array $criteria = [], string $message = 'Expected count of {entity} to be {expected} (actual: {actual}).'): self
     {
         Assert::that($this->repository->count($criteria))
             ->is($expectedCount, $message, ['entity' => $this->repository->getClassName()])
@@ -66,7 +66,7 @@ final class RepositoryAssertions
     /**
      * @param Parameters $criteria
      */
-    public function countGreaterThan(int $expected, array $criteria = [], string $message = 'Expected count of {entity} repository ({actual}) to be greater than {expected}.'): self
+    public function countGreaterThan(int $expected, array $criteria = [], string $message = 'Expected count of {entity} to be greater than {expected} (actual: {actual}).'): self
     {
         Assert::that($this->repository->count($criteria))
             ->isGreaterThan($expected, $message, ['entity' => $this->repository->getClassName()])
@@ -78,7 +78,7 @@ final class RepositoryAssertions
     /**
      * @param Parameters $criteria
      */
-    public function countGreaterThanOrEqual(int $expected, array $criteria = [], string $message = 'Expected count of {entity} repository ({actual}) to be greater than or equal to {expected}.'): self
+    public function countGreaterThanOrEqual(int $expected, array $criteria = [], string $message = 'Expected count of {entity} to be greater than or equal {expected} (actual: {actual}).'): self
     {
         Assert::that($this->repository->count($criteria))
             ->isGreaterThanOrEqualTo($expected, $message, ['entity' => $this->repository->getClassName()])
@@ -90,7 +90,7 @@ final class RepositoryAssertions
     /**
      * @param Parameters $criteria
      */
-    public function countLessThan(int $expected, array $criteria = [], string $message = 'Expected count of {entity} repository ({actual}) to be less than {expected}.'): self
+    public function countLessThan(int $expected, array $criteria = [], string $message = 'Expected count of {entity} to be less than {expected} (actual: {actual}).'): self
     {
         Assert::that($this->repository->count($criteria))
             ->isLessThan($expected, $message, ['entity' => $this->repository->getClassName()])
@@ -102,7 +102,7 @@ final class RepositoryAssertions
     /**
      * @param Parameters $criteria
      */
-    public function countLessThanOrEqual(int $expected, array $criteria = [], string $message = 'Expected count of {entity} repository ({actual}) to be less than or equal to {expected}.'): self
+    public function countLessThanOrEqual(int $expected, array $criteria = [], string $message = 'Expected count of {entity} to be less than or equal {expected} (actual: {actual}).'): self
     {
         Assert::that($this->repository->count($criteria))
             ->isLessThanOrEqualTo($expected, $message, ['entity' => $this->repository->getClassName()])
