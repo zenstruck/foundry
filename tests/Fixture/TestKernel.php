@@ -24,6 +24,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Zenstruck\Foundry\ORM\AbstractORMPersistenceStrategy;
+use Zenstruck\Foundry\Persistence\PersistenceManager;
+use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\ChangeCascadePersistOnLoadClassMetadataListener;
 use Zenstruck\Foundry\Tests\Fixture\Factories\ArrayFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\GlobalInvokableService;
@@ -36,6 +38,13 @@ use Zenstruck\Foundry\ZenstruckFoundryBundle;
 final class TestKernel extends Kernel
 {
     use MicroKernelTrait;
+
+    public function __construct(
+        string $environment,
+        bool $debug,
+    ) {
+        parent::__construct($environment, $debug);
+    }
 
     public function registerBundles(): iterable
     {
@@ -125,6 +134,12 @@ final class TestKernel extends Kernel
                     'Zenstruck\\Foundry\\Tests\\Fixture\\Migrations' => '%kernel.project_dir%/tests/Fixture/Migrations',
                 ],
             ]);
+
+            $c->register(ChangeCascadePersistOnLoadClassMetadataListener::class)
+                ->setAutowired(true)
+                ->setAutoconfigured(true);
+            $c->setAlias(PersistenceManager::class, '.zenstruck_foundry.persistence_manager')
+                ->setPublic(true);
         }
 
         if (\getenv('MONGO_URL')) {
