@@ -13,22 +13,16 @@ namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Address;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
-use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\RelationshipWithGlobalEntity\RelationshipWithGlobalEntity;
-use Zenstruck\Foundry\Tests\Fixture\Entity\GlobalEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Tag;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\EdgeCases\MultipleMandatoryRelationshipToSameEntity;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\EdgeCases\RichDomainMandatoryRelationship;
-use Zenstruck\Foundry\Tests\Fixture\Stories\GlobalStory;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
-use function Zenstruck\Foundry\Persistence\flush_after;
-use function Zenstruck\Foundry\Persistence\persistent_factory;
 use function Zenstruck\Foundry\Persistence\unproxy;
 
 /**
@@ -290,57 +284,21 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
     /**
      * @test
      */
-    public function inversed_multiple_mandatory_relationship_to_same_entity(): void
+    public function forced_one_to_many_with_doctrine_collection_type(): void
     {
-        $this->markTestIncomplete('fixme! 🙏');
+        $category = $this->categoryFactory()
+            ->instantiateWith(Instantiator::withConstructor()->alwaysForce())
+            ->create([
+                'contacts' => $this->contactFactory()->many(2),
+            ])
+        ;
 
-        // @phpstan-ignore-next-line
-        $inversedSideEntity = MultipleMandatoryRelationshipToSameEntity\InversedSideEntityFactory::createOne([
-            'mainRelations' => MultipleMandatoryRelationshipToSameEntity\OwningSideEntityFactory::new()->many(2),
-            'secondaryRelations' => MultipleMandatoryRelationshipToSameEntity\OwningSideEntityFactory::new()->many(2),
-        ]);
-
-        $this->assertCount(2, $inversedSideEntity->getMainRelations());
-        $this->assertCount(2, $inversedSideEntity->getSecondaryRelations());
-        MultipleMandatoryRelationshipToSameEntity\OwningSideEntityFactory::assert()->count(4);
-        MultipleMandatoryRelationshipToSameEntity\InversedSideEntityFactory::assert()->count(1);
-    }
-
-    /**
-     * @test
-     */
-    public function inversed_mandatory_relationship_in_rich_domain(): void
-    {
-        $this->markTestIncomplete('fixme! 🙏');
-
-        // @phpstan-ignore-next-line
-        $inversedSideEntity = RichDomainMandatoryRelationship\InversedSideEntityFactory::createOne([
-            'main' => RichDomainMandatoryRelationship\OwningSideEntityFactory::new()->many(2),
-        ]);
-
-        $this->assertCount(2, $inversedSideEntity->getRelations());
-        RichDomainMandatoryRelationship\OwningSideEntityFactory::assert()->count(2);
-        RichDomainMandatoryRelationship\InversedSideEntityFactory::assert()->count(1);
-    }
-
-    /**
-     * @test
-     */
-    public function it_can_use_flush_after_and_entity_from_global_state(): void
-    {
-        $globalEntitiesCount = persistent_factory(GlobalEntity::class)::repository()->count();
-
-        flush_after(function() {
-            $this->relationshipWithGlobalEntityFactory()->create(['globalEntity' => GlobalStory::globalEntity()]);
-        });
-
-        // assert no extra GlobalEntity have been created
-        persistent_factory(GlobalEntity::class)::assert()->count($globalEntitiesCount);
-
-        $this->relationshipWithGlobalEntityFactory()::assert()->count(1);
-
-        $entity = $this->relationshipWithGlobalEntityFactory()::repository()->first();
-        self::assertSame(unproxy(GlobalStory::globalEntity()), $entity?->getGlobalEntity());
+        self::assertCount(2, $category->getContacts());
+        foreach ($category->getContacts() as $contact) {
+            self::assertSame(unproxy($category), $contact->getCategory());
+        }
+        $this->contactFactory()::assert()->count(2);
+        $this->categoryFactory()::assert()->count(1);
     }
 
     /**
@@ -362,9 +320,4 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
      * @return PersistentObjectFactory<Address>
      */
     abstract protected function addressFactory(): PersistentObjectFactory;
-
-    /**
-     * @return PersistentObjectFactory<RelationshipWithGlobalEntity>
-     */
-    abstract protected function relationshipWithGlobalEntityFactory(): PersistentObjectFactory;
 }

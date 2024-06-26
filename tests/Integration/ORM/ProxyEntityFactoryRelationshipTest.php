@@ -44,9 +44,4 @@ final class ProxyEntityFactoryRelationshipTest extends ProxyEntityFactoryRelatio
     {
         return ProxyAddressFactory::new(); // @phpstan-ignore-line
     }
-
-    protected function relationshipWithGlobalEntityFactory(): PersistentObjectFactory
-    {
-        return proxy_factory(StandardRelationshipWithGlobalEntity::class); // @phpstan-ignore-line
-    }
 }

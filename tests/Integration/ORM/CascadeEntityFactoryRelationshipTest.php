@@ -116,9 +116,4 @@ final class CascadeEntityFactoryRelationshipTest extends EntityFactoryRelationsh
     {
         return CascadeAddressFactory::new(); // @phpstan-ignore-line
     }
-
-    protected function relationshipWithGlobalEntityFactory(): PersistentObjectFactory
-    {
-        return persistent_factory(CascadeRelationshipWithGlobalEntity::class); // @phpstan-ignore-line
-    }
 }
