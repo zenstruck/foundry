@@ -17,6 +17,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\ProxyAddressFactory
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\ProxyCategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ProxyContactFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Tag\ProxyTagFactory;
+
 use function Zenstruck\Foundry\Persistence\proxy_factory;
 
 /**

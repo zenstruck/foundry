@@ -24,11 +24,11 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Tag;
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  *
- * @method PersistentProxyObjectFactory<Contact>  contactFactory()
- * @method PersistentProxyObjectFactory<Category> categoryFactory()
- * @method PersistentProxyObjectFactory<Tag>      tagFactory()
- * @method PersistentProxyObjectFactory<Address>  addressFactory()
- * @method PersistentProxyObjectFactory<RelationshipWithGlobalEntity>  relationshipWithGlobalEntityFactory()
+ * @method PersistentProxyObjectFactory<Contact>                      contactFactory()
+ * @method PersistentProxyObjectFactory<Category>                     categoryFactory()
+ * @method PersistentProxyObjectFactory<Tag>                          tagFactory()
+ * @method PersistentProxyObjectFactory<Address>                      addressFactory()
+ * @method PersistentProxyObjectFactory<RelationshipWithGlobalEntity> relationshipWithGlobalEntityFactory()
  */
 abstract class ProxyEntityFactoryRelationshipTestCase extends EntityFactoryRelationshipTestCase
 {

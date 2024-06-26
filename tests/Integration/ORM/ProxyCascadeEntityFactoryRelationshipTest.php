@@ -17,6 +17,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\ProxyCascadeAddress
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\ProxyCascadeCategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ProxyCascadeContactFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Tag\ProxyCascadeTagFactory;
+
 use function Zenstruck\Foundry\Persistence\proxy_factory;
 
 /**

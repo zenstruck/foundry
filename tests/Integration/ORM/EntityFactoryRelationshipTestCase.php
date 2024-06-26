@@ -19,24 +19,16 @@ use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Address;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
-use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\RelationshipWithGlobalEntity\CascadeRelationshipWithGlobalEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\RelationshipWithGlobalEntity\RelationshipWithGlobalEntity;
-use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\RelationshipWithGlobalEntity\StandardRelationshipWithGlobalEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GlobalEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Tag;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\StandardAddressFactory;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\StandardCategoryFactory;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\StandardContactFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\EdgeCases\MultipleMandatoryRelationshipToSameEntity;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\EdgeCases\RichDomainMandatoryRelationship;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Tag\StandardTagFactory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\GlobalStory;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
-use function Zenstruck\Foundry\factory;
 use function Zenstruck\Foundry\Persistence\flush_after;
 use function Zenstruck\Foundry\Persistence\persistent_factory;
-use function Zenstruck\Foundry\Persistence\proxy_factory;
 use function Zenstruck\Foundry\Persistence\unproxy;
 
 /**
@@ -338,7 +330,7 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
     {
         $globalEntitiesCount = persistent_factory(GlobalEntity::class)::repository()->count();
 
-        flush_after(function () {
+        flush_after(function() {
             $this->relationshipWithGlobalEntityFactory()->create(['globalEntity' => GlobalStory::globalEntity()]);
         });
 

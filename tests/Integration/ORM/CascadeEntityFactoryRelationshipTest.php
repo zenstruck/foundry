@@ -17,6 +17,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\CascadeAddressFacto
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CascadeCategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\CascadeContactFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Tag\CascadeTagFactory;
+
 use function Zenstruck\Foundry\Persistence\persistent_factory;
 
 /**
