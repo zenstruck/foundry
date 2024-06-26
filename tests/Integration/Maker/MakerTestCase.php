@@ -42,9 +42,11 @@ abstract class MakerTestCase extends KernelTestCase
 
     protected function expectedFile(): string
     {
+        $testName = method_exists($this, 'getName') ? $this->getName() : $this->nameWithDataSet(); // @phpstan-ignore method.notFound
+
         $path = \sprintf(
             __DIR__.'/../../Fixture/Maker/expected/%s.php',
-            (new AsciiSlugger())->slug($this->getName(), '_'),
+            (new AsciiSlugger())->slug($testName, '_'),
         );
 
         $this->assertFileExists($path);

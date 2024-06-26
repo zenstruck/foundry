@@ -140,7 +140,7 @@ final class MakeFactoryTest extends MakerTestCase
     /**
      * @return iterable<string, array{0: string}>
      */
-    public function scaToolProvider(): iterable
+    public static function scaToolProvider(): iterable
     {
         yield 'phpstan' => [self::PHPSTAN_PATH];
         yield 'psalm' => [self::PSALM_PATH];
@@ -308,7 +308,7 @@ final class MakeFactoryTest extends MakerTestCase
     /**
      * @return iterable<string, array{0: string, 1: string}>
      */
-    public function documentProvider(): iterable
+    public static function documentProvider(): iterable
     {
         yield 'document' => [GenericDocument::class, 'GenericDocumentFactory'];
         yield 'embedded document' => [WithEmbeddableDocument::class, 'WithEmbeddableDocumentFactory'];
@@ -398,7 +398,7 @@ final class MakeFactoryTest extends MakerTestCase
     /**
      * @return iterable<string, array{0: string, 1: string}>
      */
-    public function objectsWithEmbeddableProvider(): iterable
+    public static function objectsWithEmbeddableProvider(): iterable
     {
         if (\getenv('DATABASE_URL')) {
             yield 'orm' => [WithEmbeddableEntity::class, 'WithEmbeddableEntityFactory'];
