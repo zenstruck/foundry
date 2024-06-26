@@ -96,7 +96,7 @@ final class Hydrator
     {
         if (
             self::isDoctrineCollection($object, $property)
-            && is_array($value)
+            && \is_array($value)
         ) {
             $value = new ArrayCollection($value);
         }
@@ -144,6 +144,6 @@ final class Hydrator
             return false;
         }
 
-        return $reflectionType->getName() === Collection::class;
+        return Collection::class === $reflectionType->getName();
     }
 }

@@ -12,13 +12,10 @@
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\RelationshipWithGlobalEntity\CascadeRelationshipWithGlobalEntity;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\ProxyCascadeAddressFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\ProxyCascadeCategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ProxyCascadeContactFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Tag\ProxyCascadeTagFactory;
-
-use function Zenstruck\Foundry\Persistence\proxy_factory;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>

@@ -22,7 +22,7 @@ class CascadeOwningSideEntity extends OwningSideEntity
     protected InversedSideEntity $main;
 
     public function __construct(
-        InversedSideEntity $main
+        InversedSideEntity $main,
     ) {
         parent::__construct($main);
     }

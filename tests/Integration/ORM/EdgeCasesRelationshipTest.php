@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -14,6 +23,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\GlobalEntity;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\EdgeCases\MultipleMandatoryRelationshipToSameEntity;
 use Zenstruck\Foundry\Tests\Fixture\Stories\GlobalStory;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
+
 use function Zenstruck\Foundry\Persistence\flush_after;
 use function Zenstruck\Foundry\Persistence\persistent_factory;
 use function Zenstruck\Foundry\Persistence\proxy_factory;
@@ -35,7 +45,7 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
     {
         $globalEntitiesCount = persistent_factory(GlobalEntity::class)::repository()->count();
 
-        flush_after(function () use ($relationshipWithGlobalEntityFactory) {
+        flush_after(function() use ($relationshipWithGlobalEntityFactory) {
             $relationshipWithGlobalEntityFactory->create(['globalEntity' => GlobalStory::globalEntity()]);
         });
 
@@ -59,7 +69,7 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
     /**
      * @test
      * @param PersistentObjectFactory<RichDomainMandatoryRelationship\InversedSideEntity> $inversedSideEntityFactory
-     * @param PersistentObjectFactory<RichDomainMandatoryRelationship\OwningSideEntity> $owningSideEntityFactory
+     * @param PersistentObjectFactory<RichDomainMandatoryRelationship\OwningSideEntity>   $owningSideEntityFactory
      * @dataProvider richDomainMandatoryRelationshipFactoryProvider
      */
     public function inversed_relationship_mandatory(PersistentObjectFactory $inversedSideEntityFactory, PersistentObjectFactory $owningSideEntityFactory): void
