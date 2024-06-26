@@ -18,6 +18,7 @@ use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Address;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\RelationshipWithGlobalEntity\RelationshipWithGlobalEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Tag;
 
 /**
@@ -27,8 +28,9 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Tag;
  * @method PersistentProxyObjectFactory<Category> categoryFactory()
  * @method PersistentProxyObjectFactory<Tag>      tagFactory()
  * @method PersistentProxyObjectFactory<Address>  addressFactory()
+ * @method PersistentProxyObjectFactory<RelationshipWithGlobalEntity>  relationshipWithGlobalEntityFactory()
  */
-abstract class ProxyEntityFactoryRelationshipTestCase extends EntityFactoryRelationshipTest
+abstract class ProxyEntityFactoryRelationshipTestCase extends EntityFactoryRelationshipTestCase
 {
     /**
      * @see https://github.com/zenstruck/foundry/issues/42

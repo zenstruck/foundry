@@ -19,6 +19,10 @@ use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Address;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\RelationshipWithGlobalEntity\CascadeRelationshipWithGlobalEntity;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\RelationshipWithGlobalEntity\RelationshipWithGlobalEntity;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\RelationshipWithGlobalEntity\StandardRelationshipWithGlobalEntity;
+use Zenstruck\Foundry\Tests\Fixture\Entity\GlobalEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Tag;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\StandardAddressFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\StandardCategoryFactory;
@@ -26,14 +30,19 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\StandardContactFact
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\EdgeCases\MultipleMandatoryRelationshipToSameEntity;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\EdgeCases\RichDomainMandatoryRelationship;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Tag\StandardTagFactory;
+use Zenstruck\Foundry\Tests\Fixture\Stories\GlobalStory;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
+use function Zenstruck\Foundry\factory;
+use function Zenstruck\Foundry\Persistence\flush_after;
+use function Zenstruck\Foundry\Persistence\persistent_factory;
+use function Zenstruck\Foundry\Persistence\proxy_factory;
 use function Zenstruck\Foundry\Persistence\unproxy;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-class EntityFactoryRelationshipTest extends KernelTestCase
+abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
 {
     use Factories, RequiresORM, ResetDatabase;
 
@@ -323,34 +332,47 @@ class EntityFactoryRelationshipTest extends KernelTestCase
     }
 
     /**
+     * @test
+     */
+    public function it_can_use_flush_after_and_entity_from_global_state(): void
+    {
+        $globalEntitiesCount = persistent_factory(GlobalEntity::class)::repository()->count();
+
+        flush_after(function () {
+            $this->relationshipWithGlobalEntityFactory()->create(['globalEntity' => GlobalStory::globalEntity()]);
+        });
+
+        // assert no extra GlobalEntity have been created
+        persistent_factory(GlobalEntity::class)::assert()->count($globalEntitiesCount);
+
+        $this->relationshipWithGlobalEntityFactory()::assert()->count(1);
+
+        $entity = $this->relationshipWithGlobalEntityFactory()::repository()->first();
+        self::assertSame(unproxy(GlobalStory::globalEntity()), $entity?->getGlobalEntity());
+    }
+
+    /**
      * @return PersistentObjectFactory<Contact>
      */
-    protected function contactFactory(): PersistentObjectFactory
-    {
-        return StandardContactFactory::new(); // @phpstan-ignore-line
-    }
+    abstract protected function contactFactory(): PersistentObjectFactory;
 
     /**
      * @return PersistentObjectFactory<Category>
      */
-    protected function categoryFactory(): PersistentObjectFactory
-    {
-        return StandardCategoryFactory::new(); // @phpstan-ignore-line
-    }
+    abstract protected function categoryFactory(): PersistentObjectFactory;
 
     /**
      * @return PersistentObjectFactory<Tag>
      */
-    protected function tagFactory(): PersistentObjectFactory
-    {
-        return StandardTagFactory::new(); // @phpstan-ignore-line
-    }
+    abstract protected function tagFactory(): PersistentObjectFactory;
 
     /**
      * @return PersistentObjectFactory<Address>
      */
-    protected function addressFactory(): PersistentObjectFactory
-    {
-        return StandardAddressFactory::new(); // @phpstan-ignore-line
-    }
+    abstract protected function addressFactory(): PersistentObjectFactory;
+
+    /**
+     * @return PersistentObjectFactory<RelationshipWithGlobalEntity>
+     */
+    abstract protected function relationshipWithGlobalEntityFactory(): PersistentObjectFactory;
 }

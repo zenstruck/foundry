@@ -12,10 +12,12 @@
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\RelationshipWithGlobalEntity\StandardRelationshipWithGlobalEntity;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\ProxyAddressFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\ProxyCategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ProxyContactFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Tag\ProxyTagFactory;
+use function Zenstruck\Foundry\Persistence\proxy_factory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -40,5 +42,10 @@ final class ProxyEntityFactoryRelationshipTest extends ProxyEntityFactoryRelatio
     protected function addressFactory(): PersistentObjectFactory
     {
         return ProxyAddressFactory::new(); // @phpstan-ignore-line
+    }
+
+    protected function relationshipWithGlobalEntityFactory(): PersistentObjectFactory
+    {
+        return proxy_factory(StandardRelationshipWithGlobalEntity::class); // @phpstan-ignore-line
     }
 }
