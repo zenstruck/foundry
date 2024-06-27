@@ -1,0 +1,10 @@
+rules:
+    filename_uses_underscores_only: ~
+    max_blank_lines:
+        max: 2
+    short_array_syntax: ~
+    typo: ~
+    unused_links: ~
+    versionadded_directive_should_have_version: ~
+    yaml_instead_of_yml_suffix: ~
+
