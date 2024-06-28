@@ -31,27 +31,47 @@ final class OrmV2PersistenceStrategy extends AbstractORMPersistenceStrategy
 
         $association = $this->getAssociationMapping($parent, $field);
 
-        if (null === $association) {
-            $inversedAssociation = $this->getAssociationMapping($child, $field);
-
-            if (null === $inversedAssociation || !$metadata instanceof ClassMetadataInfo) {
-                return null;
-            }
-
-            if (!\is_a($parent, $inversedAssociation['targetEntity'], allow_string: true)) { // is_a() handles inheritance as well
-                throw new \LogicException("Cannot find correct association named \"{$field}\" between classes [parent: \"{$parent}\", child: \"{$child}\"]");
-            }
-
-            if (ClassMetadataInfo::ONE_TO_MANY !== $inversedAssociation['type'] || !isset($inversedAssociation['mappedBy'])) {
-                return null;
-            }
-
-            $association = $metadata->getAssociationMapping($inversedAssociation['mappedBy']);
+        if ($association) {
+            return new RelationshipMetadata(
+                isCascadePersist: $association['isCascadePersist'],
+                inverseField: $metadata->isSingleValuedAssociation($association['fieldName']) ? $association['fieldName'] : null,
+                isCollection: $metadata->isCollectionValuedAssociation($association['fieldName']),
+            );
         }
 
+        $inversedAssociation = $this->getAssociationMapping($child, $field);
+
+        if (null === $inversedAssociation || !$metadata instanceof ClassMetadataInfo) {
+            return null;
+        }
+
+        if (!\is_a(
+            $parent,
+            $inversedAssociation['targetEntity'],
+            allow_string: true
+        )) { // is_a() handles inheritance as well
+            throw new \LogicException(
+                "Cannot find correct association named \"{$field}\" between classes [parent: \"{$parent}\", child: \"{$child}\"]"
+            );
+        }
+
+        if (!in_array(
+                $inversedAssociation['type'],
+                [ClassMetadataInfo::ONE_TO_MANY, ClassMetadataInfo::ONE_TO_ONE],
+                true
+            )
+            || !isset($inversedAssociation['mappedBy'])
+        ) {
+            return null;
+        }
+
+        $association = $metadata->getAssociationMapping($inversedAssociation['mappedBy']);
+        $inversedAssociationMetadata = $this->classMetadata($inversedAssociation['sourceEntity']);
+
         return new RelationshipMetadata(
-            isCascadePersist: $association['isCascadePersist'],
+            isCascadePersist: $inversedAssociation['isCascadePersist'],
             inverseField: $metadata->isSingleValuedAssociation($association['fieldName']) ? $association['fieldName'] : null,
+            isCollection: $inversedAssociationMetadata->isCollectionValuedAssociation($inversedAssociation['fieldName']),
         );
     }
 

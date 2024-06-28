@@ -17,6 +17,7 @@ use Doctrine\ORM\Mapping\AssociationMapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\InverseSideMapping;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
+use Doctrine\ORM\Mapping\ToManyAssociationMapping;
 use Doctrine\Persistence\Mapping\MappingException;
 use Zenstruck\Foundry\Persistence\RelationshipMetadata;
 
@@ -28,27 +29,40 @@ final class OrmV3PersistenceStrategy extends AbstractORMPersistenceStrategy
 
         $association = $this->getAssociationMapping($parent, $field);
 
-        if (null === $association) {
-            $inversedAssociation = $this->getAssociationMapping($child, $field);
-
-            if (null === $inversedAssociation || !$metadata instanceof ClassMetadata) {
-                return null;
-            }
-
-            if (!\is_a($parent, $inversedAssociation->targetEntity, allow_string: true)) { // is_a() handles inheritance as well
-                throw new \LogicException("Cannot find correct association named \"{$field}\" between classes [parent: \"{$parent}\", child: \"{$child}\"]");
-            }
-
-            if (!$inversedAssociation instanceof InverseSideMapping) {
-                return null;
-            }
-
-            $association = $metadata->getAssociationMapping($inversedAssociation->mappedBy);
+        if ($association) {
+            return new RelationshipMetadata(
+                isCascadePersist: $association->isCascadePersist(),
+                inverseField: $metadata->isSingleValuedAssociation($association->fieldName) ? $association->fieldName : null,
+                isCollection: $association instanceof ToManyAssociationMapping
+            );
         }
 
+        $inversedAssociation = $this->getAssociationMapping($child, $field);
+
+        if (null === $inversedAssociation || !$metadata instanceof ClassMetadata) {
+            return null;
+        }
+
+        if (!\is_a(
+            $parent,
+            $inversedAssociation->targetEntity,
+            allow_string: true
+        )) { // is_a() handles inheritance as well
+            throw new \LogicException(
+                "Cannot find correct association named \"{$field}\" between classes [parent: \"{$parent}\", child: \"{$child}\"]"
+            );
+        }
+
+        if (!$inversedAssociation instanceof InverseSideMapping) {
+            return null;
+        }
+
+        $association = $metadata->getAssociationMapping($inversedAssociation->mappedBy);
+
         return new RelationshipMetadata(
-            isCascadePersist: $association->isCascadePersist(),
+            isCascadePersist: $inversedAssociation->isCascadePersist(),
             inverseField: $metadata->isSingleValuedAssociation($association->fieldName) ? $association->fieldName : null,
+            isCollection: $inversedAssociation instanceof ToManyAssociationMapping
         );
     }
 

@@ -21,6 +21,7 @@ final class RelationshipMetadata
     public function __construct(
         public readonly bool $isCascadePersist,
         public readonly ?string $inverseField,
+        public readonly bool $isCollection,
     ) {
     }
 }

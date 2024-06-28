@@ -40,7 +40,7 @@ class CascadeContact extends Contact
     #[ORM\JoinTable(name: 'category_tag_cascade_secondary')]
     protected Collection $secondaryTags;
 
-    #[ORM\OneToOne(targetEntity: CascadeAddress::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(targetEntity: CascadeAddress::class, inversedBy: 'contact', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
     protected Address $address;
 }
