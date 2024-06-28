@@ -17,6 +17,7 @@ use Doctrine\ORM\Mapping\AssociationMapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\InverseSideMapping;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
+use Doctrine\ORM\Mapping\ToManyAssociationMapping;
 use Doctrine\Persistence\Mapping\MappingException;
 use Zenstruck\Foundry\Persistence\RelationshipMetadata;
 
@@ -47,8 +48,9 @@ final class OrmV3PersistenceStrategy extends AbstractORMPersistenceStrategy
         }
 
         return new RelationshipMetadata(
-            isCascadePersist: $association->isCascadePersist(),
+            isCascadePersist: ($inversedAssociation ?? $association)->isCascadePersist(),
             inverseField: $metadata->isSingleValuedAssociation($association->fieldName) ? $association->fieldName : null,
+            isCollection: ($inversedAssociation ?? $association) instanceof ToManyAssociationMapping
         );
     }
 
