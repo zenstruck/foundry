@@ -391,24 +391,34 @@ final class Proxy implements \Stringable, ProxyBase
     }
 
     /**
-     * @deprecated without replacement
+     * @deprecated without method "_assertPersisted" instead
      */
     public function assertPersisted(string $message = '{entity} is not persisted.'): self
     {
         trigger_deprecation('zenstruck\foundry', '1.38.0', 'Method "%s()" is deprecated and will be removed in 2.0 without replacement.', __METHOD__);
 
+        return $this->_assertPersisted();
+    }
+
+    public function _assertPersisted(string $message = '{entity} is not persisted.'): self
+    {
         Assert::that($this->fetchObject())->isNotEmpty($message, ['entity' => $this->class]);
 
         return $this;
     }
 
     /**
-     * @deprecated without replacement
+     * @deprecated without method "_assertNotPersisted" instead
      */
     public function assertNotPersisted(string $message = '{entity} is persisted but it should not be.'): self
     {
         trigger_deprecation('zenstruck\foundry', '1.38.0', 'Method "%s()" is deprecated and will be removed in 2.0 without replacement.', __METHOD__);
 
+        return $this->_assertNotPersisted();
+    }
+
+    public function _assertNotPersisted(string $message = '{entity} is persisted but it should not be.'): self
+    {
         Assert::that($this->fetchObject())->isEmpty($message, ['entity' => $this->class]);
 
         return $this;

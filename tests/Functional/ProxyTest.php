@@ -29,33 +29,30 @@ abstract class ProxyTest extends KernelTestCase
 
     /**
      * @test
-     * @group legacy
      */
     public function can_assert_persisted(): void
     {
-        $this->postFactoryClass()::createOne()->assertPersisted();
+        $this->postFactoryClass()::createOne()->_assertPersisted();
 
-        Assert::that(function(): void { $this->postFactoryClass()::new()->withoutPersisting()->create()->assertPersisted(); })
+        Assert::that(function(): void { $this->postFactoryClass()::new()->withoutPersisting()->create()->_assertPersisted(); })
             ->throws(AssertionFailedError::class, \sprintf('%s is not persisted.', $this->postClass()))
         ;
     }
 
     /**
      * @test
-     * @group legacy
      */
     public function can_assert_not_persisted(): void
     {
-        $this->postFactoryClass()::new()->withoutPersisting()->create()->assertNotPersisted();
+        $this->postFactoryClass()::new()->withoutPersisting()->create()->_assertNotPersisted();
 
-        Assert::that(function(): void { $this->postFactoryClass()::createOne()->assertNotPersisted(); })
+        Assert::that(function(): void { $this->postFactoryClass()::createOne()->_assertNotPersisted(); })
             ->throws(AssertionFailedError::class, \sprintf('%s is persisted but it should not be.', $this->postClass()))
         ;
     }
 
     /**
      * @test
-     * @group legacy
      */
     public function can_remove_and_assert_not_persisted(): void
     {
@@ -63,7 +60,20 @@ abstract class ProxyTest extends KernelTestCase
 
         $post->_delete();
 
-        $post->assertNotPersisted();
+        $post->_assertNotPersisted();
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    public function can_use_deprecated_assertion_methods(): void
+    {
+        $this->postFactoryClass()::createOne()
+            ->_assertPersisted()
+            ->_delete()
+            ->_assertNotPersisted()
+        ;
     }
 
     /**

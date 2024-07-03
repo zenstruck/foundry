@@ -13,6 +13,8 @@ function legacyProxy(\Zenstruck\Foundry\Proxy $proxy): void
     $proxy->enableAutoRefresh();
     $proxy->disableAutoRefresh();
     $proxy->withoutAutoRefresh();
+    $proxy->assertPersisted();
+    $proxy->assertNotPersisted();
 }
 
 function newProxy(\Zenstruck\Foundry\Persistence\Proxy $proxy): void
@@ -28,6 +30,8 @@ function newProxy(\Zenstruck\Foundry\Persistence\Proxy $proxy): void
     $proxy->enableAutoRefresh();
     $proxy->disableAutoRefresh();
     $proxy->withoutAutoRefresh();
+    $proxy->assertPersisted();
+    $proxy->assertNotPersisted();
 }
 
 ?>
@@ -47,6 +51,8 @@ function legacyProxy(\Zenstruck\Foundry\Proxy $proxy): void
     $proxy->_enableAutoRefresh();
     $proxy->_disableAutoRefresh();
     $proxy->_withoutAutoRefresh();
+    $proxy->_assertPersisted();
+    $proxy->_assertNotPersisted();
 }
 
 function newProxy(\Zenstruck\Foundry\Persistence\Proxy $proxy): void
@@ -62,6 +68,8 @@ function newProxy(\Zenstruck\Foundry\Persistence\Proxy $proxy): void
     $proxy->_enableAutoRefresh();
     $proxy->_disableAutoRefresh();
     $proxy->_withoutAutoRefresh();
+    $proxy->_assertPersisted();
+    $proxy->_assertNotPersisted();
 }
 
 ?>
