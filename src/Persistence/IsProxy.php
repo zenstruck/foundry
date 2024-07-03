@@ -11,7 +11,9 @@
 
 namespace Zenstruck\Foundry\Persistence;
 
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\VarExporter\LazyProxyTrait;
+use Zenstruck\Assert;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\Object\Hydrator;
@@ -110,6 +112,35 @@ trait IsProxy
     public function _repository(): ProxyRepositoryDecorator
     {
         return new ProxyRepositoryDecorator(parent::class);
+    }
+
+    public function _assertPersisted(string $message = '{entity} is not persisted.'): static
+    {
+        Assert::that($this->isPersisted())->isTrue($message, ['entity' => parent::class]);
+
+        return $this;
+    }
+
+    public function _assertNotPersisted(string $message = '{entity} is persisted but it should not be.'): static
+    {
+        Assert::that($this->isPersisted())->isFalse($message, ['entity' => parent::class]);
+
+        return $this;
+    }
+
+    private function isPersisted(): bool
+    {
+        try {
+            $this->_refresh();
+
+            return true;
+        } catch (RefreshObjectFailed $e) {
+            if ($e->objectWasDeleted()) {
+                return false;
+            }
+
+            throw $e;
+        }
     }
 
     private function _autoRefresh(): void

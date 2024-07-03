@@ -13,6 +13,9 @@ namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\Proxy as DoctrineProxy;
+use PHPUnit\Framework\AssertionFailedError;
+use Zenstruck\Assert;
+use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Address;
@@ -81,5 +84,55 @@ abstract class ProxyEntityFactoryRelationshipTestCase extends EntityFactoryRelat
         $this->contactFactory()::assert()->count(1);
         $tag = $this->tagFactory()::first();
         self::assertContains($contact->_real(), $tag->getContacts());
+    }
+
+
+    /**
+     * @test
+     */
+    public function can_assert_persisted(): void
+    {
+        $this->contactFactory()->create()->_assertPersisted();
+
+        Assert::that(function(): void { $this->contactFactory()->withoutPersisting()->create()->_assertPersisted(); })
+            ->throws(AssertionFailedError::class, \sprintf('%s is not persisted.', $this->contactFactory()::class()))
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function can_assert_not_persisted(): void
+    {
+        $this->contactFactory()->withoutPersisting()->create()->_assertNotPersisted();
+
+        Assert::that(function(): void { $this->contactFactory()->create()->_assertNotPersisted(); })
+            ->throws(AssertionFailedError::class, \sprintf('%s is persisted but it should not be.', $this->contactFactory()::class()))
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function can_remove_and_assert_not_persisted(): void
+    {
+        $this->contactFactory()
+            ->create()
+            ->_assertPersisted()
+            ->_delete()
+            ->_assertNotPersisted()
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function cannot_use_assert_persisted_when_entity_has_changes(): void
+    {
+        $contact = $this->contactFactory()->create();
+        $contact->setName('foo');
+
+        $this->expectException(RefreshObjectFailed::class);
+        $contact->_assertPersisted();
     }
 }

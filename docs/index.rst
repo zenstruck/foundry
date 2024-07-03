@@ -1467,11 +1467,15 @@ This library provides a *Repository Proxy* that wraps your object repositories t
 Assertions
 ~~~~~~~~~~
 
-Your object factory's have helpful PHPUnit assertions:
+Both object proxies and your Factory have helpful PHPUnit assertions:
 
 .. code-block:: php
 
     use App\Factory\PostFactory;
+
+    $post = PostFactory::createOne();
+    $post->_assertPersisted();
+    $post->_assertNotPersisted();
 
     PostFactory::assert()->empty();
     PostFactory::assert()->count(3);
