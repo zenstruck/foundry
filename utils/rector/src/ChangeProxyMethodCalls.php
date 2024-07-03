@@ -40,6 +40,8 @@ final class ChangeProxyMethodCalls extends AbstractRector
                         $proxy->enableAutoRefresh();
                         $proxy->disableAutoRefresh();
                         $proxy->withoutAutoRefresh();
+                        $proxy->assertPersisted();
+                        $proxy->assertNotPersisted();
                         CODE_SAMPLE,
                     <<<'CODE_SAMPLE'
                         $proxy->_real();
@@ -52,6 +54,8 @@ final class ChangeProxyMethodCalls extends AbstractRector
                         $proxy->_enableAutoRefresh();
                         $proxy->_disableAutoRefresh();
                         $proxy->_withoutAutoRefresh();
+                        $proxy->_assertPersisted();
+                        $proxy->_assertNotPersisted();
                         CODE_SAMPLE
                 ),
             ]
@@ -114,6 +118,14 @@ final class ChangeProxyMethodCalls extends AbstractRector
                 return $node;
             case 'withoutAutoRefresh':
                 $node->name = new Node\Identifier('_withoutAutoRefresh');
+
+                return $node;
+            case 'assertPersisted':
+                $node->name = new Node\Identifier('_assertPersisted');
+
+                return $node;
+            case 'assertNotPersisted':
+                $node->name = new Node\Identifier('_assertNotPersisted');
 
                 return $node;
             default: return null;

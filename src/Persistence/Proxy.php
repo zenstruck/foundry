@@ -114,12 +114,16 @@ interface Proxy
     public function withoutAutoRefresh(callable $callback): static;
 
     /**
-     * @deprecated without replacement
+     * @deprecated without method "_assertPersisted" instead
      */
     public function assertPersisted(string $message = '{entity} is not persisted.'): self;
 
+    public function _assertPersisted(string $message = '{entity} is not persisted.'): self;
+
     /**
-     * @deprecated without replacement
+     * @deprecated without method "_assertNotPersisted" instead
      */
     public function assertNotPersisted(string $message = '{entity} is persisted but it should not be.'): self;
+
+    public function _assertNotPersisted(string $message = '{entity} is persisted but it should not be.'): self;
 }
