@@ -86,7 +86,6 @@ abstract class ProxyEntityFactoryRelationshipTestCase extends EntityFactoryRelat
         self::assertContains($contact->_real(), $tag->getContacts());
     }
 
-
     /**
      * @test
      */
