@@ -1005,7 +1005,6 @@ once. To do this, wrap the operations in a ``flush_after()`` callback:
         TagFactory::createMany(200); // instantiated/persisted but not flushed
     }); // single flush
 
-.. _without-persisting:
 
 Not-persisted objects factory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1013,6 +1012,8 @@ Not-persisted objects factory
 When dealing with objects which are not aimed to be persisted, you can make your factory inherit from
 `Zenstruck\Foundry\ObjectFactory`. This will create plain objects, that does not interact with database (these objects
 won't be wrapped with a :ref:`proxy object <object-proxy>`).
+
+.. _without-persisting:
 
 Without Persisting
 ~~~~~~~~~~~~~~~~~~
