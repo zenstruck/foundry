@@ -246,10 +246,10 @@ This implies that calling `->object()` (or, now, `_real()`) everywhere to satisf
   - `enableAutoRefresh()` -> `_enableAutoRefresh()`
   - `disableAutoRefresh()` -> `_disableAutoRefresh()`
   - `withoutAutoRefresh()` -> `_withoutAutoRefresh()`
+  - `assertPersisted()` -> `_assertPersisted()` 
+  - `assertNotPersisted()` -> `_assertNotPersisted()`
   - `isPersisted()` is removed without any replacement
   - `forceSetAll()` is removed without any replacement
-  - `assertPersisted()` is removed without any replacement
-  - `assertNotPersisted()` is removed without any replacement
 - Everywhere you've type-hinted `Zenstruck\Foundry\FactoryCollection<T>` which was coming from a `PersistentProxyObjectFactory`, replace to `Zenstruck\Foundry\FactoryCollection<Proxy<T>>`
 
 ### Instantiator

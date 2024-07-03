@@ -45,6 +45,10 @@ interface Proxy
      */
     public function _real(): object;
 
+    public function _assertPersisted(string $message = '{entity} is not persisted.'): static;
+
+    public function _assertNotPersisted(string $message = '{entity} is persisted but it should not be.'): static;
+
     /**
      * @return ProxyRepositoryDecorator<T,ObjectRepository<T>>
      */
