@@ -22,6 +22,7 @@
         "symfony/deprecation-contracts": "^2.2|^3.0",
         "symfony/framework-bundle": "^6.4|^7.0",
         "symfony/property-access": "^6.4|^7.0",
+        "symfony/var-exporter": "^6.4.9|~7.0.9|^7.1.2",
         "zenstruck/assert": "^1.4"
     },
     "require-dev": {

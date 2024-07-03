@@ -29,10 +29,6 @@ final class ProxyGeneratorTest extends TestCase
     {
         $proxyfiedObj = ProxyGenerator::wrap($obj);
         self::assertEquals(\unserialize(\serialize($proxyfiedObj))->_real(), $proxyfiedObj->_real());
-
-        // if this assertion fails, https://github.com/symfony/symfony/pull/57460 have been released
-        // so, the monkey patch around contravariance problem could be removed
-        self::assertFalse((new \ReflectionClass($proxyfiedObj))->hasMethod('__doUnserialize'));
     }
 
     public static function classWithUnserializeMagicMethodProvider(): iterable
