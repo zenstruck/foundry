@@ -24,7 +24,7 @@ Installation
 
 .. code-block:: terminal
 
-    $ composer require zenstruck/foundry --dev
+    $ composer require --dev zenstruck/foundry
 
 To use the ``make:*`` commands from this bundle, ensure
 `Symfony MakerBundle <https://symfony.com/bundles/SymfonyMakerBundle/current/index.html>`_ is installed.
@@ -36,7 +36,7 @@ Same Entities used in these Docs
 
 For the remainder of the documentation, the following sample entities will be used:
 
-.. code-block:: php
+::
 
     namespace App\Entity;
 
@@ -62,7 +62,7 @@ For the remainder of the documentation, the following sample entities will be us
         // ... getters/setters
     }
 
-.. code-block:: php
+::
 
     namespace App\Entity;
 
@@ -116,7 +116,7 @@ Create a persistent object factory for one of your entities with the maker comma
 
 .. code-block:: terminal
 
-    $ bin/console make:factory
+    $ php bin/console make:factory
 
     > Entity class to create a factory for:
     > Post
@@ -127,10 +127,9 @@ Create a persistent object factory for one of your entities with the maker comma
 
 This command will generate a ``PostFactory`` class that looks like this:
 
-.. code-block:: php
+::
 
     // src/Factory/PostFactory.php
-
     namespace App\Factory;
 
     use App\Entity\Post;
@@ -188,7 +187,7 @@ This command will generate a ``PostFactory`` class that looks like this:
 
 .. tip::
 
-    You can also inherit from `Zenstruck\Foundry\Persistence\PersistentObjectFactory`. Which will create regular objects
+    You can also inherit from `Zenstruck\\Foundry\Persistence\PersistentObjectFactory`. Which will create regular objects
     without proxy (see :ref:`Proxy object section <object-proxy>` for more information).
 
 .. tip::
@@ -212,7 +211,7 @@ This command will generate a ``PostFactory`` class that looks like this:
     You can add the option ``--with-phpdoc`` in order to add the following ``@method`` docblocks.
     This would ease autocompletion in your IDE (might be not useful anymore since Foundry v2, at least in PHPStorm):
 
-    .. code-block:: php
+    ::
 
         /**
          * @method        Post|Proxy create(array|callable $attributes = [])
@@ -255,7 +254,7 @@ This command will generate a ``PostFactory`` class that looks like this:
 In the ``defaults()``, you can return an array of all default values that any new object
 should have. `Faker`_ is available to easily get random data:
 
-.. code-block:: php
+::
 
     protected function defaults(): array
     {
@@ -285,7 +284,7 @@ should have. `Faker`_ is available to easily get random data:
 Using your Factory
 ~~~~~~~~~~~~~~~~~~
 
-.. code-block:: php
+::
 
     use App\Factory\PostFactory;
 
@@ -358,7 +357,7 @@ Reusable Factory "States"
 You can add any methods you want to your factories (i.e. static methods that create an object in a certain way) but
 you can also add *states*:
 
-.. code-block:: php
+::
 
     final class PostFactory extends PersistentProxyObjectFactory
     {
@@ -375,7 +374,7 @@ you can also add *states*:
             return $this->with(['published_at' => null]);
         }
 
-        public function withViewCount(int $count = null): self
+        public function withViewCount(?int $count = null): self
         {
             return $this->with(function () use ($count) {
                 return ['view_count' => $count ?? self::faker()->numberBetween(0, 10000)];
@@ -385,7 +384,7 @@ you can also add *states*:
 
 You can use states to make your tests very explicit to improve readability:
 
-.. code-block:: php
+::
 
     // never use the constructor (i.e. "new PostFactory()"), but use the
     // "new()" method. After defining the states, call "create()" to create
@@ -411,7 +410,7 @@ The attributes used to instantiate the object can be added several ways. Attribu
 that returns an array. Using a *callable* ensures random data as the callable is run for each object separately during
 instantiation.
 
-.. code-block:: php
+::
 
     use App\Entity\Category;
     use App\Entity\Post;
@@ -461,7 +460,7 @@ Sequences
 
 Sequences help to create different objects in one call:
 
-.. code-block:: php
+::
 
     use App\Factory\PostFactory;
 
@@ -498,7 +497,7 @@ Faker
 This library provides a wrapper for `FakerPHP <https://fakerphp.github.io/>`_ to help with generating
 random data for your factories:
 
-.. code-block:: php
+::
 
     use function Zenstruck\Foundry\faker;
 
@@ -523,7 +522,7 @@ random data for your factories:
     You can register your own *Faker Provider* by tagging any service with ``foundry.faker_provider``.
     All public methods on this service will be available on Foundry's Faker instance:
 
-    .. code-block:: php
+    ::
 
         use function Zenstruck\Foundry\faker;
 
@@ -547,7 +546,7 @@ Events / Hooks
 The following events can be added to factories. Multiple event callbacks can be added, they are run in the order
 they were added.
 
-.. code-block:: php
+::
 
     use App\Factory\PostFactory;
     use Zenstruck\Foundry\Proxy;
@@ -577,7 +576,7 @@ they were added.
 
 You can also add hooks directly in your factory class:
 
-.. code-block:: php
+::
 
     protected function initialize(): static
     {
@@ -593,7 +592,7 @@ Initialization
 
 You can override your factory's ``initialize()`` method to add default state/logic:
 
-.. code-block:: php
+::
 
     final class PostFactory extends PersistentProxyObjectFactory
     {
@@ -623,7 +622,7 @@ that match constructor arguments are used. Remaining attributes are set to the o
 
 You can customize the instantiator in several ways:
 
-.. code-block:: php
+::
 
     use App\Entity\Post;
     use App\Factory\PostFactory;
@@ -675,7 +674,7 @@ Immutable
 
 Factory's are immutable:
 
-.. code-block:: php
+::
 
     use App\Factory\PostFactory;
 
@@ -700,7 +699,7 @@ Many-to-One
 
 The following assumes the ``Comment`` entity has a many-to-one relationship with ``Post``:
 
-.. code-block:: php
+::
 
     use App\Factory\CommentFactory;
     use App\Factory\PostFactory;
@@ -745,7 +744,7 @@ The following assumes the ``Comment`` entity has a many-to-one relationship with
     It is also recommended that your ``defaults()`` return a ``Factory`` and not the created entity.
     However, you can use `Lazy Values`_ if you need to create the entity in the ``defaults()`` method.
 
-    .. code-block:: php
+    ::
 
         protected function defaults(): array
         {
@@ -770,7 +769,7 @@ One-to-Many
 
 The following assumes the ``Post`` entity has a one-to-many relationship with ``Comment``:
 
-.. code-block:: php
+::
 
     use App\Factory\CommentFactory;
     use App\Factory\PostFactory;
@@ -789,7 +788,7 @@ Many-to-Many
 
 The following assumes the ``Post`` entity has a many-to-many relationship with ``Tag``:
 
-.. code-block:: php
+::
 
     use App\Factory\PostFactory;
     use App\Factory\TagFactory;
@@ -838,7 +837,7 @@ of your attributes that:
 You can wrap the value in a ``LazyValue`` which ensures the value is only calculated when/if it's needed. Additionally,
 the LazyValue can be `memoized <https://en.wikipedia.org/wiki/Memoization>`_ so that it is only calculated once.
 
-    .. code-block:: php
+    ::
 
         use Zenstruck\Foundry\Attributes\LazyValue;
 
@@ -871,10 +870,9 @@ Factories as Services
 If your factories require dependencies, you can define them as a service. The following example demonstrates a very
 common use-case: encoding a password with the ``UserPasswordHasherInterface`` service.
 
-.. code-block:: php
+::
 
     // src/Factory/UserFactory.php
-
     use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
     final class UserFactory extends PersistentProxyObjectFactory
@@ -916,7 +914,7 @@ with ``foundry.factory``.
 
 Use the factory as normal:
 
-.. code-block:: php
+::
 
     UserFactory::createOne(['password' => 'mypass'])->getPassword(); // "mypass" encoded
     UserFactory::createOne()->getPassword(); // "1234" encoded (because "1234" is set as the default password)
@@ -936,11 +934,11 @@ Anonymous Factories
 
 Foundry can be used to create factories for entities that you don't have factories for:
 
-.. code-block:: php
+::
 
     use App\Entity\Post;
-    use function Zenstruck\Foundry\Persistence\proxy_factory;
     use function Zenstruck\Foundry\Persistence\persist_proxy;
+    use function Zenstruck\Foundry\Persistence\proxy_factory;
     use function Zenstruck\Foundry\Persistence\repository;
 
     $factory = proxy_factory(Post::class);
@@ -996,7 +994,7 @@ When creating/persisting many factories at once, it can improve performance
 to instantiate them all without saving to the database, then flush them all at
 once. To do this, wrap the operations in a ``flush_after()`` callback:
 
-.. code-block:: php
+::
 
     use function Zenstruck\Foundry\Persistence\flush_after;
 
@@ -1011,22 +1009,22 @@ Not-persisted objects factory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When dealing with objects which are not aimed to be persisted, you can make your factory inherit from
-`Zenstruck\Foundry\ObjectFactory`. This will create plain objects, that does not interact with database (these objects
+`Zenstruck\\Foundry\ObjectFactory`. This will create plain objects, that does not interact with database (these objects
 won't be wrapped with a :ref:`proxy object <object-proxy>`).
 
 Without Persisting
 ~~~~~~~~~~~~~~~~~~
 
 "Persitent factories" can also create objects without persisting them. This can be useful for unit tests where you just
-want to test the behaviour of the actual object or for creating objects that are not entities. When created, they are
+want to test the behavior of the actual object or for creating objects that are not entities. When created, they are
 still wrapped in a ``Proxy`` to optionally save later.
 
-.. code-block:: php
+::
 
-    use App\Factory\PostFactory;
     use App\Entity\Post;
-    use function Zenstruck\Foundry\Persistence\proxy_factory;
+    use App\Factory\PostFactory;
     use function Zenstruck\Foundry\object;
+    use function Zenstruck\Foundry\Persistence\proxy_factory;
 
     $post = PostFactory::new()->withoutPersisting()->create(); // returns Post|Proxy
     $post->setTitle('something else'); // do something with object
@@ -1048,9 +1046,9 @@ still wrapped in a ``Proxy`` to optionally save later.
     // convenience functions
     $entity = object(Post::class, ['field' => 'value']);
 
-If you'd like your factory to not persist by default, override its ``initialize()`` method to add this behaviour:
+If you'd like your factory to not persist by default, override its ``initialize()`` method to add this behavior:
 
-.. code-block:: php
+::
 
     protected function initialize(): static
     {
@@ -1074,7 +1072,7 @@ Array factories
 
 You can even create associative arrays, with the nice DX provided by Foundry:
 
-.. code-block:: php
+::
 
     use Zenstruck\Foundry\ArrayFactory;
 
@@ -1100,7 +1098,7 @@ Using with DoctrineFixturesBundle
 Foundry works out of the box with `DoctrineFixturesBundle <https://symfony.com/bundles/DoctrineFixturesBundle/current/index.html>`_.
 You can simply use your factories and stories right within your fixture files:
 
-.. code-block:: php
+::
 
     // src/DataFixtures/AppFixtures.php
     namespace App\DataFixtures;
@@ -1155,7 +1153,7 @@ objects are wrapped in a "proxy" that helps with pre and post assertions.
 
 Let's look at an example:
 
-.. code-block:: php
+::
 
     public function test_can_post_a_comment(): void
     {
@@ -1199,11 +1197,11 @@ Enable Foundry in your TestCase
 
 Add the ``Factories`` trait for tests using factories:
 
-.. code-block:: php
+::
 
     use App\Factory\PostFactory;
-    use Zenstruck\Foundry\Test\Factories;
     use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+    use Zenstruck\Foundry\Test\Factories;
 
     class MyTest extends WebTestCase
     {
@@ -1223,11 +1221,11 @@ Database Reset
 This library requires that your database be reset before each test. The packaged ``ResetDatabase`` trait handles
 this for you.
 
-.. code-block:: php
+::
 
+    use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
     use Zenstruck\Foundry\Test\Factories;
     use Zenstruck\Foundry\Test\ResetDatabase;
-    use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
     class MyTest extends WebTestCase
     {
@@ -1287,7 +1285,7 @@ Object Proxy
 Objects created by a factory are wrapped in a special *Proxy* object. These objects allow your doctrine entities
 to have `Active Record <https://en.wikipedia.org/wiki/Active_record_pattern>`_ *like* behavior:
 
-.. code-block:: php
+::
 
     use App\Factory\PostFactory;
 
@@ -1316,7 +1314,7 @@ Force Setting
 
 Object proxies have helper methods to access non-public properties of the object they wrap:
 
-.. code-block:: php
+::
 
     // set private/protected properties
     $post->_set('createdAt', new \DateTime());
@@ -1332,7 +1330,7 @@ methods on the underlying object. When auto-refresh is enabled, most calls to pr
 object from the database. This is mainly useful with "integration" test which interacts with your database and Symfony's
 kernel.
 
-.. code-block:: php
+::
 
     use App\Factory\PostFactory;
 
@@ -1353,7 +1351,7 @@ Without auto-refreshing enabled, the above call to ``$post->getTitle()`` would r
     changing the object's state via multiple methods (or multiple force-sets), an "unsaved changes" exception will be
     thrown:
 
-    .. code-block:: php
+    ::
 
         use App\Factory\PostFactory;
 
@@ -1367,7 +1365,7 @@ Without auto-refreshing enabled, the above call to ``$post->getTitle()`` would r
 
     To overcome this, you need to first disable auto-refreshing, then re-enable after making/saving the changes:
 
-    .. code-block:: php
+    ::
 
         use App\Entity\Post;
         use App\Factory\PostFactory;
@@ -1425,7 +1423,7 @@ Repository Proxy
 
 This library provides a *Repository Proxy* that wraps your object repositories to provide useful assertions and methods:
 
-.. code-block:: php
+::
 
     use App\Entity\Post;
     use App\Factory\PostFactory;
@@ -1469,7 +1467,7 @@ Assertions
 
 Your object factory's have helpful PHPUnit assertions:
 
-.. code-block:: php
+::
 
     use App\Factory\PostFactory;
 
@@ -1524,7 +1522,7 @@ PHPUnit Data Providers
 It is possible to use factories in
 `PHPUnit data providers <https://phpunit.readthedocs.io/en/9.3/writing-tests-for-phpunit.html#data-providers>`_:
 
-.. code-block:: php
+::
 
     use App\Factory\PostFactory;
 
@@ -1561,7 +1559,7 @@ It is possible to use factories in
 
     Given the data provider of the previous example, here is ``PostFactory::published()``
 
-    .. code-block:: php
+    ::
 
         public function published(): self
         {
@@ -1581,7 +1579,7 @@ It is possible to use factories in
     ``ObjectFactory::new()->many()`` and ``ObjectFactory::new()->sequence()`` return a special ``FactoryCollection`` object
     which can be used to generate data providers:
 
-    .. code-block:: php
+    ::
 
         use App\Factory\PostFactory;
 
@@ -1607,7 +1605,7 @@ It is possible to use factories in
 
     The ``FactoryCollection`` could also be passed directly to the test case in order to have several objects available in the same test:
 
-    .. code-block:: php
+    ::
 
         use App\Factory\PostFactory;
 
@@ -1695,7 +1693,7 @@ This can dramatically improve test speed. The following considerations need to b
 
 3. If running with debug mode disabled, you need to adjust the `Disable Debug Mode`_ code to the following:
 
-   .. code-block:: php
+   ::
 
        // tests/bootstrap.php
        // ...
@@ -1715,7 +1713,7 @@ In your ``.env.test`` file, you can set ``APP_DEBUG=0`` to have your tests run w
 your tests considerably. You will need to ensure you cache is cleared before running the test suite. The best place to
 do this is in your ``tests/bootstrap.php``:
 
-.. code-block:: php
+::
 
     // tests/bootstrap.php
     // ...
@@ -1748,7 +1746,7 @@ Pre-Encode Passwords
 Pre-encode user passwords with a known value via ``bin/console security:encode-password`` and set this in
 ``defaults()``. Add the known value as a ``const`` on your factory:
 
-.. code-block:: php
+::
 
     class UserFactory extends PersistentProxyObjectFactory
     {
@@ -1775,7 +1773,7 @@ Foundry but will not have doctrine available. Factories created in these tests w
 ``->withoutPersisting()`` is not necessary). Because the bundle is not available in these tests,
 any bundle configuration you have will not be picked up.
 
-.. code-block:: php
+::
 
     use App\Factory\PostFactory;
     use PHPUnit\Framework\TestCase;
@@ -1795,7 +1793,7 @@ any bundle configuration you have will not be picked up.
 
 You will need to configure manually Foundry. Unfortunately, this may mean duplicating your bundle configuration here.
 
-.. code-block:: php
+::
 
     // tests/bootstrap.php
     // ...
@@ -1827,7 +1825,7 @@ Create a story using the maker command:
 
 .. code-block:: terminal
 
-    $ bin/console make:story Post
+    $ php bin/console make:story Post
 
 .. note::
 
@@ -1835,10 +1833,9 @@ Create a story using the maker command:
 
 Modify the *build* method to set the state for this story:
 
-.. code-block:: php
+::
 
     // src/Story/PostStory.php
-
     namespace App\Story;
 
     use App\Factory\CategoryFactory;
@@ -1871,7 +1868,7 @@ Modify the *build* method to set the state for this story:
 
 Use the new story in your tests, dev fixtures, or even other stories:
 
-.. code-block:: php
+::
 
     PostStory::load(); // loads the state defined in PostStory::build()
 
@@ -1887,10 +1884,9 @@ Stories as Services
 
 If your stories require dependencies, you can define them as a service:
 
-.. code-block:: php
+::
 
     // src/Story/PostStory.php
-
     namespace App\Story;
 
     use App\Factory\PostFactory;
@@ -1923,10 +1919,9 @@ Story State
 
 Another feature of *stories* is the ability for them to *remember* the objects they created to be referenced later:
 
-.. code-block:: php
+::
 
     // src/Story/CategoryStory.php
-
     namespace App\Story;
 
     use App\Factory\CategoryFactory;
@@ -1945,7 +1940,7 @@ Another feature of *stories* is the ability for them to *remember* the objects t
 
 Later, you can access the story's state when creating other fixtures:
 
-.. code-block:: php
+::
 
     PostFactory::createOne(['category' => CategoryStory::get('php')]);
 
@@ -1957,10 +1952,9 @@ Later, you can access the story's state when creating other fixtures:
     Unlike factories, stories are not tied to a specific type, and then they cannot be generic, but you can leverage
     the magic method and PHPDoc to improve autocompletion and fix static analysis issues with stories:
 
-    .. code-block:: php
+    ::
 
         // src/Story/CategoryStory.php
-
         namespace App\Story;
 
         use App\Factory\CategoryFactory;
@@ -1990,10 +1984,9 @@ Story Pools
 
 Stories can store (as state) *pools* of objects:
 
-.. code-block:: php
+::
 
     // src/Story/ProvinceStory.php
-
     namespace App\Story;
 
     use App\Factory\ProvinceFactory;
@@ -2019,7 +2012,7 @@ Stories can store (as state) *pools* of objects:
 
 Objects can be fetched from pools in your tests, fixtures or other stories:
 
-.. code-block:: php
+::
 
     ProvinceStory::getRandom('be'); // random Province|Proxy from "be" pool
     ProvinceStory::getRandomSet('be', 3); // 3 random Province|Proxy's from "be" pool
@@ -2038,7 +2031,6 @@ This way, there is just one place to set your config.
     .. code-block:: yaml
 
         # config/packages/zenstruck_foundry.yaml
-
         when@dev: &dev
             zenstruck_foundry:
                 # ... put all your config here
