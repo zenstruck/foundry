@@ -26,7 +26,7 @@ namespace Zenstruck\Foundry;
  */
 function restorePhpUnitErrorHandler(): void
 {
-    if (!class_exists(\PHPUnit\Runner\ErrorHandler::class)) {
+    if (!\class_exists(\PHPUnit\Runner\ErrorHandler::class)) {
         return;
     }
 
