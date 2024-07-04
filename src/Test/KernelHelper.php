@@ -33,6 +33,10 @@ final class KernelHelper
     {
         $kernel->shutdown();
 
+        if (!class_exists(\PHPUnit\Runner\ErrorHandler::class)) {
+            return;
+        }
+
         while (true) {
             $previousHandler = \set_error_handler(static fn() => null);
             \restore_error_handler();
