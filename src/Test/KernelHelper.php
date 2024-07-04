@@ -33,7 +33,7 @@ final class KernelHelper
     {
         $kernel->shutdown();
 
-        if (!class_exists(\PHPUnit\Runner\ErrorHandler::class)) {
+        if (!\class_exists(\PHPUnit\Runner\ErrorHandler::class)) {
             return;
         }
 
