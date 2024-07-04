@@ -163,7 +163,7 @@ jobs:
 
       - name: Install PHPUnit ${{ matrix.phpunit }}
         run: |
-          composer remove --dev symfony/phpunit-bridge 
+          composer remove --dev symfony/phpunit-bridge
           composer require --dev phpunit/phpunit:^${{ matrix.phpunit }} -W
 
       - name: Install rector and change PHPUnit metadata from annotations to attributes
@@ -227,6 +227,20 @@ jobs:
 
   composer-validate:
     uses: zenstruck/.github/.github/workflows/php-composer-validate.yml@main
+
+  lint-docs:
+    name: Lint Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v3
+
+      - name: DOCtor-RST
+        uses: docker://oskarstark/doctor-rst
+        with:
+          args: --short --error-format=github
+        env:
+          DOCS_DIR: 'docs/'
 
   build-docs:
     name: Build Documentation

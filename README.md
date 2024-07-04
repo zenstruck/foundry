@@ -92,6 +92,16 @@ services:
 DATABASE_URL="mysql://root:1234@127.0.0.1:3308/foundry_test?serverVersion=5.7.42"
 ```
 
+### Running the documentation linter locally
+
+This section provides guidance on how to run the documentation linter, contained within a Docker image, locally on your machine. This linter is designed to verify and ensure that the document syntax adheres to the required standards.
+
+The following command runs the linter in the local directory:
+
+```shell
+docker run --rm -it -e DOCS_DIR='/docs' -v ${PWD}/docs:/docs  oskarstark/doctor-rst:latest
+```
+
 ## Credit
 
 The [AAA](https://www.thephilocoder.com/unit-testing-aaa-pattern/) style of testing was first introduced to me by
