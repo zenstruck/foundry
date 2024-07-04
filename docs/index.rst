@@ -211,7 +211,7 @@ This command will generate a ``PostFactory`` class that looks like this:
     You can add the option ``--with-phpdoc`` in order to add the following ``@method`` docblocks.
     This would ease autocompletion in your IDE (might be not useful anymore since Foundry v2, at least in PHPStorm):
 
-    ::
+::
 
         /**
          * @method        Post|Proxy create(array|callable $attributes = [])
@@ -522,7 +522,7 @@ random data for your factories:
     You can register your own *Faker Provider* by tagging any service with ``foundry.faker_provider``.
     All public methods on this service will be available on Foundry's Faker instance:
 
-    ::
+::
 
         use function Zenstruck\Foundry\faker;
 
@@ -744,7 +744,7 @@ The following assumes the ``Comment`` entity has a many-to-one relationship with
     It is also recommended that your ``defaults()`` return a ``Factory`` and not the created entity.
     However, you can use `Lazy Values`_ if you need to create the entity in the ``defaults()`` method.
 
-    ::
+::
 
         protected function defaults(): array
         {
@@ -837,7 +837,7 @@ of your attributes that:
 You can wrap the value in a ``LazyValue`` which ensures the value is only calculated when/if it's needed. Additionally,
 the LazyValue can be `memoized <https://en.wikipedia.org/wiki/Memoization>`_ so that it is only calculated once.
 
-    ::
+::
 
         use Zenstruck\Foundry\Attributes\LazyValue;
 
@@ -1351,7 +1351,7 @@ Without auto-refreshing enabled, the above call to ``$post->getTitle()`` would r
     changing the object's state via multiple methods (or multiple force-sets), an "unsaved changes" exception will be
     thrown:
 
-    ::
+::
 
         use App\Factory\PostFactory;
 
@@ -1365,7 +1365,7 @@ Without auto-refreshing enabled, the above call to ``$post->getTitle()`` would r
 
     To overcome this, you need to first disable auto-refreshing, then re-enable after making/saving the changes:
 
-    ::
+::
 
         use App\Entity\Post;
         use App\Factory\PostFactory;
@@ -1559,7 +1559,7 @@ It is possible to use factories in
 
     Given the data provider of the previous example, here is ``PostFactory::published()``
 
-    ::
+::
 
         public function published(): self
         {
@@ -1579,7 +1579,7 @@ It is possible to use factories in
     ``ObjectFactory::new()->many()`` and ``ObjectFactory::new()->sequence()`` return a special ``FactoryCollection`` object
     which can be used to generate data providers:
 
-    ::
+::
 
         use App\Factory\PostFactory;
 
@@ -1605,7 +1605,7 @@ It is possible to use factories in
 
     The ``FactoryCollection`` could also be passed directly to the test case in order to have several objects available in the same test:
 
-    ::
+::
 
         use App\Factory\PostFactory;
 
@@ -1952,7 +1952,7 @@ Later, you can access the story's state when creating other fixtures:
     Unlike factories, stories are not tied to a specific type, and then they cannot be generic, but you can leverage
     the magic method and PHPDoc to improve autocompletion and fix static analysis issues with stories:
 
-    ::
+::
 
         // src/Story/CategoryStory.php
         namespace App\Story;
