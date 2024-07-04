@@ -391,7 +391,7 @@ final class Proxy implements \Stringable, ProxyBase
     }
 
     /**
-     * @deprecated without method "_assertPersisted" instead
+     * @deprecated Use method "_assertPersisted" instead
      */
     public function assertPersisted(string $message = '{entity} is not persisted.'): self
     {
@@ -408,7 +408,7 @@ final class Proxy implements \Stringable, ProxyBase
     }
 
     /**
-     * @deprecated without method "_assertNotPersisted" instead
+     * @deprecated Use method "_assertNotPersisted" instead
      */
     public function assertNotPersisted(string $message = '{entity} is persisted but it should not be.'): self
     {
