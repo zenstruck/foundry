@@ -26,10 +26,14 @@ namespace Zenstruck\Foundry;
  */
 function restorePhpUnitErrorHandler(): void
 {
+    if (!class_exists(\PHPUnit\Runner\ErrorHandler::class)) {
+        return;
+    }
+
     while (true) {
         $previousHandler = \set_error_handler(static fn() => null); // @phpstan-ignore-line
         \restore_error_handler();
-        $isPhpUnitErrorHandler = $previousHandler instanceof \PHPUnit\Runner\ErrorHandler; // @phpstan-ignore-line
+        $isPhpUnitErrorHandler = $previousHandler instanceof \PHPUnit\Runner\ErrorHandler;
         if (null === $previousHandler || $isPhpUnitErrorHandler) {
             break;
         }
