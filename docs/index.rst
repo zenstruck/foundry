@@ -494,7 +494,7 @@ Sequences help to create different objects in one call:
 Faker
 ~~~~~
 
-This library provides a wrapper for `FakerPHP <https://fakerphp.github.io/>`_ to help with generating
+This library provides a wrapper for `FakerPHP <https://fakerphp.org/>`_ to help with generating
 random data for your factories:
 
 ::
@@ -505,8 +505,8 @@ random data for your factories:
 
 .. note::
 
-    You can customize Faker's `locale <https://fakerphp.github.io/#localization>`_ and random
-    `seed <https://fakerphp.github.io/#seeding-the-generator>`_:
+    You can customize Faker's `locale <https://fakerphp.org/#localization>`_ and random
+    `seed <https://fakerphp.org/#seeding-the-generator>`_:
 
     .. code-block:: yaml
 
