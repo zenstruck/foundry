@@ -15,6 +15,7 @@ namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\RelationshipWithGlobalEntity;
@@ -41,12 +42,15 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
      * @param PersistentObjectFactory<RelationshipWithGlobalEntity\RelationshipWithGlobalEntity> $relationshipWithGlobalEntityFactory
      * @dataProvider relationshipWithGlobalEntityFactoryProvider
      */
-    public function it_can_use_flush_after_and_entity_from_global_state(PersistentObjectFactory $relationshipWithGlobalEntityFactory): void
+    public function it_can_use_flush_after_and_entity_from_global_state(PersistentObjectFactory $relationshipWithGlobalEntityFactory, bool $asProxy): void
     {
         $globalEntitiesCount = persistent_factory(GlobalEntity::class)::repository()->count();
 
-        flush_after(function() use ($relationshipWithGlobalEntityFactory) {
-            $relationshipWithGlobalEntityFactory->create(['globalEntity' => GlobalStory::globalEntity()]);
+        flush_after(function() use ($relationshipWithGlobalEntityFactory, $asProxy) {
+            $globalEntity = $asProxy ? GlobalStory::globalEntityProxy() : GlobalStory::globalEntity();
+            self::assertSame($asProxy, $globalEntity instanceof Proxy);
+
+            $relationshipWithGlobalEntityFactory->create(['globalEntity' => $globalEntity]);
         });
 
         // assert no extra GlobalEntity have been created
@@ -55,15 +59,15 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
         $relationshipWithGlobalEntityFactory::assert()->count(1);
 
         $entity = $relationshipWithGlobalEntityFactory::repository()->first();
-        self::assertSame(unproxy(GlobalStory::globalEntity()), $entity?->getGlobalEntity());
+        self::assertSame(GlobalStory::globalEntity(), $entity?->getGlobalEntity());
     }
 
     public static function relationshipWithGlobalEntityFactoryProvider(): iterable
     {
-        yield [persistent_factory(RelationshipWithGlobalEntity\StandardRelationshipWithGlobalEntity::class)];
-        yield [proxy_factory(RelationshipWithGlobalEntity\StandardRelationshipWithGlobalEntity::class)];
-        yield [persistent_factory(RelationshipWithGlobalEntity\CascadeRelationshipWithGlobalEntity::class)];
-        yield [proxy_factory(RelationshipWithGlobalEntity\CascadeRelationshipWithGlobalEntity::class)];
+        yield [persistent_factory(RelationshipWithGlobalEntity\StandardRelationshipWithGlobalEntity::class), false];
+        yield [persistent_factory(RelationshipWithGlobalEntity\CascadeRelationshipWithGlobalEntity::class), false];
+        yield [persistent_factory(RelationshipWithGlobalEntity\StandardRelationshipWithGlobalEntity::class), true];
+        yield [persistent_factory(RelationshipWithGlobalEntity\CascadeRelationshipWithGlobalEntity::class), true];
     }
 
     /**
