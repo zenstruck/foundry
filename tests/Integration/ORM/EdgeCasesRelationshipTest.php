@@ -28,7 +28,6 @@ use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 use function Zenstruck\Foundry\Persistence\flush_after;
 use function Zenstruck\Foundry\Persistence\persistent_factory;
 use function Zenstruck\Foundry\Persistence\proxy_factory;
-use function Zenstruck\Foundry\Persistence\unproxy;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
