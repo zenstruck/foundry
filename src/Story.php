@@ -14,6 +14,8 @@ namespace Zenstruck\Foundry;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\Persistence\Exception\NoPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
+use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Persistence\ProxyGenerator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -132,7 +134,12 @@ abstract class Story
         }
 
         try {
-            return Configuration::instance()->persistence()->refresh($this->state[$name], force: true); // @phpstan-ignore argument.templateType
+            $isProxy = $this->state[$name] instanceof Proxy;
+
+            $unwrappedObject = ProxyGenerator::unwrap($this->state[$name]);
+            Configuration::instance()->persistence()->refresh($unwrappedObject, force: true); // @phpstan-ignore argument.templateType
+
+            return $isProxy ? ProxyGenerator::wrap($unwrappedObject) : $unwrappedObject; // @phpstan-ignore argument.templateType
         } catch (PersistenceNotAvailable|NoPersistenceStrategy|RefreshObjectFailed) {
             return $this->state[$name];
         }

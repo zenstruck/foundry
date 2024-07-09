@@ -16,10 +16,12 @@ use Zenstruck\Foundry\Tests\Fixture\Document\GlobalDocument;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GlobalEntity;
 
 use function Zenstruck\Foundry\Persistence\persist;
+use function Zenstruck\Foundry\Persistence\proxy;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  * @method static GlobalEntity globalEntity()
+ * @method static GlobalEntity globalEntityProxy()
  */
 final class GlobalStory extends Story
 {
@@ -28,6 +30,7 @@ final class GlobalStory extends Story
         if (\getenv('DATABASE_URL')) {
             $globalEntity = persist(GlobalEntity::class);
             $this->addState('globalEntity', $globalEntity);
+            $this->addState('globalEntityProxy', proxy($globalEntity));
         }
 
         if (\getenv('MONGO_URL')) {
