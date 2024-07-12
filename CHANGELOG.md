@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [v2.0.7](https://github.com/zenstruck/foundry/releases/tag/v2.0.7)
+
+July 12th, 2024 - [v2.0.6...v2.0.7](https://github.com/zenstruck/foundry/compare/v2.0.6...v2.0.7)
+
+* 5c44991 fix: handle proxies when refreshing entity in Proxy::getState() (#672) by @nikophil
+* 49f5e1d Fix faker php urls (#671) by @BackEndTea
+* 7719b0d chore(CI): Enable documentation linter (#657) by @cezarpopa
+
 ## [v2.0.2](https://github.com/zenstruck/foundry/releases/tag/v2.0.2)
 
 June 14th, 2024 - [v2.0.1...v2.0.2](https://github.com/zenstruck/foundry/compare/v2.0.1...v2.0.2)
