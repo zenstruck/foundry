@@ -203,6 +203,9 @@ abstract class PersistentObjectFactory extends ObjectFactory
         static::repository()->truncate();
     }
 
+    /**
+     * @return T
+     */
     final public function create(callable|array $attributes = []): object
     {
         $object = parent::create($attributes);
