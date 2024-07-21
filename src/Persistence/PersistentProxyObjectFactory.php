@@ -25,6 +25,7 @@ use Zenstruck\Foundry\FactoryCollection; // keep me!
  *
  * @phpstan-type InstantiatorCallable = Instantiator|callable(Parameters,class-string<T>):T
  * @phpstan-import-type Parameters from Factory
+ * @phpstan-import-type Attributes from Factory
  *
  * @phpstan-method $this instantiateWith(InstantiatorCallable $instantiator)
  *
@@ -33,6 +34,12 @@ use Zenstruck\Foundry\FactoryCollection; // keep me!
  *
  * @phpstan-method static list<T&Proxy<T>> createSequence(iterable<array<string, mixed>>|callable(): iterable<array<string, mixed>> $sequence)
  * @phpstan-method static list<T&Proxy<T>> createMany(int $number, array|callable $attributes = [])
+ *
+ * @method static Proxy<T> createOne(Attributes $attributes = [])
+ * @phpstan-method static T&Proxy<T> createOne(Attributes $attributes = [])
+ *
+ * @method Proxy<T> create(Attributes $attributes = [])
+ * @phpstan-method T&Proxy<T> create(Attributes $attributes = [])
  */
 abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
 {
@@ -42,7 +49,8 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
     abstract public static function class(): string;
 
     /**
-     * @return T&Proxy<T>
+     * @return Proxy<T>
+     * @phpstan-return T&Proxy<T>
      */
     final public static function find(mixed $criteriaOrId): object
     {
@@ -50,7 +58,8 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
     }
 
     /**
-     * @return T&Proxy<T>
+     * @return Proxy<T>
+     * @phpstan-return T&Proxy<T>
      */
     final public static function findOrCreate(array $criteria): object
     {
@@ -58,7 +67,8 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
     }
 
     /**
-     * @return T&Proxy<T>
+     * @return Proxy<T>
+     * @phpstan-return T&Proxy<T>
      */
     final public static function randomOrCreate(array $criteria = []): object
     {
@@ -90,7 +100,8 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
     }
 
     /**
-     * @return T&Proxy<T>
+     * @return Proxy<T>
+     * @phpstan-return T&Proxy<T>
      */
     final public static function random(array $criteria = []): object
     {
@@ -98,7 +109,8 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
     }
 
     /**
-     * @return T&Proxy<T>
+     * @return Proxy<T>
+     * @phpstan-return T&Proxy<T>
      */
     final public static function first(string $sortBy = 'id'): object
     {
@@ -106,7 +118,8 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
     }
 
     /**
-     * @return T&Proxy<T>
+     * @return Proxy<T>
+     * @phpstan-return T&Proxy<T>
      */
     final public static function last(string $sortBy = 'id'): object
     {
