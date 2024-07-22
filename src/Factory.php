@@ -36,6 +36,8 @@ abstract class Factory
 
     /**
      * @param Attributes $attributes
+     *
+     * @return static<T>
      */
     final public static function new(array|callable $attributes = []): static
     {
@@ -130,6 +132,8 @@ abstract class Factory
 
     /**
      * @param Attributes $attributes
+     *
+     * @return static<T>
      */
     final public function with(array|callable $attributes = []): static
     {
@@ -173,7 +177,7 @@ abstract class Factory
     /**
      * Override to adjust default attributes & config.
      *
-     * @return static
+     * @return static<T>
      */
     protected function initialize(): static
     {
