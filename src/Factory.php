@@ -36,8 +36,10 @@ abstract class Factory
 
     /**
      * @param Attributes $attributes
+     *
+     * @return static<T>
      */
-    final public static function new(array|callable $attributes = []): static
+    final public static function new(array|callable $attributes = []): static // @phpstan-ignore return.phpDocType
     {
         if (Configuration::isBooted()) {
             $factory = Configuration::instance()->factories->get(static::class);
@@ -130,8 +132,10 @@ abstract class Factory
 
     /**
      * @param Attributes $attributes
+     *
+     * @return static<T>
      */
-    final public function with(array|callable $attributes = []): static
+    final public function with(array|callable $attributes = []): static // @phpstan-ignore return.phpDocType
     {
         $clone = clone $this;
         $clone->attributes[] = $attributes;
@@ -174,8 +178,10 @@ abstract class Factory
      * Override to adjust default attributes & config.
      *
      * @return static
+     *
+     * @return static<T>
      */
-    protected function initialize(): static
+    protected function initialize(): static // @phpstan-ignore return.phpDocType
     {
         return $this;
     }

@@ -41,6 +41,8 @@ abstract class ObjectFactory extends Factory
 
     /**
      * @final
+     *
+     * @return T
      */
     public function create(callable|array $attributes = []): object
     {
