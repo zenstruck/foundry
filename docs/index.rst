@@ -187,7 +187,7 @@ This command will generate a ``PostFactory`` class that looks like this:
 
 .. tip::
 
-    You can also inherit from ``Zenstruck\\Foundry\\Persistence\\PersistentObjectFactory``. Which will create regular objects
+    You can also inherit from ``Zenstruck\Foundry\Persistence\PersistentObjectFactory``. Which will create regular objects
     without proxy (see :ref:`Proxy object section <object-proxy>` for more information).
 
 .. tip::
@@ -1008,7 +1008,7 @@ Not-persisted objects factory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When dealing with objects which are not aimed to be persisted, you can make your factory inherit from
-``Zenstruck\\Foundry\\ObjectFactory``. This will create plain objects, that does not interact with database (these objects
+``Zenstruck\Foundry\ObjectFactory``. This will create plain objects, that does not interact with database (these objects
 won't be wrapped with a :ref:`proxy object <object-proxy>`).
 
 .. _without-persisting:
@@ -1399,10 +1399,10 @@ Proxy objects pitfalls
 Proxified objects may have some pitfalls when dealing with Doctrine's entity manager. You may encounter this error:
 
 > Doctrine\ORM\ORMInvalidArgumentException: A new entity was found through the relationship
-  'App\Entity\Post#category' that was not configured to cascade persist operations for entity: AppEntityCategoryProxy@3082.
-  To solve this issue: Either explicitly call EntityManager#persist() on this unknown entity or configure cascade persist
-  this association in the mapping for example @ManyToOne(..,cascade={"persist"}). If you cannot find out which entity
-  causes the problem implement 'App\Entity\Category#__toString()' to get a clue.
+    'App\Entity\Post#category' that was not configured to cascade persist operations for entity: AppEntityCategoryProxy@3082.
+    To solve this issue: Either explicitly call EntityManager#persist() on this unknown entity or configure cascade persist
+    this association in the mapping for example @ManyToOne(..,cascade={"persist"}). If you cannot find out which entity
+    causes the problem implement 'App\Entity\Category#__toString()' to get a clue.
 
 The problem will occur if a proxy has been passed to ``EntityManager::persist()``. To fix this, you should pass the "real"
 object, by calling ``$proxyfiedObject->_real()``.
