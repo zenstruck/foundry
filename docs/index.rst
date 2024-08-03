@@ -1957,7 +1957,7 @@ Later, you can access the story's state when creating other fixtures:
     Unlike factories, stories are not tied to a specific type, and then they cannot be generic, but you can leverage
     the magic method and PHPDoc to improve autocompletion and fix static analysis issues with stories:
 
-::
+    ::
 
         // src/Story/CategoryStory.php
         namespace App\Story;
