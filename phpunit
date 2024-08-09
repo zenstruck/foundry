@@ -8,9 +8,7 @@ check_phpunit_version() {
 
     REQUIRED_PHPUNIT_VERSION="${1?}"
 
-    if [[ "${INSTALLED_PHPUNIT_VERSION}" == *"dev"* ]] && [ "${REQUIRED_PHPUNIT_VERSION}" != "11.4" ]; then
-      echo 0;
-    elif [[ "${INSTALLED_PHPUNIT_VERSION}" == "${REQUIRED_PHPUNIT_VERSION}"* ]]; then
+    if [[ "${INSTALLED_PHPUNIT_VERSION}" == "${REQUIRED_PHPUNIT_VERSION}"* ]]; then
       echo 1;
     else
       echo 0;
@@ -28,8 +26,8 @@ fi
 ### <<
 
 ### >> update PHPUnit if needed
-if [[ " 9 10 11 11.4 " != *" ${PHPUNIT_VERSION-9} "* ]]; then
-  echo "❌ PHPUNIT_VERSION should be one of 9, 10, 11, 11.4";
+if [[ " 9 10 11 " != *" ${PHPUNIT_VERSION-9} "* ]]; then
+  echo "❌ PHPUNIT_VERSION should be one of 9, 10, 11";
   exit 1;
 fi
 
@@ -37,33 +35,25 @@ SHOULD_UPDATE_PHPUNIT=$(check_phpunit_version "${PHPUNIT_VERSION}")
 
 if [ "${SHOULD_UPDATE_PHPUNIT}" = "0" ]; then
   echo "ℹ️  Upgrading PHPUnit to ${PHPUNIT_VERSION}"
-  if [ "${PHPUNIT_VERSION}" = "9" ]; then
-    composer update phpunit/phpunit:^9 -W --dev
-  else
-    if [ "${PHPUNIT_VERSION}" = "11.4" ]; then
-      composer update phpunit/phpunit:11.4.x-dev -W --dev
-    else
-      composer update "phpunit/phpunit:^${PHPUNIT_VERSION}" -W --dev
-    fi
-  fi
-fi
-### <<
-
-### >> guess extensions
-EXTENSION=""
-
-if [ "${USE_DAMA_DOCTRINE_TEST_BUNDLE:-0}" = "1" ]; then
-  EXTENSION="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension"
+  composer update "phpunit/phpunit:^${PHPUNIT_VERSION}" -W
 fi
 ### <<
 
 ### >> actually execute PHPUnit with the right options
+DAMA_EXTENSION="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension"
+FOUNDRY_EXTENSION="Zenstruck\Foundry\PHPUnit\FoundryExtension"
+
+if [ "${USE_FOUNDRY_PHPUNIT_EXTENSION:-0}" = "1" ] && [ "${PHPUNIT_VERSION}" != "11" ]; then
+  echo "❌ USE_FOUNDRY_PHPUNIT_EXTENSION could only be used with PHPUNIT_VERSION=11";
+  exit 1;
+fi
+
 case ${PHPUNIT_VERSION} in
   "9")
-    if [ -z "${EXTENSION}" ]; then
-      vendor/bin/phpunit -c phpunit.xml.dist "$@"
+    if [ "${USE_DAMA_DOCTRINE_TEST_BUNDLE:-0}" = "1" ]; then
+      vendor/bin/phpunit -c phpunit.xml.dist --extensions "${DAMA_EXTENSION}" "$@"
     else
-      vendor/bin/phpunit -c phpunit.xml.dist --extensions "${EXTENSION}" "$@"
+      vendor/bin/phpunit -c phpunit.xml.dist "$@"
     fi
     ;;
 
@@ -72,12 +62,18 @@ case ${PHPUNIT_VERSION} in
     vendor/bin/phpunit -c phpunit-10.xml.dist "$@"
     ;;
 
-  "11"|"11.4")
-    if [ -z "${EXTENSION}" ]; then
-      vendor/bin/phpunit -c phpunit-10.xml.dist "$@"
-    else
-      vendor/bin/phpunit -c phpunit-10.xml.dist --extension "${EXTENSION}" "$@"
+  "11")
+    PHPUNIT_EXEC="vendor/bin/phpunit -c phpunit-10.xml.dist $@"
+    if [ "${USE_DAMA_DOCTRINE_TEST_BUNDLE:-0}" = "1" ]; then
+      PHPUNIT_EXEC="${PHPUNIT_EXEC} --extension "${DAMA_EXTENSION}""
     fi
+
+    if [ "${USE_FOUNDRY_PHPUNIT_EXTENSION:-0}" = "1" ]; then
+      PHPUNIT_EXEC="${PHPUNIT_EXEC} --extension "${FOUNDRY_EXTENSION}""
+    fi
+
+    echo $PHPUNIT_EXEC
+    $PHPUNIT_EXEC
     ;;
 esac
 ### <<

@@ -87,4 +87,9 @@ interface Proxy
      * @return ProxyRepositoryDecorator<T,ObjectRepository<T>>
      */
     public function _repository(): ProxyRepositoryDecorator;
+
+    /**
+     * @internal
+     */
+    public function _initializeLazyObject(): void;
 }

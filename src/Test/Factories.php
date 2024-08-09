@@ -16,6 +16,8 @@ use PHPUnit\Framework\Attributes\Before;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
 
+use function Zenstruck\Foundry\Persistence\initialize_proxy_object;
+
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
@@ -26,7 +28,26 @@ trait Factories
      * @before
      */
     #[Before]
-    public static function _bootFoundry(): void
+    public function _beforeHook(): void
+    {
+        $this->_bootFoundry();
+        $this->_loadDataProvidedProxies();
+    }
+
+    /**
+     * @internal
+     * @after
+     */
+    #[After]
+    public static function _shutdownFoundry(): void
+    {
+        Configuration::shutdown();
+    }
+
+    /**
+     * @internal
+     */
+    private function _bootFoundry(): void
     {
         if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.impossibleType
             // unit test
@@ -46,12 +67,73 @@ trait Factories
     }
 
     /**
+     * If a persistent object has been created in a data provider, we need to initialize the proxy object,
+     * which will trigger the object to be persisted.
+     *
+     * Otherwise, such test would not pass:
+     * ```php
+     * #[DataProvider('provide')]
+     * public function testSomething(MyEntity $entity): void
+     * {
+     *     MyEntityFactory::assert()->count(1);
+     * }
+     *
+     * public static function provide(): iterable
+     * {
+     *     yield [MyEntityFactory::createOne()];
+     * }
+     * ```
+     *
+     * Sadly, this cannot be done in a subscriber, since PHPUnit does not give access to the actual tests instances.
+     *
      * @internal
-     * @after
      */
-    #[After]
-    public static function _shutdownFoundry(): void
+    private function _loadDataProvidedProxies(): void
     {
+        if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.impossibleType
+            return;
+        }
+
+        $providedData = \method_exists($this, 'getProvidedData') ? $this->getProvidedData() : $this->providedData(); // @phpstan-ignore method.notFound
+
+        initialize_proxy_object($providedData);
+    }
+
+    /**
+     * @see \Zenstruck\Foundry\PHPUnit\BootFoundryOnDataProviderMethodCalled
+     * @internal
+     */
+    public static function _bootForDataProvider(): void
+    {
+        if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.impossibleType
+            // unit test
+            Configuration::bootForDataProvider(UnitTestConfig::build());
+
+            return;
+        }
+
+        // integration test
+        Configuration::bootForDataProvider(static function() {
+            if (!static::getContainer()->has('.zenstruck_foundry.configuration')) { // @phpstan-ignore staticMethod.notFound
+                throw new \LogicException('ZenstruckFoundryBundle is not enabled. Ensure it is added to your config/bundles.php.');
+            }
+
+            return static::getContainer()->get('.zenstruck_foundry.configuration'); // @phpstan-ignore staticMethod.notFound
+        });
+    }
+
+    /**
+     * @internal
+     * @see \Zenstruck\Foundry\PHPUnit\ShutdownFoundryOnDataProviderMethodFinished
+     */
+    public static function _shutdownAfterDataProvider(): void
+    {
+        if (\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.impossibleType
+            self::ensureKernelShutdown(); // @phpstan-ignore staticMethod.notFound
+            static::$class = null; // @phpstan-ignore staticProperty.notFound
+            static::$kernel = null; // @phpstan-ignore staticProperty.notFound
+            static::$booted = false; // @phpstan-ignore staticProperty.notFound
+        }
         Configuration::shutdown();
     }
 }

@@ -11,7 +11,6 @@
 
 namespace Zenstruck\Foundry\Persistence;
 
-use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\VarExporter\LazyProxyTrait;
 use Zenstruck\Assert;
 use Zenstruck\Foundry\Configuration;
@@ -126,6 +125,11 @@ trait IsProxy
         Assert::that($this->isPersisted())->isFalse($message, ['entity' => parent::class]);
 
         return $this;
+    }
+
+    public function _initializeLazyObject(): void
+    {
+        $this->initializeLazyObject();
     }
 
     private function isPersisted(): bool
