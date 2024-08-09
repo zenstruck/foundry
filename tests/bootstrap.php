@@ -16,6 +16,7 @@ use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\ErrorHandler\ErrorHandler;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\ORM\AbstractORMPersistenceStrategy;
 use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 
@@ -53,3 +54,9 @@ if (\getenv('DATABASE_URL') && AbstractORMPersistenceStrategy::RESET_MODE_MIGRAT
 }
 
 \set_exception_handler([new ErrorHandler(), 'handleException']);
+
+/**
+ * Some tests with data providers are only meant to be tested with Foundry's extension for PHPUnit,
+ * The only way to skip them for now is to skip them based on a data provider name.
+ */
+const FOUNDRY_SKIP_DATA_PROVIDER = 'skip_data_provider';

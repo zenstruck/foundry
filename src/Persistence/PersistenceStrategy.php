@@ -11,7 +11,6 @@
 
 namespace Zenstruck\Foundry\Persistence;
 
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\Mapping\MappingException;

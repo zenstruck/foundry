@@ -14,8 +14,8 @@ namespace Zenstruck\Foundry\Persistence;
 use Doctrine\Persistence\ObjectRepository;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\FactoryCollection; // keep me!
+use Zenstruck\Foundry\Object\Instantiator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -43,6 +43,19 @@ use Zenstruck\Foundry\FactoryCollection; // keep me!
  */
 abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
 {
+    /**
+     * @return T&Proxy<T>
+     */
+    final public function create(callable|array $attributes = []): object
+    {
+        $configuration = Configuration::instance();
+        if ($configuration->inADataProvider()) {
+            return ProxyGenerator::wrapFactory($this, $attributes);
+        }
+
+        return parent::create($attributes);
+    }
+
     /**
      * @return class-string<T>
      */

@@ -33,8 +33,12 @@ final class Configuration
      */
     public $instantiator;
 
-    /** @var \Closure():self|self|null */
-    private static \Closure|self|null $instance = null;
+    /**
+     * This property is only filled if the PHPUnit extension is used!
+     */
+    private bool $bootedForDataProvider = false;
+
+    private static ?self $instance = null;
 
     /**
      * @param InstantiatorCallable $instantiator
@@ -66,13 +70,18 @@ final class Configuration
         }
     }
 
+    public function inADataProvider(): bool
+    {
+        return $this->bootedForDataProvider;
+    }
+
     public static function instance(): self
     {
         if (!self::$instance) {
-            throw new FoundryNotBooted('Foundry is not yet booted. Ensure ZenstruckFoundryBundle is enabled. If in a test, ensure your TestCase has the Factories trait.');
+            throw new FoundryNotBooted();
         }
 
-        return \is_callable(self::$instance) ? (self::$instance)() : self::$instance;
+        return self::$instance;
     }
 
     public static function isBooted(): bool
@@ -82,7 +91,14 @@ final class Configuration
 
     public static function boot(\Closure|self $configuration): void
     {
-        self::$instance = $configuration;
+        self::$instance = \is_callable($configuration) ? ($configuration)() : $configuration;
+        self::$instance->bootedForDataProvider = false;
+    }
+
+    public static function bootForDataProvider(\Closure|self $configuration): void
+    {
+        self::$instance = \is_callable($configuration) ? ($configuration)() : $configuration;
+        self::$instance->bootedForDataProvider = true;
     }
 
     public static function shutdown(): void

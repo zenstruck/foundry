@@ -26,7 +26,7 @@ final class GenericEntityProxyFactoryTest extends GenericProxyFactoryTestCase
 {
     use RequiresORM;
 
-    protected function factory(): PersistentProxyObjectFactory
+    protected static function factory(): GenericProxyEntityFactory
     {
         return GenericProxyEntityFactory::new();
     }
