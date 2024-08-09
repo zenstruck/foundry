@@ -204,11 +204,14 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
+     * @final
      * @return T
      */
-    final public function create(callable|array $attributes = []): object
+    public function create(callable|array $attributes = []): object
     {
         $object = parent::create($attributes);
+
+        $this->throwIfCannotCreateObject();
 
         if (!$this->isPersisting()) {
             return $this->proxy($object);
@@ -360,5 +363,27 @@ abstract class PersistentObjectFactory extends ObjectFactory
         $object = proxy($object);
 
         return $this->isPersisting() ? $object : $object->_disableAutoRefresh();
+    }
+
+    private function throwIfCannotCreateObject(): void
+    {
+        $configuration = Configuration::instance();
+
+        /**
+         * "false === $configuration->inADataProvider()" would also mean that the PHPUnit extension is NOT used
+         * so a `FoundryNotBooted` exception would be thrown if we actually are in a data provider.
+         */
+        if (!$configuration->inADataProvider()) {
+            return;
+        }
+
+        if (
+            !$configuration->isPersistenceAvailable()
+            || $this instanceof PersistentProxyObjectFactory
+        ) {
+            return;
+        }
+
+        throw new \LogicException(\sprintf('Cannot create object in a data provider for non-proxy factories. Transform your factory into a "%s", or call "create()" method in the test. See https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#phpunit-data-providers', PersistentProxyObjectFactory::class));
     }
 }

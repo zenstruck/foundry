@@ -26,7 +26,7 @@ final class GenericDocumentProxyFactoryTest extends GenericProxyFactoryTestCase
 {
     use RequiresMongo;
 
-    protected function factory(): PersistentProxyObjectFactory
+    protected static function factory(): GenericProxyDocumentFactory
     {
         return GenericProxyDocumentFactory::new();
     }

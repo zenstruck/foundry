@@ -16,6 +16,8 @@ use PHPUnit\Framework\Attributes\Before;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
 
+use function Zenstruck\Foundry\Persistence\initialize_proxy_object;
+
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
@@ -26,7 +28,48 @@ trait Factories
      * @before
      */
     #[Before]
-    public static function _bootFoundry(): void
+    public function _beforeHook(): void
+    {
+        $this->_bootFoundry();
+        $this->_loadDataProvidedProxies();
+    }
+
+    /**
+     * @internal
+     * @after
+     */
+    #[After]
+    public static function _shutdownFoundry(): void
+    {
+        Configuration::shutdown();
+    }
+
+    /**
+     * @internal
+     */
+    public static function _bootForDataProvider(): void
+    {
+        if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore-line
+            // unit test
+            Configuration::bootForDataProvider(UnitTestConfig::build());
+
+            return;
+        }
+
+        static::$class = null; // @phpstan-ignore staticProperty.notFound
+        static::$kernel = null; // @phpstan-ignore staticProperty.notFound
+        static::$booted = false; // @phpstan-ignore staticProperty.notFound
+
+        // integration test
+        Configuration::bootForDataProvider(
+            static fn() => static::getContainer()->get('.zenstruck_foundry.configuration') // @phpstan-ignore staticMethod.notFound
+        );
+    }
+
+    /**
+     * @internal
+     */
+    private function _bootFoundry(): void
     {
         if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore-line
             // unit test
@@ -47,12 +90,35 @@ trait Factories
     }
 
     /**
+     * If a persistent object has been created in a data provider, we need to initialize the proxy object,
+     * which will trigger the object to be persisted.
+     *
+     * Otherwise, such test would not pass:
+     * ```php
+     * #[DataProvider('provide')]
+     * public function testSomething(MyEntity $entity): void
+     * {
+     *     MyEntityFactory::assert()->count(1);
+     * }
+     *
+     * public static function provide(): iterable
+     * {
+     *     yield [MyEntityFactory::createOne()];
+     * }
+     * ```
+     *
+     * Sadly, this cannot be done in a subscriber, since PHPUnit does not give access to the actual tests instances.
+     *
      * @internal
-     * @after
      */
-    #[After]
-    public static function _shutdownFoundry(): void
+    private function _loadDataProvidedProxies(): void
     {
-        Configuration::shutdown();
+        if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore-line
+            return;
+        }
+
+        $providedData = \method_exists($this, 'getProvidedData') ? $this->getProvidedData() : $this->providedData(); // @phpstan-ignore method.notFound
+
+        initialize_proxy_object($providedData);
     }
 }

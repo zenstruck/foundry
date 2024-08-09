@@ -15,11 +15,14 @@ use Doctrine\Persistence\Proxy as DoctrineProxy;
 use Symfony\Component\VarExporter\LazyObjectInterface;
 use Symfony\Component\VarExporter\LazyProxyTrait;
 use Symfony\Component\VarExporter\ProxyHelper;
+use Zenstruck\Foundry\Factory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @internal
+ *
+ * @phpstan-import-type Attributes from Factory
  */
 final class ProxyGenerator
 {
@@ -41,6 +44,19 @@ final class ProxyGenerator
         }
 
         return self::generateClassFor($object)::createLazyProxy(static fn() => $object); // @phpstan-ignore-line
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param PersistentProxyObjectFactory<T> $factory
+     * @phpstan-param Attributes $attributes
+     *
+     * @return T&Proxy<T>
+     */
+    public static function wrapFactory(PersistentProxyObjectFactory $factory, callable|array $attributes): Proxy
+    {
+        return self::generateClassFor($factory)::createLazyProxy(static fn() => unproxy($factory->create($attributes))); // @phpstan-ignore-line
     }
 
     /**
@@ -68,6 +84,14 @@ final class ProxyGenerator
     }
 
     /**
+     * @param class-string $class
+     */
+    public static function proxyClassNameFor(string $class): string
+    {
+        return \str_replace('\\', '', $class).'Proxy';
+    }
+
+    /**
      * @template T of object
      *
      * @param T $object
@@ -76,8 +100,8 @@ final class ProxyGenerator
      */
     private static function generateClassFor(object $object): string
     {
-        /** @var class-string $class */
-        $class = $object instanceof DoctrineProxy ? \get_parent_class($object) : $object::class;
+        $class = self::extractClassName($object);
+
         $proxyClass = self::proxyClassNameFor($class);
 
         /** @var class-string<LazyObjectInterface&Proxy<T>&T> $proxyClass */
@@ -102,10 +126,14 @@ final class ProxyGenerator
     }
 
     /**
-     * @param class-string $class
+     * @return class-string
      */
-    public static function proxyClassNameFor(string $class): string
+    private static function extractClassName(object $object): string
     {
-        return \str_replace('\\', '', $class).'Proxy';
+        if ($object instanceof PersistentProxyObjectFactory) {
+            return $object::class();
+        }
+
+        return $object instanceof DoctrineProxy ? \get_parent_class($object) : $object::class; // @phpstan-ignore return.type
     }
 }

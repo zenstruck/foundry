@@ -14,7 +14,7 @@ namespace Zenstruck\Foundry\Tests\Fixture;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class Object1
+class Object1
 {
     private string $prop1;
     private string $prop2;

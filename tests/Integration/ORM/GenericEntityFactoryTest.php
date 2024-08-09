@@ -12,7 +12,6 @@
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
-use Zenstruck\Foundry\Tests\Fixture\Factories\GenericModelFactory;
 use Zenstruck\Foundry\Tests\Integration\Persistence\GenericFactoryTestCase;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
@@ -23,7 +22,7 @@ final class GenericEntityFactoryTest extends GenericFactoryTestCase
 {
     use RequiresORM;
 
-    protected function factory(): GenericModelFactory
+    protected static function factory(): GenericEntityFactory
     {
         return GenericEntityFactory::new();
     }
