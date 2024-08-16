@@ -63,7 +63,7 @@ final class FactoryTest extends TestCase
      */
     public function can_use_arrays_for_attribute_values(): void
     {
-        $object = new class() {
+        $object = new class {
             public mixed $value;
         };
 
