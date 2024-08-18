@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\PHPUnit;
 
 use PHPUnit\Event;
+use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\InMemory\AsInMemoryTest;
 
 /**
  * @internal
@@ -25,6 +27,12 @@ final class BootFoundryOnDataProviderMethodCalled implements Event\Test\DataProv
     {
         if (\method_exists($event->testMethod()->className(), '_bootForDataProvider')) {
             $event->testMethod()->className()::_bootForDataProvider();
+        }
+
+        $testMethod = $event->testMethod();
+
+        if (AsInMemoryTest::shouldEnableInMemory($testMethod->className(), $testMethod->methodName())) {
+            Configuration::instance()->enableInMemory();
         }
     }
 }
