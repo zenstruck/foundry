@@ -43,13 +43,6 @@ if (\getenv('DATABASE_URL') && AbstractORMPersistenceStrategy::RESET_MODE_MIGRAT
     $application->run(new StringInput('doctrine:migrations:diff'), new NullOutput());
     $application->run(new StringInput('doctrine:database:drop --force'), new NullOutput());
 
-    // restore custom migrations
-    // this must be after "doctrine:migrations:diff" otherwise
-    // Doctrine is not able to run its diff command
-    foreach ((new Finder())->files()->in(__DIR__.'/Fixture/CustomMigrations') as $customMigrationFile) {
-        $fs->copy($customMigrationFile->getRealPath(), __DIR__.'/Fixture/Migrations/'.$customMigrationFile->getFilename());
-    }
-
     $kernel->shutdown();
 }
 

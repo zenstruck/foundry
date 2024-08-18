@@ -273,7 +273,9 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
     protected function normalizeParameter(string $field, mixed $value): mixed
     {
-        if (!Configuration::instance()->isPersistenceAvailable()) {
+        $configuration = Configuration::instance();
+
+        if (!$configuration->isPersistenceAvailable()) {
             return unproxy(parent::normalizeParameter($field, $value));
         }
 
@@ -281,7 +283,10 @@ abstract class PersistentObjectFactory extends ObjectFactory
             $value->persist = $this->persist; // todo - breaks immutability
         }
 
-        if ($value instanceof self && Configuration::instance()->persistence()->relationshipMetadata(static::class(), $value::class(), $field)?->isCascadePersist) {
+        if ($value instanceof self
+            && !Configuration::instance()->isInMemoryEnabled()
+            && Configuration::instance()->persistence()->relationshipMetadata(static::class(), $value::class(), $field)?->isCascadePersist
+        ) {
             $value->persist = false;
         }
 
@@ -342,7 +347,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     {
         $config = Configuration::instance();
 
-        if ($config->isPersistenceAvailable() && !$config->persistence()->isEnabled()) {
+        if ($config->isInMemoryEnabled() || $config->isPersistenceAvailable() && !$config->persistence()->isEnabled()) {
             return false;
         }
 

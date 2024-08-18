@@ -12,6 +12,7 @@
 namespace Zenstruck\Foundry;
 
 use Faker;
+use Zenstruck\Foundry\Exception\CannotCreateFactory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -33,7 +34,6 @@ abstract class Factory
     {
     }
 
-
     /**
      * @param Attributes $attributes
      *
@@ -48,7 +48,7 @@ abstract class Factory
         try {
             $factory ??= new static(); // @phpstan-ignore-line
         } catch (\ArgumentCountError $e) {
-            throw new \LogicException('Factories with dependencies (services) cannot be created before foundry is booted.', previous: $e);
+            throw CannotCreateFactory::argumentCountError($e);
         }
 
         return $factory->initialize()->with($attributes);

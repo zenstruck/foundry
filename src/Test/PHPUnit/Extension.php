@@ -45,7 +45,14 @@ final class Extension implements Runner\Extension\Extension
         $kernel = $this->createKernel();
 
         $facade->registerSubscribers(
+            // DataProviderMethodCalled
             new BootFoundryOnDataProviderMethodCalled($kernel),
+            new EnableInMemoryOnDataProviderMethodCalled(),
+
+            // DataProviderMethodCalledFinished
+            new DisableInMemoryOnDataProviderMethodFinished(),
+
+            // TestSuiteLoaded
             new ShutdownKernelOnTestSuiteLoaded($kernel),
         );
     }

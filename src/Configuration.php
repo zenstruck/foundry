@@ -15,6 +15,7 @@ use Faker;
 use Zenstruck\Foundry\Exception\FoundryNotBooted;
 use Zenstruck\Foundry\Exception\PersistenceDisabled;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
+use Zenstruck\Foundry\InMemory\InMemoryRepositoryRegistry;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
 
 /**
@@ -40,15 +41,18 @@ final class Configuration
 
     private static ?self $instance = null;
 
+    private bool $inMemory = false;
+
     /**
      * @param InstantiatorCallable $instantiator
      */
-    public function __construct(
-        public readonly FactoryRegistry $factories,
+    public function __construct(  // @phpstan-ignore missingType.generics
+        public readonly FactoryRegistryInterface $factories,
         public readonly Faker\Generator $faker,
         callable $instantiator,
         public readonly StoryRegistry $stories,
         private readonly ?PersistenceManager $persistence = null,
+        public readonly ?InMemoryRepositoryRegistry $inMemoryRepositoryRegistry = null,
     ) {
         $this->instantiator = $instantiator;
     }
@@ -93,17 +97,34 @@ final class Configuration
     {
         self::$instance = \is_callable($configuration) ? ($configuration)() : $configuration;
         self::$instance->bootedForDataProvider = false;
+        self::$instance->inMemory = false;
     }
 
     public static function bootForDataProvider(\Closure|self $configuration): void
     {
         self::$instance = \is_callable($configuration) ? ($configuration)() : $configuration;
         self::$instance->bootedForDataProvider = true;
+        self::$instance->inMemory = false;
     }
 
     public static function shutdown(): void
     {
         StoryRegistry::reset();
         self::$instance = null;
+    }
+
+    public function enableInMemory(): void
+    {
+        $this->inMemory = true;
+    }
+
+    public function disableInMemory(): void
+    {
+        $this->inMemory = false;
+    }
+
+    public function isInMemoryEnabled(): bool
+    {
+        return $this->inMemory;
     }
 }

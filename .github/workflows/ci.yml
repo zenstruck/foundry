@@ -86,7 +86,7 @@ jobs:
           - php: 8.3
             deps: highest
             symfony: '*'
-            database: mysql
+            database: pgsql
             use-dama: 1
             use-migrate: 1
             use-phpunit-extension: 0

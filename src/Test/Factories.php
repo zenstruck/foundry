@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\Before;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
 
+use function Zenstruck\Foundry\InMemory\should_enable_in_memory;
 use function Zenstruck\Foundry\Persistence\initialize_proxy_object;
 
 /**
@@ -31,6 +32,7 @@ trait Factories
     public function _beforeHook(): void
     {
         $this->_bootFoundry();
+        $this->_enableInMemory();
         $this->_loadDataProvidedProxies();
     }
 
@@ -65,6 +67,20 @@ trait Factories
 
             return static::getContainer()->get('.zenstruck_foundry.configuration'); // @phpstan-ignore-line
         });
+    }
+
+    /**
+     * @internal
+     */
+    private function _enableInMemory(): void
+    {
+        $method = \method_exists($this, 'name') ? $this->name() : $this->getName(false); // @phpstan-ignore method.notFound
+
+        if (!\is_subclass_of(static::class, KernelTestCase::class) || !should_enable_in_memory(static::class, $method)) { // @phpstan-ignore-line
+            return;
+        }
+
+        Configuration::instance()->enableInMemory();
     }
 
     /**
