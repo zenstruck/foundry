@@ -1,7 +1,7 @@
 /composer.lock
 /phpunit.xml
-/phpunit-dama-doctrine.xml
 /phpunit-10.xml
+/.phpunit.cache
 /vendor/
 /bin/tools/*/vendor/
 /bin/tools/php-cs-fixer/composer.lock

@@ -28,13 +28,13 @@
     "require-dev": {
         "bamarni/composer-bin-plugin": "^1.8",
         "dama/doctrine-test-bundle": "^7.0|^8.0",
-        "doctrine/common": "^3.2",
         "doctrine/collections": "^1.7|^2.0",
+        "doctrine/common": "^3.2",
         "doctrine/doctrine-bundle": "^2.10",
         "doctrine/doctrine-migrations-bundle": "^2.2|^3.0",
         "doctrine/mongodb-odm-bundle": "^4.6|^5.0",
         "doctrine/orm": "^2.16|^3.0",
-        "phpunit/phpunit": "^9.5.0",
+        "phpunit/phpunit": "^9.5.0 || ^10.0 || ^11.0",
         "symfony/console": "^6.4|^7.0",
         "symfony/dotenv": "^6.4|^7.0",
         "symfony/maker-bundle": "^1.55",
@@ -76,10 +76,10 @@
             "@test-schema-dama",
             "@test-migrate-dama"
         ],
-        "test-schema-no-dama": "DATABASE_RESET_MODE=schema vendor/bin/phpunit",
-        "test-migrate-no-dama": "DATABASE_RESET_MODE=migrate vendor/bin/phpunit",
-        "test-schema-dama": "DATABASE_RESET_MODE=schema vendor/bin/phpunit -c phpunit.dama.xml.dist",
-        "test-migrate-dama": "DATABASE_RESET_MODE=migrate vendor/bin/phpunit -c phpunit.dama.xml.dist"
+        "test-schema-no-dama": "DATABASE_RESET_MODE=schema USE_DAMA_DOCTRINE_TEST_BUNDLE=0 ./phpunit",
+        "test-migrate-no-dama": "DATABASE_RESET_MODE=migrate USE_DAMA_DOCTRINE_TEST_BUNDLE=0 ./phpunit",
+        "test-schema-dama": "DATABASE_RESET_MODE=schema USE_DAMA_DOCTRINE_TEST_BUNDLE=1 ./phpunit",
+        "test-migrate-dama": "DATABASE_RESET_MODE=migrate USE_DAMA_DOCTRINE_TEST_BUNDLE=1 ./phpunit"
     },
     "scripts-descriptions": {
         "test": "Run all test permutations",

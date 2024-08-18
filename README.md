@@ -51,13 +51,16 @@ $ composer update
 $ composer test
 
 # run only one permutation
-$ vendor/bin/phpunit
+$ ./phpunit
 
 # run test suite with dama/doctrine-test-bundle
-$ vendor/bin/phpunit -c phpunit.dama.xml.dist
+$ USE_DAMA_DOCTRINE_TEST_BUNDLE=1 vendor/bin/phpunit
 
 # run test suite with postgreSQL instead of MySQL
 $ DATABASE_URL="postgresql://zenstruck:zenstruck@127.0.0.1:5433/zenstruck_foundry?serverVersion=15" vendor/bin/phpunit
+
+# run test suite with another PHPUnit version
+$ PHPUNIT_VERSION=10 vendor/bin/phpunit
 ```
 
 ### Overriding the default configuration
@@ -66,7 +69,10 @@ You can override default environment variables by creating a `.env.local` file, 
 
 ```bash
 # .env.local
-DATABASE_URL="postgresql://zenstruck:zenstruck@127.0.0.1:5433/zenstruck_foundry?serverVersion=15"
+DATABASE_URL="postgresql://zenstruck:zenstruck@127.0.0.1:5433/zenstruck_foundry?serverVersion=15" # enables postgreSQL instead of MySQL
+MONGO_URL="" # disables Mongo
+USE_DAMA_DOCTRINE_TEST_BUNDLE="1" # enables dama/doctrine-test-bundle
+PHPUNIT_VERSION="11" # possible values: 9, 10, 11, 11.4
 
 # run test suite with postgreSQL
 $ vendor/bin/phpunit

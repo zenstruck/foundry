@@ -101,6 +101,7 @@ final class TestKernel extends Kernel
                             'alias' => 'Model',
                         ],
                     ],
+                    'controller_resolver' => ['auto_mapping' => true]
                 ],
             ]);
 

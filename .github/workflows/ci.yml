@@ -8,7 +8,7 @@ on:
 
 jobs:
   tests:
-    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.use-dama == 1 && contains(matrix.database, 'sql') && ' (dama)' || '' }}${{ !contains(matrix.database, 'sql') && '' || matrix.use-migrate == 1 && ' (migrate)' || ' (schema)' }}
+    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}, PU:${{ matrix.phpunit }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.use-dama == 1 && contains(matrix.database, 'sql') && ' (dama)' || '' }}${{ !contains(matrix.database, 'sql') && '' || matrix.use-migrate == 1 && ' (migrate)' || ' (schema)' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -19,6 +19,7 @@ jobs:
         database: [ mysql, mongo ]
         use-dama: [ 1 ]
         use-migrate: [ 0 ]
+        phpunit: [ 9 ]
         exclude:
           - php: 8.1
             symfony: 7.0.*
@@ -31,52 +32,75 @@ jobs:
             database: none
             use-dama: 1
             use-migrate: 0
+            phpunit: 9
           - php: 8.3
             deps: highest
             symfony: '*'
             database: mysql|mongo
             use-dama: 1
             use-migrate: 0
+            phpunit: 9
           - php: 8.3
             deps: highest
             symfony: '*'
             database: pgsql|mongo
             use-dama: 1
             use-migrate: 0
+            phpunit: 9
           - php: 8.3
             deps: highest
             symfony: '*'
             database: pgsql
             use-dama: 0
             use-migrate: 0
+            phpunit: 9
           - php: 8.3
             deps: highest
             symfony: '*'
             database: sqlite
             use-dama: 0
             use-migrate: 0
+            phpunit: 9
           - php: 8.3
             deps: lowest
             symfony: '*'
             database: sqlite
             use-dama: 0
             use-migrate: 0
+            phpunit: 9
           - php: 8.3
             deps: lowest
             symfony: '*'
             database: mysql
             use-dama: 1
             use-migrate: 0
+            phpunit: 9
           - php: 8.3
             deps: highest
             symfony: '*'
             database: mysql
             use-dama: 1
             use-migrate: 1
+            phpunit: 9
+          - php: 8.3
+            deps: highest
+            symfony: '*'
+            database: mysql|mongo
+            use-dama: 1
+            use-migrate: 0
+            phpunit: 10
+          - php: 8.3
+            deps: highest
+            symfony: '*'
+            database: mysql|mongo
+            use-dama: 1
+            use-migrate: 0
+            phpunit: 11
     env:
       DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || contains(matrix.database, 'sqlite') && 'sqlite:///%kernel.project_dir%/var/data.db' || '' }}
       MONGO_URL: ${{ contains(matrix.database, 'mongo') && 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb' || '' }}
       USE_DAMA_DOCTRINE_TEST_BUNDLE: ${{ matrix.use-dama == 1 && contains(matrix.database, 'sql') && 1 || 0 }}
+      PHPUNIT_VERSION: ${{ matrix.phpunit }}
     services:
       postgres:
         image: ${{ contains(matrix.database, 'pgsql') && 'postgres:15' || '' }}
@@ -119,60 +143,10 @@ jobs:
         run: sudo /etc/init.d/mysql start
 
       - name: Test
-        run: vendor/bin/phpunit -c "${PHPUNIT_CONFIG_FILE}"
+        run: ./phpunit
         shell: bash
         env:
           DATABASE_RESET_MODE: ${{ matrix.use-migrate == 1 && 'migrate' || 'schema' }}
-          PHPUNIT_CONFIG_FILE: ${{ env.USE_DAMA_DOCTRINE_TEST_BUNDLE == 1 && 'phpunit.dama.xml.dist' || 'phpunit.xml.dist' }}
-
-  tests-no-phpunit-bridge:
-    name: PHPUnit:${{ matrix.phpunit }}, P:8.3, S:7.1.*, D:mysql|mongo (dama) (schema)
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        phpunit: [10, 11]
-    env:
-      DATABASE_URL: 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42'
-      MONGO_URL: 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb'
-    services:
-      mongo:
-        image: 'mongo:4'
-        ports:
-          - 27017:27017
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.3
-          coverage: none
-          tools: flex
-
-      - name: Install dependencies
-        uses: ramsey/composer-install@v2
-        with:
-          composer-options: --prefer-dist
-        env:
-          SYMFONY_REQUIRE: 7.1.*
-
-      - name: Set up MySQL
-        run: sudo /etc/init.d/mysql start
-
-      - name: Install PHPUnit ${{ matrix.phpunit }}
-        run: |
-          composer remove --dev symfony/phpunit-bridge
-          composer require --dev phpunit/phpunit:^${{ matrix.phpunit }} -W
-
-      - name: Install rector and change PHPUnit metadata from annotations to attributes
-        run: |
-          composer bin rector require --dev rector/rector
-          bin/tools/rector/vendor/rector/rector/bin/rector -c rector-phpunit-10.php
-
-      - name: Test
-        run: vendor/bin/phpunit -c phpunit-10.xml.dist
 
   code-coverage:
     name: Code Coverage
@@ -180,6 +154,8 @@ jobs:
     env:
       DATABASE_URL: postgresql://root:root@localhost:5432/foundry?serverVersion=15
       MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
+      USE_DAMA_DOCTRINE_TEST_BUNDLE: 1
+      PHPUNIT_VERSION: 9
     services:
       mongo:
         image: mongo:4
@@ -215,7 +191,7 @@ jobs:
           composer-options: --prefer-dist
 
       - name: Test with coverage
-        run: vendor/bin/phpunit -c phpunit.dama.xml.dist --coverage-text --coverage-clover coverage.xml
+        run: ./phpunit --coverage-text --coverage-clover coverage.xml
         shell: bash
         env:
           SYMFONY_DEPRECATIONS_HELPER: disabled
@@ -241,27 +217,6 @@ jobs:
           args: --short --error-format=github
         env:
           DOCS_DIR: 'docs/'
-
-  build-docs:
-    name: Build Documentation
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.1
-          coverage: none
-
-      - name: Install dependencies
-        uses: ramsey/composer-install@v2
-        with:
-          composer-options: --prefer-dist
-
-      - name: Build docs
-        run: bin/build-docs
 
   static-analysis:
     name: Static Analysis

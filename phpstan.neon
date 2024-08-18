@@ -10,8 +10,6 @@ parameters:
         - message: '#Return type of call to function Zenstruck\\Foundry\\Persistence\\proxy contains unresolvable type#'
           path: src/Persistence/ProxyRepositoryDecorator.php
 
-        - message: '#Attribute class PHPUnit\\Framework\\Attributes\\(.*) does not exist.#'
-
         # prevent PHPStan to force to type data providers
         - identifier: missingType.iterableValue
           path: tests/
