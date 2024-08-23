@@ -781,7 +781,7 @@ The following assumes the ``Post`` entity has a one-to-many relationship with ``
     PostFactory::createMany(6, ['comments' => CommentFactory::new()->many(4)]);
 
     // Example 3: Create 6 Posts each with between 0 and 10 Comments
-    PostFactory::createMany(6, ['comments' => CommentFactory::new()->many(0, 10)]);
+    PostFactory::createMany(6, ['comments' => CommentFactory::new()->range(0, 10)]);
 
 Many-to-Many
 ............
@@ -1131,7 +1131,7 @@ You can simply use your factories and stories right within your fixture files:
                     'tags' => TagFactory::randomRange(0, 6),
 
                     // each Post will have between 0 and 10 Comment's that are created new
-                    'comments' => CommentFactory::new()->many(0, 10),
+                    'comments' => CommentFactory::new()->range(0, 10),
                 ];
             });
         }
