@@ -204,11 +204,14 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
+     * @final
      * @return T
      */
-    final public function create(callable|array $attributes = []): object
+    public function create(callable|array $attributes = []): object
     {
         $object = parent::create($attributes);
+
+        $this->throwIfCannotCreateObject();
 
         if (!$this->isPersisting()) {
             return $this->proxy($object);
@@ -270,7 +273,9 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
     protected function normalizeParameter(string $field, mixed $value): mixed
     {
-        if (!Configuration::instance()->isPersistenceAvailable()) {
+        $configuration = Configuration::instance();
+
+        if (!$configuration->isPersistenceAvailable()) {
             return unproxy(parent::normalizeParameter($field, $value));
         }
 
@@ -278,7 +283,10 @@ abstract class PersistentObjectFactory extends ObjectFactory
             $value->persist = $this->persist; // todo - breaks immutability
         }
 
-        if ($value instanceof self && Configuration::instance()->persistence()->relationshipMetadata(static::class(), $value::class(), $field)?->isCascadePersist) {
+        if ($value instanceof self
+            && !Configuration::instance()->isInMemoryEnabled()
+            && Configuration::instance()->persistence()->relationshipMetadata(static::class(), $value::class(), $field)?->isCascadePersist
+        ) {
             $value->persist = false;
         }
 
@@ -339,7 +347,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     {
         $config = Configuration::instance();
 
-        if ($config->isPersistenceAvailable() && !$config->persistence()->isEnabled()) {
+        if ($config->isInMemoryEnabled() || $config->isPersistenceAvailable() && !$config->persistence()->isEnabled()) {
             return false;
         }
 
@@ -360,5 +368,27 @@ abstract class PersistentObjectFactory extends ObjectFactory
         $object = proxy($object);
 
         return $this->isPersisting() ? $object : $object->_disableAutoRefresh();
+    }
+
+    private function throwIfCannotCreateObject(): void
+    {
+        $configuration = Configuration::instance();
+
+        /**
+         * "false === $configuration->inADataProvider()" would also mean that the PHPUnit extension is NOT used
+         * so a `FoundryNotBooted` exception would be thrown if we actually are in a data provider.
+         */
+        if (!$configuration->inADataProvider()) {
+            return;
+        }
+
+        if (
+            !$configuration->isPersistenceAvailable()
+            || $this instanceof PersistentProxyObjectFactory
+        ) {
+            return;
+        }
+
+        throw new \LogicException(\sprintf('Cannot create object in a data provider for non-proxy factories. Transform your factory into a "%s", or call "create()" method in the test. See https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#phpunit-data-providers', PersistentProxyObjectFactory::class));
     }
 }

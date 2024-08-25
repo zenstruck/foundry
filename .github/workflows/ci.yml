@@ -8,7 +8,7 @@ on:
 
 jobs:
   tests:
-    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}, PU:${{ matrix.phpunit }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.use-dama == 1 && contains(matrix.database, 'sql') && ' (dama)' || '' }}${{ !contains(matrix.database, 'sql') && '' || matrix.use-migrate == 1 && ' (migrate)' || ' (schema)' }}
+    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}, PU:${{ matrix.phpunit }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.use-dama == 1 && contains(matrix.database, 'sql') && ' (dama)' || '' }}${{ !contains(matrix.database, 'sql') && '' || matrix.use-migrate == 1 && ' (migrate)' || ' (schema)' }}${{ matrix.use-phpunit-extension == 1 && ' (phpunit extension)' || '' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -19,6 +19,7 @@ jobs:
         database: [ mysql, mongo ]
         use-dama: [ 1 ]
         use-migrate: [ 0 ]
+        use-phpunit-extension: [ 0 ]
         phpunit: [ 9 ]
         exclude:
           - php: 8.1
@@ -32,6 +33,7 @@ jobs:
             database: none
             use-dama: 1
             use-migrate: 0
+            use-phpunit-extension: 0
             phpunit: 9
           - php: 8.3
             deps: highest
@@ -39,6 +41,7 @@ jobs:
             database: mysql|mongo
             use-dama: 1
             use-migrate: 0
+            use-phpunit-extension: 0
             phpunit: 9
           - php: 8.3
             deps: highest
@@ -46,6 +49,7 @@ jobs:
             database: pgsql|mongo
             use-dama: 1
             use-migrate: 0
+            use-phpunit-extension: 0
             phpunit: 9
           - php: 8.3
             deps: highest
@@ -53,6 +57,7 @@ jobs:
             database: pgsql
             use-dama: 0
             use-migrate: 0
+            use-phpunit-extension: 0
             phpunit: 9
           - php: 8.3
             deps: highest
@@ -60,6 +65,7 @@ jobs:
             database: sqlite
             use-dama: 0
             use-migrate: 0
+            use-phpunit-extension: 0
             phpunit: 9
           - php: 8.3
             deps: lowest
@@ -67,6 +73,7 @@ jobs:
             database: sqlite
             use-dama: 0
             use-migrate: 0
+            use-phpunit-extension: 0
             phpunit: 9
           - php: 8.3
             deps: lowest
@@ -74,13 +81,15 @@ jobs:
             database: mysql
             use-dama: 1
             use-migrate: 0
+            use-phpunit-extension: 0
             phpunit: 9
           - php: 8.3
             deps: highest
             symfony: '*'
-            database: mysql
+            database: pgsql
             use-dama: 1
             use-migrate: 1
+            use-phpunit-extension: 0
             phpunit: 9
           - php: 8.3
             deps: highest
@@ -88,6 +97,7 @@ jobs:
             database: mysql|mongo
             use-dama: 1
             use-migrate: 0
+            use-phpunit-extension: 0
             phpunit: 10
           - php: 8.3
             deps: highest
@@ -95,11 +105,21 @@ jobs:
             database: mysql|mongo
             use-dama: 1
             use-migrate: 0
+            use-phpunit-extension: 0
             phpunit: 11
+          - php: 8.3
+            deps: highest
+            symfony: '*'
+            database: mysql|mongo
+            use-dama: 1
+            use-migrate: 0
+            use-phpunit-extension: 1
+            phpunit: 11.4
     env:
       DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || contains(matrix.database, 'sqlite') && 'sqlite:///%kernel.project_dir%/var/data.db' || '' }}
       MONGO_URL: ${{ contains(matrix.database, 'mongo') && 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb' || '' }}
       USE_DAMA_DOCTRINE_TEST_BUNDLE: ${{ matrix.use-dama == 1 && contains(matrix.database, 'sql') && 1 || 0 }}
+      USE_FOUNDRY_PHPUNIT_EXTENSION: ${{ matrix.use-phpunit-extension }}
       PHPUNIT_VERSION: ${{ matrix.phpunit }}
     services:
       postgres:
@@ -155,7 +175,8 @@ jobs:
       DATABASE_URL: postgresql://root:root@localhost:5432/foundry?serverVersion=15
       MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
       USE_DAMA_DOCTRINE_TEST_BUNDLE: 1
-      PHPUNIT_VERSION: 9
+      USE_FOUNDRY_PHPUNIT_EXTENSION: 1
+      PHPUNIT_VERSION: 11.4
     services:
       mongo:
         image: mongo:4
