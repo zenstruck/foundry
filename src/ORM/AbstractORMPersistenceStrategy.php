@@ -20,6 +20,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
 use Zenstruck\Foundry\Persistence\PersistenceStrategy;
+use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseHandler;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -96,7 +97,7 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
 
     final public function resetSchema(KernelInterface $kernel): void
     {
-        if (PersistenceManager::isDAMADoctrineTestBundleEnabled()) {
+        if (ResetDatabaseHandler::isDAMADoctrineTestBundleEnabled()) {
             // not required as the DAMADoctrineTestBundle wraps each test in a transaction
             return;
         }

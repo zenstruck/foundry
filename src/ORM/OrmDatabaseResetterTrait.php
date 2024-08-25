@@ -6,6 +6,7 @@ namespace Zenstruck\Foundry\ORM;
 
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
 /**
@@ -17,7 +18,7 @@ trait OrmDatabaseResetterTrait
     private function dropAndResetDatabase(Application $application): void
     {
         foreach ($this->connections() as $connection) {
-            $databasePlatform = $this->registry->getConnection($connection)->getDatabasePlatform(); // @phpstan-ignore-line
+            $databasePlatform = $this->registry()->getConnection($connection)->getDatabasePlatform(); // @phpstan-ignore-line
 
             if ($databasePlatform instanceof SQLitePlatform) {
                 // we don't need to create the sqlite database - it's created when the schema is created
@@ -48,13 +49,13 @@ trait OrmDatabaseResetterTrait
 
     private function createSchema(Application $application): void
     {
-        if (self::RESET_MODE_MIGRATE === $this->config['reset']['mode']) {
-            self::runCommand($application, 'doctrine:migrations:migrate', [
-                '--no-interaction' => true,
-            ]);
-
-            return;
-        }
+//        if (self::RESET_MODE_MIGRATE === $this->config['reset']['mode']) {
+//            self::runCommand($application, 'doctrine:migrations:migrate', [
+//                '--no-interaction' => true,
+//            ]);
+//
+//            return;
+//        }
 
         foreach ($this->managers() as $manager) {
             self::runCommand($application, 'doctrine:schema:update', [
@@ -63,6 +64,8 @@ trait OrmDatabaseResetterTrait
             ]);
         }
     }
+
+    abstract private function registry(): ManagerRegistry;
 
     /**
      * @return list<string>

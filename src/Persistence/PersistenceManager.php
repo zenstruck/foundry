@@ -32,7 +32,6 @@ use Zenstruck\Foundry\Tests\Fixture\TestKernel;
  */
 final class PersistenceManager
 {
-    private static bool $hasDatabaseBeenReset = false;
     private static bool $ormOnly = false;
 
     private bool $flush = true;
@@ -40,107 +39,14 @@ final class PersistenceManager
 
     /**
      * @param PersistenceStrategy[] $strategies
+     * @param DatabaseResetterInterface[] $databaseResetters
      * @param SchemaResetterInterface[] $schemaResetters
      */
     public function __construct(
         private iterable $strategies,
+        public iterable $databaseResetters,
         public iterable $schemaResetters,
     ) {
-    }
-
-    public static function isDAMADoctrineTestBundleEnabled(): bool
-    {
-        return \class_exists(StaticDriver::class) && StaticDriver::isKeepStaticConnections();
-    }
-
-    /**
-     * @param callable():KernelInterface $createKernel
-     * @param callable():void            $shutdownKernel
-     */
-    public static function resetDatabase(callable $createKernel, callable $shutdownKernel): void
-    {
-        if (self::$hasDatabaseBeenReset) {
-            return;
-        }
-
-        if ($isDAMADoctrineTestBundleEnabled = self::isDAMADoctrineTestBundleEnabled()) {
-            // disable static connections for this operation
-            // :warning: the kernel should not be booted before calling this!
-            StaticDriver::setKeepStaticConnections(false);
-        }
-
-        $kernel = $createKernel();
-        $configuration = Configuration::instance();
-        $strategyClasses = [];
-
-        try {
-            $strategies = $configuration->persistence()->strategies;
-        } catch (PersistenceNotAvailable $e) {
-            if (!\class_exists(TestKernel::class)) {
-                throw $e;
-            }
-
-            // allow this to fail if running foundry test suite
-            return;
-        }
-
-        foreach ($strategies as $strategy) {
-            $strategy->resetDatabase($kernel);
-            $strategyClasses[] = $strategy::class;
-        }
-
-        if (1 === \count($strategyClasses) && \is_a($strategyClasses[0], AbstractORMPersistenceStrategy::class, allow_string: true)) {
-            // enable skipping booting the kernel for resetSchema()
-            self::$ormOnly = true;
-        }
-
-        if ($isDAMADoctrineTestBundleEnabled && self::$ormOnly) {
-            // add global stories so they are available after transaction rollback
-            $configuration->stories->loadGlobalStories();
-        }
-
-        if ($isDAMADoctrineTestBundleEnabled) {
-            // re-enable static connections
-            StaticDriver::setKeepStaticConnections(true);
-        }
-
-        $shutdownKernel();
-
-        self::$hasDatabaseBeenReset = true;
-    }
-
-    /**
-     * @param callable():KernelInterface $createKernel
-     * @param callable():void            $shutdownKernel
-     */
-    public static function resetSchema(callable $createKernel, callable $shutdownKernel): void
-    {
-        if (self::canSkipSchemaReset()) {
-            // can fully skip booting the kernel
-            return;
-        }
-
-        $kernel = $createKernel();
-        $configuration = Configuration::instance();
-
-        try {
-            $strategies = $configuration->persistence()->strategies;
-        } catch (PersistenceNotAvailable $e) {
-            if (!\class_exists(TestKernel::class)) {
-                throw $e;
-            }
-
-            // allow this to fail if running foundry test suite
-            return;
-        }
-
-        foreach ($strategies as $strategy) {
-            $strategy->resetSchema($kernel);
-        }
-
-        $configuration->stories->loadGlobalStories();
-
-        $shutdownKernel();
     }
 
     public function isEnabled(): bool
@@ -376,11 +282,6 @@ final class PersistenceManager
         } catch (NoPersistenceStrategy) {
             return false;
         }
-    }
-
-    private static function canSkipSchemaReset(): bool
-    {
-        return self::$ormOnly && self::isDAMADoctrineTestBundleEnabled();
     }
 
     /**
