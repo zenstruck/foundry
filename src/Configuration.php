@@ -49,6 +49,9 @@ final class Configuration
         $this->instantiator = $instantiator;
     }
 
+    /**
+     * @throws PersistenceNotAvailable
+     */
     public function persistence(): PersistenceManager
     {
         return $this->persistence ?? throw new PersistenceNotAvailable('No persistence managers configured. Note: persistence cannot be used in unit tests.');

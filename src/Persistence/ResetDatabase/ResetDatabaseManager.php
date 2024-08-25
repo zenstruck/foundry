@@ -8,20 +8,30 @@ use DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
-use Zenstruck\Foundry\ORM\AbstractORMPersistenceStrategy;
+use Zenstruck\Foundry\Persistence\PersistenceManager;
 use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 
 /**
+ * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-final class ResetDatabaseHandler
+final class ResetDatabaseManager
 {
     private static bool $hasDatabaseBeenReset = false;
-    private static bool $ormOnly = false;
+
+    /**
+     * @param iterable<DatabaseResetterInterface> $databaseResetters
+     * @param iterable<SchemaResetterInterface> $schemaResetters
+     */
+    public function __construct(
+        private iterable $databaseResetters,
+        private iterable $schemaResetters
+    ) {
+    }
 
     /**
      * @param callable():KernelInterface $createKernel
-     * @param callable():void            $shutdownKernel
+     * @param callable():void $shutdownKernel
      */
     public static function resetDatabase(callable $createKernel, callable $shutdownKernel): void
     {
@@ -29,18 +39,11 @@ final class ResetDatabaseHandler
             return;
         }
 
-        if ($isDAMADoctrineTestBundleEnabled = self::isDAMADoctrineTestBundleEnabled()) {
-            // disable static connections for this operation
-            // :warning: the kernel should not be booted before calling this!
-            StaticDriver::setKeepStaticConnections(false);
-        }
-
         $kernel = $createKernel();
         $configuration = Configuration::instance();
-        $strategyClasses = [];
 
         try {
-            $strategies = $configuration->persistence()->databaseResetters;
+            $databaseResetters = $configuration->persistence()->resetDatabaseManager()->databaseResetters;
         } catch (PersistenceNotAvailable $e) {
             if (!\class_exists(TestKernel::class)) {
                 throw $e;
@@ -50,24 +53,8 @@ final class ResetDatabaseHandler
             return;
         }
 
-        foreach ($strategies as $strategy) {
-            $strategy->resetDatabase($kernel);
-            $strategyClasses[] = $strategy::class;
-        }
-
-        if (1 === \count($strategyClasses) && \is_a($strategyClasses[0], AbstractORMPersistenceStrategy::class, allow_string: true)) {
-            // enable skipping booting the kernel for resetSchema()
-            self::$ormOnly = true;
-        }
-
-        if ($isDAMADoctrineTestBundleEnabled && self::$ormOnly) {
-            // add global stories so they are available after transaction rollback
-            $configuration->stories->loadGlobalStories();
-        }
-
-        if ($isDAMADoctrineTestBundleEnabled) {
-            // re-enable static connections
-            StaticDriver::setKeepStaticConnections(true);
+        foreach ($databaseResetters as $databaseResetter) {
+            $databaseResetter->resetDatabase($kernel);
         }
 
         $shutdownKernel();
@@ -77,7 +64,7 @@ final class ResetDatabaseHandler
 
     /**
      * @param callable():KernelInterface $createKernel
-     * @param callable():void            $shutdownKernel
+     * @param callable():void $shutdownKernel
      */
     public static function resetSchema(callable $createKernel, callable $shutdownKernel): void
     {
@@ -90,7 +77,7 @@ final class ResetDatabaseHandler
         $configuration = Configuration::instance();
 
         try {
-            $strategies = $configuration->persistence()->schemaResetters;
+            $schemaResetters = $configuration->persistence()->resetDatabaseManager()->schemaResetters;
         } catch (PersistenceNotAvailable $e) {
             if (!\class_exists(TestKernel::class)) {
                 throw $e;
@@ -100,8 +87,8 @@ final class ResetDatabaseHandler
             return;
         }
 
-        foreach ($strategies as $strategy) {
-            $strategy->resetSchema($kernel);
+        foreach ($schemaResetters as $schemaResetter) {
+            $schemaResetter->resetSchema($kernel);
         }
 
         $configuration->stories->loadGlobalStories();
@@ -111,7 +98,7 @@ final class ResetDatabaseHandler
 
     private static function canSkipSchemaReset(): bool
     {
-        return self::$ormOnly && self::isDAMADoctrineTestBundleEnabled();
+        return PersistenceManager::isOrmOnly() && self::isDAMADoctrineTestBundleEnabled();
     }
 
     public static function isDAMADoctrineTestBundleEnabled(): bool

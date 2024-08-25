@@ -2,11 +2,14 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver;
 use Zenstruck\Foundry\ORM\DoctrineOrmVersionGuesser;
-use Zenstruck\Foundry\ORM\OrmDatabaseResetter;
-use Zenstruck\Foundry\ORM\OrmSchemaResetter;
 use Zenstruck\Foundry\ORM\OrmV2PersistenceStrategy;
 use Zenstruck\Foundry\ORM\OrmV3PersistenceStrategy;
+use Zenstruck\Foundry\ORM\ResetDatabase\DamaDatabaseResetter;
+use Zenstruck\Foundry\ORM\ResetDatabase\DamaSchemaResetter;
+use Zenstruck\Foundry\ORM\ResetDatabase\OrmDatabaseResetter;
+use Zenstruck\Foundry\ORM\ResetDatabase\OrmSchemaResetter;
 
 return static function (ContainerConfigurator $container): void {
     $container->services()
@@ -31,4 +34,21 @@ return static function (ContainerConfigurator $container): void {
             ])
             ->tag('.foundry.persistence.schema_resetter')
     ;
+
+    if (\class_exists(StaticDriver::class)) {
+        $container->services()
+            ->set('.zenstruck_foundry.persistence.database_resetter.orm.dama', DamaDatabaseResetter::class)
+                ->decorate('.zenstruck_foundry.persistence.database_resetter.orm')
+                ->args([
+                    service('.inner'),
+                ])
+                ->tag('.foundry.persistence.database_resetter')
+            ->set('.zenstruck_foundry.persistence.schema_resetter.orm.dama', DamaSchemaResetter::class)
+                ->decorate('.zenstruck_foundry.persistence.schema_resetter.orm')
+                ->args([
+                    service('.inner'),
+                ])
+                ->tag('.foundry.persistence.schema_resetter')
+        ;
+    }
 };

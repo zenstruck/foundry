@@ -89,43 +89,4 @@ final class MongoPersistenceStrategy extends PersistenceStrategy
     {
         return $this->objectManagerFor($object::class)->getClassMetadata($object::class)->isEmbeddedDocument;
     }
-
-    public function resetDatabase(KernelInterface $kernel): void
-    {
-        // noop
-    }
-
-    public function resetSchema(KernelInterface $kernel): void
-    {
-        $application = self::application($kernel);
-
-        foreach ($this->managers() as $manager) {
-            try {
-                self::runCommand(
-                    $application,
-                    'doctrine:mongodb:schema:drop',
-                    [
-                        '--dm' => $manager,
-                    ]
-                );
-            } catch (\Exception) {
-            }
-
-            self::runCommand(
-                $application,
-                'doctrine:mongodb:schema:create',
-                [
-                    '--dm' => $manager,
-                ]
-            );
-        }
-    }
-
-    /**
-     * @return string[]
-     */
-    private function managers(): array
-    {
-        return $this->config['reset']['document_managers'];
-    }
 }

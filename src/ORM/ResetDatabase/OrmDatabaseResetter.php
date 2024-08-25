@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Zenstruck\Foundry\ORM;
+namespace Zenstruck\Foundry\ORM\ResetDatabase;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -42,11 +42,17 @@ final class OrmDatabaseResetter implements DatabaseResetterInterface
         return $this->registry;
     }
 
+    /**
+     * @return list<string>
+     */
     private function managers(): array
     {
         return $this->managers;
     }
 
+    /**
+     * @return list<string>
+     */
     private function connections(): array
     {
         return $this->connections;

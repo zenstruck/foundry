@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Zenstruck\Foundry\ORM;
+namespace Zenstruck\Foundry\ORM\ResetDatabase;
 
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
@@ -43,6 +43,7 @@ trait OrmDatabaseResetterTrait
                 '--force' => true,
                 '--if-exists' => true,
             ]);
+
             self::runCommand($application, 'doctrine:database:create', ['--connection' => $connection]);
         }
     }
