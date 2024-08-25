@@ -29,23 +29,11 @@ final class MongoSchemaResetter implements SchemaResetterInterface
 
         foreach ($this->managers as $manager) {
             try {
-                self::runCommand(
-                    $application,
-                    'doctrine:mongodb:schema:drop',
-                    [
-                        '--dm' => $manager,
-                    ]
-                );
+                self::runCommand($application, 'doctrine:mongodb:schema:drop', ['--dm' => $manager]);
             } catch (\Exception) {
             }
 
-            self::runCommand(
-                $application,
-                'doctrine:mongodb:schema:create',
-                [
-                    '--dm' => $manager,
-                ]
-            );
+            self::runCommand($application, 'doctrine:mongodb:schema:create', ['--dm' => $manager]);
         }
     }
 }

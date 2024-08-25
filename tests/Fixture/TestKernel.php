@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Zenstruck\Foundry\ORM\AbstractORMPersistenceStrategy;
+use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
 use Zenstruck\Foundry\Tests\Fixture\Factories\ArrayFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\GlobalInvokableService;
@@ -74,7 +75,7 @@ final class TestKernel extends Kernel
             ],
             'orm' => [
                 'reset' => [
-                    'mode' => \getenv('DATABASE_RESET_MODE') ?: AbstractORMPersistenceStrategy::RESET_MODE_SCHEMA,
+                    'mode' => \getenv('DATABASE_RESET_MODE') ?: ResetDatabaseMode::SCHEMA,
                 ],
             ],
         ]);
@@ -105,7 +106,7 @@ final class TestKernel extends Kernel
                 ],
             ]);
 
-            if (AbstractORMPersistenceStrategy::RESET_MODE_MIGRATE === \getenv('DATABASE_RESET_MODE')) {
+            if (ResetDatabaseMode::MIGRATE->value === \getenv('DATABASE_RESET_MODE')) {
                 $c->loadFromExtension('doctrine', [
                     'orm' => [
                         'mappings' => [

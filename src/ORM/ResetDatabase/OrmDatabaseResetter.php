@@ -4,31 +4,15 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\ORM\ResetDatabase;
 
-use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Zenstruck\Foundry\Persistence\ResetDatabase\DatabaseResetterInterface;
-use Zenstruck\Foundry\Persistence\SymfonyCommandRunner;
 
 /**
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-final class OrmDatabaseResetter implements DatabaseResetterInterface
+final class OrmDatabaseResetter extends AbstractOrmResetter implements OrmDatabaseResetterInterface
 {
-    use OrmDatabaseResetterTrait;
-    use SymfonyCommandRunner;
-
-    /**
-     * @param list<string> $managers
-     * @param list<string> $connections
-     */
-    public function __construct(
-        private ManagerRegistry $registry,
-        private array $managers,
-        private array $connections,
-    ) {
-    }
-
     final public function resetDatabase(KernelInterface $kernel): void
     {
         $application = self::application($kernel);
@@ -37,24 +21,33 @@ final class OrmDatabaseResetter implements DatabaseResetterInterface
         $this->createSchema($application);
     }
 
-    private function registry(): ManagerRegistry
+    final public function resetSchema(KernelInterface $kernel): void
     {
-        return $this->registry;
+        $application = self::application($kernel);
+
+        $this->dropSchema($application);
+        $this->createSchema($application);
     }
 
-    /**
-     * @return list<string>
-     */
-    private function managers(): array
+    private function createSchema(Application $application): void
     {
-        return $this->managers;
+        foreach ($this->managers as $manager) {
+            self::runCommand(
+                $application,
+                'doctrine:schema:update',
+                ['--em' => $manager, '--force' => true]
+            );
+        }
     }
 
-    /**
-     * @return list<string>
-     */
-    private function connections(): array
+    private function dropSchema(Application $application): void
     {
-        return $this->connections;
+        foreach ($this->managers as $manager) {
+            self::runCommand(
+                $application,
+                'doctrine:schema:drop',
+                ['--em' => $manager, '--force' => true, '--full-database' => true]
+            );
+        }
     }
 }

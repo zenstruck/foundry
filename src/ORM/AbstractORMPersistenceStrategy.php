@@ -11,16 +11,10 @@
 
 namespace Zenstruck\Foundry\ORM;
 
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
-use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 use Doctrine\Persistence\Mapping\MappingException;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Zenstruck\Foundry\Persistence\PersistenceManager;
 use Zenstruck\Foundry\Persistence\PersistenceStrategy;
-use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -32,9 +26,6 @@ use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
  */
 abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
 {
-    public const RESET_MODE_SCHEMA = 'schema';
-    public const RESET_MODE_MIGRATE = 'migrate';
-
     final public function contains(object $object): bool
     {
         $em = $this->objectManagerFor($object::class);
@@ -53,7 +44,7 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
         // cannot use UOW::recomputeSingleEntityChangeSet() here as it wrongly computes embedded objects as changed
         $em->getUnitOfWork()->computeChangeSet($em->getClassMetadata($object::class), $object);
 
-        return (bool) $em->getUnitOfWork()->getEntityChangeSet($object);
+        return (bool)$em->getUnitOfWork()->getEntityChangeSet($object);
     }
 
     final public function truncate(string $class): void

@@ -20,7 +20,7 @@ trait SymfonyCommandRunner
     final protected static function runCommand(Application $application, string $command, array $parameters = [], bool $canFail = false): void
     {
         $exit = $application->run(
-            new ArrayInput(\array_merge(['command' => $command], $parameters)),
+            new ArrayInput(\array_merge(['command' => $command], $parameters + ['--no-interaction' => true])),
             $output = new BufferedOutput()
         );
 

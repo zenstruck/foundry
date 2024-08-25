@@ -8,17 +8,16 @@ use DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
-use Zenstruck\Foundry\Persistence\ResetDatabase\DatabaseResetterInterface;
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 
 /**
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-final class DamaDatabaseResetter implements DatabaseResetterInterface
+final class DamaDatabaseResetter implements OrmDatabaseResetterInterface
 {
     public function __construct(
-        private DatabaseResetterInterface $decorated,
+        private OrmDatabaseResetterInterface $decorated,
     ) {
     }
 
@@ -48,5 +47,15 @@ final class DamaDatabaseResetter implements DatabaseResetterInterface
 
         // re-enable static connections
         StaticDriver::setKeepStaticConnections(true);
+    }
+
+    public function resetSchema(KernelInterface $kernel): void
+    {
+        if (ResetDatabaseManager::isDAMADoctrineTestBundleEnabled()) {
+            // not required as the DAMADoctrineTestBundle wraps each test in a transaction
+            return;
+        }
+
+        $this->decorated->resetSchema($kernel);
     }
 }
