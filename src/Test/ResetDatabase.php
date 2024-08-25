@@ -16,7 +16,7 @@ use PHPUnit\Framework\Attributes\BeforeClass;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
 
-use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseHandler;
+use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 use function Zenstruck\Foundry\restorePhpUnitErrorHandler;
 
 /**
@@ -35,7 +35,7 @@ trait ResetDatabase
             throw new \RuntimeException(\sprintf('The "%s" trait can only be used on TestCases that extend "%s".', __TRAIT__, KernelTestCase::class));
         }
 
-        ResetDatabaseHandler::resetDatabase(
+        ResetDatabaseManager::resetDatabase(
             static fn() => static::bootKernel(),
             static function(): void {
                 static::ensureKernelShutdown();
@@ -55,7 +55,7 @@ trait ResetDatabase
             throw new \RuntimeException(\sprintf('The "%s" trait can only be used on TestCases that extend "%s".', __TRAIT__, KernelTestCase::class));
         }
 
-        ResetDatabaseHandler::resetSchema(
+        ResetDatabaseManager::resetSchema(
             static fn() => static::bootKernel(),
             static fn() => static::ensureKernelShutdown(),
         );

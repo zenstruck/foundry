@@ -2,14 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Zenstruck\Foundry\ORM;
+namespace Zenstruck\Foundry\ORM\ResetDatabase;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Zenstruck\Foundry\Persistence\PersistenceManager;
-use Zenstruck\Foundry\Persistence\ResetDatabase\DatabaseResetterInterface;
-use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseHandler;
 use Zenstruck\Foundry\Persistence\ResetDatabase\SchemaResetterInterface;
 use Zenstruck\Foundry\Persistence\SymfonyCommandRunner;
 
@@ -35,11 +32,6 @@ final class OrmSchemaResetter implements SchemaResetterInterface
 
     final public function resetSchema(KernelInterface $kernel): void
     {
-        if (ResetDatabaseHandler::isDAMADoctrineTestBundleEnabled()) {
-            // not required as the DAMADoctrineTestBundle wraps each test in a transaction
-            return;
-        }
-
         $application = self::application($kernel);
 
         $this->dropSchema($application);
@@ -68,11 +60,17 @@ final class OrmSchemaResetter implements SchemaResetterInterface
         return $this->registry;
     }
 
+    /**
+     * @return list<string>
+     */
     private function managers(): array
     {
         return $this->managers;
     }
 
+    /**
+     * @return list<string>
+     */
     private function connections(): array
     {
         return $this->connections;

@@ -11,19 +11,17 @@
 
 namespace Zenstruck\Foundry\Persistence;
 
-use DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\ORM\AbstractORMPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\NoPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
 use Zenstruck\Foundry\Persistence\ResetDatabase\DatabaseResetterInterface;
+use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 use Zenstruck\Foundry\Persistence\ResetDatabase\SchemaResetterInterface;
-use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -32,20 +30,15 @@ use Zenstruck\Foundry\Tests\Fixture\TestKernel;
  */
 final class PersistenceManager
 {
-    private static bool $ormOnly = false;
-
     private bool $flush = true;
     private bool $persist = true;
 
     /**
-     * @param PersistenceStrategy[] $strategies
-     * @param DatabaseResetterInterface[] $databaseResetters
-     * @param SchemaResetterInterface[] $schemaResetters
+     * @param iterable<PersistenceStrategy> $strategies
      */
     public function __construct(
         private iterable $strategies,
-        public iterable $databaseResetters,
-        public iterable $schemaResetters,
+        private ResetDatabaseManager $resetDatabaseManager,
     ) {
     }
 
@@ -278,10 +271,30 @@ final class PersistenceManager
     public function hasPersistenceFor(object $object): bool
     {
         try {
-            return (bool) $this->strategyFor($object::class);
+            return (bool)$this->strategyFor($object::class);
         } catch (NoPersistenceStrategy) {
             return false;
         }
+    }
+
+    public function resetDatabaseManager(): ResetDatabaseManager
+    {
+        return $this->resetDatabaseManager;
+    }
+
+    public static function isOrmOnly(): bool
+    {
+        static $isOrmOnly = null;
+
+        return $isOrmOnly ??= (static function (): bool {
+            try {
+                $strategies = iterator_to_array(Configuration::instance()->persistence()->strategies);
+            } catch (PersistenceNotAvailable) {
+                $strategies = [];
+            }
+
+            return count($strategies) === 1 && $strategies[0] instanceof AbstractORMPersistenceStrategy;
+        })();
     }
 
     /**

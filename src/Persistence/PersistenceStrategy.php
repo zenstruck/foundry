@@ -26,7 +26,7 @@ use Zenstruck\Foundry\Persistence\ResetDatabase\DatabaseResetterInterface;
  *
  * @internal
  */
-abstract class PersistenceStrategy implements DatabaseResetterInterface
+abstract class PersistenceStrategy
 {
     /**
      * @param array<string,mixed> $config
@@ -89,8 +89,6 @@ abstract class PersistenceStrategy implements DatabaseResetterInterface
 
     abstract public function contains(object $object): bool;
 
-    abstract public function resetSchema(KernelInterface $kernel): void;
-
     abstract public function truncate(string $class): void;
 
     /**
@@ -106,27 +104,4 @@ abstract class PersistenceStrategy implements DatabaseResetterInterface
     abstract public function embeddablePropertiesFor(object $object, string $owner): ?array;
 
     abstract public function isEmbeddable(object $object): bool;
-
-    /**
-     * @param array<string,scalar> $parameters
-     */
-    final protected static function runCommand(Application $application, string $command, array $parameters = [], bool $canFail = false): void
-    {
-        $exit = $application->run(
-            new ArrayInput(\array_merge(['command' => $command], $parameters)),
-            $output = new BufferedOutput()
-        );
-
-        if (0 !== $exit && !$canFail) {
-            throw new \RuntimeException(\sprintf('Error running "%s": %s', $command, $output->fetch()));
-        }
-    }
-
-    final protected static function application(KernelInterface $kernel): Application
-    {
-        $application = new Application($kernel);
-        $application->setAutoExit(false);
-
-        return $application;
-    }
 }
