@@ -8,26 +8,25 @@ use DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
-use Zenstruck\Foundry\Persistence\ResetDatabase\DatabaseResetterInterface;
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 
 /**
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-final class DamaDatabaseResetter implements DatabaseResetterInterface
+final class DamaDatabaseResetter implements OrmResetter
 {
     public function __construct(
-        private DatabaseResetterInterface $decorated,
+        private OrmResetter $decorated,
     ) {
     }
 
-    public function resetDatabase(KernelInterface $kernel): void
+    public function resetBeforeFirstTest(KernelInterface $kernel): void
     {
         $isDAMADoctrineTestBundleEnabled = ResetDatabaseManager::isDAMADoctrineTestBundleEnabled();
 
         if (!$isDAMADoctrineTestBundleEnabled) {
-            $this->decorated->resetDatabase($kernel);
+            $this->decorated->resetBeforeFirstTest($kernel);
 
             return;
         }
@@ -35,7 +34,7 @@ final class DamaDatabaseResetter implements DatabaseResetterInterface
         // disable static connections for this operation
         StaticDriver::setKeepStaticConnections(false);
 
-        $this->decorated->resetDatabase($kernel);
+        $this->decorated->resetBeforeFirstTest($kernel);
 
         if (PersistenceManager::isOrmOnly()) {
             // add global stories so they are available after transaction rollback
@@ -48,5 +47,15 @@ final class DamaDatabaseResetter implements DatabaseResetterInterface
 
         // re-enable static connections
         StaticDriver::setKeepStaticConnections(true);
+    }
+
+    public function resetBeforeEachTest(KernelInterface $kernel): void
+    {
+        if (ResetDatabaseManager::isDAMADoctrineTestBundleEnabled()) {
+            // not required as the DAMADoctrineTestBundle wraps each test in a transaction
+            return;
+        }
+
+        $this->decorated->resetBeforeEachTest($kernel);
     }
 }

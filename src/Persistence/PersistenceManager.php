@@ -19,9 +19,7 @@ use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\ORM\AbstractORMPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\NoPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
-use Zenstruck\Foundry\Persistence\ResetDatabase\DatabaseResetterInterface;
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
-use Zenstruck\Foundry\Persistence\ResetDatabase\SchemaResetterInterface;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

@@ -20,12 +20,12 @@ final class ResetDatabaseManager
     private static bool $hasDatabaseBeenReset = false;
 
     /**
-     * @param iterable<DatabaseResetterInterface> $databaseResetters
-     * @param iterable<SchemaResetterInterface> $schemaResetters
+     * @param iterable<BeforeFirstTestResetter> $beforeFirstTestResetters
+     * @param iterable<BeforeEachTestResetter> $beforeEachTestResetter
      */
     public function __construct(
-        private iterable $databaseResetters,
-        private iterable $schemaResetters
+        private iterable $beforeFirstTestResetters,
+        private iterable $beforeEachTestResetter
     ) {
     }
 
@@ -33,7 +33,7 @@ final class ResetDatabaseManager
      * @param callable():KernelInterface $createKernel
      * @param callable():void $shutdownKernel
      */
-    public static function resetDatabase(callable $createKernel, callable $shutdownKernel): void
+    public static function resetBeforeFirstTest(callable $createKernel, callable $shutdownKernel): void
     {
         if (self::$hasDatabaseBeenReset) {
             return;
@@ -43,7 +43,7 @@ final class ResetDatabaseManager
         $configuration = Configuration::instance();
 
         try {
-            $databaseResetters = $configuration->persistence()->resetDatabaseManager()->databaseResetters;
+            $databaseResetters = $configuration->persistence()->resetDatabaseManager()->beforeFirstTestResetters;
         } catch (PersistenceNotAvailable $e) {
             if (!\class_exists(TestKernel::class)) {
                 throw $e;
@@ -54,7 +54,7 @@ final class ResetDatabaseManager
         }
 
         foreach ($databaseResetters as $databaseResetter) {
-            $databaseResetter->resetDatabase($kernel);
+            $databaseResetter->resetBeforeFirstTest($kernel);
         }
 
         $shutdownKernel();
@@ -66,7 +66,7 @@ final class ResetDatabaseManager
      * @param callable():KernelInterface $createKernel
      * @param callable():void $shutdownKernel
      */
-    public static function resetSchema(callable $createKernel, callable $shutdownKernel): void
+    public static function resetBeforeEachTest(callable $createKernel, callable $shutdownKernel): void
     {
         if (self::canSkipSchemaReset()) {
             // can fully skip booting the kernel
@@ -77,7 +77,7 @@ final class ResetDatabaseManager
         $configuration = Configuration::instance();
 
         try {
-            $schemaResetters = $configuration->persistence()->resetDatabaseManager()->schemaResetters;
+            $beforeEachTestResetters = $configuration->persistence()->resetDatabaseManager()->beforeEachTestResetter;
         } catch (PersistenceNotAvailable $e) {
             if (!\class_exists(TestKernel::class)) {
                 throw $e;
@@ -87,8 +87,8 @@ final class ResetDatabaseManager
             return;
         }
 
-        foreach ($schemaResetters as $schemaResetter) {
-            $schemaResetter->resetSchema($kernel);
+        foreach ($beforeEachTestResetters as $beforeEachTestResetter) {
+            $beforeEachTestResetter->resetBeforeEachTest($kernel);
         }
 
         $configuration->stories->loadGlobalStories();
