@@ -25,7 +25,6 @@ final class ResetDatabaseHandler
      */
     public static function resetDatabase(callable $createKernel, callable $shutdownKernel): void
     {
-        return;
         if (self::$hasDatabaseBeenReset) {
             return;
         }

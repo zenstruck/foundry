@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\ORM;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
 use Zenstruck\Foundry\Persistence\ResetDatabase\DatabaseResetterInterface;
+use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseHandler;
 use Zenstruck\Foundry\Persistence\ResetDatabase\SchemaResetterInterface;
 use Zenstruck\Foundry\Persistence\SymfonyCommandRunner;
 
@@ -25,6 +27,7 @@ final class OrmSchemaResetter implements SchemaResetterInterface
      * @param list<string> $connections
      */
     public function __construct(
+        private ManagerRegistry $registry,
         private array $managers,
         private array $connections,
     ) {
@@ -32,7 +35,7 @@ final class OrmSchemaResetter implements SchemaResetterInterface
 
     final public function resetSchema(KernelInterface $kernel): void
     {
-        if (PersistenceManager::isDAMADoctrineTestBundleEnabled()) {
+        if (ResetDatabaseHandler::isDAMADoctrineTestBundleEnabled()) {
             // not required as the DAMADoctrineTestBundle wraps each test in a transaction
             return;
         }
@@ -45,6 +48,12 @@ final class OrmSchemaResetter implements SchemaResetterInterface
 
     private function dropSchema(Application $application): void
     {
+//        if (self::RESET_MODE_MIGRATE === $this->config['reset']['mode']) {
+//            $this->dropAndResetDatabase($application);
+//
+//            return;
+//        }
+
         foreach ($this->managers() as $manager) {
             self::runCommand($application, 'doctrine:schema:drop', [
                 '--em' => $manager,
@@ -52,6 +61,11 @@ final class OrmSchemaResetter implements SchemaResetterInterface
                 '--full-database' => true,
             ]);
         }
+    }
+
+    private function registry(): ManagerRegistry
+    {
+        return $this->registry;
     }
 
     private function managers(): array

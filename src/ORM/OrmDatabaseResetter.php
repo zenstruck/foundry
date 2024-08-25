@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\ORM;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Persistence\ResetDatabase\DatabaseResetterInterface;
 use Zenstruck\Foundry\Persistence\SymfonyCommandRunner;
@@ -22,6 +23,7 @@ final class OrmDatabaseResetter implements DatabaseResetterInterface
      * @param list<string> $connections
      */
     public function __construct(
+        private ManagerRegistry $registry,
         private array $managers,
         private array $connections,
     ) {
@@ -33,6 +35,11 @@ final class OrmDatabaseResetter implements DatabaseResetterInterface
 
         $this->dropAndResetDatabase($application);
         $this->createSchema($application);
+    }
+
+    private function registry(): ManagerRegistry
+    {
+        return $this->registry;
     }
 
     private function managers(): array

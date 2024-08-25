@@ -237,6 +237,16 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
             $container->getDefinition('.zenstruck_foundry.persistence_strategy.orm')
                 ->replaceArgument(1, $config['orm'])
             ;
+
+            $container->getDefinition('.zenstruck_foundry.persistence.database_resetter.orm')
+                ->replaceArgument(1, $config['orm']['reset']['entity_managers'])
+                ->replaceArgument(2, $config['orm']['reset']['connections'])
+            ;
+
+            $container->getDefinition('.zenstruck_foundry.persistence.schema_resetter.orm')
+                ->replaceArgument(1, $config['orm']['reset']['entity_managers'])
+                ->replaceArgument(2, $config['orm']['reset']['connections'])
+            ;
         }
 
         if (isset($bundles['DoctrineMongoDBBundle'])) {
