@@ -245,6 +245,10 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
             $container->getDefinition('.zenstruck_foundry.persistence_strategy.mongo')
                 ->replaceArgument(1, $config['mongo'])
             ;
+
+            $container->getDefinition('.zenstruck_foundry.persistence.schema_resetter.mongo')
+                ->replaceArgument(0, $config['mongo']['reset']['document_managers'])
+            ;
         }
     }
 

@@ -21,6 +21,8 @@ use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\ORM\AbstractORMPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\NoPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
+use Zenstruck\Foundry\Persistence\ResetDatabase\DatabaseResetterInterface;
+use Zenstruck\Foundry\Persistence\ResetDatabase\SchemaResetterInterface;
 use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 
 /**
@@ -38,9 +40,12 @@ final class PersistenceManager
 
     /**
      * @param PersistenceStrategy[] $strategies
+     * @param SchemaResetterInterface[] $schemaResetters
      */
-    public function __construct(private iterable $strategies)
-    {
+    public function __construct(
+        private iterable $strategies,
+        public iterable $schemaResetters,
+    ) {
     }
 
     public static function isDAMADoctrineTestBundleEnabled(): bool
