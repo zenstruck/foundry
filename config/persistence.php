@@ -9,6 +9,7 @@ return static function (ContainerConfigurator $container): void {
         ->set('.zenstruck_foundry.persistence_manager', PersistenceManager::class)
             ->args([
                 tagged_iterator('.foundry.persistence_strategy'),
+                tagged_iterator('.foundry.persistence.schema_resetter'),
             ])
     ;
 };

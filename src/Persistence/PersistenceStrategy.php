@@ -20,13 +20,14 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Zenstruck\Foundry\Persistence\ResetDatabase\DatabaseResetterInterface;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @internal
  */
-abstract class PersistenceStrategy
+abstract class PersistenceStrategy implements DatabaseResetterInterface
 {
     /**
      * @param array<string,mixed> $config
@@ -88,8 +89,6 @@ abstract class PersistenceStrategy
     abstract public function hasChanges(object $object): bool;
 
     abstract public function contains(object $object): bool;
-
-    abstract public function resetDatabase(KernelInterface $kernel): void;
 
     abstract public function resetSchema(KernelInterface $kernel): void;
 
