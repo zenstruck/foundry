@@ -435,16 +435,20 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     {
         $this->factory()::repository()->assert()->empty();
 
-        flush_after(function() {
+        $object = null;
+        $return = flush_after(function() use (&$object) {
             $object = $this->factory()::createOne();
 
             // ensure auto-refresh does not break when in flush_after
             $object->getProp1();
 
             $this->factory()::repository()->assert()->empty();
+
+            return $object;
         });
 
         $this->factory()::repository()->assert()->count(1);
+        self::assertSame($object, $return);
     }
 
     /**

@@ -149,11 +149,11 @@ function delete(object $object): object
 }
 
 /**
- * @param callable():void $callback
+ * @param callable():mixed $callback
  */
-function flush_after(callable $callback): void
+function flush_after(callable $callback): mixed
 {
-    Configuration::instance()->persistence()->flushAfter($callback);
+    return Configuration::instance()->persistence()->flushAfter($callback);
 }
 
 /**
