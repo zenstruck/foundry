@@ -174,13 +174,13 @@ final class PersistenceManager
     }
 
     /**
-     * @param callable():void $callback
+     * @param callable():mixed $callback
      */
-    public function flushAfter(callable $callback): void
+    public function flushAfter(callable $callback): mixed
     {
         $this->flush = false;
 
-        $callback();
+        $result = $callback();
 
         $this->flush = true;
 
@@ -189,6 +189,8 @@ final class PersistenceManager
                 $this->flush($om);
             }
         }
+
+        return $result;
     }
 
     public function flush(ObjectManager $om): void
