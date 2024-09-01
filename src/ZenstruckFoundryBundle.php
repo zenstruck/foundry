@@ -114,7 +114,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                                     ->defaultValue(AbstractORMPersistenceStrategy::RESET_MODE_SCHEMA)
                                     ->values([AbstractORMPersistenceStrategy::RESET_MODE_SCHEMA, AbstractORMPersistenceStrategy::RESET_MODE_MIGRATE])
                                 ->end()
-                                ->arrayNode('migrations')
+                                ->arrayNode(AbstractORMPersistenceStrategy::RESET_MODE_MIGRATE)
                                     ->addDefaultsIfNotSet()
                                     ->children()
                                         ->arrayNode('configurations')

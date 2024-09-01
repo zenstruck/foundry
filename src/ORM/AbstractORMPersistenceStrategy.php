@@ -163,7 +163,7 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
             return;
         }
 
-        if (!$migrationsConfigurations = $this->config['reset']['migrations']['configurations']) {
+        if (!$migrationsConfigurations = $this->config['reset'][self::RESET_MODE_MIGRATE]['configurations']) {
             self::runCommand($application, 'doctrine:migrations:migrate', [
                 '--no-interaction' => true,
             ]);
