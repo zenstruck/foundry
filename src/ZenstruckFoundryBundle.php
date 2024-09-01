@@ -114,6 +114,28 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                                     ->defaultValue(AbstractORMPersistenceStrategy::RESET_MODE_SCHEMA)
                                     ->values([AbstractORMPersistenceStrategy::RESET_MODE_SCHEMA, AbstractORMPersistenceStrategy::RESET_MODE_MIGRATE])
                                 ->end()
+                                ->arrayNode('migrations')
+                                    ->addDefaultsIfNotSet()
+                                    ->children()
+                                        ->arrayNode('configurations')
+                                            ->info('Migration configurations')
+                                            ->defaultValue([])
+                                            ->scalarPrototype()->end()
+                                            ->validate()
+                                                ->ifTrue(function(array $configurationFiles): bool {
+                                                    foreach ($configurationFiles as $configurationFile) {
+                                                        if (!\is_file($configurationFile)) {
+                                                            return true;
+                                                        }
+                                                    }
+
+                                                    return false;
+                                                })
+                                                ->thenInvalid('At least one migrations configuration file does not exist.')
+                                            ->end()
+                                        ->end()
+                                    ->end()
+                                ->end()
                             ->end()
                         ->end()
                     ->end()
