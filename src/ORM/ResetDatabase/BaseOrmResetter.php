@@ -9,15 +9,20 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Zenstruck\Foundry\Persistence\SymfonyCommandRunner;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpKernel\KernelInterface;
+
+use Zenstruck\Foundry\ORM\DoctrineOrmVersionGuesser;
+
+use function Zenstruck\Foundry\runCommand;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  * @internal
  */
-abstract class BaseOrmResetter
+abstract class BaseOrmResetter implements OrmResetter
 {
-    use SymfonyCommandRunner;
+    private static bool $inFirstTest = true;
 
     /**
      * @param list<string> $managers
@@ -30,6 +35,19 @@ abstract class BaseOrmResetter
     ) {
     }
 
+    final public function resetBeforeEachTest(KernelInterface $kernel): void
+    {
+        if (self::$inFirstTest) {
+            self::$inFirstTest = false;
+
+            return;
+        }
+
+        $this->doResetBeforeEachTest($kernel);
+    }
+
+    abstract protected function doResetBeforeEachTest(KernelInterface $kernel): void;
+
     final protected function dropAndResetDatabase(Application $application): void
     {
         foreach ($this->connections as $connectionName) {
@@ -39,29 +57,26 @@ abstract class BaseOrmResetter
 
             if ($databasePlatform instanceof SQLitePlatform) {
                 // we don't need to create the sqlite database - it's created when the schema is created
+                // let's only drop the .db file
+
+                $dbPath = $connection->getParams()['path'] ?? null;
+                $fs = new Filesystem();
+                if (DoctrineOrmVersionGuesser::isOrmV3() && $dbPath && $fs->exists($dbPath)) {
+                    (new Filesystem())->remove($dbPath);
+                }
+
                 continue;
             }
 
             if ($databasePlatform instanceof PostgreSQLPlatform) {
                 // let's drop all connections to the database to be able to drop it
-                self::runCommand(
-                    $application,
-                    'dbal:run-sql',
-                    [
-                        '--connection' => $connectionName,
-                        'sql' => 'SELECT pid, pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = current_database() AND pid <> pg_backend_pid()',
-                    ],
-                    canFail: true,
-                );
+                $sql = 'SELECT pid, pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = current_database() AND pid <> pg_backend_pid()';
+                runCommand($application, "dbal:run-sql --connection={$connectionName} '{$sql}'", canFail: true);
             }
 
-            self::runCommand(
-                $application,
-                'doctrine:database:drop',
-                ['--connection' => $connectionName, '--force' => true, '--if-exists' => true]
-            );
+            runCommand($application, "doctrine:database:drop --connection={$connectionName} --force --if-exists");
 
-            self::runCommand($application, 'doctrine:database:create', ['--connection' => $connectionName]);
+            runCommand($application, "doctrine:database:create --connection={$connectionName}");
         }
     }
 }

@@ -8,7 +8,7 @@ on:
 
 jobs:
   tests:
-    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}, PU:${{ matrix.phpunit }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.use-dama == 1 && contains(matrix.database, 'sql') && ' (dama)' || '' }}${{ !contains(matrix.database, 'sql') && '' || matrix.use-migrate == 1 && ' (migrate)' || ' (schema)' }}
+    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}, PU:${{ matrix.phpunit }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.use-dama == 1 && contains(matrix.database, 'sql') && ' (dama)' || '' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -18,7 +18,6 @@ jobs:
         symfony: [ 6.4.*, 7.0.*, 7.1.* ]
         database: [ mysql, mongo ]
         use-dama: [ 1 ]
-        use-migrate: [ 0 ]
         phpunit: [ 9 ]
         exclude:
           - php: 8.1
@@ -31,70 +30,60 @@ jobs:
             symfony: '*'
             database: none
             use-dama: 1
-            use-migrate: 0
             phpunit: 9
           - php: 8.3
             deps: highest
             symfony: '*'
             database: mysql|mongo
             use-dama: 1
-            use-migrate: 0
             phpunit: 9
           - php: 8.3
             deps: highest
             symfony: '*'
             database: pgsql|mongo
             use-dama: 1
-            use-migrate: 0
             phpunit: 9
           - php: 8.3
             deps: highest
             symfony: '*'
             database: pgsql
             use-dama: 0
-            use-migrate: 0
             phpunit: 9
           - php: 8.3
             deps: highest
             symfony: '*'
             database: sqlite
             use-dama: 0
-            use-migrate: 0
             phpunit: 9
           - php: 8.3
             deps: lowest
             symfony: '*'
             database: sqlite
             use-dama: 0
-            use-migrate: 0
             phpunit: 9
           - php: 8.3
             deps: lowest
             symfony: '*'
             database: mysql
             use-dama: 1
-            use-migrate: 0
             phpunit: 9
           - php: 8.3
             deps: highest
             symfony: '*'
             database: mysql
             use-dama: 1
-            use-migrate: 1
             phpunit: 9
           - php: 8.3
             deps: highest
             symfony: '*'
             database: mysql|mongo
             use-dama: 1
-            use-migrate: 0
             phpunit: 10
           - php: 8.3
             deps: highest
             symfony: '*'
             database: mysql|mongo
             use-dama: 1
-            use-migrate: 0
             phpunit: 11
     env:
       DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || contains(matrix.database, 'sqlite') && 'sqlite:///%kernel.project_dir%/var/data.db' || '' }}
@@ -145,8 +134,69 @@ jobs:
       - name: Test
         run: ./phpunit
         shell: bash
+
+  test-reset-database-with-migration:
+    name: Test migration - D:${{ matrix.database }}, ${{ matrix.use-dama == 1 && ' (dama)' || '' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        database: [ mysql, pgsql, sqlite ]
+        use-dama: [ 0, 1 ]
+        with-migration-configuration-file:
+          - ''
+          - 'tests/Fixture/MigrationTests/configs/migration-configuration.php'
+          - 'tests/Fixture/MigrationTests/configs/migration-configuration-transactional.php'
+        exclude:
+          # there is currently a bug with MySQL and transactional migrations
+          - database: mysql
+            with-migration-configuration-file: 'tests/Fixture/MigrationTests/configs/migration-configuration-transactional.php'
+    env:
+      DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || 'sqlite:///%kernel.project_dir%/var/data.db' }}
+      MONGO_URL: ''
+      USE_DAMA_DOCTRINE_TEST_BUNDLE: ${{ matrix.use-dama == 1 && 1 || 0 }}
+      WITH_MIGRATION_CONFIGURATION_FILE: ${{ matrix.with-migration-configuration-file }}
+      PHPUNIT_VERSION: 9
+    services:
+      postgres:
+        image: ${{ contains(matrix.database, 'pgsql') && 'postgres:15' || '' }}
         env:
-          DATABASE_RESET_MODE: ${{ matrix.use-migrate == 1 && 'migrate' || 'schema' }}
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: foundry
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+          coverage: none
+          tools: flex
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v2
+        with:
+          dependency-versions: highest
+          composer-options: --prefer-dist
+        env:
+          SYMFONY_REQUIRE: 7.1.*
+
+      - name: Set up MySQL
+        if: contains(matrix.database, 'mysql')
+        run: sudo /etc/init.d/mysql start
+
+      - name: Test
+        run: ./phpunit --testsuite migrate --bootstrap tests/bootstrap-migrate.php
+        shell: bash
 
   code-coverage:
     name: Code Coverage

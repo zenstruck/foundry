@@ -13,7 +13,6 @@ namespace Zenstruck\Foundry\Tests\Fixture;
 
 use DAMA\DoctrineTestBundle\DAMADoctrineTestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
-use Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -44,7 +43,6 @@ final class TestKernel extends Kernel
 
         if (\getenv('DATABASE_URL')) {
             yield new DoctrineBundle();
-            yield new DoctrineMigrationsBundle();
         }
 
         if (\getenv('MONGO_URL')) {
@@ -74,7 +72,7 @@ final class TestKernel extends Kernel
             ],
             'orm' => [
                 'reset' => [
-                    'mode' => \getenv('DATABASE_RESET_MODE') ?: ResetDatabaseMode::SCHEMA,
+                    'mode' => ResetDatabaseMode::SCHEMA,
                 ],
             ],
         ]);
@@ -100,30 +98,23 @@ final class TestKernel extends Kernel
                             'prefix' => 'Zenstruck\Foundry\Tests\Fixture\Model',
                             'alias' => 'Model',
                         ],
-                    ],
-                    'controller_resolver' => ['auto_mapping' => true],
-                ],
-            ]);
 
-            if (ResetDatabaseMode::MIGRATE->value === \getenv('DATABASE_RESET_MODE')) {
-                $c->loadFromExtension('doctrine', [
-                    'orm' => [
-                        'mappings' => [
-                            'Migrate' => [
-                                'is_bundle' => false,
-                                'type' => 'attribute',
-                                'dir' => '%kernel.project_dir%/tests/Fixture/EdgeCases/Migrate/ORM',
-                                'prefix' => 'Zenstruck\Foundry\Tests\Fixture\EdgeCases\Migrate\ORM',
-                                'alias' => 'Migrate',
-                            ],
-                        ],
+                        // postgres acts weirdly with multiple schemas
+                        // @see https://github.com/doctrine/DoctrineBundle/issues/548
+                        ...(str_starts_with(\getenv('DATABASE_URL'), 'postgresql')
+                            ? [
+                                'EntityInAnotherSchema' => [
+                                    'is_bundle' => false,
+                                    'type' => 'attribute',
+                                    'dir' => '%kernel.project_dir%/tests/Fixture/EntityInAnotherSchema',
+                                    'prefix' => 'Zenstruck\Foundry\Tests\Fixture\EntityInAnotherSchema',
+                                    'alias' => 'Migrate',
+                                ]
+                            ]
+                            : []
+                        ),
                     ],
-                ]);
-            }
-
-            $c->loadFromExtension('doctrine_migrations', [
-                'migrations_paths' => [
-                    'Zenstruck\\Foundry\\Tests\\Fixture\\Migrations' => '%kernel.project_dir%/tests/Fixture/Migrations',
+                    'controller_resolver' => ['auto_mapping' => false],
                 ],
             ]);
         }

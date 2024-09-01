@@ -11,11 +11,17 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\Tests\Fixture\EdgeCases\Migrate\ORM\EntityInAnotherSchema;
+namespace Zenstruck\Foundry\Tests\Fixture\EntityInAnotherSchema;
 
 use Doctrine\ORM\Mapping as ORM;
 use Zenstruck\Foundry\Tests\Fixture\Model\Base;
 
+/**
+ * Create custom "cms" schema ({@see Article}) to ensure "migrate" mode is still working with multiple schemas.
+ * Note: this entity is added to mapping only for PostgreSQ, as it is the only supported DBMS which handles multiple schemas.
+ *
+ * @see https://github.com/zenstruck/foundry/issues/618
+ */
 #[ORM\Entity]
 #[ORM\Table(name: 'article', schema: 'cms')]
 class Article extends Base

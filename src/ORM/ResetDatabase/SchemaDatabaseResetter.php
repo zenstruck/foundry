@@ -16,23 +16,26 @@ namespace Zenstruck\Foundry\ORM\ResetDatabase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+use function Zenstruck\Foundry\application;
+use function Zenstruck\Foundry\runCommand;
+
 /**
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-final class SchemaDatabaseResetter extends BaseOrmResetter implements OrmResetter
+final class SchemaDatabaseResetter extends BaseOrmResetter
 {
     public function resetBeforeFirstTest(KernelInterface $kernel): void
     {
-        $application = self::application($kernel);
+        $application = application($kernel);
 
         $this->dropAndResetDatabase($application);
         $this->createSchema($application);
     }
 
-    public function resetBeforeEachTest(KernelInterface $kernel): void
+    public function doResetBeforeEachTest(KernelInterface $kernel): void
     {
-        $application = self::application($kernel);
+        $application = application($kernel);
 
         $this->dropSchema($application);
         $this->createSchema($application);
@@ -41,22 +44,14 @@ final class SchemaDatabaseResetter extends BaseOrmResetter implements OrmResette
     private function createSchema(Application $application): void
     {
         foreach ($this->managers as $manager) {
-            self::runCommand(
-                $application,
-                'doctrine:schema:update',
-                ['--em' => $manager, '--force' => true]
-            );
+            runCommand($application, "doctrine:schema:update --em={$manager} --force -v");
         }
     }
 
     private function dropSchema(Application $application): void
     {
         foreach ($this->managers as $manager) {
-            self::runCommand(
-                $application,
-                'doctrine:schema:drop',
-                ['--em' => $manager, '--force' => true, '--full-database' => true]
-            );
+            runCommand($application, "doctrine:schema:drop --em={$manager} --force --full-database");
         }
     }
 }

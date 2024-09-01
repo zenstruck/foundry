@@ -6,7 +6,8 @@
          colors="true"
          failOnRisky="true"
          failOnWarning="true"
-         cacheDirectory=".phpunit.cache">
+         cacheDirectory=".phpunit.cache"
+         defaultTestSuite="main">
     <php>
         <ini name="error_reporting" value="-1"/>
         <server name="KERNEL_CLASS" value="Zenstruck\Foundry\Tests\Fixture\TestKernel"/>
@@ -14,8 +15,12 @@
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>
     </php>
     <testsuites>
-        <testsuite name="zenstruck/foundry Test Suite">
+        <testsuite name="main">
             <directory>tests</directory>
+            <exclude>tests/Integration/Migration/ResetDatabaseWithMigrationTest.php</exclude>
+        </testsuite>
+        <testsuite name="migrate">
+            <file>tests/Integration/Migration/ResetDatabaseWithMigrationTest.php</file>
         </testsuite>
     </testsuites>
     <source ignoreSuppressionOfDeprecations="true">
