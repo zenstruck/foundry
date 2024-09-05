@@ -152,7 +152,18 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
 
     private function createSchema(Application $application): void
     {
-        if (self::RESET_MODE_MIGRATE === $this->config['reset']['mode']) {
+        if (self::RESET_MODE_SCHEMA === $this->config['reset']['mode']) {
+            foreach ($this->managers() as $manager) {
+                self::runCommand($application, 'doctrine:schema:update', [
+                    '--em' => $manager,
+                    '--force' => true,
+                ]);
+            }
+
+            return;
+        }
+
+        if (!$migrationsConfigurations = $this->config['reset']['migrations']['configurations']) {
             self::runCommand($application, 'doctrine:migrations:migrate', [
                 '--no-interaction' => true,
             ]);
@@ -160,10 +171,10 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
             return;
         }
 
-        foreach ($this->managers() as $manager) {
-            self::runCommand($application, 'doctrine:schema:update', [
-                '--em' => $manager,
-                '--force' => true,
+        foreach ($migrationsConfigurations as $migrationsConfiguration) {
+            self::runCommand($application, 'doctrine:migrations:migrate', [
+                '--configuration' => $migrationsConfiguration,
+                '--no-interaction' => true,
             ]);
         }
     }
