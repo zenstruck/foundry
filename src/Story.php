@@ -143,7 +143,7 @@ abstract class Story
             $unwrappedObject = ProxyGenerator::unwrap($this->state[$name]);
             Configuration::instance()->persistence()->refresh($unwrappedObject, force: true);
 
-            return $isProxy ? ProxyGenerator::wrap($unwrappedObject) : $unwrappedObject;
+            return $isProxy ? ProxyGenerator::wrap($unwrappedObject) : $unwrappedObject; // @phpstan-ignore argument.templateType
         } catch (PersistenceNotAvailable|NoPersistenceStrategy|RefreshObjectFailed) {
             return $this->state[$name];
         }
