@@ -20,6 +20,12 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericDocumentFactory;
  *
  * @method static GenericDocument foo()
  * @method static GenericDocument bar()
+ * @method static int             int()
+ * @method static float           float()
+ * @method static string          string()
+ * @method static bool            bool()
+ * @method static array           array()
+ * @method static null            null()
  */
 final class DocumentStory extends Story
 {
@@ -27,5 +33,11 @@ final class DocumentStory extends Story
     {
         $this->addState('foo', GenericDocumentFactory::createOne(['prop1' => 'foo']));
         $this->addState('bar', GenericDocumentFactory::createOne(['prop1' => 'bar']));
+        $this->addState('int', 12);
+        $this->addState('float', 12.12);
+        $this->addState('string', 'dummyString');
+        $this->addState('bool', true);
+        $this->addState('array', [12, 'dummyString', [true, 12.12]]);
+        $this->addState('null', null);
     }
 }

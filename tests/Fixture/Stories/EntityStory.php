@@ -20,6 +20,12 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
  *
  * @method static GenericEntity foo()
  * @method static GenericEntity bar()
+ * @method static int           int()
+ * @method static float         float()
+ * @method static string        string()
+ * @method static bool          bool()
+ * @method static array         array()
+ * @method static null          null()
  */
 final class EntityStory extends Story
 {
@@ -27,5 +33,11 @@ final class EntityStory extends Story
     {
         $this->addState('foo', GenericEntityFactory::createOne(['prop1' => 'foo']), 'pool');
         $this->addState('bar', GenericEntityFactory::createOne(['prop1' => 'bar']), 'pool');
+        $this->addState('int', 12);
+        $this->addState('float', 12.12);
+        $this->addState('string', 'dummyString');
+        $this->addState('bool', true);
+        $this->addState('array', [12, 'dummyString', [true, 12.12]]);
+        $this->addState('null', null);
     }
 }

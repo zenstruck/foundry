@@ -133,11 +133,15 @@ abstract class Story
             throw new \InvalidArgumentException(\sprintf('"%s" was not registered. Did you forget to call "%s::addState()"?', $name, static::class));
         }
 
+        if (!\is_object($this->state[$name])) {
+            return $this->state[$name];
+        }
+
         try {
             $isProxy = $this->state[$name] instanceof Proxy;
 
             $unwrappedObject = ProxyGenerator::unwrap($this->state[$name]);
-            Configuration::instance()->persistence()->refresh($unwrappedObject, force: true); // @phpstan-ignore argument.templateType
+            Configuration::instance()->persistence()->refresh($unwrappedObject, force: true);
 
             return $isProxy ? ProxyGenerator::wrap($unwrappedObject) : $unwrappedObject; // @phpstan-ignore argument.templateType
         } catch (PersistenceNotAvailable|NoPersistenceStrategy|RefreshObjectFailed) {
