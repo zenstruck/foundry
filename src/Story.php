@@ -133,7 +133,7 @@ abstract class Story
             throw new \InvalidArgumentException(\sprintf('"%s" was not registered. Did you forget to call "%s::addState()"?', $name, static::class));
         }
 
-        if (!is_object($this->state[$name])) {
+        if (!\is_object($this->state[$name])) {
             return $this->state[$name];
         }
 

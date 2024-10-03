@@ -120,6 +120,12 @@ final class StoryTest extends KernelTestCase
     {
         $this->assertSame('foo', $story::get('foo')->getProp1());
         $this->assertSame('bar', $story::get('bar')->getProp1());
+        $this->assertSame(12, $story::get('int'));
+        $this->assertSame(12.12, $story::get('float'));
+        $this->assertSame('dummyString', $story::get('string'));
+        $this->assertTrue($story::get('bool'));
+        $this->assertSame([12, 'dummyString', [true, 12.12]], $story::get('array'));
+        $this->assertNull($story::get('null'));
     }
 
     /**
@@ -132,6 +138,12 @@ final class StoryTest extends KernelTestCase
     {
         $this->assertSame('foo', $story::foo()->getProp1());
         $this->assertSame('bar', $story::bar()->getProp1());
+        $this->assertSame(12, $story::int());
+        $this->assertSame(12.12, $story::float());
+        $this->assertSame('dummyString', $story::string());
+        $this->assertTrue($story::bool());
+        $this->assertSame([12, 'dummyString', [true, 12.12]], $story::array());
+        $this->assertNull($story::null());
     }
 
     /**
@@ -144,6 +156,12 @@ final class StoryTest extends KernelTestCase
     {
         $this->assertSame('foo', $story::load()->foo()->getProp1());
         $this->assertSame('bar', $story::load()->bar()->getProp1());
+        $this->assertSame(12, $story::load()->int());
+        $this->assertSame(12.12, $story::load()->float());
+        $this->assertSame('dummyString', $story::load()->string());
+        $this->assertTrue($story::load()->bool());
+        $this->assertSame([12, 'dummyString', [true, 12.12]], $story::load()->array());
+        $this->assertNull($story::load()->null());
     }
 
     /**
