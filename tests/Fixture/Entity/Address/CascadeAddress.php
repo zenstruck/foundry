@@ -13,6 +13,8 @@ namespace Zenstruck\Foundry\Tests\Fixture\Entity\Address;
 
 use Doctrine\ORM\Mapping as ORM;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Address;
+use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
+use Zenstruck\Foundry\Tests\Fixture\Entity\Contact\CascadeContact;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -20,4 +22,6 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Address;
 #[ORM\Entity]
 class CascadeAddress extends Address
 {
+    #[ORM\OneToOne(targetEntity: CascadeContact::class, mappedBy: 'address', cascade: ['persist', 'remove'])]
+    protected Contact|null $contact = null;
 }

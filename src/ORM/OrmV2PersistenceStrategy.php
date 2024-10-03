@@ -52,6 +52,7 @@ final class OrmV2PersistenceStrategy extends AbstractORMPersistenceStrategy
         return new RelationshipMetadata(
             isCascadePersist: $association['isCascadePersist'],
             inverseField: $metadata->isSingleValuedAssociation($association['fieldName']) ? $association['fieldName'] : null,
+            isCollection: $metadata->isCollectionValuedAssociation($association['fieldName']),
         );
     }
 
