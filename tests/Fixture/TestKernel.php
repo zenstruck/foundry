@@ -13,7 +13,6 @@ namespace Zenstruck\Foundry\Tests\Fixture;
 
 use DAMA\DoctrineTestBundle\DAMADoctrineTestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
-use Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -44,7 +43,6 @@ final class TestKernel extends Kernel
 
         if (\getenv('DATABASE_URL')) {
             yield new DoctrineBundle();
-            yield new DoctrineMigrationsBundle();
         }
 
         if (\getenv('MONGO_URL')) {
@@ -74,7 +72,7 @@ final class TestKernel extends Kernel
             ],
             'orm' => [
                 'reset' => [
-                    'mode' => \getenv('DATABASE_RESET_MODE') ?: AbstractORMPersistenceStrategy::RESET_MODE_SCHEMA,
+                    'mode' => AbstractORMPersistenceStrategy::RESET_MODE_SCHEMA,
                 ],
             ],
         ]);
@@ -105,27 +103,22 @@ final class TestKernel extends Kernel
                 ],
             ]);
 
-            if (AbstractORMPersistenceStrategy::RESET_MODE_MIGRATE === \getenv('DATABASE_RESET_MODE')) {
+            // doctrine only handles different schema with postgres
+            if (str_starts_with(\getenv('DATABASE_URL'), 'postgresql')) {
                 $c->loadFromExtension('doctrine', [
                     'orm' => [
                         'mappings' => [
                             'Migrate' => [
                                 'is_bundle' => false,
                                 'type' => 'attribute',
-                                'dir' => '%kernel.project_dir%/tests/Fixture/EdgeCases/Migrate/ORM',
-                                'prefix' => 'Zenstruck\Foundry\Tests\Fixture\EdgeCases\Migrate\ORM',
+                                'dir' => '%kernel.project_dir%/tests/Fixture/MigrationTests/EntityInAnotherSchema',
+                                'prefix' => 'Zenstruck\Foundry\Tests\Fixture\MigrationTests\EntityInAnotherSchema',
                                 'alias' => 'Migrate',
                             ],
                         ],
                     ],
                 ]);
             }
-
-            $c->loadFromExtension('doctrine_migrations', [
-                'migrations_paths' => [
-                    'Zenstruck\\Foundry\\Tests\\Fixture\\Migrations' => '%kernel.project_dir%/tests/Fixture/Migrations',
-                ],
-            ]);
         }
 
         if (\getenv('MONGO_URL')) {

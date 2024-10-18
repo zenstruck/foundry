@@ -14,8 +14,9 @@
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>
     </php>
     <testsuites>
-        <testsuite name="zenstruck/foundry Test Suite">
+        <testsuite name="zenstruck/foundry Test Suite" >
             <directory>tests</directory>
+            <exclude>tests/Integration/Migration/ResetDatabaseWithMigrationTest.php</exclude>
         </testsuite>
     </testsuites>
     <source ignoreSuppressionOfDeprecations="true">

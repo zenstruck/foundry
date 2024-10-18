@@ -7,6 +7,7 @@
          colors="true"
          failOnRisky="true"
          failOnWarning="true"
+         defaultTestSuite="main"
 >
     <php>
         <ini name="error_reporting" value="-1" />
@@ -16,8 +17,12 @@
     </php>
 
     <testsuites>
-        <testsuite name="zenstruck/foundry Test Suite">
+        <testsuite name="main">
             <directory>tests</directory>
+            <exclude>tests/Integration/Migration/ResetDatabaseWithMigrationTest.php</exclude>
+        </testsuite>
+        <testsuite name="migrate">
+            <file>tests/Integration/Migration/ResetDatabaseWithMigrationTest.php</file>
         </testsuite>
     </testsuites>
 
