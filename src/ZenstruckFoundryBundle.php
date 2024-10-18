@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\ORM\AbstractORMPersistenceStrategy;
+use Zenstruck\Foundry\ORM\ResetDatabase\OrmMigrationDatabaseResetter;
+use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -111,8 +113,12 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                                 ->end()
                                 ->enumNode('mode')
                                     ->info('Reset mode to use with ResetDatabase trait')
-                                    ->defaultValue(AbstractORMPersistenceStrategy::RESET_MODE_SCHEMA)
-                                    ->values([AbstractORMPersistenceStrategy::RESET_MODE_SCHEMA, AbstractORMPersistenceStrategy::RESET_MODE_MIGRATE])
+                                    ->defaultValue(ResetDatabaseMode::SCHEMA)
+                                    ->beforeNormalization()
+                                        ->ifString()
+                                        ->then(static fn(string $mode): ?ResetDatabaseMode => ResetDatabaseMode::tryFrom($mode))
+                                    ->end()
+                                    ->values(ResetDatabaseMode::cases())
                                 ->end()
                                 ->arrayNode('migrations')
                                     ->addDefaultsIfNotSet()
@@ -237,6 +243,22 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
             $container->getDefinition('.zenstruck_foundry.persistence_strategy.orm')
                 ->replaceArgument(1, $config['orm'])
             ;
+
+            $container->getDefinition('.zenstruck_foundry.persistence.database_resetter.orm.abstract')
+                ->replaceArgument('$managers', $config['orm']['reset']['entity_managers'])
+                ->replaceArgument('$connections', $config['orm']['reset']['connections'])
+            ;
+
+            $container->getDefinition('.zenstruck_foundry.persistence.database_resetter.orm.migrate')
+                ->replaceArgument('$configurations', $config['orm']['reset']['migrations']['configurations'])
+            ;
+
+            /** @var ResetDatabaseMode $resetMode */
+            $resetMode = $config['orm']['reset']['mode'];
+            $toRemove = $resetMode === ResetDatabaseMode::SCHEMA ? ResetDatabaseMode::MIGRATE->value : ResetDatabaseMode::SCHEMA->value;
+
+            $container->removeDefinition(".zenstruck_foundry.persistence.database_resetter.orm.$toRemove.dama");
+            $container->removeDefinition(".zenstruck_foundry.persistence.database_resetter.orm.$toRemove");
         }
 
         if (isset($bundles['DoctrineMongoDBBundle'])) {
@@ -244,6 +266,10 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
 
             $container->getDefinition('.zenstruck_foundry.persistence_strategy.mongo')
                 ->replaceArgument(1, $config['mongo'])
+            ;
+
+            $container->getDefinition('.zenstruck_foundry.persistence.schema_resetter.mongo')
+                ->replaceArgument(0, $config['mongo']['reset']['document_managers'])
             ;
         }
     }
