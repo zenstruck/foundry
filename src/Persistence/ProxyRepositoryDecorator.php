@@ -22,56 +22,97 @@ use Doctrine\Persistence\ObjectRepository;
  */
 final class ProxyRepositoryDecorator extends RepositoryDecorator // @phpstan-ignore-line
 {
+    /**
+     * @return T|Proxy<T>|null
+     * @psalm-return (T&Proxy<T>)|null
+     */
     public function first(string $sortBy = 'id'): ?object
     {
         return $this->proxyNullableObject(parent::first($sortBy));
     }
 
+    /**
+     * @return T|Proxy<T>
+     * @psalm-return T&Proxy<T>
+     */
     public function firstOrFail(string $sortBy = 'id'): object
     {
         return proxy(parent::firstOrFail($sortBy));
     }
 
+    /**
+     * @return T|Proxy<T>|null
+     * @psalm-return (T&Proxy<T>)|null
+     */
     public function last(string $sortedField = 'id'): ?object
     {
         return $this->proxyNullableObject(parent::last($sortedField));
     }
 
+    /**
+     * @return T|Proxy<T>
+     * @psalm-return T&Proxy<T>
+     */
     public function lastOrFail(string $sortBy = 'id'): object
     {
         return proxy(parent::lastOrFail($sortBy));
     }
 
+    /**
+     * @return T|Proxy<T>|null
+     * @psalm-return (T&Proxy<T>)|null
+     */
     public function find($id): ?object
     {
         return $this->proxyNullableObject(parent::find($id));
     }
 
+    /**
+     * @return T|Proxy<T>
+     * @psalm-return T&Proxy<T>
+     */
     public function findOrFail(mixed $id): object
     {
         return proxy(parent::findOrFail($id));
     }
 
+    /**
+     * @psalm-return array<array-key, T&Proxy<T>>
+     */
     public function findAll(): array
     {
         return $this->proxyArray(parent::findAll());
     }
 
+    /**
+     * @psalm-return array<array-key, T&Proxy<T>>
+     */
     public function findBy(array $criteria, ?array $orderBy = null, $limit = null, $offset = null): array
     {
         return $this->proxyArray(parent::findBy($criteria, $orderBy, $limit, $offset));
     }
 
+    /**
+     * @return T|Proxy<T>|null
+     * @psalm-return (T&Proxy<T>)|null
+     */
     public function findOneBy(array $criteria): ?object
     {
         return $this->proxyNullableObject(parent::findOneBy($criteria));
     }
 
+    /**
+     * @return T|Proxy<T>|null
+     * @psalm-return T&Proxy<T>
+     */
     public function random(array $criteria = []): object
     {
         return proxy(parent::random($criteria));
     }
 
+    /**
+     * @psalm-return array<array-key, T&Proxy<T>>
+     */
     public function randomSet(int $count, array $criteria = []): array
     {
         return $this->proxyArray(
@@ -79,6 +120,9 @@ final class ProxyRepositoryDecorator extends RepositoryDecorator // @phpstan-ign
         );
     }
 
+    /**
+     * @psalm-return array<array-key, T&Proxy<T>>
+     */
     public function randomRange(int $min, int $max, array $criteria = []): array
     {
         return $this->proxyArray(

@@ -25,7 +25,7 @@ use Faker;
  */
 abstract class Factory
 {
-    /** @var Attributes[] */
+    /** @phpstan-var Attributes[] */
     private array $attributes;
 
     // keep an empty constructor for BC
@@ -33,9 +33,10 @@ abstract class Factory
     {
     }
 
-
     /**
-     * @param Attributes $attributes
+     * @return static
+     * @phpstan-return static
+     * @phpstan-param Attributes $attributes
      */
     final public static function new(array|callable $attributes = []): static
     {
@@ -53,19 +54,19 @@ abstract class Factory
     }
 
     /**
-     * @param Attributes $attributes
+     * @phpstan-param Attributes $attributes
      *
      * @return T
      */
-    final public static function createOne(array|callable $attributes = []): mixed
+    public static function createOne(array|callable $attributes = []): mixed
     {
         return static::new()->create($attributes);
     }
 
     /**
-     * @param Attributes $attributes
+     * @phpstan-param Attributes $attributes
      *
-     * @return T[]
+     * @return list<T>
      */
     final public static function createMany(int $number, array|callable $attributes = []): array
     {
@@ -73,9 +74,9 @@ abstract class Factory
     }
 
     /**
-     * @param Attributes $attributes
+     * @phpstan-param Attributes $attributes
      *
-     * @return T[]
+     * @return list<T>
      */
     final public static function createRange(int $min, int $max, array|callable $attributes = []): array
     {
@@ -83,9 +84,9 @@ abstract class Factory
     }
 
     /**
-     * @param Sequence $sequence
+     * @phpstan-param Sequence $sequence
      *
-     * @return T[]
+     * @return list<T>
      */
     final public static function createSequence(iterable|callable $sequence): array
     {
@@ -93,7 +94,7 @@ abstract class Factory
     }
 
     /**
-     * @param Attributes $attributes
+     * @phpstan-param Attributes $attributes
      *
      * @return T
      */
@@ -116,7 +117,7 @@ abstract class Factory
     }
 
     /**
-     * @param  Sequence $sequence
+     * @phpstan-param Sequence $sequence
      * @return FactoryCollection<T>
      */
     final public function sequence(iterable|callable $sequence): FactoryCollection
@@ -129,7 +130,10 @@ abstract class Factory
     }
 
     /**
-     * @param Attributes $attributes
+     * @phpstan-param Attributes $attributes
+     *
+     * @psalm-return static<T>
+     * @phpstan-return static
      */
     final public function with(array|callable $attributes = []): static
     {
@@ -147,9 +151,9 @@ abstract class Factory
     /**
      * @internal
      *
-     * @param Attributes $attributes
+     * @phpstan-param Attributes $attributes
      *
-     * @return Parameters
+     * @phpstan-return Parameters
      */
     final protected function normalizeAttributes(array|callable $attributes = []): array
     {
@@ -181,9 +185,9 @@ abstract class Factory
     /**
      * @internal
      *
-     * @param Parameters $parameters
+     * @phpstan-param Parameters $parameters
      *
-     * @return Parameters
+     * @phpstan-return Parameters
      */
     protected function normalizeParameters(array $parameters): array
     {
@@ -241,7 +245,7 @@ abstract class Factory
     }
 
     /**
-     * @return Attributes
+     * @phpstan-return Attributes
      */
     abstract protected function defaults(): array|callable;
 }

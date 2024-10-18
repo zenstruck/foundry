@@ -25,13 +25,13 @@ use Zenstruck\Foundry\Object\Instantiator;
  */
 abstract class ObjectFactory extends Factory
 {
-    /** @var list<callable(Parameters,class-string<T>):Parameters> */
+    /** @phpstan-var list<callable(Parameters,class-string<T>):Parameters> */
     private array $beforeInstantiate = [];
 
-    /** @var list<callable(T,Parameters):void> */
+    /** @phpstan-var list<callable(T,Parameters):void> */
     private array $afterInstantiate = [];
 
-    /** @var InstantiatorCallable|null */
+    /** @phpstan-var InstantiatorCallable|null */
     private $instantiator;
 
     /**
@@ -40,8 +40,6 @@ abstract class ObjectFactory extends Factory
     abstract public static function class(): string;
 
     /**
-     * @final
-     *
      * @return T
      */
     public function create(callable|array $attributes = []): object
@@ -58,6 +56,7 @@ abstract class ObjectFactory extends Factory
 
         $parameters = $this->normalizeParameters($parameters);
         $instantiator = $this->instantiator ?? Configuration::instance()->instantiator;
+        /** @var T $object */
         $object = $instantiator($parameters, static::class());
 
         foreach ($this->afterInstantiate as $hook) {
@@ -68,7 +67,10 @@ abstract class ObjectFactory extends Factory
     }
 
     /**
-     * @param InstantiatorCallable $instantiator
+     * @phpstan-param InstantiatorCallable $instantiator
+     *
+     * @psalm-return static<T>
+     * @phpstan-return static
      */
     final public function instantiateWith(callable $instantiator): static
     {
@@ -79,7 +81,7 @@ abstract class ObjectFactory extends Factory
     }
 
     /**
-     * @param callable(Parameters,class-string<T>):Parameters $callback
+     * @phpstan-param callable(Parameters,class-string<T>):Parameters $callback
      */
     final public function beforeInstantiate(callable $callback): static
     {
@@ -92,7 +94,7 @@ abstract class ObjectFactory extends Factory
     /**
      * @final
      *
-     * @param callable(T,Parameters):void $callback
+     * @phpstan-param callable(T,Parameters):void $callback
      */
     public function afterInstantiate(callable $callback): static
     {

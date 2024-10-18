@@ -852,7 +852,7 @@ the LazyValue can be `memoized <https://en.wikipedia.org/wiki/Memoization>`_ so 
                 return [
                     // Call CategoryFactory::random() everytime this factory is instantiated
                     'category' => LazyValue::new(fn() => CategoryFactory::random()),
-                    // The same User instance will be both added to the Project and set as the Task owner
+                    // The same UserForPersistentFactory instance will be both added to the Project and set as the Task owner
                     'project' => ProjectFactory::new(['users' => [$owner]]),
                     'owner'   => $owner,
                 ];
@@ -888,7 +888,7 @@ common use-case: encoding a password with the ``UserPasswordHasherInterface`` se
 
         public static function class(): string
         {
-            return User::class;
+            return UserForPersistentFactory::class;
         }
 
         protected function defaults(): array
@@ -902,7 +902,7 @@ common use-case: encoding a password with the ``UserPasswordHasherInterface`` se
         protected function initialize(): static
         {
             return $this
-                ->afterInstantiate(function(User $user) {
+                ->afterInstantiate(function(UserForPersistentFactory $user) {
                     $user->setPassword($this->passwordHasher->hashPassword($user, $user->getPassword()));
                 })
             ;
@@ -1748,7 +1748,7 @@ You can improve the speed by reducing the *work factor* of your encoder:
     # config/packages/test/security.yaml
     encoders:
         # use your user class name here
-        App\Entity\User:
+        App\Entity\UserForPersistentFactory:
             # This should be the same value as in config/packages/security.yaml
             algorithm: auto
             cost: 4 # Lowest possible value for bcrypt
