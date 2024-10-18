@@ -171,3 +171,15 @@ function enable_persisting(): void
 {
     Configuration::instance()->persistence()->enablePersisting();
 }
+
+/**
+ * @internal
+ */
+function initialize_proxy_object(mixed $what): void
+{
+    match (true) {
+        $what instanceof Proxy => $what->_initializeLazyObject(),
+        \is_array($what) => \array_map(initialize_proxy_object(...), $what),
+        default => true, // do nothing
+    };
+}
