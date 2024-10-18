@@ -648,6 +648,14 @@ You can customize the instantiator in several ways:
         // can combine the different "modes"
         ->instantiateWith(Instantiator::withoutConstructor()->allowExtra()->alwaysForce())
 
+        // use a "namedConstructor"
+        ->instantiateWith(Instantiator::namedConstructor("methodName"))
+
+        // use a callable
+        ->instantiateWith(Instantiator::use(function(string $title): object {
+            return new Post($title); // ... your own logic
+        }))
+
         // the instantiator is just a callable, you can provide your own
         ->instantiateWith(function(array $attributes, string $class): object {
             return new Post(); // ... your own logic
