@@ -242,12 +242,11 @@ jobs:
       - name: Run static analysis
         run: bin/tools/phpstan/vendor/phpstan/phpstan/phpstan analyse
 
-  # there are some problem with psalm and bc layer, around proxy
-  #      - name: Install Psalm
-  #        run: composer bin psalm install
-  #
-  #      - name: Run Psalm on factories generated with maker
-  #        run: bin/tools/psalm/vendor/vimeo/psalm/psalm
+      - name: Install Psalm
+        run: composer bin psalm install
+
+      - name: Run Psalm on factories generated with maker
+        run: bin/tools/psalm/vendor/vimeo/psalm/psalm
 
   fixcs:
     name: Run php-cs-fixer
