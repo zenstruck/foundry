@@ -160,7 +160,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     {
         Configuration::instance()->assertPersistanceEnabled();
 
-        return is_a(static::class, PersistentProxyObjectFactory::class, allow_string: true) // @phpstan-ignore return.type
+        return \is_a(static::class, PersistentProxyObjectFactory::class, allow_string: true) // @phpstan-ignore return.type
             ? new ProxyRepositoryDecorator(static::class()) // @phpstan-ignore argument.type
             : new RepositoryDecorator(static::class());
     }
