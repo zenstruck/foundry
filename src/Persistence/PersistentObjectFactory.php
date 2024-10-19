@@ -41,27 +41,23 @@ abstract class PersistentObjectFactory extends ObjectFactory
     private array $tempAfterPersist = [];
 
     /**
-     * @final
-     *
      * @param mixed|Parameters $criteriaOrId
      *
      * @return T
      *
      * @throws \RuntimeException If no object found
      */
-    public static function find(mixed $criteriaOrId): object
+    final public static function find(mixed $criteriaOrId): object
     {
         return static::repository()->findOrFail($criteriaOrId);
     }
 
     /**
-     * @final
-     *
      * @param Parameters $criteria
      *
      * @return T
      */
-    public static function findOrCreate(array $criteria): object
+    final public static function findOrCreate(array $criteria): object
     {
         try {
             $object = static::repository()->findOneBy($criteria);
@@ -73,13 +69,11 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
-     * @final
-     *
      * @param Parameters $criteria
      *
      * @return T
      */
-    public static function randomOrCreate(array $criteria = []): object
+    final public static function randomOrCreate(array $criteria = []): object
     {
         try {
             return static::repository()->random($criteria);
@@ -89,96 +83,80 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
-     * @final
-     *
      * @param positive-int $count
      * @param Parameters   $criteria
      *
      * @return T[]
      */
-    public static function randomSet(int $count, array $criteria = []): array
+    final public static function randomSet(int $count, array $criteria = []): array
     {
         return static::repository()->randomSet($count, $criteria);
     }
 
     /**
-     * @final
-     *
      * @param int<0, max> $min
      * @param int<0, max> $max
      * @param Parameters  $criteria
      *
      * @return T[]
      */
-    public static function randomRange(int $min, int $max, array $criteria = []): array
+    final public static function randomRange(int $min, int $max, array $criteria = []): array
     {
         return static::repository()->randomRange($min, $max, $criteria);
     }
 
     /**
-     * @final
-     *
      * @param Parameters $criteria
      *
      * @return T[]
      */
-    public static function findBy(array $criteria): array
+    final public static function findBy(array $criteria): array
     {
         return static::repository()->findBy($criteria);
     }
 
     /**
-     * @final
-     *
      * @param Parameters $criteria
      *
      * @return T
      */
-    public static function random(array $criteria = []): object
+    final public static function random(array $criteria = []): object
     {
         return static::repository()->random($criteria);
     }
 
     /**
-     * @final
-     *
      * @return T
      *
      * @throws \RuntimeException If no objects exist
      */
-    public static function first(string $sortBy = 'id'): object
+    final public static function first(string $sortBy = 'id'): object
     {
         return static::repository()->firstOrFail($sortBy);
     }
 
     /**
-     * @final
-     *
      * @return T
      *
      * @throws \RuntimeException If no objects exist
      */
-    public static function last(string $sortBy = 'id'): object
+    final public static function last(string $sortBy = 'id'): object
     {
         return static::repository()->lastOrFail($sortBy);
     }
 
     /**
-     * @final
-     *
      * @return T[]
      */
-    public static function all(): array
+    final public static function all(): array
     {
         return static::repository()->findAll();
     }
 
     /**
-     * @final
-     *
      * @return RepositoryDecorator<T,ObjectRepository<T>>
      */
-    public static function repository(): ObjectRepository
+    final public static function repository(): ObjectRepository
     {
         Configuration::instance()->assertPersistanceEnabled();
 

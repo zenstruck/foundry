@@ -1,8 +1,6 @@
 <?php
 
-use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 
 use function PHPStan\Testing\assertType;
 
@@ -12,25 +10,10 @@ class User1
 }
 
 /**
- * @extends EntityRepository<User1>
- */
-class UserRepository1 extends EntityRepository
-{
-    public function findByName(string $name): User1
-    {
-        return new User1();
-    }
-}
-
-/**
  * The following method stubs are required for auto-completion in PhpStorm
  * AND phpstan support.
  *
  * @extends PersistentProxyObjectFactory<User1>
- *
- * @method static RepositoryDecorator|UserRepository1 repository()
- *
- * @phpstan-method static RepositoryDecorator<User1,UserRepository1> repository()
  */
 final class User1Factory extends PersistentProxyObjectFactory
 {
@@ -44,6 +27,29 @@ final class User1Factory extends PersistentProxyObjectFactory
         return [];
     }
 }
+
+$proxyType = 'User1&Zenstruck\Foundry\Persistence\Proxy<User1>';
+assertType('User1', User1Factory::new()->create()->_real());
+assertType($proxyType, User1Factory::new()->create());
+assertType($proxyType, User1Factory::new()->create()->_refresh());
+assertType($proxyType, User1Factory::createOne());
+assertType($proxyType, User1Factory::new()->many(2)->create()[0]);
+assertType($proxyType, User1Factory::new()->sequence([])->create()[0]);
+assertType($proxyType, User1Factory::first());
+assertType($proxyType, User1Factory::last());
+assertType($proxyType, User1Factory::find(1));
+assertType($proxyType, User1Factory::random());
+assertType($proxyType, User1Factory::findOrCreate([]));
+assertType($proxyType, User1Factory::randomOrCreate());
+assertType("array<{$proxyType}>", User1Factory::all());
+assertType("array<{$proxyType}>", User1Factory::createMany(1));
+assertType("array<{$proxyType}>", User1Factory::createSequence([]));
+assertType("array<{$proxyType}>", User1Factory::randomRange(1, 2));
+assertType("array<{$proxyType}>", User1Factory::randomSet(2));
+assertType("array<{$proxyType}>", User1Factory::findBy(['name' => 'foo']));
+assertType("({$proxyType})|null", User1Factory::repository()->find(1));
+assertType("array<{$proxyType}>", User1Factory::repository()->findAll());
+assertType("Zenstruck\Foundry\Persistence\RepositoryDecorator<{$proxyType}, Doctrine\Persistence\ObjectRepository<{$proxyType}>>", User1Factory::repository());
 
 // test autocomplete with phpstorm
 assertType('string', User1Factory::new()->create()->_refresh()->name);
@@ -62,5 +68,4 @@ assertType('string', User1Factory::findOrCreate([])->_refresh()->name);
 assertType('string', User1Factory::randomOrCreate([])->_refresh()->name);
 assertType('string|null', User1Factory::repository()->find(1)?->name);
 assertType('string', User1Factory::repository()->findAll()[0]->name);
-assertType('string', User1Factory::repository()->findByName('foo')->name);
 assertType('int', User1Factory::repository()->count());

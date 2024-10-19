@@ -1,8 +1,6 @@
 <?php
 
-use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 
 use function PHPStan\Testing\assertType;
 use function Zenstruck\Foundry\Persistence\proxy;
@@ -13,26 +11,12 @@ class User
 }
 
 /**
- * @extends EntityRepository<User>
- */
-class UserRepository extends EntityRepository
-{
-    public function findByName(string $name): User
-    {
-        return new User();
-    }
-}
-
-/**
  * The following method stubs are required for auto-completion in PhpStorm
  * AND phpstan support.
  *
  * @extends PersistentObjectFactory<User>
  *
  * @method User create(array|callable $attributes = [])
- * @method static RepositoryDecorator|UserRepository repository()
- *
- * @phpstan-method static RepositoryDecorator<User,UserRepository> repository()
  */
 final class UserFactory extends PersistentObjectFactory
 {
@@ -46,6 +30,26 @@ final class UserFactory extends PersistentObjectFactory
         return [];
     }
 }
+
+assertType('User', UserFactory::new()->create());
+assertType('User', UserFactory::createOne());
+assertType('User', UserFactory::new()->many(2)->create()[0]);
+assertType('User', UserFactory::new()->sequence([])->create()[0]);
+assertType('User', UserFactory::first());
+assertType('User', UserFactory::last());
+assertType('User', UserFactory::find(1));
+assertType('User', UserFactory::random());
+assertType('User', UserFactory::findOrCreate([]));
+assertType('User', UserFactory::randomOrCreate());
+assertType('User|null', UserFactory::repository()->find(1));
+assertType("array<User>", UserFactory::all());
+assertType("array<User>", UserFactory::createMany(1));
+assertType("array<User>", UserFactory::createSequence([]));
+assertType("array<User>", UserFactory::randomRange(1, 2));
+assertType("array<User>", UserFactory::randomSet(2));
+assertType("array<User>", UserFactory::findBy(['name' => 'foo']));
+assertType("array<User>", UserFactory::repository()->findAll());
+assertType("Zenstruck\Foundry\Persistence\RepositoryDecorator<User, Doctrine\Persistence\ObjectRepository<User>>", UserFactory::repository());
 
 // test autocomplete with phpstorm
 assertType('string', UserFactory::new()->create()->name);
@@ -64,7 +68,6 @@ assertType('string', UserFactory::findOrCreate([])->name);
 assertType('string', UserFactory::randomOrCreate([])->name);
 assertType('string|null', UserFactory::repository()->find(1)?->name);
 assertType('string', UserFactory::repository()->findAll()[0]->name);
-assertType('string', UserFactory::repository()->findByName('foo')->name);
 assertType('int', UserFactory::repository()->count());
 assertType('string', proxy(UserFactory::createOne())->name);
 assertType('string', proxy(UserFactory::new()->create())->name);
