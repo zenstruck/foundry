@@ -47,7 +47,6 @@ interface Proxy
     public function _save(): static;
 
     /**
-     * @return static
      * @psalm-return T&Proxy<T>
      * @phpstan-return static
      */

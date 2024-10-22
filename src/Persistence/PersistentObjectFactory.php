@@ -134,6 +134,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     {
         /** @var T $object */
         $object = static::repository()->firstOrFail($sortBy);
+
         return $object;
     }
 
@@ -146,6 +147,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     {
         /** @var T $object */
         $object = static::repository()->lastOrFail($sortBy);
+
         return $object;
     }
 

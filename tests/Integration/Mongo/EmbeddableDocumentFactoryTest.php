@@ -13,8 +13,6 @@ namespace Zenstruck\Foundry\Tests\Integration\Mongo;
 
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Document\WithEmbeddableDocument;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\CascadeContactFactory;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ProxyCascadeContactFactory;
 use Zenstruck\Foundry\Tests\Fixture\Model\Embeddable;
 use Zenstruck\Foundry\Tests\Integration\Persistence\EmbeddableFactoryTestCase;
 use Zenstruck\Foundry\Tests\Integration\RequiresMongo;
