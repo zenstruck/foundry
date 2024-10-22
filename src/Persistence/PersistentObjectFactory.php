@@ -34,16 +34,14 @@ abstract class PersistentObjectFactory extends ObjectFactory
 {
     private bool $persist;
 
-    /** @var list<callable(T, Parameters):void> */
+    /** @phpstan-var list<callable(T, Parameters):void> */
     private array $afterPersist = [];
 
     /** @var list<callable(T):void> */
     private array $tempAfterPersist = [];
 
     /**
-     * @final
-     *
-     * @param mixed|Parameters $criteriaOrId
+     * @phpstan-param mixed|Parameters $criteriaOrId
      *
      * @return T
      *
@@ -55,9 +53,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
-     * @final
-     *
-     * @param Parameters $criteria
+     * @phpstan-param Parameters $criteria
      *
      * @return T
      */
@@ -73,9 +69,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
-     * @final
-     *
-     * @param Parameters $criteria
+     * @phpstan-param Parameters $criteria
      *
      * @return T
      */
@@ -89,12 +83,10 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
-     * @final
-     *
      * @param positive-int $count
-     * @param Parameters   $criteria
+     * @phpstan-param Parameters   $criteria
      *
-     * @return T[]
+     * @return list<T>
      */
     public static function randomSet(int $count, array $criteria = []): array
     {
@@ -102,13 +94,11 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
-     * @final
-     *
      * @param int<0, max> $min
      * @param int<0, max> $max
-     * @param Parameters  $criteria
+     * @phpstan-param Parameters  $criteria
      *
-     * @return T[]
+     * @return list<T>
      */
     public static function randomRange(int $min, int $max, array $criteria = []): array
     {
@@ -116,11 +106,9 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
-     * @final
+     * @phpstan-param Parameters $criteria
      *
-     * @param Parameters $criteria
-     *
-     * @return T[]
+     * @return list<T>
      */
     public static function findBy(array $criteria): array
     {
@@ -128,9 +116,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
-     * @final
-     *
-     * @param Parameters $criteria
+     * @phpstan-param Parameters $criteria
      *
      * @return T
      */
@@ -140,33 +126,33 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
-     * @final
-     *
      * @return T
      *
      * @throws \RuntimeException If no objects exist
      */
     public static function first(string $sortBy = 'id'): object
     {
-        return static::repository()->firstOrFail($sortBy);
+        /** @var T $object */
+        $object = static::repository()->firstOrFail($sortBy);
+
+        return $object;
     }
 
     /**
-     * @final
-     *
      * @return T
      *
      * @throws \RuntimeException If no objects exist
      */
     public static function last(string $sortBy = 'id'): object
     {
-        return static::repository()->lastOrFail($sortBy);
+        /** @var T $object */
+        $object = static::repository()->lastOrFail($sortBy);
+
+        return $object;
     }
 
     /**
-     * @final
-     *
-     * @return T[]
+     * @return list<T>
      */
     public static function all(): array
     {
@@ -174,8 +160,6 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
-     * @final
-     *
      * @return RepositoryDecorator<T,ObjectRepository<T>>
      */
     public static function repository(): ObjectRepository
@@ -191,7 +175,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
-     * @param Parameters $criteria
+     * @phpstan-param Parameters $criteria
      */
     final public static function count(array $criteria = []): int
     {
@@ -206,12 +190,12 @@ abstract class PersistentObjectFactory extends ObjectFactory
     /**
      * @return T
      */
-    final public function create(callable|array $attributes = []): object
+    public function create(callable|array $attributes = []): object
     {
         $object = parent::create($attributes);
 
         if (!$this->isPersisting()) {
-            return $this->proxy($object);
+            return $object;
         }
 
         $configuration = Configuration::instance();
@@ -238,7 +222,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
             $configuration->persistence()->save($object);
         }
 
-        return $this->proxy($object);
+        return $object;
     }
 
     final public function andPersist(): static
@@ -258,7 +242,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
-     * @param callable(T, Parameters):void $callback
+     * @phpstan-param callable(T, Parameters):void $callback
      */
     final public function afterPersist(callable $callback): static
     {
@@ -344,21 +328,5 @@ abstract class PersistentObjectFactory extends ObjectFactory
         }
 
         return $this->persist ?? $config->isPersistenceAvailable() && $config->persistence()->isEnabled() && $config->persistence()->autoPersist(static::class());
-    }
-
-    /**
-     * @param T $object
-     *
-     * @return T
-     */
-    private function proxy(object $object): object
-    {
-        if (!$this instanceof PersistentProxyObjectFactory) {
-            return $object;
-        }
-
-        $object = proxy($object);
-
-        return $this->isPersisting() ? $object : $object->_disableAutoRefresh();
     }
 }

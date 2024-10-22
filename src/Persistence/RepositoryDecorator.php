@@ -92,10 +92,16 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
     public function find($id): ?object
     {
         if (\is_array($id) && (empty($id) || !array_is_list($id))) {
-            return $this->findOneBy($id);
+            /** @var T|null $object */
+            $object = $this->findOneBy($id);
+
+            return $object;
         }
 
-        return $this->inner()->find(unproxy($id));
+        /** @var T|null $object */
+        $object = $this->inner()->find(unproxy($id));
+
+        return $object;
     }
 
     /**

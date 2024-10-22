@@ -13,33 +13,12 @@ namespace Zenstruck\Foundry\Persistence;
 
 use Doctrine\Persistence\ObjectRepository;
 use Zenstruck\Foundry\Configuration;
-use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\Object\Instantiator;
-use Zenstruck\Foundry\FactoryCollection; // keep me!
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @template T of object
  * @extends PersistentObjectFactory<T&Proxy<T>>
- *
- * @phpstan-type InstantiatorCallable = Instantiator|callable(Parameters,class-string<T>):T
- * @phpstan-import-type Parameters from Factory
- * @phpstan-import-type Attributes from Factory
- *
- * @phpstan-method $this instantiateWith(InstantiatorCallable $instantiator)
- *
- * @phpstan-method FactoryCollection<T&Proxy<T>> sequence(iterable<array<string, mixed>>|callable(): iterable<array<string, mixed>> $sequence)
- * @phpstan-method FactoryCollection<T&Proxy<T>> many(int $min, int|null $max = null)
- *
- * @phpstan-method static list<T&Proxy<T>> createSequence(iterable<array<string, mixed>>|callable(): iterable<array<string, mixed>> $sequence)
- * @phpstan-method static list<T&Proxy<T>> createMany(int $number, array|callable $attributes = [])
- *
- * @method static Proxy<T> createOne(Attributes $attributes = [])
- * @phpstan-method static T&Proxy<T> createOne(Attributes $attributes = [])
- *
- * @method Proxy<T> create(Attributes $attributes = [])
- * @phpstan-method T&Proxy<T> create(Attributes $attributes = [])
  */
 abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
 {
@@ -49,30 +28,48 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
     abstract public static function class(): string;
 
     /**
-     * @return Proxy<T>
+     * @return T|Proxy<T>
+     * @phpstan-return T&Proxy<T>
+     */
+    public function create(callable|array $attributes = []): object
+    {
+        return proxy(parent::create($attributes)); // @phpstan-ignore function.unresolvableReturnType
+    }
+
+    /**
+     * @return T|Proxy<T>
+     * @phpstan-return T&Proxy<T>
+     */
+    public static function createOne(array|callable $attributes = []): mixed
+    {
+        return proxy(parent::createOne($attributes)); // @phpstan-ignore function.unresolvableReturnType
+    }
+
+    /**
+     * @return T|Proxy<T>
      * @phpstan-return T&Proxy<T>
      */
     final public static function find(mixed $criteriaOrId): object
     {
-        return proxy(parent::find($criteriaOrId)); // @phpstan-ignore-line
+        return proxy(parent::find($criteriaOrId)); // @phpstan-ignore function.unresolvableReturnType
     }
 
     /**
-     * @return Proxy<T>
+     * @return T|Proxy<T>
      * @phpstan-return T&Proxy<T>
      */
     final public static function findOrCreate(array $criteria): object
     {
-        return proxy(parent::findOrCreate($criteria)); // @phpstan-ignore-line
+        return proxy(parent::findOrCreate($criteria)); // @phpstan-ignore function.unresolvableReturnType
     }
 
     /**
-     * @return Proxy<T>
+     * @return T|Proxy<T>
      * @phpstan-return T&Proxy<T>
      */
     final public static function randomOrCreate(array $criteria = []): object
     {
-        return proxy(parent::randomOrCreate($criteria)); // @phpstan-ignore-line
+        return proxy(parent::randomOrCreate($criteria)); // @phpstan-ignore function.unresolvableReturnType
     }
 
     /**
@@ -80,7 +77,7 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
      */
     final public static function randomSet(int $count, array $criteria = []): array
     {
-        return \array_map(proxy(...), parent::randomSet($count, $criteria)); // @phpstan-ignore-line
+        return \array_map(proxy(...), parent::randomSet($count, $criteria));
     }
 
     /**
@@ -88,7 +85,7 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
      */
     final public static function randomRange(int $min, int $max, array $criteria = []): array
     {
-        return \array_map(proxy(...), parent::randomRange($min, $max, $criteria)); // @phpstan-ignore-line
+        return \array_map(proxy(...), parent::randomRange($min, $max, $criteria));
     }
 
     /**
@@ -96,34 +93,34 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
      */
     final public static function findBy(array $criteria): array
     {
-        return \array_map(proxy(...), parent::findBy($criteria)); // @phpstan-ignore-line
+        return \array_map(proxy(...), parent::findBy($criteria));
     }
 
     /**
-     * @return Proxy<T>
+     * @return T|Proxy<T>
      * @phpstan-return T&Proxy<T>
      */
     final public static function random(array $criteria = []): object
     {
-        return proxy(parent::random($criteria)); // @phpstan-ignore-line
+        return proxy(parent::random($criteria)); // @phpstan-ignore function.unresolvableReturnType
     }
 
     /**
-     * @return Proxy<T>
+     * @return T|Proxy<T>
      * @phpstan-return T&Proxy<T>
      */
     final public static function first(string $sortBy = 'id'): object
     {
-        return proxy(parent::first($sortBy)); // @phpstan-ignore-line
+        return proxy(parent::first($sortBy)); // @phpstan-ignore function.unresolvableReturnType
     }
 
     /**
-     * @return Proxy<T>
+     * @return T|Proxy<T>
      * @phpstan-return T&Proxy<T>
      */
     final public static function last(string $sortBy = 'id'): object
     {
-        return proxy(parent::last($sortBy)); // @phpstan-ignore-line
+        return proxy(parent::last($sortBy)); // @phpstan-ignore function.unresolvableReturnType
     }
 
     /**
@@ -131,7 +128,7 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
      */
     final public static function all(): array
     {
-        return \array_map(proxy(...), parent::all()); // @phpstan-ignore-line
+        return \array_map(proxy(...), parent::all());
     }
 
     /**
@@ -141,6 +138,6 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
     {
         Configuration::instance()->assertPersistanceEnabled();
 
-        return new ProxyRepositoryDecorator(static::class()); // @phpstan-ignore-line
+        return new ProxyRepositoryDecorator(static::class()); // @phpstan-ignore argument.type, return.type
     }
 }

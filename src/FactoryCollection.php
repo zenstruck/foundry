@@ -66,7 +66,7 @@ final class FactoryCollection implements \IteratorAggregate
     /**
      * @param Attributes $attributes
      *
-     * @return T[]
+     * @return list<T>
      */
     public function create(array|callable $attributes = []): array
     {
