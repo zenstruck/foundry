@@ -55,6 +55,6 @@ final class EmbeddableDocumentFactoryTest extends EmbeddableFactoryTestCase
 
     protected function withEmbeddableFactory(): PersistentObjectFactory
     {
-        return persistent_factory(WithEmbeddableDocument::class); // @phpstan-ignore-line
+        return persistent_factory(WithEmbeddableDocument::class); // @phpstan-ignore return.type
     }
 }

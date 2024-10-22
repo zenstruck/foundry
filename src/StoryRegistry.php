@@ -42,11 +42,11 @@ final class StoryRegistry
     public function load(string $class): Story
     {
         if (\array_key_exists($class, self::$globalInstances)) {
-            return self::$globalInstances[$class]; // @phpstan-ignore-line
+            return self::$globalInstances[$class]; // @phpstan-ignore return.type
         }
 
         if (\array_key_exists($class, self::$instances)) {
-            return self::$instances[$class]; // @phpstan-ignore-line
+            return self::$instances[$class]; // @phpstan-ignore return.type
         }
 
         self::$instances[$class] = $this->getOrCreateStory($class);
@@ -60,7 +60,7 @@ final class StoryRegistry
         self::$globalInstances = [];
 
         foreach ($this->globalStories as $story) {
-            \is_a($story, Story::class, true) ? $this->load($story) : $story(); // @phpstan-ignore-line
+            \is_a($story, Story::class, true) ? $this->load($story) : $story(); // @phpstan-ignore argument.type, argument.type
         }
 
         self::$globalInstances = self::$instances;
@@ -83,13 +83,13 @@ final class StoryRegistry
     {
         foreach ($this->stories as $story) {
             if ($class === $story::class) {
-                return $story; // @phpstan-ignore-line
+                return $story; // @phpstan-ignore return.type
             }
         }
 
         try {
             return new $class();
-        } catch (\ArgumentCountError $e) { // @phpstan-ignore-line
+        } catch (\ArgumentCountError $e) { // @phpstan-ignore catch.neverThrown
             throw new \RuntimeException('Stories with dependencies (Story services) cannot be used without the foundry bundle.', 0, $e);
         }
     }

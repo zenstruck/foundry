@@ -40,7 +40,7 @@ final class ProxyGenerator
             return $object;
         }
 
-        return self::generateClassFor($object)::createLazyProxy(static fn() => $object); // @phpstan-ignore-line
+        return self::generateClassFor($object)::createLazyProxy(static fn() => $object); // @phpstan-ignore staticMethod.unresolvableReturnType
     }
 
     /**
@@ -53,15 +53,15 @@ final class ProxyGenerator
     public static function unwrap(mixed $what): mixed
     {
         if (\is_array($what)) {
-            return \array_map(self::unwrap(...), $what); // @phpstan-ignore-line
+            return \array_map(self::unwrap(...), $what); // @phpstan-ignore return.type
         }
 
         if (\is_string($what) && \is_a($what, Proxy::class, true)) {
-            return \get_parent_class($what) ?: throw new \LogicException('Could not unwrap proxy.'); // @phpstan-ignore-line
+            return \get_parent_class($what) ?: throw new \LogicException('Could not unwrap proxy.'); // @phpstan-ignore return.type
         }
 
         if ($what instanceof Proxy) {
-            return $what->_real(); // @phpstan-ignore-line
+            return $what->_real(); // @phpstan-ignore return.type
         }
 
         return $what;

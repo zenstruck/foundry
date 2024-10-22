@@ -51,7 +51,7 @@ abstract class MakerTestCase extends KernelTestCase
 
         $this->assertFileExists($path);
 
-        return \realpath($path); // @phpstan-ignore-line
+        return \realpath($path); // @phpstan-ignore return.type
     }
 
     protected function assertFileFromMakerSameAsExpectedFile(string $fileFromMaker): void

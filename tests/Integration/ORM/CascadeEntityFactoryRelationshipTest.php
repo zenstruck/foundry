@@ -96,21 +96,21 @@ final class CascadeEntityFactoryRelationshipTest extends EntityFactoryRelationsh
 
     protected function contactFactory(): PersistentObjectFactory
     {
-        return CascadeContactFactory::new(); // @phpstan-ignore-line
+        return CascadeContactFactory::new(); // @phpstan-ignore return.type
     }
 
     protected function categoryFactory(): PersistentObjectFactory
     {
-        return CascadeCategoryFactory::new(); // @phpstan-ignore-line
+        return CascadeCategoryFactory::new(); // @phpstan-ignore return.type
     }
 
     protected function tagFactory(): PersistentObjectFactory
     {
-        return CascadeTagFactory::new(); // @phpstan-ignore-line
+        return CascadeTagFactory::new(); // @phpstan-ignore return.type
     }
 
     protected function addressFactory(): PersistentObjectFactory
     {
-        return CascadeAddressFactory::new(); // @phpstan-ignore-line
+        return CascadeAddressFactory::new(); // @phpstan-ignore return.type
     }
 }

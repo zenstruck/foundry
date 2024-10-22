@@ -24,21 +24,21 @@ final class ProxyEntityFactoryRelationshipTest extends ProxyEntityFactoryRelatio
 {
     protected function contactFactory(): PersistentObjectFactory
     {
-        return ProxyContactFactory::new(); // @phpstan-ignore-line
+        return ProxyContactFactory::new(); // @phpstan-ignore return.type
     }
 
     protected function categoryFactory(): PersistentObjectFactory
     {
-        return ProxyCategoryFactory::new(); // @phpstan-ignore-line
+        return ProxyCategoryFactory::new(); // @phpstan-ignore return.type
     }
 
     protected function tagFactory(): PersistentObjectFactory
     {
-        return ProxyTagFactory::new(); // @phpstan-ignore-line
+        return ProxyTagFactory::new(); // @phpstan-ignore return.type
     }
 
     protected function addressFactory(): PersistentObjectFactory
     {
-        return ProxyAddressFactory::new(); // @phpstan-ignore-line
+        return ProxyAddressFactory::new(); // @phpstan-ignore return.type
     }
 }

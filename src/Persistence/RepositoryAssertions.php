@@ -32,7 +32,7 @@ final class RepositoryAssertions
     }
 
     /**
-     * @param Parameters $criteria
+     * @phpstan-param Parameters $criteria
      */
     public function empty(array $criteria = [], string $message = 'Expected {entity} repository to be empty but it has {actual} items.'): self
     {
@@ -40,7 +40,7 @@ final class RepositoryAssertions
     }
 
     /**
-     * @param Parameters $criteria
+     * @phpstan-param Parameters $criteria
      */
     public function notEmpty(array $criteria = [], string $message = 'Expected {entity} repository to NOT be empty but it is.'): self
     {
@@ -52,7 +52,7 @@ final class RepositoryAssertions
     }
 
     /**
-     * @param Parameters $criteria
+     * @phpstan-param Parameters $criteria
      */
     public function count(int $expectedCount, array $criteria = [], string $message = 'Expected count of {entity} to be {expected} (actual: {actual}).'): self
     {
@@ -64,7 +64,7 @@ final class RepositoryAssertions
     }
 
     /**
-     * @param Parameters $criteria
+     * @phpstan-param Parameters $criteria
      */
     public function countGreaterThan(int $expected, array $criteria = [], string $message = 'Expected count of {entity} to be greater than {expected} (actual: {actual}).'): self
     {
@@ -76,7 +76,7 @@ final class RepositoryAssertions
     }
 
     /**
-     * @param Parameters $criteria
+     * @phpstan-param Parameters $criteria
      */
     public function countGreaterThanOrEqual(int $expected, array $criteria = [], string $message = 'Expected count of {entity} to be greater than or equal {expected} (actual: {actual}).'): self
     {
@@ -88,7 +88,7 @@ final class RepositoryAssertions
     }
 
     /**
-     * @param Parameters $criteria
+     * @phpstan-param Parameters $criteria
      */
     public function countLessThan(int $expected, array $criteria = [], string $message = 'Expected count of {entity} to be less than {expected} (actual: {actual}).'): self
     {
@@ -100,7 +100,7 @@ final class RepositoryAssertions
     }
 
     /**
-     * @param Parameters $criteria
+     * @phpstan-param Parameters $criteria
      */
     public function countLessThanOrEqual(int $expected, array $criteria = [], string $message = 'Expected count of {entity} to be less than or equal {expected} (actual: {actual}).'): self
     {

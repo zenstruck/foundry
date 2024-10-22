@@ -21,7 +21,7 @@ final class ProxyGenericEntityRepositoryDecoratorTest extends GenericRepositoryD
 {
     use RequiresORM;
 
-    protected function factory(): GenericProxyEntityFactory // @phpstan-ignore-line
+    protected function factory(): GenericProxyEntityFactory // @phpstan-ignore method.childReturnType
     {
         return GenericProxyEntityFactory::new();
     }

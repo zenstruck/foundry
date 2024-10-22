@@ -36,7 +36,7 @@ final class FactoryRegistry
     {
         foreach ($this->factories as $factory) {
             if ($class === $factory::class) {
-                return $factory; // @phpstan-ignore-line
+                return $factory; // @phpstan-ignore return.type
             }
         }
 

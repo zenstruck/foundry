@@ -45,7 +45,7 @@ abstract class Factory
         }
 
         try {
-            $factory ??= new static(); // @phpstan-ignore-line
+            $factory ??= new static(); // @phpstan-ignore new.static
         } catch (\ArgumentCountError $e) {
             throw new \LogicException('Factories with dependencies (services) cannot be created before foundry is booted.', previous: $e);
         }

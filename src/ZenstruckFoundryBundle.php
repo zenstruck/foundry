@@ -28,13 +28,13 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
     public function boot(): void
     {
         if ($this->container && !Configuration::isBooted()) {
-            Configuration::boot($this->container->get('.zenstruck_foundry.configuration')); // @phpstan-ignore-line
+            Configuration::boot($this->container->get('.zenstruck_foundry.configuration')); // @phpstan-ignore argument.type
         }
     }
 
     public function configure(DefinitionConfigurator $definition): void
     {
-        $definition->rootNode() // @phpstan-ignore-line
+        $definition->rootNode() // @phpstan-ignore method.notFound
             ->children()
                 ->booleanNode('auto_refresh_proxies')
                     ->info('Whether to auto-refresh proxies by default (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#auto-refresh)')
@@ -184,7 +184,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
         ;
     }
 
-    public function loadExtension(array $config, ContainerConfigurator $configurator, ContainerBuilder $container): void // @phpstan-ignore-line
+    public function loadExtension(array $config, ContainerConfigurator $configurator, ContainerBuilder $container): void // @phpstan-ignore missingType.iterableValue
     {
         $container->registerForAutoconfiguration(Factory::class)
             ->addTag('foundry.factory')

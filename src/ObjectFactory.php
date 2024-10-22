@@ -21,7 +21,6 @@ use Zenstruck\Foundry\Object\Instantiator;
  *
  * @phpstan-type InstantiatorCallable = Instantiator|callable(Parameters,class-string<T>):T
  * @phpstan-import-type Parameters from Factory
- * @phpstan-import-type Attributes from Factory
  */
 abstract class ObjectFactory extends Factory
 {

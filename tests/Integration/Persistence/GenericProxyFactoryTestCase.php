@@ -283,7 +283,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
     /**
      * @return PersistentProxyObjectFactory<GenericModel>
      */
-    abstract protected function factory(): PersistentProxyObjectFactory; // @phpstan-ignore-line
+    abstract protected function factory(): PersistentProxyObjectFactory; // @phpstan-ignore method.childReturnType
 
     /**
      * @return PersistentProxyObjectFactory<DocumentWithReadonly|EntityWithReadonly>

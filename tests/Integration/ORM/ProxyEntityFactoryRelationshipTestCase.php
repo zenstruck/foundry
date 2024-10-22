@@ -43,7 +43,7 @@ abstract class ProxyEntityFactoryRelationshipTestCase extends EntityFactoryRelat
         $this->contactFactory()->create(['category' => $this->categoryFactory()]);
 
         // clear the em so nothing is tracked
-        self::getContainer()->get(EntityManagerInterface::class)->clear(); // @phpstan-ignore-line
+        self::getContainer()->get(EntityManagerInterface::class)->clear(); // @phpstan-ignore method.nonObject
 
         // load a random Contact which causes the em to track a "doctrine proxy" for category
         $this->contactFactory()::random();

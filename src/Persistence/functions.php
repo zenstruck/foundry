@@ -24,7 +24,7 @@ use Zenstruck\Foundry\Configuration;
  */
 function repository(string $class): RepositoryDecorator
 {
-    return new RepositoryDecorator($class); // @phpstan-ignore-line
+    return new RepositoryDecorator($class); // @phpstan-ignore return.type
 }
 
 /**
@@ -36,7 +36,7 @@ function repository(string $class): RepositoryDecorator
  */
 function proxy_repository(string $class): ProxyRepositoryDecorator
 {
-    return new ProxyRepositoryDecorator($class); // @phpstan-ignore-line
+    return new ProxyRepositoryDecorator($class); // @phpstan-ignore return.type, argument.type
 }
 
 /**

@@ -25,12 +25,12 @@ use Zenstruck\Foundry\StoryRegistry;
  */
 final class UnitTestConfig
 {
-    /** @var InstantiatorCallable|null */
+    /** @phpstan-var InstantiatorCallable|null */
     private static $instantiator;
     private static ?Faker\Generator $faker = null;
 
     /**
-     * @param InstantiatorCallable|null $instantiator
+     * @phpstan-param InstantiatorCallable|null $instantiator
      */
     public static function configure(Instantiator|callable|null $instantiator = null, ?Faker\Generator $faker = null): void
     {
