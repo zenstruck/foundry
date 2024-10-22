@@ -13,8 +13,6 @@ namespace Zenstruck\Foundry;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- *
- * @phpstan-import-type Parameters from Factory
  */
 final class LazyValue
 {

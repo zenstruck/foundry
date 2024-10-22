@@ -29,7 +29,7 @@ final class Configuration
     /**
      * @readonly
      *
-     * @var InstantiatorCallable
+     * @phpstan-var InstantiatorCallable
      */
     public $instantiator;
 
@@ -37,7 +37,7 @@ final class Configuration
     private static \Closure|self|null $instance = null;
 
     /**
-     * @param InstantiatorCallable $instantiator
+     * @phpstan-param InstantiatorCallable $instantiator
      */
     public function __construct(
         public readonly FactoryRegistry $factories,

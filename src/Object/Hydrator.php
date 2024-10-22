@@ -38,8 +38,8 @@ final class Hydrator
     /**
      * @template T of object
      *
-     * @param T          $object
-     * @param Parameters $parameters
+     * @param T $object
+     * @phpstan-param Parameters $parameters
      *
      * @return T
      */

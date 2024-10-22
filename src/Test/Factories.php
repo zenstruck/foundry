@@ -28,7 +28,7 @@ trait Factories
     #[Before]
     public static function _bootFoundry(): void
     {
-        if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore-line
+        if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.impossibleType
             // unit test
             Configuration::boot(UnitTestConfig::build());
 
@@ -36,13 +36,12 @@ trait Factories
         }
 
         // integration test
-        // @phpstan-ignore-next-line
         Configuration::boot(static function() {
-            if (!static::getContainer()->has('.zenstruck_foundry.configuration')) { // @phpstan-ignore-line
+            if (!static::getContainer()->has('.zenstruck_foundry.configuration')) { // @phpstan-ignore staticMethod.notFound
                 throw new \LogicException('ZenstruckFoundryBundle is not enabled. Ensure it is added to your config/bundles.php.');
             }
 
-            return static::getContainer()->get('.zenstruck_foundry.configuration'); // @phpstan-ignore-line
+            return static::getContainer()->get('.zenstruck_foundry.configuration'); // @phpstan-ignore staticMethod.notFound
         });
     }
 

@@ -26,7 +26,7 @@ final class FactoryClassMap
     private array $classesWithFactories;
 
     /** @param \Traversable<ObjectFactory> $factories */
-    public function __construct(\Traversable $factories) // @phpstan-ignore-line
+    public function __construct(\Traversable $factories) // @phpstan-ignore missingType.generics
     {
         $this->classesWithFactories = \array_unique(
             \array_reduce(

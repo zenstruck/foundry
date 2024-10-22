@@ -79,7 +79,7 @@ final class MakeFactoryData
     /**
      * @return class-string<ObjectFactory>
      */
-    public function getFactoryClass(): string // @phpstan-ignore-line
+    public function getFactoryClass(): string // @phpstan-ignore missingType.generics
     {
         return $this->isPersisted() ? PersistentProxyObjectFactory::class : ObjectFactory::class;
     }
@@ -100,7 +100,7 @@ final class MakeFactoryData
         return $this->object->getName();
     }
 
-    public function getRepositoryReflectionClass(): ?\ReflectionClass // @phpstan-ignore-line
+    public function getRepositoryReflectionClass(): ?\ReflectionClass // @phpstan-ignore missingType.generics
     {
         return $this->repository;
     }

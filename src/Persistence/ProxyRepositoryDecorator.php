@@ -20,7 +20,7 @@ use Doctrine\Persistence\ObjectRepository;
  * @template I of ObjectRepository
  * @extends  RepositoryDecorator<T&Proxy<T>, I>
  */
-final class ProxyRepositoryDecorator extends RepositoryDecorator // @phpstan-ignore-line
+final class ProxyRepositoryDecorator extends RepositoryDecorator // @phpstan-ignore class.extendsFinalByPhpDoc
 {
     /**
      * @return T|Proxy<T>|null

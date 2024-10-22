@@ -145,7 +145,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
     }
 
     /**
-     * @param Parameters $criteria
+     * @phpstan-param Parameters $criteria
      */
     public function count(array $criteria = []): int
     {
@@ -165,7 +165,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
     }
 
     /**
-     * @param Parameters $criteria
+     * @phpstan-param Parameters $criteria
      *
      * @return T
      */
@@ -176,7 +176,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
 
     /**
      * @param positive-int $count
-     * @param Parameters   $criteria
+     * @phpstan-param Parameters   $criteria
      *
      * @return T[]
      */
@@ -192,7 +192,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
     /**
      * @param int<0, max> $min
      * @param int<0, max> $max
-     * @param Parameters  $criteria
+     * @phpstan-param Parameters  $criteria
      *
      * @return T[]
      */
@@ -214,7 +214,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
             throw new NotEnoughObjects(\sprintf('At least %d "%s" object(s) must have been persisted (%d persisted).', $max, $this->getClassName(), \count($all)));
         }
 
-        return \array_slice($all, 0, \random_int($min, $max)); // @phpstan-ignore-line
+        return \array_slice($all, 0, \random_int($min, $max)); // @phpstan-ignore argument.type
     }
 
     public function getIterator(): \Traversable
@@ -235,7 +235,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
     }
 
     /**
-     * @param Parameters $criteria
+     * @phpstan-param Parameters $criteria
      *
      * @return Parameters
      */

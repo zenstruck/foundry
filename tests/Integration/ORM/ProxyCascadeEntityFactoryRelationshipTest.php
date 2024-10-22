@@ -24,21 +24,21 @@ final class ProxyCascadeEntityFactoryRelationshipTest extends ProxyEntityFactory
 {
     protected function contactFactory(): PersistentObjectFactory
     {
-        return ProxyCascadeContactFactory::new(); // @phpstan-ignore-line
+        return ProxyCascadeContactFactory::new(); // @phpstan-ignore return.type
     }
 
     protected function categoryFactory(): PersistentObjectFactory
     {
-        return ProxyCascadeCategoryFactory::new(); // @phpstan-ignore-line
+        return ProxyCascadeCategoryFactory::new(); // @phpstan-ignore return.type
     }
 
     protected function tagFactory(): PersistentObjectFactory
     {
-        return ProxyCascadeTagFactory::new(); // @phpstan-ignore-line
+        return ProxyCascadeTagFactory::new(); // @phpstan-ignore return.type
     }
 
     protected function addressFactory(): PersistentObjectFactory
     {
-        return ProxyCascadeAddressFactory::new(); // @phpstan-ignore-line
+        return ProxyCascadeAddressFactory::new(); // @phpstan-ignore return.type
     }
 }

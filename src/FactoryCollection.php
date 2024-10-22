@@ -23,7 +23,7 @@ final class FactoryCollection implements \IteratorAggregate
 {
     /**
      * @param Factory<T>                      $factory
-     * @param \Closure():iterable<Attributes> $items
+     * @phpstan-param \Closure():iterable<Attributes> $items
      */
     private function __construct(public readonly Factory $factory, private \Closure $items)
     {
@@ -55,7 +55,7 @@ final class FactoryCollection implements \IteratorAggregate
 
     /**
      * @param  Factory<T>           $factory
-     * @param  iterable<Attributes> $items
+     * @phpstan-param  iterable<Attributes> $items
      * @return self<T>
      */
     public static function sequence(Factory $factory, iterable $items): self
@@ -64,7 +64,7 @@ final class FactoryCollection implements \IteratorAggregate
     }
 
     /**
-     * @param Attributes $attributes
+     * @phpstan-param Attributes $attributes
      *
      * @return list<T>
      */

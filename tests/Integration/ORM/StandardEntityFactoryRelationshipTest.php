@@ -24,21 +24,21 @@ class StandardEntityFactoryRelationshipTest extends EntityFactoryRelationshipTes
 {
     protected function contactFactory(): PersistentObjectFactory
     {
-        return StandardContactFactory::new(); // @phpstan-ignore-line
+        return StandardContactFactory::new(); // @phpstan-ignore return.type
     }
 
     protected function categoryFactory(): PersistentObjectFactory
     {
-        return StandardCategoryFactory::new(); // @phpstan-ignore-line
+        return StandardCategoryFactory::new(); // @phpstan-ignore return.type
     }
 
     protected function tagFactory(): PersistentObjectFactory
     {
-        return StandardTagFactory::new(); // @phpstan-ignore-line
+        return StandardTagFactory::new(); // @phpstan-ignore return.type
     }
 
     protected function addressFactory(): PersistentObjectFactory
     {
-        return StandardAddressFactory::new(); // @phpstan-ignore-line
+        return StandardAddressFactory::new(); // @phpstan-ignore return.type
     }
 }

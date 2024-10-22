@@ -121,7 +121,7 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
     private function dropAndResetDatabase(Application $application): void
     {
         foreach ($this->connections() as $connection) {
-            $databasePlatform = $this->registry->getConnection($connection)->getDatabasePlatform(); // @phpstan-ignore-line
+            $databasePlatform = $this->registry->getConnection($connection)->getDatabasePlatform(); // @phpstan-ignore method.notFound
 
             if ($databasePlatform instanceof SQLitePlatform) {
                 // we don't need to create the sqlite database - it's created when the schema is created

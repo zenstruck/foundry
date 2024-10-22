@@ -34,7 +34,7 @@ final class GenericDocumentProxyFactoryTest extends GenericProxyFactoryTestCase
     /**
      * @return PersistentProxyObjectFactory<DocumentWithReadonly>
      */
-    protected function objectWithReadonlyFactory(): PersistentProxyObjectFactory // @phpstan-ignore-line
+    protected function objectWithReadonlyFactory(): PersistentProxyObjectFactory // @phpstan-ignore method.childReturnType
     {
         return proxy_factory(DocumentWithReadonly::class);
     }

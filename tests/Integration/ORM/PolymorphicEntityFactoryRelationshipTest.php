@@ -21,6 +21,6 @@ class PolymorphicEntityFactoryRelationshipTest extends StandardEntityFactoryRela
 {
     protected function contactFactory(): PersistentObjectFactory
     {
-        return ChildContactFactory::new(); // @phpstan-ignore-line
+        return ChildContactFactory::new(); // @phpstan-ignore return.type
     }
 }

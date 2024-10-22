@@ -41,13 +41,13 @@ class ODMDefaultPropertiesGuesser extends AbstractDoctrineDefaultPropertiesGuess
                 continue;
             }
 
-            $fieldName = $item['fieldName']; // @phpstan-ignore-line
+            $fieldName = $item['fieldName']; // @phpstan-ignore class.notFound
 
-            if (!$makeFactoryQuery->isAllFields() && $item['nullable']) { // @phpstan-ignore-line
+            if (!$makeFactoryQuery->isAllFields() && $item['nullable']) { // @phpstan-ignore class.notFound
                 continue;
             }
 
-            $this->addDefaultValueUsingFactory($io, $makeFactoryData, $makeFactoryQuery, $fieldName, $item['targetDocument']); // @phpstan-ignore-line
+            $this->addDefaultValueUsingFactory($io, $makeFactoryData, $makeFactoryQuery, $fieldName, $item['targetDocument']); // @phpstan-ignore class.notFound
         }
     }
 
