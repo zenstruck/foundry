@@ -648,6 +648,14 @@ You can customize the instantiator in several ways:
         // can combine the different "modes"
         ->instantiateWith(Instantiator::withoutConstructor()->allowExtra()->alwaysForce())
 
+        // use a "namedConstructor"
+        ->instantiateWith(Instantiator::namedConstructor("methodName"))
+
+        // use a callable
+        ->instantiateWith(Instantiator::use(function(string $title): object {
+            return new Post($title); // ... your own logic
+        }))
+
         // the instantiator is just a callable, you can provide your own
         ->instantiateWith(function(array $attributes, string $class): object {
             return new Post(); // ... your own logic
@@ -1248,20 +1256,14 @@ this for you.
 Before the first test using the ``ResetDatabase`` trait, it drops (if exists) and creates the test database.
 Then, by default, before each test, it resets the schema using ``doctrine:schema:drop``/``doctrine:schema:create``.
 
-Alternatively, you can have it run your migrations instead by modifying the ``reset_mode`` option in configuration file.
-When using this *mode*, before each test, the database is dropped/created and your migrations run (via
-``doctrine:migrations:migrate``). This mode can really make your test suite slow (especially if you have a lot of
-migrations). It is highly recommended to use `DamaDoctrineTestBundle`_ to improve the
-speed. When this bundle is enabled, the database is dropped/created and migrated only once for the suite.
-
 .. tip::
 
     Create a base TestCase for tests using factories to avoid adding the traits to every TestCase.
 
 .. tip::
 
-    If your tests :ref:`are not persisting <without-persisting>` the objects they create, these test traits are not
-    required.
+    If your tests :ref:`are not persisting <without-persisting>` the objects they create, the ``ResetDatabase``
+    trait is not required.
 
 By default, ``ResetDatabase`` resets the default configured connection's database and default configured object manager's
 schema. To customize the connection's and object manager's to be reset (or reset multiple connections/managers), use the
@@ -1282,11 +1284,42 @@ bundle's configuration:
                         object_managers:
                             - orm_object_manager_1
                             - orm_object_manager_2
-                        reset_mode: schema
+                        reset_mode: schema # default value, enables resetting the schema with doctrine:schema commands
                     mongo:
                         object_managers:
                             - odm_object_manager_1
                             - odm_object_manager_2
+
+Resetting using migrations
+..........................
+
+Alternatively, you can have it run your migrations instead by modifying the ``orm.reset.mode`` option in configuration file.
+When using this *mode*, before each test, the database is dropped/created and your migrations run (via
+``doctrine:migrations:migrate``). This mode can really make your test suite slow (especially if you have a lot of
+migrations). It is highly recommended to use `DamaDoctrineTestBundle`_ to improve the
+speed. When this bundle is enabled, the database is dropped/created and migrated only once for the suite.
+
+Additionally, it is possible to provide `configuration files <https://www.doctrine-project.org/projects/doctrine-migrations/en/current/reference/configuration.html#migrations-configuration>`_
+to be used by the migrations. The configuration files can be in any format supported by Doctrine Migrations (php, xml,
+json, yml). Then then command ``doctrine:migrations:migrate`` will run as many times as the number of configuration
+files.
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/packages/zenstruck_foundry.yaml
+        when@dev: # see Bundle Configuration section about sharing this in the test environment
+            zenstruck_foundry:
+                database_resetter:
+                    orm:
+                        reset_mode: migrate # enables resetting with migrations
+
+                        # optional: allows you to pass additional configuration to the doctrine:migrations:migrate command
+                        migrations:
+                            configurations:
+                                - '%kernel.root_dir%/migrations/configuration.php'
+                                - 'migrations/configuration.yaml'
 
 .. _object-proxy:
 
@@ -2034,6 +2067,19 @@ Objects can be fetched from pools in your tests, fixtures or other stories:
     ProvinceStory::getRandomRange('be', 1, 4); // between 1 and 4 random Province|Proxy's from "be" pool
     ProvinceStory::getPool('be'); // all Province|Proxy's from "be" pool
 
+Static Analysis
+---------------
+
+Psalm
+~~~~~
+
+A Psalm extension is shipped with the library.
+Please, enable it with:
+
+.. code-block:: terminal
+
+    $ vendor/bin/psalm-plugin enable zenstruck/foundry
+
 Bundle Configuration
 --------------------
 
@@ -2102,6 +2148,11 @@ Full Default Bundle Configuration
 
                 # Reset mode to use with ResetDatabase trait
                 mode:                 schema # One of "schema"; "migrate"
+                migrations:
+
+                    # Migration configurations
+                    configurations:       []
+
         mongo:
             reset:
 
