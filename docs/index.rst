@@ -2067,6 +2067,19 @@ Objects can be fetched from pools in your tests, fixtures or other stories:
     ProvinceStory::getRandomRange('be', 1, 4); // between 1 and 4 random Province|Proxy's from "be" pool
     ProvinceStory::getPool('be'); // all Province|Proxy's from "be" pool
 
+Static Analysis
+---------------
+
+Psalm
+~~~~~
+
+A Psalm extension is shipped with the library.
+Please, enable it with:
+
+.. code-block:: terminal
+
+    $ vendor/bin/psalm-plugin enable zenstruck/foundry
+
 Bundle Configuration
 --------------------
 
