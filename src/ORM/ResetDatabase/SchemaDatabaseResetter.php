@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\ORM\ResetDatabase;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -13,7 +22,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 final class SchemaDatabaseResetter extends BaseOrmResetter implements OrmResetter
 {
-    final public function resetBeforeFirstTest(KernelInterface $kernel): void
+    public function resetBeforeFirstTest(KernelInterface $kernel): void
     {
         $application = self::application($kernel);
 
@@ -21,7 +30,7 @@ final class SchemaDatabaseResetter extends BaseOrmResetter implements OrmResette
         $this->createSchema($application);
     }
 
-    final public function resetBeforeEachTest(KernelInterface $kernel): void
+    public function resetBeforeEachTest(KernelInterface $kernel): void
     {
         $application = self::application($kernel);
 

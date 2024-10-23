@@ -255,10 +255,10 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
 
             /** @var ResetDatabaseMode $resetMode */
             $resetMode = $config['orm']['reset']['mode'];
-            $toRemove = $resetMode === ResetDatabaseMode::SCHEMA ? ResetDatabaseMode::MIGRATE->value : ResetDatabaseMode::SCHEMA->value;
+            $toRemove = ResetDatabaseMode::SCHEMA === $resetMode ? ResetDatabaseMode::MIGRATE->value : ResetDatabaseMode::SCHEMA->value;
 
-            $container->removeDefinition(".zenstruck_foundry.persistence.database_resetter.orm.$toRemove.dama");
-            $container->removeDefinition(".zenstruck_foundry.persistence.database_resetter.orm.$toRemove");
+            $container->removeDefinition(".zenstruck_foundry.persistence.database_resetter.orm.{$toRemove}.dama");
+            $container->removeDefinition(".zenstruck_foundry.persistence.database_resetter.orm.{$toRemove}");
 
             $container->setAlias(OrmResetter::class, ".zenstruck_foundry.persistence.database_resetter.orm.{$resetMode->value}");
         }

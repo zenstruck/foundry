@@ -269,7 +269,7 @@ final class PersistenceManager
     public function hasPersistenceFor(object $object): bool
     {
         try {
-            return (bool)$this->strategyFor($object::class);
+            return (bool) $this->strategyFor($object::class);
         } catch (NoPersistenceStrategy) {
             return false;
         }
@@ -284,14 +284,14 @@ final class PersistenceManager
     {
         static $isOrmOnly = null;
 
-        return $isOrmOnly ??= (static function (): bool {
+        return $isOrmOnly ??= (static function(): bool {
             try {
-                $strategies = iterator_to_array(Configuration::instance()->persistence()->strategies);
+                $strategies = \iterator_to_array(Configuration::instance()->persistence()->strategies);
             } catch (PersistenceNotAvailable) {
                 $strategies = [];
             }
 
-            return count($strategies) === 1 && $strategies[0] instanceof AbstractORMPersistenceStrategy;
+            return 1 === \count($strategies) && $strategies[0] instanceof AbstractORMPersistenceStrategy;
         })();
     }
 

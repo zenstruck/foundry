@@ -14,9 +14,8 @@ namespace Zenstruck\Foundry\Test;
 use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Persistence\PersistenceManager;
-
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
+
 use function Zenstruck\Foundry\restorePhpUnitErrorHandler;
 
 /**

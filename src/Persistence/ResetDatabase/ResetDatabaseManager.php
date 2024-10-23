@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Persistence\ResetDatabase;
 
 use DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver;
@@ -21,17 +30,17 @@ final class ResetDatabaseManager
 
     /**
      * @param iterable<BeforeFirstTestResetter> $beforeFirstTestResetters
-     * @param iterable<BeforeEachTestResetter> $beforeEachTestResetter
+     * @param iterable<BeforeEachTestResetter>  $beforeEachTestResetter
      */
     public function __construct(
         private iterable $beforeFirstTestResetters,
-        private iterable $beforeEachTestResetter
+        private iterable $beforeEachTestResetter,
     ) {
     }
 
     /**
      * @param callable():KernelInterface $createKernel
-     * @param callable():void $shutdownKernel
+     * @param callable():void            $shutdownKernel
      */
     public static function resetBeforeFirstTest(callable $createKernel, callable $shutdownKernel): void
     {
@@ -64,7 +73,7 @@ final class ResetDatabaseManager
 
     /**
      * @param callable():KernelInterface $createKernel
-     * @param callable():void $shutdownKernel
+     * @param callable():void            $shutdownKernel
      */
     public static function resetBeforeEachTest(callable $createKernel, callable $shutdownKernel): void
     {
@@ -96,13 +105,13 @@ final class ResetDatabaseManager
         $shutdownKernel();
     }
 
-    private static function canSkipSchemaReset(): bool
-    {
-        return PersistenceManager::isOrmOnly() && self::isDAMADoctrineTestBundleEnabled();
-    }
-
     public static function isDAMADoctrineTestBundleEnabled(): bool
     {
         return \class_exists(StaticDriver::class) && StaticDriver::isKeepStaticConnections();
+    }
+
+    private static function canSkipSchemaReset(): bool
+    {
+        return PersistenceManager::isOrmOnly() && self::isDAMADoctrineTestBundleEnabled();
     }
 }

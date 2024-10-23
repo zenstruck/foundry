@@ -14,7 +14,6 @@ namespace Zenstruck\Foundry\Mongo;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\MappingException as MongoMappingException;
 use Doctrine\Persistence\Mapping\MappingException;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Persistence\PersistenceStrategy;
 
 /**
