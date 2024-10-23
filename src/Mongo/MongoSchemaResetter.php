@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Mongo;
 
 use Symfony\Component\HttpKernel\KernelInterface;
-use Zenstruck\Foundry\Persistence\SymfonyCommandRunner;
+
+use function Zenstruck\Foundry\application;
+use function Zenstruck\Foundry\runCommand;
 
 /**
  * @internal
@@ -22,8 +24,6 @@ use Zenstruck\Foundry\Persistence\SymfonyCommandRunner;
  */
 final class MongoSchemaResetter implements MongoResetter
 {
-    use SymfonyCommandRunner;
-
     /**
      * @param list<string> $managers
      */
@@ -33,15 +33,15 @@ final class MongoSchemaResetter implements MongoResetter
 
     public function resetBeforeEachTest(KernelInterface $kernel): void
     {
-        $application = self::application($kernel);
+        $application = application($kernel);
 
         foreach ($this->managers as $manager) {
             try {
-                self::runCommand($application, 'doctrine:mongodb:schema:drop', ['--dm' => $manager]);
+                runCommand($application, "doctrine:mongodb:schema:drop --dm={$manager}");
             } catch (\Exception) {
             }
 
-            self::runCommand($application, 'doctrine:mongodb:schema:create', ['--dm' => $manager]);
+            runCommand($application, "doctrine:mongodb:schema:create --dm={$manager}");
         }
     }
 }

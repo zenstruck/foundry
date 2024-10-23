@@ -48,7 +48,12 @@
             "Zenstruck\\Foundry\\": "src/",
             "Zenstruck\\Foundry\\Psalm\\": "utils/psalm"
         },
-        "files": ["src/functions.php", "src/Persistence/functions.php", "src/phpunit_helper.php"]
+        "files": [
+            "src/functions.php",
+            "src/Persistence/functions.php",
+            "src/phpunit_helper.php",
+            "src/symfony_console.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -77,22 +82,15 @@
     },
     "scripts": {
         "test": [
-            "@test-schema-no-dama",
-            "@test-migrate-no-dama",
-            "@test-schema-dama",
-            "@test-migrate-dama"
+            "@test-schema",
+            "@test-migrate"
         ],
-        "test-schema-no-dama": "DATABASE_RESET_MODE=schema USE_DAMA_DOCTRINE_TEST_BUNDLE=0 ./phpunit",
-        "test-migrate-no-dama": "DATABASE_RESET_MODE=migrate USE_DAMA_DOCTRINE_TEST_BUNDLE=0 ./phpunit",
-        "test-schema-dama": "DATABASE_RESET_MODE=schema USE_DAMA_DOCTRINE_TEST_BUNDLE=1 ./phpunit",
-        "test-migrate-dama": "DATABASE_RESET_MODE=migrate USE_DAMA_DOCTRINE_TEST_BUNDLE=1 ./phpunit"
+        "test-schema": "./phpunit",
+        "test-migrate": "./phpunit --testsuite migrate --bootstrap tests/bootstrap-migrate.php"
     },
     "scripts-descriptions": {
-        "test": "Run all test permutations",
-        "test-schema-no-dama": "Test with schema reset (no dama/doctrine-test-bundle)",
-        "test-migrate-no-dama": "Test with migrations reset (no dama/doctrine-test-bundle)",
-        "test-schema-dama": "Test with schema reset and dama/doctrine-test-bundle",
-        "test-migrate-dama": "Test with migrations reset and dama/doctrine-test-bundle"
+        "test-schema": "Test with schema reset",
+        "test-migrate": "Test with migrations reset"
     },
     "minimum-stability": "dev",
     "prefer-stable": true
