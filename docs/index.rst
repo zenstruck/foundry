@@ -1321,6 +1321,45 @@ files.
                                 - '%kernel.root_dir%/migrations/configuration.php'
                                 - 'migrations/configuration.yaml'
 
+Extending reset mechanism
+.........................
+
+The reset mechanism can be extended thanks to decoration:
+
+::
+
+    use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
+    use Symfony\Component\DependencyInjection\Attribute\When;
+    use Symfony\Component\HttpKernel\KernelInterface;
+    use Zenstruck\Foundry\ORM\ResetDatabase\OrmResetter;
+
+    // The decorator should be declared in test environment only.
+    #[When('test')]
+    // You can also decorate `MongoResetter::class`.
+    #[AsDecorator(OrmResetter::class)]
+    final readonly class DecorateDatabaseResetter implements OrmResetter
+    {
+        public function __construct(
+            private OrmResetter $decorated
+        ) {}
+
+        public function resetBeforeFirstTest(KernelInterface $kernel): void
+        {
+            // do something once per test suite (for instance: install a PostgreSQL extension)
+
+            $this->decorated->resetBeforeFirstTest($kernel);
+        }
+
+        public function resetBeforeEachTest(KernelInterface $kernel): void
+        {
+            // do something once per test case (for instance: restart PostgreSQL sequences)
+
+            $this->decorated->resetBeforeEachTest($kernel);
+        }
+    }
+
+If using a standard Symfony Flex app, this will be autowired/autoconfigured. If not, register the service
+
 .. _object-proxy:
 
 Object Proxy
