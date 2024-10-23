@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\BeforeClass;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
 
+use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 use function Zenstruck\Foundry\restorePhpUnitErrorHandler;
 
 /**
@@ -28,13 +29,13 @@ trait ResetDatabase
      * @beforeClass
      */
     #[BeforeClass]
-    public static function _resetDatabase(): void
+    public static function _resetDatabaseBeforeFirstTest(): void
     {
         if (!\is_subclass_of(static::class, KernelTestCase::class)) {
             throw new \RuntimeException(\sprintf('The "%s" trait can only be used on TestCases that extend "%s".', __TRAIT__, KernelTestCase::class));
         }
 
-        PersistenceManager::resetDatabase(
+        ResetDatabaseManager::resetBeforeFirstTest(
             static fn() => static::bootKernel(),
             static function(): void {
                 static::ensureKernelShutdown();
@@ -48,13 +49,13 @@ trait ResetDatabase
      * @before
      */
     #[Before]
-    public static function _resetSchema(): void
+    public static function _resetDatabaseBeforeEachTest(): void
     {
         if (!\is_subclass_of(static::class, KernelTestCase::class)) {
             throw new \RuntimeException(\sprintf('The "%s" trait can only be used on TestCases that extend "%s".', __TRAIT__, KernelTestCase::class));
         }
 
-        PersistenceManager::resetSchema(
+        ResetDatabaseManager::resetBeforeEachTest(
             static fn() => static::bootKernel(),
             static fn() => static::ensureKernelShutdown(),
         );

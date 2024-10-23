@@ -11,17 +11,15 @@
 
 namespace Zenstruck\Foundry\Persistence;
 
-use DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\ORM\AbstractORMPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\NoPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
-use Zenstruck\Foundry\Tests\Fixture\TestKernel;
+use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -30,112 +28,16 @@ use Zenstruck\Foundry\Tests\Fixture\TestKernel;
  */
 final class PersistenceManager
 {
-    private static bool $hasDatabaseBeenReset = false;
-    private static bool $ormOnly = false;
-
     private bool $flush = true;
     private bool $persist = true;
 
     /**
-     * @param PersistenceStrategy[] $strategies
+     * @param iterable<PersistenceStrategy> $strategies
      */
-    public function __construct(private iterable $strategies)
-    {
-    }
-
-    public static function isDAMADoctrineTestBundleEnabled(): bool
-    {
-        return \class_exists(StaticDriver::class) && StaticDriver::isKeepStaticConnections();
-    }
-
-    /**
-     * @param callable():KernelInterface $createKernel
-     * @param callable():void            $shutdownKernel
-     */
-    public static function resetDatabase(callable $createKernel, callable $shutdownKernel): void
-    {
-        if (self::$hasDatabaseBeenReset) {
-            return;
-        }
-
-        if ($isDAMADoctrineTestBundleEnabled = self::isDAMADoctrineTestBundleEnabled()) {
-            // disable static connections for this operation
-            // :warning: the kernel should not be booted before calling this!
-            StaticDriver::setKeepStaticConnections(false);
-        }
-
-        $kernel = $createKernel();
-        $configuration = Configuration::instance();
-        $strategyClasses = [];
-
-        try {
-            $strategies = $configuration->persistence()->strategies;
-        } catch (PersistenceNotAvailable $e) {
-            if (!\class_exists(TestKernel::class)) {
-                throw $e;
-            }
-
-            // allow this to fail if running foundry test suite
-            return;
-        }
-
-        foreach ($strategies as $strategy) {
-            $strategy->resetDatabase($kernel);
-            $strategyClasses[] = $strategy::class;
-        }
-
-        if (1 === \count($strategyClasses) && \is_a($strategyClasses[0], AbstractORMPersistenceStrategy::class, allow_string: true)) {
-            // enable skipping booting the kernel for resetSchema()
-            self::$ormOnly = true;
-        }
-
-        if ($isDAMADoctrineTestBundleEnabled && self::$ormOnly) {
-            // add global stories so they are available after transaction rollback
-            $configuration->stories->loadGlobalStories();
-        }
-
-        if ($isDAMADoctrineTestBundleEnabled) {
-            // re-enable static connections
-            StaticDriver::setKeepStaticConnections(true);
-        }
-
-        $shutdownKernel();
-
-        self::$hasDatabaseBeenReset = true;
-    }
-
-    /**
-     * @param callable():KernelInterface $createKernel
-     * @param callable():void            $shutdownKernel
-     */
-    public static function resetSchema(callable $createKernel, callable $shutdownKernel): void
-    {
-        if (self::canSkipSchemaReset()) {
-            // can fully skip booting the kernel
-            return;
-        }
-
-        $kernel = $createKernel();
-        $configuration = Configuration::instance();
-
-        try {
-            $strategies = $configuration->persistence()->strategies;
-        } catch (PersistenceNotAvailable $e) {
-            if (!\class_exists(TestKernel::class)) {
-                throw $e;
-            }
-
-            // allow this to fail if running foundry test suite
-            return;
-        }
-
-        foreach ($strategies as $strategy) {
-            $strategy->resetSchema($kernel);
-        }
-
-        $configuration->stories->loadGlobalStories();
-
-        $shutdownKernel();
+    public function __construct(
+        private iterable $strategies,
+        private ResetDatabaseManager $resetDatabaseManager,
+    ) {
     }
 
     public function isEnabled(): bool
@@ -367,15 +269,30 @@ final class PersistenceManager
     public function hasPersistenceFor(object $object): bool
     {
         try {
-            return (bool) $this->strategyFor($object::class);
+            return (bool)$this->strategyFor($object::class);
         } catch (NoPersistenceStrategy) {
             return false;
         }
     }
 
-    private static function canSkipSchemaReset(): bool
+    public function resetDatabaseManager(): ResetDatabaseManager
     {
-        return self::$ormOnly && self::isDAMADoctrineTestBundleEnabled();
+        return $this->resetDatabaseManager;
+    }
+
+    public static function isOrmOnly(): bool
+    {
+        static $isOrmOnly = null;
+
+        return $isOrmOnly ??= (static function (): bool {
+            try {
+                $strategies = iterator_to_array(Configuration::instance()->persistence()->strategies);
+            } catch (PersistenceNotAvailable) {
+                $strategies = [];
+            }
+
+            return count($strategies) === 1 && $strategies[0] instanceof AbstractORMPersistenceStrategy;
+        })();
     }
 
     /**

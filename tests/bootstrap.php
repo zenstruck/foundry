@@ -16,7 +16,7 @@ use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\ErrorHandler\ErrorHandler;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
-use Zenstruck\Foundry\ORM\AbstractORMPersistenceStrategy;
+use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
 use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 
 require \dirname(__DIR__).'/vendor/autoload.php';
@@ -27,7 +27,7 @@ $fs->remove(__DIR__.'/../var');
 
 (new Dotenv())->usePutenv()->loadEnv(__DIR__.'/../.env');
 
-if (\getenv('DATABASE_URL') && AbstractORMPersistenceStrategy::RESET_MODE_MIGRATE === \getenv('DATABASE_RESET_MODE')) {
+if (\getenv('DATABASE_URL') && ResetDatabaseMode::MIGRATE->value === \getenv('DATABASE_RESET_MODE')) {
     $fs->remove(__DIR__.'/Fixture/Migrations');
     $fs->mkdir(__DIR__.'/Fixture/Migrations');
 

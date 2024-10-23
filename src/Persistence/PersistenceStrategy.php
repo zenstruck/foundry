@@ -11,15 +11,10 @@
 
 namespace Zenstruck\Foundry\Persistence;
 
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\Mapping\MappingException;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -89,10 +84,6 @@ abstract class PersistenceStrategy
 
     abstract public function contains(object $object): bool;
 
-    abstract public function resetDatabase(KernelInterface $kernel): void;
-
-    abstract public function resetSchema(KernelInterface $kernel): void;
-
     abstract public function truncate(string $class): void;
 
     /**
@@ -108,27 +99,4 @@ abstract class PersistenceStrategy
     abstract public function embeddablePropertiesFor(object $object, string $owner): ?array;
 
     abstract public function isEmbeddable(object $object): bool;
-
-    /**
-     * @param array<string,scalar> $parameters
-     */
-    final protected static function runCommand(Application $application, string $command, array $parameters = [], bool $canFail = false): void
-    {
-        $exit = $application->run(
-            new ArrayInput(\array_merge(['command' => $command], $parameters)),
-            $output = new BufferedOutput()
-        );
-
-        if (0 !== $exit && !$canFail) {
-            throw new \RuntimeException(\sprintf('Error running "%s": %s', $command, $output->fetch()));
-        }
-    }
-
-    final protected static function application(KernelInterface $kernel): Application
-    {
-        $application = new Application($kernel);
-        $application->setAutoExit(false);
-
-        return $application;
-    }
 }
