@@ -1,5 +1,26 @@
 # CHANGELOG
 
+## [v1.38.3](https://github.com/zenstruck/foundry/releases/tag/v1.38.3)
+
+July 4th, 2024 - [v1.38.2...v1.38.3](https://github.com/zenstruck/foundry/compare/v1.38.2...v1.38.3)
+
+* 112e3a6 fix: only restore error handler for PHPUnit 10 or superior (#669) by @nikophil
+* bad65a2 fix(1.x): re-introduce Proxy assertion methods (#665) by @nikophil
+
+## [v1.38.2](https://github.com/zenstruck/foundry/releases/tag/v1.38.2)
+
+June 19th, 2024 - [v1.38.1...v1.38.2](https://github.com/zenstruck/foundry/compare/v1.38.1...v1.38.2)
+
+* 841bb70 fix(1.x): only reset error handler in before class hook (#642) by @nikophil
+
+## [v1.38.1](https://github.com/zenstruck/foundry/releases/tag/v1.38.1)
+
+June 18th, 2024 - [v1.38.0...v1.38.1](https://github.com/zenstruck/foundry/compare/v1.38.0...v1.38.1)
+
+* 2691d99 fix: handle when userland factory has empty constructor (#641) by @nikophil
+* 1227d11 docs(1.x): fix typo in upgrade guide (#625) by @nikophil
+* 74fe2d6 docs: upgrade readme with a link to upgrade guide (#621) by @nikophil
+
 ## [v1.38.0](https://github.com/zenstruck/foundry/releases/tag/v1.38.0)
 
 June 7th, 2024 - [v1.37.0...v1.38.0](https://github.com/zenstruck/foundry/compare/v1.37.0...v1.38.0)
@@ -226,16 +247,16 @@ November 25th, 2022 - [v1.23.0...v1.24.0](https://github.com/zenstruck/foundry/c
 * 18ea4fb feat(make:factory): create factory for not-persisted objects (#343) by @nikophil
 * 64786fc fix: typo in docs (#348) by @nikophil
 * 1a98fc4 chore: Use composer 2.4 (#346) by @OskarStark
-* 96c4cbe minor(make:factory): Use `@see`/`@todo` annotations (#344) by @OskarStark
+* 96c4cbe minor(make:factory): Use `@see`/`@todo` annoations (#344) by @OskarStark
 * cbeb2ce fix: adjust docblocks to remove PhpStorm errors (#341) by @kbond
 * cd1e394 fix: use orm limit length in factory (#294) by @MrYamous
-* b1d7ce3 [feature] add default for Mongo properties in (#340) by @nikophil
+* b1d7ce3 [feat] add default for Mongo properties in (#340) by @nikophil
 * 778607a [chore] use cache for docker CI (#339) by @nikophil
-* c662eb3 [feature] auto add phpstan annotations in make:factory (#338) by @nikophil
+* c662eb3 [feat] auto add phpstan annotations in make:factory (#338) by @nikophil
 * 2bd046f [docs] sort phpstan-method annotations (#333) by @OskarStark
 * 0460741 [docs] remove obsolete section (#335) by @nikophil
-* 2c34baf [bug] Typos in Makefile (#330) by @OskarStark
-* 65924b2 [bug] typos in docs (#331) by @OskarStark
+* 2c34baf [fix] Typos in Makefile (#330) by @OskarStark
+* 65924b2 [fix] typos in docs (#331) by @OskarStark
 * 6b48878 [chore] upgrade ci actions (#329) by @kbond
 * 210faff [chore] use phpstan instead of psalm (#328) by @nikophil
 * 51f1bc0 [refactor] modernize code with rector (#327) by @nikophil
