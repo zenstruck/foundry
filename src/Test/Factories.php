@@ -45,6 +45,44 @@ trait Factories
     }
 
     /**
+     * @see \Zenstruck\Foundry\PHPUnit\BootFoundryOnDataProviderMethodCalled
+     * @internal
+     */
+    public static function _bootForDataProvider(): void
+    {
+        if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.impossibleType
+            // unit test
+            Configuration::bootForDataProvider(UnitTestConfig::build());
+
+            return;
+        }
+
+        // integration test
+        Configuration::bootForDataProvider(static function() {
+            if (!static::getContainer()->has('.zenstruck_foundry.configuration')) { // @phpstan-ignore staticMethod.notFound
+                throw new \LogicException('ZenstruckFoundryBundle is not enabled. Ensure it is added to your config/bundles.php.');
+            }
+
+            return static::getContainer()->get('.zenstruck_foundry.configuration'); // @phpstan-ignore staticMethod.notFound
+        });
+    }
+
+    /**
+     * @internal
+     * @see \Zenstruck\Foundry\PHPUnit\ShutdownFoundryOnDataProviderMethodFinished
+     */
+    public static function _shutdownAfterDataProvider(): void
+    {
+        if (\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.impossibleType
+            self::ensureKernelShutdown(); // @phpstan-ignore staticMethod.notFound
+            static::$class = null; // @phpstan-ignore staticProperty.notFound
+            static::$kernel = null; // @phpstan-ignore staticProperty.notFound
+            static::$booted = false; // @phpstan-ignore staticProperty.notFound
+        }
+        Configuration::shutdown();
+    }
+
+    /**
      * @internal
      */
     private function _bootFoundry(): void
@@ -97,43 +135,5 @@ trait Factories
         $providedData = \method_exists($this, 'getProvidedData') ? $this->getProvidedData() : $this->providedData(); // @phpstan-ignore method.notFound
 
         initialize_proxy_object($providedData);
-    }
-
-    /**
-     * @see \Zenstruck\Foundry\PHPUnit\BootFoundryOnDataProviderMethodCalled
-     * @internal
-     */
-    public static function _bootForDataProvider(): void
-    {
-        if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.impossibleType
-            // unit test
-            Configuration::bootForDataProvider(UnitTestConfig::build());
-
-            return;
-        }
-
-        // integration test
-        Configuration::bootForDataProvider(static function() {
-            if (!static::getContainer()->has('.zenstruck_foundry.configuration')) { // @phpstan-ignore staticMethod.notFound
-                throw new \LogicException('ZenstruckFoundryBundle is not enabled. Ensure it is added to your config/bundles.php.');
-            }
-
-            return static::getContainer()->get('.zenstruck_foundry.configuration'); // @phpstan-ignore staticMethod.notFound
-        });
-    }
-
-    /**
-     * @internal
-     * @see \Zenstruck\Foundry\PHPUnit\ShutdownFoundryOnDataProviderMethodFinished
-     */
-    public static function _shutdownAfterDataProvider(): void
-    {
-        if (\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.impossibleType
-            self::ensureKernelShutdown(); // @phpstan-ignore staticMethod.notFound
-            static::$class = null; // @phpstan-ignore staticProperty.notFound
-            static::$kernel = null; // @phpstan-ignore staticProperty.notFound
-            static::$booted = false; // @phpstan-ignore staticProperty.notFound
-        }
-        Configuration::shutdown();
     }
 }

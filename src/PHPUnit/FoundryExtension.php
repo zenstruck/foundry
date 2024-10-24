@@ -32,9 +32,7 @@ final class FoundryExtension implements Runner\Extension\Extension
         Runner\Extension\ParameterCollection $parameters,
     ): void {
         if (!ConstraintRequirement::from(self::MIN_PHPUNIT_VERSION)->isSatisfiedBy(Runner\Version::id())) {
-            throw new \LogicException(
-                \sprintf('Your PHPUnit version (%s) is not compatible with the minimum version (%s) needed to use this extension.', Runner\Version::id(), self::MIN_PHPUNIT_VERSION)
-            );
+            throw new \LogicException(\sprintf('Your PHPUnit version (%s) is not compatible with the minimum version (%s) needed to use this extension.', Runner\Version::id(), self::MIN_PHPUNIT_VERSION));
         }
 
         // shutdown Foundry if for some reason it has been booted before

@@ -23,8 +23,8 @@ final class ShutdownFoundryOnDataProviderMethodFinished implements Event\Test\Da
 {
     public function notify(Event\Test\DataProviderMethodFinished $event): void
     {
-        if (method_exists($event->testMethod()->className(), '_shutdownAfterDataProvider')) {
-            call_user_func([$event->testMethod()->className(), '_shutdownAfterDataProvider']);
+        if (\method_exists($event->testMethod()->className(), '_shutdownAfterDataProvider')) {
+            \call_user_func([$event->testMethod()->className(), '_shutdownAfterDataProvider']);
         }
     }
 }
