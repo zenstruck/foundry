@@ -28,6 +28,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Object2Factory;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
 use Zenstruck\Foundry\Tests\Fixture\Object2;
 
+use function Zenstruck\Foundry\faker;
 use function Zenstruck\Foundry\Persistence\unproxy;
 
 /**
@@ -64,5 +65,18 @@ final class DataProviderInUnitTest extends TestCase
     {
         yield 'persistent factory' => [GenericEntityFactory::createOne(), new GenericEntity('default1')];
         yield 'proxy persistent factory' => [GenericProxyEntityFactory::createOne(), new GenericEntity('default1')];
+    }
+
+    #[Test]
+    #[DataProvider('createObjectUsingFakerInDataProvider')]
+    public function assert_it_can_create_use_faker_in_data_provider(mixed $providedData, string $expected): void
+    {
+        self::assertSame($expected, $providedData->getProp1());
+    }
+
+    public static function createObjectUsingFakerInDataProvider(): iterable
+    {
+        yield 'object factory' => [Object1Factory::createOne(['prop1' => $prop1 = faker()->sentence()]), "$prop1-constructor"];
+        yield 'persistent factory' => [GenericEntityFactory::createOne(['prop1' => $prop1 = faker()->sentence()]), $prop1];
     }
 }

@@ -1607,7 +1607,68 @@ PHPUnit Data Providers
 ~~~~~~~~~~~~~~~~~~~~~~
 
 It is possible to use factories in
-`PHPUnit data providers <https://phpunit.readthedocs.io/en/9.3/writing-tests-for-phpunit.html#data-providers>`_:
+`PHPUnit data providers <https://phpunit.readthedocs.io/en/9.3/writing-tests-for-phpunit.html#data-providers>`_.
+Their usage depends on which Foundry version you are running:
+
+Data Providers with Foundry ^2.2
+................................
+
+From version 2.2, Foundry provides an extension for PHPUnit.
+You can install it by modifying you ``phpunit.xml.dist``:
+
+.. configuration-block::
+
+    .. code-block:: xml
+    
+    <phpunit>
+      <extensions>
+        <bootstrap class="Zenstruck\Foundry\PHPUnit\FoundryExtension"/>
+      </extensions>
+    </phpunit>
+    
+.. warning::
+
+    This PHPUnit extension requires at least PHPUnit 11.4.
+
+Using this extension will allow to use your factories in your data providers the same way you're using them in tests.
+Thanks to it, you can:
+    * Call ``->create()`` or ``::createOne()`` or any other method which creates objects in unit tests
+    (using ``PHPUnit\Framework\TestCase``) and functional tests (``Symfony\Bundle\FrameworkBundle\Test\KernelTestCase``)
+    * Use `Factories as Services`_ in functional tests
+    * Use `faker()` normally, without wrapping its call in a callable
+    
+::
+
+    use App\Factory\PostFactory;
+    use PHPUnit\Framework\Attributes\DataProvider;
+
+    #[DataProvider('createMultipleObjectsInDataProvider')]
+    public function test_post_via_data_provider(Post $post): void
+    {
+        // at this point, `$post` exists, and is already stored in database
+    }
+
+    public static function postDataProvider(): iterable
+    {
+        yield [PostFactory::createOne()];
+        yield [PostWithServiceFactory::createOne()];
+        yield [PostFactory::createOne(['body' => faker()->sentence()];
+    }
+    
+    
+.. warning::
+
+    Because Foundry is relying on its `Proxy mechanism <object-proxy>`_, when using persistence,
+    your factories must extend ``Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory`` to work in your data providers.
+    
+.. warning::
+
+    For the same reason, you should not call methods from `Proxy` class in your data providers,
+    not even ``->_real()``.
+
+
+Data Providers before Foundry v2.2
+..................................
 
 ::
 
