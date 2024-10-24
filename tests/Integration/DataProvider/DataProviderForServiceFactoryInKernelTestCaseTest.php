@@ -24,6 +24,8 @@ use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
 
+use function Zenstruck\Foundry\faker;
+
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  * @requires PHPUnit 11.4
@@ -34,23 +36,21 @@ final class DataProviderForServiceFactoryInKernelTestCaseTest extends KernelTest
 {
     use Factories;
 
-    /**
-     * @test
-     */
     #[Test]
     #[DataProvider('createObjectFromServiceFactoryInDataProvider')]
-    public function it_can_create_one_object_in_data_provider(?Object1 $providedData): void
+    public function it_can_create_one_object_in_data_provider(?Object1 $providedData, string $expected): void
     {
         self::assertFalse(Configuration::instance()->inADataProvider());
 
         self::assertInstanceOf(Object1::class, $providedData);
-        $this->assertSame('router-constructor', $providedData->getProp1());
+        $this->assertSame($expected, $providedData->getProp1());
     }
 
     public static function createObjectFromServiceFactoryInDataProvider(): iterable
     {
         yield 'service factory' => [
-            Object1Factory::createOne(),
+            Object1Factory::createOne(['prop1' => $prop1 = faker()->sentence()]),
+            "$prop1-constructor"
         ];
     }
 }
