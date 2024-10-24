@@ -264,8 +264,25 @@ abstract class PersistentObjectFactory extends ObjectFactory
             $value->persist = $this->persist; // todo - breaks immutability
         }
 
-        if ($value instanceof self && Configuration::instance()->persistence()->relationshipMetadata(static::class(), $value::class(), $field)?->isCascadePersist) {
-            $value->persist = false;
+        if ($value instanceof self) {
+            $pm = Configuration::instance()->persistence();
+
+            $relationshipMetadata = $pm->relationshipMetadata($value::class(), static::class(), $field);
+
+            // handle inversed OneToOne
+            if ($relationshipMetadata && !$relationshipMetadata->isCollection && $inverseField = $relationshipMetadata->inverseField) {
+                $this->tempAfterPersist[] = static function(object $object) use ($value, $inverseField, $pm) {
+                    $value->create([$inverseField => $object]);
+                    $pm->refresh($object);
+                };
+
+                // creation delegated to afterPersist hook - return empty array here
+                return null;
+            }
+
+            if (Configuration::instance()->persistence()->relationshipMetadata(static::class(), $value::class(), $field)?->isCascadePersist) {
+                $value->persist = false;
+            }
         }
 
         return unproxy(parent::normalizeParameter($field, $value));

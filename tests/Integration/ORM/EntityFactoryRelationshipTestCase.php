@@ -255,6 +255,22 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
     /**
      * @test
      */
+    public function inversed_one_to_one(): void
+    {
+        $addressFactory = $this->addressFactory();
+        $contactFactory = $this->contactFactory();
+
+        $address = $addressFactory->create(['contact' => $contactFactory]);
+
+        self::assertNotNull($address->getContact());
+
+        $addressFactory::assert()->count(1);
+        $contactFactory::assert()->count(1);
+    }
+
+    /**
+     * @test
+     */
     public function can_use_adder_as_attributes(): void
     {
         $category = $this->categoryFactory()->create([

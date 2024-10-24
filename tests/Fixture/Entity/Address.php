@@ -20,12 +20,24 @@ use Zenstruck\Foundry\Tests\Fixture\Model\Base;
 #[ORM\MappedSuperclass]
 abstract class Address extends Base
 {
+    protected Contact|null $contact = null;
+
     #[ORM\Column(length: 255)]
     private string $city;
 
     public function __construct(string $city)
     {
         $this->city = $city;
+    }
+
+    public function getContact(): Contact|null
+    {
+        return $this->contact;
+    }
+
+    public function setContact(Contact|null $contact): void
+    {
+        $this->contact = $contact;
     }
 
     public function getCity(): string
