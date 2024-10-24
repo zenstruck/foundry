@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## [v2.2.0](https://github.com/zenstruck/foundry/releases/tag/v2.2.0)
+
+October 24th, 2024 - [v2.1.0...v2.2.0](https://github.com/zenstruck/foundry/compare/v2.1.0...v2.2.0)
+
+* a549c10 docs: using factories in data providers (#707) by @nikophil
+* 470d927 docs: how to extend database reset mechanism (#706) by @nikophil
+* 2014ed9 feature: allow to use `Factory::create()` and factory service in data providers (#648) by @nikophil
+* df568da refactor: make "database reset" mechanism extendable (#690) by @nikophil
+* 4fb0b25 docs: add missing docs (#703) by @nikophil
+* fa1d527 minor: misc fixes for sca (#705) by @nikophil
+* 0d570cc refactor: fix proxy system and introduce psalm extension (#704) by @nikophil
+
 ## [v2.1.0](https://github.com/zenstruck/foundry/releases/tag/v2.1.0)
 
 October 3rd, 2024 - [v2.0.9...v2.1.0](https://github.com/zenstruck/foundry/compare/v2.0.9...v2.1.0)
