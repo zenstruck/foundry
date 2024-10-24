@@ -31,8 +31,13 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
      * @return T|Proxy<T>
      * @phpstan-return T&Proxy<T>
      */
-    public function create(callable|array $attributes = []): object
+    final public function create(callable|array $attributes = []): object
     {
+        $configuration = Configuration::instance();
+        if ($configuration->inADataProvider()) {
+            return ProxyGenerator::wrapFactory($this, $attributes);
+        }
+
         return proxy(parent::create($attributes)); // @phpstan-ignore function.unresolvableReturnType
     }
 
@@ -40,7 +45,7 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
      * @return T|Proxy<T>
      * @phpstan-return T&Proxy<T>
      */
-    public static function createOne(array|callable $attributes = []): mixed
+    final public static function createOne(array|callable $attributes = []): mixed
     {
         return proxy(parent::createOne($attributes)); // @phpstan-ignore function.unresolvableReturnType
     }

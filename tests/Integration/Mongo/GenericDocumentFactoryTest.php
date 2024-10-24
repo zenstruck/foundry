@@ -12,7 +12,6 @@
 namespace Zenstruck\Foundry\Tests\Integration\Mongo;
 
 use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericDocumentFactory;
-use Zenstruck\Foundry\Tests\Fixture\Factories\GenericModelFactory;
 use Zenstruck\Foundry\Tests\Integration\Persistence\GenericFactoryTestCase;
 use Zenstruck\Foundry\Tests\Integration\RequiresMongo;
 
@@ -23,7 +22,7 @@ final class GenericDocumentFactoryTest extends GenericFactoryTestCase
 {
     use RequiresMongo;
 
-    protected function factory(): GenericModelFactory
+    protected static function factory(): GenericDocumentFactory
     {
         return GenericDocumentFactory::new();
     }

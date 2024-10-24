@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
+use PHPUnit\Framework\Attributes\Test;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
@@ -18,6 +19,7 @@ use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithReadonly\EntityWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Model\Embeddable;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
+
 use function Zenstruck\Foundry\factory;
 
 /**
@@ -30,32 +32,32 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
      */
     public function can_update_and_delete_via_proxy(): void
     {
-        $this->factory()->repository()->assert()->empty();
+        static::factory()->repository()->assert()->empty();
 
-        $object = $this->factory()->create();
+        $object = static::factory()->create();
 
         $this->assertNotNull($object->id);
         $this->assertSame('default1', $object->getProp1());
         $this->assertSame('default1', $object->_refresh()->getProp1());
 
-        $this->factory()->repository()->assert()
+        static::factory()->repository()->assert()
             ->count(1)
             ->exists(['prop1' => 'default1'])
             ->notExists(['prop1' => 'invalid'])
         ;
 
-        $this->assertSame($object->id, $this->factory()->first()->id);
-        $this->assertSame($object->id, $this->factory()->last()->id);
+        $this->assertSame($object->id, static::factory()->first()->id);
+        $this->assertSame($object->id, static::factory()->last()->id);
 
         $object->setProp1('new value');
         $object->_save();
 
         $this->assertSame('new value', $object->getProp1());
-        $this->factory()->repository()->assert()->exists(['prop1' => 'new value']);
+        static::factory()->repository()->assert()->exists(['prop1' => 'new value']);
 
         $object->_delete();
 
-        $this->factory()->repository()->assert()->empty();
+        static::factory()->repository()->assert()->empty();
     }
 
     /**
@@ -63,18 +65,18 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
      */
     public function can_disable_persisting_by_factory_and_save_proxy(): void
     {
-        $this->factory()->repository()->assert()->empty();
+        static::factory()->repository()->assert()->empty();
 
-        $object = $this->factory()->withoutPersisting()->create()->_disableAutoRefresh();
+        $object = static::factory()->withoutPersisting()->create()->_disableAutoRefresh();
 
         $this->assertNull($object->id);
         $this->assertSame('default1', $object->getProp1());
 
-        $this->factory()->repository()->assert()->empty();
+        static::factory()->repository()->assert()->empty();
 
         $object->_save();
 
-        $this->factory()->repository()->assert()->exists(['prop1' => 'default1']);
+        static::factory()->repository()->assert()->exists(['prop1' => 'default1']);
     }
 
     /**
@@ -82,11 +84,11 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
      */
     public function can_disable_and_enable_proxy_auto_refreshing(): void
     {
-        $object = $this->factory()->create();
+        $object = static::factory()->create();
 
         // initial data
         $this->assertSame('default1', $object->getProp1());
-        $this->factory()->repository()->assert()->exists(['prop1' => 'default1']);
+        static::factory()->repository()->assert()->exists(['prop1' => 'default1']);
 
         $object->_disableAutoRefresh();
         $object->setProp1('new');
@@ -95,7 +97,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
         $object->_save();
 
         $this->assertSame('new 2', $object->getProp1());
-        $this->factory()->repository()->assert()->exists(['prop1' => 'new 2']);
+        static::factory()->repository()->assert()->exists(['prop1' => 'new 2']);
     }
 
     /**
@@ -103,11 +105,11 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
      */
     public function can_disable_and_enable_proxy_auto_refreshing_with_callback(): void
     {
-        $object = $this->factory()->create();
+        $object = static::factory()->create();
 
         // initial data
         $this->assertSame('default1', $object->getProp1());
-        $this->factory()->repository()->assert()->exists(['prop1' => 'default1']);
+        static::factory()->repository()->assert()->exists(['prop1' => 'default1']);
 
         $object->_withoutAutoRefresh(function(GenericModel&Proxy $object) {
             $object->setProp1('new');
@@ -116,7 +118,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
         });
 
         $this->assertSame('new 2', $object->getProp1());
-        $this->factory()->repository()->assert()->exists(['prop1' => 'new 2']);
+        static::factory()->repository()->assert()->exists(['prop1' => 'new 2']);
     }
 
     /**
@@ -124,16 +126,16 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
      */
     public function can_manually_refresh_via_proxy(): void
     {
-        $object = $this->factory()->create()->_disableAutoRefresh();
+        $object = static::factory()->create()->_disableAutoRefresh();
 
         // initial data
         $this->assertSame('default1', $object->getProp1());
-        $this->factory()->repository()->assert()->exists(['prop1' => 'default1']);
+        static::factory()->repository()->assert()->exists(['prop1' => 'default1']);
 
         self::ensureKernelShutdown();
 
         // modify and save title "externally"
-        $ext = $this->factory()::first();
+        $ext = static::factory()::first();
         $ext->setProp1('external');
         $ext->_save();
 
@@ -143,7 +145,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
 
         // "calling method" triggers auto-refresh
         $this->assertSame('external', $object->getProp1());
-        $this->factory()->repository()->assert()->exists(['prop1' => 'external']);
+        static::factory()->repository()->assert()->exists(['prop1' => 'external']);
     }
 
     /**
@@ -151,16 +153,16 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
      */
     public function proxy_auto_refreshes(): void
     {
-        $object = $this->factory()->create();
+        $object = static::factory()->create();
 
         // initial data
         $this->assertSame('default1', $object->getProp1());
-        $this->factory()->repository()->assert()->exists(['prop1' => 'default1']);
+        static::factory()->repository()->assert()->exists(['prop1' => 'default1']);
 
         self::ensureKernelShutdown();
 
         // modify and save title "externally"
-        $ext = $this->factory()::first();
+        $ext = static::factory()::first();
         $ext->setProp1('external');
         $ext->_save();
 
@@ -168,7 +170,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
 
         // "calling method" triggers auto-refresh
         $this->assertSame('external', $object->getProp1());
-        $this->factory()->repository()->assert()->exists(['prop1' => 'external']);
+        static::factory()->repository()->assert()->exists(['prop1' => 'external']);
     }
 
     /**
@@ -176,21 +178,21 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
      */
     public function cannot_auto_refresh_proxy_if_changes(): void
     {
-        $object = $this->factory()->create();
+        $object = static::factory()->create();
 
         // initial data
         $this->assertSame('default1', $object->getProp1());
-        $this->factory()->repository()->assert()->exists(['prop1' => 'default1']);
+        static::factory()->repository()->assert()->exists(['prop1' => 'default1']);
 
         $object->setProp1('new');
 
         try {
             $object->setProp1('new 1');
         } catch (\RuntimeException) {
-            $this->factory()->repository()->assert()->exists(['prop1' => 'default1']);
+            static::factory()->repository()->assert()->exists(['prop1' => 'default1']);
             $object->_save();
             $this->assertSame('new', $object->getProp1());
-            $this->factory()->repository()->assert()->exists(['prop1' => 'new']);
+            static::factory()->repository()->assert()->exists(['prop1' => 'new']);
 
             return;
         }
@@ -203,11 +205,11 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
      */
     public function can_access_repository_from_proxy(): void
     {
-        $object = $this->factory()::createOne();
+        $object = static::factory()::createOne();
 
         $object = $object->_repository()->findOneBy(['prop1' => 'default1']);
 
-        $this->assertInstanceOf($this->factory()::class(), $object);
+        $this->assertInstanceOf(static::factory()::class(), $object);
     }
 
     /**
@@ -215,7 +217,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
      */
     public function can_force_set_and_get_proxy(): void
     {
-        $object = $this->factory()::createOne();
+        $object = static::factory()::createOne();
 
         $this->assertSame('default1', $object->_get('prop1'));
 
@@ -229,7 +231,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
      */
     public function can_get_real_object_even_if_modified(): void
     {
-        $object = $this->factory()->create();
+        $object = static::factory()->create();
         $object->setProp1('foo');
 
         self::assertInstanceOf(GenericModel::class, $real = $object->_real());
@@ -246,7 +248,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
         $objectWithReadOnly = $factory::createOne([
             'prop' => 1,
             'embedded' => factory(Embeddable::class, ['prop1' => 'value1']),
-            'date' => new \DateTimeImmutable()
+            'date' => new \DateTimeImmutable(),
         ]);
 
         $objectWithReadOnly->_refresh();
@@ -259,7 +261,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
      */
     public function can_delete_proxified_object_and_still_access_its_methods(): void
     {
-        $object = $this->factory()->create();
+        $object = static::factory()->create();
         $object->_delete();
 
         $this->assertSame('default1', $object->getProp1());
@@ -270,9 +272,9 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
      */
     public function can_use_after_persist_with_attributes(): void
     {
-        $object = $this->factory()
+        $object = static::factory()
             ->instantiateWith(Instantiator::withConstructor()->allowExtra('extra'))
-            ->afterPersist(function (GenericModel $object, array $attributes) {
+            ->afterPersist(function(GenericModel $object, array $attributes) {
                 $object->setProp1($attributes['extra']);
             })
             ->create(['extra' => $value = 'value set with after persist']);
@@ -283,7 +285,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
     /**
      * @return PersistentProxyObjectFactory<GenericModel>
      */
-    abstract protected function factory(): PersistentProxyObjectFactory; // @phpstan-ignore method.childReturnType
+    abstract protected static function factory(): PersistentProxyObjectFactory;
 
     /**
      * @return PersistentProxyObjectFactory<DocumentWithReadonly|EntityWithReadonly>
