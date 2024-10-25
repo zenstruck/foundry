@@ -48,22 +48,23 @@ if [ "${USE_FOUNDRY_PHPUNIT_EXTENSION:-0}" = "1" ] && [ "${PHPUNIT_VERSION}" != 
   exit 1;
 fi
 
+PHPUNIT_EXEC="vendor/bin/phpunit"
 case ${PHPUNIT_VERSION} in
   "9")
+    PHPUNIT_EXEC="${PHPUNIT_EXEC} -c phpunit.xml.dist"
     if [ "${USE_DAMA_DOCTRINE_TEST_BUNDLE:-0}" = "1" ]; then
-      vendor/bin/phpunit -c phpunit.xml.dist --extensions "${DAMA_EXTENSION}" "$@"
-    else
-      vendor/bin/phpunit -c phpunit.xml.dist "$@"
+      PHPUNIT_EXEC="${PHPUNIT_EXEC} --extensions ${DAMA_EXTENSION}"
     fi
     ;;
 
   "10")
     # PHPUnit 10 does not have a --extension option
-    vendor/bin/phpunit -c phpunit-10.xml.dist "$@"
+    PHPUNIT_EXEC="${PHPUNIT_EXEC} -c phpunit-10.xml.dist"
     ;;
 
   "11")
-    PHPUNIT_EXEC="vendor/bin/phpunit -c phpunit-10.xml.dist $@"
+    PHPUNIT_EXEC="${PHPUNIT_EXEC} -c phpunit-10.xml.dist"
+
     if [ "${USE_DAMA_DOCTRINE_TEST_BUNDLE:-0}" = "1" ]; then
       PHPUNIT_EXEC="${PHPUNIT_EXEC} --extension "${DAMA_EXTENSION}""
     fi
@@ -71,9 +72,11 @@ case ${PHPUNIT_VERSION} in
     if [ "${USE_FOUNDRY_PHPUNIT_EXTENSION:-0}" = "1" ]; then
       PHPUNIT_EXEC="${PHPUNIT_EXEC} --extension "${FOUNDRY_EXTENSION}""
     fi
-
-    echo $PHPUNIT_EXEC
-    $PHPUNIT_EXEC
     ;;
 esac
+
+PHPUNIT_EXEC="${PHPUNIT_EXEC} ${@}"
+
+echo "${PHPUNIT_EXEC}"
+$PHPUNIT_EXEC
 ### <<

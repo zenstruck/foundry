@@ -8,119 +8,44 @@ on:
 
 jobs:
   tests:
-    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}, PU:${{ matrix.phpunit }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.use-dama == 1 && contains(matrix.database, 'sql') && ' (dama)' || '' }}${{ !contains(matrix.database, 'sql') && '' || matrix.use-migrate == 1 && ' (migrate)' || ' (schema)' }}${{ matrix.use-phpunit-extension == 1 && ' (phpunit extension)' || '' }}
+    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}, PU:${{ matrix.phpunit || 9 }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.without-dama == 0 && contains(matrix.database, 'sql') && ' (dama)' || '' }}${{ !contains(matrix.database, 'sql') && '' || matrix.use-migrate == 1 && ' (migrate)' || ' (schema)' }}${{ matrix.use-phpunit-extension == 1 && ' (phpunit extension)' || '' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         php: [ 8.1, 8.2, 8.3 ]
-        deps: [ highest ]
-        symfony: [ 6.4.*, 7.0.*, 7.1.* ]
+        symfony: [ 6.4.*, 7.1.* ]
         database: [ mysql, mongo ]
-        use-dama: [ 1 ]
-        use-migrate: [ 0 ]
-        use-phpunit-extension: [ 0 ]
-        phpunit: [ 9 ]
+
+        # default values:
+        # deps: [ highest ]
+        # without-dama: [ 0 ]
+        # use-migrate: [ 0 ]
+        # use-phpunit-extension: [ 0 ]
+        # phpunit: [ 9 ]
+
         exclude:
-          - php: 8.1
-            symfony: 7.0.*
-          - php: 8.1
-            symfony: 7.1.*
+          - {php: 8.1, symfony: 7.1.*}
         include:
-          - php: 8.3
-            deps: highest
-            symfony: '*'
-            database: none
-            use-dama: 1
-            use-migrate: 0
-            use-phpunit-extension: 0
-            phpunit: 9
-          - php: 8.3
-            deps: highest
-            symfony: '*'
-            database: mysql|mongo
-            use-dama: 1
-            use-migrate: 0
-            use-phpunit-extension: 0
-            phpunit: 9
-          - php: 8.3
-            deps: highest
-            symfony: '*'
-            database: pgsql|mongo
-            use-dama: 1
-            use-migrate: 0
-            use-phpunit-extension: 0
-            phpunit: 9
-          - php: 8.3
-            deps: highest
-            symfony: '*'
-            database: pgsql
-            use-dama: 0
-            use-migrate: 0
-            use-phpunit-extension: 0
-            phpunit: 9
-          - php: 8.3
-            deps: highest
-            symfony: '*'
-            database: sqlite
-            use-dama: 0
-            use-migrate: 0
-            use-phpunit-extension: 0
-            phpunit: 9
-          - php: 8.3
-            deps: lowest
-            symfony: '*'
-            database: sqlite
-            use-dama: 0
-            use-migrate: 0
-            use-phpunit-extension: 0
-            phpunit: 9
-          - php: 8.3
-            deps: lowest
-            symfony: '*'
-            database: mysql
-            use-dama: 1
-            use-migrate: 0
-            use-phpunit-extension: 0
-            phpunit: 9
-          - php: 8.3
-            deps: highest
-            symfony: '*'
-            database: mysql
-            use-dama: 1
-            use-migrate: 1
-            use-phpunit-extension: 0
-            phpunit: 9
-          - php: 8.3
-            deps: highest
-            symfony: '*'
-            database: mysql|mongo
-            use-dama: 1
-            use-migrate: 0
-            use-phpunit-extension: 0
-            phpunit: 10
-          - php: 8.3
-            deps: highest
-            symfony: '*'
-            database: mysql|mongo
-            use-dama: 1
-            use-migrate: 0
-            use-phpunit-extension: 0
-            phpunit: 11
-          - php: 8.3
-            deps: highest
-            symfony: '*'
-            database: mysql|mongo
-            use-dama: 1
-            use-migrate: 0
-            use-phpunit-extension: 1
-            phpunit: 11
+          - {php: 8.3, symfony: '*', database: none}
+          - {php: 8.3, symfony: '*', database: mysql|mongo}
+          - {php: 8.3, symfony: '*', database: pgsql|mongo}
+          - {php: 8.3, symfony: '*', database: pgsql, without-dama: 1}
+          - {php: 8.3, symfony: '*', database: sqlite, without-dama: 1}
+          - {php: 8.3, symfony: '*', database: sqlite, without-dama: 1, deps: lowest}
+          - {php: 8.3, symfony: '*', database: mysql, deps: lowest}
+          - {php: 8.3, symfony: '*', database: mysql, use-migrate: 1}
+          - {php: 8.3, symfony: '*', database: mysql|mongo, phpunit: 10}
+          - {php: 8.3, symfony: '*', database: mysql|mongo, phpunit: 11}
+          - {php: 8.3, symfony: '*', database: mysql|mongo, use-phpunit-extension: 1, phpunit: 11}
+          - {php: 8.3, symfony: '*', database: mysql|mongo, use-phpunit-extension: 1, phpunit: 11, without-dama: 1}
     env:
       DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || contains(matrix.database, 'sqlite') && 'sqlite:///%kernel.project_dir%/var/data.db' || '' }}
       MONGO_URL: ${{ contains(matrix.database, 'mongo') && 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb' || '' }}
-      USE_DAMA_DOCTRINE_TEST_BUNDLE: ${{ matrix.use-dama == 1 && contains(matrix.database, 'sql') && 1 || 0 }}
-      USE_FOUNDRY_PHPUNIT_EXTENSION: ${{ matrix.use-phpunit-extension }}
-      PHPUNIT_VERSION: ${{ matrix.phpunit }}
+      USE_DAMA_DOCTRINE_TEST_BUNDLE: ${{ matrix.without-dama == 0 && contains(matrix.database, 'sql') && 1 || 0 }}
+      USE_FOUNDRY_PHPUNIT_EXTENSION: ${{ matrix.use-phpunit-extension || 0 }}
+      PHPUNIT_VERSION: ${{ matrix.phpunit || 9 }}
+      DATABASE_RESET_MODE: ${{ matrix.use-migrate == 1 && 'migrate' || 'schema' }}
     services:
       postgres:
         image: ${{ contains(matrix.database, 'pgsql') && 'postgres:15' || '' }}
@@ -165,8 +90,6 @@ jobs:
       - name: Test
         run: ./phpunit
         shell: bash
-        env:
-          DATABASE_RESET_MODE: ${{ matrix.use-migrate == 1 && 'migrate' || 'schema' }}
 
   code-coverage:
     name: Code Coverage
