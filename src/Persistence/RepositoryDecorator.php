@@ -229,7 +229,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
     /**
      * @return ObjectRepository<T>
      */
-    private function inner(): ObjectRepository
+    public function inner(): ObjectRepository
     {
         return Configuration::instance()->persistence()->repositoryFor($this->class);
     }
