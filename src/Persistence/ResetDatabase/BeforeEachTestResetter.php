@@ -16,7 +16,6 @@ namespace Zenstruck\Foundry\Persistence\ResetDatabase;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
 interface BeforeEachTestResetter
