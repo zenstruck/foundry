@@ -134,4 +134,16 @@ abstract class ProxyEntityFactoryRelationshipTestCase extends EntityFactoryRelat
         $this->expectException(RefreshObjectFailed::class);
         $contact->_assertPersisted();
     }
+
+    /**
+     * @test
+     */
+    public function can_add_and_save_association(): void
+    {
+        $category = $this->categoryFactory()->create();
+
+        $contact = $this->contactFactory()->withoutPersisting()->create();
+        $category->addContact($contact->_real());
+        $category->_save();
+    }
 }
