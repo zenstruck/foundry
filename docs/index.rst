@@ -1620,11 +1620,11 @@ You can install it by modifying you ``phpunit.xml.dist``:
 
     .. code-block:: xml
     
-    <phpunit>
-      <extensions>
-        <bootstrap class="Zenstruck\Foundry\PHPUnit\FoundryExtension"/>
-      </extensions>
-    </phpunit>
+        <phpunit>
+          <extensions>
+            <bootstrap class="Zenstruck\Foundry\PHPUnit\FoundryExtension"/>
+          </extensions>
+        </phpunit>
     
 .. warning::
 
@@ -1825,7 +1825,7 @@ This can dramatically improve test speed. The following considerations need to b
 
    .. code-block:: yaml
 
-   # config/packages/doctrine.yaml
+       # config/packages/doctrine.yaml
        when@test:
            doctrine:
                dbal:
