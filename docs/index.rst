@@ -1621,9 +1621,9 @@ You can install it by modifying you ``phpunit.xml.dist``:
     .. code-block:: xml
     
         <phpunit>
-          <extensions>
-            <bootstrap class="Zenstruck\Foundry\PHPUnit\FoundryExtension"/>
-          </extensions>
+            <extensions>
+                <bootstrap class="Zenstruck\Foundry\PHPUnit\FoundryExtension"/>
+            </extensions>
         </phpunit>
     
 .. warning::
