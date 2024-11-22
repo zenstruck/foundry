@@ -14,6 +14,7 @@ namespace Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact\StandardContact;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\StandardAddressFactory;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\StandardCategoryFactory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -32,6 +33,7 @@ class StandardContactFactory extends PersistentObjectFactory
         return [
             'name' => self::faker()->word(),
             'address' => StandardAddressFactory::new(),
+            'category' => StandardCategoryFactory::new(),
         ];
     }
 }

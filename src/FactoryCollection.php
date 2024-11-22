@@ -23,10 +23,51 @@ final class FactoryCollection implements \IteratorAggregate
 {
     /**
      * @param Factory<T>                      $factory
-     * @phpstan-param \Closure():iterable<Attributes> $items
+     * @phpstan-param \Closure():iterable<Attributes>|\Closure():iterable<Factory<T>> $items
      */
     private function __construct(public readonly Factory $factory, private \Closure $items)
     {
+    }
+
+    /**
+     * @phpstan-assert-if-true non-empty-list<Factory<T>> $potentialFactories
+     *
+     * @internal
+     */
+    public static function accepts(mixed $potentialFactories): bool
+    {
+        if (!is_array($potentialFactories) || count($potentialFactories) === 0 || !array_is_list($potentialFactories)) {
+            return false;
+        }
+
+        if (!$potentialFactories[0] instanceof ObjectFactory) {
+            return false;
+        }
+
+        foreach ($potentialFactories as $potentialFactory) {
+            if (!$potentialFactory instanceof ObjectFactory
+                || $potentialFactory::class() !== $potentialFactories[0]::class()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param array<mixed> $factories
+     *
+     * @return self<T>
+     *
+     * @internal
+     */
+    public static function fromFactoriesList(array $factories): self
+    {
+        if (!self::accepts($factories)) {
+            throw new \InvalidArgumentException('All factories must be of the same type.');
+        }
+
+        return new self($factories[0], static fn() => $factories);
     }
 
     /**
@@ -81,8 +122,14 @@ final class FactoryCollection implements \IteratorAggregate
         $factories = [];
 
         $i = 1;
-        foreach (($this->items)() as $attributes) {
-            $factories[] = $this->factory->with($attributes)->with(['__index' => $i++]);
+        foreach (($this->items)() as $attributesOrFactory) {
+            if ($attributesOrFactory instanceof Factory) {
+                $factories[] = $attributesOrFactory;
+
+                continue;
+            }
+
+            $factories[] = $this->factory->with($attributesOrFactory)->with(['__index' => $i++]);
         }
 
         return $factories;

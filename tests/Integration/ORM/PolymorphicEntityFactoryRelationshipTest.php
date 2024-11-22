@@ -19,7 +19,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ChildContactFactory
  */
 class PolymorphicEntityFactoryRelationshipTest extends StandardEntityFactoryRelationshipTest
 {
-    protected function contactFactory(): PersistentObjectFactory
+    protected static function contactFactory(): PersistentObjectFactory
     {
         return ChildContactFactory::new(); // @phpstan-ignore return.type
     }

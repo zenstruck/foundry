@@ -22,22 +22,22 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Tag\ProxyTagFactory;
  */
 final class ProxyEntityFactoryRelationshipTest extends ProxyEntityFactoryRelationshipTestCase
 {
-    protected function contactFactory(): PersistentObjectFactory
+    protected static function contactFactory(): PersistentObjectFactory
     {
         return ProxyContactFactory::new(); // @phpstan-ignore return.type
     }
 
-    protected function categoryFactory(): PersistentObjectFactory
+    protected static function categoryFactory(): PersistentObjectFactory
     {
         return ProxyCategoryFactory::new(); // @phpstan-ignore return.type
     }
 
-    protected function tagFactory(): PersistentObjectFactory
+    protected static function tagFactory(): PersistentObjectFactory
     {
         return ProxyTagFactory::new(); // @phpstan-ignore return.type
     }
 
-    protected function addressFactory(): PersistentObjectFactory
+    protected static function addressFactory(): PersistentObjectFactory
     {
         return ProxyAddressFactory::new(); // @phpstan-ignore return.type
     }

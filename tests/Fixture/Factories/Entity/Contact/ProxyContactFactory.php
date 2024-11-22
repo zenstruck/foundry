@@ -32,7 +32,7 @@ final class ProxyContactFactory extends PersistentProxyObjectFactory
     {
         return [
             'name' => self::faker()->word(),
-            //            'category' => ProxyCategoryFactory::new(),
+            'category' => ProxyCategoryFactory::new(),
             'address' => ProxyAddressFactory::new(),
         ];
     }

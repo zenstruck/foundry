@@ -14,6 +14,7 @@ namespace Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact\CascadeContact;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\ProxyCascadeAddressFactory;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\ProxyCascadeCategoryFactory;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
@@ -31,7 +32,7 @@ final class ProxyCascadeContactFactory extends PersistentProxyObjectFactory
     {
         return [
             'name' => self::faker()->word(),
-            //            'category' => ProxyCategoryFactory::new(),
+            'category' => ProxyCascadeCategoryFactory::new(),
             'address' => ProxyCascadeAddressFactory::new(),
         ];
     }

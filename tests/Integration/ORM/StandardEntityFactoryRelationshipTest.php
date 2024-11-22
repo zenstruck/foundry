@@ -22,22 +22,22 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Tag\StandardTagFactory;
  */
 class StandardEntityFactoryRelationshipTest extends EntityFactoryRelationshipTestCase
 {
-    protected function contactFactory(): PersistentObjectFactory
+    protected static function contactFactory(): PersistentObjectFactory
     {
         return StandardContactFactory::new(); // @phpstan-ignore return.type
     }
 
-    protected function categoryFactory(): PersistentObjectFactory
+    protected static function categoryFactory(): PersistentObjectFactory
     {
         return StandardCategoryFactory::new(); // @phpstan-ignore return.type
     }
 
-    protected function tagFactory(): PersistentObjectFactory
+    protected static function tagFactory(): PersistentObjectFactory
     {
         return StandardTagFactory::new(); // @phpstan-ignore return.type
     }
 
-    protected function addressFactory(): PersistentObjectFactory
+    protected static function addressFactory(): PersistentObjectFactory
     {
         return StandardAddressFactory::new(); // @phpstan-ignore return.type
     }

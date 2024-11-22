@@ -202,13 +202,6 @@ abstract class Factory
      */
     protected function normalizeParameter(string $field, mixed $value): mixed
     {
-        if (\is_array($value)) {
-            return array_combine(
-                array_keys($value),
-                \array_map($this->normalizeParameter(...), array_fill(0, count($value), $field), $value)
-            );
-        }
-
         if ($value instanceof LazyValue) {
             $value = $value();
         }
@@ -217,8 +210,19 @@ abstract class Factory
             $value = $value->create();
         }
 
+        if (FactoryCollection::accepts($value)) {
+            $value = FactoryCollection::fromFactoriesList($value);
+        }
+
         if ($value instanceof FactoryCollection) {
             $value = $this->normalizeCollection($field, $value);
+        }
+
+        if (\is_array($value)) {
+            return array_combine(
+                array_keys($value),
+                \array_map($this->normalizeParameter(...), array_fill(0, count($value), $field), $value)
+            );
         }
 
         return \is_object($value) ? $this->normalizeObject($value) : $value;

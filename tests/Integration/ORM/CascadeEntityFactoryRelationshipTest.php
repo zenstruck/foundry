@@ -27,15 +27,15 @@ final class CascadeEntityFactoryRelationshipTest extends EntityFactoryRelationsh
      */
     public function ensure_to_one_cascade_relations_are_not_pre_persisted(): void
     {
-        $contact = $this->contactFactory()
+        $contact = self::contactFactory()
             ->afterInstantiate(function() {
-                $this->categoryFactory()::repository()->assert()->empty();
-                $this->addressFactory()::repository()->assert()->empty();
-                $this->tagFactory()::repository()->assert()->empty();
+                self::categoryFactory()::repository()->assert()->empty();
+                self::addressFactory()::repository()->assert()->empty();
+                self::tagFactory()::repository()->assert()->empty();
             })
             ->create([
-                'tags' => $this->tagFactory()->many(3),
-                'category' => $this->categoryFactory(),
+                'tags' => self::tagFactory()->many(3),
+                'category' => self::categoryFactory(),
             ])
         ;
 
@@ -53,14 +53,14 @@ final class CascadeEntityFactoryRelationshipTest extends EntityFactoryRelationsh
      */
     public function ensure_many_to_many_cascade_relations_are_not_pre_persisted(): void
     {
-        $tag = $this->tagFactory()
+        $tag = self::tagFactory()
             ->afterInstantiate(function() {
-                $this->categoryFactory()::repository()->assert()->empty();
-                $this->addressFactory()::repository()->assert()->empty();
-                $this->contactFactory()::repository()->assert()->empty();
+                self::categoryFactory()::repository()->assert()->empty();
+                self::addressFactory()::repository()->assert()->empty();
+                self::contactFactory()::repository()->assert()->empty();
             })
             ->create([
-                'contacts' => $this->contactFactory()->many(3),
+                'contacts' => self::contactFactory()->many(3),
             ])
         ;
 
@@ -76,14 +76,14 @@ final class CascadeEntityFactoryRelationshipTest extends EntityFactoryRelationsh
      */
     public function ensure_one_to_many_cascade_relations_are_not_pre_persisted(): void
     {
-        $category = $this->categoryFactory()
+        $category = self::categoryFactory()
             ->afterInstantiate(function() {
-                $this->contactFactory()::repository()->assert()->empty();
-                $this->addressFactory()::repository()->assert()->empty();
-                $this->tagFactory()::repository()->assert()->empty();
+                self::contactFactory()::repository()->assert()->empty();
+                self::addressFactory()::repository()->assert()->empty();
+                self::tagFactory()::repository()->assert()->empty();
             })
             ->create([
-                'contacts' => $this->contactFactory()->many(3),
+                'contacts' => self::contactFactory()->many(3),
             ])
         ;
 
@@ -94,22 +94,22 @@ final class CascadeEntityFactoryRelationshipTest extends EntityFactoryRelationsh
         }
     }
 
-    protected function contactFactory(): PersistentObjectFactory
+    protected static function contactFactory(): PersistentObjectFactory
     {
         return CascadeContactFactory::new(); // @phpstan-ignore return.type
     }
 
-    protected function categoryFactory(): PersistentObjectFactory
+    protected static function categoryFactory(): PersistentObjectFactory
     {
         return CascadeCategoryFactory::new(); // @phpstan-ignore return.type
     }
 
-    protected function tagFactory(): PersistentObjectFactory
+    protected static function tagFactory(): PersistentObjectFactory
     {
         return CascadeTagFactory::new(); // @phpstan-ignore return.type
     }
 
-    protected function addressFactory(): PersistentObjectFactory
+    protected static function addressFactory(): PersistentObjectFactory
     {
         return CascadeAddressFactory::new(); // @phpstan-ignore return.type
     }
