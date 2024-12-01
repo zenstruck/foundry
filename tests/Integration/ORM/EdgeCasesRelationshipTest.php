@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\InversedOneToOneWithNonNullableOwning;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
@@ -25,6 +26,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\EdgeCases\MultipleMandatory
 use Zenstruck\Foundry\Tests\Fixture\Stories\GlobalStory;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
+use function Zenstruck\Foundry\factory;
 use function Zenstruck\Foundry\Persistence\flush_after;
 use function Zenstruck\Foundry\Persistence\persistent_factory;
 use function Zenstruck\Foundry\Persistence\proxy_factory;
@@ -104,6 +106,22 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
             proxy_factory(RichDomainMandatoryRelationship\CascadeInversedSideEntity::class),
             proxy_factory(RichDomainMandatoryRelationship\CascadeOwningSideEntity::class),
         ];
+    }
+
+    /**
+     * @test
+     */
+    public function inverse_one_to_one_with_non_nullable_inverse_side(): void
+    {
+        $owningSideFactory = persistent_factory(InversedOneToOneWithNonNullableOwning\OwningSide::class);
+        $inverseSideFactory = persistent_factory(InversedOneToOneWithNonNullableOwning\InverseSide::class);
+
+        $inverseSide = $inverseSideFactory->create(['owningSide' => $owningSideFactory]);
+
+        $owningSideFactory::assert()->count(1);
+        $inverseSideFactory::assert()->count(1);
+
+        self::assertSame($inverseSide, $inverseSide->owningSide->inverseSide);
     }
 
     /**

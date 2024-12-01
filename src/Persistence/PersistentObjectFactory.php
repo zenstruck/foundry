@@ -22,6 +22,8 @@ use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
 
+use function Zenstruck\Foundry\get;
+
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
@@ -271,13 +273,23 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
             // handle inversed OneToOne
             if ($relationshipMetadata && !$relationshipMetadata->isCollection && $inverseField = $relationshipMetadata->inverseField) {
-                $this->tempAfterPersist[] = static function(object $object) use ($value, $inverseField, $pm) {
+                // we create now the object to prevent "non-nullable" property errors,
+                // but we'll need to remove it once the current object is created
+                $inversedObject = unproxy($value->create());
+                $this->tempAfterPersist[] = static function(object $object) use ($value, $inverseField, $pm, $inversedObject) {
+                    // we cannot use the already created $inversedObject:
+                    // because we must also remove its potential newly created owner (here: "$oldObj")
+                    // but a cascade:["persist"] would remove too many things
                     $value->create([$inverseField => $object]);
                     $pm->refresh($object);
+                    $oldObj = get($inversedObject, $inverseField);
+                    delete($inversedObject);
+                    if ($oldObj) {
+                        delete($oldObj); // @phpstan-ignore argument.templateType
+                    }
                 };
 
-                // creation delegated to afterPersist hook - return empty array here
-                return null;
+                return $inversedObject;
             }
 
             if (Configuration::instance()->persistence()->relationshipMetadata(static::class(), $value::class(), $field)?->isCascadePersist) {
