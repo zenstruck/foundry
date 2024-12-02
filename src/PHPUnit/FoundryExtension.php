@@ -43,6 +43,7 @@ final class FoundryExtension implements Runner\Extension\Extension
         $facade->registerSubscribers(
             new BootFoundryOnDataProviderMethodCalled(),
             new ShutdownFoundryOnDataProviderMethodFinished(),
+            new BuildStoryOnTestPrepared(),
         );
     }
 }
