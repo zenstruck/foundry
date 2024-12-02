@@ -2,19 +2,29 @@
 
 declare(strict_types=1);
 
-namespace Integration\Attribute\WithStory;
+namespace Zenstruck\Foundry\Tests\Integration\Attribute\WithStory;
 
+use PHPUnit\Framework\Attributes\RequiresPhpunit;
+use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Attribute\WithStory;
+use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\EntityPoolStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\EntityStory;
+use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
+/**
+ * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ * @requires PHPUnit 11.4
+ */
+#[RequiresPhpunit('11.4')]
+#[RequiresPhpunitExtension(FoundryExtension::class)]
 final class WithStoryOnMethodTest extends KernelTestCase
 {
-    use Factories, ResetDatabase;
+    use Factories, ResetDatabase, RequiresORM;
 
     /**
      * @test

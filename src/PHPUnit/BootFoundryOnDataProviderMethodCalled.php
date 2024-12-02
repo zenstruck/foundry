@@ -24,7 +24,7 @@ final class BootFoundryOnDataProviderMethodCalled implements Event\Test\DataProv
     public function notify(Event\Test\DataProviderMethodCalled $event): void
     {
         if (\method_exists($event->testMethod()->className(), '_bootForDataProvider')) {
-            \call_user_func([$event->testMethod()->className(), '_bootForDataProvider']);
+            $event->testMethod()->className()::_bootForDataProvider();
         }
     }
 }
