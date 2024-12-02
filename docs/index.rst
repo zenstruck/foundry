@@ -1608,35 +1608,26 @@ PHPUnit Data Providers
 
 It is possible to use factories in
 `PHPUnit data providers <https://phpunit.readthedocs.io/en/9.3/writing-tests-for-phpunit.html#data-providers>`_.
-Their usage depends on which Foundry version you are running:
+Their usage depends on whether you're using Foundry's `PHPUnit Extension`_ or not.:
 
-Data Providers with Foundry ^2.2
-................................
+With PHPUnit Extension
+......................
 
-From version 2.2, Foundry provides an extension for PHPUnit.
-You can install it by modifying you ``phpunit.xml.dist``:
+.. versionadded::  2.2
 
-.. configuration-block::
+    The ability to call ``Factory::create()`` in data providers was introduced in Foundry 2.2.
 
-    .. code-block:: xml
-    
-        <phpunit>
-            <extensions>
-                <bootstrap class="Zenstruck\Foundry\PHPUnit\FoundryExtension"/>
-            </extensions>
-        </phpunit>
-    
 .. warning::
 
-    This PHPUnit extension requires at least PHPUnit 11.4.
+    You will need at least PHPUnit 11.4 to call ``Factory::create()`` in your data providers.
 
-Using this extension will allow to use your factories in your data providers the same way you're using them in tests.
-Thanks to it, you can:
+Thanks to Foundry's `PHPUnit Extension`_, you'll be able to use your factories in your data providers the same way
+you're using them in tests. Thanks to it, you can:
     * Call ``->create()`` or ``::createOne()`` or any other method which creates objects in unit tests
     (using ``PHPUnit\Framework\TestCase``) and functional tests (``Symfony\Bundle\FrameworkBundle\Test\KernelTestCase``)
     * Use `Factories as Services`_ in functional tests
     * Use `faker()` normally, without wrapping its call in a callable
-    
+
 ::
 
     use App\Factory\PostFactory;
@@ -1654,21 +1645,22 @@ Thanks to it, you can:
         yield [PostWithServiceFactory::createOne()];
         yield [PostFactory::createOne(['body' => faker()->sentence()];
     }
-    
-    
+
 .. warning::
 
     Because Foundry is relying on its `Proxy mechanism <object-proxy>`_, when using persistence,
     your factories must extend ``Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory`` to work in your data providers.
-    
+
 .. warning::
 
-    For the same reason, you should not call methods from `Proxy` class in your data providers,
-    not even ``->_real()``.
+    For the same reason, you should not call methods from `Proxy` class in your data providers, not even ``->_real()``.
 
 
-Data Providers before Foundry v2.2
-..................................
+Without PHPUnit Extension
+.........................
+
+Data providers are computed early in the phpunit process before Foundry is booted.
+Be sure your data provider returns only instances of ``Factory`` and you do not try to call ``->create()`` on them:
 
 ::
 
@@ -1689,11 +1681,6 @@ Data Providers before Foundry v2.2
         yield [PostFactory::new()];
         yield [PostFactory::new()->published()];
     }
-
-.. note::
-
-    Be sure your data provider returns only instances of ``Factory`` and you do not try to call ``->create()`` on them.
-    Data providers are computed early in the phpunit process before Foundry is booted.
 
 .. note::
 
@@ -2168,6 +2155,39 @@ Objects can be fetched from pools in your tests, fixtures or other stories:
     ProvinceStory::getRandomRange('be', 1, 4); // between 1 and 4 random Province|Proxy's from "be" pool
     ProvinceStory::getPool('be'); // all Province|Proxy's from "be" pool
 
+#[WithStory] Attribute
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 2.3
+
+    The `#[WithStory]` attribute was added in Foundry 2.3.
+
+.. warning::
+
+    The `PHPUnit Extension`_ for Foundry is needed to use ``#[WithStory]`` attribute.
+
+You can use the ``#[WithStory]`` attribute to load stories in your tests:
+
+::
+
+    use App\Story\CategoryStory;
+    use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+    use Zenstruck\Foundry\Attribute\WithStory;
+
+    // You can use the attribute on the class...
+    #[WithStory(CategoryStory::class)]
+    final class NeedsCategoriesTest extends KernelTestCase
+    {
+        // ... or on the method
+        #[WithStory(CategoryStory::class)]
+        public function testThatNeedStories(): void
+        {
+            // ...
+        }
+    }
+
+If used on the class, the story will be loaded before each test method.
+
 Static Analysis
 ---------------
 
@@ -2180,6 +2200,33 @@ Please, enable it with:
 .. code-block:: terminal
 
     $ vendor/bin/psalm-plugin enable zenstruck/foundry
+
+PHPUnit Extension
+-----------------
+
+Foundry is shipped with an extension for PHPUnit. You can install it by modifying the file ``phpunit.xml.dist``:
+
+.. configuration-block::
+
+    .. code-block:: xml
+
+        <phpunit>
+            <extensions>
+                <bootstrap class="Zenstruck\Foundry\PHPUnit\FoundryExtension"/>
+            </extensions>
+        </phpunit>
+
+This extension provides the following features:
+- support for the `#[WithStory] Attribute`_
+- ability to use ``Factory::create()`` in `PHPUnit Data Providers`_ (along with PHPUnit ^11.4)
+
+.. versionadded:: 2.2
+
+    The PHPUnit extension was introduced in Foundry 2.2.
+
+.. warning::
+
+    The PHPUnit extension is only compatible with PHPUnit 10+.
 
 Bundle Configuration
 --------------------

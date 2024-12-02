@@ -18,9 +18,9 @@ use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit 11.4
+ * @requires PHPUnit 11
  */
-#[RequiresPhpunit('11.4')]
+#[RequiresPhpunit('11')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 #[WithStory(EntityStory::class)]
 final class WithStoryOnClassTest extends KernelTestCase

@@ -43,8 +43,8 @@ fi
 DAMA_EXTENSION="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension"
 FOUNDRY_EXTENSION="Zenstruck\Foundry\PHPUnit\FoundryExtension"
 
-if [ "${USE_FOUNDRY_PHPUNIT_EXTENSION:-0}" = "1" ] && [ "${PHPUNIT_VERSION}" != "11" ]; then
-  echo "❌ USE_FOUNDRY_PHPUNIT_EXTENSION could only be used with PHPUNIT_VERSION=11";
+if [ "${USE_FOUNDRY_PHPUNIT_EXTENSION:-0}" = "1" ] && [ "${PHPUNIT_VERSION}" = "9" ]; then
+  echo "❌ USE_FOUNDRY_PHPUNIT_EXTENSION cannot be used with PHPUNIT_VERSION=10";
   exit 1;
 fi
 

@@ -28,6 +28,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\ArrayFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\GlobalInvokableService;
 use Zenstruck\Foundry\Tests\Fixture\Stories\GlobalStory;
+use Zenstruck\Foundry\Tests\Fixture\Stories\ServiceStory;
 use Zenstruck\Foundry\ZenstruckFoundryBundle;
 
 /**
@@ -162,6 +163,7 @@ final class TestKernel extends Kernel
         $c->register(GlobalInvokableService::class);
         $c->register(ArrayFactory::class)->setAutowired(true)->setAutoconfigured(true);
         $c->register(Object1Factory::class)->setAutowired(true)->setAutoconfigured(true);
+        $c->register(ServiceStory::class)->setAutowired(true)->setAutoconfigured(true);
     }
 
     protected function configureRoutes(RoutingConfigurator $routes): void

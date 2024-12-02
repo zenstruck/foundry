@@ -14,13 +14,14 @@ use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\EntityPoolStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\EntityStory;
+use Zenstruck\Foundry\Tests\Fixture\Stories\ServiceStory;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit 11.4
+ * @requires PHPUnit 11
  */
-#[RequiresPhpunit('11.4')]
+#[RequiresPhpunit('11')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 final class WithStoryOnMethodTest extends KernelTestCase
 {
@@ -46,5 +47,14 @@ final class WithStoryOnMethodTest extends KernelTestCase
     public function can_use_multiple_story_in_attribute(): void
     {
         GenericEntityFactory::assert()->count(5);
+    }
+
+    /**
+     * @test
+     */
+    #[WithStory(ServiceStory::class)]
+    public function can_use_service_story(): void
+    {
+        $this->assertSame('localhost', ServiceStory::get('foo')->getProp1());
     }
 }

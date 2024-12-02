@@ -24,26 +24,24 @@ use Zenstruck\Foundry\Configuration;
  */
 final class FoundryExtension implements Runner\Extension\Extension
 {
-    public const MIN_PHPUNIT_VERSION = '11.4';
-
     public function bootstrap(
         TextUI\Configuration\Configuration $configuration,
         Runner\Extension\Facade $facade,
         Runner\Extension\ParameterCollection $parameters,
     ): void {
-        if (!ConstraintRequirement::from(self::MIN_PHPUNIT_VERSION)->isSatisfiedBy(Runner\Version::id())) {
-            throw new \LogicException(\sprintf('Your PHPUnit version (%s) is not compatible with the minimum version (%s) needed to use this extension.', Runner\Version::id(), self::MIN_PHPUNIT_VERSION));
-        }
-
         // shutdown Foundry if for some reason it has been booted before
         if (Configuration::isBooted()) {
             Configuration::shutdown();
         }
 
-        $facade->registerSubscribers(
-            new BootFoundryOnDataProviderMethodCalled(),
-            new ShutdownFoundryOnDataProviderMethodFinished(),
-            new BuildStoryOnTestPrepared(),
-        );
+        $subscribers = [new BuildStoryOnTestPrepared()];
+
+        if (ConstraintRequirement::from('11.4')->isSatisfiedBy(Runner\Version::id())) {
+            // those deal with data provider events which can be useful only if PHPUnit 11.4 is used
+            $subscribers[] = new BootFoundryOnDataProviderMethodCalled();
+            $subscribers[] = new ShutdownFoundryOnDataProviderMethodFinished();
+        }
+
+        $facade->registerSubscribers(...$subscribers);
     }
 }
