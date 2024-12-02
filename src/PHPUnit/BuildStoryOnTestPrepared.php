@@ -29,18 +29,20 @@ final class BuildStoryOnTestPrepared implements Event\Test\PreparedSubscriber
         if (!$test->isTestMethod()) {
             return;
         }
+
         /** @var Event\Code\TestMethod $test */
 
-        $method = (new \ReflectionMethod($test->className(), $test->methodName()));
-        $withStoryReflectionAttributes = $method->getAttributes(WithStory::class);
+        $withStoryAttributes = [
+           ...(new \ReflectionClass($test->className()))->getAttributes(WithStory::class),
+           ...(new \ReflectionMethod($test->className(), $test->methodName()))->getAttributes(WithStory::class),
+        ];
 
-        if (!$withStoryReflectionAttributes) {
+        if (!$withStoryAttributes) {
             return;
         }
 
-        $withStoryAttributes = array_map(static fn(\ReflectionAttribute $a): WithStory => $a->newInstance(), $withStoryReflectionAttributes);
         foreach ($withStoryAttributes as $withStoryAttribute) {
-            $withStoryAttribute->story::load();
+            $withStoryAttribute->newInstance()->story::load();
         }
     }
 }
