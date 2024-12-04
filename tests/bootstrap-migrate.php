@@ -10,7 +10,6 @@
  */
 
 use Symfony\Component\Dotenv\Dotenv;
-use Symfony\Component\ErrorHandler\ErrorHandler;
 use Symfony\Component\Filesystem\Filesystem;
 use Zenstruck\Foundry\Tests\Fixture\MigrationTests\TestMigrationKernel;
 
@@ -44,5 +43,3 @@ runCommand($application, "doctrine:migrations:diff {$configuration}");
 runCommand($application, 'doctrine:database:drop --force', canFail: true);
 
 $kernel->shutdown();
-
-\set_exception_handler([new ErrorHandler(), 'handleException']);

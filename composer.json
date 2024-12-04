@@ -40,6 +40,7 @@
         "symfony/dotenv": "^6.4|^7.0",
         "symfony/maker-bundle": "^1.55",
         "symfony/phpunit-bridge": "^6.4|^7.0",
+        "symfony/runtime": "^6.4|^7.0",
         "symfony/translation-contracts": "^3.4",
         "symfony/var-dumper": "^6.4|^7.0",
         "symfony/yaml": "^6.4|^7.0"
@@ -52,7 +53,6 @@
         "files": [
             "src/functions.php",
             "src/Persistence/functions.php",
-            "src/phpunit_helper.php",
             "src/symfony_console.php"
         ]
     },
@@ -68,7 +68,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "bamarni/composer-bin-plugin": true,
-            "symfony/flex": true
+            "symfony/flex": true,
+            "symfony/runtime": false
         }
     },
     "extra": {

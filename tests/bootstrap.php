@@ -10,15 +10,12 @@
  */
 
 use Symfony\Component\Dotenv\Dotenv;
-use Symfony\Component\ErrorHandler\ErrorHandler;
 use Symfony\Component\Filesystem\Filesystem;
 
-require \dirname(__DIR__).'/vendor/autoload.php';
+require \dirname(__DIR__) . '/vendor/autoload.php';
 
 $fs = new Filesystem();
 
-$fs->remove(__DIR__.'/../var');
+$fs->remove(__DIR__ . '/../var');
 
-(new Dotenv())->usePutenv()->loadEnv(__DIR__.'/../.env');
-
-\set_exception_handler([new ErrorHandler(), 'handleException']);
+(new Dotenv())->usePutenv()->loadEnv(__DIR__ . '/../.env');

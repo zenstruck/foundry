@@ -16,8 +16,6 @@ use PHPUnit\Framework\Attributes\BeforeClass;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 
-use function Zenstruck\Foundry\restorePhpUnitErrorHandler;
-
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
@@ -36,10 +34,7 @@ trait ResetDatabase
 
         ResetDatabaseManager::resetBeforeFirstTest(
             static fn() => static::bootKernel(),
-            static function(): void {
-                static::ensureKernelShutdown();
-                restorePhpUnitErrorHandler();
-            },
+            static fn() => static::ensureKernelShutdown(),
         );
     }
 
