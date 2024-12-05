@@ -37,8 +37,8 @@ final class MakeFactoryPHPDocMethod
         if ($makeFactoryData->isPersisted()) {
             $methods[] = new self($makeFactoryData->getObjectShortName(), 'find(object|array|mixed $criteria)', returnsCollection: false);
             $methods[] = new self($makeFactoryData->getObjectShortName(), 'findOrCreate(array $attributes)', returnsCollection: false);
-            $methods[] = new self($makeFactoryData->getObjectShortName(), 'first(string $sortedField = \'id\')', returnsCollection: false);
-            $methods[] = new self($makeFactoryData->getObjectShortName(), 'last(string $sortedField = \'id\')', returnsCollection: false);
+            $methods[] = new self($makeFactoryData->getObjectShortName(), 'first(string $sortBy = \'id\')', returnsCollection: false);
+            $methods[] = new self($makeFactoryData->getObjectShortName(), 'last(string $sortBy = \'id\')', returnsCollection: false);
             $methods[] = new self($makeFactoryData->getObjectShortName(), 'random(array $attributes = [])', returnsCollection: false);
             $methods[] = new self($makeFactoryData->getObjectShortName(), 'randomOrCreate(array $attributes = [])', returnsCollection: false);
 

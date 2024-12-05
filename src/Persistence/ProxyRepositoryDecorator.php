@@ -44,9 +44,9 @@ final class ProxyRepositoryDecorator extends RepositoryDecorator // @phpstan-ign
      * @return T|Proxy<T>|null
      * @psalm-return (T&Proxy<T>)|null
      */
-    public function last(string $sortedField = 'id'): ?object
+    public function last(string $sortBy = 'id'): ?object
     {
-        return $this->proxyNullableObject(parent::last($sortedField));
+        return $this->proxyNullableObject(parent::last($sortBy));
     }
 
     /**

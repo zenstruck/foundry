@@ -73,9 +73,9 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
     /**
      * @return T|null
      */
-    public function last(string $sortedField = 'id'): ?object
+    public function last(string $sortBy = 'id'): ?object
     {
-        return $this->findBy([], [$sortedField => 'DESC'], 1)[0] ?? null;
+        return $this->findBy([], [$sortBy => 'DESC'], 1)[0] ?? null;
     }
 
     /**
