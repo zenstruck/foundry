@@ -19,6 +19,7 @@ use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\InversedOneToOneWithNonNullableOwning;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\ManyToOneToSelfReferencing;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\RelationshipWithGlobalEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\RichDomainMandatoryRelationship;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GlobalEntity;
@@ -121,6 +122,20 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
         $inverseSideFactory::assert()->count(1);
 
         self::assertSame($inverseSide, $inverseSide->owningSide->inverseSide);
+    }
+
+    /**
+     * @test
+     */
+    public function many_to_many_to_self_referencing_inverse_side(): void
+    {
+        $owningSideFactory = persistent_factory(ManyToOneToSelfReferencing\OwningSide::class);
+        $inverseSideFactory = persistent_factory(ManyToOneToSelfReferencing\SelfReferencingInverseSide::class);
+
+        $owningSideFactory->create(['inverseSide' => $inverseSideFactory]);
+
+        $owningSideFactory::assert()->count(1);
+        $inverseSideFactory::assert()->count(1);
     }
 
     /**

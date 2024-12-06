@@ -29,17 +29,18 @@ final class OrmV2PersistenceStrategy extends AbstractORMPersistenceStrategy
     {
         $metadata = $this->classMetadata($parent);
 
-        $association = $this->getAssociationMapping($parent, $field);
+        $association = $this->getAssociationMapping($parent, $child, $field);
 
         if ($association) {
             return new RelationshipMetadata(
                 isCascadePersist: $association['isCascadePersist'],
                 inverseField: $metadata->isSingleValuedAssociation($association['fieldName']) ? $association['fieldName'] : null,
                 isCollection: $metadata->isCollectionValuedAssociation($association['fieldName']),
+                isOneToOne: $association['type'] === ClassMetadataInfo::ONE_TO_ONE
             );
         }
 
-        $inversedAssociation = $this->getAssociationMapping($child, $field);
+        $inversedAssociation = $this->getAssociationMapping($child, $parent, $field);
 
         if (null === $inversedAssociation || !$metadata instanceof ClassMetadataInfo) {
             return null;
@@ -70,6 +71,7 @@ final class OrmV2PersistenceStrategy extends AbstractORMPersistenceStrategy
             isCascadePersist: $inversedAssociation['isCascadePersist'],
             inverseField: $metadata->isSingleValuedAssociation($association['fieldName']) ? $association['fieldName'] : null,
             isCollection: $inversedAssociationMetadata->isCollectionValuedAssociation($inversedAssociation['fieldName']),
+            isOneToOne: $inversedAssociation['type'] === ClassMetadataInfo::ONE_TO_ONE
         );
     }
 
@@ -78,12 +80,18 @@ final class OrmV2PersistenceStrategy extends AbstractORMPersistenceStrategy
      * @return array[]|null
      * @phpstan-return AssociationMapping|null
      */
-    private function getAssociationMapping(string $entityClass, string $field): ?array
+    private function getAssociationMapping(string $entityClass, string $targetEntity, string $field): ?array
     {
         try {
-            return $this->objectManagerFor($entityClass)->getClassMetadata($entityClass)->getAssociationMapping($field);
+            $associationMapping = $this->objectManagerFor($entityClass)->getClassMetadata($entityClass)->getAssociationMapping($field);
         } catch (MappingException|ORMMappingException) {
             return null;
         }
+
+        if (!is_a($targetEntity, $associationMapping['targetEntity'], allow_string: true)) {
+            return null;
+        }
+
+        return $associationMapping;
     }
 }

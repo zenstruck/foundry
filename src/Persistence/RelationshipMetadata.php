@@ -22,6 +22,7 @@ final class RelationshipMetadata
         public readonly bool $isCascadePersist,
         public readonly ?string $inverseField,
         public readonly bool $isCollection,
+        public readonly bool $isOneToOne,
     ) {
     }
 }

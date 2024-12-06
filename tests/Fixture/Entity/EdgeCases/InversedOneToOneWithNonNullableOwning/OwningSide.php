@@ -19,6 +19,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
 #[ORM\Entity]
+#[ORM\Table('inversed_one_to_one_with_non_nullable_owning_owning_side')]
 class OwningSide
 {
     #[ORM\Id]

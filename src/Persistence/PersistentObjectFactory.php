@@ -272,7 +272,10 @@ abstract class PersistentObjectFactory extends ObjectFactory
             $relationshipMetadata = $pm->relationshipMetadata($value::class(), static::class(), $field);
 
             // handle inversed OneToOne
-            if ($relationshipMetadata && !$relationshipMetadata->isCollection && $inverseField = $relationshipMetadata->inverseField) {
+            if ($relationshipMetadata
+                && $relationshipMetadata->isOneToOne
+                && !$relationshipMetadata->isCollection
+                && $inverseField = $relationshipMetadata->inverseField) {
                 // we create now the object to prevent "non-nullable" property errors,
                 // but we'll need to remove it once the current object is created
                 $inversedObject = unproxy($value->create());

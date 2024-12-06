@@ -17,6 +17,7 @@ use Doctrine\ORM\Mapping\AssociationMapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\InverseSideMapping;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
+use Doctrine\ORM\Mapping\OneToOneAssociationMapping;
 use Doctrine\ORM\Mapping\ToManyAssociationMapping;
 use Doctrine\Persistence\Mapping\MappingException;
 use Zenstruck\Foundry\Persistence\RelationshipMetadata;
@@ -27,17 +28,18 @@ final class OrmV3PersistenceStrategy extends AbstractORMPersistenceStrategy
     {
         $metadata = $this->classMetadata($parent);
 
-        $association = $this->getAssociationMapping($parent, $field);
+        $association = $this->getAssociationMapping($parent, $child, $field);
 
         if ($association) {
             return new RelationshipMetadata(
                 isCascadePersist: $association->isCascadePersist(),
                 inverseField: $metadata->isSingleValuedAssociation($association->fieldName) ? $association->fieldName : null,
-                isCollection: $association instanceof ToManyAssociationMapping
+                isCollection: $association instanceof ToManyAssociationMapping,
+                isOneToOne: $association instanceof OneToOneAssociationMapping,
             );
         }
 
-        $inversedAssociation = $this->getAssociationMapping($child, $field);
+        $inversedAssociation = $this->getAssociationMapping($child, $parent, $field);
 
         if (null === $inversedAssociation || !$metadata instanceof ClassMetadata) {
             return null;
@@ -60,19 +62,26 @@ final class OrmV3PersistenceStrategy extends AbstractORMPersistenceStrategy
         return new RelationshipMetadata(
             isCascadePersist: $inversedAssociation->isCascadePersist(),
             inverseField: $metadata->isSingleValuedAssociation($association->fieldName) ? $association->fieldName : null,
-            isCollection: $inversedAssociation instanceof ToManyAssociationMapping
+            isCollection: $inversedAssociation instanceof ToManyAssociationMapping,
+            isOneToOne: $inversedAssociation instanceof OneToOneAssociationMapping,
         );
     }
 
     /**
      * @param class-string $entityClass
      */
-    private function getAssociationMapping(string $entityClass, string $field): ?AssociationMapping
+    private function getAssociationMapping(string $entityClass, string $targetEntity, string $field): ?AssociationMapping
     {
         try {
-            return $this->objectManagerFor($entityClass)->getClassMetadata($entityClass)->getAssociationMapping($field);
+            $associationMapping = $this->objectManagerFor($entityClass)->getClassMetadata($entityClass)->getAssociationMapping($field);
         } catch (MappingException|ORMMappingException) {
             return null;
         }
+
+        if (!is_a($targetEntity, $associationMapping->targetEntity, allow_string: true)) {
+            return null;
+        }
+
+        return $associationMapping;
     }
 }
