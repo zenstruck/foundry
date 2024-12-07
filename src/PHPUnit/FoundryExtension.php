@@ -36,8 +36,8 @@ final class FoundryExtension implements Runner\Extension\Extension
 
         $subscribers = [new BuildStoryOnTestPrepared()];
 
-        if (ConstraintRequirement::from('11.4')->isSatisfiedBy(Runner\Version::id())) {
-            // those deal with data provider events which can be useful only if PHPUnit 11.4 is used
+        if (ConstraintRequirement::from('>=11.4')->isSatisfiedBy(Runner\Version::id())) {
+            // those deal with data provider events which can be useful only if PHPUnit >=11.4 is used
             $subscribers[] = new BootFoundryOnDataProviderMethodCalled();
             $subscribers[] = new ShutdownFoundryOnDataProviderMethodFinished();
         }
