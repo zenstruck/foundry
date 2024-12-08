@@ -92,6 +92,39 @@ jobs:
         run: ./phpunit
         shell: bash
 
+  test-with-paratest:
+    name: Test with paratest
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42'
+      MONGO_URL: ''
+      USE_DAMA_DOCTRINE_TEST_BUNDLE: 1
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          coverage: none
+          tools: flex
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v2
+        with:
+          dependency-versions: highest
+          composer-options: --prefer-dist
+        env:
+          SYMFONY_REQUIRE: 7.2.*
+
+      - name: Set up MySQL
+        run: sudo /etc/init.d/mysql start
+
+      - name: Test
+        run: vendor/bin/paratest --processes 1 --configuration phpunit-paratest.xml.dist
+        shell: bash
+
   code-coverage:
     name: Code Coverage
     runs-on: ubuntu-latest
