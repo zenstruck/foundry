@@ -18,7 +18,6 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  * @group maker
- * @requires PHP 8.1
  */
 abstract class MakerTestCase extends KernelTestCase
 {

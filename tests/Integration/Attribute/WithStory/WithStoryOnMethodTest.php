@@ -15,6 +15,7 @@ namespace Zenstruck\Foundry\Tests\Integration\Attribute\WithStory;
 
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Attribute\WithStory;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
@@ -28,9 +29,9 @@ use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit 11
+ * @requires PHPUnit ^11.0
  */
-#[RequiresPhpunit('11')]
+#[RequiresPhpunit('^11.0')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 final class WithStoryOnMethodTest extends KernelTestCase
 {
@@ -39,6 +40,7 @@ final class WithStoryOnMethodTest extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     #[WithStory(EntityStory::class)]
     public function can_use_story_in_attribute(): void
     {
@@ -51,6 +53,7 @@ final class WithStoryOnMethodTest extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     #[WithStory(EntityStory::class)]
     #[WithStory(EntityPoolStory::class)]
     public function can_use_multiple_story_in_attribute(): void
@@ -61,6 +64,7 @@ final class WithStoryOnMethodTest extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     #[WithStory(ServiceStory::class)]
     public function can_use_service_story(): void
     {

@@ -15,6 +15,7 @@ namespace Zenstruck\Foundry\Tests\Integration\Attribute\WithStory;
 
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Attribute\WithStory;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
@@ -27,9 +28,9 @@ use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit 11
+ * @requires PHPUnit ^11.0
  */
-#[RequiresPhpunit('11')]
+#[RequiresPhpunit('^11.0')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 #[WithStory(EntityStory::class)]
 final class WithStoryOnClassTest extends KernelTestCase
@@ -39,6 +40,7 @@ final class WithStoryOnClassTest extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_use_story_in_attribute(): void
     {
         GenericEntityFactory::assert()->count(2);
@@ -50,6 +52,7 @@ final class WithStoryOnClassTest extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     #[WithStory(EntityStory::class)]
     public function can_use_story_in_attribute_multiple_times(): void
     {
@@ -59,6 +62,7 @@ final class WithStoryOnClassTest extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     #[WithStory(EntityPoolStory::class)]
     public function can_use_another_story_at_level_class(): void
     {
