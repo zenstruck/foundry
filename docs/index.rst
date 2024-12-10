@@ -552,20 +552,24 @@ they were added.
     use Zenstruck\Foundry\Proxy;
 
     PostFactory::new()
-        ->beforeInstantiate(function(array $attributes): array {
+        ->beforeInstantiate(function(array $attributes, string $class, static $factory): array {
             // $attributes is what will be used to instantiate the object, manipulate as required
+            // $class is the class of the object being instantiated
+            // $factory is the factory instance which creates the object
             $attributes['title'] = 'Different title';
 
             return $attributes; // must return the final $attributes
         })
-        ->afterInstantiate(function(Post $object, array $attributes): void {
+        ->afterInstantiate(function(Post $object, array $attributes, static $factory): void {
             // $object is the instantiated object
             // $attributes contains the attributes used to instantiate the object and any extras
+            // $factory is the factory instance which creates the object
         })
-        ->afterPersist(function(Post $object, array $attributes) {
+        ->afterPersist(function(Post $object, array $attributes, static $factory) {
             // this event is only called if the object was persisted
             // $object is the persisted Post object
             // $attributes contains the attributes used to instantiate the object and any extras
+            // $factory is the factory instance which creates the object
         })
 
         // multiple events are allowed

@@ -24,10 +24,10 @@ use Zenstruck\Foundry\Object\Instantiator;
  */
 abstract class ObjectFactory extends Factory
 {
-    /** @phpstan-var list<callable(Parameters,class-string<T>):Parameters> */
+    /** @phpstan-var list<callable(Parameters, class-string<T>, static):Parameters> */
     private array $beforeInstantiate = [];
 
-    /** @phpstan-var list<callable(T,Parameters):void> */
+    /** @phpstan-var list<callable(T, Parameters, static):void> */
     private array $afterInstantiate = [];
 
     /** @phpstan-var InstantiatorCallable|null */
@@ -46,7 +46,7 @@ abstract class ObjectFactory extends Factory
         $parameters = $this->normalizeAttributes($attributes);
 
         foreach ($this->beforeInstantiate as $hook) {
-            $parameters = $hook($parameters, static::class());
+            $parameters = $hook($parameters, static::class(), $this);
 
             if (!\is_array($parameters)) {
                 throw new \LogicException('Before Instantiate hook callback must return a parameter array.');
@@ -59,7 +59,7 @@ abstract class ObjectFactory extends Factory
         $object = $instantiator($parameters, static::class());
 
         foreach ($this->afterInstantiate as $hook) {
-            $hook($object, $parameters);
+            $hook($object, $parameters, $this);
         }
 
         return $object;
@@ -80,7 +80,7 @@ abstract class ObjectFactory extends Factory
     }
 
     /**
-     * @phpstan-param callable(Parameters,class-string<T>):Parameters $callback
+     * @phpstan-param callable(Parameters, class-string<T>, static):Parameters $callback
      */
     final public function beforeInstantiate(callable $callback): static
     {
@@ -93,7 +93,7 @@ abstract class ObjectFactory extends Factory
     /**
      * @final
      *
-     * @phpstan-param callable(T,Parameters):void $callback
+     * @phpstan-param callable(T, Parameters, static):void $callback
      */
     public function afterInstantiate(callable $callback): static
     {
