@@ -36,7 +36,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
 {
     private bool $persist;
 
-    /** @phpstan-var list<callable(T, Parameters):void> */
+    /** @phpstan-var list<callable(T, Parameters, static):void> */
     private array $afterPersist = [];
 
     /** @var list<callable(T):void> */
@@ -220,7 +220,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
             $attributes = $this->normalizeAttributes($attributes);
 
             foreach ($this->afterPersist as $callback) {
-                $callback($object, $attributes);
+                $callback($object, $attributes, $this);
             }
 
             $configuration->persistence()->save($object);
@@ -246,7 +246,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
-     * @phpstan-param callable(T, Parameters):void $callback
+     * @phpstan-param callable(T, Parameters, static):void $callback
      */
     final public function afterPersist(callable $callback): static
     {
