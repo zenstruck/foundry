@@ -19,13 +19,15 @@ use Zenstruck\Foundry\Tests\Fixture\Model\Base;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-#[ORM\MappedSuperclass]
-abstract class Category extends Base
+#[ORM\Entity]
+class Category extends Base
 {
     /** @var Collection<int,Contact> */
+    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Contact::class)]
     protected Collection $contacts;
 
     /** @var Collection<int,Contact> */
+    #[ORM\OneToMany(mappedBy: 'secondaryCategory', targetEntity: Contact::class)]
     protected Collection $secondaryContacts;
 
     #[ORM\Column(length: 255)]

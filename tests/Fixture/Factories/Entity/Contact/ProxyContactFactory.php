@@ -12,20 +12,20 @@
 namespace Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact;
 
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Tests\Fixture\Entity\Contact\StandardContact;
+use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\ProxyAddressFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\ProxyCategoryFactory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
- * @extends PersistentProxyObjectFactory<StandardContact>
+ * @extends PersistentProxyObjectFactory<Contact>
  */
 final class ProxyContactFactory extends PersistentProxyObjectFactory
 {
     public static function class(): string
     {
-        return StandardContact::class;
+        return Contact::class;
     }
 
     protected function defaults(): array|callable

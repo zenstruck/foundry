@@ -13,11 +13,17 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpunit;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\ChangesEntityRelationshipCascadePersist;
+use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\UsingRelationships;
+use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\InversedOneToOneWithNonNullableOwning;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\ManyToOneToSelfReferencing;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\RelationshipWithGlobalEntity;
@@ -36,49 +42,45 @@ use function Zenstruck\Foundry\Persistence\proxy_factory;
  */
 final class EdgeCasesRelationshipTest extends KernelTestCase
 {
-    use Factories, RequiresORM, ResetDatabase;
+    use Factories, ChangesEntityRelationshipCascadePersist, RequiresORM, ResetDatabase;
 
-    /**
-     * @test
-     * @param PersistentObjectFactory<RelationshipWithGlobalEntity\RelationshipWithGlobalEntity> $relationshipWithGlobalEntityFactory
-     * @dataProvider relationshipWithGlobalEntityFactoryProvider
-     */
-    public function it_can_use_flush_after_and_entity_from_global_state(PersistentObjectFactory $relationshipWithGlobalEntityFactory, bool $asProxy): void
+    /** @test */
+    #[Test]
+    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[UsingRelationships(RelationshipWithGlobalEntity\RelationshipWithGlobalEntity::class, ['globalEntity'])]
+    #[RequiresPhpunit('11.4')]
+    public function it_can_use_flush_after_and_entity_from_global_state(): void
     {
+        $relationshipWithGlobalEntityFactory = persistent_factory(RelationshipWithGlobalEntity\RelationshipWithGlobalEntity::class);
         $globalEntitiesCount = persistent_factory(GlobalEntity::class)::repository()->count();
 
-        flush_after(function() use ($relationshipWithGlobalEntityFactory, $asProxy) {
-            $globalEntity = $asProxy ? GlobalStory::globalEntityProxy() : GlobalStory::globalEntity();
-            self::assertSame($asProxy, $globalEntity instanceof Proxy);
-
-            $relationshipWithGlobalEntityFactory->create(['globalEntity' => $globalEntity]);
+        flush_after(function() use ($relationshipWithGlobalEntityFactory) {
+            $relationshipWithGlobalEntityFactory->create(['globalEntity' => GlobalStory::globalEntityProxy()]);
+            $relationshipWithGlobalEntityFactory->create(['globalEntity' => GlobalStory::globalEntity()]);
         });
 
         // assert no extra GlobalEntity have been created
         persistent_factory(GlobalEntity::class)::assert()->count($globalEntitiesCount);
 
-        $relationshipWithGlobalEntityFactory::assert()->count(1);
+        $relationshipWithGlobalEntityFactory::assert()->count(2);
 
         $entity = $relationshipWithGlobalEntityFactory::repository()->first();
         self::assertSame(GlobalStory::globalEntity(), $entity?->getGlobalEntity());
+
+        $entity = $relationshipWithGlobalEntityFactory::repository()->last();
+        self::assertSame(GlobalStory::globalEntity(), $entity?->getGlobalEntity());
     }
 
-    public static function relationshipWithGlobalEntityFactoryProvider(): iterable
+    /** @test */
+    #[Test]
+    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[UsingRelationships(RichDomainMandatoryRelationship\OwningSide::class, ['main'])]
+    #[RequiresPhpunit('11.4')]
+    public function inversed_relationship_mandatory(): void
     {
-        yield [persistent_factory(RelationshipWithGlobalEntity\StandardRelationshipWithGlobalEntity::class), false];
-        yield [persistent_factory(RelationshipWithGlobalEntity\CascadeRelationshipWithGlobalEntity::class), false];
-        yield [persistent_factory(RelationshipWithGlobalEntity\StandardRelationshipWithGlobalEntity::class), true];
-        yield [persistent_factory(RelationshipWithGlobalEntity\CascadeRelationshipWithGlobalEntity::class), true];
-    }
+        $owningSideEntityFactory = persistent_factory(RichDomainMandatoryRelationship\OwningSide::class);
+        $inversedSideEntityFactory = persistent_factory(RichDomainMandatoryRelationship\InversedSide::class);
 
-    /**
-     * @test
-     * @param PersistentObjectFactory<RichDomainMandatoryRelationship\InversedSideEntity> $inversedSideEntityFactory
-     * @param PersistentObjectFactory<RichDomainMandatoryRelationship\OwningSideEntity>   $owningSideEntityFactory
-     * @dataProvider richDomainMandatoryRelationshipFactoryProvider
-     */
-    public function inversed_relationship_mandatory(PersistentObjectFactory $inversedSideEntityFactory, PersistentObjectFactory $owningSideEntityFactory): void
-    {
         $inversedSideEntity = $inversedSideEntityFactory->create([
             'relations' => $owningSideEntityFactory->many(2),
         ]);
@@ -86,26 +88,6 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
         $this->assertCount(2, $inversedSideEntity->getRelations());
         $owningSideEntityFactory::assert()->count(2);
         $inversedSideEntityFactory::assert()->count(1);
-    }
-
-    public static function richDomainMandatoryRelationshipFactoryProvider(): iterable
-    {
-        yield [
-            persistent_factory(RichDomainMandatoryRelationship\StandardInversedSideEntity::class),
-            persistent_factory(RichDomainMandatoryRelationship\StandardOwningSideEntity::class),
-        ];
-        yield [
-            proxy_factory(RichDomainMandatoryRelationship\CascadeInversedSideEntity::class),
-            proxy_factory(RichDomainMandatoryRelationship\CascadeOwningSideEntity::class),
-        ];
-        yield [
-            persistent_factory(RichDomainMandatoryRelationship\StandardInversedSideEntity::class),
-            persistent_factory(RichDomainMandatoryRelationship\StandardOwningSideEntity::class),
-        ];
-        yield [
-            proxy_factory(RichDomainMandatoryRelationship\CascadeInversedSideEntity::class),
-            proxy_factory(RichDomainMandatoryRelationship\CascadeOwningSideEntity::class),
-        ];
     }
 
     /**

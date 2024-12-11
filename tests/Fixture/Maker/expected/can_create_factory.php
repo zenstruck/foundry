@@ -9,15 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace App\Factory\Category;
+namespace App\Factory;
 
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Tests\Fixture\Entity\Category\StandardCategory;
+use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 
 /**
- * @extends PersistentProxyObjectFactory<StandardCategory>
+ * @extends PersistentProxyObjectFactory<Category>
  */
-final class StandardCategoryFactory extends PersistentProxyObjectFactory
+final class CategoryFactory extends PersistentProxyObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -30,7 +30,7 @@ final class StandardCategoryFactory extends PersistentProxyObjectFactory
 
     public static function class(): string
     {
-        return StandardCategory::class;
+        return Category::class;
     }
 
     /**
@@ -51,7 +51,7 @@ final class StandardCategoryFactory extends PersistentProxyObjectFactory
     protected function initialize(): static
     {
         return $this
-            // ->afterInstantiate(function(StandardCategory $standardCategory): void {})
+            // ->afterInstantiate(function(Category $category): void {})
         ;
     }
 }

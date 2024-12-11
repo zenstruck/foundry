@@ -19,19 +19,30 @@ use Zenstruck\Foundry\Tests\Fixture\Model\Base;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-#[ORM\MappedSuperclass]
-abstract class Contact extends Base
+#[ORM\Entity]
+#[ORM\InheritanceType(value: 'SINGLE_TABLE')]
+#[ORM\DiscriminatorColumn(name: 'type')]
+#[ORM\DiscriminatorMap(['simple' => Contact::class, 'specific' => ChildContact::class])]
+class Contact extends Base
 {
+    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'contacts')]
+    #[ORM\JoinColumn(nullable: true)]
     protected ?Category $category = null;
 
+    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'secondaryContacts')]
     protected ?Category $secondaryCategory = null;
 
     /** @var Collection<int,Tag> */
+    #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: 'contacts')]
     protected Collection $tags;
 
     /** @var Collection<int,Tag> */
+    #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: 'secondaryContacts')]
+    #[ORM\JoinTable(name: 'category_tag_standard_secondary')]
     protected Collection $secondaryTags;
 
+    #[ORM\OneToOne(targetEntity: Address::class, inversedBy: 'contact')]
+    #[ORM\JoinColumn(nullable: false)]
     protected Address $address;
 
     #[ORM\Column(length: 255)]

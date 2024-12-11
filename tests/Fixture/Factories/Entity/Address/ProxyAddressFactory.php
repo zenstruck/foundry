@@ -12,18 +12,18 @@
 namespace Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address;
 
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Tests\Fixture\Entity\Address\StandardAddress;
+use Zenstruck\Foundry\Tests\Fixture\Entity\Address;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
- * @extends PersistentProxyObjectFactory<StandardAddress>
+ * @extends PersistentProxyObjectFactory<Address>
  */
 final class ProxyAddressFactory extends PersistentProxyObjectFactory
 {
     public static function class(): string
     {
-        return StandardAddress::class;
+        return Address::class;
     }
 
     protected function defaults(): array|callable

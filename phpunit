@@ -63,7 +63,7 @@ case ${PHPUNIT_VERSION} in
     ;;
 
   "11")
-    PHPUNIT_EXEC="${PHPUNIT_EXEC} -c phpunit-10.xml.dist"
+    PHPUNIT_EXEC="${PHPUNIT_EXEC} -c phpunit-10.xml.dist --extension Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\PhpUnitTestExtension"
 
     if [ "${USE_DAMA_DOCTRINE_TEST_BUNDLE:-0}" = "1" ]; then
       PHPUNIT_EXEC="${PHPUNIT_EXEC} --extension "${DAMA_EXTENSION}""

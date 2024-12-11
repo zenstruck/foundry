@@ -9,16 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace App\Factory\Contact;
+namespace App\Factory;
 
-use App\Factory\Address\StandardAddressFactory;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Tests\Fixture\Entity\Contact\StandardContact;
+use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 
 /**
- * @extends PersistentProxyObjectFactory<StandardContact>
+ * @extends PersistentProxyObjectFactory<Contact>
  */
-final class StandardContactFactory extends PersistentProxyObjectFactory
+final class ContactFactory extends PersistentProxyObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -31,7 +30,7 @@ final class StandardContactFactory extends PersistentProxyObjectFactory
 
     public static function class(): string
     {
-        return StandardContact::class;
+        return Contact::class;
     }
 
     /**
@@ -42,7 +41,7 @@ final class StandardContactFactory extends PersistentProxyObjectFactory
     protected function defaults(): array|callable
     {
         return [
-            'address' => StandardAddressFactory::new(),
+            'address' => AddressFactory::new(),
             'name' => self::faker()->text(255),
         ];
     }
@@ -53,7 +52,7 @@ final class StandardContactFactory extends PersistentProxyObjectFactory
     protected function initialize(): static
     {
         return $this
-            // ->afterInstantiate(function(StandardContact $standardContact): void {})
+            // ->afterInstantiate(function(Contact $contact): void {})
         ;
     }
 }

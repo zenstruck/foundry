@@ -12,18 +12,18 @@
 namespace Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category;
 
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Tests\Fixture\Entity\Category\StandardCategory;
+use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
- * @extends PersistentProxyObjectFactory<StandardCategory>
+ * @extends PersistentProxyObjectFactory<Category>
  */
 final class ProxyCategoryFactory extends PersistentProxyObjectFactory
 {
     public static function class(): string
     {
-        return StandardCategory::class;
+        return Category::class;
     }
 
     protected function defaults(): array|callable

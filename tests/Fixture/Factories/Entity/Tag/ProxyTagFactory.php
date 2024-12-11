@@ -12,18 +12,18 @@
 namespace Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Tag;
 
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Tests\Fixture\Entity\Tag\StandardTag;
+use Zenstruck\Foundry\Tests\Fixture\Entity\Tag;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
- * @extends PersistentProxyObjectFactory<StandardTag>
+ * @extends PersistentProxyObjectFactory<Tag>
  */
 final class ProxyTagFactory extends PersistentProxyObjectFactory
 {
     public static function class(): string
     {
-        return StandardTag::class;
+        return Tag::class;
     }
 
     protected function defaults(): array|callable

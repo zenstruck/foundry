@@ -9,50 +9,50 @@
  * file that was distributed with this source code.
  */
 
-namespace App\Tests\Factory\Category;
+namespace App\Tests\Factory;
 
 use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
-use Zenstruck\Foundry\Tests\Fixture\Entity\Category\StandardCategory;
+use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 
 /**
- * @extends PersistentProxyObjectFactory<StandardCategory>
+ * @extends PersistentProxyObjectFactory<Category>
  *
- * @method        StandardCategory|Proxy                    create(array|callable $attributes = [])
- * @method static StandardCategory|Proxy                    createOne(array $attributes = [])
- * @method static StandardCategory|Proxy                    find(object|array|mixed $criteria)
- * @method static StandardCategory|Proxy                    findOrCreate(array $attributes)
- * @method static StandardCategory|Proxy                    first(string $sortBy = 'id')
- * @method static StandardCategory|Proxy                    last(string $sortBy = 'id')
- * @method static StandardCategory|Proxy                    random(array $attributes = [])
- * @method static StandardCategory|Proxy                    randomOrCreate(array $attributes = [])
+ * @method        Category|Proxy                            create(array|callable $attributes = [])
+ * @method static Category|Proxy                            createOne(array $attributes = [])
+ * @method static Category|Proxy                            find(object|array|mixed $criteria)
+ * @method static Category|Proxy                            findOrCreate(array $attributes)
+ * @method static Category|Proxy                            first(string $sortBy = 'id')
+ * @method static Category|Proxy                            last(string $sortBy = 'id')
+ * @method static Category|Proxy                            random(array $attributes = [])
+ * @method static Category|Proxy                            randomOrCreate(array $attributes = [])
  * @method static EntityRepository|ProxyRepositoryDecorator repository()
- * @method static StandardCategory[]|Proxy[]                all()
- * @method static StandardCategory[]|Proxy[]                createMany(int $number, array|callable $attributes = [])
- * @method static StandardCategory[]|Proxy[]                createSequence(iterable|callable $sequence)
- * @method static StandardCategory[]|Proxy[]                findBy(array $attributes)
- * @method static StandardCategory[]|Proxy[]                randomRange(int $min, int $max, array $attributes = [])
- * @method static StandardCategory[]|Proxy[]                randomSet(int $number, array $attributes = [])
+ * @method static Category[]|Proxy[]                        all()
+ * @method static Category[]|Proxy[]                        createMany(int $number, array|callable $attributes = [])
+ * @method static Category[]|Proxy[]                        createSequence(iterable|callable $sequence)
+ * @method static Category[]|Proxy[]                        findBy(array $attributes)
+ * @method static Category[]|Proxy[]                        randomRange(int $min, int $max, array $attributes = [])
+ * @method static Category[]|Proxy[]                        randomSet(int $number, array $attributes = [])
  *
- * @phpstan-method        StandardCategory&Proxy<StandardCategory> create(array|callable $attributes = [])
- * @phpstan-method static StandardCategory&Proxy<StandardCategory> createOne(array $attributes = [])
- * @phpstan-method static StandardCategory&Proxy<StandardCategory> find(object|array|mixed $criteria)
- * @phpstan-method static StandardCategory&Proxy<StandardCategory> findOrCreate(array $attributes)
- * @phpstan-method static StandardCategory&Proxy<StandardCategory> first(string $sortBy = 'id')
- * @phpstan-method static StandardCategory&Proxy<StandardCategory> last(string $sortBy = 'id')
- * @phpstan-method static StandardCategory&Proxy<StandardCategory> random(array $attributes = [])
- * @phpstan-method static StandardCategory&Proxy<StandardCategory> randomOrCreate(array $attributes = [])
- * @phpstan-method static ProxyRepositoryDecorator<StandardCategory, EntityRepository> repository()
- * @phpstan-method static list<StandardCategory&Proxy<StandardCategory>> all()
- * @phpstan-method static list<StandardCategory&Proxy<StandardCategory>> createMany(int $number, array|callable $attributes = [])
- * @phpstan-method static list<StandardCategory&Proxy<StandardCategory>> createSequence(iterable|callable $sequence)
- * @phpstan-method static list<StandardCategory&Proxy<StandardCategory>> findBy(array $attributes)
- * @phpstan-method static list<StandardCategory&Proxy<StandardCategory>> randomRange(int $min, int $max, array $attributes = [])
- * @phpstan-method static list<StandardCategory&Proxy<StandardCategory>> randomSet(int $number, array $attributes = [])
+ * @phpstan-method        Category&Proxy<Category> create(array|callable $attributes = [])
+ * @phpstan-method static Category&Proxy<Category> createOne(array $attributes = [])
+ * @phpstan-method static Category&Proxy<Category> find(object|array|mixed $criteria)
+ * @phpstan-method static Category&Proxy<Category> findOrCreate(array $attributes)
+ * @phpstan-method static Category&Proxy<Category> first(string $sortBy = 'id')
+ * @phpstan-method static Category&Proxy<Category> last(string $sortBy = 'id')
+ * @phpstan-method static Category&Proxy<Category> random(array $attributes = [])
+ * @phpstan-method static Category&Proxy<Category> randomOrCreate(array $attributes = [])
+ * @phpstan-method static ProxyRepositoryDecorator<Category, EntityRepository> repository()
+ * @phpstan-method static list<Category&Proxy<Category>> all()
+ * @phpstan-method static list<Category&Proxy<Category>> createMany(int $number, array|callable $attributes = [])
+ * @phpstan-method static list<Category&Proxy<Category>> createSequence(iterable|callable $sequence)
+ * @phpstan-method static list<Category&Proxy<Category>> findBy(array $attributes)
+ * @phpstan-method static list<Category&Proxy<Category>> randomRange(int $min, int $max, array $attributes = [])
+ * @phpstan-method static list<Category&Proxy<Category>> randomSet(int $number, array $attributes = [])
  */
-final class StandardCategoryFactory extends PersistentProxyObjectFactory
+final class CategoryFactory extends PersistentProxyObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -65,7 +65,7 @@ final class StandardCategoryFactory extends PersistentProxyObjectFactory
 
     public static function class(): string
     {
-        return StandardCategory::class;
+        return Category::class;
     }
 
     /**
@@ -86,7 +86,7 @@ final class StandardCategoryFactory extends PersistentProxyObjectFactory
     protected function initialize(): static
     {
         return $this
-            // ->afterInstantiate(function(StandardCategory $standardCategory): void {})
+            // ->afterInstantiate(function(Category $category): void {})
         ;
     }
 }

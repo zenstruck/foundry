@@ -15,18 +15,15 @@ namespace Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\RelationshipWithGloba
 
 use Doctrine\ORM\Mapping as ORM;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GlobalEntity;
+use Zenstruck\Foundry\Tests\Fixture\Model\Base;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-#[ORM\MappedSuperclass]
-abstract class RelationshipWithGlobalEntity
+#[ORM\Entity]
+class RelationshipWithGlobalEntity extends Base
 {
-    #[ORM\Id]
-    #[ORM\Column]
-    #[ORM\GeneratedValue(strategy: 'AUTO')]
-    public ?int $id = null;
-
+    #[ORM\ManyToOne(targetEntity: GlobalEntity::class)]
     protected ?GlobalEntity $globalEntity = null;
 
     public function setGlobalEntity(?GlobalEntity $globalEntity): void

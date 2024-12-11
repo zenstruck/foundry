@@ -17,8 +17,8 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Zenstruck\Foundry\Maker\Factory\FactoryGenerator;
 use Zenstruck\Foundry\Tests\Fixture\Document\GenericDocument;
 use Zenstruck\Foundry\Tests\Fixture\Document\WithEmbeddableDocument;
-use Zenstruck\Foundry\Tests\Fixture\Entity\Category\StandardCategory;
-use Zenstruck\Foundry\Tests\Fixture\Entity\Contact\StandardContact;
+use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
+use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithEmbeddableEntity;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
@@ -66,13 +66,13 @@ final class MakeFactoryTest extends MakerTestCase
 
         $tester = $this->makeFactoryCommandTester();
 
-        $tester->execute(['class' => StandardCategory::class]);
+        $tester->execute(['class' => Category::class]);
 
         $output = $tester->getDisplay();
 
         $this->assertStringContainsString('Note: pass --test if you want to generate factories in your tests/ directory', $output);
 
-        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/Category/StandardCategoryFactory.php'));
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/CategoryFactory.php'));
     }
 
     /**
@@ -87,19 +87,19 @@ final class MakeFactoryTest extends MakerTestCase
         $tester = $this->makeFactoryCommandTester();
 
         $tester->setInputs([
-            StandardContact::class, // which class to create a factory for?
-            'yes', // should create PostFactory for StandardContact::$address?
+            Contact::class, // which class to create a factory for?
+            'yes', // should create PostFactory for Contact::$address?
         ]);
         $tester->execute([], ['interactive' => true]);
 
         $output = $tester->getDisplay();
         $this->assertStringContainsString(
-            'A factory for class "Zenstruck\Foundry\Tests\Fixture\Entity\Address\StandardAddress" is missing for field StandardContact::$address. Do you want to create it?',
+            'A factory for class "Zenstruck\Foundry\Tests\Fixture\Entity\Address" is missing for field Contact::$address. Do you want to create it?',
             $output,
         );
 
-        $this->assertFileExists(self::tempFile('src/Factory/Address/StandardAddressFactory.php'));
-        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/Contact/StandardContactFactory.php'));
+        $this->assertFileExists(self::tempFile('src/Factory/AddressFactory.php'));
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/ContactFactory.php'));
     }
 
     /**
@@ -113,9 +113,9 @@ final class MakeFactoryTest extends MakerTestCase
 
         $tester = $this->makeFactoryCommandTester();
 
-        $tester->execute(['class' => StandardCategory::class, '--test' => true]);
+        $tester->execute(['class' => Category::class, '--test' => true]);
 
-        $this->assertFileExists(self::tempFile('tests/Factory/Category/StandardCategoryFactory.php'));
+        $this->assertFileExists(self::tempFile('tests/Factory/CategoryFactory.php'));
     }
 
     /**
@@ -132,9 +132,9 @@ final class MakeFactoryTest extends MakerTestCase
 
         $tester = $this->makeFactoryCommandTester();
 
-        $tester->execute(['class' => StandardCategory::class, '--test' => true, '--with-phpdoc' => true]);
+        $tester->execute(['class' => Category::class, '--test' => true, '--with-phpdoc' => true]);
 
-        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('tests/Factory/Category/StandardCategoryFactory.php'));
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('tests/Factory/CategoryFactory.php'));
     }
 
     /**

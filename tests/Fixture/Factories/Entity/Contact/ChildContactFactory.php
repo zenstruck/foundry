@@ -11,9 +11,9 @@
 
 namespace Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact;
 
-use Zenstruck\Foundry\Tests\Fixture\Entity\Contact\ChildContact;
+use Zenstruck\Foundry\Tests\Fixture\Entity\ChildContact;
 
-final class ChildContactFactory extends StandardContactFactory
+final class ChildContactFactory extends ContactFactory
 {
     public static function class(): string
     {

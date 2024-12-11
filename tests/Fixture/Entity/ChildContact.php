@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
+namespace Zenstruck\Foundry\Tests\Fixture\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-class ChildContact extends StandardContact
+class ChildContact extends Contact
 {
 }

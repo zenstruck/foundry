@@ -11,17 +11,20 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\ORM\EntityRelationship;
 
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\StandardAddressFactory;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\StandardCategoryFactory;
+use PHPUnit\Framework\Attributes\RequiresPhpunit;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\AddressFactory;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ChildContactFactory;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Tag\StandardTagFactory;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Tag\TagFactory;
 
 /**
  * tests behavior with inheritance.
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ * @requires PHPUnit ^11.4
  */
+#[RequiresPhpunit('^11.4')]
 final class PolymorphicEntityFactoryRelationshipTest extends EntityFactoryRelationshipTestCase
 {
     protected static function contactFactory(): ChildContactFactory
@@ -29,18 +32,18 @@ final class PolymorphicEntityFactoryRelationshipTest extends EntityFactoryRelati
         return ChildContactFactory::new();
     }
 
-    protected static function categoryFactory(): StandardCategoryFactory
+    protected static function categoryFactory(): CategoryFactory
     {
-        return StandardCategoryFactory::new();
+        return CategoryFactory::new();
     }
 
-    protected static function tagFactory(): StandardTagFactory
+    protected static function tagFactory(): TagFactory
     {
-        return StandardTagFactory::new();
+        return TagFactory::new();
     }
 
-    protected static function addressFactory(): StandardAddressFactory
+    protected static function addressFactory(): AddressFactory
     {
-        return StandardAddressFactory::new();
+        return AddressFactory::new();
     }
 }

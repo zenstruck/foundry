@@ -10,6 +10,9 @@ use Doctrine\ORM\Events;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ *
+ * This class changes the "cascade persist" value of a doctrine relationship.
+ * @see ChangesEntityRelationshipCascadePersist
  */
 #[AsDoctrineListener(event: Events::loadClassMetadata)]
 final class ChangeCascadePersistOnLoadClassMetadataListener
@@ -31,7 +34,7 @@ final class ChangeCascadePersistOnLoadClassMetadataListener
 
         foreach ($this->metadata as $metadatum) {
             if ($classMetadata->getName() === $metadatum->class) {
-                $classMetadata->getAssociationMapping($metadatum->field)->cascade = $metadatum->cascade ? ['persist'] : [];
+                $classMetadata->getAssociationMapping($metadatum->field)['cascade'] = $metadatum->cascade ? ['persist'] : [];
             }
         }
     }

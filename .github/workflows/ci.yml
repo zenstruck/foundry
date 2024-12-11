@@ -8,7 +8,7 @@ on:
 
 jobs:
   tests:
-    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}, PU:${{ matrix.phpunit || 9 }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.without-dama == 0 && contains(matrix.database, 'sql') && ' (dama)' || '' }}${{ matrix.use-phpunit-extension == 1 && ' (phpunit extension)' || '' }}
+    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}, PU:${{ matrix.phpunit }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.without-dama == 0 && contains(matrix.database, 'sql') && ' (dama)' || '' }}${{ matrix.use-phpunit-extension == 1 && ' (phpunit extension)' || '' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -16,34 +16,34 @@ jobs:
         php: [ 8.1, 8.2, 8.3, 8.4 ]
         symfony: [ 6.4.*, 7.1.*, 7.2.* ]
         database: [ mysql, mongo ]
+        phpunit: [ 9, 11 ]
 
         # default values:
         # deps: [ highest ]
         # without-dama: [ 0 ]
         # use-phpunit-extension: [ 0 ]
-        # phpunit: [ 9 ]
 
         exclude:
           - {php: 8.1, symfony: 7.1.*}
           - {php: 8.1, symfony: 7.2.*}
+          - {php: 8.1, phpunit: 11 }
         include:
-          - {php: 8.3, symfony: '*', database: none}
-          - {php: 8.3, symfony: '*', database: mysql|mongo}
-          - {php: 8.3, symfony: '*', database: pgsql|mongo}
-          - {php: 8.3, symfony: '*', database: pgsql, without-dama: 1}
-          - {php: 8.3, symfony: '*', database: sqlite, without-dama: 1}
-          - {php: 8.3, symfony: '*', database: sqlite, without-dama: 1, deps: lowest}
-          - {php: 8.3, symfony: '*', database: mysql, deps: lowest}
-          - {php: 8.3, symfony: '*', database: mysql|mongo, phpunit: 10}
-          - {php: 8.3, symfony: '*', database: mysql|mongo, phpunit: 11}
-          - {php: 8.3, symfony: '*', database: mysql|mongo, use-phpunit-extension: 1, phpunit: 11}
-          - {php: 8.3, symfony: '*', database: mysql|mongo, use-phpunit-extension: 1, phpunit: 11, without-dama: 1}
+          - {php: 8.3, symfony: '*', phpunit: 9, database: none}
+          - {php: 8.3, symfony: '*', phpunit: 11, database: mysql|mongo}
+          - {php: 8.3, symfony: '*', phpunit: 11, database: pgsql|mongo}
+          - {php: 8.3, symfony: '*', phpunit: 11, database: pgsql, without-dama: 1}
+          - {php: 8.3, symfony: '*', phpunit: 11, database: sqlite, without-dama: 1}
+          - {php: 8.3, symfony: '*', phpunit: 9, database: sqlite, without-dama: 1, deps: lowest}
+          - {php: 8.3, symfony: '*', phpunit: 9, database: mysql, deps: lowest}
+          - {php: 8.3, symfony: '*', phpunit: 10, database: mysql|mongo}
+          - {php: 8.3, symfony: '*', phpunit: 11, database: mysql|mongo, use-phpunit-extension: 1}
+          - {php: 8.3, symfony: '*', phpunit: 11, database: mysql|mongo, use-phpunit-extension: 1, without-dama: 1}
     env:
       DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || contains(matrix.database, 'sqlite') && 'sqlite:///%kernel.project_dir%/var/data.db' || '' }}
       MONGO_URL: ${{ contains(matrix.database, 'mongo') && 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb' || '' }}
       USE_DAMA_DOCTRINE_TEST_BUNDLE: ${{ matrix.without-dama == 0 && contains(matrix.database, 'sql') && 1 || 0 }}
       USE_FOUNDRY_PHPUNIT_EXTENSION: ${{ matrix.use-phpunit-extension || 0 }}
-      PHPUNIT_VERSION: ${{ matrix.phpunit || 9 }}
+      PHPUNIT_VERSION: ${{ matrix.phpunit }}
     services:
       postgres:
         image: ${{ contains(matrix.database, 'pgsql') && 'postgres:15' || '' }}

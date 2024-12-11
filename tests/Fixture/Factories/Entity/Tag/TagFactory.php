@@ -9,27 +9,27 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address;
+namespace Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Tag;
 
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Tests\Fixture\Entity\Address\CascadeAddress;
+use Zenstruck\Foundry\Tests\Fixture\Entity\Tag;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
- * @extends PersistentObjectFactory<CascadeAddress>
+ * @extends PersistentObjectFactory<Tag>
  */
-final class CascadeAddressFactory extends PersistentObjectFactory
+final class TagFactory extends PersistentObjectFactory
 {
     public static function class(): string
     {
-        return CascadeAddress::class;
+        return Tag::class;
     }
 
     protected function defaults(): array|callable
     {
         return [
-            'city' => self::faker()->city(),
+            'name' => self::faker()->word(),
         ];
     }
 }

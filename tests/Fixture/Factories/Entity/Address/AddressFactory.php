@@ -11,19 +11,19 @@
 
 namespace Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address;
 
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Tests\Fixture\Entity\Address\CascadeAddress;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+use Zenstruck\Foundry\Tests\Fixture\Entity\Address;
 
 /**
- * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ * @author Kevin Bond <kevinbond@gmail.com>
  *
- * @extends PersistentProxyObjectFactory<CascadeAddress>
+ * @extends PersistentObjectFactory<Address>
  */
-final class ProxyCascadeAddressFactory extends PersistentProxyObjectFactory
+final class AddressFactory extends PersistentObjectFactory
 {
     public static function class(): string
     {
-        return CascadeAddress::class;
+        return Address::class;
     }
 
     protected function defaults(): array|callable

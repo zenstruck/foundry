@@ -19,13 +19,13 @@ use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\UnitTestConfig;
-use Zenstruck\Foundry\Tests\Fixture\Entity\Category\StandardCategory;
+use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\ProxyAddressFactory;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\StandardCategoryFactory;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ProxyContactFactory;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\StandardContactFactory;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericProxyEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
 
@@ -116,7 +116,7 @@ final class FactoryTest extends TestCase
     public function proxy_attributes_can_be_used_in_unit_test(): void
     {
         $object = ProxyContactFactory::createOne([
-            'category' => proxy(new StandardCategory('name')),
+            'category' => proxy(new Category('name')),
             'address' => ProxyAddressFactory::new(),
         ]);
 
@@ -128,11 +128,11 @@ final class FactoryTest extends TestCase
      */
     public function instantiating_with_factory_attribute_instantiates_the_factory(): void
     {
-        $object = StandardContactFactory::createOne([
-            'category' => StandardCategoryFactory::new(),
+        $object = ContactFactory::createOne([
+            'category' => CategoryFactory::new(),
         ]);
 
-        $this->assertInstanceOf(StandardCategory::class, $object->getCategory());
+        $this->assertInstanceOf(Category::class, $object->getCategory());
     }
 
     /**
@@ -141,9 +141,9 @@ final class FactoryTest extends TestCase
     public function instantiating_with_proxy_attribute_normalizes_to_underlying_object(): void
     {
         $object = ProxyContactFactory::createOne([
-            'category' => proxy(new StandardCategory('name')),
+            'category' => proxy(new Category('name')),
         ]);
 
-        $this->assertInstanceOf(StandardCategory::class, $object->getCategory());
+        $this->assertInstanceOf(Category::class, $object->getCategory());
     }
 }

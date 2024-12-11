@@ -9,21 +9,21 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Tag;
+namespace Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category;
 
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Tests\Fixture\Entity\Tag\CascadeTag;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 
 /**
- * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ * @author Kevin Bond <kevinbond@gmail.com>
  *
- * @extends PersistentProxyObjectFactory<CascadeTag>
+ * @extends PersistentObjectFactory<Category>
  */
-final class ProxyCascadeTagFactory extends PersistentProxyObjectFactory
+final class CategoryFactory extends PersistentObjectFactory
 {
     public static function class(): string
     {
-        return CascadeTag::class;
+        return Category::class;
     }
 
     protected function defaults(): array|callable

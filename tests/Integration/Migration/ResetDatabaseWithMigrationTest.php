@@ -21,7 +21,7 @@ use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GlobalEntity;
 use Zenstruck\Foundry\Tests\Fixture\EntityInAnotherSchema\Article;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\StandardContactFactory;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
 use Zenstruck\Foundry\Tests\Fixture\MigrationTests\TestMigrationKernel;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
@@ -62,11 +62,11 @@ final class ResetDatabaseWithMigrationTest extends KernelTestCase
      */
     public function it_can_store_object(): void
     {
-        StandardContactFactory::assert()->count(0);
+        ContactFactory::assert()->count(0);
 
-        StandardContactFactory::createOne();
+        ContactFactory::createOne();
 
-        StandardContactFactory::assert()->count(1);
+        ContactFactory::assert()->count(1);
     }
 
     /**
@@ -75,7 +75,7 @@ final class ResetDatabaseWithMigrationTest extends KernelTestCase
      */
     public function it_starts_from_fresh_db(): void
     {
-        StandardContactFactory::assert()->count(0);
+        ContactFactory::assert()->count(0);
     }
 
     /**

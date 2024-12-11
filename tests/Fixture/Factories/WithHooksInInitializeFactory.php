@@ -14,17 +14,17 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Fixture\Factories;
 
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Tests\Fixture\Entity\Address\StandardAddress;
+use Zenstruck\Foundry\Tests\Fixture\Entity\Address;
 
 /**
  * @author Nicolas Philippe <nikophil@gmail.com>
- * @extends PersistentObjectFactory<StandardAddress>
+ * @extends PersistentObjectFactory<Address>
  */
 final class WithHooksInInitializeFactory extends PersistentObjectFactory
 {
     public static function class(): string
     {
-        return StandardAddress::class;
+        return Address::class;
     }
 
     protected function defaults(): array|callable
@@ -47,7 +47,7 @@ final class WithHooksInInitializeFactory extends PersistentObjectFactory
                 }
             )
             ->afterInstantiate(
-                function(StandardAddress $object, array $parameters, WithHooksInInitializeFactory $factory) {
+                function(Address $object, array $parameters, WithHooksInInitializeFactory $factory) {
                     if (!$factory->isPersisting()) {
                         $object->setCity("{$object->getCity()} - afterInstantiate");
                     }

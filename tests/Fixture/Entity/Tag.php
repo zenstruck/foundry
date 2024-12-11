@@ -19,13 +19,15 @@ use Zenstruck\Foundry\Tests\Fixture\Model\Base;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-#[ORM\MappedSuperclass]
-abstract class Tag extends Base
+#[ORM\Entity]
+class Tag extends Base
 {
     /** @var Collection<int,Contact> */
+    #[ORM\ManyToMany(targetEntity: Contact::class, mappedBy: 'tags', fetch: 'EAGER')]
     protected Collection $contacts;
 
     /** @var Collection<int,Contact> */
+    #[ORM\ManyToMany(targetEntity: Contact::class, mappedBy: 'secondaryTags')]
     protected Collection $secondaryContacts;
 
     #[ORM\Column(length: 255)]
