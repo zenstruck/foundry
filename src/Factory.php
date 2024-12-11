@@ -50,7 +50,10 @@ abstract class Factory
             throw new \LogicException('Factories with dependencies (services) cannot be created before foundry is booted.', previous: $e);
         }
 
-        return $factory->initialize()->with($attributes);
+        return $factory
+            ->initializeInternal()
+            ->initialize()
+            ->with($attributes);
     }
 
     /**
@@ -178,6 +181,14 @@ abstract class Factory
      * Override to adjust default attributes & config.
      */
     protected function initialize(): static
+    {
+        return $this;
+    }
+
+    /**
+     * @internal
+     */
+    protected function initializeInternal(): static
     {
         return $this;
     }

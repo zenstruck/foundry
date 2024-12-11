@@ -334,6 +334,29 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
     }
 
     /**
+     * @test
+     */
+    public function ensure_one_to_many_cascade_relations_are_not_pre_persisted(): void
+    {
+        $category = static::categoryFactory()
+            ->afterInstantiate(function() {
+                static::contactFactory()::repository()->assert()->empty();
+                static::addressFactory()::repository()->assert()->empty();
+                static::tagFactory()::repository()->assert()->empty();
+            })
+            ->create([
+                'contacts' => static::contactFactory()->many(3),
+            ])
+        ;
+
+        $this->assertCount(3, $category->getContacts());
+
+        foreach ($category->getContacts() as $contact) {
+            $this->assertNotNull($contact->id);
+        }
+    }
+
+    /**
      * @return PersistentObjectFactory<Contact>
      */
     abstract protected static function contactFactory(): PersistentObjectFactory;

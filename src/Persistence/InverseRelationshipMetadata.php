@@ -16,13 +16,11 @@ namespace Zenstruck\Foundry\Persistence;
  *
  * @internal
  */
-final class RelationshipMetadata
+final class InverseRelationshipMetadata
 {
     public function __construct(
-        public readonly bool $isCascadePersist,
-        public readonly ?string $inverseField,
+        public readonly string $inverseField,
         public readonly bool $isCollection,
-        public readonly bool $isOneToOne,
     ) {
     }
 }

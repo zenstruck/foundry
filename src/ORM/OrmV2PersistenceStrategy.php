@@ -16,7 +16,7 @@ namespace Zenstruck\Foundry\ORM;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 use Doctrine\Persistence\Mapping\MappingException;
-use Zenstruck\Foundry\Persistence\RelationshipMetadata;
+use Zenstruck\Foundry\Persistence\InverseRelationshipMetadata;
 
 /**
  * @internal
@@ -25,35 +25,25 @@ use Zenstruck\Foundry\Persistence\RelationshipMetadata;
  */
 final class OrmV2PersistenceStrategy extends AbstractORMPersistenceStrategy
 {
-    public function relationshipMetadata(string $parent, string $child, string $field): ?RelationshipMetadata
+    public function inversedRelationshipMetadata(string $parent, string $child, string $field): ?InverseRelationshipMetadata
     {
-        $metadata = $this->classMetadata($parent);
+        $metadata = $this->classMetadata($child);
 
-        $association = $this->getAssociationMapping($parent, $child, $field);
-
-        if ($association) {
-            return new RelationshipMetadata(
-                isCascadePersist: $association['isCascadePersist'],
-                inverseField: $metadata->isSingleValuedAssociation($association['fieldName']) ? $association['fieldName'] : null,
-                isCollection: $metadata->isCollectionValuedAssociation($association['fieldName']),
-                isOneToOne: ClassMetadataInfo::ONE_TO_ONE === $association['type']
-            );
-        }
-
-        $inversedAssociation = $this->getAssociationMapping($child, $parent, $field);
+        $inversedAssociation = $this->getAssociationMapping($parent, $child, $field);
 
         if (null === $inversedAssociation || !$metadata instanceof ClassMetadataInfo) {
             return null;
         }
 
         if (!\is_a(
-            $parent,
+            $child,
             $inversedAssociation['targetEntity'],
             allow_string: true
         )) { // is_a() handles inheritance as well
             throw new \LogicException("Cannot find correct association named \"{$field}\" between classes [parent: \"{$parent}\", child: \"{$child}\"]");
         }
 
+        // exclude "owning" side of the association (owning OneToOne or ManyToOne)
         if (!\in_array(
             $inversedAssociation['type'],
             [ClassMetadataInfo::ONE_TO_MANY, ClassMetadataInfo::ONE_TO_ONE],
@@ -65,13 +55,17 @@ final class OrmV2PersistenceStrategy extends AbstractORMPersistenceStrategy
         }
 
         $association = $metadata->getAssociationMapping($inversedAssociation['mappedBy']);
+
+        // only keep *ToOne associations
+        if (!$metadata->isSingleValuedAssociation($association['fieldName'])) {
+            return null;
+        }
+
         $inversedAssociationMetadata = $this->classMetadata($inversedAssociation['sourceEntity']);
 
-        return new RelationshipMetadata(
-            isCascadePersist: $inversedAssociation['isCascadePersist'],
-            inverseField: $metadata->isSingleValuedAssociation($association['fieldName']) ? $association['fieldName'] : null,
+        return new InverseRelationshipMetadata(
+            inverseField: $association['fieldName'],
             isCollection: $inversedAssociationMetadata->isCollectionValuedAssociation($inversedAssociation['fieldName']),
-            isOneToOne: ClassMetadataInfo::ONE_TO_ONE === $inversedAssociation['type']
         );
     }
 

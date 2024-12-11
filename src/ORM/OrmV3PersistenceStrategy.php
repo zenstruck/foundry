@@ -20,50 +20,43 @@ use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 use Doctrine\ORM\Mapping\OneToOneAssociationMapping;
 use Doctrine\ORM\Mapping\ToManyAssociationMapping;
 use Doctrine\Persistence\Mapping\MappingException;
-use Zenstruck\Foundry\Persistence\RelationshipMetadata;
+use Zenstruck\Foundry\Persistence\InverseRelationshipMetadata;
 
 final class OrmV3PersistenceStrategy extends AbstractORMPersistenceStrategy
 {
-    public function relationshipMetadata(string $parent, string $child, string $field): ?RelationshipMetadata
+    public function inversedRelationshipMetadata(string $parent, string $child, string $field): ?InverseRelationshipMetadata
     {
-        $metadata = $this->classMetadata($parent);
+        $metadata = $this->classMetadata($child);
 
-        $association = $this->getAssociationMapping($parent, $child, $field);
-
-        if ($association) {
-            return new RelationshipMetadata(
-                isCascadePersist: $association->isCascadePersist(),
-                inverseField: $metadata->isSingleValuedAssociation($association->fieldName) ? $association->fieldName : null,
-                isCollection: $association instanceof ToManyAssociationMapping,
-                isOneToOne: $association instanceof OneToOneAssociationMapping,
-            );
-        }
-
-        $inversedAssociation = $this->getAssociationMapping($child, $parent, $field);
+        $inversedAssociation = $this->getAssociationMapping($parent, $child, $field);
 
         if (null === $inversedAssociation || !$metadata instanceof ClassMetadata) {
             return null;
         }
 
         if (!\is_a(
-            $parent,
+            $child,
             $inversedAssociation->targetEntity,
             allow_string: true
         )) { // is_a() handles inheritance as well
             throw new \LogicException("Cannot find correct association named \"{$field}\" between classes [parent: \"{$parent}\", child: \"{$child}\"]");
         }
 
+        // exclude "owning" side of the association (owning OneToOne or ManyToOne)
         if (!$inversedAssociation instanceof InverseSideMapping) {
             return null;
         }
 
         $association = $metadata->getAssociationMapping($inversedAssociation->mappedBy);
 
-        return new RelationshipMetadata(
-            isCascadePersist: $inversedAssociation->isCascadePersist(),
-            inverseField: $metadata->isSingleValuedAssociation($association->fieldName) ? $association->fieldName : null,
+        // only keep *ToOne associations
+        if (!$metadata->isSingleValuedAssociation($association->fieldName)) {
+            return null;
+        }
+
+        return new InverseRelationshipMetadata(
+            inverseField: $association->fieldName,
             isCollection: $inversedAssociation instanceof ToManyAssociationMapping,
-            isOneToOne: $inversedAssociation instanceof OneToOneAssociationMapping,
         );
     }
 

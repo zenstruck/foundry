@@ -76,6 +76,25 @@ final class PersistenceManager
     }
 
     /**
+     * @template T of object
+     *
+     * @param T $object
+     *
+     * @return T
+     */
+    public function scheduleForInsert(object $object): object
+    {
+        if ($object instanceof Proxy) {
+            $object = unproxy($object);
+        }
+
+        $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
+        $om->persist($object);
+
+        return $object;
+    }
+
+    /**
      * @template T
      *
      * @param callable():T $callback
@@ -212,12 +231,12 @@ final class PersistenceManager
      * @param class-string $parent
      * @param class-string $child
      */
-    public function relationshipMetadata(string $parent, string $child, string $field): ?RelationshipMetadata
+    public function inverseRelationshipMetadata(string $parent, string $child, string $field): ?InverseRelationshipMetadata
     {
         $parent = unproxy($parent);
         $child = unproxy($child);
 
-        return $this->strategyFor($parent)->relationshipMetadata($parent, $child, $field);
+        return $this->strategyFor($parent)->inversedRelationshipMetadata($parent, $child, $field);
     }
 
     /**

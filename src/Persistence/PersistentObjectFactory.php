@@ -263,19 +263,20 @@ abstract class PersistentObjectFactory extends ObjectFactory
         }
 
         if ($value instanceof self && isset($this->persist)) {
-            $value->persist = $this->persist; // todo - breaks immutability
+            $value = $this->isPersisting()
+                ? $value->andPersist()
+                : $value->withoutPersisting();
         }
 
         if ($value instanceof self) {
             $pm = Configuration::instance()->persistence();
 
-            $relationshipMetadata = $pm->relationshipMetadata($value::class(), static::class(), $field);
+            $inversedRelationshipMetadata = $pm->inverseRelationshipMetadata(static::class(), $value::class(), $field);
 
             // handle inversed OneToOne
-            if ($relationshipMetadata
-                && $relationshipMetadata->isOneToOne
-                && !$relationshipMetadata->isCollection
-                && $inverseField = $relationshipMetadata->inverseField) {
+            if ($inversedRelationshipMetadata && !$inversedRelationshipMetadata->isCollection) {
+                $inverseField = $inversedRelationshipMetadata->inverseField;
+
                 // we create now the object to prevent "non-nullable" property errors,
                 // but we'll need to remove it once the current object is created
                 $inversedObject = unproxy($value->create());
@@ -294,10 +295,6 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
                 return $inversedObject;
             }
-
-            if (Configuration::instance()->persistence()->relationshipMetadata(static::class(), $value::class(), $field)?->isCascadePersist) {
-                $value->persist = false;
-            }
         }
 
         return unproxy(parent::normalizeParameter($field, $value));
@@ -311,7 +308,11 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
         $pm = Configuration::instance()->persistence();
 
-        if ($inverseField = $pm->relationshipMetadata($collection->factory::class(), static::class(), $field)?->inverseField) {
+        $inverseRelationshipMetadata = $pm->inverseRelationshipMetadata(static::class(), $collection->factory::class(), $field);
+
+        if ($inverseRelationshipMetadata && $inverseRelationshipMetadata->isCollection) {
+            $inverseField = $inverseRelationshipMetadata->inverseField;
+
             $this->tempAfterPersist[] = static function(object $object) use ($collection, $inverseField, $pm) {
                 $collection->create([$inverseField => $object]);
                 $pm->refresh($object);
@@ -362,6 +363,22 @@ abstract class PersistentObjectFactory extends ObjectFactory
         }
 
         return $this->persist ?? $config->isPersistenceAvailable() && $config->persistence()->isEnabled() && $config->persistence()->autoPersist(static::class());
+    }
+
+    /**
+     * Schedule any new object for insert right after instantiation
+     */
+    final protected function initializeInternal(): static
+    {
+        return $this->afterInstantiate(
+            static function (object $object, array $parameters, PersistentObjectFactory $factory): void {
+                if (!$factory->isPersisting()) {
+                    return;
+                }
+
+                Configuration::instance()->persistence()->scheduleForInsert($object);
+            }
+        );
     }
 
     private function throwIfCannotCreateObject(): void
