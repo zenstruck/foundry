@@ -28,4 +28,7 @@
             <directory>src</directory>
         </include>
     </source>
+    <extensions>
+        <bootstrap class="Zenstruck\Foundry\Tests\PhpUnitTestExtension" />
+    </extensions>
 </phpunit>

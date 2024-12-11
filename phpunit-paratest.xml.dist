@@ -26,6 +26,7 @@
     </source>
     <extensions>
         <bootstrap class="Zenstruck\Foundry\PHPUnit\FoundryExtension" />
+        <bootstrap class="Zenstruck\Foundry\Tests\PhpUnitTestExtension" />
         <bootstrap class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension" />
     </extensions>
 </phpunit>
