@@ -69,11 +69,11 @@ $var = UserFactory::randomSet(2);
 $var = UserFactory::findBy(['name' => 'foo']);
 
 // methods with FactoryCollection
-/** @psalm-check-type-exact $var = FactoryCollection<UserForPersistentFactory> */
+/** @psalm-check-type-exact $var = FactoryCollection<UserForPersistentFactory, UserFactory> */
 $var = UserFactory::new()->many(2);
-/** @psalm-check-type-exact $var = FactoryCollection<UserForPersistentFactory> */
+/** @psalm-check-type-exact $var = FactoryCollection<UserForPersistentFactory, UserFactory> */
 $var = UserFactory::new()->range(1, 2);
-/** @psalm-check-type-exact $var = FactoryCollection<UserForPersistentFactory> */
+/** @psalm-check-type-exact $var = FactoryCollection<UserForPersistentFactory, UserFactory> */
 $var = UserFactory::new()->sequence([]);
 /** @psalm-check-type-exact $var = list<UserForPersistentFactory> */
 $var = UserFactory::new()->many(2)->create();
@@ -81,6 +81,8 @@ $var = UserFactory::new()->many(2)->create();
 $var = UserFactory::new()->range(1, 2)->create();
 /** @psalm-check-type-exact $var = list<UserForPersistentFactory> */
 $var = UserFactory::new()->sequence([])->create();
+/** @psalm-check-type-exact $var = list<UserFactory> */
+$var = UserFactory::new()->many(2)->all();
 
 // methods using repository()
 $repository = UserFactory::repository();

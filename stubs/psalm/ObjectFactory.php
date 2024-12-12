@@ -49,11 +49,11 @@ $var = UserObjectFactory::createRange(1, 2);
 $var = UserObjectFactory::createSequence([]);
 
 // methods with FactoryCollection
-/** @psalm-check-type-exact $var = FactoryCollection<UserForObjectFactory> */
+/** @psalm-check-type-exact $var = FactoryCollection<UserForObjectFactory, UserObjectFactory> */
 $var = UserObjectFactory::new()->many(2);
-/** @psalm-check-type-exact $var = FactoryCollection<UserForObjectFactory> */
+/** @psalm-check-type-exact $var = FactoryCollection<UserForObjectFactory, UserObjectFactory> */
 $var = UserObjectFactory::new()->range(1, 2);
-/** @psalm-check-type-exact $var = FactoryCollection<UserForObjectFactory> */
+/** @psalm-check-type-exact $var = FactoryCollection<UserForObjectFactory, UserObjectFactory> */
 $var = UserObjectFactory::new()->sequence([]);
 /** @psalm-check-type-exact $var = list<UserForObjectFactory> */
 $var = UserObjectFactory::new()->many(2)->create();
@@ -61,3 +61,5 @@ $var = UserObjectFactory::new()->many(2)->create();
 $var = UserObjectFactory::new()->range(1, 2)->create();
 /** @psalm-check-type-exact $var = list<UserForObjectFactory> */
 $var = UserObjectFactory::new()->sequence([])->create();
+/** @psalm-check-type-exact $var = list<UserObjectFactory> */
+$var = UserObjectFactory::new()->many(2)->all();

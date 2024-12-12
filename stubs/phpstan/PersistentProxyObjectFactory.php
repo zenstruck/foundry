@@ -54,12 +54,14 @@ assertType("array<int, {$proxyType}>", UserProxyFactory::findBy(['name' => 'foo'
 
 // methods with FactoryCollection
 $factoryCollection = FactoryCollection::class;
-assertType("{$factoryCollection}<{$proxyType}>", UserProxyFactory::new()->many(2));
-assertType("{$factoryCollection}<{$proxyType}>", UserProxyFactory::new()->range(1, 2));
-assertType("{$factoryCollection}<{$proxyType}>", UserProxyFactory::new()->sequence([]));
+$factory = UserProxyFactory::class;
+assertType("{$factoryCollection}<{$proxyType}, {$factory}>", UserProxyFactory::new()->many(2));
+assertType("{$factoryCollection}<{$proxyType}, {$factory}>", UserProxyFactory::new()->range(1, 2));
+assertType("{$factoryCollection}<{$proxyType}, {$factory}>", UserProxyFactory::new()->sequence([]));
 assertType("array<int, {$proxyType}>", UserProxyFactory::new()->many(2)->create());
 assertType("array<int, {$proxyType}>", UserProxyFactory::new()->range(1, 2)->create());
 assertType("array<int, {$proxyType}>", UserProxyFactory::new()->sequence([])->create());
+assertType("array<int, {$factory}>", UserProxyFactory::new()->many(2)->all());
 
 // methods using repository()
 $repository = UserProxyFactory::repository();

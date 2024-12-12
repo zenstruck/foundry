@@ -47,12 +47,14 @@ assertType("array<int, UserForObjectFactory>", UserObjectFactory::createSequence
 
 // methods with FactoryCollection
 $factoryCollection = FactoryCollection::class;
-assertType("{$factoryCollection}<UserForObjectFactory>", UserObjectFactory::new()->many(2));
-assertType("{$factoryCollection}<UserForObjectFactory>", UserObjectFactory::new()->range(1, 2));
-assertType("{$factoryCollection}<UserForObjectFactory>", UserObjectFactory::new()->sequence([]));
+$factory = UserObjectFactory::class;
+assertType("{$factoryCollection}<UserForObjectFactory, {$factory}>", UserObjectFactory::new()->many(2));
+assertType("{$factoryCollection}<UserForObjectFactory, {$factory}>", UserObjectFactory::new()->range(1, 2));
+assertType("{$factoryCollection}<UserForObjectFactory, {$factory}>", UserObjectFactory::new()->sequence([]));
 assertType("array<int, UserForObjectFactory>", UserObjectFactory::new()->many(2)->create());
 assertType("array<int, UserForObjectFactory>", UserObjectFactory::new()->range(1, 2)->create());
 assertType("array<int, UserForObjectFactory>", UserObjectFactory::new()->sequence([])->create());
+assertType("array<int, {$factory}>", UserObjectFactory::new()->many(2)->all());
 
 // test autocomplete with phpstorm
 assertType('string', UserObjectFactory::new()->create()->name);

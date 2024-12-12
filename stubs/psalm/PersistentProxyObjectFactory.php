@@ -69,11 +69,11 @@ $var = UserProxyFactory::randomSet(2);
 $var = UserProxyFactory::findBy(['name' => 'foo']);
 
 // methods with FactoryCollection
-/** @psalm-check-type-exact $var = FactoryCollection<UserForProxyFactory&Proxy<UserForProxyFactory>> */
+/** @psalm-check-type-exact $var = FactoryCollection<UserForProxyFactory&Proxy<UserForProxyFactory>, UserProxyFactory> */
 $var = UserProxyFactory::new()->many(2);
-/** @psalm-check-type-exact $var = FactoryCollection<UserForProxyFactory&Proxy<UserForProxyFactory>> */
+/** @psalm-check-type-exact $var = FactoryCollection<UserForProxyFactory&Proxy<UserForProxyFactory>, UserProxyFactory> */
 $var = UserProxyFactory::new()->range(1, 2);
-/** @psalm-check-type-exact $var = FactoryCollection<UserForProxyFactory&Proxy<UserForProxyFactory>> */
+/** @psalm-check-type-exact $var = FactoryCollection<UserForProxyFactory&Proxy<UserForProxyFactory>, UserProxyFactory> */
 $var = UserProxyFactory::new()->sequence([]);
 /** @psalm-check-type-exact $var = list<UserForProxyFactory&Proxy<UserForProxyFactory>> */
 $var = UserProxyFactory::new()->many(2)->create();
@@ -81,6 +81,9 @@ $var = UserProxyFactory::new()->many(2)->create();
 $var = UserProxyFactory::new()->range(1, 2)->create();
 /** @psalm-check-type-exact $var = list<UserForProxyFactory&Proxy<UserForProxyFactory>> */
 $var = UserProxyFactory::new()->sequence([])->create();
+// not working... ?
+///** @psalm-check-type-exact $var = list<UserProxyFactory> */
+//$var = UserProxyFactory::new()->many(2)->all();
 
 // methods using repository()
 $repository = UserProxyFactory::repository();

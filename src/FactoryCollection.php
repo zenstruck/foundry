@@ -15,22 +15,23 @@ namespace Zenstruck\Foundry;
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @template T
- * @implements \IteratorAggregate<Factory<T>>
+ * @template TFactory of Factory<T>
+ * @implements \IteratorAggregate<TFactory>
  *
  * @phpstan-import-type Attributes from Factory
  */
 final class FactoryCollection implements \IteratorAggregate
 {
     /**
-     * @param Factory<T>                      $factory
-     * @phpstan-param \Closure():iterable<Attributes>|\Closure():iterable<Factory<T>> $items
+     * @param TFactory $factory
+     * @phpstan-param \Closure():iterable<Attributes>|\Closure():iterable<TFactory> $items
      */
     private function __construct(public readonly Factory $factory, private \Closure $items)
     {
     }
 
     /**
-     * @phpstan-assert-if-true non-empty-list<Factory<T>> $potentialFactories
+     * @phpstan-assert-if-true non-empty-list<TFactory> $potentialFactories
      *
      * @internal
      */
@@ -55,9 +56,9 @@ final class FactoryCollection implements \IteratorAggregate
     }
 
     /**
-     * @param array<mixed> $factories
+     * @param array<TFactory> $factories
      *
-     * @return self<T>
+     * @return self<T, TFactory>
      *
      * @internal
      */
@@ -71,9 +72,9 @@ final class FactoryCollection implements \IteratorAggregate
     }
 
     /**
-     * @param Factory<T> $factory
+     * @param TFactory $factory
      *
-     * @return self<T>
+     * @return self<T, TFactory>
      */
     public static function many(Factory $factory, int $count): self
     {
@@ -81,9 +82,9 @@ final class FactoryCollection implements \IteratorAggregate
     }
 
     /**
-     * @param Factory<T> $factory
+     * @param TFactory $factory
      *
-     * @return self<T>
+     * @return self<T, TFactory>
      */
     public static function range(Factory $factory, int $min, int $max): self
     {
@@ -95,9 +96,9 @@ final class FactoryCollection implements \IteratorAggregate
     }
 
     /**
-     * @param  Factory<T>           $factory
+     * @param  TFactory           $factory
      * @phpstan-param  iterable<Attributes> $items
-     * @return self<T>
+     * @return self<T, TFactory>
      */
     public static function sequence(Factory $factory, iterable $items): self
     {
@@ -115,7 +116,7 @@ final class FactoryCollection implements \IteratorAggregate
     }
 
     /**
-     * @return list<Factory<T>>
+     * @return list<TFactory>
      */
     public function all(): array
     {
@@ -132,7 +133,7 @@ final class FactoryCollection implements \IteratorAggregate
             $factories[] = $this->factory->with($attributesOrFactory)->with(['__index' => $i++]);
         }
 
-        return $factories;
+        return $factories; // @phpstan-ignore return.type (PHPStan does not understand we have an array of factories)
     }
 
     public function getIterator(): \Traversable
@@ -141,7 +142,7 @@ final class FactoryCollection implements \IteratorAggregate
     }
 
     /**
-     * @return iterable<array{Factory<T>}>
+     * @return iterable<array{TFactory}>
      */
     public function asDataProvider(): iterable
     {

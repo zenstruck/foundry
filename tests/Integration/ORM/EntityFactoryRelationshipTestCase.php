@@ -91,7 +91,7 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
 
     /**
      * @test
-     * @param FactoryCollection<Contact>|list<Factory<Contact>> $contacts
+     * @param FactoryCollection<Contact, PersistentObjectFactory<Contact>>|list<Factory<Contact>> $contacts
      * @dataProvider one_to_many_provider
      */
     public function one_to_many(FactoryCollection|array $contacts): void
