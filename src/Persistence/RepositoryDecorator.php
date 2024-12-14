@@ -113,22 +113,22 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
     }
 
     /**
-     * @return T[]
+     * @return list<T>
      */
     public function findAll(): array
     {
-        return $this->inner()->findAll();
+        return array_values($this->inner()->findAll());
     }
 
     /**
      * @param ?int $limit
      * @param ?int $offset
      *
-     * @return T[]
+     * @return list<T>
      */
     public function findBy(array $criteria, ?array $orderBy = null, $limit = null, $offset = null): array
     {
-        return $this->inner()->findBy($this->normalize($criteria), $orderBy, $limit, $offset);
+        return array_values($this->inner()->findBy($this->normalize($criteria), $orderBy, $limit, $offset));
     }
 
     /**
@@ -178,7 +178,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
      * @param positive-int $count
      * @phpstan-param Parameters   $criteria
      *
-     * @return T[]
+     * @return list<T>
      */
     public function randomSet(int $count, array $criteria = []): array
     {
@@ -194,7 +194,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
      * @param int<0, max> $max
      * @phpstan-param Parameters  $criteria
      *
-     * @return T[]
+     * @return list<T>
      */
     public function randomRange(int $min, int $max, array $criteria = []): array
     {

@@ -168,7 +168,7 @@ final class PersistenceManager
 
         $id = $om->getClassMetadata($object::class)->getIdentifierValues($object);
 
-        if (!$id || !$object = $om->find($object::class, $id)) {
+        if (!$id || !($object = $om->find($object::class, $id))) { // @phpstan-ignore parameterByRef.type
             throw RefreshObjectFailed::objectNoLongExists();
         }
 
@@ -240,7 +240,10 @@ final class PersistenceManager
     }
 
     /**
-     * @param class-string $class
+     * @template T of object
+     *
+     * @param class-string<T> $class
+     * @return ClassMetadata<T>
      */
     public function metadataFor(string $class): ClassMetadata
     {
@@ -248,7 +251,7 @@ final class PersistenceManager
     }
 
     /**
-     * @return iterable<ClassMetadata>
+     * @return iterable<ClassMetadata<object>>
      */
     public function allMetadata(): iterable
     {

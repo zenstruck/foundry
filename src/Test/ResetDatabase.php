@@ -28,7 +28,7 @@ trait ResetDatabase
     #[BeforeClass]
     public static function _resetDatabaseBeforeFirstTest(): void
     {
-        if (!\is_subclass_of(static::class, KernelTestCase::class)) {
+        if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.alreadyNarrowedType
             throw new \RuntimeException(\sprintf('The "%s" trait can only be used on TestCases that extend "%s".', __TRAIT__, KernelTestCase::class));
         }
 
@@ -45,7 +45,7 @@ trait ResetDatabase
     #[Before]
     public static function _resetDatabaseBeforeEachTest(): void
     {
-        if (!\is_subclass_of(static::class, KernelTestCase::class)) {
+        if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.alreadyNarrowedType
             throw new \RuntimeException(\sprintf('The "%s" trait can only be used on TestCases that extend "%s".', __TRAIT__, KernelTestCase::class));
         }
 

@@ -44,7 +44,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
  * @phpstan-method static Category&Proxy<Category> last(string $sortBy = 'id')
  * @phpstan-method static Category&Proxy<Category> random(array $attributes = [])
  * @phpstan-method static Category&Proxy<Category> randomOrCreate(array $attributes = [])
- * @phpstan-method static ProxyRepositoryDecorator<Category, EntityRepository> repository()
+ * @phpstan-method static ProxyRepositoryDecorator<Category, EntityRepository<Category>> repository()
  * @phpstan-method static list<Category&Proxy<Category>> all()
  * @phpstan-method static list<Category&Proxy<Category>> createMany(int $number, array|callable $attributes = [])
  * @phpstan-method static list<Category&Proxy<Category>> createSequence(iterable|callable $sequence)

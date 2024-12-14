@@ -51,7 +51,7 @@ trait ChangesEntityRelationshipCascadePersist
 
         /** @var ChangeCascadePersistOnLoadClassMetadataListener $changeCascadePersistListener */
         $changeCascadePersistListener = self::getContainer()->get(ChangeCascadePersistOnLoadClassMetadataListener::class);
-        $changeCascadePersistListener->withMetadata($this->providedData());
+        $changeCascadePersistListener->withMetadata(array_values($this->providedData()));
 
         /** @var CacheItemPoolInterface $doctrineMetadataCache */
         $doctrineMetadataCache = self::getContainer()->get('doctrine.orm.default_metadata_cache');

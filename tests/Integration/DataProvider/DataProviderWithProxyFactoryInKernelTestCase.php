@@ -46,7 +46,6 @@ abstract class DataProviderWithProxyFactoryInKernelTestCase extends KernelTestCa
 
         self::assertInstanceOf(Proxy::class, $providedData);
         self::assertNotInstanceOf(Proxy::class, unproxy($providedData)); // asserts two proxies are not nested
-        self::assertInstanceOf(GenericModel::class, $providedData);
         self::assertSame('value set in data provider', $providedData->getProp1());
     }
 

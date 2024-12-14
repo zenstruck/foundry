@@ -26,7 +26,7 @@ final class AddressFactory extends PersistentObjectFactory
         return Address::class;
     }
 
-    protected function defaults(): array|callable
+    protected function defaults(): array
     {
         return [
             'city' => self::faker()->city(),

@@ -12,14 +12,12 @@
 namespace Zenstruck\Foundry\Tests\Fixture\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Zenstruck\Foundry\Tests\Fixture\Model\Base;
 use Zenstruck\Foundry\Tests\Fixture\Model\Embeddable;
 
 #[MongoDB\Document]
-class DocumentWithReadonly
+class DocumentWithReadonly extends Base
 {
-    #[MongoDB\Id(type: 'int', strategy: 'INCREMENT')]
-    public int $id;
-
     public function __construct(
         #[MongoDB\Field()]
         public readonly int $prop,

@@ -26,7 +26,7 @@ final class ProxyCategoryFactory extends PersistentProxyObjectFactory
         return Category::class;
     }
 
-    protected function defaults(): array|callable
+    protected function defaults(): array
     {
         return [
             'name' => self::faker()->word(),

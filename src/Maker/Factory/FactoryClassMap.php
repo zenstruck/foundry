@@ -25,12 +25,12 @@ final class FactoryClassMap
      */
     private array $classesWithFactories;
 
-    /** @param \Traversable<ObjectFactory> $factories */
-    public function __construct(\Traversable $factories) // @phpstan-ignore missingType.generics
+    /** @param \Traversable<Factory> $factories */
+    public function __construct(\Traversable $factories)
     {
         $this->classesWithFactories = \array_unique(
             \array_reduce(
-                \array_filter(\iterator_to_array($factories, preserve_keys: true), static fn(Factory $f) => $f instanceof ObjectFactory),
+                \array_filter(\iterator_to_array($factories), static fn(Factory $f) => $f instanceof ObjectFactory),
                 static function(array $carry, ObjectFactory $factory): array {
                     $carry[$factory::class] = $factory::class();
 

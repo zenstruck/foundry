@@ -31,7 +31,7 @@ final class Object1Factory extends ObjectFactory
         return Object1::class;
     }
 
-    protected function defaults(): array|callable
+    protected function defaults(): array
     {
         return [
             'prop1' => $this->router ? 'router' : 'value1',

@@ -68,6 +68,8 @@ function get(object $object, string $property): mixed
 /**
  * Create a "lazy" factory attribute which will only be evaluated
  * if used.
+ *
+ * @param callable():mixed $factory
  */
 function lazy(callable $factory): LazyValue
 {
@@ -77,6 +79,8 @@ function lazy(callable $factory): LazyValue
 /**
  * Same as {@see lazy()} but subsequent evaluations will return the
  * same value.
+ *
+ * @param callable():mixed $factory
  */
 function memoize(callable $factory): LazyValue
 {

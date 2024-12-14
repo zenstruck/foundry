@@ -16,8 +16,6 @@ use Zenstruck\Foundry\Factory;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
- * @immutable
- *
  * @phpstan-import-type Parameters from Factory
  */
 final class Instantiator
@@ -28,7 +26,7 @@ final class Instantiator
     private Hydrator $hydrator;
     private bool $hydration = true;
 
-    private function __construct(private string|\Closure $mode)
+    private function __construct(private string|\Closure $mode) // @phpstan-ignore missingType.callable
     {
         $this->hydrator = new Hydrator();
     }
@@ -63,7 +61,7 @@ final class Instantiator
         return new self($method);
     }
 
-    public static function use(callable $factory): self
+    public static function use(callable $factory): self // @phpstan-ignore missingType.callable
     {
         return new self($factory(...));
     }

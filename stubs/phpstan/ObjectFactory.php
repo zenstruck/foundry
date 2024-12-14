@@ -1,5 +1,6 @@
 <?php
 
+use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\ObjectFactory;
@@ -17,6 +18,7 @@ class UserForObjectFactory
 
 /**
  * @extends ObjectFactory<UserForObjectFactory>
+ * @phpstan-import-type Parameters from Factory
  */
 final class UserObjectFactory extends ObjectFactory
 {
@@ -25,7 +27,8 @@ final class UserObjectFactory extends ObjectFactory
         return UserForObjectFactory::class;
     }
 
-    protected function defaults(): array|callable
+    /** @return Parameters */
+    protected function defaults(): array
     {
         return [];
     }
@@ -41,9 +44,9 @@ assertType(
 assertType('UserForObjectFactory', UserObjectFactory::new()->with()->create());
 
 // methods returning a list of objects
-assertType("array<int, UserForObjectFactory>", UserObjectFactory::createMany(1));
-assertType("array<int, UserForObjectFactory>", UserObjectFactory::createRange(1, 2));
-assertType("array<int, UserForObjectFactory>", UserObjectFactory::createSequence([]));
+assertType("list<UserForObjectFactory>", UserObjectFactory::createMany(1));
+assertType("list<UserForObjectFactory>", UserObjectFactory::createRange(1, 2));
+assertType("list<UserForObjectFactory>", UserObjectFactory::createSequence([]));
 
 // methods with FactoryCollection
 $factoryCollection = FactoryCollection::class;
@@ -51,10 +54,10 @@ $factory = UserObjectFactory::class;
 assertType("{$factoryCollection}<UserForObjectFactory, {$factory}>", UserObjectFactory::new()->many(2));
 assertType("{$factoryCollection}<UserForObjectFactory, {$factory}>", UserObjectFactory::new()->range(1, 2));
 assertType("{$factoryCollection}<UserForObjectFactory, {$factory}>", UserObjectFactory::new()->sequence([]));
-assertType("array<int, UserForObjectFactory>", UserObjectFactory::new()->many(2)->create());
-assertType("array<int, UserForObjectFactory>", UserObjectFactory::new()->range(1, 2)->create());
-assertType("array<int, UserForObjectFactory>", UserObjectFactory::new()->sequence([])->create());
-assertType("array<int, {$factory}>", UserObjectFactory::new()->many(2)->all());
+assertType("list<UserForObjectFactory>", UserObjectFactory::new()->many(2)->create());
+assertType("list<UserForObjectFactory>", UserObjectFactory::new()->range(1, 2)->create());
+assertType("list<UserForObjectFactory>", UserObjectFactory::new()->sequence([])->create());
+assertType("list<{$factory}>", UserObjectFactory::new()->many(2)->all());
 
 // test autocomplete with phpstorm
 assertType('string', UserObjectFactory::new()->create()->name);

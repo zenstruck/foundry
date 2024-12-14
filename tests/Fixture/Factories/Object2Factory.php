@@ -26,7 +26,7 @@ final class Object2Factory extends ObjectFactory
         return Object2::class;
     }
 
-    protected function defaults(): array|callable
+    protected function defaults(): array
     {
         return [
             'object' => Object1Factory::new(),

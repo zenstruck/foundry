@@ -93,11 +93,13 @@ final class Configuration
         return null !== self::$instance;
     }
 
+    /** @param \Closure():self|self $configuration */
     public static function boot(\Closure|self $configuration): void
     {
         self::$instance = $configuration;
     }
 
+    /** @param \Closure():self|self $configuration */
     public static function bootForDataProvider(\Closure|self $configuration): void
     {
         self::$instance = \is_callable($configuration) ? ($configuration)() : $configuration;

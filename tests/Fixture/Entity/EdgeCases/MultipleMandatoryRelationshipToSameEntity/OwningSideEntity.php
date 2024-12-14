@@ -21,8 +21,10 @@ class OwningSideEntity extends Base
 {
     public function __construct(
         #[ORM\ManyToOne(targetEntity: InversedSideEntity::class, cascade: ['persist', 'remove'], inversedBy: 'mainRelations')]
+        #[ORM\JoinColumn(nullable: false)]
         private InversedSideEntity $main,
         #[ORM\ManyToOne(targetEntity: InversedSideEntity::class, cascade: ['persist', 'remove'], inversedBy: 'secondaryRelations')]
+        #[ORM\JoinColumn(nullable: false)]
         private InversedSideEntity $secondary,
     ) {
     }

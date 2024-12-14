@@ -28,7 +28,7 @@ final class ProxyContactFactory extends PersistentProxyObjectFactory
         return Contact::class;
     }
 
-    protected function defaults(): array|callable
+    protected function defaults(): array
     {
         return [
             'name' => self::faker()->word(),

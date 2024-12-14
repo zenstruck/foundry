@@ -36,7 +36,6 @@ final class MakeFactoryData
     /** @var list<MakeFactoryPHPDocMethod> */
     private array $methodsInPHPDoc;
 
-    // @phpstan-ignore-next-line
     public function __construct(
         private \ReflectionClass $object,
         private ClassNameDetails $factoryClassNameDetails,
@@ -79,7 +78,7 @@ final class MakeFactoryData
     /**
      * @return class-string<ObjectFactory>
      */
-    public function getFactoryClass(): string // @phpstan-ignore missingType.generics
+    public function getFactoryClass(): string
     {
         return $this->isPersisted() ? PersistentProxyObjectFactory::class : ObjectFactory::class;
     }
@@ -100,7 +99,7 @@ final class MakeFactoryData
         return $this->object->getName();
     }
 
-    public function getRepositoryReflectionClass(): ?\ReflectionClass // @phpstan-ignore missingType.generics
+    public function getRepositoryReflectionClass(): ?\ReflectionClass
     {
         return $this->repository;
     }

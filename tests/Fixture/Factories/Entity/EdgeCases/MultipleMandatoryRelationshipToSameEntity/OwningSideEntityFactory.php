@@ -24,7 +24,7 @@ final class OwningSideEntityFactory extends PersistentObjectFactory
         return OwningSideEntity::class;
     }
 
-    protected function defaults(): array|callable
+    protected function defaults(): array
     {
         return [
             'main' => InversedSideEntityFactory::new(),

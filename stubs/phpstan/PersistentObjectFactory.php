@@ -1,5 +1,6 @@
 <?php
 
+use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
@@ -16,6 +17,7 @@ class UserForPersistentFactory
 
 /**
  * @extends PersistentObjectFactory<UserForPersistentFactory>
+ * @phpstan-import-type Parameters from Factory
  */
 final class UserFactory extends PersistentObjectFactory
 {
@@ -24,7 +26,8 @@ final class UserFactory extends PersistentObjectFactory
         return UserForPersistentFactory::class;
     }
 
-    protected function defaults(): array|callable
+    /** @return Parameters */
+    protected function defaults(): array
     {
         return [];
     }
@@ -43,13 +46,13 @@ assertType('UserForPersistentFactory', UserFactory::new()->instantiateWith(Insta
 assertType('UserForPersistentFactory', UserFactory::new()->with()->create());
 
 // methods returning a list of objects
-assertType("array<int, UserForPersistentFactory>", UserFactory::all());
-assertType("array<int, UserForPersistentFactory>", UserFactory::createMany(1));
-assertType("array<int, UserForPersistentFactory>", UserFactory::createRange(1, 2));
-assertType("array<int, UserForPersistentFactory>", UserFactory::createSequence([]));
-assertType("array<int, UserForPersistentFactory>", UserFactory::randomRange(1, 2));
-assertType("array<int, UserForPersistentFactory>", UserFactory::randomSet(2));
-assertType("array<int, UserForPersistentFactory>", UserFactory::findBy(['name' => 'foo']));
+assertType("list<UserForPersistentFactory>", UserFactory::all());
+assertType("list<UserForPersistentFactory>", UserFactory::createMany(1));
+assertType("list<UserForPersistentFactory>", UserFactory::createRange(1, 2));
+assertType("list<UserForPersistentFactory>", UserFactory::createSequence([]));
+assertType("list<UserForPersistentFactory>", UserFactory::randomRange(1, 2));
+assertType("list<UserForPersistentFactory>", UserFactory::randomSet(2));
+assertType("list<UserForPersistentFactory>", UserFactory::findBy(['name' => 'foo']));
 
 // methods with FactoryCollection
 $factoryCollection = FactoryCollection::class;
@@ -57,10 +60,10 @@ $factory = UserFactory::class;
 assertType("{$factoryCollection}<UserForPersistentFactory, {$factory}>", UserFactory::new()->many(2));
 assertType("{$factoryCollection}<UserForPersistentFactory, {$factory}>", UserFactory::new()->range(1, 2));
 assertType("{$factoryCollection}<UserForPersistentFactory, {$factory}>", UserFactory::new()->sequence([]));
-assertType("array<int, UserForPersistentFactory>", UserFactory::new()->many(2)->create());
-assertType("array<int, UserForPersistentFactory>", UserFactory::new()->range(1, 2)->create());
-assertType("array<int, UserForPersistentFactory>", UserFactory::new()->sequence([])->create());
-assertType("array<int, {$factory}>", UserFactory::new()->many(2)->all());
+assertType("list<UserForPersistentFactory>", UserFactory::new()->many(2)->create());
+assertType("list<UserForPersistentFactory>", UserFactory::new()->range(1, 2)->create());
+assertType("list<UserForPersistentFactory>", UserFactory::new()->sequence([])->create());
+assertType("list<{$factory}>", UserFactory::new()->many(2)->all());
 
 // methods using repository()
 $repository = UserFactory::repository();
@@ -73,11 +76,11 @@ assertType("UserForPersistentFactory|null", $repository->find(1));
 assertType("UserForPersistentFactory", $repository->findOrFail(1));
 assertType("UserForPersistentFactory|null", $repository->findOneBy([]));
 assertType('UserForPersistentFactory', $repository->random());
-assertType("array<UserForPersistentFactory>", $repository->findAll());
-assertType("array<UserForPersistentFactory>", $repository->findBy([]));
-assertType("array<UserForPersistentFactory>", $repository->randomSet(2));
-assertType("array<UserForPersistentFactory>", $repository->randomRange(1, 2));
-assertType('int', $repository->count());
+assertType("list<UserForPersistentFactory>", $repository->findAll());
+assertType("list<UserForPersistentFactory>", $repository->findBy([]));
+assertType("list<UserForPersistentFactory>", $repository->randomSet(2));
+assertType("list<UserForPersistentFactory>", $repository->randomRange(1, 2));
+assertType('int<0, max>', $repository->count());
 
 // test autocomplete with phpstorm
 assertType('string', UserFactory::new()->create()->name);

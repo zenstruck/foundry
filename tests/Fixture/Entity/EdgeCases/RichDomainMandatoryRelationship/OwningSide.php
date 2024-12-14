@@ -22,6 +22,7 @@ class OwningSide extends Base
 {
     public function __construct(
         #[ORM\ManyToOne(targetEntity: InversedSide::class, inversedBy: 'relations')]
+        #[ORM\JoinColumn(nullable: false)]
         private InversedSide $main,
     ) {
         $main->addRelation($this);

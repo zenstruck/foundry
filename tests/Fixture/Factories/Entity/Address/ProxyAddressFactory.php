@@ -26,7 +26,7 @@ final class ProxyAddressFactory extends PersistentProxyObjectFactory
         return Address::class;
     }
 
-    protected function defaults(): array|callable
+    protected function defaults(): array
     {
         return [
             'city' => self::faker()->city(),

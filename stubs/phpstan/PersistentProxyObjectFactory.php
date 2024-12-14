@@ -1,5 +1,6 @@
 <?php
 
+use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
@@ -16,6 +17,7 @@ class UserForProxyFactory
 
 /**
  * @extends PersistentProxyObjectFactory<UserForProxyFactory>
+ * @phpstan-import-type Parameters from Factory
  */
 final class UserProxyFactory extends PersistentProxyObjectFactory
 {
@@ -24,7 +26,8 @@ final class UserProxyFactory extends PersistentProxyObjectFactory
         return UserForProxyFactory::class;
     }
 
-    protected function defaults(): array|callable
+    /** @return Parameters */
+    protected function defaults(): array
     {
         return [];
     }
@@ -44,13 +47,13 @@ assertType($proxyType, UserProxyFactory::randomOrCreate());
 assertType($proxyType, UserProxyFactory::new()->instantiateWith(Instantiator::withConstructor())->with()->create());
 
 // methods returning a list of objects
-assertType("array<int, {$proxyType}>", UserProxyFactory::all());
-assertType("array<int, {$proxyType}>", UserProxyFactory::createMany(1));
-assertType("array<int, {$proxyType}>", UserProxyFactory::createRange(1, 2));
-assertType("array<int, {$proxyType}>", UserProxyFactory::createSequence([]));
-assertType("array<int, {$proxyType}>", UserProxyFactory::randomRange(1, 2));
-assertType("array<int, {$proxyType}>", UserProxyFactory::randomSet(2));
-assertType("array<int, {$proxyType}>", UserProxyFactory::findBy(['name' => 'foo']));
+assertType("list<{$proxyType}>", UserProxyFactory::all());
+assertType("list<{$proxyType}>", UserProxyFactory::createMany(1));
+assertType("list<{$proxyType}>", UserProxyFactory::createRange(1, 2));
+assertType("list<{$proxyType}>", UserProxyFactory::createSequence([]));
+assertType("list<{$proxyType}>", UserProxyFactory::randomRange(1, 2));
+assertType("list<{$proxyType}>", UserProxyFactory::randomSet(2));
+assertType("list<{$proxyType}>", UserProxyFactory::findBy(['name' => 'foo']));
 
 // methods with FactoryCollection
 $factoryCollection = FactoryCollection::class;
@@ -58,10 +61,10 @@ $factory = UserProxyFactory::class;
 assertType("{$factoryCollection}<{$proxyType}, {$factory}>", UserProxyFactory::new()->many(2));
 assertType("{$factoryCollection}<{$proxyType}, {$factory}>", UserProxyFactory::new()->range(1, 2));
 assertType("{$factoryCollection}<{$proxyType}, {$factory}>", UserProxyFactory::new()->sequence([]));
-assertType("array<int, {$proxyType}>", UserProxyFactory::new()->many(2)->create());
-assertType("array<int, {$proxyType}>", UserProxyFactory::new()->range(1, 2)->create());
-assertType("array<int, {$proxyType}>", UserProxyFactory::new()->sequence([])->create());
-assertType("array<int, {$factory}>", UserProxyFactory::new()->many(2)->all());
+assertType("list<{$proxyType}>", UserProxyFactory::new()->many(2)->create());
+assertType("list<{$proxyType}>", UserProxyFactory::new()->range(1, 2)->create());
+assertType("list<{$proxyType}>", UserProxyFactory::new()->sequence([])->create());
+assertType("list<{$factory}>", UserProxyFactory::new()->many(2)->all());
 
 // methods using repository()
 $repository = UserProxyFactory::repository();
@@ -74,11 +77,11 @@ assertType("({$proxyType})|null", $repository->find(1));
 assertType($proxyType, $repository->findOrFail(1));
 assertType("({$proxyType})|null", $repository->findOneBy([]));
 assertType($proxyType, $repository->random());
-assertType("array<{$proxyType}>", $repository->findAll());
-assertType("array<{$proxyType}>", $repository->findBy([]));
-assertType("array<{$proxyType}>", $repository->randomSet(2));
-assertType("array<{$proxyType}>", $repository->randomRange(1, 2));
-assertType('int', $repository->count());
+assertType("list<{$proxyType}>", $repository->findAll());
+assertType("list<{$proxyType}>", $repository->findBy([]));
+assertType("list<{$proxyType}>", $repository->randomSet(2));
+assertType("list<{$proxyType}>", $repository->randomRange(1, 2));
+assertType('int<0, max>', $repository->count());
 
 // check proxy methods
 assertType($proxyType, UserProxyFactory::new()->create()->_refresh());

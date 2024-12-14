@@ -10,7 +10,7 @@ use function Zenstruck\Foundry\Persistence\repository;
 
 class User
 {
-    public string $name;
+    public string $name; // @phpstan-ignore property.uninitialized
 }
 
 assertType('string', factory(UserForPersistentFactory::class)->create()->name);

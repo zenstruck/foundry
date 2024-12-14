@@ -64,11 +64,10 @@ final class MakeFactoryPHPDocMethod
             $returnType = match ((bool) $staticAnalysisTool) {
                 false => "{$this->repository->getShortName()}|ProxyRepositoryDecorator",
                 true => \sprintf(
-                    'ProxyRepositoryDecorator<%s, %s>',
-                    $this->objectName,
+                    "ProxyRepositoryDecorator<{$this->objectName}, %s>",
                     \is_a($this->repository->getName(), DocumentRepository::class, allow_string: true)
-                        ? 'DocumentRepository'
-                        : 'EntityRepository'
+                        ? "DocumentRepository<{$this->objectName}>"
+                        : "EntityRepository<{$this->objectName}>"
                 ),
             };
         } else {

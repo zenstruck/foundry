@@ -26,7 +26,7 @@ final class TagFactory extends PersistentObjectFactory
         return Tag::class;
     }
 
-    protected function defaults(): array|callable
+    protected function defaults(): array
     {
         return [
             'name' => self::faker()->word(),

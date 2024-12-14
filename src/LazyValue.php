@@ -18,7 +18,7 @@ final class LazyValue
 {
     /** @var \Closure():mixed */
     private \Closure $factory;
-    private mixed $memoizedValue;
+    private mixed $memoizedValue = null;
 
     /**
      * @param callable():mixed $factory
@@ -54,11 +54,17 @@ final class LazyValue
         return $value;
     }
 
+    /**
+     * @param callable():mixed $factory
+     */
     public static function new(callable $factory): self
     {
         return new self($factory, false);
     }
 
+    /**
+     * @param callable():mixed $factory
+     */
     public static function memoize(callable $factory): self
     {
         return new self($factory, true);

@@ -64,7 +64,7 @@ final class FactoryTest extends TestCase
     public function can_use_arrays_for_attribute_values(): void
     {
         $object = new class {
-            public mixed $value;
+            public mixed $value = null;
         };
 
         $factory = factory($object::class)->create(['value' => ['foo' => 'bar']]);

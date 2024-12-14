@@ -21,7 +21,7 @@ use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
  */
 abstract class GenericProxyModelFactory extends PersistentProxyObjectFactory
 {
-    protected function defaults(): array|callable
+    protected function defaults(): array
     {
         return [
             'prop1' => 'default1',

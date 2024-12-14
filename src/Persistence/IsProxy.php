@@ -25,7 +25,7 @@ use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
  *
  * @mixin LazyProxyTrait
  */
-trait IsProxy
+trait IsProxy // @phpstan-ignore trait.unused
 {
     private static array $_autoRefresh = [];
 

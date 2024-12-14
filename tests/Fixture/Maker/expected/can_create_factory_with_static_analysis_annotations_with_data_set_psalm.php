@@ -44,7 +44,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
  * @psalm-method static Category&Proxy<Category> last(string $sortBy = 'id')
  * @psalm-method static Category&Proxy<Category> random(array $attributes = [])
  * @psalm-method static Category&Proxy<Category> randomOrCreate(array $attributes = [])
- * @psalm-method static ProxyRepositoryDecorator<Category, EntityRepository> repository()
+ * @psalm-method static ProxyRepositoryDecorator<Category, EntityRepository<Category>> repository()
  * @psalm-method static list<Category&Proxy<Category>> all()
  * @psalm-method static list<Category&Proxy<Category>> createMany(int $number, array|callable $attributes = [])
  * @psalm-method static list<Category&Proxy<Category>> createSequence(iterable|callable $sequence)

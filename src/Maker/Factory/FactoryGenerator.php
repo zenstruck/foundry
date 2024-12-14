@@ -108,7 +108,10 @@ final class FactoryGenerator
         return $factoryClass;
     }
 
-    /** @param class-string $class */
+    /**
+     * @template T of object
+     * @param class-string<T> $class
+     */
     private function createMakeFactoryData(Generator $generator, string $class, MakeFactoryQuery $makeFactoryQuery): MakeFactoryData
     {
         $object = new \ReflectionClass($class);

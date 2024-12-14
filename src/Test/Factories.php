@@ -50,7 +50,7 @@ trait Factories
      */
     public static function _bootForDataProvider(): void
     {
-        if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.impossibleType
+        if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.impossibleType, function.alreadyNarrowedType
             // unit test
             Configuration::bootForDataProvider(UnitTestConfig::build());
 
@@ -58,12 +58,12 @@ trait Factories
         }
 
         // integration test
-        Configuration::bootForDataProvider(static function() {
+        Configuration::bootForDataProvider(static function(): Configuration {
             if (!static::getContainer()->has('.zenstruck_foundry.configuration')) { // @phpstan-ignore staticMethod.notFound
                 throw new \LogicException('ZenstruckFoundryBundle is not enabled. Ensure it is added to your config/bundles.php.');
             }
 
-            return static::getContainer()->get('.zenstruck_foundry.configuration'); // @phpstan-ignore staticMethod.notFound
+            return static::getContainer()->get('.zenstruck_foundry.configuration'); // @phpstan-ignore staticMethod.notFound, return.type
         });
     }
 
@@ -73,7 +73,7 @@ trait Factories
      */
     public static function _shutdownAfterDataProvider(): void
     {
-        if (\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.impossibleType
+        if (\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.impossibleType, function.alreadyNarrowedType
             self::ensureKernelShutdown(); // @phpstan-ignore staticMethod.notFound
             static::$class = null; // @phpstan-ignore staticProperty.notFound
             static::$kernel = null; // @phpstan-ignore staticProperty.notFound
@@ -87,7 +87,7 @@ trait Factories
      */
     private function _bootFoundry(): void
     {
-        if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.impossibleType
+        if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.impossibleType, function.alreadyNarrowedType
             // unit test
             Configuration::boot(UnitTestConfig::build());
 
@@ -95,12 +95,12 @@ trait Factories
         }
 
         // integration test
-        Configuration::boot(static function() {
+        Configuration::boot(static function(): Configuration {
             if (!static::getContainer()->has('.zenstruck_foundry.configuration')) { // @phpstan-ignore staticMethod.notFound
                 throw new \LogicException('ZenstruckFoundryBundle is not enabled. Ensure it is added to your config/bundles.php.');
             }
 
-            return static::getContainer()->get('.zenstruck_foundry.configuration'); // @phpstan-ignore staticMethod.notFound
+            return static::getContainer()->get('.zenstruck_foundry.configuration'); // @phpstan-ignore staticMethod.notFound, return.type
         });
     }
 
@@ -128,7 +128,7 @@ trait Factories
      */
     private function _loadDataProvidedProxies(): void
     {
-        if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.impossibleType
+        if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.impossibleType, function.alreadyNarrowedType
             return;
         }
 

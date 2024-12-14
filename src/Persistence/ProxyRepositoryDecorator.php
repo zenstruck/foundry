@@ -77,7 +77,8 @@ final class ProxyRepositoryDecorator extends RepositoryDecorator // @phpstan-ign
     }
 
     /**
-     * @psalm-return array<array-key, T&Proxy<T>>
+     * @phpstan-return list<T&Proxy<T>>
+     * @psalm-return list<T&Proxy<T>>
      */
     public function findAll(): array
     {
@@ -85,7 +86,7 @@ final class ProxyRepositoryDecorator extends RepositoryDecorator // @phpstan-ign
     }
 
     /**
-     * @psalm-return array<array-key, T&Proxy<T>>
+     * @psalm-return list<T&Proxy<T>>
      */
     public function findBy(array $criteria, ?array $orderBy = null, $limit = null, $offset = null): array
     {
@@ -111,7 +112,7 @@ final class ProxyRepositoryDecorator extends RepositoryDecorator // @phpstan-ign
     }
 
     /**
-     * @psalm-return array<array-key, T&Proxy<T>>
+     * @psalm-return list<T&Proxy<T>>
      */
     public function randomSet(int $count, array $criteria = []): array
     {
@@ -121,7 +122,7 @@ final class ProxyRepositoryDecorator extends RepositoryDecorator // @phpstan-ign
     }
 
     /**
-     * @psalm-return array<array-key, T&Proxy<T>>
+     * @psalm-return list<T&Proxy<T>>
      */
     public function randomRange(int $min, int $max, array $criteria = []): array
     {
@@ -148,8 +149,8 @@ final class ProxyRepositoryDecorator extends RepositoryDecorator // @phpstan-ign
     }
 
     /**
-     * @param  array<T>          $objects
-     * @return array<T&Proxy<T>>
+     * @param  list<T>          $objects
+     * @return list<T&Proxy<T>>
      */
     private function proxyArray(array $objects): array
     {

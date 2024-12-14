@@ -27,6 +27,6 @@ class OwningSide
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     public ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'owningSide')]
+    #[ORM\ManyToOne(inversedBy: 'owningSides')]
     public ?SelfReferencingInverseSide $inverseSide = null;
 }

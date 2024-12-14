@@ -28,7 +28,7 @@ class ContactFactory extends PersistentObjectFactory
         return Contact::class;
     }
 
-    protected function defaults(): array|callable
+    protected function defaults(): array
     {
         return [
             'name' => self::faker()->word(),

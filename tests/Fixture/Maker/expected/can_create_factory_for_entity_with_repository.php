@@ -45,7 +45,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Repository\GenericEntityRepository;
  * @phpstan-method static GenericEntity&Proxy<GenericEntity> last(string $sortBy = 'id')
  * @phpstan-method static GenericEntity&Proxy<GenericEntity> random(array $attributes = [])
  * @phpstan-method static GenericEntity&Proxy<GenericEntity> randomOrCreate(array $attributes = [])
- * @phpstan-method static ProxyRepositoryDecorator<GenericEntity, EntityRepository> repository()
+ * @phpstan-method static ProxyRepositoryDecorator<GenericEntity, EntityRepository<GenericEntity>> repository()
  * @phpstan-method static list<GenericEntity&Proxy<GenericEntity>> all()
  * @phpstan-method static list<GenericEntity&Proxy<GenericEntity>> createMany(int $number, array|callable $attributes = [])
  * @phpstan-method static list<GenericEntity&Proxy<GenericEntity>> createSequence(iterable|callable $sequence)
