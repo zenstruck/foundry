@@ -60,9 +60,8 @@ abstract class BaseOrmResetter implements OrmResetter
                 // let's only drop the .db file
 
                 $dbPath = $connection->getParams()['path'] ?? null;
-                $fs = new Filesystem();
-                if (DoctrineOrmVersionGuesser::isOrmV3() && $dbPath && $fs->exists($dbPath)) {
-                    (new Filesystem())->remove($dbPath);
+                if (DoctrineOrmVersionGuesser::isOrmV3() && $dbPath && (new Filesystem())->exists($dbPath)) {
+                    file_put_contents($dbPath, '');
                 }
 
                 continue;
