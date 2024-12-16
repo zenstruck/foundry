@@ -21,6 +21,7 @@ use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\ChangesEntityRelationshipCascadePersist;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\UsingRelationships;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\InversedOneToOneWithSetter;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\InversedOneToOneWithNonNullableOwning;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\ManyToOneToSelfReferencing;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\RelationshipWithGlobalEntity;
@@ -86,9 +87,11 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
         $inversedSideEntityFactory::assert()->count(1);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
+    #[Test]
+    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[UsingRelationships(InversedOneToOneWithNonNullableOwning\OwningSide::class, ['inverseSide'])]
+    #[RequiresPhpunit('^11.4')]
     public function inverse_one_to_one_with_non_nullable_inverse_side(): void
     {
         $owningSideFactory = persistent_factory(InversedOneToOneWithNonNullableOwning\OwningSide::class);
@@ -100,6 +103,24 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
         $inverseSideFactory::assert()->count(1);
 
         self::assertSame($inverseSide, $inverseSide->owningSide->inverseSide);
+    }
+
+    /** @test */
+    #[Test]
+    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[UsingRelationships(InversedOneToOneWithSetter\OwningSide::class, ['inverseSide'])]
+    #[RequiresPhpunit('^11.4')]
+    public function inverse_one_to_one_with_both_nullable(): void
+    {
+        $owningSideFactory = persistent_factory(InversedOneToOneWithSetter\OwningSide::class);
+        $inverseSideFactory = persistent_factory(InversedOneToOneWithSetter\InverseSide::class);
+
+        $inverseSide = $inverseSideFactory->create(['owningSide' => $owningSideFactory]);
+
+        $owningSideFactory::assert()->count(1);
+        $inverseSideFactory::assert()->count(1);
+
+        self::assertSame($inverseSide, $inverseSide->getOwningSide()?->inverseSide);
     }
 
     /**

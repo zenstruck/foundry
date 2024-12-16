@@ -22,7 +22,7 @@ use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
 
-use function Zenstruck\Foundry\get;
+use function Zenstruck\Foundry\set;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -34,10 +34,13 @@ use function Zenstruck\Foundry\get;
  */
 abstract class PersistentObjectFactory extends ObjectFactory
 {
-    private bool $persist;
+    private PersistMode $persist;
 
     /** @phpstan-var list<callable(T, Parameters, static):void> */
     private array $afterPersist = [];
+
+    /** @var list<callable(T):void> */
+    private array $tempAfterInstantiate = [];
 
     /** @var list<callable(T):void> */
     private array $tempAfterPersist = [];
@@ -196,6 +199,12 @@ abstract class PersistentObjectFactory extends ObjectFactory
     {
         $object = parent::create($attributes);
 
+        foreach ($this->tempAfterInstantiate as $callback) {
+            $callback($object);
+        }
+
+        $this->tempAfterInstantiate = [];
+
         $this->throwIfCannotCreateObject();
 
         if (!$this->isPersisting()) {
@@ -232,7 +241,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     final public function andPersist(): static
     {
         $clone = clone $this;
-        $clone->persist = true;
+        $clone->persist = PersistMode::PERSIST;
 
         return $clone;
     }
@@ -240,7 +249,15 @@ abstract class PersistentObjectFactory extends ObjectFactory
     final public function withoutPersisting(): static
     {
         $clone = clone $this;
-        $clone->persist = false;
+        $clone->persist = PersistMode::WITHOUT_PERSISTING;
+
+        return $clone;
+    }
+
+    private function withoutPersistingButScheduleForInsert(): static
+    {
+        $clone = clone $this;
+        $clone->persist = PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT;
 
         return $clone;
     }
@@ -263,9 +280,11 @@ abstract class PersistentObjectFactory extends ObjectFactory
         }
 
         if ($value instanceof self && isset($this->persist)) {
-            $value = $this->isPersisting()
-                ? $value->andPersist()
-                : $value->withoutPersisting();
+            $value = match($this->persist) {
+                PersistMode::PERSIST => $value->andPersist(),
+                PersistMode::WITHOUT_PERSISTING => $value->withoutPersisting(),
+                PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT => $value->withoutPersistingButScheduleForInsert(),
+            };
         }
 
         if ($value instanceof self) {
@@ -277,21 +296,21 @@ abstract class PersistentObjectFactory extends ObjectFactory
             if ($inversedRelationshipMetadata && !$inversedRelationshipMetadata->isCollection) {
                 $inverseField = $inversedRelationshipMetadata->inverseField;
 
-                // we create now the object to prevent "non-nullable" property errors,
-                // but we'll need to remove it once the current object is created
+                // we need to handle the circular dependency involved by inversed one-to-one relationship:
+                // a placeholder object is used, which will be replaced by the real object, after its instantiation
+                $inversedObject = $value->withoutPersistingButScheduleForInsert()
+                    ->create([$inverseField => $placeholder = (new \ReflectionClass(static::class()))->newInstanceWithoutConstructor()]);
 
-                $inversedObject = unproxy($value->create());
-                $this->tempAfterPersist[] = static function(object $object) use ($value, $inverseField, $pm, $inversedObject) {
-                    // we cannot use the already created $inversedObject:
-                    // because we must also remove its potential newly created owner (here: "$oldObj")
-                    // but a cascade:["remove"] would remove too many things
-                    $value->create([$inverseField => $object]);
-                    $pm->refresh($object);
-                    $oldObj = get($inversedObject, $inverseField);
-                    delete($inversedObject);
-                    if ($oldObj) {
-                        delete($oldObj); // @phpstan-ignore argument.templateType
-                    }
+                // auto-refresh computes changeset and prevents the placeholder object to be cleanly
+                // forgotten fom the persistence manager
+                if ($inversedObject instanceof Proxy) {
+                    $inversedObject->_disableAutoRefresh();
+                    $inversedObject = $inversedObject->_real();
+                }
+
+                $this->tempAfterInstantiate[] = static function(object $object) use ($inversedObject, $inverseField, $pm, $placeholder) {
+                    $pm->forget($placeholder);
+                    set($inversedObject, $inverseField, $object);
                 };
 
                 return $inversedObject;
@@ -359,11 +378,13 @@ abstract class PersistentObjectFactory extends ObjectFactory
     {
         $config = Configuration::instance();
 
-        if ($config->isPersistenceAvailable() && !$config->persistence()->isEnabled()) {
+        if (!$config->isPersistenceEnabled()) {
             return false;
         }
 
-        return $this->persist ?? $config->isPersistenceAvailable() && $config->persistence()->isEnabled() && $config->persistence()->autoPersist(static::class());
+        $persistMode = $this->persist ?? ($config->persistence()->autoPersist(static::class()) ? PersistMode::PERSIST : PersistMode::WITHOUT_PERSISTING);
+
+        return $persistMode->isPersisting();
     }
 
     /**
@@ -373,7 +394,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     {
         return $this->afterInstantiate(
             static function(object $object, array $parameters, PersistentObjectFactory $factory): void {
-                if (!$factory->isPersisting()) {
+                if (!$factory->isPersisting() && (!isset($factory->persist) || $factory->persist !== PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT)) {
                     return;
                 }
 

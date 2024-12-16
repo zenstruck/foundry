@@ -11,7 +11,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\InversedOneToOneWithNonNullableOwning;
+namespace Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\InversedOneToOneWithSetter;
 
 use Doctrine\ORM\Mapping as ORM;
 use Zenstruck\Foundry\Tests\Fixture\Model\Base;
@@ -20,7 +20,7 @@ use Zenstruck\Foundry\Tests\Fixture\Model\Base;
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
 #[ORM\Entity]
-#[ORM\Table('inversed_one_to_one_with_non_nullable_owning_owning_side')]
+#[ORM\Table('inversed_one_to_one_with_setter_owning_side')]
 class OwningSide extends Base
 {
     #[ORM\OneToOne(inversedBy: 'owningSide')]

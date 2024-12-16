@@ -20,7 +20,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use Zenstruck\Assert;
-use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
 use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\UsingRelationships;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
