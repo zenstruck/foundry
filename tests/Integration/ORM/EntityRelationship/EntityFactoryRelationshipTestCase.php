@@ -167,7 +167,7 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(Address::class, ['contact'])]
-    #[UsingRelationships(Contact::class, ['address'])]
+    #[UsingRelationships(Contact::class, ['address', 'category'])]
     public function inversed_one_to_one(): void
     {
         $address = static::addressFactory()->create(['contact' => static::contactFactory()]);

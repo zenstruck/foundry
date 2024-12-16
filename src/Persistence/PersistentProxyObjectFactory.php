@@ -141,7 +141,7 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
      */
     final public static function repository(): ObjectRepository
     {
-        Configuration::instance()->assertPersistanceEnabled();
+        Configuration::instance()->assertPersistenceEnabled();
 
         return new ProxyRepositoryDecorator(static::class()); // @phpstan-ignore argument.type, return.type
     }

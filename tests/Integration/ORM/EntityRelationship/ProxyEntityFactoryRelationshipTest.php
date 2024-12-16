@@ -127,12 +127,11 @@ final class ProxyEntityFactoryRelationshipTest extends EntityFactoryRelationship
 
     /** @test */
     #[Test]
-    public function cannot_use_assert_persisted_when_entity_has_changes(): void
+    public function can_use_assert_persisted_when_entity_has_changes(): void
     {
         $contact = static::contactFactory()->create();
         $contact->setName('foo');
 
-        $this->expectException(RefreshObjectFailed::class);
         $contact->_assertPersisted();
     }
 

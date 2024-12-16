@@ -175,6 +175,18 @@ final class PersistenceManager
         return $object;
     }
 
+    public function isPersisted(object $object): bool
+    {
+        if ($object instanceof Proxy) {
+            $object = unproxy($object);
+        }
+
+        $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
+        $id = $om->getClassMetadata($object::class)->getIdentifierValues($object);
+
+        return $id && $om->find($object::class, $id) !== null;
+    }
+
     /**
      * @template T of object
      *

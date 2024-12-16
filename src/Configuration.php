@@ -67,9 +67,14 @@ final class Configuration
         return (bool) $this->persistence;
     }
 
-    public function assertPersistanceEnabled(): void
+    public function isPersistenceEnabled(): bool
     {
-        if (!$this->isPersistenceAvailable() || !$this->persistence()->isEnabled()) {
+        return $this->isPersistenceAvailable() && $this->persistence()->isEnabled();
+    }
+
+    public function assertPersistenceEnabled(): void
+    {
+        if (!$this->isPersistenceEnabled()) {
             throw new PersistenceDisabled('Cannot get repository when persist is disabled.');
         }
     }

@@ -166,7 +166,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
      */
     public static function repository(): ObjectRepository
     {
-        Configuration::instance()->assertPersistanceEnabled();
+        Configuration::instance()->assertPersistenceEnabled();
 
         return new RepositoryDecorator(static::class()); // @phpstan-ignore return.type
     }
@@ -279,11 +279,12 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
                 // we create now the object to prevent "non-nullable" property errors,
                 // but we'll need to remove it once the current object is created
+
                 $inversedObject = unproxy($value->create());
                 $this->tempAfterPersist[] = static function(object $object) use ($value, $inverseField, $pm, $inversedObject) {
                     // we cannot use the already created $inversedObject:
                     // because we must also remove its potential newly created owner (here: "$oldObj")
-                    // but a cascade:["persist"] would remove too many things
+                    // but a cascade:["remove"] would remove too many things
                     $value->create([$inverseField => $object]);
                     $pm->refresh($object);
                     $oldObj = get($inversedObject, $inverseField);

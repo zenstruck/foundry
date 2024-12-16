@@ -134,17 +134,10 @@ trait IsProxy // @phpstan-ignore trait.unused
 
     private function isPersisted(): bool
     {
-        try {
-            $this->_refresh();
+        $this->initializeLazyObject();
+        $object = $this->lazyObjectState->realInstance;
 
-            return true;
-        } catch (RefreshObjectFailed $e) {
-            if ($e->objectWasDeleted()) {
-                return false;
-            }
-
-            throw $e;
-        }
+        return Configuration::instance()->persistence()->isPersisted($object);
     }
 
     private function _autoRefresh(): void
