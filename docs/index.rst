@@ -11,7 +11,10 @@ Foundry supports ``doctrine/orm`` (with `doctrine/doctrine-bundle <https://githu
 ``doctrine/mongodb-odm`` (with `doctrine/mongodb-odm-bundle <https://github.com/doctrine/DoctrineMongoDBBundle>`_)
 or a combination of these.
 
-Want to watch a screencast 🎥 about it? Check out https://symfonycasts.com/foundry
+.. admonition:: Screencast
+    :class: screencast
+
+    Want to watch a screencast 🎥 about it? Check out `https://symfonycasts.com/foundry`__
 
 .. warning::
 
@@ -251,6 +254,8 @@ This command will generate a ``PostFactory`` class that looks like this:
             // ...
         }
 
+.. _defaults:
+
 In the ``defaults()``, you can return an array of all default values that any new object
 should have. `Faker`_ is available to easily get random data:
 
@@ -259,12 +264,21 @@ should have. `Faker`_ is available to easily get random data:
     protected function defaults(): array
     {
         return [
-            // Symfony's property-access component is used to populate the properties
-            // this means that setTitle() will be called or you can have a $title constructor argument
+            // use the built-in Fake integration to generate good random values...
             'title' => self::faker()->unique()->sentence(),
             'body' => self::faker()->sentence(),
+
+            // ...or generate the values yourself if you prefer
+            'createdAt' => new \DateTimeImmutable('today'),
         ];
     }
+
+These default values are applied to both the **constructor arguments** and the
+**properties** of the objects. For example, defining a default value for ``title``
+will first attempt to set a constructor argument called ``$title``. If that doesn't
+exist, the `PropertyAccess <https://symfony.com/doc/current/components/property_access.html>`_
+component will be used to call the ``setTitle()`` method or directly set the public
+``$title`` property.
 
 .. tip::
 
@@ -666,6 +680,12 @@ You can customize the instantiator in several ways:
         })
     ;
 
+.. warning::
+
+    The ``instantiateWith()`` method completely overrides the default instantiation
+    and object hydration system. Any attributes defined in the ``defaults()``
+    method will be ignored.
+
 You can customize the instantiator globally for all your factories (can still be overruled by factory instance
 instantiators):
 
@@ -843,8 +863,8 @@ The ``defaults()`` method is called everytime a factory is instantiated (even if
 creating it). Sometimes, you might not want your value calculated every time. For example, if you have a value for one
 of your attributes that:
 
- - has side effects (i.e. creating a file or fetching a random existing entity from another factory)
- - you only want to calculate once (i.e. creating an entity from another factory to pass as a value into multiple other factories)
+* has side effects (i.e. creating a file or fetching a random existing entity from another factory)
+* you only want to calculate once (i.e. creating an entity from another factory to pass as a value into multiple other factories)
 
 You can wrap the value in a ``LazyValue`` which ensures the value is only calculated when/if it's needed. Additionally,
 the LazyValue can be `memoized <https://en.wikipedia.org/wiki/Memoization>`_ so that it is only calculated once.
@@ -2216,8 +2236,9 @@ Foundry is shipped with an extension for PHPUnit. You can install it by modifyin
         </phpunit>
 
 This extension provides the following features:
-- support for the `#[WithStory] Attribute`_
-- ability to use ``Factory::create()`` in `PHPUnit Data Providers`_ (along with PHPUnit ^11.4)
+
+* support for the `#[WithStory] Attribute`_
+* ability to use ``Factory::create()`` in `PHPUnit Data Providers`_ (along with PHPUnit ^11.4)
 
 .. versionadded:: 2.2
 
