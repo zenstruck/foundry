@@ -19,10 +19,10 @@
     <testsuites>
         <testsuite name="main">
             <directory>tests</directory>
-            <exclude>tests/Integration/Migration/ResetDatabaseWithMigrationTest.php</exclude>
+            <exclude>tests/Integration/ResetDatabase</exclude>
         </testsuite>
-        <testsuite name="migrate">
-            <file>tests/Integration/Migration/ResetDatabaseWithMigrationTest.php</file>
+        <testsuite name="reset-database">
+            <directory>tests/Integration/ResetDatabase</directory>
         </testsuite>
     </testsuites>
 

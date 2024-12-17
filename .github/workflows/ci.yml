@@ -89,28 +89,33 @@ jobs:
         run: ./phpunit
         shell: bash
 
-  test-reset-database-with-migration:
-    name: Test migration - D:${{ matrix.database }} ${{ matrix.use-dama == 1 && ' (dama)' || '' }} ${{ contains(matrix.with-migration-configuration-file, 'transactional') && '(configuration file transactional)' || contains(matrix.with-migration-configuration-file, 'configuration') && '(configuration file)' || '' }}
+  test-reset-database:
+    name: Test reset database - D:${{ matrix.database }} ${{ matrix.use-dama == 1 && ' (dama)' || '' }} ${{ matrix.reset-database-mode == 'migrate' && ' (migrate)' || '' }} ${{ contains(matrix.with-migration-configuration-file, 'transactional') && '(configuration file transactional)' || contains(matrix.with-migration-configuration-file, 'configuration') && '(configuration file)' || '' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        database: [ mysql, pgsql, sqlite ]
+        database: [ mysql, pgsql, sqlite, mysql|mongo ]
         use-dama: [ 0, 1 ]
-        with-migration-configuration-file:
-          - ''
-          - 'tests/Fixture/MigrationTests/configs/migration-configuration.php'
-          - 'tests/Fixture/MigrationTests/configs/migration-configuration-transactional.php'
+        reset-database-mode: [ schema, migrate ]
+        migration-configuration-file: ['no', 'migration-configuration', 'migration-configuration-transactional']
+        include:
+          - { database: mongo, migration-configuration-file: 'no', use-dama: 0, reset-database-mode: schema }
         exclude:
           # there is currently a bug with MySQL and transactional migrations
           - database: mysql
-            with-migration-configuration-file: 'tests/Fixture/MigrationTests/configs/migration-configuration-transactional.php'
+            migration-configuration-file: 'migration-configuration-transactional'
+          - reset-database-mode: schema
+            migration-configuration-file: 'migration-configuration'
+          - reset-database-mode: schema
+            migration-configuration-file: 'migration-configuration-transactional'
     env:
       DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || 'sqlite:///%kernel.project_dir%/var/data.db' }}
-      MONGO_URL: ''
+      MONGO_URL: ${{ contains(matrix.database, 'mongo') && 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb' || '' }}
       USE_DAMA_DOCTRINE_TEST_BUNDLE: ${{ matrix.use-dama == 1 && 1 || 0 }}
-      WITH_MIGRATION_CONFIGURATION_FILE: ${{ matrix.with-migration-configuration-file }}
-      PHPUNIT_VERSION: 9
+      DATABASE_RESET_MODE: ${{ matrix.reset-database-mode == 1 && 1 || 0 }}
+      MIGRATION_CONFIGURATION_FILE: ${{ matrix.migration-configuration-file == 'no' && '' || format('tests/Fixture/MigrationTests/configs/{0}.php', matrix.migration-configuration-file) }}
+      PHPUNIT_VERSION: 11
     services:
       postgres:
         image: ${{ contains(matrix.database, 'pgsql') && 'postgres:15' || '' }}
@@ -125,6 +130,10 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+      mongo:
+        image: ${{ contains(matrix.database, 'mongo') && 'mongo:4' || '' }}
+        ports:
+          - 27017:27017
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -149,7 +158,7 @@ jobs:
         run: sudo /etc/init.d/mysql start
 
       - name: Test
-        run: ./phpunit --testsuite migrate --bootstrap tests/bootstrap-migrate.php
+        run: ./phpunit --testsuite reset-database --bootstrap tests/bootstrap-reset-database.php
         shell: bash
 
   test-with-paratest:

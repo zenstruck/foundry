@@ -86,15 +86,15 @@
     },
     "scripts": {
         "test": [
-            "@test-schema",
-            "@test-migrate"
+            "@test-main",
+            "@test-reset-database"
         ],
-        "test-schema": "./phpunit",
-        "test-migrate": "./phpunit --testsuite migrate --bootstrap tests/bootstrap-migrate.php"
+        "test-main": "./phpunit --testsuite main",
+        "test-reset-database": "./phpunit --testsuite reset-database --bootstrap tests/bootstrap-reset-database.php"
     },
     "scripts-descriptions": {
-        "test-schema": "Test with schema reset",
-        "test-migrate": "Test with migrations reset"
+        "test-main": "Main test suite",
+        "test-reset-database": "Test reset database test suite"
     },
     "minimum-stability": "dev",
     "prefer-stable": true

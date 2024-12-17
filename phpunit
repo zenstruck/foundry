@@ -16,7 +16,7 @@ check_phpunit_version() {
 }
 
 ### >> load env vars from .env files if not in CI and not from a composer script
-if [ -z "${CI:-}" ] && [ -z "${COMPOSER_BINARY:-}" ] ; then
+if [ -z "${CI:-}" ] ; then
   source .env
 
   if [ -f .env.local ]; then

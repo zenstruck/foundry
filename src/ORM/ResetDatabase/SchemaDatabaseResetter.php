@@ -33,7 +33,7 @@ final class SchemaDatabaseResetter extends BaseOrmResetter
         $this->createSchema($application);
     }
 
-    public function doResetBeforeEachTest(KernelInterface $kernel): void
+    protected function doResetBeforeEachTest(KernelInterface $kernel): void
     {
         $application = application($kernel);
 

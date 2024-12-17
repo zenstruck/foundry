@@ -16,9 +16,7 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Story;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
-use Zenstruck\Foundry\Tests\Fixture\Document\GlobalDocument;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
-use Zenstruck\Foundry\Tests\Fixture\Entity\GlobalEntity;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericDocumentFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
@@ -27,11 +25,8 @@ use Zenstruck\Foundry\Tests\Fixture\Stories\DocumentPoolStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\DocumentStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\EntityPoolStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\EntityStory;
-use Zenstruck\Foundry\Tests\Fixture\Stories\GlobalStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\ObjectStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\PersistenceDisabledStory;
-
-use function Zenstruck\Foundry\Persistence\repository;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -70,44 +65,6 @@ final class StoryTest extends KernelTestCase
         $story::load();
 
         $factory::repository()->assert()->count(2);
-    }
-
-    /**
-     * @test
-     */
-    public function global_stories_are_loaded(): void
-    {
-        if (!\getenv('DATABASE_URL') && !\getenv('MONGO_URL')) {
-            $this->markTestSkipped('No persistence enabled.');
-        }
-
-        if (\getenv('DATABASE_URL')) {
-            repository(GlobalEntity::class)->assert()->count(2);
-        }
-
-        if (\getenv('MONGO_URL')) {
-            repository(GlobalDocument::class)->assert()->count(2);
-        }
-    }
-
-    /**
-     * @test
-     */
-    public function global_stories_cannot_be_loaded_again(): void
-    {
-        if (!\getenv('DATABASE_URL') && !\getenv('MONGO_URL')) {
-            $this->markTestSkipped('No persistence enabled.');
-        }
-
-        GlobalStory::load();
-
-        if (\getenv('DATABASE_URL')) {
-            repository(GlobalEntity::class)->assert()->count(2);
-        }
-
-        if (\getenv('MONGO_URL')) {
-            repository(GlobalDocument::class)->assert()->count(2);
-        }
     }
 
     /**

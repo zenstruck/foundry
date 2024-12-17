@@ -16,7 +16,7 @@
     <testsuites>
         <testsuite name="main">
             <directory>tests</directory>
-            <exclude>tests/Integration/Migration/ResetDatabaseWithMigrationTest.php</exclude>
+            <exclude>tests/Integration/ResetDatabase</exclude>
         </testsuite>
     </testsuites>
     <source ignoreSuppressionOfDeprecations="true">
