@@ -274,6 +274,9 @@ jobs:
         with:
           composer-options: --prefer-dist
 
+      - name: Validate PSR-4
+        run: composer dump-autoload --optimize --strict-psr --strict-ambiguous
+
       - name: Install PHPStan
         run: composer bin phpstan install
 

@@ -11,7 +11,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Unit\Persistence;
+namespace Zenstruck\Foundry\Tests\Unit\Persistence;
 
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Persistence\ProxyGenerator;

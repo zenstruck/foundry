@@ -61,7 +61,8 @@
             "Zenstruck\\Foundry\\Tests\\": ["tests/"],
             "App\\": "tests/Fixture/Maker/tmp/src",
             "App\\Tests\\": "tests/Fixture/Maker/tmp/tests"
-        }
+        },
+        "exclude-from-classmap": ["tests/Fixture/Maker/expected"]
     },
     "config": {
         "preferred-install": "dist",
