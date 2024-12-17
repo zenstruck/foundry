@@ -264,7 +264,7 @@ should have. `Faker`_ is available to easily get random data:
     protected function defaults(): array
     {
         return [
-            // use the built-in Fake integration to generate good random values...
+            // use the built-in Faker integration to generate good random values...
             'title' => self::faker()->unique()->sentence(),
             'body' => self::faker()->sentence(),
 
@@ -278,7 +278,8 @@ These default values are applied to both the **constructor arguments** and the
 will first attempt to set a constructor argument called ``$title``. If that doesn't
 exist, the `PropertyAccess <https://symfony.com/doc/current/components/property_access.html>`_
 component will be used to call the ``setTitle()`` method or directly set the public
-``$title`` property.
+``$title`` property. If all these methods fail, PHP Reflection will be used
+to set the value of the property.
 
 .. tip::
 
@@ -682,9 +683,11 @@ You can customize the instantiator in several ways:
 
 .. warning::
 
-    The ``instantiateWith()`` method completely overrides the default instantiation
-    and object hydration system. Any attributes defined in the ``defaults()``
-    method will be ignored.
+    The ``instantiateWith()`` method fully replaces the default instantiation
+    and object hydration system. Attributes defined in the ``defaults()`` method,
+    as well as any states defined with the ``with()`` method, **will not be
+    applied automatically**. However, they are available as arguments to the
+    ``instantiateWith()`` callable.
 
 You can customize the instantiator globally for all your factories (can still be overruled by factory instance
 instantiators):
