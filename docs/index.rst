@@ -278,8 +278,7 @@ These default values are applied to both the **constructor arguments** and the
 will first attempt to set a constructor argument called ``$title``. If that doesn't
 exist, the `PropertyAccess <https://symfony.com/doc/current/components/property_access.html>`_
 component will be used to call the ``setTitle()`` method or directly set the public
-``$title`` property. If all these methods fail, PHP Reflection will be used
-to set the value of the property.
+``$title`` property. More about this in the :ref:`instantiation and hydration <instantiation>` section.
 
 .. tip::
 
@@ -631,15 +630,16 @@ You can override your factory's ``initialize()`` method to add default state/log
 
 .. _instantiation:
 
-Instantiation
-~~~~~~~~~~~~~
+Object Instantiation & Hydration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default, objects are instantiated in the normal fashion, by using the object's constructor. Attributes
-that match constructor arguments are used. Remaining attributes are set to the object using Symfony's
-`PropertyAccess <https://symfony.com/doc/current/components/property_access.html>`_ component
+that match constructor arguments are used. Remaining attributes are used in the hydration phase and set to the object
+using Symfony's `PropertyAccess <https://symfony.com/doc/current/components/property_access.html>`_ component
 (setters/public properties). Any extra attributes cause an exception to be thrown.
 
-You can customize the instantiator in several ways:
+You can customize the instantiator in several ways, so that Foundry will instantiate and hydrate your objects, using the
+attributes provided:
 
 ::
 
@@ -670,20 +670,25 @@ You can customize the instantiator in several ways:
         // use a "namedConstructor"
         ->instantiateWith(Instantiator::namedConstructor("methodName"))
 
-        // use a callable
+        // use a callable: it will be passed the attributes matching its parameters names,
+        // remaining attributes will be used in the hydration phase
         ->instantiateWith(Instantiator::use(function(string $title): object {
-            return new Post($title); // ... your own logic
+            return new Post($title); // ... your own instantiation logic
         }))
+    ;
 
-        // the instantiator is just a callable, you can provide your own
+If this does not suit your needs, the instantiator is just a callable. You can provide your own to have complete control
+over instantiation and hydration phases:
+
+::
+
         ->instantiateWith(function(array $attributes, string $class): object {
             return new Post(); // ... your own logic
         })
-    ;
 
 .. warning::
 
-    The ``instantiateWith()`` method fully replaces the default instantiation
+    The ``instantiateWith(callable(...))`` method fully replaces the default instantiation
     and object hydration system. Attributes defined in the ``defaults()`` method,
     as well as any states defined with the ``with()`` method, **will not be
     applied automatically**. However, they are available as arguments to the
