@@ -4,7 +4,7 @@
 /.phpunit.cache
 /vendor/
 /bin/tools/*/vendor/
-/bin/tools/php-cs-fixer/composer.lock
+/bin/tools/csfixer
 /build/
 /.php-cs-fixer.cache
 /.phpunit.result.cache

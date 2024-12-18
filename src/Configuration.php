@@ -12,6 +12,7 @@
 namespace Zenstruck\Foundry;
 
 use Faker;
+use Zenstruck\Foundry\Exception\FactoriesTraitNotUsed;
 use Zenstruck\Foundry\Exception\FoundryNotBooted;
 use Zenstruck\Foundry\Exception\PersistenceDisabled;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
@@ -89,6 +90,8 @@ final class Configuration
         if (!self::$instance) {
             throw new FoundryNotBooted();
         }
+
+        FactoriesTraitNotUsed::throwIfComingFromKernelTestCaseWithoutFactoriesTrait();
 
         return \is_callable(self::$instance) ? (self::$instance)() : self::$instance;
     }
