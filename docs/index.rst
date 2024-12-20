@@ -1770,7 +1770,7 @@ Be sure your data provider returns only instances of ``Factory`` and you do not 
             )->asDataProvider();
         }
 
-    The ``FactoryCollection`` could also be passed directly to the test case in order to have several objects available in the same test:
+The ``FactoryCollection`` could also be passed directly to the test case in order to have several objects available in the same test:
 
 ::
 
