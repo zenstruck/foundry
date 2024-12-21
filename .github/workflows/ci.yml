@@ -297,7 +297,7 @@ jobs:
     steps:
       - uses: zenstruck/.github/actions/php-cs-fixer@main
         with:
-          php: 8
+          php: 8.1
           key: ${{ secrets.GPG_PRIVATE_KEY }}
           token: ${{ secrets.COMPOSER_TOKEN }}
 
