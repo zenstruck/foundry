@@ -88,4 +88,11 @@ final class MongoPersistenceStrategy extends PersistenceStrategy
     {
         return $this->objectManagerFor($object::class)->getClassMetadata($object::class)->isEmbeddedDocument;
     }
+
+    final function isScheduledForInsert(object $object): bool
+    {
+        $uow = $this->objectManagerFor($object::class)->getUnitOfWork();
+
+        return $uow->isScheduledForInsert($object) || $uow->isScheduledForUpsert($object);
+    }
 }

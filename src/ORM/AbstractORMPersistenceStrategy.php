@@ -78,6 +78,11 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
         return $this->objectManagerFor($object::class)->getClassMetadata($object::class)->isEmbeddedClass;
     }
 
+    final function isScheduledForInsert(object $object): bool
+    {
+        return $this->objectManagerFor($object::class)->getUnitOfWork()->isScheduledForInsert($object);
+    }
+
     final public function managedNamespaces(): array
     {
         $namespaces = [];

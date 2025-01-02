@@ -99,4 +99,6 @@ abstract class PersistenceStrategy
     abstract public function embeddablePropertiesFor(object $object, string $owner): ?array;
 
     abstract public function isEmbeddable(object $object): bool;
+
+    abstract public function isScheduledForInsert(object $object): bool;
 }

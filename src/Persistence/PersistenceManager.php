@@ -211,7 +211,7 @@ final class PersistenceManager
 
     public function isPersisted(object $object): bool
     {
-        return (bool) $this->findPersisted($object);
+        return !$this->strategyFor($object::class)->isScheduledForInsert($object) && $this->findPersisted($object);
     }
 
     /**

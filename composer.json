@@ -30,7 +30,7 @@
         "brianium/paratest": "^6|^7",
         "dama/doctrine-test-bundle": "^7.0|^8.0",
         "doctrine/collections": "^1.7|^2.0",
-        "doctrine/common": "^3.2",
+        "doctrine/common": "^2|^3",
         "doctrine/doctrine-bundle": "^2.10",
         "doctrine/doctrine-migrations-bundle": "^2.2|^3.0",
         "doctrine/mongodb-odm-bundle": "^4.6|^5.0",
@@ -42,6 +42,7 @@
         "symfony/phpunit-bridge": "^6.4|^7.0",
         "symfony/runtime": "^6.4|^7.0",
         "symfony/translation-contracts": "^3.4",
+        "symfony/uid": "^6.4|^7.0",
         "symfony/var-dumper": "^6.4|^7.0",
         "symfony/yaml": "^6.4|^7.0"
     },
