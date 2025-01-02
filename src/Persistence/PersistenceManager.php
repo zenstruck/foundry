@@ -186,7 +186,14 @@ final class PersistenceManager
         return $object;
     }
 
-    public function isPersisted(object $object): bool
+    /**
+     * @template T of object
+     *
+     * @param T $object
+     *
+     * @return ?T
+     */
+    public function findPersisted(object $object): ?object
     {
         if ($object instanceof Proxy) {
             $object = unproxy($object);
@@ -195,7 +202,16 @@ final class PersistenceManager
         $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
         $id = $om->getClassMetadata($object::class)->getIdentifierValues($object);
 
-        return $id && null !== $om->find($object::class, $id);
+        if (!$id) {
+            return null;
+        }
+
+        return $om->find($object::class, $id);
+    }
+
+    public function isPersisted(object $object): bool
+    {
+        return (bool) $this->findPersisted($object);
     }
 
     /**
@@ -318,7 +334,9 @@ final class PersistenceManager
     public function hasPersistenceFor(object $object): bool
     {
         try {
-            return (bool) $this->strategyFor($object::class);
+            $strategy = $this->strategyFor($object::class);
+
+            return !$strategy->isEmbeddable($object);
         } catch (NoPersistenceStrategy) {
             return false;
         }

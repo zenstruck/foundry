@@ -12,7 +12,6 @@
 namespace Zenstruck\Foundry\Persistence;
 
 use Doctrine\Persistence\ObjectRepository;
-use Symfony\Component\VarExporter\Exception\LogicException as VarExportLogicException;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\PersistenceDisabled;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
@@ -20,7 +19,6 @@ use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
-use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
 
 use function Zenstruck\Foundry\set;
 
@@ -359,11 +357,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
             return $object;
         }
 
-        try {
-            return proxy($object)->_refresh()->_real();
-        } catch (RefreshObjectFailed|VarExportLogicException) {
-            return $object;
-        }
+        return $configuration->persistence()->findPersisted($object) ?? $object;
     }
 
     final protected function isPersisting(): bool
