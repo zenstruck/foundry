@@ -137,3 +137,19 @@ function enable_persisting(): void
 {
     Factory::configuration()->enablePersist();
 }
+
+/**
+ * Recursively unwrap all proxies.
+ */
+function unproxy(mixed $what): mixed
+{
+    if ($what instanceof Proxy) {
+        return $what->_real();
+    }
+
+    if (\is_array($what)) {
+        return \array_map('Zenstruck\Foundry\Persistence\unproxy', $what);
+    }
+
+    return $what;
+}

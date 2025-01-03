@@ -11,7 +11,7 @@
         <ini name="error_reporting" value="-1"/>
         <env name="KERNEL_CLASS" value="Zenstruck\Foundry\Tests\Fixtures\Kernel"/>
         <env name="USE_DAMA_DOCTRINE_TEST_BUNDLE" value="1"/>
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0&amp;max[direct]=0&amp;quiet[]=indirect&amp;quiet[]=other"/>
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=99999&amp;max[direct]=99999&amp;quiet[]=indirect&amp;quiet[]=other"/>
         <env name="SHELL_VERBOSITY" value="0"/>
     </php>
 

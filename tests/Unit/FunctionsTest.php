@@ -23,6 +23,8 @@ use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 
+use Zenstruck\Foundry\Tests\Fixtures\Factories\PostFactory;
+
 use function Zenstruck\Foundry\create;
 use function Zenstruck\Foundry\create_many;
 use function Zenstruck\Foundry\faker;
@@ -32,6 +34,7 @@ use function Zenstruck\Foundry\memoize;
 use function Zenstruck\Foundry\object;
 use function Zenstruck\Foundry\Persistence\disable_persisting;
 use function Zenstruck\Foundry\Persistence\enable_persisting;
+use function Zenstruck\Foundry\Persistence\unproxy;
 use function Zenstruck\Foundry\repository;
 
 /**
@@ -163,5 +166,24 @@ final class FunctionsTest extends TestCase
 
         enable_persisting();
         disable_persisting();
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_unproxy_all_the_stuff(): void
+    {
+        self::assertInstanceOf(Proxy::class, $post = PostFactory::createOne());
+        self::assertInstanceOf(Post::class, unproxy($post));
+        self::assertInstanceOf(Post::class, unproxy(unproxy($post)));
+
+        $posts = PostFactory::createMany(2);
+        foreach (unproxy($posts) as $post) {
+            self::assertInstanceOf(Post::class, $post);
+        }
+
+        $stdClass = new \stdClass();
+        self::assertSame($stdClass, unproxy($stdClass));
+        self::assertSame(1, unproxy(1));
     }
 }
