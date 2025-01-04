@@ -155,8 +155,10 @@ final class PersistenceManager
 
         $strategy = $this->strategyFor($object::class);
 
-        if ($strategy->hasChanges($object)) {
-            throw RefreshObjectFailed::objectHasUnsavedChanges($object::class);
+        if (!$force) {
+            if ($strategy->hasChanges($object)) {
+                throw RefreshObjectFailed::objectHasUnsavedChanges($object::class);
+            }
         }
 
         $om = $strategy->objectManagerFor($object::class);
@@ -186,15 +188,12 @@ final class PersistenceManager
         return $object;
     }
 
-    /**
-     * @template T of object
-     *
-     * @param T $object
-     *
-     * @return ?T
-     */
-    public function findPersisted(object $object): ?object
+    public function isPersisted(object $object): bool
     {
+        if ($this->strategyFor($object::class)->isScheduledForInsert($object)) {
+            return false;
+        }
+
         if ($object instanceof Proxy) {
             $object = unproxy($object);
         }
@@ -202,16 +201,7 @@ final class PersistenceManager
         $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
         $id = $om->getClassMetadata($object::class)->getIdentifierValues($object);
 
-        if (!$id) {
-            return null;
-        }
-
-        return $om->find($object::class, $id);
-    }
-
-    public function isPersisted(object $object): bool
-    {
-        return !$this->strategyFor($object::class)->isScheduledForInsert($object) && $this->findPersisted($object);
+        return $id && null !== $om->find($object::class, $id);
     }
 
     /**
