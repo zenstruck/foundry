@@ -44,6 +44,10 @@ final class ChangeCascadePersistOnLoadClassMetadataListener
         foreach ($this->metadata as $metadatum) {
             if ($classMetadata->getName() === $metadatum->class) {
                 $classMetadata->getAssociationMapping($metadatum->field)['cascade'] = $metadatum->cascade ? ['persist'] : [];
+
+                if ($metadatum->orphanRemoval) {
+                    $classMetadata->getAssociationMapping($metadatum->field)['orphanRemoval'] = true;
+                }
             }
         }
     }

@@ -112,9 +112,12 @@ trait ChangesEntityRelationshipCascadePersist
                     throw new \LogicException(\sprintf("Wrong parameters for attribute \"%s\". Association \"{$class}::\${$field}\" does not exist.", UsingRelationships::class));
                 }
 
-                $relationshipFields[] = ['class' => $association['sourceEntity'], 'field' => $association['fieldName']];
+                $relationshipFields[] = ['class' => $association['sourceEntity'], 'field' => $association['fieldName'], 'isOneToMany' => $association['type'] === ClassMetadata::ONE_TO_MANY];
                 if ($association['inversedBy'] ?? $association['mappedBy'] ?? null) {
-                    $relationshipFields[] = ['class' => $association['targetEntity'], 'field' => $association['inversedBy'] ?? $association['mappedBy']];
+                    /** @var ClassMetadata<object> $metadataTargetEntity */
+                    $metadataTargetEntity = $persistenceManager->metadataFor($association['targetEntity']); // @phpstan-ignore argument.templateType
+                    $associationTargetEntity = $metadataTargetEntity->getAssociationMapping($association['inversedBy'] ?? $association['mappedBy']);
+                    $relationshipFields[] = ['class' => $associationTargetEntity['sourceEntity'], 'field' => $associationTargetEntity['fieldName'], 'isOneToMany' => $associationTargetEntity['type'] === ClassMetadata::ONE_TO_MANY];
                 }
             }
         }
