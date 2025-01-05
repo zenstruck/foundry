@@ -25,6 +25,6 @@ enum PersistMode
 
     public function isPersisting(): bool
     {
-        return self::PERSIST === $this;
+        return self::WITHOUT_PERSISTING !== $this;
     }
 }

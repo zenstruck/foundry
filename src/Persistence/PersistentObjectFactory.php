@@ -42,9 +42,6 @@ abstract class PersistentObjectFactory extends ObjectFactory
     /** @var list<callable(T):void> */
     private array $tempAfterInstantiate = [];
 
-    /** @var list<callable(T):void> */
-    private array $tempAfterPersist = [];
-
     /**
      * @phpstan-param mixed|Parameters $criteriaOrId
      *
@@ -207,7 +204,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
         $this->throwIfCannotCreateObject();
 
-        if (!$this->isPersisting()) {
+        if ($this->persistMode() !== PersistMode::PERSIST) {
             return $object;
         }
 
@@ -218,12 +215,6 @@ abstract class PersistentObjectFactory extends ObjectFactory
         }
 
         $configuration->persistence()->save($object);
-
-        foreach ($this->tempAfterPersist as $callback) {
-            $callback($object);
-        }
-
-        $this->tempAfterPersist = [];
 
         if ($this->afterPersist) {
             $attributes = $this->normalizedParameters ?? throw new \LogicException('Factory::$normalizedParameters has not been initialized.');
@@ -255,6 +246,17 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
+     * @internal
+     */
+    public function withPersistMode(PersistMode $persistMode): static
+    {
+        $clone = clone $this;
+        $clone->persist = $persistMode;
+
+        return $clone;
+    }
+
+    /**
      * @phpstan-param callable(T, Parameters, static):void $callback
      */
     final public function afterPersist(callable $callback): static
@@ -272,11 +274,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
         }
 
         if ($value instanceof self && isset($this->persist)) {
-            $value = match ($this->persist) {
-                PersistMode::PERSIST => $value->andPersist(),
-                PersistMode::WITHOUT_PERSISTING => $value->withoutPersisting(),
-                PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT => $value->withoutPersistingButScheduleForInsert(),
-            };
+            $value = $value->withPersistMode($this->persist);
         }
 
         if ($value instanceof self) {
@@ -290,7 +288,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
                 // we need to handle the circular dependency involved by inversed one-to-one relationship:
                 // a placeholder object is used, which will be replaced by the real object, after its instantiation
-                $inversedObject = $value->withoutPersistingButScheduleForInsert()
+                $inversedObject = $value->withPersistMode(PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT)
                     ->create([$inverseField => $placeholder = (new \ReflectionClass(static::class()))->newInstanceWithoutConstructor()]);
 
                 // auto-refresh computes changeset and prevents the placeholder object to be cleanly
@@ -325,9 +323,9 @@ abstract class PersistentObjectFactory extends ObjectFactory
         if ($inverseRelationshipMetadata && $inverseRelationshipMetadata->isCollection) {
             $inverseField = $inverseRelationshipMetadata->inverseField;
 
-            $this->tempAfterPersist[] = static function(object $object) use ($collection, $inverseField, $pm) {
-                $collection->create([$inverseField => $object]);
-                $pm->refresh($object);
+            $this->tempAfterInstantiate[] = static function(object $object) use ($collection, $inverseField, $field) {
+                $inverseObjects = $collection->withPersistMode(PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT)->create([$inverseField => $object]);
+                set($object, $field, unproxy($inverseObjects));
             };
 
             // creation delegated to afterPersist hook - return empty array here
@@ -374,33 +372,38 @@ abstract class PersistentObjectFactory extends ObjectFactory
             return false;
         }
 
-        $persistMode = $this->persist ?? ($config->persistence()->autoPersist(static::class()) ? PersistMode::PERSIST : PersistMode::WITHOUT_PERSISTING);
+        return $this->persistMode()->isPersisting();
+    }
 
-        return $persistMode->isPersisting();
+    /**
+     * @internal
+     */
+    public function persistMode(): PersistMode
+    {
+        $config = Configuration::instance();
+
+        if (!$config->isPersistenceEnabled()) {
+            return PersistMode::WITHOUT_PERSISTING;
+        }
+
+        return $this->persist ?? ($config->persistence()->autoPersist(static::class()) ? PersistMode::PERSIST : PersistMode::WITHOUT_PERSISTING);
     }
 
     /**
      * Schedule any new object for insert right after instantiation.
+     * @internal
      */
     final protected function initializeInternal(): static
     {
         return $this->afterInstantiate(
             static function(object $object, array $parameters, PersistentObjectFactory $factory): void {
-                if (!$factory->isPersisting() && (!isset($factory->persist) || PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT !== $factory->persist)) {
+                if (!$factory->isPersisting()) {
                     return;
                 }
 
                 Configuration::instance()->persistence()->scheduleForInsert($object);
             }
         );
-    }
-
-    private function withoutPersistingButScheduleForInsert(): static
-    {
-        $clone = clone $this;
-        $clone->persist = PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT;
-
-        return $clone;
     }
 
     private function throwIfCannotCreateObject(): void

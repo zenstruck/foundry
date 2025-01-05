@@ -11,6 +11,9 @@
 
 namespace Zenstruck\Foundry;
 
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistMode;
+
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
@@ -22,12 +25,28 @@ namespace Zenstruck\Foundry;
  */
 final class FactoryCollection implements \IteratorAggregate
 {
+    private PersistMode $persistMode;
+
     /**
      * @param TFactory $factory
      * @phpstan-param \Closure():iterable<Attributes>|\Closure():iterable<TFactory> $items
      */
     private function __construct(public readonly Factory $factory, private \Closure $items)
     {
+        $this->persistMode = $this->factory instanceof PersistentObjectFactory
+            ? $this->factory->persistMode()
+            : PersistMode::WITHOUT_PERSISTING;
+    }
+
+    /**
+     * @internal
+     */
+    public function withPersistMode(PersistMode $persistMode): static
+    {
+        $clone = clone $this;
+        $clone->persistMode = $persistMode;
+
+        return $clone;
     }
 
     /**
@@ -133,7 +152,16 @@ final class FactoryCollection implements \IteratorAggregate
             $factories[] = $this->factory->with($attributesOrFactory)->with(['__index' => $i++]);
         }
 
-        return $factories; // @phpstan-ignore return.type (PHPStan does not understand we have an array of factories)
+        return array_map( // @phpstan-ignore return.type (PHPStan does not understand we have an array of factories)
+            function (Factory $f) {
+                if ($f instanceof PersistentObjectFactory) {
+                    return $f->withPersistMode($this->persistMode);
+                }
+
+                return $f;
+            },
+            $factories
+        );
     }
 
     public function getIterator(): \Traversable

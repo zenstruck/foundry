@@ -239,7 +239,11 @@ final class PersistenceManager
      */
     public function autoPersist(string $class): bool
     {
-        return $this->strategyFor(unproxy($class))->autoPersist();
+        try {
+            return $this->strategyFor(unproxy($class))->autoPersist();
+        } catch (NoPersistenceStrategy) {
+            return false;
+        }
     }
 
     /**
