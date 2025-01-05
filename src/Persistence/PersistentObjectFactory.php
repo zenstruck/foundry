@@ -367,12 +367,29 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
         $configuration = Configuration::instance();
 
-        if (!$configuration->isPersistenceAvailable() || !$configuration->persistence()->hasPersistenceFor($object)) {
+        if (!$configuration->isPersistenceAvailable()) {
             return $object;
         }
 
+        $persistenceManager = $configuration->persistence();
+
+        if ($object instanceof Proxy) {
+            $proxy = $object;
+            $proxy->_disableAutoRefresh();
+            $object = $proxy->_real();
+            $proxy->_enableAutoRefresh();
+        }
+
+        if (!$persistenceManager->hasPersistenceFor($object)) {
+            return $object;
+        }
+
+        if (!$persistenceManager->isPersisted($object)) {
+            $persistenceManager->scheduleForInsert($object);
+        }
+
         try {
-            return $configuration->persistence()->refresh($object, true);
+            return $persistenceManager->refresh($object, force: true);
         } catch (RefreshObjectFailed|VarExportLogicException) {
             return $object;
         }

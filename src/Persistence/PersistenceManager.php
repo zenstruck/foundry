@@ -190,6 +190,7 @@ final class PersistenceManager
 
     public function isPersisted(object $object): bool
     {
+        // prevents doctrine to use its cache and think the object is persisted
         if ($this->strategyFor($object::class)->isScheduledForInsert($object)) {
             return false;
         }
