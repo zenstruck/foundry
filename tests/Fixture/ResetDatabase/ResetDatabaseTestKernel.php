@@ -63,5 +63,13 @@ final class ResetDatabaseTestKernel extends FoundryTestKernel
         }
 
         $c->register(GlobalInvokableService::class);
+
+        if (self::hasORM()) {
+            $c->register(OrmResetterDecorator::class)->setAutowired(true)->setAutoconfigured(true);
+        }
+
+        if (self::hasMongo()) {
+            $c->register(MongoResetterDecorator::class)->setAutowired(true)->setAutoconfigured(true);
+        }
     }
 }
