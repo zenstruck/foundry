@@ -155,10 +155,8 @@ final class PersistenceManager
 
         $strategy = $this->strategyFor($object::class);
 
-        if (!$force) {
-            if ($strategy->hasChanges($object)) {
-                throw RefreshObjectFailed::objectHasUnsavedChanges($object::class);
-            }
+        if ($strategy->hasChanges($object)) {
+            throw RefreshObjectFailed::objectHasUnsavedChanges($object::class);
         }
 
         $om = $strategy->objectManagerFor($object::class);

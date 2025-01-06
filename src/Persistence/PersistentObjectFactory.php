@@ -389,7 +389,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
         }
 
         try {
-            return $persistenceManager->refresh($object, force: true);
+            return $configuration->persistence()->refresh($object);
         } catch (RefreshObjectFailed|VarExportLogicException) {
             return $object;
         }

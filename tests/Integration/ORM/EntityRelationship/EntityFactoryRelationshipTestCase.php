@@ -31,6 +31,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Tag;
 
+use function Zenstruck\Foundry\Persistence\refresh;
 use function Zenstruck\Foundry\Persistence\unproxy;
 
 /**
@@ -359,6 +360,22 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         foreach ($category->getContacts() as $contact) {
             $this->assertNotNull($contact->id);
         }
+    }
+
+    /**
+     * @test
+     */
+    public function assert_updates_are_implicitly_persisted(): void
+    {
+        $category = static::categoryFactory()->create();
+        $address = static::addressFactory()->create();
+
+        $category->setName('new name');
+
+        static::contactFactory()->create(['category' => $category, 'address' => $address]);
+
+        refresh($category);
+        self::assertSame('new name', $category->getName());
     }
 
     /** @test */

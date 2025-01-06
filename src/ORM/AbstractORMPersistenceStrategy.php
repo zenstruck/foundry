@@ -41,10 +41,13 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
             return false;
         }
 
-        // cannot use UOW::recomputeSingleEntityChangeSet() here as it wrongly computes embedded objects as changed
-        $em->getUnitOfWork()->computeChangeSet($em->getClassMetadata($object::class), $object);
+        // we're cloning the UOW because computing change set has side effect
+        $unitOfWork = clone $em->getUnitOfWork();
 
-        return (bool) $em->getUnitOfWork()->getEntityChangeSet($object);
+        // cannot use UOW::recomputeSingleEntityChangeSet() here as it wrongly computes embedded objects as changed
+        $unitOfWork->computeChangeSet($em->getClassMetadata($object::class), $object);
+
+        return (bool) $unitOfWork->getEntityChangeSet($object);
     }
 
     final public function truncate(string $class): void
