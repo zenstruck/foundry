@@ -1605,7 +1605,7 @@ Global State
 ~~~~~~~~~~~~
 
 If you have an initial database state you want for all tests, you can set this in the config of the bundle. Accepted
-values are: stories as service, "global" stories and invokable services. Global state is loaded before each using
+values are: stories as service, "global" stories and invokable services. Global state is loaded before each test using
 the ``ResetDatabase`` trait. If you are using `DamaDoctrineTestBundle`_, it is only loaded once for the entire
 test suite.
 
