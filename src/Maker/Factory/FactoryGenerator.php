@@ -97,6 +97,9 @@ final class FactoryGenerator
             }
         }
 
+        // Should never do this if file/class already exists.
+        // A class_exists($factoryClass), return false, I don't know if it's not part of the autoloader, that the class is not found.
+        // I suspect that it's part of the problem.
         $generator->generateClass(
             $factoryClass,
             __DIR__.'/../../../skeleton/Factory.tpl.php',
