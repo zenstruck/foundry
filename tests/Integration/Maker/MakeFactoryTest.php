@@ -17,6 +17,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Zenstruck\Foundry\Maker\Factory\FactoryGenerator;
 use Zenstruck\Foundry\Tests\Fixture\Document\GenericDocument;
 use Zenstruck\Foundry\Tests\Fixture\Document\WithEmbeddableDocument;
+use Zenstruck\Foundry\Tests\Fixture\Entity\Address;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
@@ -116,6 +117,22 @@ final class MakeFactoryTest extends MakerTestCase
         $tester->execute(['class' => Category::class, '--test' => true]);
 
         $this->assertFileExists(self::tempFile('tests/Factory/CategoryFactory.php'));
+    }
+
+    /**
+     * @test
+     */
+    public function can_create_factory_in_test_dir_with_nested_factory_already_created(): void
+    {
+        if (!\getenv('DATABASE_URL')) {
+            self::markTestSkipped('doctrine/orm not enabled.');
+        }
+
+        $tester = $this->makeFactoryCommandTester();
+        $tester->execute(['class' => Contact::class, '--test' => true]);
+        $tester->execute(['class' => Address::class, '--test' => true]);
+        $this->assertFileExists(self::tempFile('tests/Factory/ContactFactory.php'));
+        $this->assertFileExists(self::tempFile('tests/Factory/AddressFactory.php'));
     }
 
     /**
