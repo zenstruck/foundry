@@ -14,7 +14,7 @@ or a combination of these.
 .. admonition:: Screencast
     :class: screencast
 
-    Want to watch a screencast 🎥 about it? Check out `https://symfonycasts.com/foundry`__
+    Want to watch a screencast 🎥 about it? Check out `symfonycasts.com/foundry <https://symfonycasts.com/foundry>`_.
 
 .. warning::
 
@@ -534,9 +534,7 @@ random data for your factories:
 .. note::
 
     You can register your own *Faker Provider* by tagging any service with ``foundry.faker_provider``.
-    All public methods on this service will be available on Foundry's Faker instance:
-
-::
+    All public methods on this service will be available on Foundry's Faker instance::
 
         use function Zenstruck\Foundry\faker;
 
@@ -1512,7 +1510,9 @@ Proxy objects pitfalls
 
 Proxified objects may have some pitfalls when dealing with Doctrine's entity manager. You may encounter this error:
 
-> Doctrine\ORM\ORMInvalidArgumentException: A new entity was found through the relationship
+.. code-block:: text
+
+    > Doctrine\ORM\ORMInvalidArgumentException: A new entity was found through the relationship
     'App\Entity\Post#category' that was not configured to cascade persist operations for entity: AppEntityCategoryProxy@3082.
     To solve this issue: Either explicitly call EntityManager#persist() on this unknown entity or configure cascade persist
     this association in the mapping for example @ManyToOne(..,cascade={"persist"}). If you cannot find out which entity
@@ -1520,7 +1520,6 @@ Proxified objects may have some pitfalls when dealing with Doctrine's entity man
 
 The problem will occur if a proxy has been passed to ``EntityManager::persist()``. To fix this, you should pass the "real"
 object, by calling ``$proxyfiedObject->_real()``.
-
 
 Factory without proxy
 .....................
@@ -1655,10 +1654,11 @@ With PHPUnit Extension
 
 Thanks to Foundry's `PHPUnit Extension`_, you'll be able to use your factories in your data providers the same way
 you're using them in tests. Thanks to it, you can:
-    * Call ``->create()`` or ``::createOne()`` or any other method which creates objects in unit tests
-    (using ``PHPUnit\Framework\TestCase``) and functional tests (``Symfony\Bundle\FrameworkBundle\Test\KernelTestCase``)
-    * Use `Factories as Services`_ in functional tests
-    * Use `faker()` normally, without wrapping its call in a callable
+
+* Call ``->create()`` or ``::createOne()`` or any other method which creates objects in unit tests
+  (using ``PHPUnit\Framework\TestCase``) and functional tests (``Symfony\Bundle\FrameworkBundle\Test\KernelTestCase``);
+* Use `Factories as Services`_ in functional tests;
+* Use ``faker()`` normally, without wrapping its call in a callable.
 
 ::
 
