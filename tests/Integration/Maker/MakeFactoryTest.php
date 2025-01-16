@@ -129,10 +129,17 @@ final class MakeFactoryTest extends MakerTestCase
         }
 
         $tester = $this->makeFactoryCommandTester();
-        $tester->execute(['class' => Contact::class, '--test' => true]);
-        $tester->execute(['class' => Address::class, '--test' => true]);
+        
+        $tester->execute(['class' => Contact::class, '--test' => true]);    
+        
         $this->assertFileExists(self::tempFile('tests/Factory/ContactFactory.php'));
         $this->assertFileExists(self::tempFile('tests/Factory/AddressFactory.php'));
+        
+        // here, we're faking multiple calls to `bin/console make:factory`
+        // so it's perfectly acceptable to manually load the newly created class
+        require_once self::tempFile('tests/Factory/AddressFactory.php';
+        
+        $tester->execute(['class' => Address::class, '--test' => true]);
     }
 
     /**
