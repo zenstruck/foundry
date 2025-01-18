@@ -45,16 +45,9 @@ final class ResetDatabaseWithMigrationTest extends KernelTestCase
         $application = new Application(self::bootKernel());
         $application->setAutoExit(false);
 
-        $exit = $application->run(
-            new ArrayInput(['command' => 'doctrine:schema:validate', '-v' => true]),
-            $output = new BufferedOutput()
-        );
+        $exit = $application->run(new ArrayInput(['command' => 'doctrine:schema:validate', '-v' => true]), new BufferedOutput());
 
-        // The command actually fails, because of a bug in doctrine ORM 3!
-        // https://github.com/doctrine/migrations/issues/1406
-        self::assertSame(2, $exit, \sprintf('Schema is not valid: %s', $commandOutput = $output->fetch()));
-        self::assertStringContainsString('1 schema diff(s) detected', $commandOutput);
-        self::assertStringContainsString('DROP TABLE doctrine_migration_versions', $commandOutput);
+        self::assertSame(0, $exit);
     }
 
     /**
