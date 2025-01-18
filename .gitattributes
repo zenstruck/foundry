@@ -1,6 +1,8 @@
 * text=auto
 
 /.codecov.yml                   export-ignore
+/.editorconfig                  export-ignore
+/.env                           export-ignore
 /.gitattributes                 export-ignore
 /.github                        export-ignore
 /.gitignore                     export-ignore
@@ -12,8 +14,12 @@
 /docker-compose.yaml            export-ignore
 /Makefile                       export-ignore
 /phpstan.neon                   export-ignore
-/phpunit-dama-doctrine.xml.dist export-ignore
+/phpunit                        export-ignore
 /phpunit.xml.dist               export-ignore
+/phpunit-10.xml.dist            export-ignore
+/phpunit-paratest.xml.dist      export-ignore
+/psalm.xml                      export-ignore
+/stubs                          export-ignore
 /tests                          export-ignore
 /utils/rector/tests             export-ignore
 /utils/rector/composer.json     export-ignore
