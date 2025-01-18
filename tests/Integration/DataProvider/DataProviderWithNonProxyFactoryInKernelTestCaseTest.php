@@ -25,9 +25,9 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit ^11.4
+ * @requires PHPUnit >=11.4
  */
-#[RequiresPhpunit('^11.4')]
+#[RequiresPhpunit('>=11.4')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 final class DataProviderWithNonProxyFactoryInKernelTestCaseTest extends KernelTestCase
 {

@@ -23,9 +23,9 @@ use Zenstruck\Foundry\Tests\Fixture\Stories\EntityPoolStory;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit ^11.0
+ * @requires PHPUnit >=11.0
  */
-#[RequiresPhpunit('^11.0')]
+#[RequiresPhpunit('>=11.0')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 #[WithStory(EntityPoolStory::class)]
 final class WithStoryOnParentClassTest extends ParentClassWithStoryAttributeTestCase

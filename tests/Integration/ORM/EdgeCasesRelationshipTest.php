@@ -45,7 +45,7 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(RelationshipWithGlobalEntity\RelationshipWithGlobalEntity::class, ['globalEntity'])]
-    #[RequiresPhpunit('^11.4')]
+    #[RequiresPhpunit('>=11.4')]
     public function it_can_use_flush_after_and_entity_from_global_state(): void
     {
         $relationshipWithGlobalEntityFactory = persistent_factory(RelationshipWithGlobalEntity\RelationshipWithGlobalEntity::class);
@@ -72,7 +72,7 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(RichDomainMandatoryRelationship\OwningSide::class, ['main'])]
-    #[RequiresPhpunit('^11.4')]
+    #[RequiresPhpunit('>=11.4')]
     public function inversed_relationship_mandatory(): void
     {
         $owningSideEntityFactory = persistent_factory(RichDomainMandatoryRelationship\OwningSide::class);
@@ -91,7 +91,7 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(InversedOneToOneWithNonNullableOwning\OwningSide::class, ['inverseSide'])]
-    #[RequiresPhpunit('^11.4')]
+    #[RequiresPhpunit('>=11.4')]
     public function inverse_one_to_one_with_non_nullable_inverse_side(): void
     {
         $owningSideFactory = persistent_factory(InversedOneToOneWithNonNullableOwning\OwningSide::class);
@@ -109,7 +109,7 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(InversedOneToOneWithSetter\OwningSide::class, ['inverseSide'])]
-    #[RequiresPhpunit('^11.4')]
+    #[RequiresPhpunit('>=11.4')]
     public function inverse_one_to_one_with_both_nullable(): void
     {
         $owningSideFactory = persistent_factory(InversedOneToOneWithSetter\OwningSide::class);
