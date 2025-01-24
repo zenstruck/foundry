@@ -16,6 +16,6 @@ require \dirname(__DIR__).'/vendor/autoload.php';
 
 $fs = new Filesystem();
 
-$fs->remove(__DIR__.'/../var');
+$fs->remove(__DIR__.'/../var/cache');
 
 (new Dotenv())->usePutenv()->loadEnv(__DIR__.'/../.env');

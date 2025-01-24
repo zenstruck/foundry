@@ -21,12 +21,12 @@ require \dirname(__DIR__).'/vendor/autoload.php';
 
 $fs = new Filesystem();
 
-$fs->remove(__DIR__.'/../var');
+$fs->remove(__DIR__.'/../var/cache');
 
 (new Dotenv())->usePutenv()->loadEnv(__DIR__.'/../.env');
 
 if (FoundryTestKernel::usesMigrations()) {
-    $fs->mkdir(__DIR__.'/../var/Migrations');
+    $fs->mkdir(__DIR__.'/../var/cache/Migrations');
 
     $kernel = new ResetDatabaseTestKernel('test', true);
     $kernel->boot();

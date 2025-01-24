@@ -20,7 +20,6 @@ use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Zenstruck\Foundry\ORM\DoctrineOrmVersionGuesser;
 
 use function Zenstruck\Foundry\runCommand;
 
@@ -68,7 +67,7 @@ abstract class BaseOrmResetter implements OrmResetter
                 // let's only drop the .db file
 
                 $dbPath = $connection->getParams()['path'] ?? null;
-                if (DoctrineOrmVersionGuesser::isOrmV3() && $dbPath && (new Filesystem())->exists($dbPath)) {
+                if ($dbPath && (new Filesystem())->exists($dbPath)) {
                     \file_put_contents($dbPath, '');
                 }
 

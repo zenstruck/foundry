@@ -90,7 +90,7 @@ jobs:
         shell: bash
 
   test-reset-database:
-    name: Test reset database - D:${{ matrix.database }} ${{ matrix.use-dama == 1 && ' (dama)' || '' }} ${{ matrix.reset-database-mode == 'migrate' && ' (migrate)' || '' }} ${{ contains(matrix.with-migration-configuration-file, 'transactional') && '(configuration file transactional)' || contains(matrix.with-migration-configuration-file, 'configuration') && '(configuration file)' || '' }}
+    name: Reset DB - D:${{ matrix.database }} ${{ matrix.use-dama == 1 && ' (dama)' || '' }} ${{ matrix.reset-database-mode == 'migrate' && ' (migrate)' || '' }} ${{ contains(matrix.with-migration-configuration-file, 'transactional') && '(configuration file transactional)' || contains(matrix.with-migration-configuration-file, 'configuration') && '(configuration file)' || '' }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -98,17 +98,12 @@ jobs:
         database: [ mysql, pgsql, sqlite, mysql|mongo ]
         use-dama: [ 0, 1 ]
         reset-database-mode: [ schema, migrate ]
-        migration-configuration-file: ['no', 'migration-configuration', 'migration-configuration-transactional']
+        migration-configuration-file: ['no']
+        deps: [ highest, lowest ]
         include:
           - { database: mongo, migration-configuration-file: 'no', use-dama: 0, reset-database-mode: schema }
-        exclude:
-          # there is currently a bug with MySQL and transactional migrations
-          - database: mysql
-            migration-configuration-file: 'migration-configuration-transactional'
-          - reset-database-mode: schema
-            migration-configuration-file: 'migration-configuration'
-          - reset-database-mode: schema
-            migration-configuration-file: 'migration-configuration-transactional'
+          - { database: pgsql, migration-configuration-file: 'migration-configuration', use-dama: 0, reset-database-mode: migration }
+          - { database: pgsql, migration-configuration-file: 'migration-configuration-transactional', use-dama: 0, reset-database-mode: migration }
     env:
       DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || 'sqlite:///%kernel.project_dir%/var/data.db' }}
       MONGO_URL: ${{ contains(matrix.database, 'mongo') && 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb' || '' }}
@@ -148,7 +143,7 @@ jobs:
       - name: Install dependencies
         uses: ramsey/composer-install@v2
         with:
-          dependency-versions: highest
+          dependency-versions: ${{ matrix.deps }}
           composer-options: --prefer-dist
         env:
           SYMFONY_REQUIRE: 7.1.*
@@ -158,7 +153,12 @@ jobs:
         run: sudo /etc/init.d/mysql start
 
       - name: Test
-        run: ./phpunit --testsuite reset-database --bootstrap tests/bootstrap-reset-database.php
+        run: |
+          ./phpunit --testsuite reset-database --bootstrap tests/bootstrap-reset-database.php
+
+          # We should be able to run the tests twice in order to check if the second run also starts from a fresh db
+          # some bugs could be detected this way
+          ./phpunit --testsuite reset-database --bootstrap tests/bootstrap-reset-database.php
         shell: bash
 
   test-with-paratest:

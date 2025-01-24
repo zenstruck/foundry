@@ -11,7 +11,7 @@
 
 return [
     'migrations_paths' => [
-        'Zenstruck\\Foundry\\Tests\\Fixture\\ResetDatabase\\Migrations' => \dirname(__DIR__).'/Migrations',
+        'Zenstruck\\Foundry\\Tests\\Fixture\\ResetDatabase\\Migrations' => \dirname(__DIR__, 4).'/var/cache/Migrations',
     ],
     'transactional' => true,
 ];
