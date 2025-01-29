@@ -41,7 +41,6 @@ final class FactoriesTraitNotUsed extends \LogicException
                 && isset($trace['class'])
                 && KernelTestCase::class !== $trace['class']
                 && \is_a($trace['class'], KernelTestCase::class, allow_string: true)
-                && !(new \ReflectionClass($trace['class']))->hasMethod('_bootFoundry')
             ) {
                 self::throwIfClassDoesNotHaveFactoriesTrait($trace['class']);
             }
