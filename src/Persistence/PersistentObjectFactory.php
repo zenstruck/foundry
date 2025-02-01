@@ -21,6 +21,7 @@ use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Object\Hydrator;
 use Zenstruck\Foundry\ObjectFactory;
+use Zenstruck\Foundry\Persistence\Event\AfterPersist;
 use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
 use Zenstruck\Foundry\Persistence\Relationship\ManyToOneRelationship;
@@ -451,7 +452,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
         $this->persist = $this->isPersistenceEnabled() ? PersistMode::PERSIST : PersistMode::WITHOUT_PERSISTING;
 
         // Schedule any new object for insert right after instantiation
-        return parent::initializeInternal()
+        $factory = parent::initializeInternal()
             ->afterInstantiate(
                 static function(object $object, array $parameters, PersistentObjectFactory $factoryUsed): void {
                     if (!$factoryUsed->isPersisting()) {
@@ -470,6 +471,19 @@ abstract class PersistentObjectFactory extends ObjectFactory
                 }
             )
         ;
+
+        if (!Configuration::instance()->hasEventDispatcher()) {
+            return $factory;
+        }
+
+        // Dispatch event after persist
+        return $factory->afterPersist(
+            static function(object $object, array $parameters, self $factoryUsed): void {
+                Configuration::instance()->eventDispatcher()->dispatch(
+                    new AfterPersist($object, $parameters, $factoryUsed)
+                );
+            }
+        );
     }
 
     private function throwIfCannotCreateObject(): void
