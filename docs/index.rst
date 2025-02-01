@@ -552,10 +552,10 @@ random data for your factories:
                 faker:
                     service: my_faker # service id for your own instance of Faker\Generator
 
-Events / Hooks
-~~~~~~~~~~~~~~
+Hooks
+~~~~~
 
-The following events can be added to factories. Multiple event callbacks can be added, they are run in the order
+The following hooks can be added to factories. Multiple hooks callbacks can be added, they are run in the order
 they were added.
 
 ::
@@ -564,28 +564,28 @@ they were added.
     use Zenstruck\Foundry\Proxy;
 
     PostFactory::new()
-        ->beforeInstantiate(function(array $attributes, string $class, static $factory): array {
-            // $attributes is what will be used to instantiate the object, manipulate as required
+        ->beforeInstantiate(function(array $parameters, string $class, static $factory): array {
+            // $parameters is what will be used to instantiate the object, manipulate as required
             // $class is the class of the object being instantiated
             // $factory is the factory instance which creates the object
-            $attributes['title'] = 'Different title';
+            $parameters['title'] = 'Different title';
 
-            return $attributes; // must return the final $attributes
+            return $parameters; // must return the final $parameters
         })
-        ->afterInstantiate(function(Post $object, array $attributes, static $factory): void {
+        ->afterInstantiate(function(Post $object, array $parameters, static $factory): void {
             // $object is the instantiated object
-            // $attributes contains the attributes used to instantiate the object and any extras
+            // $parameters contains the attributes used to instantiate the object and any extras
             // $factory is the factory instance which creates the object
         })
-        ->afterPersist(function(Post $object, array $attributes, static $factory) {
+        ->afterPersist(function(Post $object, array $parameters, static $factory) {
             // this event is only called if the object was persisted
             // $object is the persisted Post object
-            // $attributes contains the attributes used to instantiate the object and any extras
+            // $parameters contains the attributes used to instantiate the object and any extras
             // $factory is the factory instance which creates the object
         })
 
         // multiple events are allowed
-        ->beforeInstantiate(function($attributes) { return $attributes; })
+        ->beforeInstantiate(function($parameters) { return $parameters; })
         ->afterInstantiate(function() {})
         ->afterPersist(function() {})
     ;
@@ -602,6 +602,52 @@ You can also add hooks directly in your factory class:
     }
 
 Read `Initialization`_ to learn more about the ``initialize()`` method.
+
+Events
+~~~~~~
+
+In addition to hooks, Foundry also leverages `symfony/event-dispatcher` and dispatches events that you can listen to,
+allowing to create hooks globally, as Symfony services:
+
+::
+
+    use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+    use Zenstruck\Foundry\Object\Event\AfterInstantiate;
+    use Zenstruck\Foundry\Object\Event\BeforeInstantiate;
+    use Zenstruck\Foundry\Persistence\Event\AfterPersist;
+
+    final class FoundryEventListener
+    {
+        #[AsEventListener]
+        public function beforeInstantiate(BeforeInstantiate $event): void
+        {
+            // do something before the object is instantiated:
+            // $event->parameters is what will be used to instantiate the object, manipulate as required
+            // $event->objectClass is the class of the object being instantiated
+            // $event->factory is the factory instance which creates the object
+        }
+
+        #[AsEventListener]
+        public function afterInstantiate(AfterInstantiate $event): void
+        {
+            // $event->object is the instantiated object
+            // $event->parameters contains the attributes used to instantiate the object and any extras
+            // $event->factory is the factory instance which creates the object
+        }
+
+        #[AsEventListener]
+        public function afterPersist(AfterPersist $event): void
+        {
+            // this event is only called if the object was persisted
+            // $event->object is the persisted Post object
+            // $event->parameters contains the attributes used to instantiate the object and any extras
+            // $event->factory is the factory instance which creates the object
+        }
+    }
+
+.. versionadded::  2.4
+
+    Those events are triggered since Foundry 2.4.
 
 Initialization
 ~~~~~~~~~~~~~~

@@ -19,6 +19,7 @@ use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\ObjectFactory;
+use Zenstruck\Foundry\Persistence\Event\AfterPersist;
 use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
 
@@ -406,19 +407,30 @@ abstract class PersistentObjectFactory extends ObjectFactory
         return $this->persistMode()->isPersisting();
     }
 
-    /**
-     * Schedule any new object for insert right after instantiation.
-     * @internal
-     */
     final protected function initializeInternal(): static
     {
-        return $this->afterInstantiate(
-            static function(object $object, array $parameters, PersistentObjectFactory $factory): void {
-                if (!$factory->isPersisting()) {
-                    return;
-                }
+        // Schedule any new object for insert right after instantiation
+        $factory = parent::initializeInternal()
+            ->afterInstantiate(
+                static function(object $object, array $parameters, PersistentObjectFactory $factoryUsed): void {
+                    if (!$factoryUsed->isPersisting()) {
+                        return;
+                    }
 
-                Configuration::instance()->persistence()->scheduleForInsert($object);
+                    Configuration::instance()->persistence()->scheduleForInsert($object);
+                }
+            );
+
+        if (!Configuration::instance()->hasEventDispatcher()) {
+            return $factory;
+        };
+
+        // Dispatch event after persist
+        return $factory->afterPersist(
+            static function(object $object, array $parameters, self $factoryUsed): void {
+                Configuration::instance()->eventDispatcher()->dispatch(
+                    new AfterPersist($object, $parameters, $factoryUsed)
+                );
             }
         );
     }
