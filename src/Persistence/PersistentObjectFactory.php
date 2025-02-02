@@ -388,7 +388,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
         }
     }
 
-    final protected function isPersisting(): bool
+    final public function isPersisting(): bool
     {
         $config = Configuration::instance();
 

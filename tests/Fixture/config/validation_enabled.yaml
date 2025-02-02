@@ -1,0 +1,6 @@
+framework:
+    validation: true
+
+zenstruck_foundry:
+    instantiator:
+        validation: true

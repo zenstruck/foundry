@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Zenstruck\Foundry\Attribute\AsFoundryHook;
 use Zenstruck\Foundry\Mongo\MongoResetter;
 use Zenstruck\Foundry\Object\Event\Event;
@@ -93,6 +94,16 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                             ->info('Service id of your custom instantiator.')
                             ->example('my_instantiator')
                             ->defaultNull()
+                        ->end()
+                        ->arrayNode('validation')
+                            ->info('Automatically validate the objects created.')
+                            ->canBeEnabled()
+                            ->validate()
+                                ->ifTrue(function(array $validation): bool {
+                                    return $validation['enabled'] && !interface_exists(ValidatorInterface::class);
+                                })
+                                ->thenInvalid('Validation support cannot be enabled as the Validator component is not installed. Try running "composer require --dev symfony/validator".')
+                            ->end()
                         ->end()
                     ->end()
                 ->end()
@@ -203,13 +214,9 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
 
     public function loadExtension(array $config, ContainerConfigurator $configurator, ContainerBuilder $container): void // @phpstan-ignore missingType.iterableValue
     {
-        $container->registerForAutoconfiguration(Factory::class)
-            ->addTag('foundry.factory')
-        ;
+        $container->registerForAutoconfiguration(Factory::class)->addTag('foundry.factory');
 
-        $container->registerForAutoconfiguration(Story::class)
-            ->addTag('foundry.story')
-        ;
+        $container->registerForAutoconfiguration(Story::class)->addTag('foundry.story');
 
         $configurator->import('../config/services.php');
 
@@ -284,6 +291,8 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
             ;
         }
 
+        $container->setParameter('.zenstruck_foundry.validation_enabled', $config['instantiator']['validation']['enabled']);
+
         $container->registerAttributeForAutoconfiguration(
             AsFoundryHook::class,
             // @phpstan-ignore argument.type
@@ -334,6 +343,22 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
 
                 ++$i;
             }
+        }
+
+        // validation
+        $container->getDefinition('.zenstruck_foundry.configuration')
+            ->replaceArgument(7, $container->has('validator'));
+
+        if (!interface_exists(ValidatorInterface::class)) {
+            $container->removeDefinition('.zenstruck_foundry.validation_listener');
+        }
+
+        if ($container->has('.zenstruck_foundry.configuration') && !$container->has('validator')) {
+            if ($container->getParameter('.zenstruck_foundry.validation_enabled') === true) {
+                throw new LogicException('Validation support cannot be enabled because the validation is not enabled. Please, add enable validation with configuration "framework.validation: true".');
+            }
+
+            $container->removeDefinition('.zenstruck_foundry.validation_listener');
         }
     }
 

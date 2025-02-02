@@ -1193,6 +1193,38 @@ You can even create associative arrays, with the nice DX provided by Foundry:
     // will create ['prop1' => 'foo', 'prop2' => 'default value 2']
     $array = SomeArrayFactory::createOne(['prop1' => 'foo']);
 
+Validate your objects
+~~~~~~~~~~~~~~~~~~~~~
+
+Foundry can validate your objects automatically after they are instantiated. This can be useful to
+ensure that your objects are in a valid state before they are used in your tests.
+
+You can either enable validation them globally:
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/packages/zenstruck_foundry.yaml
+        when@dev: # see Bundle Configuration section about sharing this in the test environment
+            zenstruck_foundry:
+                instantiator:
+                    validate: true
+
+Or enable/disable it for a specific factory, or in a specific test with methods ``withValidation()`` / ``withoutValidation()``:
+
+::
+
+    class UserFactory extends ObjectFactory
+    {
+        protected function initialize(): static
+        {
+            return $this->withValidation();
+            // you can also disable validation using ->withoutValidation()
+        }
+    }
+
+
 Using with DoctrineFixturesBundle
 ---------------------------------
 

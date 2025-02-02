@@ -35,6 +35,16 @@ abstract class ObjectFactory extends Factory
     /** @phpstan-var InstantiatorCallable|null */
     private $instantiator;
 
+    private bool $validationEnabled;
+
+    // keep an empty constructor for BC
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->validationEnabled = Configuration::instance()->validationEnabled;
+    }
+
     /**
      * @return class-string<T>
      */
@@ -103,6 +113,42 @@ abstract class ObjectFactory extends Factory
         $clone->afterInstantiate[] = $callback;
 
         return $clone;
+    }
+
+    /**
+     * @psalm-return static<T>
+     * @phpstan-return static
+     */
+    public function withValidation(): static
+    {
+        if (!Configuration::instance()->validationAvailable) {
+            throw new \LogicException('Validation is not available. Make sure the "symfony/validator" package is installed and validation enabled.');
+        }
+
+        $clone = clone $this;
+        $clone->validationEnabled = true;
+
+        return $clone;
+    }
+
+    /**
+     * @psalm-return static<T>
+     * @phpstan-return static
+     */
+    public function withoutValidation(): static
+    {
+        $clone = clone $this;
+        $clone->validationEnabled = false;
+
+        return $clone;
+    }
+
+    /**
+     * @internal
+     */
+    public function validationEnabled(): bool
+    {
+        return $this->validationEnabled;
     }
 
     /**

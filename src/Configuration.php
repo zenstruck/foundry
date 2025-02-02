@@ -56,6 +56,8 @@ final class Configuration
         private readonly ?PersistenceManager $persistence = null,
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
         ?int $forcedFakerSeed = null,
+        public readonly bool $validationEnabled = false,
+        public readonly bool $validationAvailable = false,
     ) {
         $this->faker->seed(self::fakerSeed($forcedFakerSeed));
 
