@@ -535,6 +535,10 @@ If you have a collection of values that you want to distribute over a collection
 
         ->create();
 
+.. versionadded::  2.4
+
+    The ``distribute()`` method was added in Foundry 2.4.
+
 Faker
 ~~~~~
 
@@ -944,6 +948,31 @@ The following assumes the ``Post`` entity has a many-to-many relationship with `
     // Example 5: create 3 Posts each with between 0 and 3 unique Tags
     PostFactory::createMany(3, ['tags' => TagFactory::new()->many(0, 3)]);
 
+Reuse Objects in Relationships
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When creating nested objects, sometimes it can be useful to tell Foundry to always use the same object for a given class.
+It can enforce coherence in your fixtures and avoid creating too many objects.
+
+In order to do this, you can use the ``reuse()`` method: it will force Foundry to use the object passed as parameter in
+all `ManyToOne` and `OneToOne` relationships using the class of this object:
+
+::
+
+    // let's say both Post and Comment classes have a ManyToOne field "author" of class User
+    $user = UserFactory::createOne();
+
+    PostFactory::new([
+        'comments' => CommentFactory::new()->many(5),
+    ])
+        // by calling reuse, the post and all its comments will have the same author
+        ->reuse($user)
+        ->create();
+
+.. versionadded::  2.4
+
+    The ``reuse()`` method was added in Foundry 2.4.
+
 Lazy Values
 ~~~~~~~~~~~
 
@@ -1234,6 +1263,10 @@ Validate your objects
 
 Foundry can validate your objects automatically after they are instantiated. This can be useful to
 ensure that your objects are in a valid state before they are used in your tests.
+
+.. versionadded::  2.4
+
+    Validation of the objects was added in Foundry 2.4.
 
 You can either enable validation globally:
 

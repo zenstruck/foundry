@@ -38,6 +38,7 @@ return static function (ContainerConfigurator $container): void {
             '%env(default:zenstruck_foundry.faker.seed:int:FOUNDRY_FAKER_SEED)%',
             param('.zenstruck_foundry.validation_enabled'),
             abstract_arg('validation_available'),
+            service('property_info'),
         ])
         ->public()
 

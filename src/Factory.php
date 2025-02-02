@@ -179,20 +179,29 @@ abstract class Factory
      */
     final protected function normalizeAttributes(array|callable $attributes = []): array
     {
-        $attributes = [$this->defaults(), ...$this->attributes, $attributes];
+        $mergedAttributes = [$this->defaults()];
+
+        // "reused" attributes will override the ones from "defaults()"
+        // but should be overridden by the other states of the factory
+        if ($this instanceof ObjectFactory) {
+            $mergedAttributes[] = $this->reusedAttributes();
+        }
+
+        $mergedAttributes = [...$mergedAttributes, ...$this->attributes, $attributes];
+
         $index = 1;
 
         // find if an index was set by factory collection
-        foreach ($attributes as $i => $attr) {
+        foreach ($mergedAttributes as $i => $attr) {
             if (\is_array($attr) && isset($attr['__index'])) {
                 $index = $attr['__index'];
-                unset($attributes[$i]);
+                unset($mergedAttributes[$i]);
                 break;
             }
         }
 
         return \array_merge(
-            ...\array_map(static fn(array|callable $attr) => \is_callable($attr) ? $attr($index) : $attr, $attributes)
+            ...\array_map(static fn(array|callable $attr) => \is_callable($attr) ? $attr($index) : $attr, $mergedAttributes)
         );
     }
 

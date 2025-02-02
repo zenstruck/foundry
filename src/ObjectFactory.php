@@ -36,6 +36,9 @@ abstract class ObjectFactory extends Factory
     /** @phpstan-var InstantiatorCallable|null */
     private $instantiator;
 
+    /** @phpstan-var array<class-string, object> */
+    private array $reusedObjects = [];
+
     private bool $validationEnabled;
 
     /** @var string|GroupSequence|list<string>|null */
@@ -187,6 +190,71 @@ abstract class ObjectFactory extends Factory
     public function getValidationGroups(): string|GroupSequence|array|null
     {
         return $this->validationGroups;
+    }
+
+    /**
+     * @psalm-return static<T>
+     * @phpstan-return static
+     */
+    final public function reuse(object $object): static
+    {
+        if (isset($this->reusedObjects[$object::class])) {
+            throw new \InvalidArgumentException(\sprintf('An object of class "%s" is already being reused.', $object::class));
+        }
+
+        if ($object instanceof Factory) {
+            throw new \InvalidArgumentException('Cannot reuse a factory.');
+        }
+
+        $clone = clone $this;
+        $clone->reusedObjects[$object::class] = $object;
+
+        return $clone;
+    }
+
+    protected function normalizeParameter(string $field, mixed $value): mixed
+    {
+        if ($value instanceof self) {
+            // propagate "reused" objects
+            foreach ($this->reusedObjects as $item) {
+                // "reused" item in the target factory have priority, if they are of the same type
+                if (!isset($value->reusedObjects[$item::class])) {
+                    $value = $value->reuse($item);
+                }
+            }
+        }
+
+        return parent::normalizeParameter($field, $value);
+    }
+
+    /**
+     * @internal
+     * @phpstan-return Parameters
+     */
+    final protected function reusedAttributes(): array
+    {
+        $attributes = [];
+
+        $propertyInfo = Configuration::instance()->propertyInfo;
+
+        $properties = $propertyInfo->getProperties(static::class());
+        foreach ($properties ?? [] as $property) {
+            $types = $propertyInfo->getTypes(static::class(), $property);
+
+            foreach ($types ?? [] as $type) {
+                if (null === $type->getClassName()) {
+                    continue;
+                }
+
+                if (isset($this->reusedObjects[$type->getClassName()])) {
+                    $attributes[$property] = $this->reusedObjects[$type->getClassName()];
+
+                    break;
+                }
+            }
+        }
+
+        return $attributes;
     }
 
     /**
