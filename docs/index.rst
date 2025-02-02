@@ -603,11 +603,11 @@ You can also add hooks directly in your factory class:
 
 Read `Initialization`_ to learn more about the ``initialize()`` method.
 
-Events
-~~~~~~
+Hooks as service / global hooks
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In addition to hooks, Foundry also leverages `symfony/event-dispatcher` and dispatches events that you can listen to,
-allowing to create hooks globally, as Symfony services:
+For a better control of your hooks, you can define them as services, allowing to leverage dependency injection and
+to create hooks globally:
 
 ::
 
@@ -616,26 +616,26 @@ allowing to create hooks globally, as Symfony services:
     use Zenstruck\Foundry\Object\Event\BeforeInstantiate;
     use Zenstruck\Foundry\Persistence\Event\AfterPersist;
 
-    final class FoundryEventListener
+    final class FoundryHook
     {
-        #[AsEventListener]
+        #[AsFoundryHook(Post::class)]
         public function beforeInstantiate(BeforeInstantiate $event): void
         {
-            // do something before the object is instantiated:
+            // do something before the post is instantiated:
             // $event->parameters is what will be used to instantiate the object, manipulate as required
             // $event->objectClass is the class of the object being instantiated
             // $event->factory is the factory instance which creates the object
         }
 
-        #[AsEventListener]
+        #[AsFoundryHook(Post::class)]
         public function afterInstantiate(AfterInstantiate $event): void
         {
-            // $event->object is the instantiated object
+            // $event->object is the instantiated Post object
             // $event->parameters contains the attributes used to instantiate the object and any extras
             // $event->factory is the factory instance which creates the object
         }
 
-        #[AsEventListener]
+        #[AsFoundryHook(Post::class)]
         public function afterPersist(AfterPersist $event): void
         {
             // this event is only called if the object was persisted
@@ -643,11 +643,17 @@ allowing to create hooks globally, as Symfony services:
             // $event->parameters contains the attributes used to instantiate the object and any extras
             // $event->factory is the factory instance which creates the object
         }
+
+        #[AsFoundryHook]
+        public function afterInstantiateGlobal(AfterInstantiate $event): void
+        {
+            // Omitting class defines a "global" hook which will be called for all objects
+        }
     }
 
 .. versionadded::  2.4
 
-    Those events are triggered since Foundry 2.4.
+    The ``#[AsFoundryHook]`` attribute was added in Foundry 2.4.
 
 Initialization
 ~~~~~~~~~~~~~~
