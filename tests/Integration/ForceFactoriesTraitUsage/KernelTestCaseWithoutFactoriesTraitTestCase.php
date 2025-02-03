@@ -44,7 +44,7 @@ abstract class KernelTestCaseWithoutFactoriesTraitTestCase extends KernelTestCas
     #[IgnoreDeprecations]
     public function using_foundry_without_trait_should_throw(): void
     {
-        $this->expectUserDeprecationMessageMatches('/In order to use Foundry, you must use the trait/');
+        $this->assertDeprecation();
 
         Object1Factory::createOne();
     }
@@ -53,7 +53,7 @@ abstract class KernelTestCaseWithoutFactoriesTraitTestCase extends KernelTestCas
     #[IgnoreDeprecations]
     public function using_foundry_without_trait_should_throw_even_when_kernel_is_booted(): void
     {
-        $this->expectUserDeprecationMessageMatches('/In order to use Foundry, you must use the trait/');
+        $this->assertDeprecation();
 
         self::getContainer()->get('.zenstruck_foundry.configuration');
 
@@ -65,7 +65,7 @@ abstract class KernelTestCaseWithoutFactoriesTraitTestCase extends KernelTestCas
     #[IgnoreDeprecations]
     public function using_a_story_without_factories_trait_should_throw(): void
     {
-        $this->expectUserDeprecationMessageMatches('/In order to use Foundry, you must use the trait/');
+        $this->assertDeprecation();
 
         ObjectStory::load();
     }
@@ -87,5 +87,10 @@ abstract class KernelTestCaseWithoutFactoriesTraitTestCase extends KernelTestCas
     public static function _shutdownFoundry(): void
     {
         Configuration::shutdown();
+    }
+
+    private function assertDeprecation(): void
+    {
+        $this->expectUserDeprecationMessageMatches('/In order to use Foundry correctly, you must use the trait "Zenstruck\\\\Foundry\\\\Test\\\\Factories/');
     }
 }

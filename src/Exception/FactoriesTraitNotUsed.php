@@ -57,8 +57,8 @@ final class FactoriesTraitNotUsed extends \LogicException
             trigger_deprecation(
                 'zenstruck/foundry',
                 '2.4',
-                'In order to use Foundry, you must use the trait "%s" in your "%s" tests. This will throw an exception in 3.0.',
-                KernelTestCase::class,
+                'In order to use Foundry correctly, you must use the trait "%s" in your "%s" tests. This will throw an exception in 3.0.',
+                Factories::class,
                 $class
             );
         }
