@@ -24,7 +24,7 @@ final class ValidationListener
             return;
         }
 
-        $violations = $this->validator->validate($event->object);
+        $violations = $this->validator->validate($event->object, groups: $event->factory->getValidationGroups());
 
         if ($violations->count() > 0) {
             throw new ValidationFailedException($event->object, $violations);

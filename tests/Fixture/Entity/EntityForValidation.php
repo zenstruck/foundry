@@ -24,6 +24,10 @@ class EntityForValidation extends Base
         #[ORM\Column()]
         #[Assert\NotBlank()]
         public string $name = '',
+
+        #[ORM\Column()]
+        #[Assert\GreaterThan(10, groups: ['validation_group'])]
+        public int $number = 0,
     ) {
     }
 }

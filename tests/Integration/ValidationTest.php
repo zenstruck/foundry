@@ -44,6 +44,7 @@ final class ValidationTest extends KernelTestCase
     public function test_it_validates_object_if_validation_forced(): void
     {
         self::expectException(ValidationFailedException::class);
+        self::expectExceptionMessageMatches('/This value should not be blank/');
 
         self::bootKernel(['environment' => 'validation_available']);
 
@@ -66,5 +67,35 @@ final class ValidationTest extends KernelTestCase
         self::bootKernel(['environment' => 'validation_enabled']);
 
         factory(EntityForValidation::class)->withoutValidation()->create();
+    }
+
+    public function test_it_validates_object_with_validation_groups(): void
+    {
+        self::expectException(ValidationFailedException::class);
+        self::expectExceptionMessageMatches('/This value should be greater than 10/');
+
+        self::bootKernel(['environment' => 'validation_available']);
+
+        factory(EntityForValidation::class)->withValidation('validation_group')->create();
+    }
+
+    public function test_it_validates_object_with_validation_groups_when_validation_enabled_globally(): void
+    {
+        self::expectException(ValidationFailedException::class);
+        self::expectExceptionMessageMatches('/This value should be greater than 10/');
+
+        self::bootKernel(['environment' => 'validation_enabled']);
+
+        factory(EntityForValidation::class)->withValidationGroups('validation_group')->create();
+    }
+
+    public function test_it_can_erase_validation_groups(): void
+    {
+        self::expectException(ValidationFailedException::class);
+        self::expectExceptionMessageMatches('/This value should not be blank/');
+
+        self::bootKernel(['environment' => 'validation_available']);
+
+        factory(EntityForValidation::class)->withValidation('validation_group')->withValidationGroups(null)->create();
     }
 }
