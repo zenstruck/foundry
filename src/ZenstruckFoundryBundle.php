@@ -61,6 +61,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                             ->defaultNull()
                         ->end()
                         ->scalarNode('seed')
+                            ->setDeprecated('zenstruck/foundry', '2.4', 'The "faker.seed" configuration is deprecated and will be removed in 3.0.')
                             ->info('Random number generator seed to produce the same fake values every run.')
                             ->example(1234)
                             ->defaultNull()

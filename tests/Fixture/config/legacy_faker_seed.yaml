@@ -1,0 +1,3 @@
+zenstruck_foundry:
+    faker:
+        seed: 1234
