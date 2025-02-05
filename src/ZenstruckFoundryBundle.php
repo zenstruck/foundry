@@ -61,7 +61,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                             ->defaultNull()
                         ->end()
                         ->scalarNode('seed')
-                            ->setDeprecated('zenstruck/foundry', '2.4', 'The "faker.seed" configuration is deprecated and will be removed in 3.0.')
+                            ->setDeprecated('zenstruck/foundry', '2.4', 'The "faker.seed" configuration is deprecated and will be removed in 3.0. Use environment variable "FOUNDRY_FAKER_SEED" instead.')
                             ->info('Random number generator seed to produce the same fake values every run.')
                             ->example(1234)
                             ->defaultNull()
@@ -405,8 +405,6 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
             $definition->addArgument($config['locale']);
         }
 
-        if ($config['seed']) {
-            $definition->addMethodCall('seed', [$config['seed']]);
-        }
+        $container->setParameter('zenstruck_foundry.faker.seed', $config['seed']);
     }
 }

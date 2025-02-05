@@ -1,0 +1,2 @@
+parameters:
+    env(FOUNDRY_FAKER_SEED): 1234
