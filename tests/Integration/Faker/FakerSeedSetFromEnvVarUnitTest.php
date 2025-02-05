@@ -6,14 +6,12 @@ namespace Zenstruck\Foundry\Tests\Integration\Faker;
 
 use PHPUnit\Framework\Attributes\AfterClass;
 use PHPUnit\Framework\Attributes\Before;
-use PHPUnit\Framework\Attributes\BeforeClass;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\AddressFactory;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
@@ -43,7 +41,7 @@ final class FakerSeedSetFromEnvVarUnitTest extends TestCase
         self::assertSame(1234, Configuration::fakerSeed());
     }
 
-    #[AfterClass(-9)] // @phpstan-ignore argument.type (negative priority should be allowed)
+    #[AfterClass(-9)]
     public static function __resetFakerSeedEnv(): void
     {
         unset($_ENV['FOUNDRY_FAKER_SEED'], $_SERVER['FOUNDRY_FAKER_SEED']);

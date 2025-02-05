@@ -22,7 +22,7 @@ trait FakerTestTrait
         Configuration::resetFakerSeed();
     }
 
-    #[AfterClass(-10)] // @phpstan-ignore argument.type (negative priority should be allowed)
+    #[AfterClass(-10)]
     public static function __restoreSeed(): void
     {
         Configuration::resetFakerSeed();
