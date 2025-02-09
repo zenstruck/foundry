@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\Mongo;
 
+use PHPUnit\Framework\Attributes\Test;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Document\WithEmbeddableDocument;
 use Zenstruck\Foundry\Tests\Fixture\Model\Embeddable;
@@ -32,6 +33,7 @@ final class EmbeddableDocumentFactoryTest extends EmbeddableFactoryTestCase
     /**
      * @test
      */
+    #[Test]
     public function embed_many(): void
     {
         $document = persist(WithEmbeddableDocument::class, [

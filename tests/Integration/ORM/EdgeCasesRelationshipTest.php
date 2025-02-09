@@ -99,7 +99,7 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(InversedOneToOneWithOneToMany\OwningSide::class, ['inverseSide'])]
     #[UsingRelationships(InversedOneToOneWithOneToMany\Item::class, ['owningSide'])]
-    #[RequiresPhpunit('^11.4')]
+    #[RequiresPhpunit('>=11.4')]
     public function inverse_one_to_one_with_one_to_many(): void
     {
         $inverseSideFactory = persistent_factory(InversedOneToOneWithOneToMany\InverseSide::class);
@@ -122,9 +122,8 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
         self::assertCount(2, $inverseSide->getOwningSide()->getItems());
     }
 
-    /**
-     * @test
-     */
+    /** @test */
+    #[Test]
     public function many_to_many_to_self_referencing_inverse_side(): void
     {
         $owningSideFactory = persistent_factory(ManyToOneToSelfReferencing\OwningSide::class);
@@ -140,7 +139,7 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(IndexedOneToMany\ParentEntity::class, ['items'])]
-    #[RequiresPhpunit('^11.4')]
+    #[RequiresPhpunit('>=11.4')]
     public function indexed_one_to_many(): void
     {
         $parentFactory = persistent_factory(IndexedOneToMany\ParentEntity::class);
@@ -161,6 +160,7 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function inversed_multiple_mandatory_relationship_to_same_entity(): void
     {
         $this->markTestIncomplete('fixme! 🙏');

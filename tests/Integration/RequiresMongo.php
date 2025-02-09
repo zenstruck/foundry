@@ -11,12 +11,18 @@
 
 namespace Zenstruck\Foundry\Tests\Integration;
 
+use PHPUnit\Framework\Attributes\BeforeClass;
+
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 trait RequiresMongo
 {
-    public static function setUpBeforeClass(): void
+    /**
+     * @beforeClass
+     */
+    #[BeforeClass]
+    public static function _requiresMongo(): void
     {
         if (!\getenv('MONGO_URL')) {
             self::markTestSkipped('MongoDB not available.');

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration;
 
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
@@ -25,6 +26,7 @@ final class EventsTest extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function it_can_call_hooks(): void
     {
         $address = FactoryWithEventListeners::createOne(['name' => 'events']);

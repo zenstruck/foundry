@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Integration;
 
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
@@ -26,6 +27,7 @@ final class ObjectFactoryTest extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_create_service_factory(): void
     {
         $object = Object1Factory::createOne();
@@ -38,6 +40,7 @@ final class ObjectFactoryTest extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_create_non_service_factories(): void
     {
         $object = Object2Factory::createOne();
@@ -48,6 +51,7 @@ final class ObjectFactoryTest extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_create_different_objects_based_on_same_factory(): void
     {
         $factory = Object1Factory::new(['prop1' => 'first object']);

@@ -31,7 +31,6 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Tag\ProxyTagFactory;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11.4
  */
 #[RequiresPhpunit('>=11.4')]
 final class ProxyEntityFactoryRelationshipTest extends EntityFactoryRelationshipTestCase

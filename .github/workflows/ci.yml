@@ -16,32 +16,35 @@ jobs:
         php: [ 8.2, 8.3, 8.4 ]
         symfony: [ 6.4.*, 7.1.*, 7.2.* ]
         database: [ mysql|mongo ]
-        phpunit: [ 11 ]
+        phpunit: [ 11, 12 ]
 
         # default values:
         # deps: [ highest ]
         # use-phpunit-extension: [ 0 ]
 
         exclude:
-          - {php: 8.1, symfony: 7.1.*}
-          - {php: 8.1, symfony: 7.2.*}
+          - {php: 8.2, phpunit: 12}
+          - {php: 8.3, phpunit: 11}
+          - {php: 8.4, phpunit: 11}
+
         include:
           # php 8.1
           - {php: 8.1, symfony: 6.4.*, phpunit: 9, database: mysql}
 
           # old PHPUnit versions
           - {php: 8.3, symfony: '*', phpunit: 9, database: mysql}
-          - {php: 8.3, symfony: '*', phpunit: 10, database: mysql}
+          - {php: 8.4, symfony: '*', phpunit: 10, database: mysql}
+          - {php: 8.4, symfony: '*', phpunit: 11, database: mysql}
 
           # test with no database (PHPUnit 9 is used to prevent some problems with empty data providers)
           - {php: 8.3, symfony: '*', phpunit: 9, database: none}
           - {php: 8.3, symfony: '*', phpunit: 9, database: none, deps: lowest}
 
           # One permutation per DBMS
-          - {php: 8.3, symfony: '*', phpunit: 11, database: mongo}
-          - {php: 8.3, symfony: '*', phpunit: 11, database: pgsql}
-          - {php: 8.3, symfony: '*', phpunit: 11, database: sqlite}
-          - {php: 8.3, symfony: '*', phpunit: 11, database: mysql}
+          - {php: 8.4, symfony: '*', phpunit: 12, database: mongo}
+          - {php: 8.4, symfony: '*', phpunit: 12, database: pgsql}
+          - {php: 8.4, symfony: '*', phpunit: 12, database: sqlite}
+          - {php: 8.4, symfony: '*', phpunit: 12, database: mysql}
 
           # lowest deps (one per DBMS)
           - {php: 8.3, symfony: '*', phpunit: 9, database: mysql|mongo, deps: lowest}
@@ -51,7 +54,7 @@ jobs:
           - {php: 8.3, symfony: '*', phpunit: 9, database: mysql, deps: lowest}
 
           # using Foundry's PHPUnit extension
-          - {php: 8.3, symfony: '*', phpunit: 11, database: mysql|mongo, use-phpunit-extension: 1}
+          - {php: 8.4, symfony: '*', phpunit: 12, database: mysql|mongo, use-phpunit-extension: 1}
     env:
       DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || contains(matrix.database, 'sqlite') && 'sqlite:///%kernel.project_dir%/var/data.db' || '' }}
       MONGO_URL: ${{ contains(matrix.database, 'mongo') && 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb' || '' }}

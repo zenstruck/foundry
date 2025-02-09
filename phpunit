@@ -26,8 +26,8 @@ fi
 ### <<
 
 ### >> update PHPUnit if needed
-if [[ " 9 10 11 " != *" ${PHPUNIT_VERSION-9} "* ]]; then
-  echo "❌ PHPUNIT_VERSION should be one of 9, 10, 11";
+if [[ " 9 10 11 12 " != *" ${PHPUNIT_VERSION-9} "* ]]; then
+  echo "❌ PHPUNIT_VERSION should be one of 9, 10, 11, 12";
   exit 1;
 fi
 
@@ -62,7 +62,7 @@ case ${PHPUNIT_VERSION} in
     PHPUNIT_EXEC="${PHPUNIT_EXEC} -c phpunit-10.xml.dist"
     ;;
 
-  "11")
+  "11"|"12")
     PHPUNIT_EXEC="${PHPUNIT_EXEC} -c phpunit-10.xml.dist --extension Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\PhpUnitTestExtension"
 
     if [ "${USE_DAMA_DOCTRINE_TEST_BUNDLE:-0}" = "1" ]; then

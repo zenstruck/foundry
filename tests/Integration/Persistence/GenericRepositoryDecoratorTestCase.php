@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Test\Factories;
@@ -29,6 +30,7 @@ abstract class GenericRepositoryDecoratorTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function repository_proxy_is_countable_and_iterable(): void
     {
         $this->factory()->many(4)->create();
@@ -42,6 +44,7 @@ abstract class GenericRepositoryDecoratorTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_fetch_objects(): void
     {
         $this->factory()->many(2)->create();
@@ -60,6 +63,7 @@ abstract class GenericRepositoryDecoratorTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_call_find_with_empty_array(): void
     {
         $object = $this->factory()->create();

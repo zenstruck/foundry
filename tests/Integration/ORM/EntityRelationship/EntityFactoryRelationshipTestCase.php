@@ -37,7 +37,6 @@ use function Zenstruck\Foundry\Persistence\unproxy;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11.4
  */
 #[RequiresPhpunit('>=11.4')]
 abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
@@ -304,7 +303,7 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
     public function disabling_persistence_cascades_to_children(): void
     {
         $contact = static::contactFactory()->withoutPersisting()->create([
-            'tags' => static::tagFactory()::new()->many(3),
+            'tags' => static::tagFactory()->many(3),
             'category' => static::categoryFactory(),
         ]);
 
@@ -365,9 +364,8 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         }
     }
 
-    /**
-     * @test
-     */
+    /** @test */
+    #[Test]
     public function assert_updates_are_implicitly_persisted(): void
     {
         $category = static::categoryFactory()->create();
@@ -404,6 +402,7 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
     }
 
     /** @test */
+    #[Test]
     public function it_uses_after_persist_with_many_to_many(): void
     {
         $contact = static::contactFactory()
@@ -420,6 +419,7 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
     }
 
     /** @test */
+    #[Test]
     public function it_uses_after_persist_with_one_to_many(): void
     {
         $category = static::categoryFactory()
@@ -435,6 +435,7 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
     }
 
     /** @test */
+    #[Test]
     public function it_uses_after_persist_with_many_to_one(): void
     {
         $contact = static::contactFactory()
@@ -449,6 +450,7 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
     }
 
     /** @test */
+    #[Test]
     public function it_uses_after_persist_with_one_to_one(): void
     {
         $contact = static::contactFactory()
@@ -461,6 +463,7 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
     }
 
     /** @test */
+    #[Test]
     public function it_uses_after_persist_with_inversed_one_to_one(): void
     {
         $address = static::addressFactory()

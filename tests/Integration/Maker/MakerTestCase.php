@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\Maker;
 
+use PHPUnit\Framework\Attributes\Before;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\String\Slugger\AsciiSlugger;
@@ -19,11 +21,13 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
  * @author Kevin Bond <kevinbond@gmail.com>
  * @group maker
  */
+#[Group('maker')]
 abstract class MakerTestCase extends KernelTestCase
 {
     /**
      * @before
      */
+    #[Before]
     public static function cleanupTempDir(): void
     {
         (new Filesystem())->remove(self::tempDir());

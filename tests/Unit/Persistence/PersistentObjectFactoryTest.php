@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Unit\Persistence;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
@@ -26,6 +27,7 @@ final class PersistentObjectFactoryTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function can_create(): void
     {
         $entity1 = GenericEntityFactory::createOne();
@@ -42,6 +44,7 @@ final class PersistentObjectFactoryTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function find_or_create(): void
     {
         $entity = GenericEntityFactory::findOrCreate(['prop1' => 'foo']);
@@ -52,6 +55,7 @@ final class PersistentObjectFactoryTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function random_or_create(): void
     {
         $entity = GenericEntityFactory::randomOrCreate(['prop1' => 'foo']);

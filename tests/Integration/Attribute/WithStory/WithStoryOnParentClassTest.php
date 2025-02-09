@@ -30,9 +30,6 @@ use Zenstruck\Foundry\Tests\Fixture\Stories\EntityPoolStory;
 #[WithStory(EntityPoolStory::class)]
 final class WithStoryOnParentClassTest extends ParentClassWithStoryAttributeTestCase
 {
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_story_in_attribute_from_parent_class(): void
     {

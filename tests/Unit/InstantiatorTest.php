@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Object\Instantiator;
 
@@ -21,6 +22,7 @@ final class InstantiatorTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function can_set_variadic_constructor_attributes(): void
     {
         $object = Instantiator::withConstructor()([

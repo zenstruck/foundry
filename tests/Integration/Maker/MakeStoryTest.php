@@ -11,6 +11,9 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\Maker;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -18,12 +21,15 @@ use Symfony\Component\Console\Tester\CommandTester;
  * @author Kevin Bond <kevinbond@gmail.com>
  * @group maker
  */
+#[Group('maker')]
 final class MakeStoryTest extends MakerTestCase
 {
     /**
      * @test
      * @dataProvider storyNameProvider
      */
+    #[Test]
+    #[DataProvider('storyNameProvider')]
     public function can_create_story(string $name): void
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:story'));
@@ -66,6 +72,8 @@ final class MakeStoryTest extends MakerTestCase
      * @test
      * @dataProvider storyNameProvider
      */
+    #[Test]
+    #[DataProvider('storyNameProvider')]
     public function can_create_story_interactively(string $name): void
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:story'));
@@ -112,6 +120,8 @@ final class MakeStoryTest extends MakerTestCase
      * @test
      * @dataProvider storyNameProvider
      */
+    #[Test]
+    #[DataProvider('storyNameProvider')]
     public function can_create_story_in_test_dir(string $name): void
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:story'));
@@ -154,6 +164,8 @@ final class MakeStoryTest extends MakerTestCase
      * @test
      * @dataProvider storyNameProvider
      */
+    #[Test]
+    #[DataProvider('storyNameProvider')]
     public function can_create_story_in_test_dir_interactively(string $name): void
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:story'));
@@ -210,6 +222,8 @@ final class MakeStoryTest extends MakerTestCase
      * @dataProvider namespaceProvider
      * @param array<string, mixed> $commandOptions
      */
+    #[Test]
+    #[DataProvider('namespaceProvider')]
     public function can_customize_namespace(string $filePath, array $commandOptions, string $expectedFullNamespace): void
     {
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:story'));

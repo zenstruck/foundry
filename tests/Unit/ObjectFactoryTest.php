@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Foundry\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\Object\Instantiator;
@@ -36,6 +38,7 @@ final class ObjectFactoryTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function defaults(): void
     {
         $object = Object1Factory::createOne();
@@ -48,6 +51,7 @@ final class ObjectFactoryTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function named_constructor_defaults(): void
     {
         $object = Object1Factory::new()->instantiateWith(Instantiator::namedConstructor('factory'))->create();
@@ -60,6 +64,7 @@ final class ObjectFactoryTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function default_instantiator_and_hydrator(): void
     {
         $object = Object1Factory::createOne([
@@ -76,6 +81,7 @@ final class ObjectFactoryTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function without_constructor_instantiator(): void
     {
         $object = Object1Factory::new()->instantiateWith(Instantiator::withoutConstructor())->create([
@@ -92,6 +98,7 @@ final class ObjectFactoryTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function with_closure_factory_constructor(): void
     {
         $object = Object1Factory::new()
@@ -111,6 +118,7 @@ final class ObjectFactoryTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function with_method_factory_constructor(): void
     {
         $object = Object1Factory::new()
@@ -130,6 +138,7 @@ final class ObjectFactoryTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function with_named_constructor_instantiator(): void
     {
         $object = Object1Factory::new()->instantiateWith(Instantiator::namedConstructor('factory'))->create([
@@ -146,6 +155,7 @@ final class ObjectFactoryTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function with_extra_and_force_mode_without_constructor(): void
     {
         $object = Object1Factory::new()
@@ -166,6 +176,7 @@ final class ObjectFactoryTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function with_configured_hydrator(): void
     {
         $object = Object1Factory::new()
@@ -186,6 +197,7 @@ final class ObjectFactoryTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function with_hydration_disabled(): void
     {
         $object = Object1Factory::new()
@@ -206,6 +218,7 @@ final class ObjectFactoryTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function with_custom_instantiator_callable(): void
     {
         $object = Object1Factory::new()
@@ -226,6 +239,7 @@ final class ObjectFactoryTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function before_instantiate_hook(): void
     {
         $object = Object1Factory::new()
@@ -250,6 +264,7 @@ final class ObjectFactoryTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function after_instantiate_hook(): void
     {
         $object = Object1Factory::new()
@@ -269,6 +284,7 @@ final class ObjectFactoryTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function create_anonymous_factory(): void
     {
         $object = factory(Object1::class, ['prop1' => 'value1'])->create(['prop2' => 'value2']);
@@ -293,6 +309,7 @@ final class ObjectFactoryTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function object_factories_are_converted(): void
     {
         $object = Object2Factory::createOne();
@@ -303,6 +320,7 @@ final class ObjectFactoryTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function can_create_many(): void
     {
         $objects = Object1Factory::createMany(3, fn(int $i) => ['prop1' => "value{$i}"]);
@@ -323,6 +341,7 @@ final class ObjectFactoryTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function set_and_get_functions(): void
     {
         $object = new Object1('value');
@@ -341,6 +360,8 @@ final class ObjectFactoryTest extends TestCase
      *
      * @test
      */
+    #[Test]
+    #[DataProvider('sequenceDataProvider')]
     public function can_create_sequence(iterable|callable $sequence): void
     {
         self::assertEquals(
@@ -392,6 +413,7 @@ final class ObjectFactoryTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function can_use_sequence_with_associative_array(): void
     {
         self::assertEquals(
@@ -415,6 +437,7 @@ final class ObjectFactoryTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function as_data_provider(): void
     {
         $this->markTestIncomplete();

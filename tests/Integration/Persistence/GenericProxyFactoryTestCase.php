@@ -30,6 +30,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_update_and_delete_via_proxy(): void
     {
         static::factory()->repository()->assert()->empty();
@@ -63,6 +64,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_disable_persisting_by_factory_and_save_proxy(): void
     {
         static::factory()->repository()->assert()->empty();
@@ -82,6 +84,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_disable_and_enable_proxy_auto_refreshing(): void
     {
         $object = static::factory()->create();
@@ -103,6 +106,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_disable_and_enable_proxy_auto_refreshing_with_callback(): void
     {
         $object = static::factory()->create();
@@ -124,6 +128,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_manually_refresh_via_proxy(): void
     {
         $object = static::factory()->create()->_disableAutoRefresh();
@@ -151,6 +156,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
     /**
      * @test
      */
+    #[Test]
     public function proxy_auto_refreshes(): void
     {
         $object = static::factory()->create();
@@ -176,6 +182,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
     /**
      * @test
      */
+    #[Test]
     public function cannot_auto_refresh_proxy_if_changes(): void
     {
         $object = static::factory()->create();
@@ -203,6 +210,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_access_repository_from_proxy(): void
     {
         $object = static::factory()::createOne();
@@ -215,6 +223,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_force_set_and_get_proxy(): void
     {
         $object = static::factory()::createOne();
@@ -229,6 +238,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_get_real_object_even_if_modified(): void
     {
         $object = static::factory()->create();
@@ -241,6 +251,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_create_object_with_readonly_properties(): void
     {
         $factory = $this->objectWithReadonlyFactory();
@@ -259,6 +270,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_delete_proxified_object_and_still_access_its_methods(): void
     {
         $object = static::factory()->create();
@@ -270,6 +282,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_use_after_persist_with_attributes_added_in_before_instantiate(): void
     {
         $value = 'value set with before instantiate';

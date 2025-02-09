@@ -26,8 +26,6 @@ use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
  * @implements \IteratorAggregate<array-key, T>
  * @mixin I
  *
- * @final
- *
  * @phpstan-import-type Parameters from Factory
  */
 class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Countable

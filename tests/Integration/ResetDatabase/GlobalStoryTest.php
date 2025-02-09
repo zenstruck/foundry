@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\ResetDatabase;
 
+use PHPUnit\Framework\Attributes\Test;
 use Zenstruck\Foundry\Tests\Fixture\Document\GlobalDocument;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GlobalEntity;
 use Zenstruck\Foundry\Tests\Fixture\FoundryTestKernel;
@@ -25,6 +26,7 @@ final class GlobalStoryTest extends ResetDatabaseTestCase
     /**
      * @test
      */
+    #[Test]
     public function global_stories_are_loaded(): void
     {
         if (FoundryTestKernel::hasORM()) {
@@ -39,6 +41,7 @@ final class GlobalStoryTest extends ResetDatabaseTestCase
     /**
      * @test
      */
+    #[Test]
     public function global_stories_cannot_be_loaded_again(): void
     {
         GlobalStory::load();

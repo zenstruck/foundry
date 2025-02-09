@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\LazyValue;
 
@@ -25,6 +26,7 @@ final class LazyValueTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function lazy(): void
     {
         $value = lazy(fn() => new \stdClass());
@@ -35,6 +37,7 @@ final class LazyValueTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function memoize(): void
     {
         $value = memoize(fn() => new \stdClass());
@@ -45,6 +48,7 @@ final class LazyValueTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function can_handle_nested_lazy_values(): void
     {
         $value = LazyValue::new(LazyValue::new(LazyValue::new(fn() => LazyValue::new(fn() => 'foo'))));
@@ -55,6 +59,7 @@ final class LazyValueTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function can_handle_array_with_lazy_values(): void
     {
         $value = LazyValue::new(fn() => [

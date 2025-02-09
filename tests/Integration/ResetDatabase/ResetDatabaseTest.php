@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\ResetDatabase;
 
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -35,6 +37,7 @@ final class ResetDatabaseTest extends ResetDatabaseTestCase
     /**
      * @test
      */
+    #[Test]
     public function it_generates_valid_schema(): void
     {
         $application = new Application(self::bootKernel());
@@ -59,6 +62,7 @@ final class ResetDatabaseTest extends ResetDatabaseTestCase
     /**
      * @test
      */
+    #[Test]
     public function it_can_store_object(): void
     {
         if (FoundryTestKernel::hasORM()) {
@@ -78,6 +82,8 @@ final class ResetDatabaseTest extends ResetDatabaseTestCase
      * @test
      * @depends it_can_store_object
      */
+    #[Test]
+    #[Depends('it_can_store_object')]
     public function it_still_starts_from_fresh_db(): void
     {
         if (FoundryTestKernel::hasORM()) {
@@ -92,6 +98,7 @@ final class ResetDatabaseTest extends ResetDatabaseTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_create_object_in_another_schema(): void
     {
         if (!\str_starts_with(\getenv('DATABASE_URL') ?: '', 'postgresql')) {
@@ -105,6 +112,7 @@ final class ResetDatabaseTest extends ResetDatabaseTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_extend_orm_reset_mechanism_first(): void
     {
         if (!FoundryTestKernel::hasORM()) {
@@ -127,6 +135,8 @@ final class ResetDatabaseTest extends ResetDatabaseTestCase
      * @test
      * @depends can_extend_orm_reset_mechanism_first
      */
+    #[Test]
+    #[Depends('can_extend_orm_reset_mechanism_first')]
     public function can_extend_orm_reset_mechanism_second(): void
     {
         if (!FoundryTestKernel::hasORM()) {
@@ -146,6 +156,7 @@ final class ResetDatabaseTest extends ResetDatabaseTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_extend_mongo_reset_mechanism_first(): void
     {
         if (!FoundryTestKernel::hasMongo()) {

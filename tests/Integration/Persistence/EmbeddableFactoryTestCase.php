@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Test\Factories;
@@ -27,9 +28,8 @@ abstract class EmbeddableFactoryTestCase extends KernelTestCase
 {
     use Factories, ResetDatabase;
 
-    /**
-     * @test
-     */
+    /** @test */
+    #[Test]
     public function embed_one(): void
     {
         $factory = $this->withEmbeddableFactory();
@@ -48,6 +48,7 @@ abstract class EmbeddableFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_find_using_embeddable_object(): void
     {
         $factory = $this->withEmbeddableFactory();
@@ -64,6 +65,7 @@ abstract class EmbeddableFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_use_embeddable_as_factory_parameter(): void
     {
         $factory = $this->withEmbeddableFactory();

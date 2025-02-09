@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\PersistenceDisabled;
@@ -42,6 +44,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_create_and_update(): void
     {
         static::factory()::assert()->empty();
@@ -70,6 +73,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_disable_auto_persist(): void
     {
         static::factory()->repository()->assert()->empty();
@@ -89,6 +93,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_refresh(): void
     {
         $object = static::factory()->create();
@@ -116,6 +121,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function cannot_refresh_if_there_are_unsaved_changes(): void
     {
         $object = static::factory()->create();
@@ -140,6 +146,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_delete(): void
     {
         $object = static::factory()->create();
@@ -154,6 +161,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function repository_and_create_function(): void
     {
         repository($this->modelClass())->assert()->empty();
@@ -169,6 +177,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function create_many(): void
     {
         $models = static::factory()->createMany(3, fn(int $i) => ['prop1' => "value{$i}"]);
@@ -183,6 +192,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function find(): void
     {
         $object = static::factory()->create(['prop1' => 'foo']);
@@ -194,6 +204,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function find_must_return_object(): void
     {
         $this->expectException(\RuntimeException::class);
@@ -204,6 +215,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function find_by(): void
     {
         static::factory()->create(['prop1' => 'a']);
@@ -217,6 +229,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function find_or_create(): void
     {
         static::factory()->create(['prop1' => 'a']);
@@ -233,6 +246,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function random(): void
     {
         static::factory()->create(['prop1' => 'a']);
@@ -246,6 +260,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function random_must_return_an_object(): void
     {
         $this->expectException(NotEnoughObjects::class);
@@ -256,6 +271,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function random_or_create(): void
     {
         static::factory()->create(['prop1' => 'a']);
@@ -273,6 +289,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function random_set(): void
     {
         static::factory()->create(['prop1' => 'a']);
@@ -295,6 +312,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function random_set_requires_at_least_the_number_available(): void
     {
         static::factory()::createMany(3);
@@ -307,6 +325,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function random_range(): void
     {
         static::factory()->create(['prop1' => 'a']);
@@ -336,6 +355,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function random_range_requires_at_least_the_max_available(): void
     {
         static::factory()::createMany(3);
@@ -348,6 +368,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function factory_count(): void
     {
         static::factory()::createOne(['prop1' => 'a']);
@@ -361,6 +382,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function truncate(): void
     {
         static::factory()::createMany(3);
@@ -374,6 +396,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function factory_all(): void
     {
         static::factory()::createMany(3);
@@ -384,6 +407,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function repository_assertions(): void
     {
         $assert = static::factory()::repository()->assert();
@@ -414,6 +438,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function repository_is_lazy(): void
     {
         static::factory()::createOne();
@@ -432,6 +457,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function flush_after(): void
     {
         static::factory()::repository()->assert()->empty();
@@ -455,6 +481,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_disable_and_enable_persisting_globally(): void
     {
         static::factory()::repository()->assert()->empty();
@@ -475,6 +502,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function cannot_access_repository_method_when_persist_disabled(): void
     {
         disable_persisting();
@@ -504,6 +532,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_persist_object_with_sequence(): void
     {
         static::factory()->sequence([['prop1' => 'foo'], ['prop1' => 'bar']])->create();
@@ -517,6 +546,8 @@ abstract class GenericFactoryTestCase extends KernelTestCase
      * @test
      * @depends cannot_access_repository_method_when_persist_disabled
      */
+    #[Test]
+    #[Depends('cannot_access_repository_method_when_persist_disabled')]
     public function assert_persist_is_re_enabled_automatically(): void
     {
         $configuration = Configuration::instance();
@@ -530,6 +561,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function assert_it_ca_create_object_with_dates(): void
     {
         $object = static::factory()->create(['date' => $date = new \DateTimeImmutable()]);
@@ -539,6 +571,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function it_should_not_create_proxy_for_not_persistable_objects(): void
     {
         $this->factory()->create(['date' => new \DateTimeImmutable()]);
@@ -548,6 +581,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     /**
      * @test
      */
+    #[Test]
     public function can_use_after_persist_with_attributes(): void
     {
         $object = static::factory()
