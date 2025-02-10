@@ -133,6 +133,31 @@ final class ProxyEntityFactoryRelationshipTest extends EntityFactoryRelationship
         $contact->_assertPersisted();
     }
 
+    /** @test */
+    #[Test]
+    public function real_method_always_return_same_instance(): void
+    {
+        $category = static::categoryFactory()->create();
+
+        $this->assertSame($category->_real(), $category->_real());
+
+        $category->_real()->addContact($contact1 = static::contactFactory()->create()->_real());
+        $category->_real()->addContact($contact2 = static::contactFactory()->create()->_real());
+
+        $category->_real()->addSecondaryContact($contact3 = static::contactFactory()->create()->_real());
+        $category->_real()->addSecondaryContact($contact4 = static::contactFactory()->create()->_real());
+
+        $category->_save();
+
+        $this->assertSame($category->_real(), $category->_real());
+
+        $this->assertSame([$contact1, $contact2], $category->getContacts()->getValues());
+        $this->assertSame([$contact1, $contact2], $category->_real()->getContacts()->getValues());
+
+        $this->assertSame([$contact3, $contact4], $category->getSecondaryContacts()->getValues());
+        $this->assertSame([$contact3, $contact4], $category->_real()->getSecondaryContacts()->getValues());
+    }
+
     protected static function contactFactory(): ProxyContactFactory
     {
         return ProxyContactFactory::new();

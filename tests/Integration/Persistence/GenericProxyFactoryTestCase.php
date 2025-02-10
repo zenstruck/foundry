@@ -252,6 +252,21 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
      * @test
      */
     #[Test]
+    public function assert_real_method_returns_same_object_regardless_of_auto_refresh(): void
+    {
+        $object = static::factory()->create();
+
+        self::assertSame($object->_real(withAutoRefresh: false), $object->_real());
+
+        // check with a modified object
+        $object->setProp1('foo');
+        self::assertSame($object->_real(withAutoRefresh: false), $object->_real());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
     public function can_create_object_with_readonly_properties(): void
     {
         $factory = $this->objectWithReadonlyFactory();
