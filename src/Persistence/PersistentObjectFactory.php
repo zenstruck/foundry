@@ -22,6 +22,7 @@ use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
 
+use function Zenstruck\Foundry\get;
 use function Zenstruck\Foundry\set;
 
 /**
@@ -335,11 +336,22 @@ abstract class PersistentObjectFactory extends ObjectFactory
         $inverseRelationshipMetadata = $pm->inverseRelationshipMetadata(static::class(), $collection->factory::class(), $field);
 
         if ($inverseRelationshipMetadata && $inverseRelationshipMetadata->isCollection) {
-            $inverseField = $inverseRelationshipMetadata->inverseField;
+            $this->tempAfterInstantiate[] = static function(object $object) use ($collection, $inverseRelationshipMetadata, $field) {
+                $inverseField = $inverseRelationshipMetadata->inverseField;
 
-            $this->tempAfterInstantiate[] = static function(object $object) use ($collection, $inverseField, $field) {
                 $inverseObjects = $collection->withPersistMode(PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT)->create([$inverseField => $object]);
-                set($object, $field, unproxy($inverseObjects));
+
+                $inverseObjects = unproxy($inverseObjects);
+
+                // if the collection is indexed by a field, index the array
+                if ($inverseRelationshipMetadata->collectionIndexedBy) {
+                    $inverseObjects = \array_combine(
+                        array_map(static fn($o) => get($o, $inverseRelationshipMetadata->collectionIndexedBy), $inverseObjects),
+                        array_values($inverseObjects)
+                    );
+                }
+
+                set($object, $field, $inverseObjects);
             };
 
             // creation delegated to afterPersist hook - return empty array here

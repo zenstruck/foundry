@@ -66,6 +66,7 @@ final class OrmV2PersistenceStrategy extends AbstractORMPersistenceStrategy
         return new InverseRelationshipMetadata(
             inverseField: $association['fieldName'],
             isCollection: $inversedAssociationMetadata->isCollectionValuedAssociation($inversedAssociation['fieldName']),
+            collectionIndexedBy: $inversedAssociation['indexBy'] ?? null
         );
     }
 

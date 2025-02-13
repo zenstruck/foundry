@@ -56,6 +56,7 @@ final class OrmV3PersistenceStrategy extends AbstractORMPersistenceStrategy
         return new InverseRelationshipMetadata(
             inverseField: $association->fieldName,
             isCollection: $inversedAssociation instanceof ToManyAssociationMapping,
+            collectionIndexedBy: $inversedAssociation->isIndexed() ? $inversedAssociation->indexBy() : null
         );
     }
 
