@@ -97,12 +97,14 @@ trait IsProxy // @phpstan-ignore trait.unused
         return $this;
     }
 
-    public function _real(): object
+    public function _real(bool $withAutoRefresh = true): object
     {
-        try {
-            // we don't want the auto-refresh mechanism to break "real" object retrieval
-            $this->_autoRefresh();
-        } catch (\Throwable) {
+        if ($withAutoRefresh) {
+            try {
+                // we don't want the auto-refresh mechanism to break "real" object retrieval
+                $this->_autoRefresh();
+            } catch (\Throwable) {
+            }
         }
 
         return $this->initializeLazyObject();

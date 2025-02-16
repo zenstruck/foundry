@@ -308,6 +308,9 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
             'category' => static::categoryFactory(),
         ]);
 
+        // ensure nothing was persisted in Doctrine by flushing
+        self::getContainer()->get(EntityManagerInterface::class)->flush(); // @phpstan-ignore method.notFound
+
         static::contactFactory()::assert()->empty();
         static::categoryFactory()::assert()->empty();
         static::tagFactory()::assert()->empty();

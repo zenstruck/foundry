@@ -69,7 +69,7 @@ interface Proxy
     /**
      * @return T
      */
-    public function _real(): object;
+    public function _real(bool $withAutoRefresh = true): object;
 
     /**
      * @psalm-return T&Proxy<T>

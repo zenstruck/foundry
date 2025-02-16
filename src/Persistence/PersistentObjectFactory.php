@@ -309,8 +309,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
                 // auto-refresh computes changeset and prevents the placeholder object to be cleanly
                 // forgotten fom the persistence manager
                 if ($inversedObject instanceof Proxy) {
-                    $inversedObject->_disableAutoRefresh();
-                    $inversedObject = $inversedObject->_real();
+                    $inversedObject = $inversedObject->_real(withAutoRefresh: false);
                 }
 
                 $this->tempAfterInstantiate[] = static function(object $object) use ($inversedObject, $inverseField, $pm, $placeholder) {
@@ -362,36 +361,26 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
+     * This method will try to find entities in database if they are detached.
+     *
      * @internal
      */
     protected function normalizeObject(object $object): object
     {
-        $reflectionClass = new \ReflectionClass($object::class);
-
-        if ($reflectionClass->isFinal()) {
-            return $object;
-        }
-
-        // readonly classes exist since php 8.2 and proxyHelper supports them since 8.3
-        if (80200 <= \PHP_VERSION_ID && \PHP_VERSION_ID < 80300 && $reflectionClass->isReadonly()) {
-            return $object;
-        }
-
         $configuration = Configuration::instance();
 
-        if (!$configuration->isPersistenceAvailable()) {
+        if (
+            !$this->isPersisting()
+            || !$configuration->isPersistenceAvailable()
+        ) {
             return $object;
+        }
+
+        if ($object instanceof Proxy) {
+            $object = $object->_real(withAutoRefresh: false);
         }
 
         $persistenceManager = $configuration->persistence();
-
-        if ($object instanceof Proxy) {
-            $proxy = $object;
-            $proxy->_disableAutoRefresh();
-            $object = $proxy->_real();
-            $proxy->_enableAutoRefresh();
-        }
-
         if (!$persistenceManager->hasPersistenceFor($object)) {
             return $object;
         }
