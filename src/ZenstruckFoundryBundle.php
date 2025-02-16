@@ -105,6 +105,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                         ->booleanNode('auto_persist')
                             ->info('Automatically persist entities when created.')
                             ->defaultTrue()
+                            ->setDeprecated('zenstruck/foundry', '2.4', 'Since 2.4 auto_persist defaults to true and this configuration has no effect.')
                         ->end()
                         ->arrayNode('reset')
                             ->addDefaultsIfNotSet()
@@ -160,6 +161,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                         ->booleanNode('auto_persist')
                             ->info('Automatically persist documents when created.')
                             ->defaultTrue()
+                            ->setDeprecated('zenstruck/foundry', '2.4', 'Since 2.4 auto_persist defaults to true and this configuration has no effect.')
                         ->end()
                         ->arrayNode('reset')
                             ->addDefaultsIfNotSet()
@@ -251,10 +253,6 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
         if (isset($bundles['DoctrineBundle'])) {
             $configurator->import('../config/orm.php');
 
-            $container->getDefinition('.zenstruck_foundry.persistence_strategy.orm')
-                ->replaceArgument(1, $config['orm'])
-            ;
-
             $container->getDefinition('.zenstruck_foundry.persistence.database_resetter.orm.abstract')
                 ->replaceArgument('$managers', $config['orm']['reset']['entity_managers'])
                 ->replaceArgument('$connections', $config['orm']['reset']['connections'])
@@ -279,10 +277,6 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
 
         if (isset($bundles['DoctrineMongoDBBundle'])) {
             $configurator->import('../config/mongo.php');
-
-            $container->getDefinition('.zenstruck_foundry.persistence_strategy.mongo')
-                ->replaceArgument(1, $config['mongo'])
-            ;
 
             $container->getDefinition(MongoResetter::class)
                 ->replaceArgument(0, $config['mongo']['reset']['document_managers'])

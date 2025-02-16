@@ -11,7 +11,6 @@ return static function (ContainerConfigurator $container): void {
         ->set('.zenstruck_foundry.persistence_strategy.mongo', MongoPersistenceStrategy::class)
             ->args([
                 service('doctrine_mongodb'),
-                abstract_arg('config'),
             ])
             ->tag('.foundry.persistence_strategy')
 

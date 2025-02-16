@@ -234,18 +234,6 @@ final class PersistenceManager
     }
 
     /**
-     * @param class-string $class
-     */
-    public function autoPersist(string $class): bool
-    {
-        try {
-            return $this->strategyFor(unproxy($class))->autoPersist();
-        } catch (NoPersistenceStrategy) {
-            return false;
-        }
-    }
-
-    /**
      * @template T of object
      *
      * @param class-string<T> $class

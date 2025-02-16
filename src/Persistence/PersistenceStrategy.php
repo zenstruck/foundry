@@ -23,16 +23,8 @@ use Doctrine\Persistence\ObjectManager;
  */
 abstract class PersistenceStrategy
 {
-    /**
-     * @param array<string,mixed> $config
-     */
-    public function __construct(protected readonly ManagerRegistry $registry, protected readonly array $config)
+    public function __construct(protected readonly ManagerRegistry $registry)
     {
-    }
-
-    public function autoPersist(): bool
-    {
-        return $this->config['auto_persist'];
     }
 
     /**

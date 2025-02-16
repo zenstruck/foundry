@@ -44,6 +44,13 @@ abstract class PersistentObjectFactory extends ObjectFactory
     /** @var list<callable(T):void> */
     private array $tempAfterInstantiate = [];
 
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->persist = Configuration::instance()->isPersistenceEnabled() ? PersistMode::PERSIST : PersistMode::WITHOUT_PERSISTING;
+    }
+
     /**
      * @phpstan-param mixed|Parameters $criteriaOrId
      *
@@ -274,13 +281,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
      */
     public function persistMode(): PersistMode
     {
-        $config = Configuration::instance();
-
-        if (!$config->isPersistenceEnabled()) {
-            return PersistMode::WITHOUT_PERSISTING;
-        }
-
-        return $this->persist ?? ($config->persistence()->autoPersist(static::class()) ? PersistMode::PERSIST : PersistMode::WITHOUT_PERSISTING);
+        return Configuration::instance()->isPersistenceEnabled() ? $this->persist : PersistMode::WITHOUT_PERSISTING;
     }
 
     protected function normalizeParameter(string $field, mixed $value): mixed
@@ -289,7 +290,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
             return unproxy(parent::normalizeParameter($field, $value));
         }
 
-        if ($value instanceof self && isset($this->persist)) {
+        if ($value instanceof self) {
             $value = $value->withPersistMode($this->persist);
         }
 
