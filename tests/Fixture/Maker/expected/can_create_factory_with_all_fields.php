@@ -43,6 +43,7 @@ final class GenericEntityFactory extends PersistentProxyObjectFactory
         return [
             'date' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
             'prop1' => self::faker()->text(),
+            'propInteger' => self::faker()->randomNumber(),
         ];
     }
 

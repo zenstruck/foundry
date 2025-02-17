@@ -14,6 +14,7 @@ namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\PersistenceDisabled;
+use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\ProxyGenerator;
@@ -542,6 +543,25 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     {
         $this->factory()->create(['date' => new \DateTimeImmutable()]);
         self::assertFalse(\class_exists(ProxyGenerator::proxyClassNameFor(\DateTimeImmutable::class)));
+    }
+
+    /**
+     * @test
+     */
+    public function can_use_after_persist_with_attributes(): void
+    {
+        $object = static::factory()
+            ->instantiateWith(Instantiator::withConstructor()->allowExtra('extra'))
+            ->afterPersist(function(GenericModel $object, array $attributes) {
+                $object->setProp1($attributes['extra']);
+                $object->setPropInteger($object->getPropInteger() + 1);
+            })
+            ->create(['extra' => $value = 'value set with after persist']);
+
+        $this->assertSame($value, $object->getProp1());
+
+        // ensure after persist is only called once
+        $this->assertSame(1, $object->getPropInteger());
     }
 
     /**

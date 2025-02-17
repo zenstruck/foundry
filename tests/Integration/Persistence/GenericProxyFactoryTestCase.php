@@ -270,21 +270,6 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
     /**
      * @test
      */
-    public function can_use_after_persist_with_attributes(): void
-    {
-        $object = static::factory()
-            ->instantiateWith(Instantiator::withConstructor()->allowExtra('extra'))
-            ->afterPersist(function(GenericModel $object, array $attributes) {
-                $object->setProp1($attributes['extra']);
-            })
-            ->create(['extra' => $value = 'value set with after persist']);
-
-        $this->assertSame($value, $object->getProp1());
-    }
-
-    /**
-     * @test
-     */
     public function can_use_after_persist_with_attributes_added_in_before_instantiate(): void
     {
         $value = 'value set with before instantiate';

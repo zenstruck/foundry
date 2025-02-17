@@ -38,7 +38,6 @@ parameters:
         - identifier: property.readOnlyByPhpDocDefaultValue
           paths:
             - src/Object/Hydrator.php
-            - src/Factory.php
             - src/ObjectFactory.php
             - src/Persistence/PersistentObjectFactory.php
 

@@ -33,6 +33,10 @@ abstract class GenericModel
     #[MongoDB\Field(type: 'string')]
     private string $prop1;
 
+    #[ORM\Column]
+    #[MongoDB\Field(type: 'int')]
+    private int $propInteger = 0;
+
     #[ORM\Column(nullable: true)]
     #[MongoDB\Field(type: 'date_immutable', nullable: true)]
     private ?\DateTimeImmutable $date = null;
@@ -50,6 +54,16 @@ abstract class GenericModel
     public function setProp1(string $prop1): void
     {
         $this->prop1 = $prop1;
+    }
+
+    public function getPropInteger(): int
+    {
+        return $this->propInteger;
+    }
+
+    public function setPropInteger(int $propInteger): void
+    {
+        $this->propInteger = $propInteger;
     }
 
     public function getDate(): ?\DateTimeImmutable

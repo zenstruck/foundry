@@ -25,13 +25,6 @@ use Faker;
  */
 abstract class Factory
 {
-    /**
-     * Memoization of normalized parameters.
-     *
-     * @internal
-     * @var Parameters|null
-     */
-    protected ?array $normalizedParameters = null;
     /** @phpstan-var Attributes[] */
     private array $attributes;
 
@@ -208,7 +201,7 @@ abstract class Factory
      */
     protected function normalizeParameters(array $parameters): array
     {
-        return $this->normalizedParameters = \array_combine(
+        return \array_combine(
             \array_keys($parameters),
             \array_map($this->normalizeParameter(...), \array_keys($parameters), $parameters)
         );

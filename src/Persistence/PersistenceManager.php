@@ -31,6 +31,9 @@ final class PersistenceManager
     private bool $flush = true;
     private bool $persist = true;
 
+    /** @var list<callable():void> */
+    private array $afterPersistCallbacks = [];
+
     /**
      * @param iterable<PersistenceStrategy> $strategies
      */
@@ -72,6 +75,16 @@ final class PersistenceManager
         $om->persist($object);
         $this->flush($om);
 
+        if ($this->afterPersistCallbacks) {
+            foreach ($this->afterPersistCallbacks as $afterPersistCallback) {
+                $afterPersistCallback();
+            }
+
+            $this->afterPersistCallbacks = [];
+
+            $this->save($object);
+        }
+
         return $object;
     }
 
@@ -79,10 +92,11 @@ final class PersistenceManager
      * @template T of object
      *
      * @param T $object
+     * @param list<callable():void> $afterPersistCallbacks
      *
      * @return T
      */
-    public function scheduleForInsert(object $object): object
+    public function scheduleForInsert(object $object, array $afterPersistCallbacks = []): object
     {
         if ($object instanceof Proxy) {
             $object = unproxy($object);
@@ -90,6 +104,8 @@ final class PersistenceManager
 
         $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
         $om->persist($object);
+
+        $this->afterPersistCallbacks = [...$this->afterPersistCallbacks, ...$afterPersistCallbacks];
 
         return $object;
     }

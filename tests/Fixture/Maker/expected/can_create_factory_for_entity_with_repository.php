@@ -78,6 +78,7 @@ final class GenericEntityFactory extends PersistentProxyObjectFactory
     {
         return [
             'prop1' => self::faker()->text(),
+            'propInteger' => self::faker()->randomNumber(),
         ];
     }
 

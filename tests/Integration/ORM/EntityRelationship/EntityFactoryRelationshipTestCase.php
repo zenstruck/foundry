@@ -400,6 +400,75 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         );
     }
 
+    /** @test */
+    public function it_uses_after_persist_with_many_to_many(): void
+    {
+        $contact = static::contactFactory()
+            ->with(
+                [
+                    'tags' => static::tagFactory()
+                        ->afterPersist(static function (Tag $tag) {$tag->setName('foobar');})
+                        ->many(1)
+                ]
+            )
+            ->create();
+
+        self::assertEquals('foobar', $contact->getTags()[0]?->getName());
+    }
+
+    /** @test */
+    public function it_uses_after_persist_with_one_to_many(): void
+    {
+        $category = static::categoryFactory()
+            ->with([
+                'contacts' => static::contactFactory()
+                    ->afterPersist(static function (Contact $contact) {
+                        $contact->setName('foobar');
+                    })
+                    ->many(1)
+            ])->create();
+
+        self::assertEquals('foobar', $category->getContacts()[0]?->getName());
+    }
+
+    /** @test */
+    public function it_uses_after_persist_with_many_to_one(): void
+    {
+        $contact = static::contactFactory()
+            ->with([
+                'category' => static::categoryFactory()
+                    ->afterPersist(static function (Category $category) {
+                        $category->setName('foobar');
+                    })
+            ])->create();
+
+        self::assertEquals('foobar', $contact->getCategory()?->getName());
+    }
+
+    /** @test */
+    public function it_uses_after_persist_with_one_to_one(): void
+    {
+        $contact = static::contactFactory()
+            ->with([
+                'address' => static::addressFactory()
+                    ->afterPersist(static function (Address $address) {$address->setCity('foobar');})
+            ])->create();
+
+        self::assertEquals('foobar', $contact->getAddress()->getCity());
+    }
+
+    /** @test */
+    public function it_uses_after_persist_with_inversed_one_to_one(): void
+    {
+        $address = static::addressFactory()
+            ->with([
+                'contact' => static::contactFactory()
+                    ->afterPersist(static function (Contact $contact) {$contact->setName('foobar');})
+            ])->create();
+
+        self::assertEquals('foobar', $address->getContact()?->getName());
+    }
+
     /** @return PersistentObjectFactory<Contact> */
     protected static function contactFactoryWithoutCategory(): PersistentObjectFactory
     {

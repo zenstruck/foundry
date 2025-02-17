@@ -217,16 +217,6 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
         $configuration->persistence()->save($object);
 
-        if ($this->afterPersist) {
-            $attributes = $this->normalizedParameters ?? throw new \LogicException('Factory::$normalizedParameters has not been initialized.');
-
-            foreach ($this->afterPersist as $callback) {
-                $callback($object, $attributes, $this);
-            }
-
-            $configuration->persistence()->save($object);
-        }
-
         return $object;
     }
 
@@ -430,7 +420,15 @@ abstract class PersistentObjectFactory extends ObjectFactory
                     return;
                 }
 
-                Configuration::instance()->persistence()->scheduleForInsert($object);
+                $afterPersistCallbacks = [];
+
+                foreach ($factory->afterPersist as $afterPersist) {
+                    $afterPersistCallbacks[] = static function() use ($object, $afterPersist, $parameters, $factory): void {
+                        $afterPersist($object, $parameters, $factory);
+                    };
+                }
+
+                Configuration::instance()->persistence()->scheduleForInsert($object, $afterPersistCallbacks);
             }
         );
     }
