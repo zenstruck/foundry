@@ -1358,17 +1358,18 @@ bundle's configuration:
         # config/packages/zenstruck_foundry.yaml
         when@dev: # see Bundle Configuration section about sharing this in the test environment
             zenstruck_foundry:
-                database_resetter:
-                    orm:
+                orm:
+                    reset:
                         connections:
                             - orm_connection_1
                             - orm_connection_2
-                        object_managers:
+                        entity_managers:
                             - orm_object_manager_1
                             - orm_object_manager_2
-                        reset_mode: schema # default value, enables resetting the schema with doctrine:schema commands
-                    mongo:
-                        object_managers:
+                        mode: schema # default value, enables resetting the schema with doctrine:schema commands
+                mongo:
+                    reset:
+                        document_managers:
                             - odm_object_manager_1
                             - odm_object_manager_2
 
@@ -1393,9 +1394,9 @@ files.
         # config/packages/zenstruck_foundry.yaml
         when@dev: # see Bundle Configuration section about sharing this in the test environment
             zenstruck_foundry:
-                database_resetter:
-                    orm:
-                        reset_mode: migrate # enables resetting with migrations
+                orm:
+                    reset:
+                        mode: migrate # enables resetting with migrations
 
                         # optional: allows you to pass additional configuration to the doctrine:migrations:migrate command
                         migrations:
