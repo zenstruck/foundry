@@ -27,6 +27,7 @@ or a combination of these.
 Want to watch a screencast 🎥 about it? Check out https://symfonycasts.com/foundry
 
 **[Read the Documentation](https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html)**
+
 **[Upgrade guide to v2](https://github.com/zenstruck/foundry/blob/v2.0.0/UPGRADE-2.0.md)**
 
 ## How to contribute
