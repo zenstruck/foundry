@@ -1733,7 +1733,7 @@ you're using them in tests. Thanks to it, you can:
 
 .. warning::
 
-    Because Foundry is relying on its `Proxy mechanism <object-proxy>`_, when using persistence,
+    Because Foundry is relying on its `Proxy mechanism <https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#object-proxy>`_, when using persistence,
     your factories must extend ``Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory`` to work in your data providers.
 
 .. warning::
