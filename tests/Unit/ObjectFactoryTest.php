@@ -19,6 +19,7 @@ use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object2Factory;
+use Zenstruck\Foundry\Tests\Fixture\Factories\SimpleObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
 
 use function Zenstruck\Foundry\factory;
@@ -432,6 +433,43 @@ final class ObjectFactoryTest extends TestCase
                 ],
             ]),
         );
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function distribute(): void
+    {
+        $objects = SimpleObjectFactory::new()->distribute('prop1', ['foo', 'bar'])->create();
+
+        self::assertCount(2, $objects);
+        self::assertSame('foo', $objects[0]->prop1);
+        self::assertSame('bar', $objects[1]->prop1);
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function distribute_on_factory_collection(): void
+    {
+        $objects = SimpleObjectFactory::new()->many(2)->distribute('prop1', ['foo', 'bar'])->create();
+
+        self::assertCount(2, $objects);
+        self::assertSame('foo', $objects[0]->prop1);
+        self::assertSame('bar', $objects[1]->prop1);
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function providing_invalid_values_number_to_distribute_throws(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        SimpleObjectFactory::new()->many(2)->distribute('prop1', ['foo']);
     }
 
     /**

@@ -505,6 +505,39 @@ Sequences help to create different objects in one call:
             ]
         )->create();
 
+Distribute values over a collection
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you have a collection of values that you want to distribute over a collection, you can use the ``distribute()`` method:
+
+::
+
+    // let's say we have 2 categories...
+    $categories = CategoryFactory::createSequence(
+        [
+            ['name' => 'category 1'],
+            ['name' => 'category 2'],
+        ]
+    );
+
+    // ...that we want to "distribute" over 2 posts
+    $posts = PostFactory::new()
+        ->sequence(
+            [
+                ['name' => 'post 1'],
+                ['name' => 'post 2'],
+            ]
+        )
+
+        // "post 1" will have "category 1" and "post 2" will have "category 2"
+        ->distribute('category', $categories)
+
+        // you can even chain "distribute()" methods:
+        // first post is published today, second post is published tomorrow
+        ->distribute('publishedAt', [new \DateTimeImmutable('today'), new \DateTimeImmutable('tomorrow')])
+
+        ->create();
+
 Faker
 ~~~~~
 

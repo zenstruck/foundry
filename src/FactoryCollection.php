@@ -164,6 +164,29 @@ final class FactoryCollection implements \IteratorAggregate
         );
     }
 
+    /**
+     * @param list<mixed> $values
+     *
+     * @return self<T, TFactory>
+     */
+    public function distribute(string $field, array $values): self
+    {
+        $factories = $this->all();
+
+        if (\count($factories) !== \count($values)) {
+            throw new \InvalidArgumentException('Number of values must match number of factories.');
+        }
+
+        return new self(
+            $this->factory,
+            static fn() => \array_map(
+                static fn(Factory $f, $value) => $f->with([$field => $value]),
+                $factories,
+                $values
+            )
+        );
+    }
+
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->all());

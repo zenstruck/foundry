@@ -31,9 +31,6 @@ final class FakerSeedSetFromLegacyConfigKernelTest extends KernelTestCase
 {
     use Factories, FakerTestTrait, ResetDatabase;
 
-    /**
-     * @test
-     */
     #[Test]
     #[IgnoreDeprecations]
     public function faker_seed_by_configuration_is_deprecated(): void

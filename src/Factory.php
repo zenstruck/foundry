@@ -132,6 +132,18 @@ abstract class Factory
     }
 
     /**
+     * @param list<mixed> $values
+     *
+     * @return FactoryCollection<T, static>
+     */
+    final public function distribute(string $field, array $values): FactoryCollection
+    {
+        return $this->sequence(
+            \array_map(fn($value) => [$field => $value], $values)
+        );
+    }
+
+    /**
      * @phpstan-param Attributes $attributes
      *
      * @psalm-return static<T>
