@@ -187,6 +187,29 @@ final class FactoryCollection implements \IteratorAggregate
         );
     }
 
+    /**
+     * @param list<mixed>|list<list<mixed>> $values
+     *
+     * @return self<T, TFactory>
+     */
+    public function mapEach(callable $callback, array $values): self // @phpstan-ignore missingType.callable (cannot properly type the callable)
+    {
+        $factories = $this->all();
+
+        if (count($factories) !== count($values)) {
+            throw new \InvalidArgumentException('Number of values must match number of factories.');
+        }
+
+        return new self(
+            $this->factory,
+            static fn() => \array_map(
+                static fn(Factory $f, mixed $value) => is_array($value) ? $callback($f, ...$value) : $callback($f, $value),
+                $factories,
+                $values
+            )
+        );
+    }
+
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->all());
