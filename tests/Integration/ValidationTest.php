@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration;
 
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Zenstruck\Foundry\Test\Factories;
@@ -16,14 +17,18 @@ final class ValidationTest extends KernelTestCase
 {
     use Factories;
 
-    public function test_it_does_not_validate_object_if_validation_not_enabled(): void
+    /** @test */
+    #[Test]
+    public function it_does_not_validate_object_if_validation_not_enabled(): void
     {
         self::expectNotToPerformAssertions();
 
         object(EntityForValidation::class);
     }
 
-    public function test_it_throws_if_trying_to_validate_with_validation_not_available(): void
+    /** @test */
+    #[Test]
+    public function it_throws_if_trying_to_validate_with_validation_not_available(): void
     {
         self::expectException(\LogicException::class);
         self::expectExceptionMessage('Validation is not available.');
@@ -31,7 +36,9 @@ final class ValidationTest extends KernelTestCase
         factory(EntityForValidation::class)->withValidation()->create();
     }
 
-    public function test_it_throws_if_validation_enabled_in_foundry_but_disabled_in_symfony(): void
+    /** @test */
+    #[Test]
+    public function it_throws_if_validation_enabled_in_foundry_but_disabled_in_symfony(): void
     {
         self::expectException(\LogicException::class);
         self::expectExceptionMessage('Validation support cannot be enabled');
@@ -41,7 +48,9 @@ final class ValidationTest extends KernelTestCase
         object(EntityForValidation::class);
     }
 
-    public function test_it_validates_object_if_validation_forced(): void
+    /** @test */
+    #[Test]
+    public function it_validates_object_if_validation_forced(): void
     {
         self::expectException(ValidationFailedException::class);
         self::expectExceptionMessageMatches('/This value should not be blank/');
@@ -51,7 +60,9 @@ final class ValidationTest extends KernelTestCase
         factory(EntityForValidation::class)->withValidation()->create();
     }
 
-    public function test_it_validates_object_if_validation_enabled_globally(): void
+    /** @test */
+    #[Test]
+    public function it_validates_object_if_validation_enabled_globally(): void
     {
         self::expectException(ValidationFailedException::class);
 
@@ -60,7 +71,9 @@ final class ValidationTest extends KernelTestCase
         object(EntityForValidation::class);
     }
 
-    public function test_validation_can_be_disabled(): void
+    /** @test */
+    #[Test]
+    public function validation_can_be_disabled(): void
     {
         self::expectNotToPerformAssertions();
 
@@ -69,7 +82,9 @@ final class ValidationTest extends KernelTestCase
         factory(EntityForValidation::class)->withoutValidation()->create();
     }
 
-    public function test_it_validates_object_with_validation_groups(): void
+    /** @test */
+    #[Test]
+    public function it_validates_object_with_validation_groups(): void
     {
         self::expectException(ValidationFailedException::class);
         self::expectExceptionMessageMatches('/This value should be greater than 10/');
@@ -79,7 +94,9 @@ final class ValidationTest extends KernelTestCase
         factory(EntityForValidation::class)->withValidation('validation_group')->create();
     }
 
-    public function test_it_validates_object_with_validation_groups_when_validation_enabled_globally(): void
+    /** @test */
+    #[Test]
+    public function it_validates_object_with_validation_groups_when_validation_enabled_globally(): void
     {
         self::expectException(ValidationFailedException::class);
         self::expectExceptionMessageMatches('/This value should be greater than 10/');
@@ -89,7 +106,9 @@ final class ValidationTest extends KernelTestCase
         factory(EntityForValidation::class)->withValidationGroups('validation_group')->create();
     }
 
-    public function test_it_can_erase_validation_groups(): void
+    /** @test */
+    #[Test]
+    public function it_can_erase_validation_groups(): void
     {
         self::expectException(ValidationFailedException::class);
         self::expectExceptionMessageMatches('/This value should not be blank/');

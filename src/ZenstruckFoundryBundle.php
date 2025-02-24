@@ -347,7 +347,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
 
         // validation
         $container->getDefinition('.zenstruck_foundry.configuration')
-            ->replaceArgument(7, $container->has('validator'));
+            ->replaceArgument(8, $container->has('validator'));
 
         if (!interface_exists(ValidatorInterface::class)) {
             $container->removeDefinition('.zenstruck_foundry.validation_listener');

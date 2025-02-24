@@ -1199,7 +1199,7 @@ Validate your objects
 Foundry can validate your objects automatically after they are instantiated. This can be useful to
 ensure that your objects are in a valid state before they are used in your tests.
 
-You can either enable validation them globally:
+You can either enable validation globally:
 
 .. configuration-block::
 
@@ -1211,19 +1211,33 @@ You can either enable validation them globally:
                 instantiator:
                     validate: true
 
-Or enable/disable it for a specific factory, or in a specific test with methods ``withValidation()`` / ``withoutValidation()``:
+Or enable/disable it in a specific test with methods ``withValidation()`` / ``withoutValidation()``:
 
 ::
 
-    class UserFactory extends ObjectFactory
-    {
-        protected function initialize(): static
-        {
-            return $this->withValidation();
-            // you can also disable validation using ->withoutValidation()
-        }
-    }
+      class MyKernelTest extends KernelTestCase
+      {
+          use Factories;
 
+          public function some_test(): void
+          {
+              PostFactory::new()
+
+                // enable validation
+                ->withValidation()
+
+                // enable validation, and specify a validation group
+                ->withValidation('post:create')
+
+                // or, if the validation is already enabled in the config, just call `withValidationGroups()`
+                ->withValidationGroups(groups: 'post:create')
+              ;
+          }
+      }
+
+.. warning::
+
+    Validation is only available in tests using the kernel, such as `KernelTestCase` or `WebTestCase`.
 
 Using with DoctrineFixturesBundle
 ---------------------------------
@@ -2392,6 +2406,9 @@ Full Default Bundle Configuration
 
             # Customize the instantiator service.
             service:              null # Example: my_instantiator
+
+            # Automatically validate the objects created
+            validation: false
         orm:
             reset:
 
