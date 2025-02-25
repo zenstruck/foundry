@@ -31,6 +31,9 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Tag;
 
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
+
+use function Zenstruck\Foundry\Persistence\persistent_factory;
 use function Zenstruck\Foundry\Persistence\refresh;
 use function Zenstruck\Foundry\Persistence\unproxy;
 
@@ -470,6 +473,22 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
             ])->create();
 
         self::assertEquals('foobar', $address->getContact()?->getName());
+    }
+
+    /** @test */
+    #[Test]
+    public function can_call_create_in_after_persist_callback(): void
+    {
+        $category = static::categoryFactory()::new()
+            ->afterPersist(function(Category $category) {
+                static::contactFactory()->create(['category' => $category]);
+            })
+            ->create();
+
+        static::categoryFactory()::assert()->count(1);
+        static::contactFactory()::assert()->count(1);
+        self::assertCount(1, $category->getContacts());
+        self::assertSame(unproxy($category), $category->getContacts()[0]?->getCategory());
     }
 
     /** @return PersistentObjectFactory<Contact> */

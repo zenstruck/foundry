@@ -76,11 +76,12 @@ final class PersistenceManager
         $this->flush($om);
 
         if ($this->afterPersistCallbacks) {
-            foreach ($this->afterPersistCallbacks as $afterPersistCallback) {
+            $afterPersistCallbacks = $this->afterPersistCallbacks;
+            $this->afterPersistCallbacks = [];
+
+            foreach ($afterPersistCallbacks as $afterPersistCallback) {
                 $afterPersistCallback();
             }
-
-            $this->afterPersistCallbacks = [];
 
             $this->save($object);
         }
