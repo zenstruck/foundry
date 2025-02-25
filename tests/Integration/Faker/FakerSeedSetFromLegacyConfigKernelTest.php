@@ -53,7 +53,7 @@ final class FakerSeedSetFromLegacyConfigKernelTest extends KernelTestCase
     }
 
     #[Test]
-    #[Depends('test_faker_seed_by_configuration_is_deprecated')]
+    #[Depends('faker_seed_by_configuration_is_deprecated')]
     public function faker_seed_is_already_set(): void
     {
         self::assertSame(1234, Configuration::fakerSeed());
