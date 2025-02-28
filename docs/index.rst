@@ -5,7 +5,7 @@ Foundry makes creating fixtures data fun again, via an expressive, auto-completa
 Symfony and Doctrine:
 
 The factories can be used inside `DoctrineFixturesBundle <https://symfony.com/bundles/DoctrineFixturesBundle/current/index.html>`_
-to load fixtures or inside your tests, `where it has even more features <https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#using-in-your-tests>`_.
+to load fixtures or inside your tests, `where it has even more features <:ref:#using-in-your-tests>`_.
 
 Foundry supports ``doctrine/orm`` (with `doctrine/doctrine-bundle <https://github.com/doctrine/doctrinebundle>`_),
 ``doctrine/mongodb-odm`` (with `doctrine/mongodb-odm-bundle <https://github.com/doctrine/DoctrineMongoDBBundle>`_)
@@ -147,7 +147,7 @@ This command will generate a ``PostFactory`` class that looks like this:
     final class PostFactory extends PersistentProxyObjectFactory
     {
         /**
-         * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
+         * @see :ref:#factories-as-services
          *
          * @todo inject services if required
          */
@@ -161,7 +161,7 @@ This command will generate a ``PostFactory`` class that looks like this:
         }
 
         /**
-         * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
+         * @see :ref:#model-factories
          *
          * @todo add your default values here
          */
@@ -174,7 +174,7 @@ This command will generate a ``PostFactory`` class that looks like this:
         }
 
         /**
-         * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
+         * @see :ref:#initialization
          */
         protected function initialize(): static
         {
@@ -1733,7 +1733,7 @@ you're using them in tests. Thanks to it, you can:
 
 .. warning::
 
-    Because Foundry is relying on its `Proxy mechanism <https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#object-proxy>`_, when using persistence,
+    Because Foundry is relying on its `Proxy mechanism <:ref:#object-proxy>`_, when using persistence,
     your factories must extend ``Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory`` to work in your data providers.
 
 .. warning::
