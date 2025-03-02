@@ -519,6 +519,40 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         self::assertSame(unproxy($category), $category->getContacts()[0]?->getCategory());
     }
 
+    /** @test */
+    #[Test]
+    public function can_use_nested_after_persist_callback(): void
+    {
+        $contact = static::contactFactory()::createOne(
+            [
+                'address' => static::addressFactory()
+                    ->afterPersist(function(Address $address) {
+                        $address->setCity('city from after persist');
+                    }),
+            ]
+        );
+
+        self::assertSame('city from after persist', $contact->getAddress()->getCity());
+    }
+
+    /** @test */
+    #[Test]
+    public function can_call_create_in_nested_after_persist_callback(): void
+    {
+        $contact = static::contactFactory()::createOne(
+            [
+                'category' => static::categoryFactory()
+                    ->afterPersist(function(Category $category) {
+                        $category->addSecondaryContact(
+                            unproxy(static::contactFactory()::createOne())
+                        );
+                    }),
+            ]
+        );
+
+        self::assertCount(1, $contact->getCategory()?->getSecondaryContacts() ?? []);
+    }
+
     /** @return PersistentObjectFactory<Contact> */
     protected static function contactFactoryWithoutCategory(): PersistentObjectFactory
     {

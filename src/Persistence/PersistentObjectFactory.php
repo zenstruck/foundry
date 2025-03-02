@@ -44,6 +44,8 @@ abstract class PersistentObjectFactory extends ObjectFactory
     /** @var list<callable(T):void> */
     private array $tempAfterInstantiate = [];
 
+    private bool $isRootFactory = true;
+
     /**
      * @phpstan-param mixed|Parameters $criteriaOrId
      *
@@ -206,7 +208,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
         $this->throwIfCannotCreateObject();
 
-        if (PersistMode::PERSIST !== $this->persistMode()) {
+        if (PersistMode::PERSIST !== $this->persistMode() || !$this->isRootFactory) {
             return $object;
         }
 
@@ -299,6 +301,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
                 $inversedObject = $value->withPersistMode(
                     $this->isPersisting() ? PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT : PersistMode::WITHOUT_PERSISTING
                 )
+                    ->notRootFactory()
 
                     // we need to handle the circular dependency involved by inversed one-to-one relationship:
                     // a placeholder object is used, which will be replaced by the real object, after its instantiation
@@ -314,6 +317,8 @@ abstract class PersistentObjectFactory extends ObjectFactory
                 };
 
                 return $inversedObject;
+            } else {
+                $value = $value->notRootFactory();
             }
         }
 
@@ -449,5 +454,13 @@ abstract class PersistentObjectFactory extends ObjectFactory
         }
 
         throw new \LogicException(\sprintf('Cannot create object in a data provider for non-proxy factories. Transform your factory into a "%s", or call "create()" method in the test. See https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#phpunit-data-providers', PersistentProxyObjectFactory::class));
+    }
+
+    private function notRootFactory(): static
+    {
+        $clone = clone $this;
+        $clone->isRootFactory = false;
+
+        return $clone;
     }
 }

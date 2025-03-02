@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\PersistenceDisabled;
@@ -562,6 +563,25 @@ abstract class GenericFactoryTestCase extends KernelTestCase
 
         // ensure after persist is only called once
         $this->assertSame(1, $object->getPropInteger());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function it_actually_calls_post_persist_hook_after_persist_when_in_flush_after(): void
+    {
+        $object = flush_after(
+            function () {
+                return static::factory()->afterPersist(
+                    static function (GenericModel $o) {
+                        $o->setProp1((string) $o->id);
+                    }
+                )->create();
+            }
+        );
+
+        self::assertSame((string) $object->id, $object->getProp1());
     }
 
     /**

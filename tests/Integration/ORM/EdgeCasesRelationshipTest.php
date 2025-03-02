@@ -23,6 +23,7 @@ use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\ChangesEntityRelationshipCascadePersist;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\UsingRelationships;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\IndexedOneToMany;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\InversedOneToOneWithManyToOne;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\InversedOneToOneWithNonNullableOwning;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\InversedOneToOneWithOneToMany;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\InversedOneToOneWithSetter;
@@ -158,6 +159,34 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
         $childFactory::assert()->count(1);
 
         self::assertNotNull($parent->getItems()->get('en')); // @phpstan-ignore argument.type
+    }
+
+    /** @test */
+    #[Test]
+    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[UsingRelationships(InversedOneToOneWithManyToOne\InverseSide::class, ['owningSide', 'item'])]
+    #[RequiresPhpunit('>=11.4')]
+    public function inversed_one_to_one_can_be_used_after_other_relationship(): void
+    {
+        $inverseSideFactory = persistent_factory(InversedOneToOneWithManyToOne\InverseSide::class);
+        $owningSideFactory = persistent_factory(InversedOneToOneWithManyToOne\OwningSide::class);
+        $itemFactory = persistent_factory(InversedOneToOneWithManyToOne\Item::class);
+
+        $inverseSide = $inverseSideFactory->create(
+            [
+                'mandatoryField' => 'foo',
+                'owningSide' => $owningSideFactory,
+                'item' => $itemFactory,
+            ]
+        );
+
+        $inverseSideFactory::assert()->count(1);
+        $owningSideFactory::assert()->count(1);
+        $itemFactory::assert()->count(1);
+
+        self::assertNotNull($inverseSide->owningSide);
+        self::assertSame($inverseSide, $inverseSide->owningSide->inverseSide);
+        self::assertNotNull($inverseSide->item);
     }
 
     /** @test */

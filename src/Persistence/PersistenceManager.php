@@ -75,17 +75,6 @@ final class PersistenceManager
         $om->persist($object);
         $this->flush($om);
 
-        if ($this->afterPersistCallbacks) {
-            $afterPersistCallbacks = $this->afterPersistCallbacks;
-            $this->afterPersistCallbacks = [];
-
-            foreach ($afterPersistCallbacks as $afterPersistCallback) {
-                $afterPersistCallback();
-            }
-
-            $this->save($object);
-        }
-
         return $object;
     }
 
@@ -150,6 +139,17 @@ final class PersistenceManager
     {
         if ($this->flush) {
             $om->flush();
+
+            if ($this->afterPersistCallbacks) {
+                $afterPersistCallbacks = $this->afterPersistCallbacks;
+                $this->afterPersistCallbacks = [];
+
+                foreach ($afterPersistCallbacks as $afterPersistCallback) {
+                    $afterPersistCallback();
+                }
+
+                $this->flush($om);
+            }
         }
     }
 
