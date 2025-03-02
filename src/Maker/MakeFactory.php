@@ -137,7 +137,7 @@ final class MakeFactory extends AbstractMaker
 
         $io->text([
             'Next: Open your new factory and set default values/states.',
-            'Find the documentation at https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories',
+            'Find the documentation at https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories',
         ]);
     }
 

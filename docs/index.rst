@@ -5,7 +5,7 @@ Foundry makes creating fixtures data fun again, via an expressive, auto-completa
 Symfony and Doctrine:
 
 The factories can be used inside `DoctrineFixturesBundle <https://symfony.com/bundles/DoctrineFixturesBundle/current/index.html>`_
-to load fixtures or inside your tests, `where it has even more features <:ref:#using-in-your-tests>`_.
+to load fixtures or inside your tests, :ref:`where it has even more features <using-in-your-tests>`.
 
 Foundry supports ``doctrine/orm`` (with `doctrine/doctrine-bundle <https://github.com/doctrine/doctrinebundle>`_),
 ``doctrine/mongodb-odm`` (with `doctrine/mongodb-odm-bundle <https://github.com/doctrine/DoctrineMongoDBBundle>`_)
@@ -51,15 +51,13 @@ For the remainder of the documentation, the following sample entities will be us
     {
         #[ORM\Id]
         #[ORM\GeneratedValue]
-        #[ORM\Column(type: 'string')]
-        private $id;
+        #[ORM\Column(type: 'int')]
+        private ?int $id = null;
 
-        #[ORM\Column(type: 'string', length: 255)]
-        private $name;
-
-        public function __construct(string $name)
-        {
-            $this->name = $name;
+        public function __construct(
+            #[ORM\Column]
+            private string $name
+        ) {
         }
 
         // ... getters/setters
@@ -77,29 +75,28 @@ For the remainder of the documentation, the following sample entities will be us
     {
         #[ORM\Id]
         #[ORM\GeneratedValue]
-        #[ORM\Column(type: 'string')]
-        private $id;
-
-        #[ORM\Column(type: 'string', length: 255)]
-        private $title;
+        #[ORM\Column(type: 'int')]
+        private ?int $id = null;
 
         #[ORM\Column(type: 'text', nullable: true)]
-        private $body;
+        private ?string $body = null;
 
-        #[ORM\Column(type: 'datetime')]
-        private $createdAt;
+        #[ORM\Column(type: 'datetime_immutable')]
+        private \DateTimeImmutable $createdAt;
 
-        #[ORM\Column(type: 'datetime', nullable: true)]
-        private $publishedAt;
+        #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+        private ?\DateTimeImmutable $publishedAt = null;
 
-        #[ORM\ManyToOne(targetEntity: Category::class)]
-        #[ORM\JoinColumn]
-        private $category;
+        #[ORM\ManyToOne]
+        private ?Category $category = null;
 
-        public function __construct(string $title)
+        public function __construct(
+            #[ORM\Column]
+            private string $title
+        )
         {
             $this->title = $title;
-            $this->createdAt = new \DateTime('now');
+            $this->createdAt = new \DateTimeImmutable('now');
         }
 
         // ... getters/setters
@@ -147,7 +144,7 @@ This command will generate a ``PostFactory`` class that looks like this:
     final class PostFactory extends PersistentProxyObjectFactory
     {
         /**
-         * @see :ref:#factories-as-services
+         * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
          *
          * @todo inject services if required
          */
@@ -161,7 +158,7 @@ This command will generate a ``PostFactory`` class that looks like this:
         }
 
         /**
-         * @see :ref:#model-factories
+         * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories
          *
          * @todo add your default values here
          */
@@ -174,7 +171,7 @@ This command will generate a ``PostFactory`` class that looks like this:
         }
 
         /**
-         * @see :ref:#initialization
+         * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
          */
         protected function initialize(): static
         {
@@ -1000,13 +997,11 @@ common use-case: encoding a password with the ``UserPasswordHasherInterface`` se
 
     final class UserFactory extends PersistentProxyObjectFactory
     {
-        private $passwordHasher;
-
-        public function __construct(UserPasswordHasherInterface $passwordHasher)
-        {
+        // the injected service should be nullable in order to be used in unit test, without container
+        public function __construct(
+            private ?UserPasswordHasherInterface $passwordHasher = null
+        ) {
             parent::__construct();
-
-            $this->passwordHasher = $passwordHasher;
         }
 
         public static function class(): string
@@ -1026,7 +1021,9 @@ common use-case: encoding a password with the ``UserPasswordHasherInterface`` se
         {
             return $this
                 ->afterInstantiate(function(UserForPersistentFactory $user) {
-                    $user->setPassword($this->passwordHasher->hashPassword($user, $user->getPassword()));
+                    if ($this->passwordHasher !== null) {
+                        $user->setPassword($this->passwordHasher->hashPassword($user, $user->getPassword()));
+                    }
                 })
             ;
         }
@@ -1051,6 +1048,12 @@ Use the factory as normal:
     If using ``make:factory --test``, factories will be created in the ``tests/Factory`` directory which is not
     autowired/autoconfigured in a standard Symfony Flex app. You will have to manually register these as
     services.
+
+.. warning::
+
+    "Service factories" are meant to be used along with "functional" or "integration" tests (the ones using ``KernelTestCase``
+    or ``WebTestCase``). If you want to use them in "unit tests" (the ones using ``TestCase``), where Symfony's container
+    cannot be used, you will have to make the injected services nullable.
 
 Anonymous Factories
 ~~~~~~~~~~~~~~~~~~~
@@ -1812,7 +1815,7 @@ you're using them in tests. Thanks to it, you can:
 
 .. warning::
 
-    Because Foundry is relying on its `Proxy mechanism <:ref:#object-proxy>`_, when using persistence,
+    Because Foundry is relying on its :ref:`Proxy mechanism <#object-proxy>`, when using persistence,
     your factories must extend ``Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory`` to work in your data providers.
 
 .. warning::
