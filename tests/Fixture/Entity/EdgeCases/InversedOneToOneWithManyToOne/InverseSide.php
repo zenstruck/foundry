@@ -31,7 +31,7 @@ class InverseSide extends Base
 
     public function __construct(
         #[ORM\Column()]
-        public string $mandatoryField
+        public string $mandatoryField,
     ) {
     }
 }

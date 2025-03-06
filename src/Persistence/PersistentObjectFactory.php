@@ -198,6 +198,10 @@ abstract class PersistentObjectFactory extends ObjectFactory
      */
     public function create(callable|array $attributes = []): object
     {
+        if (PersistMode::PERSIST === $this->persistMode() && $this->isRootFactory) {
+            Configuration::instance()->persistence()->startTransaction();
+        }
+
         $object = parent::create($attributes);
 
         foreach ($this->tempAfterInstantiate as $callback) {
@@ -218,7 +222,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
             throw new \LogicException('Persistence cannot be used in unit tests.');
         }
 
-        $configuration->persistence()->save($object);
+        $configuration->persistence()->commit();
 
         return $object;
     }
@@ -298,25 +302,23 @@ abstract class PersistentObjectFactory extends ObjectFactory
             if ($inversedRelationshipMetadata && !$inversedRelationshipMetadata->isCollection) {
                 $inverseField = $inversedRelationshipMetadata->inverseField;
 
-                $inversedObject = $value->withPersistMode(
-                    $this->isPersisting() ? PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT : PersistMode::WITHOUT_PERSISTING
-                )
-                    ->notRootFactory()
+                // we need to handle the circular dependency involved by inversed one-to-one relationship:
+                // a placeholder object is used, which will be replaced by the real object, after its instantiation
+                $inverseObjectPlaceholder = (new \ReflectionClass($value::class()))->newInstanceWithoutConstructor();
 
-                    // we need to handle the circular dependency involved by inversed one-to-one relationship:
-                    // a placeholder object is used, which will be replaced by the real object, after its instantiation
-                    ->create([
-                        $inverseField => $placeholder = (new \ReflectionClass(static::class()))->newInstanceWithoutConstructor(),
-                    ]);
+                $this->tempAfterInstantiate[] = function(object $object) use ($value, $inverseField, $field) {
+                    $inverseObject = $value->withPersistMode(
+                        $this->isPersisting() ? PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT : PersistMode::WITHOUT_PERSISTING
+                    )
+                        ->notRootFactory()
+                        ->create([$inverseField => $object]);
 
-                $inversedObject = unproxy($inversedObject, withAutoRefresh: false);
+                    $inverseObject = unproxy($inverseObject, withAutoRefresh: false);
 
-                $this->tempAfterInstantiate[] = static function(object $object) use ($inversedObject, $inverseField, $pm, $placeholder) {
-                    $pm->forget($placeholder);
-                    set($inversedObject, $inverseField, $object);
+                    set($object, $field, $inverseObject);
                 };
 
-                return $inversedObject;
+                return $inverseObjectPlaceholder;
             } else {
                 $value = $value->notRootFactory();
             }
@@ -389,6 +391,8 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
         if (!$persistenceManager->isPersisted($object)) {
             $persistenceManager->scheduleForInsert($object);
+
+            return $object;
         }
 
         try {

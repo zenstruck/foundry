@@ -31,6 +31,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Tag;
 
+use function Zenstruck\Foundry\lazy;
 use function Zenstruck\Foundry\Persistence\refresh;
 use function Zenstruck\Foundry\Persistence\unproxy;
 
@@ -551,6 +552,57 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         );
 
         self::assertCount(1, $contact->getCategory()?->getSecondaryContacts() ?? []);
+    }
+
+    /** @test */
+    #[Test]
+    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[UsingRelationships(Address::class, ['contact'])]
+    #[UsingRelationships(Contact::class, ['category'])]
+    public function inverse_one_to_one_with_flush_in_before_instantiate(): void
+    {
+        $address = static::addressFactory()::createOne(
+            [
+                'contact' => static::contactFactory()
+                    ->beforeInstantiate(
+                        function(array $attributes): array {
+                            $attributes['category'] = static::categoryFactory()->create();
+
+                            return $attributes;
+                        }
+                    ),
+            ]
+        );
+
+        static::addressFactory()::assert()->count(1);
+        static::contactFactory()::assert()->count(1);
+        static::categoryFactory()::assert()->count(1);
+
+        self::assertNotNull($address->getContact());
+        self::assertNotNull($address->getContact()->getCategory());
+    }
+
+    /** @test */
+    #[Test]
+    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[UsingRelationships(Address::class, ['contact'])]
+    #[UsingRelationships(Contact::class, ['category'])]
+    public function inverse_one_to_one_with_lazy_flush(): void
+    {
+        $address = static::addressFactory()::createOne(
+            [
+                'contact' => static::contactFactory()->with([
+                    'category' => lazy(fn() => static::categoryFactory()->create()),
+                ]),
+            ]
+        );
+
+        static::addressFactory()::assert()->count(1);
+        static::contactFactory()::assert()->count(1);
+        static::categoryFactory()::assert()->count(1);
+
+        self::assertNotNull($address->getContact());
+        self::assertNotNull($address->getContact()->getCategory());
     }
 
     /** @return PersistentObjectFactory<Contact> */

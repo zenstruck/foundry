@@ -31,7 +31,10 @@ final class PersistenceManager
     private bool $flush = true;
     private bool $persist = true;
 
-    /** @var list<callable():void> */
+    /** @var array<int, list<object>> */
+    private array $objectsToPersist = [];
+
+    /** @var array<int, list<callable():void>> */
     private array $afterPersistCallbacks = [];
 
     /**
@@ -79,6 +82,45 @@ final class PersistenceManager
     }
 
     /**
+     * We're using so-called "transactions" to group multiple persist/flush operations
+     * This prevents such code to persist the whole batch of objects in the normalization phase:
+     * ```php
+     * SomeFactory::createOne(['item' => lazy(fn() => OtherFactory::createOne())]);
+     * ```.
+     */
+    public function startTransaction(): void
+    {
+        $this->objectsToPersist[] = [];
+        $this->afterPersistCallbacks[] = [];
+    }
+
+    public function commit(): void
+    {
+        $objectManagers = [];
+
+        $objectsToPersist = \array_pop($this->objectsToPersist);
+
+        if (null === $objectsToPersist) {
+            return;
+        }
+
+        foreach ($objectsToPersist as $object) {
+            $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
+            $om->persist($object);
+
+            if (!\in_array($om, $objectManagers, true)) {
+                $objectManagers[] = $om;
+            }
+        }
+
+        foreach ($objectManagers as $om) {
+            $this->flush($om);
+        }
+
+        $this->callPostPersistCallbacks();
+    }
+
+    /**
      * @template T of object
      *
      * @param T                     $object
@@ -92,23 +134,19 @@ final class PersistenceManager
             $object = unproxy($object);
         }
 
-        $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
-        $om->persist($object);
-
-        $this->afterPersistCallbacks = [...$this->afterPersistCallbacks, ...$afterPersistCallbacks];
-
-        return $object;
-    }
-
-    public function forget(object $object): void
-    {
-        if ($this->isPersisted($object)) {
-            throw new \LogicException('Cannot forget an object already persisted.');
+        if (0 === \count($this->objectsToPersist)) {
+            throw new \LogicException('No transaction started yet.');
         }
 
-        $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
+        $transactionCount = \count($this->objectsToPersist) - 1;
+        $this->objectsToPersist[$transactionCount][] = $object;
 
-        $om->detach($object);
+        $this->afterPersistCallbacks[$transactionCount] = [
+            ...$this->afterPersistCallbacks[$transactionCount],
+            ...$afterPersistCallbacks,
+        ];
+
+        return $object;
     }
 
     /**
@@ -126,11 +164,9 @@ final class PersistenceManager
 
         $this->flush = true;
 
-        foreach ($this->strategies as $strategy) {
-            foreach ($strategy->objectManagers() as $om) {
-                $this->flush($om);
-            }
-        }
+        $this->flushAllStrategies();
+
+        $this->callPostPersistCallbacks();
 
         return $result;
     }
@@ -139,17 +175,6 @@ final class PersistenceManager
     {
         if ($this->flush) {
             $om->flush();
-
-            if ($this->afterPersistCallbacks) {
-                $afterPersistCallbacks = $this->afterPersistCallbacks;
-                $this->afterPersistCallbacks = [];
-
-                foreach ($afterPersistCallbacks as $afterPersistCallback) {
-                    $afterPersistCallback();
-                }
-
-                $this->flush($om);
-            }
         }
     }
 
@@ -370,6 +395,30 @@ final class PersistenceManager
 
             return 1 === \count($strategies) && $strategies[0] instanceof AbstractORMPersistenceStrategy;
         })();
+    }
+
+    private function flushAllStrategies(): void
+    {
+        foreach ($this->strategies as $strategy) {
+            foreach ($strategy->objectManagers() as $om) {
+                $this->flush($om);
+            }
+        }
+    }
+
+    private function callPostPersistCallbacks(): void
+    {
+        if (!$this->flush || [] === $this->afterPersistCallbacks) {
+            return;
+        }
+
+        $afterPersistCallbacks = \array_pop($this->afterPersistCallbacks);
+
+        foreach ($afterPersistCallbacks as $afterPersistCallback) {
+            $afterPersistCallback();
+        }
+
+        $this->flushAllStrategies();
     }
 
     /**

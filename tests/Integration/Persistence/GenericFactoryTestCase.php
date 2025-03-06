@@ -572,9 +572,9 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     public function it_actually_calls_post_persist_hook_after_persist_when_in_flush_after(): void
     {
         $object = flush_after(
-            function () {
+            function() {
                 return static::factory()->afterPersist(
-                    static function (GenericModel $o) {
+                    static function(GenericModel $o) {
                         $o->setProp1((string) $o->id);
                     }
                 )->create();
