@@ -35,7 +35,7 @@ SHOULD_UPDATE_PHPUNIT=$(check_phpunit_version "${PHPUNIT_VERSION}")
 
 if [ "${SHOULD_UPDATE_PHPUNIT}" = "0" ]; then
   echo "ℹ️  Upgrading PHPUnit to ${PHPUNIT_VERSION}"
-  composer update brianium/paratest "phpunit/phpunit:^${PHPUNIT_VERSION}" -W
+  composer update dama/doctrine-test-bundle brianium/paratest "phpunit/phpunit:^${PHPUNIT_VERSION}" -W
 fi
 ### <<
 
