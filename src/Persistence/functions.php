@@ -107,9 +107,9 @@ function proxy(object $object): object
  *
  * @return T
  */
-function unproxy(mixed $what): mixed
+function unproxy(mixed $what, bool $withAutoRefresh = true): mixed
 {
-    return ProxyGenerator::unwrap($what);
+    return ProxyGenerator::unwrap($what, $withAutoRefresh);
 }
 
 /**

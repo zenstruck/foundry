@@ -296,11 +296,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
                 $inversedObject = $value->withPersistMode(PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT)
                     ->create([$inverseField => $placeholder = (new \ReflectionClass(static::class()))->newInstanceWithoutConstructor()]);
 
-                // auto-refresh computes changeset and prevents the placeholder object to be cleanly
-                // forgotten fom the persistence manager
-                if ($inversedObject instanceof Proxy) {
-                    $inversedObject = $inversedObject->_real(withAutoRefresh: false);
-                }
+                $inversedObject = unproxy($inversedObject, withAutoRefresh: false);
 
                 $this->tempAfterInstantiate[] = static function(object $object) use ($inversedObject, $inverseField, $pm, $placeholder) {
                     $pm->forget($placeholder);
@@ -311,7 +307,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
             }
         }
 
-        return unproxy(parent::normalizeParameter($field, $value));
+        return unproxy(parent::normalizeParameter($field, $value), withAutoRefresh: false);
     }
 
     protected function normalizeCollection(string $field, FactoryCollection $collection): array
@@ -330,7 +326,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
                 $inverseObjects = $collection->withPersistMode(PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT)->create([$inverseField => $object]);
 
-                $inverseObjects = unproxy($inverseObjects);
+                $inverseObjects = unproxy($inverseObjects, withAutoRefresh: false);
 
                 // if the collection is indexed by a field, index the array
                 if ($inverseRelationshipMetadata->collectionIndexedBy) {
@@ -366,9 +362,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
             return $object;
         }
 
-        if ($object instanceof Proxy) {
-            $object = $object->_real(withAutoRefresh: false);
-        }
+        $object = unproxy($object, withAutoRefresh: false);
 
         $persistenceManager = $configuration->persistence();
         if (!$persistenceManager->hasPersistenceFor($object)) {
