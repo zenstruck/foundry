@@ -324,10 +324,20 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         foreach ($contact->getTags() as $tag) {
             $this->assertNull($tag->id);
         }
+    }
 
+    /** @test */
+    #[Test]
+    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[UsingRelationships(Contact::class, ['category'])]
+    public function disabling_persistence_cascades_to_children_one_to_many(): void
+    {
         $category = static::categoryFactory()->withoutPersisting()->create([
             'contacts' => static::contactFactory()->many(3),
         ]);
+
+        // ensure nothing was persisted in Doctrine by flushing
+        self::getContainer()->get(EntityManagerInterface::class)->flush(); // @phpstan-ignore method.notFound
 
         static::contactFactory()::assert()->empty();
         static::categoryFactory()::assert()->empty();
@@ -338,6 +348,27 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         foreach ($category->getContacts() as $contact) {
             $this->assertSame($category->getName(), $contact->getCategory()?->getName());
         }
+    }
+
+    /** @test */
+    #[Test]
+    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[UsingRelationships(Contact::class, ['address'])]
+    public function disabling_persistence_cascades_to_children_inversed_one_to_one(): void
+    {
+        $address = static::addressFactory()->withoutPersisting()->create([
+            'contact' => static::contactFactory(),
+        ]);
+
+        // ensure nothing was persisted in Doctrine by flushing
+        self::getContainer()->get(EntityManagerInterface::class)->flush(); // @phpstan-ignore method.notFound
+
+        static::contactFactory()::assert()->empty();
+        static::addressFactory()::assert()->empty();
+
+        $this->assertNull($address->id);
+        $this->assertInstanceOf(Contact::class, $address->getContact());
+        $this->assertNull($address->getContact()->id);
     }
 
     /** @test */

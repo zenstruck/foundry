@@ -291,10 +291,15 @@ abstract class PersistentObjectFactory extends ObjectFactory
             if ($inversedRelationshipMetadata && !$inversedRelationshipMetadata->isCollection) {
                 $inverseField = $inversedRelationshipMetadata->inverseField;
 
-                // we need to handle the circular dependency involved by inversed one-to-one relationship:
-                // a placeholder object is used, which will be replaced by the real object, after its instantiation
-                $inversedObject = $value->withPersistMode(PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT)
-                    ->create([$inverseField => $placeholder = (new \ReflectionClass(static::class()))->newInstanceWithoutConstructor()]);
+                $inversedObject = $value->withPersistMode(
+                    $this->isPersisting() ? PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT : PersistMode::WITHOUT_PERSISTING
+                )
+
+                    // we need to handle the circular dependency involved by inversed one-to-one relationship:
+                    // a placeholder object is used, which will be replaced by the real object, after its instantiation
+                    ->create([
+                        $inverseField => $placeholder = (new \ReflectionClass(static::class()))->newInstanceWithoutConstructor(),
+                    ]);
 
                 $inversedObject = unproxy($inversedObject, withAutoRefresh: false);
 
@@ -312,7 +317,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
     protected function normalizeCollection(string $field, FactoryCollection $collection): array
     {
-        if (!$this->isPersisting() || !$collection->factory instanceof self) {
+        if (!Configuration::instance()->isPersistenceAvailable() || !$collection->factory instanceof self) {
             return parent::normalizeCollection($field, $collection);
         }
 
@@ -321,10 +326,13 @@ abstract class PersistentObjectFactory extends ObjectFactory
         $inverseRelationshipMetadata = $pm->inverseRelationshipMetadata(static::class(), $collection->factory::class(), $field);
 
         if ($inverseRelationshipMetadata && $inverseRelationshipMetadata->isCollection) {
-            $this->tempAfterInstantiate[] = static function(object $object) use ($collection, $inverseRelationshipMetadata, $field) {
+            $this->tempAfterInstantiate[] = function(object $object) use ($collection, $inverseRelationshipMetadata, $field) {
                 $inverseField = $inverseRelationshipMetadata->inverseField;
 
-                $inverseObjects = $collection->withPersistMode(PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT)->create([$inverseField => $object]);
+                $inverseObjects = $collection->withPersistMode(
+                    $this->isPersisting() ? PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT : PersistMode::WITHOUT_PERSISTING
+                )
+                    ->create([$inverseField => $object]);
 
                 $inverseObjects = unproxy($inverseObjects, withAutoRefresh: false);
 
