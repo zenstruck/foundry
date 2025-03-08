@@ -12,6 +12,7 @@
 namespace Zenstruck\Foundry\Tests\Unit\Persistence;
 
 use PHPUnit\Framework\TestCase;
+use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
@@ -57,5 +58,31 @@ final class PersistentObjectFactoryTest extends TestCase
         $entity = GenericEntityFactory::randomOrCreate(['prop1' => 'foo']);
 
         $this->assertSame('foo', $entity->getProp1());
+    }
+
+    /**
+     * @test
+     * @dataProvider factoryCollectionDataProvider
+     * @param FactoryCollection<GenericEntity, GenericEntityFactory> $collection
+     */
+    public function can_use_factory_collection_methods_in_data_providers(FactoryCollection $collection): void // @phpstan-ignore generics.notSubtype
+    {
+        self::assertEquals(
+            [
+                new GenericEntity('foo'),
+            ],
+            $collection->create(),
+        );
+    }
+
+    public static function factoryCollectionDataProvider(): iterable
+    {
+        yield [
+            GenericEntityFactory::new()->sequence([
+                [
+                    'prop1' => 'foo',
+                ],
+            ])
+        ];
     }
 }

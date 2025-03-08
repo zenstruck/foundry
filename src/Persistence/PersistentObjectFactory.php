@@ -14,6 +14,7 @@ namespace Zenstruck\Foundry\Persistence;
 use Doctrine\Persistence\ObjectRepository;
 use Symfony\Component\VarExporter\Exception\LogicException as VarExportLogicException;
 use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\Exception\FoundryNotBooted;
 use Zenstruck\Foundry\Exception\PersistenceDisabled;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\Factory;
@@ -263,7 +264,11 @@ abstract class PersistentObjectFactory extends ObjectFactory
      */
     public function persistMode(): PersistMode
     {
-        $config = Configuration::instance();
+        try {
+            $config = Configuration::instance();
+        } catch (FoundryNotBooted) {
+            return PersistMode::WITHOUT_PERSISTING;
+        }
 
         if (!$config->isPersistenceEnabled()) {
             return PersistMode::WITHOUT_PERSISTING;
