@@ -14,6 +14,7 @@ namespace Zenstruck\Foundry\Persistence;
 use Doctrine\Persistence\ObjectRepository;
 use Symfony\Component\VarExporter\Exception\LogicException as VarExportLogicException;
 use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\Exception\FoundryNotBooted;
 use Zenstruck\Foundry\Exception\PersistenceDisabled;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\Factory;
@@ -304,16 +305,17 @@ abstract class PersistentObjectFactory extends ObjectFactory
             if ($inversedRelationshipMetadata && !$inversedRelationshipMetadata->isCollection) {
                 $inverseField = $inversedRelationshipMetadata->inverseField;
 
-                // we need to handle the circular dependency involved by inversed one-to-one relationship:
-                // a placeholder object is used, which will be replaced by the real object, after its instantiation
-                $inversedObject = $value->withPersistMode(PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT)
-                    ->create([$inverseField => $placeholder = (new \ReflectionClass(static::class()))->newInstanceWithoutConstructor()]);
+                $inversedObject = $value->withPersistMode(
+                    $this->isPersisting() ? PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT : PersistMode::WITHOUT_PERSISTING
+                )
 
-                // auto-refresh computes changeset and prevents the placeholder object to be cleanly
-                // forgotten fom the persistence manager
-                if ($inversedObject instanceof Proxy) {
-                    $inversedObject = $inversedObject->_real(withAutoRefresh: false);
-                }
+                    // we need to handle the circular dependency involved by inversed one-to-one relationship:
+                    // a placeholder object is used, which will be replaced by the real object, after its instantiation
+                    ->create([
+                        $inverseField => $placeholder = (new \ReflectionClass(static::class()))->newInstanceWithoutConstructor(),
+                    ]);
+
+                $inversedObject = unproxy($inversedObject, withAutoRefresh: false);
 
                 $this->tempAfterInstantiate[] = static function(object $object) use ($inversedObject, $inverseField, $pm, $placeholder) {
                     $pm->forget($placeholder);
@@ -324,12 +326,12 @@ abstract class PersistentObjectFactory extends ObjectFactory
             }
         }
 
-        return unproxy(parent::normalizeParameter($field, $value));
+        return unproxy(parent::normalizeParameter($field, $value), withAutoRefresh: false);
     }
 
     protected function normalizeCollection(string $field, FactoryCollection $collection): array
     {
-        if (!$this->isPersisting() || !$collection->factory instanceof self) {
+        if (!Configuration::instance()->isPersistenceAvailable() || !$collection->factory instanceof self) {
             return parent::normalizeCollection($field, $collection);
         }
 
@@ -338,12 +340,15 @@ abstract class PersistentObjectFactory extends ObjectFactory
         $inverseRelationshipMetadata = $pm->inverseRelationshipMetadata(static::class(), $collection->factory::class(), $field);
 
         if ($inverseRelationshipMetadata && $inverseRelationshipMetadata->isCollection) {
-            $this->tempAfterInstantiate[] = static function(object $object) use ($collection, $inverseRelationshipMetadata, $field) {
+            $this->tempAfterInstantiate[] = function(object $object) use ($collection, $inverseRelationshipMetadata, $field) {
                 $inverseField = $inverseRelationshipMetadata->inverseField;
 
-                $inverseObjects = $collection->withPersistMode(PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT)->create([$inverseField => $object]);
+                $inverseObjects = $collection->withPersistMode(
+                    $this->isPersisting() ? PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT : PersistMode::WITHOUT_PERSISTING
+                )
+                    ->create([$inverseField => $object]);
 
-                $inverseObjects = unproxy($inverseObjects);
+                $inverseObjects = unproxy($inverseObjects, withAutoRefresh: false);
 
                 // if the collection is indexed by a field, index the array
                 if ($inverseRelationshipMetadata->collectionIndexedBy) {
@@ -379,9 +384,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
             return $object;
         }
 
-        if ($object instanceof Proxy) {
-            $object = $object->_real(withAutoRefresh: false);
-        }
+        $object = unproxy($object, withAutoRefresh: false);
 
         $persistenceManager = $configuration->persistence();
         if (!$persistenceManager->hasPersistenceFor($object)) {

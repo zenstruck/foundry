@@ -66,10 +66,10 @@ final class ProxyGenerator
      *
      * @return T
      */
-    public static function unwrap(mixed $what): mixed
+    public static function unwrap(mixed $what, bool $withAutoRefresh = true): mixed
     {
         if (\is_array($what)) {
-            return \array_map(self::unwrap(...), $what); // @phpstan-ignore return.type
+            return \array_map(static fn(mixed $w) => self::unwrap($w, $withAutoRefresh), $what); // @phpstan-ignore return.type
         }
 
         if (\is_string($what) && \is_a($what, Proxy::class, true)) {
@@ -77,7 +77,7 @@ final class ProxyGenerator
         }
 
         if ($what instanceof Proxy) {
-            return $what->_real(); // @phpstan-ignore return.type
+            return $what->_real($withAutoRefresh); // @phpstan-ignore return.type
         }
 
         return $what;

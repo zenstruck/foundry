@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [v2.3.6](https://github.com/zenstruck/foundry/releases/tag/v2.3.6)
+
+February 25th, 2025 - [v2.3.5...v2.3.6](https://github.com/zenstruck/foundry/compare/v2.3.5...v2.3.6)
+
+* 300645b fix: can call ->create() in after persist callback (#833) by @nikophil
+
 ## [v2.3.5](https://github.com/zenstruck/foundry/releases/tag/v2.3.5)
 
 February 24th, 2025 - [v2.3.4...v2.3.5](https://github.com/zenstruck/foundry/compare/v2.3.4...v2.3.5)
