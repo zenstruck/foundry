@@ -46,7 +46,7 @@ abstract class ObjectFactory extends Factory
     {
         parent::__construct();
 
-        $this->validationEnabled = Configuration::instance()->validationEnabled;
+        $this->validationEnabled = Configuration::isBooted() && Configuration::instance()->validationEnabled;
     }
 
     /**
@@ -194,7 +194,7 @@ abstract class ObjectFactory extends Factory
      */
     protected function initializeInternal(): static
     {
-        if (!Configuration::instance()->hasEventDispatcher()) {
+        if (!Configuration::isBooted() || !Configuration::instance()->hasEventDispatcher()) {
             return $this;
         }
 

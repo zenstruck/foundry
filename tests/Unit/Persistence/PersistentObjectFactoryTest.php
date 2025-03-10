@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Unit\Persistence;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\FactoryCollection;
@@ -69,7 +70,9 @@ final class PersistentObjectFactoryTest extends TestCase
      * @dataProvider factoryCollectionDataProvider
      * @param FactoryCollection<GenericEntity, GenericEntityFactory> $collection
      */
-    public function can_use_factory_collection_methods_in_data_providers(FactoryCollection $collection): void // @phpstan-ignore generics.notSubtype
+    #[Test] // @phpstan-ignore generics.notSubtype
+    #[DataProvider('factoryCollectionDataProvider')]
+    public function can_use_factory_collection_methods_in_data_providers(FactoryCollection $collection): void
     {
         self::assertEquals(
             [

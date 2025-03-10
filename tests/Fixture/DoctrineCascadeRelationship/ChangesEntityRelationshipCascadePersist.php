@@ -19,6 +19,7 @@ use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
@@ -123,6 +124,8 @@ trait ChangesEntityRelationshipCascadePersist
         }
 
         yield from DoctrineCascadeRelationshipMetadata::allCombinations($relationshipFields);
+
+        Configuration::shutdown();
     }
 
     public static function setCurrentProvidedMethodName(string $methodName): void

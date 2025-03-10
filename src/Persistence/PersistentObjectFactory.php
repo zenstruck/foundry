@@ -49,7 +49,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     {
         parent::__construct();
 
-        $this->persist = Configuration::instance()->isPersistenceEnabled() ? PersistMode::PERSIST : PersistMode::WITHOUT_PERSISTING;
+        $this->persist = $this->isPersistenceEnabled() ? PersistMode::PERSIST : PersistMode::WITHOUT_PERSISTING;
     }
 
     /**
@@ -272,17 +272,11 @@ abstract class PersistentObjectFactory extends ObjectFactory
      */
     public function persistMode(): PersistMode
     {
-        return Configuration::instance()->isPersistenceEnabled() ? $this->persist : PersistMode::WITHOUT_PERSISTING;
+        return $this->isPersistenceEnabled() ? $this->persist : PersistMode::WITHOUT_PERSISTING;
     }
 
     final public function isPersisting(): bool
     {
-        $config = Configuration::instance();
-
-        if (!$config->isPersistenceEnabled()) {
-            return false;
-        }
-
         return $this->persistMode()->isPersisting();
     }
 
@@ -424,7 +418,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
                 }
             );
 
-        if (!Configuration::instance()->hasEventDispatcher()) {
+        if (!Configuration::isBooted() || !Configuration::instance()->hasEventDispatcher()) {
             return $factory;
         }
 
@@ -458,5 +452,14 @@ abstract class PersistentObjectFactory extends ObjectFactory
         }
 
         throw new \LogicException(\sprintf('Cannot create object in a data provider for non-proxy factories. Transform your factory into a "%s", or call "create()" method in the test. See https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#phpunit-data-providers', PersistentProxyObjectFactory::class));
+    }
+
+    private function isPersistenceEnabled(): bool
+    {
+        try {
+            return Configuration::instance()->isPersistenceEnabled();
+        } catch (FoundryNotBooted) {
+            return false;
+        }
     }
 }
