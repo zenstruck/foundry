@@ -138,12 +138,24 @@ final class Hydrator
 
     private static function isDoctrineCollection(object $object, string $property): bool
     {
-        $reflectionType = self::reflectionProperty(new \ReflectionClass($object), $property)?->getType();
+        $type = self::reflectionProperty(new \ReflectionClass($object), $property)?->getType();
 
-        if (!$reflectionType instanceof \ReflectionNamedType) {
+        if (null === $type) {
             return false;
         }
 
-        return Collection::class === $reflectionType->getName();
+        if ($type instanceof \ReflectionNamedType) {
+            return Collection::class === $type->getName();
+        }
+
+        if ($type instanceof \ReflectionUnionType || $type instanceof \ReflectionIntersectionType) {
+            foreach ($type->getTypes() as $type) {
+                if ($type instanceof \ReflectionNamedType && Collection::class === $type->getName()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
