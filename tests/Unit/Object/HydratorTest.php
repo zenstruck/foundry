@@ -14,6 +14,7 @@ namespace Zenstruck\Foundry\Tests\Unit\Object;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Selectable;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Object\Hydrator;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
@@ -26,6 +27,7 @@ class HydratorTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function can_hydrate_scalar(): void
     {
         $value = 'Hello world';
@@ -42,6 +44,7 @@ class HydratorTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function can_hydrate_scalar_array(): void
     {
         $value = ['foo', 'bar'];
@@ -58,6 +61,7 @@ class HydratorTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function can_hydrate_object(): void
     {
         $object = new class {
@@ -79,6 +83,7 @@ class HydratorTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function can_hydrate_object_array(): void
     {
         $object = new class {
@@ -99,6 +104,7 @@ class HydratorTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function can_hydrate_doctrine_collection(): void
     {
         $object = new class {
@@ -125,7 +131,8 @@ class HydratorTest extends TestCase
     /**
      * @test
      */
-    public function can_hydrate_doctrine_collection_intersection(): void
+    #[Test]
+    public function can_hydrate_doctrine_collection_union(): void
     {
         $object = new class {
             /** @var Collection<array-key, Object1>|Selectable<array-key, Object1> */
@@ -151,7 +158,8 @@ class HydratorTest extends TestCase
     /**
      * @test
      */
-    public function can_hydrate_doctrine_collection_union(): void
+    #[Test]
+    public function can_hydrate_doctrine_collection_intersection(): void
     {
         $object = new class {
             /** @var Collection<array-key, Object1>&Selectable<array-key, Object1> */

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
+use Doctrine\Common\Collections\Collection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
@@ -26,6 +27,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\InversedOneToOneWithNonNull
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\InversedOneToOneWithOneToMany;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\InversedOneToOneWithSetter;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\ManyToOneToSelfReferencing;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\OneToManyWithUnionType;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\RichDomainMandatoryRelationship;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\EdgeCases\MultipleMandatoryRelationshipToSameEntity;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
@@ -156,6 +158,26 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
         $childFactory::assert()->count(1);
 
         self::assertNotNull($parent->getItems()->get('en')); // @phpstan-ignore argument.type
+    }
+
+    /** @test */
+    #[Test]
+    public function object_with_union_type(): void
+    {
+        $owningSideFactory = persistent_factory(OneToManyWithUnionType\OwningSideEntity::class);
+        $hasOneToManyWithUnionTypeFactory = persistent_factory(OneToManyWithUnionType\HasOneToManyWithUnionType::class);
+
+        $object = $hasOneToManyWithUnionTypeFactory->create(
+            [
+                'collection' => $owningSideFactory->many(2),
+            ]
+        );
+
+        $owningSideFactory::assert()->count(2);
+        $hasOneToManyWithUnionTypeFactory::assert()->count(1);
+
+        self::assertCount(2, $object->collection);
+        self::assertInstanceOf(Collection::class, $object->collection);
     }
 
     /**
