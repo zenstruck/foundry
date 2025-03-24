@@ -1181,7 +1181,7 @@ won't be wrapped with a :ref:`proxy object <object-proxy>`).
 Without Persisting
 ~~~~~~~~~~~~~~~~~~
 
-"Persitent factories" can also create objects without persisting them. This can be useful for unit tests where you just
+"Persistent factories" can also create objects without persisting them. This can be useful for unit tests where you just
 want to test the behavior of the actual object or for creating objects that are not entities. When created, they are
 still wrapped in a ``Proxy`` to optionally save later.
 
