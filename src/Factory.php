@@ -235,7 +235,7 @@ abstract class Factory
             );
         }
 
-        return \is_object($value) ? $this->normalizeObject($value) : $value;
+        return \is_object($value) ? $this->normalizeObject($field, $value) : $value;
     }
 
     /**
@@ -253,7 +253,7 @@ abstract class Factory
     /**
      * @internal
      */
-    protected function normalizeObject(object $object): object
+    protected function normalizeObject(string $field, object $object): object
     {
         return $object;
     }

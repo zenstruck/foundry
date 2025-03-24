@@ -19,6 +19,7 @@ use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\ORM\AbstractORMPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\NoPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
+use Zenstruck\Foundry\Persistence\Relationship\RelationshipMetadata;
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 
 /**
@@ -31,11 +32,13 @@ final class PersistenceManager
     private bool $flush = true;
     private bool $persist = true;
 
-    /** @var array<int, list<object>> */
+    /** @var list<object> */
     private array $objectsToPersist = [];
 
-    /** @var array<int, list<callable():void>> */
+    /** @var list<callable():void> */
     private array $afterPersistCallbacks = [];
+
+    private bool $transactionStarted = false;
 
     /**
      * @param iterable<PersistenceStrategy> $strategies
@@ -90,19 +93,21 @@ final class PersistenceManager
      */
     public function startTransaction(): void
     {
-        $this->objectsToPersist[] = [];
-        $this->afterPersistCallbacks[] = [];
+        $this->transactionStarted = true;
+    }
+
+    public function isTransactionStarted(): bool
+    {
+        return $this->transactionStarted;
     }
 
     public function commit(): void
     {
         $objectManagers = [];
 
-        $objectsToPersist = \array_pop($this->objectsToPersist);
-
-        if (null === $objectsToPersist) {
-            return;
-        }
+        $objectsToPersist = $this->objectsToPersist;
+        $this->objectsToPersist = [];
+        $this->transactionStarted = false;
 
         foreach ($objectsToPersist as $object) {
             $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
@@ -134,15 +139,10 @@ final class PersistenceManager
             $object = unproxy($object);
         }
 
-        if (0 === \count($this->objectsToPersist)) {
-            throw new \LogicException('No transaction started yet.');
-        }
+        $this->objectsToPersist[] = $object;
 
-        $transactionCount = \count($this->objectsToPersist) - 1;
-        $this->objectsToPersist[$transactionCount][] = $object;
-
-        $this->afterPersistCallbacks[$transactionCount] = [
-            ...$this->afterPersistCallbacks[$transactionCount],
+        $this->afterPersistCallbacks = [
+            ...$this->afterPersistCallbacks,
             ...$afterPersistCallbacks,
         ];
 
@@ -305,7 +305,7 @@ final class PersistenceManager
      * @param class-string $parent
      * @param class-string $child
      */
-    public function inverseRelationshipMetadata(string $parent, string $child, string $field): ?InverseRelationshipMetadata
+    public function inverseRelationshipMetadata(string $parent, string $child, string $field): ?RelationshipMetadata
     {
         $parent = unproxy($parent);
         $child = unproxy($child);
@@ -412,7 +412,8 @@ final class PersistenceManager
             return;
         }
 
-        $afterPersistCallbacks = \array_pop($this->afterPersistCallbacks);
+        $afterPersistCallbacks = $this->afterPersistCallbacks;
+        $this->afterPersistCallbacks = [];
 
         foreach ($afterPersistCallbacks as $afterPersistCallback) {
             $afterPersistCallback();

@@ -15,6 +15,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\Mapping\MappingException;
 use Doctrine\Persistence\ObjectManager;
+use Zenstruck\Foundry\Persistence\Relationship\RelationshipMetadata;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -63,7 +64,7 @@ abstract class PersistenceStrategy
      * @param class-string $parent
      * @param class-string $child
      */
-    public function inversedRelationshipMetadata(string $parent, string $child, string $field): ?InverseRelationshipMetadata
+    public function inversedRelationshipMetadata(string $parent, string $child, string $field): ?RelationshipMetadata
     {
         return null;
     }

@@ -25,7 +25,18 @@ class InverseSide extends Base
 {
     public function __construct(
         #[ORM\OneToOne(mappedBy: 'inverseSide')] // @phpstan-ignore doctrine.associationType
-        public OwningSide $owningSide,
+        private OwningSide $owningSide,
     ) {
+    }
+
+    public function getOwningSide(): OwningSide
+    {
+        return $this->owningSide;
+    }
+
+    public function setOwningSide(OwningSide $owningSide): void
+    {
+        $this->owningSide = $owningSide;
+        $owningSide->inverseSide = $this;
     }
 }

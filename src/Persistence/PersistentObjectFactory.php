@@ -22,6 +22,8 @@ use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
+use Zenstruck\Foundry\Persistence\Relationship\OneToManyRelationship;
+use Zenstruck\Foundry\Persistence\Relationship\OneToOneRelationship;
 
 use function Zenstruck\Foundry\get;
 use function Zenstruck\Foundry\set;
@@ -198,7 +200,10 @@ abstract class PersistentObjectFactory extends ObjectFactory
      */
     public function create(callable|array $attributes = []): object
     {
-        if (PersistMode::PERSIST === $this->persistMode() && $this->isRootFactory) {
+        $transactionStarted = false;
+
+        if (Configuration::isBooted() && PersistMode::PERSIST === $this->persistMode() && $this->isRootFactory) {
+            $transactionStarted = Configuration::instance()->persistence()->isTransactionStarted();
             Configuration::instance()->persistence()->startTransaction();
         }
 
@@ -212,7 +217,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
         $this->throwIfCannotCreateObject();
 
-        if (PersistMode::PERSIST !== $this->persistMode() || !$this->isRootFactory) {
+        if ($transactionStarted || PersistMode::PERSIST !== $this->persistMode() || !$this->isRootFactory) {
             return $object;
         }
 
@@ -296,11 +301,11 @@ abstract class PersistentObjectFactory extends ObjectFactory
         if ($value instanceof self) {
             $pm = Configuration::instance()->persistence();
 
-            $inversedRelationshipMetadata = $pm->inverseRelationshipMetadata(static::class(), $value::class(), $field);
+            $relationshipMetadata = $pm->inverseRelationshipMetadata(static::class(), $value::class(), $field);
 
             // handle inversed OneToOne
-            if ($inversedRelationshipMetadata && !$inversedRelationshipMetadata->isCollection) {
-                $inverseField = $inversedRelationshipMetadata->inverseField;
+            if ($relationshipMetadata instanceof OneToOneRelationship && !$relationshipMetadata->isOwning) {
+                $inverseField = $relationshipMetadata->inverseField();
 
                 // we need to handle the circular dependency involved by inversed one-to-one relationship:
                 // a placeholder object is used, which will be replaced by the real object, after its instantiation
@@ -337,9 +342,9 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
         $inverseRelationshipMetadata = $pm->inverseRelationshipMetadata(static::class(), $collection->factory::class(), $field);
 
-        if ($inverseRelationshipMetadata && $inverseRelationshipMetadata->isCollection) {
+        if ($inverseRelationshipMetadata instanceof OneToManyRelationship) {
             $this->tempAfterInstantiate[] = function(object $object) use ($collection, $inverseRelationshipMetadata, $field) {
-                $inverseField = $inverseRelationshipMetadata->inverseField;
+                $inverseField = $inverseRelationshipMetadata->inverseField();
 
                 $inverseObjects = $collection->withPersistMode(
                     $this->isPersisting() ? PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT : PersistMode::WITHOUT_PERSISTING
@@ -371,21 +376,36 @@ abstract class PersistentObjectFactory extends ObjectFactory
      *
      * @internal
      */
-    protected function normalizeObject(object $object): object
+    protected function normalizeObject(string $field, object $object): object
     {
         $configuration = Configuration::instance();
 
-        if (
-            !$this->isPersisting()
-            || !$configuration->isPersistenceAvailable()
-        ) {
+        $object = unproxy($object, withAutoRefresh: false);
+
+        if (!$configuration->isPersistenceAvailable()) {
             return $object;
         }
 
-        $object = unproxy($object, withAutoRefresh: false);
-
         $persistenceManager = $configuration->persistence();
+
         if (!$persistenceManager->hasPersistenceFor($object)) {
+            return $object;
+        }
+
+        $inverseRelationship = $persistenceManager->inverseRelationshipMetadata(static::class(), $object::class, $field);
+
+        if ($inverseRelationship instanceof OneToOneRelationship) {
+            $this->tempAfterInstantiate[] = static function(object $newObject) use ($object, $inverseRelationship) {
+                try {
+                    set($object, $inverseRelationship->inverseField(), $newObject);
+                } catch (\Throwable) {
+                }
+            };
+        }
+
+        if (
+            !$this->isPersisting()
+        ) {
             return $object;
         }
 
@@ -435,7 +455,16 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
                 Configuration::instance()->persistence()->scheduleForInsert($object, $afterPersistCallbacks);
             }
-        );
+        )
+            ->afterPersist(
+                static function(object $object): void {
+                    try {
+                        Configuration::instance()->persistence()->refresh($object);
+                    } catch (RefreshObjectFailed) {
+                    }
+                }
+            )
+        ;
     }
 
     private function throwIfCannotCreateObject(): void
