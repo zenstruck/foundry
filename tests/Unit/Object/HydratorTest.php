@@ -16,6 +16,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Selectable;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Zenstruck\Foundry\ForceValue;
 use Zenstruck\Foundry\Object\Hydrator;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
 
@@ -180,5 +181,45 @@ class HydratorTest extends TestCase
 
         $this->assertInstanceOf(ArrayCollection::class, $object->foo);
         $this->assertSame($value, $object->foo->toArray());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_hydrate_with_force_value(): void
+    {
+        $object = new class {
+            private string $foo = '';
+
+            public function getFoo(): string
+            {
+                return $this->foo;
+            }
+        };
+
+        (new Hydrator())($object, ['foo' => new ForceValue('foo')]);
+
+        $this->assertSame('foo', $object->getFoo());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_force_set_with_force_value(): void
+    {
+        $object = new class {
+            private string $foo = '';
+
+            public function getFoo(): string
+            {
+                return $this->foo;
+            }
+        };
+
+        Hydrator::set($object, 'foo', new ForceValue('foo'));
+
+        $this->assertSame('foo', $object->getFoo());
     }
 }
