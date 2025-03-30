@@ -194,6 +194,10 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                             ->defaultValue('Factory')
                             ->cannotBeEmpty()
                         ->end()
+                        ->booleanNode('add_hints')
+                            ->info('Add "beginner" hints in the created factory.')
+                            ->defaultTrue()
+                        ->end()
                     ->end()
                 ->end()
                 ->arrayNode('make_story')
@@ -230,6 +234,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
 
             $makeFactoryDefinition = $container->getDefinition('.zenstruck_foundry.maker.factory');
             $makeFactoryDefinition->setArgument('$defaultNamespace', $config['make_factory']['default_namespace']);
+            $makeFactoryDefinition->setArgument('$addHints', $config['make_factory']['add_hints']);
 
             $makeStoryDefinition = $container->getDefinition('.zenstruck_foundry.maker.story');
             $makeStoryDefinition->setArgument('$defaultNamespace', $config['make_story']['default_namespace']);

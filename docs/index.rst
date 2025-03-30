@@ -199,12 +199,24 @@ This command will generate a ``PostFactory`` class that looks like this:
         .. code-block:: yaml
 
             # config/packages/zenstruck_foundry.yaml
-            when@dev: # see Bundle Configuration section about sharing this in the test environment
-                zenstruck_foundry:
-                    make_factory:
-                        default_namespace: 'App\\MyFactories'
+            zenstruck_foundry:
+                make_factory:
+                    default_namespace: 'App\\MyFactories'
 
     You can override this configuration by using the ``--namespace`` option.
+
+.. tip::
+
+    Feeling polluted by all these "beginners" hints in the generated factory? You can disable them in the configuration:
+
+    .. configuration-block::
+
+        .. code-block:: yaml
+
+            # config/packages/zenstruck_foundry.yaml
+            zenstruck_foundry:
+                make_factory:
+                    add_hints: false
 
 .. note::
 
@@ -955,7 +967,7 @@ When creating nested objects, sometimes it can be useful to tell Foundry to alwa
 It can enforce coherence in your fixtures and avoid creating too many objects.
 
 In order to do this, you can use the ``reuse()`` method: it will force Foundry to use the object passed as parameter in
-all `ManyToOne` and `OneToOne` relationships using the class of this object:
+all ``ManyToOne`` and ``OneToOne`` relationships using the class of this object:
 
 ::
 
@@ -1306,7 +1318,7 @@ Or enable/disable it in a specific test with methods ``withValidation()`` / ``wi
 
 .. warning::
 
-    Validation is only available in tests using the kernel, such as `KernelTestCase` or `WebTestCase`.
+    Validation is only available in tests using the kernel, such as ``KernelTestCase`` or ``WebTestCase``.
 
 Using with DoctrineFixturesBundle
 ---------------------------------
@@ -2516,6 +2528,9 @@ Full Default Bundle Configuration
 
             # Default namespace where factories will be created by maker.
             default_namespace:    Factory
+
+            # Add "beginner" hints in the created factory.
+            add_hints:    true
         make_story:
 
             # Default namespace where stories will be created by maker.

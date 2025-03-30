@@ -47,6 +47,7 @@ final class MakeFactoryData
         private bool $persisted,
         bool $withPhpDoc,
         private bool $forceProperties,
+        private bool $addHints,
     ) {
         $this->uses = [
             $this->getFactoryClass(),
@@ -208,6 +209,11 @@ final class MakeFactoryData
             $propertyName,
             "self::faker()->randomElement({$enumShortClassName}::cases()),",
         );
+    }
+
+    public function shouldAddHints(): bool
+    {
+        return $this->addHints;
     }
 
     private static function propertyInfo(): ReflectionExtractor

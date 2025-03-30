@@ -1,0 +1,3 @@
+zenstruck_foundry:
+    make_factory:
+        add_hints: false

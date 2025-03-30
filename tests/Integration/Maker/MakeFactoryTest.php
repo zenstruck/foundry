@@ -210,6 +210,19 @@ final class MakeFactoryTest extends MakerTestCase
      * @test
      */
     #[Test]
+    public function can_create_factory_without_hints(): void
+    {
+        $tester = $this->makeFactoryCommandTester(['environment' => 'maker_no_hints']);
+
+        $tester->execute(['class' => Object1::class, '--no-persistence' => true, '--all-fields' => true]);
+
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/Object1Factory.php'));
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
     public function can_create_factory_for_not_persisted_class_interactively(): void
     {
         $tester = $this->makeFactoryCommandTester();

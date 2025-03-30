@@ -151,7 +151,8 @@ final class FactoryGenerator
             $this->staticAnalysisTool(),
             $persisted ?? false,
             $makeFactoryQuery->addPhpDoc(),
-            $this->forceProperties
+            $this->forceProperties,
+            $makeFactoryQuery->shouldAddHints(),
         );
     }
 

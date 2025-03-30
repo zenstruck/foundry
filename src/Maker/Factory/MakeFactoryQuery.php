@@ -27,11 +27,12 @@ final class MakeFactoryQuery
         private bool $withPhpDoc,
         private string $class,
         private bool $generateAllFactories,
+        private bool $addHints,
         private Generator $generator,
     ) {
     }
 
-    public static function fromInput(InputInterface $input, string $class, bool $generateAllFactories, Generator $generator, string $defaultNamespace): self
+    public static function fromInput(InputInterface $input, string $class, bool $generateAllFactories, Generator $generator, string $defaultNamespace, bool $addHints): self
     {
         return new self(
             namespace: $defaultNamespace,
@@ -41,6 +42,7 @@ final class MakeFactoryQuery
             withPhpDoc: (bool) $input->getOption('with-phpdoc'),
             class: $class,
             generateAllFactories: $generateAllFactories,
+            addHints: $addHints,
             generator: $generator,
         );
     }
@@ -91,5 +93,10 @@ final class MakeFactoryQuery
         $clone->class = $class;
 
         return $clone;
+    }
+
+    public function shouldAddHints(): bool
+    {
+        return $this->addHints;
     }
 }
