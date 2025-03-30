@@ -301,7 +301,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
                     $this->isPersisting() ? PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT : PersistMode::WITHOUT_PERSISTING
                 );
 
-                if ((new \ReflectionClass(static::class()))->getProperty($field)->getType()?->allowsNull()) {
+                if (($fieldType = (new \ReflectionClass(static::class()))->getProperty($field)->getType())?->allowsNull()) {
                     $this->tempAfterInstantiate[] = static function(object $object) use ($value, $inverseField, $field) {
                         $inverseObject = $value->create([$inverseField => $object]);
 
@@ -310,7 +310,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
                     // we're using "force" here to avoid a potential type check in a setter
                     return force(null);
-                } elseif ((new \ReflectionClass($value::class()))->getProperty($inverseField)->getType()?->allowsNull()) {
+                } elseif (($inverseFieldType = (new \ReflectionClass($value::class()))->getProperty($inverseField)->getType())?->allowsNull()) {
                     $inverseObject = unproxy(
                         // we're using "force" here to avoid a potential type check in a setter
                         $value->create([$inverseField => force(null)]),
@@ -322,8 +322,10 @@ abstract class PersistentObjectFactory extends ObjectFactory
                     };
 
                     return $inverseObject;
+                } elseif ($fieldType === null || $inverseFieldType === null) {
+                    throw new \InvalidArgumentException(sprintf("Cannot handle inverse OneToOne relationship: cannot determine types of \"%s::\${$field}\" and \"%s::\${$inverseField}\", please and type to the properties.", static::class(), $value::class()));
                 } else {
-                    throw new \InvalidArgumentException('Cannot handle inverse OneToOne relationship because both side are not nullable, which will result in a circular dependency.');
+                    throw new \InvalidArgumentException(sprintf("Cannot handle inverse OneToOne relationship: both \"%s::\${$field}\" and \"%s::\${$inverseField}\" are not nullable, which will result in a circular dependency.", static::class(), $value::class()));
                 }
             }
         }
