@@ -16,6 +16,7 @@ use Doctrine\Common\Collections\Collection;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\ForceValue;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -50,7 +51,11 @@ final class Hydrator
                 continue;
             }
 
-            if (true === $this->forceProperties || \in_array($parameter, $this->forceProperties, true)) {
+            if (true === $this->forceProperties || \in_array($parameter, $this->forceProperties, true) || $value instanceof ForceValue) {
+                if ($value instanceof ForceValue) {
+                    $value = $value->value;
+                }
+
                 try {
                     self::set($object, $parameter, $value);
                 } catch (\InvalidArgumentException $e) {
@@ -94,6 +99,8 @@ final class Hydrator
 
     public static function set(object $object, string $property, mixed $value): void
     {
+        $value = ForceValue::unwrap($value);
+
         if (
             self::isDoctrineCollection($object, $property)
             && \is_array($value)
@@ -138,12 +145,24 @@ final class Hydrator
 
     private static function isDoctrineCollection(object $object, string $property): bool
     {
-        $reflectionType = self::reflectionProperty(new \ReflectionClass($object), $property)?->getType();
+        $type = self::reflectionProperty(new \ReflectionClass($object), $property)?->getType();
 
-        if (!$reflectionType instanceof \ReflectionNamedType) {
+        if (null === $type) {
             return false;
         }
 
-        return Collection::class === $reflectionType->getName();
+        if ($type instanceof \ReflectionNamedType) {
+            return Collection::class === $type->getName();
+        }
+
+        if ($type instanceof \ReflectionUnionType || $type instanceof \ReflectionIntersectionType) {
+            foreach ($type->getTypes() as $type) {
+                if ($type instanceof \ReflectionNamedType && Collection::class === $type->getName()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

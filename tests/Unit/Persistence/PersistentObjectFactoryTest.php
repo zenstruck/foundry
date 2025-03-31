@@ -92,4 +92,30 @@ final class PersistentObjectFactoryTest extends TestCase
             ]),
         ];
     }
+
+    /**
+     * @test
+     * @dataProvider factoryCollectionDataProvider
+     * @param FactoryCollection<GenericEntity, GenericEntityFactory> $collection
+     */
+    public function can_use_factory_collection_methods_in_data_providers(FactoryCollection $collection): void // @phpstan-ignore generics.notSubtype
+    {
+        self::assertEquals(
+            [
+                new GenericEntity('foo'),
+            ],
+            $collection->create(),
+        );
+    }
+
+    public static function factoryCollectionDataProvider(): iterable
+    {
+        yield [
+            GenericEntityFactory::new()->sequence([
+                [
+                    'prop1' => 'foo',
+                ],
+            ]),
+        ];
+    }
 }

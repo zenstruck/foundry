@@ -111,17 +111,6 @@ final class PersistenceManager
         return $object;
     }
 
-    public function forget(object $object): void
-    {
-        if ($this->isPersisted($object)) {
-            throw new \LogicException('Cannot forget an object already persisted.');
-        }
-
-        $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
-
-        $om->detach($object);
-    }
-
     /**
      * @template T
      *

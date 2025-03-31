@@ -24,6 +24,7 @@ use Zenstruck\Foundry\Persistence\Event\AfterPersist;
 use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
 
+use function Zenstruck\Foundry\force;
 use function Zenstruck\Foundry\get;
 use function Zenstruck\Foundry\set;
 
@@ -293,30 +294,42 @@ abstract class PersistentObjectFactory extends ObjectFactory
         if ($value instanceof self) {
             $pm = Configuration::instance()->persistence();
 
-            $inversedRelationshipMetadata = $pm->inverseRelationshipMetadata(static::class(), $value::class(), $field);
+            $relationshipMetadata = $pm->inverseRelationshipMetadata(static::class(), $value::class(), $field);
 
-            // handle inversed OneToOne
-            if ($inversedRelationshipMetadata && !$inversedRelationshipMetadata->isCollection) {
-                $inverseField = $inversedRelationshipMetadata->inverseField;
+            // handle inverse OneToOne
+            if ($relationshipMetadata && !$relationshipMetadata->isCollection) {
+                $inverseField = $relationshipMetadata->inverseField;
 
-                $inversedObject = $value->withPersistMode(
+                $value = $value->withPersistMode(
                     $this->isPersisting() ? PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT : PersistMode::WITHOUT_PERSISTING
-                )
+                );
 
-                    // we need to handle the circular dependency involved by inversed one-to-one relationship:
-                    // a placeholder object is used, which will be replaced by the real object, after its instantiation
-                    ->create([
-                        $inverseField => $placeholder = (new \ReflectionClass(static::class()))->newInstanceWithoutConstructor(),
-                    ]);
+                if (($fieldType = (new \ReflectionClass(static::class()))->getProperty($field)->getType())?->allowsNull()) {
+                    $this->tempAfterInstantiate[] = static function(object $object) use ($value, $inverseField, $field) {
+                        $inverseObject = $value->create([$inverseField => $object]);
 
-                $inversedObject = unproxy($inversedObject, withAutoRefresh: false);
+                        set($object, $field, unproxy($inverseObject, withAutoRefresh: false));
+                    };
 
-                $this->tempAfterInstantiate[] = static function(object $object) use ($inversedObject, $inverseField, $pm, $placeholder) {
-                    $pm->forget($placeholder);
-                    set($inversedObject, $inverseField, $object);
-                };
+                    // we're using "force" here to avoid a potential type check in a setter
+                    return force(null);
+                } elseif (($inverseFieldType = (new \ReflectionClass($value::class()))->getProperty($inverseField)->getType())?->allowsNull()) {
+                    $inverseObject = unproxy(
+                        // we're using "force" here to avoid a potential type check in a setter
+                        $value->create([$inverseField => force(null)]),
+                        withAutoRefresh: false
+                    );
 
-                return $inversedObject;
+                    $this->tempAfterInstantiate[] = static function(object $object) use ($inverseObject, $inverseField) {
+                        set($inverseObject, $inverseField, $object);
+                    };
+
+                    return $inverseObject;
+                } elseif (null === $fieldType || null === $inverseFieldType) {
+                    throw new \InvalidArgumentException(\sprintf("Cannot handle inverse OneToOne relationship: cannot determine types of \"%s::\${$field}\" and \"%s::\${$inverseField}\", please and type to the properties.", static::class(), $value::class()));
+                } else {
+                    throw new \InvalidArgumentException(\sprintf("Cannot handle inverse OneToOne relationship: both \"%s::\${$field}\" and \"%s::\${$inverseField}\" are not nullable, which will result in a circular dependency.", static::class(), $value::class()));
+                }
             }
         }
 
@@ -355,7 +368,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
                 set($object, $field, $inverseObjects);
             };
 
-            // creation delegated to afterPersist hook - return empty array here
+            // creation delegated to tempAfterInstantiate hook - return empty array here
             return [];
         }
 

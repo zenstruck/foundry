@@ -805,6 +805,30 @@ instantiators):
                 # or
                 service: my_instantiator # your own invokable service for complete control
 
+``force()`` helper
+..................
+
+``Instantiator::alwaysForce()`` forces the property globally for the factory.
+
+It is also possible to force a property on-demand, thanks to the ``force()`` helper. You can use it to temporary
+prevent using a setter (constructor arguments will still be passed)
+
+::
+
+    use App\Factory\PostFactory;
+
+    use function Zenstruck\Foundry\force;
+
+    // in this case, the "body" attribute will be set directly, without using the setter
+    PostFactory::createOne(['body' => force('some body')]) ;
+
+    // in this case, the "title" attribute will still be used in the constructor (otherwise an error would be thrown)
+    PostFactory::createOne(['title' => force('some title')]) ;
+    // ...unless we disable the constructor:
+    PostFactory::new()
+        ->instantiateWith(Instantiator::withoutConstructor())
+        ->create(['title' => force('some title')]) ;
+
 Immutable
 ~~~~~~~~~
 
@@ -1706,7 +1730,7 @@ Factory without proxy
 
 It is possible to create factories which do not create "proxified" objects. Instead of making your factory inherit from
 ``PersistentProxyObjectFactory``, you can inherit from ``PersistentObjectFactory``. Your factory will then directly return
-the "real" object, which won't be wrapped by `Proxy` class.
+the "real" object, which won't be wrapped by ``Proxy`` class.
 
 .. warning::
 
@@ -1865,7 +1889,7 @@ you're using them in tests. Thanks to it, you can:
 
 .. warning::
 
-    For the same reason, you should not call methods from `Proxy` class in your data providers, not even ``->_real()``.
+    For the same reason, you should not call methods from ``Proxy`` class in your data providers, not even ``->_real()``.
 
 
 Without PHPUnit Extension

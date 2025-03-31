@@ -23,6 +23,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\SimpleObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
 
 use function Zenstruck\Foundry\factory;
+use function Zenstruck\Foundry\force;
 use function Zenstruck\Foundry\get;
 use function Zenstruck\Foundry\object;
 use function Zenstruck\Foundry\set;
@@ -172,6 +173,49 @@ final class ObjectFactoryTest extends TestCase
         $this->assertSame('override1', $object->getProp1());
         $this->assertSame('override2', $object->getProp2());
         $this->assertSame('override3', $object->getProp3());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_use_force_helper_to_force_a_single_property(): void
+    {
+        $object = Object1Factory::new()
+            ->instantiateWith(Instantiator::withoutConstructor())
+            ->create([
+                'prop1' => force('override1'),
+            ])
+        ;
+
+        $this->assertSame('override1', $object->getProp1());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function force_helper_used_in_constructor_does_not_throw(): void
+    {
+        $object = Object1Factory::new()
+            ->create([
+                'prop1' => force('override1'),
+            ])
+        ;
+
+        $this->assertSame('override1-constructor', $object->getProp1());
+    }
+
+    /**
+     * @test
+     */
+    public function force_helper_used_in_named_constructor_does_not_throw(): void
+    {
+        $object = Object1Factory::new()->instantiateWith(Instantiator::namedConstructor('factory'))->create([
+            'prop1' => force('override1'),
+        ]);
+
+        $this->assertSame('override1-named-constructor', $object->getProp1());
     }
 
     /**

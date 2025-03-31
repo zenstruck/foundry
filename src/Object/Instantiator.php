@@ -12,6 +12,7 @@
 namespace Zenstruck\Foundry\Object;
 
 use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\ForceValue;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -155,10 +156,12 @@ final class Instantiator
         }
 
         if ($factory instanceof \ReflectionMethod && $factory->isConstructor()) {
-            return $refClass->newInstance(...$arguments);
+            return $refClass->newInstance(
+                ...ForceValue::unwrap($arguments)
+            );
         }
 
-        $object = $factory instanceof \ReflectionMethod ? $factory->invoke(null, ...$arguments) : $factory->invoke(...$arguments);
+        $object = $factory instanceof \ReflectionMethod ? $factory->invoke(null, ...ForceValue::unwrap($arguments)) : $factory->invoke(...ForceValue::unwrap($arguments));
 
         if (!$object instanceof $class) {
             throw new \LogicException(\sprintf('Named constructor "%s" for "%s" must return an instance of "%s".', $factory->name, $class, $class));
