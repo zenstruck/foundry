@@ -38,20 +38,13 @@ use function Zenstruck\Foundry\set;
  */
 abstract class PersistentObjectFactory extends ObjectFactory
 {
-    private PersistMode $persist;
+    private PersistMode $persist = PersistMode::PERSIST;
 
     /** @phpstan-var list<callable(T, Parameters, static):void> */
     private array $afterPersist = [];
 
     /** @var list<callable(T):void> */
     private array $tempAfterInstantiate = [];
-
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->persist = $this->isPersistenceEnabled() ? PersistMode::PERSIST : PersistMode::WITHOUT_PERSISTING;
-    }
 
     /**
      * @phpstan-param mixed|Parameters $criteriaOrId
@@ -411,6 +404,8 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
     final protected function initializeInternal(): static
     {
+        $this->persist = $this->isPersistenceEnabled() ? PersistMode::PERSIST : PersistMode::WITHOUT_PERSISTING;
+
         // Schedule any new object for insert right after instantiation
         $factory = parent::initializeInternal()
             ->afterInstantiate(

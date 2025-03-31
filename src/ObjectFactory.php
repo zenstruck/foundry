@@ -39,18 +39,10 @@ abstract class ObjectFactory extends Factory
     /** @phpstan-var array<class-string, object> */
     private array $reusedObjects = [];
 
-    private bool $validationEnabled;
+    private bool $validationEnabled = false;
 
     /** @var string|GroupSequence|list<string>|null */
     private string|GroupSequence|array|null $validationGroups = [];
-
-    // keep an empty constructor for BC
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->validationEnabled = Configuration::isBooted() && Configuration::instance()->validationEnabled;
-    }
 
     /**
      * @return class-string<T>
@@ -262,6 +254,8 @@ abstract class ObjectFactory extends Factory
      */
     protected function initializeInternal(): static
     {
+        $this->validationEnabled = Configuration::isBooted() && Configuration::instance()->validationEnabled;
+
         if (!Configuration::isBooted() || !Configuration::instance()->hasEventDispatcher()) {
             return $this;
         }

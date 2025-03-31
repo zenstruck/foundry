@@ -27,6 +27,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\ProxyAddressFactory
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ProxyContactFactory;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\EmptyConstructorFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericProxyEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
 
@@ -154,5 +155,16 @@ final class FactoryTest extends TestCase
         ]);
 
         $this->assertInstanceOf(Category::class, $object->getCategory());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_use_factory_with_empty_constructor(): void
+    {
+        $genericEntity = EmptyConstructorFactory::createOne();
+
+        self::assertInstanceOf(GenericEntity::class, $genericEntity);
     }
 }

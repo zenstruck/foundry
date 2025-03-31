@@ -116,7 +116,7 @@ final class Configuration
     public function assertPersistenceEnabled(): void
     {
         if (!$this->isPersistenceEnabled()) {
-            throw new PersistenceDisabled('Cannot get repository when persist is disabled (if in a unit test, you probably should not try to get the repository.');
+            throw new PersistenceDisabled('Cannot get repository when persist is disabled (if in a unit test, you probably should not try to get the repository).');
         }
     }
 
