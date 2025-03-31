@@ -510,22 +510,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
 
     /** @test */
     #[Test]
-    public function can_call_create_in_after_persist_callback(): void
-    {
-        $category = static::categoryFactory()::new()
-            ->afterPersist(function(Category $category) {
-                static::contactFactory()->create(['category' => $category]);
-            })
-            ->create();
-
-        static::categoryFactory()::assert()->count(1);
-        static::contactFactory()::assert()->count(1);
-        self::assertCount(1, $category->getContacts());
-        self::assertSame(unproxy($category), $category->getContacts()[0]?->getCategory());
-    }
-
-    /** @test */
-    #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(Contact::class, ['category'])]
     public function can_call_create_in_after_persist_callback(): void

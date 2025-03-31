@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [v2.3.10](https://github.com/zenstruck/foundry/releases/tag/v2.3.10)
+
+March 31st, 2025 - [v2.3.9...v2.3.10](https://github.com/zenstruck/foundry/compare/v2.3.9...v2.3.10)
+
+* e5c6973 fix: handle "inverse one to one" without "placeholder" solution (#855) by @nikophil
+
 ## [v2.3.6](https://github.com/zenstruck/foundry/releases/tag/v2.3.6)
 
 February 25th, 2025 - [v2.3.5...v2.3.6](https://github.com/zenstruck/foundry/compare/v2.3.5...v2.3.6)

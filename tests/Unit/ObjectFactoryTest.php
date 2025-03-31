@@ -209,6 +209,7 @@ final class ObjectFactoryTest extends TestCase
     /**
      * @test
      */
+    #[Test]
     public function force_helper_used_in_named_constructor_does_not_throw(): void
     {
         $object = Object1Factory::new()->instantiateWith(Instantiator::namedConstructor('factory'))->create([
