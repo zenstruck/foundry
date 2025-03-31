@@ -565,8 +565,7 @@ random data for your factories:
 
 .. note::
 
-    You can customize Faker's `locale <https://fakerphp.org/#localization>`_ and random
-    `seed <https://fakerphp.org/#seeding-the-generator>`_:
+    You can customize Faker's `locale <https://fakerphp.org/#localization>`_:
 
     .. code-block:: yaml
 
@@ -575,7 +574,6 @@ random data for your factories:
             zenstruck_foundry:
                 faker:
                     locale: fr_FR # set the locale
-                    seed: 5678 # set the random number generator seed
 
 .. note::
 
@@ -597,6 +595,29 @@ random data for your factories:
             zenstruck_foundry:
                 faker:
                     service: my_faker # service id for your own instance of Faker\Generator
+
+Reproducibility
+...............
+
+Foundry sets a different random seed for each PHPUnit run. This means that Faker will generate different data on each run.
+If you're using Foundry's `PHPUnit Extension`_, it will automatically display the seed used for each test run.
+
+You can also freeze the seed, by using the environment variable ``FOUNDRY_FAKER_SEED``:
+
+.. code-block:: terminal
+
+    $ FOUNDRY_FAKER_SEED=1234 vendor/bin/phpunit
+
+    ...................................                               35 / 35 (100%)
+
+    Faker seed: 1234
+
+    Time: 00:00.047, Memory: 48.50 MB
+
+.. versionadded::  2.4
+
+    Support for ``FOUNDRY_FAKER_SEED`` was added in 2.4.
+
 
 Hooks
 ~~~~~
@@ -2490,9 +2511,6 @@ Full Default Bundle Configuration
 
             # Change the default faker locale.
             locale:               null # Example: fr_FR
-
-            # Random number generator seed to produce the same fake values every run
-            seed:                 null # Example: '1234'
 
             # Customize the faker service.
             service:              null # Example: my_faker
