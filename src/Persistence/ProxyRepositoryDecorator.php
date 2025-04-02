@@ -278,7 +278,7 @@ class ProxyRepositoryDecorator extends RepositoryDecorator
      * @phpstan-param Proxy<TProxiedObject>|array|mixed $criteria
      * @phpstan-return Proxy<TProxiedObject>|null
      */
-    public function find($criteria)
+    public function find($criteria): ?object
     {
         if ($criteria instanceof Proxy) {
             $criteria = $criteria->_real();

@@ -37,25 +37,25 @@ final class RepositoryDecoratorTest extends TestCase
     public static function objectRepositoryWithoutFindOneByOrderBy(): iterable
     {
         yield [new RepositoryDecorator(new class extends RepositoryStub {
-            public function findOneBy(array $criteria): void
+            public function findOneBy(array $criteria): ?object
             {
             }
         })];
 
         yield [new RepositoryDecorator(new class extends RepositoryStub {
-            public function findOneBy(array $criteria, ?array $foo = null): void
+            public function findOneBy(array $criteria, ?array $foo = null): ?object
             {
             }
         })];
 
         yield [new RepositoryDecorator(new class extends RepositoryStub {
-            public function findOneBy(array $criteria, $orderBy = null): void
+            public function findOneBy(array $criteria, $orderBy = null): ?object
             {
             }
         })];
 
         yield [new RepositoryDecorator(new class extends RepositoryStub {
-            public function findOneBy(array $criteria, ?string $orderBy = null): void
+            public function findOneBy(array $criteria, ?string $orderBy = null): ?object
             {
             }
         })];

@@ -194,7 +194,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
      * @phpstan-param TObject|array|mixed $criteria
      * @phpstan-return TObject|null
      */
-    public function find($criteria)
+    public function find($criteria): ?object
     {
         if ($criteria instanceof Proxy) {
             $criteria = $criteria->_real();
