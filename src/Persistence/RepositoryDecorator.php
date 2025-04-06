@@ -169,7 +169,18 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
      */
     public function random(array $criteria = []): object
     {
-        return $this->randomSet(1, $criteria)[0];
+        $count = $this->count($criteria);
+        $offset = 0;
+
+        if ($count === 0) {
+            throw new NotEnoughObjects(\sprintf('At least %d "%s" object(s) must have been persisted (%d persisted).', 1, $this->getClassName(), 0));
+        }
+
+        if ($count > 1) {
+            $offset = \random_int(0, $count - 1);
+        }
+
+        return $this->findBy($criteria, limit: 1, offset: $offset)[0];
     }
 
     /**
