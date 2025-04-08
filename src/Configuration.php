@@ -41,8 +41,6 @@ final class Configuration
      */
     public $instantiator;
 
-    public readonly PropertyInfoExtractorInterface&PropertyInitializableExtractorInterface $propertyInfo;
-
     /**
      * This property is only filled if the PHPUnit extension is used!
      */
@@ -66,23 +64,10 @@ final class Configuration
         ?int $forcedFakerSeed = null,
         public readonly bool $validationEnabled = false,
         public readonly bool $validationAvailable = false,
-        ?PropertyInfoExtractorInterface $propertyInfoExtractor = null,
     ) {
         $this->faker->seed(self::fakerSeed($forcedFakerSeed));
 
         $this->instantiator = $instantiator;
-
-        // @phpstan-ignore assign.propertyType (DNF wa shipped in PHP 8.2, so we cannot make the parameter nullable and intersection)
-        $this->propertyInfo = $propertyInfoExtractor ?? new PropertyInfoCacheExtractor(
-            new PropertyInfoExtractor(
-                [$reflectionExtractor = new ReflectionExtractor()],
-                [$reflectionExtractor],
-                [$reflectionExtractor],
-                [$reflectionExtractor],
-                [$reflectionExtractor],
-            ),
-            new ArrayAdapter()
-        );
     }
 
     public static function fakerSeed(?int $forcedFakerSeed = null): int

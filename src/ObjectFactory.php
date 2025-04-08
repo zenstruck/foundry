@@ -225,24 +225,27 @@ abstract class ObjectFactory extends Factory
      */
     final protected function reusedAttributes(): array
     {
+        if ($this->reusedObjects === []) {
+            return [];
+        }
+
         $attributes = [];
 
-        $propertyInfo = Configuration::instance()->propertyInfo;
+        $properties = (new \ReflectionClass(static::class()))->getProperties();
 
-        $properties = $propertyInfo->getProperties(static::class());
-        foreach ($properties ?? [] as $property) {
-            $types = $propertyInfo->getTypes(static::class(), $property);
+        foreach ($properties as $property) {
+            $type = $property->getType();
 
-            foreach ($types ?? [] as $type) {
-                if (null === $type->getClassName()) {
-                    continue;
-                }
+            if (null === $type) {
+                continue;
+            }
 
-                if (isset($this->reusedObjects[$type->getClassName()])) {
-                    $attributes[$property] = $this->reusedObjects[$type->getClassName()];
+            if (!$type instanceof \ReflectionNamedType) {
+                continue;
+            }
 
-                    break;
-                }
+            if (isset($this->reusedObjects[$type->getName()])) {
+                $attributes[$property->getName()] = $this->reusedObjects[$type->getName()];
             }
         }
 
