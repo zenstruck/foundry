@@ -306,6 +306,9 @@ jobs:
       - name: Install PHPStan
         run: composer bin phpstan install
 
+      - name: Install PHPBench
+        run: composer bin phpbench install
+
       - name: Run static analysis
         run: bin/tools/phpstan/vendor/phpstan/phpstan/phpstan analyse
 

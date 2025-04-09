@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Foundry\Tests\Benchmark\ORM;
 
+use PhpBench\Attributes\Groups;
 use Zenstruck\Foundry\Tests\Benchmark\Persistence\GenericFactoryBench;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 

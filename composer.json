@@ -94,7 +94,8 @@
             "@test-reset-database"
         ],
         "test-main": "./phpunit --testsuite main",
-        "test-reset-database": "./phpunit --testsuite reset-database --bootstrap tests/bootstrap-reset-database.php"
+        "test-reset-database": "./phpunit --testsuite reset-database --bootstrap tests/bootstrap-reset-database.php",
+        "post-install-cmd": ["@composer bin phpstan install", "@composer bin phpbench install"]
     },
     "scripts-descriptions": {
         "test-main": "Main test suite",

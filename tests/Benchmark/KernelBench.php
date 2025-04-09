@@ -1,6 +1,6 @@
 <?php
 
-namespace Zenstruck\Foundry\Benchmark;
+namespace Zenstruck\Foundry\Tests\Benchmark;
 
 use PhpBench\Attributes\AfterMethods;
 use PhpBench\Attributes\BeforeMethods;
@@ -16,6 +16,7 @@ use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 #[AfterMethods(['_shutdownFoundry'])]
 abstract class KernelBench
 {
+    /** @var class-string<KernelInterface>|null */
     protected static ?string $class = null;
     protected static ?KernelInterface $kernel = null;
     protected static bool $booted = false;
@@ -28,11 +29,11 @@ abstract class KernelBench
         static::bootKernel();
 
         Configuration::boot(static function (): Configuration {
-            if (!static::getContainer()->has('.zenstruck_foundry.configuration')) { // @phpstan-ignore staticMethod.notFound
+            if (!static::getContainer()->has('.zenstruck_foundry.configuration')) {
                 throw new \LogicException('ZenstruckFoundryBundle is not enabled. Ensure it is added to your config/bundles.php.');
             }
 
-            return static::getContainer()->get('.zenstruck_foundry.configuration'); // @phpstan-ignore staticMethod.notFound, return.type
+            return static::getContainer()->get('.zenstruck_foundry.configuration'); // @phpstan-ignore return.type
         });
     }
 
@@ -71,6 +72,8 @@ abstract class KernelBench
     /**
      * @throws \RuntimeException
      * @throws \LogicException
+     *
+     * @return class-string<KernelInterface>
      */
     protected static function getKernelClass(): string
     {
@@ -82,11 +85,11 @@ abstract class KernelBench
             throw new \RuntimeException(\sprintf('Class "%s" doesn\'t exist or cannot be autoloaded. Check that the KERNEL_CLASS value in phpunit.xml matches the fully-qualified class name of your Kernel or override the "%s::createKernel()" method.', $class, static::class));
         }
 
-        return $class;
+        return $class; // @phpstan-ignore return.type
     }
 
     /**
-     * Boots the Kernel for this test.
+     * @param array{environment?: string, debug?: bool} $options
      *
      * @see KernelTestCase::bootKernel()
      */
@@ -119,21 +122,16 @@ abstract class KernelBench
         }
 
         try {
-            return self::$kernel->getContainer()->get('test.service_container');
+            return self::$kernel->getContainer()->get('test.service_container'); // @phpstan-ignore method.nonObject, return.type
         } catch (ServiceNotFoundException $e) {
             throw new \LogicException('Could not find service "test.service_container". Try updating the "framework.test" config to "true".', 0, $e);
         }
     }
 
     /**
-     * Creates a Kernel.
-     *
-     * Available options:
-     *
-     *  * environment
-     *  * debug
-     *
      * @see KernelTestCase::createKernel()
+     *
+     * @param array{environment?: string, debug?: bool} $options
      */
     protected static function createKernel(array $options = []): KernelInterface
     {

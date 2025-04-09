@@ -1,6 +1,6 @@
 <?php
 
-namespace Zenstruck\Foundry\Benchmark;
+namespace Zenstruck\Foundry\Tests\Benchmark;
 
 use PhpBench\Attributes\AfterMethods;
 use PhpBench\Attributes\BeforeMethods;
