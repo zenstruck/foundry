@@ -28,6 +28,15 @@ class ContactFactory extends PersistentObjectFactory
         return Contact::class;
     }
 
+    public function noRandom(): static
+    {
+        return $this->with([
+            'name' => 'some_name',
+            'address' => AddressFactory::new()->noRandom(),
+            'category' => CategoryFactory::new()->noRandom(),
+        ]);
+    }
+
     protected function defaults(): array
     {
         return [

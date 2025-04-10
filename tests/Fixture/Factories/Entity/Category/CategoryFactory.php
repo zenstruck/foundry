@@ -26,6 +26,13 @@ final class CategoryFactory extends PersistentObjectFactory
         return Category::class;
     }
 
+    public function noRandom(): static
+    {
+        return $this->with([
+            'name' => 'some name',
+        ]);
+    }
+
     protected function defaults(): array
     {
         return [

@@ -26,6 +26,13 @@ final class AddressFactory extends PersistentObjectFactory
         return Address::class;
     }
 
+    public function noRandom(): static
+    {
+        return $this->with([
+            'city' => 'some city',
+        ]);
+    }
+
     protected function defaults(): array
     {
         return [

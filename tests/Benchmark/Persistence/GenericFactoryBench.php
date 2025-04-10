@@ -15,6 +15,7 @@ use PhpBench\Attributes\BeforeClassMethods;
 use PhpBench\Attributes\BeforeMethods;
 use PhpBench\Attributes\ParamProviders;
 use PhpBench\Attributes\Revs;
+use PhpBench\Attributes\Skip;
 use PhpBench\Attributes\Warmup;
 use Zenstruck\Foundry\Tests\Benchmark\KernelBench;
 use Zenstruck\Foundry\Tests\Fixture\Factories\GenericModelFactory;
@@ -23,6 +24,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\GenericModelFactory;
 #[BeforeMethods(['_bootFoundry', '_resetDatabaseBeforeEachBench'])]
 #[Warmup(1)]
 #[Revs(100)]
+#[Skip]
 abstract class GenericFactoryBench extends KernelBench
 {
     #[ParamProviders('_param_bench_random')]

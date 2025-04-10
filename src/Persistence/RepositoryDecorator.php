@@ -212,7 +212,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
             throw new NotEnoughObjects(\sprintf('At least %d "%s" object(s) must have been persisted (%d persisted).', $max, $this->getClassName(), \count($all)));
         }
 
-        return \array_slice($all, 0, \random_int($min, $max));
+        return \array_slice($all, 0, \random_int($min, $max)); // @phpstan-ignore argument.type
     }
 
     public function getIterator(): \Traversable

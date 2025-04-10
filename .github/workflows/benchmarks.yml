@@ -40,29 +40,32 @@ jobs:
           coverage: none
           tools: flex
 
-#      - name: Checkout
-#        uses: actions/checkout@v4
-#        with:
-#          ref: 2.x
-#          fetch-depth: 1
-#
-#      - name: Install dependencies
-#        uses: ramsey/composer-install@v2
-#        with:
-#          dependency-versions: ${{ matrix.deps }}
-#          composer-options: --prefer-dist
-#        env:
-#          SYMFONY_REQUIRE: ${{ matrix.symfony }}
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: 2.x
+          fetch-depth: 1
 
-#      - name: Run benchmarks baseline
-#        run: |
-#          bin/tools/phpbench/vendor/phpbench/phpbench/bin/phpbench run \
-#            tests/Benchmark \
-#            --report=aggregate \
-#            --tag=2.x \
-#            --iterations=5 \
-#            --progress=plain \
-#            --revs=10
+      - name: Install dependencies
+        uses: ramsey/composer-install@v2
+        with:
+          dependency-versions: ${{ matrix.deps }}
+          composer-options: --prefer-dist
+        env:
+          SYMFONY_REQUIRE: ${{ matrix.symfony }}
+
+      - name: Install PHPBench
+        run: composer bin phpbench install
+
+      - name: Run benchmarks baseline
+        run: |
+          bin/tools/phpbench/vendor/phpbench/phpbench/bin/phpbench run \
+            tests/Benchmark \
+            --report=aggregate \
+            --tag=2.x \
+            --iterations=5 \
+            --progress=plain \
+            --retry-threshold=10
 
       - name: Clear vendor files
         run: |
@@ -82,25 +85,13 @@ jobs:
         env:
           SYMFONY_REQUIRE: ${{ matrix.symfony }}
 
-      - name: Install PHPBench
-        run: composer bin phpbench install
-
-#      - name: Run benchmarks and compare
-#        run: |
-#          bin/tools/phpbench/vendor/phpbench/phpbench/bin/phpbench run \
-#            tests/Benchmark \
-#            --report=aggregate \
-#            --ref=2.x \
-#            --iterations=5 \
-#            --progress=plain \
-#            --assert="mode(variant.time.avg) <= mode(baseline.time.avg) +/- 5%"
-
-      - name: Run benchmarks baseline
+      - name: Run benchmarks and compare
         run: |
           bin/tools/phpbench/vendor/phpbench/phpbench/bin/phpbench run \
             tests/Benchmark \
             --report=aggregate \
-            --tag=2.x \
+            --ref=2.x \
             --iterations=5 \
             --progress=plain \
-            --retry-threshold=10
+            --retry-threshold=10 \
+            --assert="mode(variant.time.avg) <= mode(baseline.time.avg) +/- 5%"

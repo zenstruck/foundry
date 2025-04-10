@@ -18,6 +18,6 @@ class ContactFactoryBench extends PersistentFactoryBench
 {
     protected static function factory(): ContactFactory
     {
-        return ContactFactory::new();
+        return ContactFactory::new()->noRandom();
     }
 }

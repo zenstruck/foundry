@@ -21,6 +21,6 @@ class CategoryFactoryBench extends PersistentFactoryBench
     {
         return CategoryFactory::new([
             'contacts' => ContactFactory::new()->many(5),
-        ]);
+        ])->noRandom();
     }
 }
