@@ -88,7 +88,8 @@
             "@test-migrate"
         ],
         "test-schema": "./phpunit",
-        "test-migrate": "./phpunit --testsuite migrate --bootstrap tests/bootstrap-migrate.php"
+        "test-migrate": "./phpunit --testsuite migrate --bootstrap tests/bootstrap-migrate.php",
+        "post-install-cmd": ["@composer bin phpstan install", "@composer bin phpbench install"]
     },
     "scripts-descriptions": {
         "test-schema": "Test with schema reset",
