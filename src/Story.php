@@ -104,7 +104,7 @@ abstract class Story
             throw new \RuntimeException(\sprintf('At least %d items must be in pool "%s" (%d items found).', $max, $pool, \count($values)));
         }
 
-        return \array_slice($values, 0, \random_int($min, $max)); // @phpstan-ignore argument.type
+        return \array_slice($values, 0, \mt_rand($min, $max));
     }
 
     final public static function load(): static

@@ -111,7 +111,7 @@ final class FactoryCollection implements \IteratorAggregate
             throw new \InvalidArgumentException('Min must be less than max.');
         }
 
-        return new self($factory, static fn() => \array_fill(0, \random_int($min, $max), []));
+        return new self($factory, static fn() => \array_fill(0, \mt_rand($min, $max), []));
     }
 
     /**
