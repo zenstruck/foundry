@@ -265,6 +265,31 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
         );
     }
 
+    /** @test */
+    #[Test]
+    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[UsingRelationships(InversedOneToOneWithNonNullableOwning\OwningSide::class, ['inverseSide'])]
+    #[RequiresPhpunit('>=11.4')]
+    public function after_instantiate_flushing_using_current_object_in_relationship_inverse_one_to_one(): void
+    {
+        $owningSideFactory = persistent_factory(InversedOneToOneWithNonNullableOwning\OwningSide::class);
+        $inverseSideFactory = persistent_factory(InversedOneToOneWithNonNullableOwning\InverseSide::class);
+
+        $owningSide = $owningSideFactory
+            ->afterInstantiate(
+                static function(InversedOneToOneWithNonNullableOwning\OwningSide $o) use ($inverseSideFactory) {
+                    $inverseSideFactory->create(['owningSide' => $o]);
+                }
+            )
+            ->create();
+
+        $owningSideFactory::assert()->count(1);
+        $inverseSideFactory::assert()->count(1);
+
+        self::assertNotNull($owningSide->inverseSide);
+        self::assertSame($owningSide, $owningSide->inverseSide->getOwningSide());
+    }
+
     /**
      * @test
      */

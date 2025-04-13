@@ -19,6 +19,7 @@ use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\ORM\AbstractORMPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\NoPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
+use Zenstruck\Foundry\Persistence\Relationship\RelationshipMetadata;
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 
 /**
@@ -257,12 +258,12 @@ final class PersistenceManager
      * @param class-string $parent
      * @param class-string $child
      */
-    public function inverseRelationshipMetadata(string $parent, string $child, string $field): ?InverseRelationshipMetadata
+    public function bidirectionalRelationshipMetadata(string $parent, string $child, string $field): ?RelationshipMetadata
     {
         $parent = unproxy($parent);
         $child = unproxy($child);
 
-        return $this->strategyFor($parent)->inversedRelationshipMetadata($parent, $child, $field);
+        return $this->strategyFor($parent)->bidirectionalRelationshipMetadata($parent, $child, $field);
     }
 
     /**

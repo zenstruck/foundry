@@ -9,19 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\Persistence;
+namespace Zenstruck\Foundry\Persistence\Relationship;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @internal
  */
-final class InverseRelationshipMetadata
+interface RelationshipMetadata
 {
-    public function __construct(
-        public readonly string $inverseField,
-        public readonly bool $isCollection,
-        public readonly ?string $collectionIndexedBy,
-    ) {
-    }
+    public function inverseField(): string;
 }

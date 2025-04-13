@@ -31,6 +31,9 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Tag;
 
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
+
 use function Zenstruck\Foundry\lazy;
 use function Zenstruck\Foundry\Persistence\refresh;
 use function Zenstruck\Foundry\Persistence\unproxy;
@@ -69,6 +72,20 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
     public function one_to_many_with_factory_collection(): void
     {
         $this->one_to_many(static::contactFactory()->many(2));
+    }
+
+    /** @test */
+    #[Test]
+    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[UsingRelationships(Category::class, ['contacts'])]
+    public function create_many_one_to_many_with_factory_collection(): void
+    {
+        CategoryFactory::new([
+            'contacts' => ContactFactory::new()->many(5),
+        ])->noRandom()->create();
+
+        ContactFactory::assert()->count(5);
+        CategoryFactory::assert()->count(1);
     }
 
     /** @test */
@@ -640,6 +657,29 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(Contact::class, ['category'])]
+    public function after_instantiate_flushing_using_current_object_in_relationship_multiple_many_to_one(): void
+    {
+        $category = static::categoryFactory()
+            ->afterInstantiate(
+                static function(Category $c): void {
+                    static::contactFactory()->create(['category' => $c]);
+                    static::contactFactory()->create(['category' => $c]);
+                }
+            )
+            ->create();
+
+        static::contactFactory()::assert()->count(2);
+        static::categoryFactory()::assert()->count(1);
+
+        self::assertCount(2, $category->getContacts());
+        self::assertNotNull($category->getContacts()[0] ?? null);
+        self::assertNotNull($category->getContacts()[1] ?? null);
+    }
+
+    /** @test */
+    #[Test]
+    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[UsingRelationships(Contact::class, ['category'])]
     public function after_instantiate_flushing_using_current_object_in_relationship_one_to_many(): void
     {
         $contact = static::contactFactory()
@@ -655,6 +695,22 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
 
         self::assertNotNull($contact->getCategory());
         self::assertCount(1, $contact->getCategory()->getContacts());
+    }
+
+    /** @test */
+    #[Test]
+    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[UsingRelationships(Contact::class, ['category'])]
+    public function after_instantiate_flushing_using_current_object_in_relationship_one_to_one(): void
+    {
+        $address = static::addressFactory()
+            ->afterInstantiate(
+                static function(Address $a): void {
+                    static::contactFactory()->create(['address' => $a]);
+                }
+            )->create();
+
+        self::assertNotNull($address->getContact());
     }
 
     /** @return PersistentObjectFactory<Contact> */

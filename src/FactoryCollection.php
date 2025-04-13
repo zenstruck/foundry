@@ -14,6 +14,8 @@ namespace Zenstruck\Foundry;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistMode;
 
+use function Zenstruck\Foundry\Persistence\flush_after;
+
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
@@ -26,6 +28,7 @@ use Zenstruck\Foundry\Persistence\PersistMode;
 final class FactoryCollection implements \IteratorAggregate
 {
     private PersistMode $persistMode;
+    private bool $isRootFactory = true;
 
     /**
      * @param TFactory $factory
@@ -45,6 +48,18 @@ final class FactoryCollection implements \IteratorAggregate
     {
         $clone = clone $this;
         $clone->persistMode = $persistMode;
+
+        return $clone;
+    }
+
+    /**
+     * @internal
+     * @return self<T, TFactory>
+     */
+    public function notRootFactory(): static
+    {
+        $clone = clone $this;
+        $clone->isRootFactory = false;
 
         return $clone;
     }
@@ -131,6 +146,12 @@ final class FactoryCollection implements \IteratorAggregate
      */
     public function create(array|callable $attributes = []): array
     {
+        if ($this->isRootFactory && $this->factory instanceof PersistentObjectFactory && $this->factory->isPersisting()) {
+            return flush_after(
+               fn() => \array_map(static fn(Factory $f) => $f->create($attributes), $this->all())
+            );
+        }
+
         return \array_map(static fn(Factory $f) => $f->create($attributes), $this->all());
     }
 
@@ -155,6 +176,10 @@ final class FactoryCollection implements \IteratorAggregate
         return \array_map( // @phpstan-ignore return.type (PHPStan does not understand we have an array of factories)
             function(Factory $f) {
                 if ($f instanceof PersistentObjectFactory) {
+                    if (!$this->isRootFactory) {
+                        $f = $f->notRootFactory();
+                    }
+
                     return $f->withPersistMode($this->persistMode);
                 }
 

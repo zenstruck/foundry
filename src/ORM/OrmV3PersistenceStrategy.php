@@ -14,50 +14,54 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\ORM;
 
 use Doctrine\ORM\Mapping\AssociationMapping;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Mapping\InverseSideMapping;
+use Doctrine\ORM\Mapping\ManyToOneAssociationMapping;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
-use Doctrine\ORM\Mapping\ToManyAssociationMapping;
+use Doctrine\ORM\Mapping\OneToManyAssociationMapping;
+use Doctrine\ORM\Mapping\OneToOneAssociationMapping;
 use Doctrine\Persistence\Mapping\MappingException;
-use Zenstruck\Foundry\Persistence\InverseRelationshipMetadata;
+use Zenstruck\Foundry\Persistence\Relationship\ManyToOneRelationship;
+use Zenstruck\Foundry\Persistence\Relationship\OneToManyRelationship;
+use Zenstruck\Foundry\Persistence\Relationship\OneToOneRelationship;
+use Zenstruck\Foundry\Persistence\Relationship\RelationshipMetadata;
 
 final class OrmV3PersistenceStrategy extends AbstractORMPersistenceStrategy
 {
-    public function inversedRelationshipMetadata(string $parent, string $child, string $field): ?InverseRelationshipMetadata
+    public function bidirectionalRelationshipMetadata(string $parent, string $child, string $field): ?RelationshipMetadata
     {
-        $metadata = $this->classMetadata($child);
+        $associationMapping = $this->getAssociationMapping($parent, $child, $field);
 
-        $inversedAssociation = $this->getAssociationMapping($parent, $child, $field);
-
-        if (null === $inversedAssociation || !$metadata instanceof ClassMetadata) {
+        if (null === $associationMapping) {
             return null;
         }
 
         if (!\is_a(
             $child,
-            $inversedAssociation->targetEntity,
+            $associationMapping->targetEntity,
             allow_string: true
         )) { // is_a() handles inheritance as well
             throw new \LogicException("Cannot find correct association named \"{$field}\" between classes [parent: \"{$parent}\", child: \"{$child}\"]");
         }
 
-        // exclude "owning" side of the association (owning OneToOne or ManyToOne)
-        if (!$inversedAssociation instanceof InverseSideMapping) {
+        $inverseField = $associationMapping->isOwningSide() ? $associationMapping->inversedBy : $associationMapping->mappedBy;
+
+        if (null === $inverseField) {
             return null;
         }
 
-        $association = $metadata->getAssociationMapping($inversedAssociation->mappedBy);
-
-        // only keep *ToOne associations
-        if (!$metadata->isSingleValuedAssociation($association->fieldName)) {
-            return null;
-        }
-
-        return new InverseRelationshipMetadata(
-            inverseField: $association->fieldName,
-            isCollection: $inversedAssociation instanceof ToManyAssociationMapping,
-            collectionIndexedBy: $inversedAssociation->isIndexed() ? $inversedAssociation->indexBy() : null
-        );
+        return match (true) {
+            $associationMapping instanceof OneToManyAssociationMapping => new OneToManyRelationship(
+                inverseField: $inverseField,
+                collectionIndexedBy: $associationMapping->isIndexed() ? $associationMapping->indexBy() : null
+            ),
+            $associationMapping instanceof OneToOneAssociationMapping => new OneToOneRelationship(
+                inverseField: $inverseField,
+                isOwning: $associationMapping->isOwningSide()
+            ),
+            $associationMapping instanceof ManyToOneAssociationMapping => new ManyToOneRelationship(
+                inverseField: $inverseField,
+            ),
+            default => null,
+        };
     }
 
     /**

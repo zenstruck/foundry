@@ -12,6 +12,7 @@
 namespace Zenstruck\Foundry\Persistence;
 
 use Doctrine\Persistence\ObjectRepository;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\VarExporter\Exception\LogicException as VarExportLogicException;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\FoundryNotBooted;
@@ -19,9 +20,15 @@ use Zenstruck\Foundry\Exception\PersistenceDisabled;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\FactoryCollection;
+use Zenstruck\Foundry\Object\Hydrator;
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
+
+use Zenstruck\Foundry\Persistence\Relationship\ManyToOneRelationship;
+use Zenstruck\Foundry\Persistence\Relationship\OneToManyRelationship;
+use Zenstruck\Foundry\Persistence\Relationship\OneToOneRelationship;
+use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 
 use function Zenstruck\Foundry\force;
 use function Zenstruck\Foundry\get;
@@ -44,6 +51,8 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
     /** @var list<callable(T):void> */
     private array $tempAfterInstantiate = [];
+
+    private bool $isRootFactory = true;
 
     /**
      * @phpstan-param mixed|Parameters $criteriaOrId
@@ -207,7 +216,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
         $this->throwIfCannotCreateObject();
 
-        if (PersistMode::PERSIST !== $this->persistMode()) {
+        if (PersistMode::PERSIST !== $this->persistMode() || !$this->isRootFactory) {
             return $object;
         }
 
@@ -280,17 +289,15 @@ abstract class PersistentObjectFactory extends ObjectFactory
         }
 
         if ($value instanceof self) {
-            $value = $value->withPersistMode($this->persist);
-        }
+            $value = $value->withPersistMode($this->persist)->notRootFactory();
 
-        if ($value instanceof self) {
             $pm = Configuration::instance()->persistence();
 
-            $relationshipMetadata = $pm->inverseRelationshipMetadata(static::class(), $value::class(), $field);
+            $relationshipMetadata = $pm->bidirectionalRelationshipMetadata(static::class(), $value::class(), $field);
 
             // handle inverse OneToOne
-            if ($relationshipMetadata && !$relationshipMetadata->isCollection) {
-                $inverseField = $relationshipMetadata->inverseField;
+            if ($relationshipMetadata instanceof OneToOneRelationship && !$relationshipMetadata->isOwning) {
+                $inverseField = $relationshipMetadata->inverseField();
 
                 $value = $value->withPersistMode(
                     $this->isPersisting() ? PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT : PersistMode::WITHOUT_PERSISTING
@@ -336,11 +343,13 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
         $pm = Configuration::instance()->persistence();
 
-        $inverseRelationshipMetadata = $pm->inverseRelationshipMetadata(static::class(), $collection->factory::class(), $field);
+        $inverseRelationshipMetadata = $pm->bidirectionalRelationshipMetadata(static::class(), $collection->factory::class(), $field);
 
-        if ($inverseRelationshipMetadata && $inverseRelationshipMetadata->isCollection) {
+        $collection = $collection->notRootFactory();
+
+        if ($inverseRelationshipMetadata instanceof OneToManyRelationship) {
             $this->tempAfterInstantiate[] = function(object $object) use ($collection, $inverseRelationshipMetadata, $field) {
-                $inverseField = $inverseRelationshipMetadata->inverseField;
+                $inverseField = $inverseRelationshipMetadata->inverseField();
 
                 $inverseObjects = $collection->withPersistMode(
                     $this->isPersisting() ? PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT : PersistMode::WITHOUT_PERSISTING
@@ -372,26 +381,46 @@ abstract class PersistentObjectFactory extends ObjectFactory
      *
      * @internal
      */
-    protected function normalizeObject(object $object): object
+    protected function normalizeObject(string $field, object $object): object
     {
         $configuration = Configuration::instance();
 
-        if (
-            !$this->isPersisting()
-            || !$configuration->isPersistenceAvailable()
-        ) {
+        $object = unproxy($object, withAutoRefresh: false);
+
+        if (!$configuration->isPersistenceAvailable()) {
             return $object;
         }
 
-        $object = unproxy($object, withAutoRefresh: false);
-
         $persistenceManager = $configuration->persistence();
+
         if (!$persistenceManager->hasPersistenceFor($object)) {
+            return $object;
+        }
+
+        $inverseRelationship = $persistenceManager->bidirectionalRelationshipMetadata(static::class(), $object::class, $field);
+
+        if ($inverseRelationship instanceof OneToOneRelationship) {
+            $this->tempAfterInstantiate[] = static function(object $newObject) use ($object, $inverseRelationship) {
+                Hydrator::set($object, $inverseRelationship->inverseField(), $newObject, catchErrors: true);
+            };
+        }
+
+        if ($inverseRelationship instanceof ManyToOneRelationship) {
+            $this->tempAfterInstantiate[] = static function(object $newObject) use ($object, $inverseRelationship) {
+                Hydrator::add($object, $inverseRelationship->inverseField(), $newObject);
+            };
+        }
+
+        if (
+            !$this->isPersisting()
+        ) {
             return $object;
         }
 
         if (!$persistenceManager->isPersisted($object)) {
             $persistenceManager->scheduleForInsert($object);
+
+            return $object;
         }
 
         try {
@@ -427,7 +456,8 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
                     Configuration::instance()->persistence()->scheduleForInsert($object, $afterPersistCallbacks);
                 }
-            );
+            )
+        ;
     }
 
     private function throwIfCannotCreateObject(): void
@@ -459,5 +489,16 @@ abstract class PersistentObjectFactory extends ObjectFactory
         } catch (FoundryNotBooted) {
             return false;
         }
+    }
+
+    /**
+     * @internal
+     */
+    public function notRootFactory(): static
+    {
+        $clone = clone $this;
+        $clone->isRootFactory = false;
+
+        return $clone;
     }
 }
