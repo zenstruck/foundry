@@ -14,31 +14,21 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Persistence\Event;
 
 use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\Object\Event\Event;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  *
- * @template T of object
- * @implements Event<T>
- *
  * @phpstan-import-type Parameters from Factory
  */
-final class AfterPersist implements Event
+final class AfterPersist
 {
     public function __construct(
-        /** @var T */
         public readonly object $object,
         /** @phpstan-var Parameters */
         public readonly array $parameters,
-        /** @var PersistentObjectFactory<T> */
+        /** @var PersistentObjectFactory<object> */
         public readonly PersistentObjectFactory $factory,
     ) {
-    }
-
-    public function objectClassName(): string
-    {
-        return $this->object::class;
     }
 }

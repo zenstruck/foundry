@@ -19,25 +19,17 @@ use Zenstruck\Foundry\ObjectFactory;
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  *
- * @template T of object
- * @implements Event<T>
- *
  * @phpstan-import-type Parameters from Factory
  */
-final class BeforeInstantiate implements Event
+final class BeforeInstantiate
 {
     public function __construct(
         /** @phpstan-var Parameters */
         public array $parameters,
-        /** @var class-string<T> */
+        /** @var class-string */
         public readonly string $objectClass,
-        /** @var ObjectFactory<T> */
+        /** @var ObjectFactory<object> */
         public readonly ObjectFactory $factory,
     ) {
-    }
-
-    public function objectClassName(): string
-    {
-        return $this->objectClass;
     }
 }

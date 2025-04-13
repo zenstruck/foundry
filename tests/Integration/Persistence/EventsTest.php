@@ -11,13 +11,14 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\Tests\Integration;
+namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Events\FactoryWithEventListeners;
+use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 final class EventsTest extends KernelTestCase
 {
@@ -35,14 +36,8 @@ final class EventsTest extends KernelTestCase
             <<<TXT
                 events
                 BeforeInstantiate
-                BeforeInstantiate with Foundry attribute
-                BeforeInstantiate global
                 AfterInstantiate
-                AfterInstantiate with Foundry attribute
-                AfterInstantiate global
                 AfterPersist
-                AfterPersist with Foundry attribute
-                AfterPersist global
                 TXT,
             $address->name
         );
