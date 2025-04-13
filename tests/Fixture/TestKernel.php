@@ -51,7 +51,5 @@ final class TestKernel extends FoundryTestKernel
         $c->register(ArrayFactory::class)->setAutowired(true)->setAutoconfigured(true);
         $c->register(Object1Factory::class)->setAutowired(true)->setAutoconfigured(true);
         $c->register(ServiceStory::class)->setAutowired(true)->setAutoconfigured(true);
-
-        $c->register(FoundryEventListener::class)->setAutowired(true)->setAutoconfigured(true);
     }
 }

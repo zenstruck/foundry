@@ -12,7 +12,6 @@
 namespace Zenstruck\Foundry;
 
 use Faker;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Zenstruck\Foundry\Exception\FactoriesTraitNotUsed;
 use Zenstruck\Foundry\Exception\FoundryNotBooted;
 use Zenstruck\Foundry\Exception\PersistenceDisabled;
@@ -54,7 +53,6 @@ final class Configuration
         callable $instantiator,
         public readonly StoryRegistry $stories,
         private readonly ?PersistenceManager $persistence = null,
-        private readonly ?EventDispatcherInterface $eventDispatcher = null,
         ?int $forcedFakerSeed = null,
     ) {
         $this->faker->seed(self::fakerSeed($forcedFakerSeed));
@@ -95,16 +93,6 @@ final class Configuration
         if (!$this->isPersistenceEnabled()) {
             throw new PersistenceDisabled('Cannot get repository when persist is disabled (if in a unit test, you probably should not try to get the repository).');
         }
-    }
-
-    public function hasEventDispatcher(): bool
-    {
-        return (bool) $this->eventDispatcher;
-    }
-
-    public function eventDispatcher(): EventDispatcherInterface
-    {
-        return $this->eventDispatcher ?? throw new \RuntimeException('No event dispatcher configured.');
     }
 
     public function inADataProvider(): bool
