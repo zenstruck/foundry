@@ -1315,56 +1315,6 @@ You can even create associative arrays, with the nice DX provided by Foundry:
     // will create ['prop1' => 'foo', 'prop2' => 'default value 2']
     $array = SomeArrayFactory::createOne(['prop1' => 'foo']);
 
-Validate your objects
-~~~~~~~~~~~~~~~~~~~~~
-
-Foundry can validate your objects automatically after they are instantiated. This can be useful to
-ensure that your objects are in a valid state before they are used in your tests.
-
-.. versionadded::  2.4
-
-    Validation of the objects was added in Foundry 2.4.
-
-You can either enable validation globally:
-
-.. configuration-block::
-
-    .. code-block:: yaml
-
-        # config/packages/zenstruck_foundry.yaml
-        when@dev: # see Bundle Configuration section about sharing this in the test environment
-            zenstruck_foundry:
-                instantiator:
-                    validate: true
-
-Or enable/disable it in a specific test with methods ``withValidation()`` / ``withoutValidation()``:
-
-::
-
-      class MyKernelTest extends KernelTestCase
-      {
-          use Factories;
-
-          public function some_test(): void
-          {
-              PostFactory::new()
-
-                // enable validation
-                ->withValidation()
-
-                // enable validation, and specify a validation group
-                ->withValidation('post:create')
-
-                // or, if the validation is already enabled in the config, just call `withValidationGroups()`
-                ->withValidationGroups(groups: 'post:create')
-              ;
-          }
-      }
-
-.. warning::
-
-    Validation is only available in tests using the kernel, such as ``KernelTestCase`` or ``WebTestCase``.
-
 Using with DoctrineFixturesBundle
 ---------------------------------
 
@@ -2529,9 +2479,6 @@ Full Default Bundle Configuration
 
             # Customize the instantiator service.
             service:              null # Example: my_instantiator
-
-            # Automatically validate the objects created
-            validation: false
         orm:
             reset:
 

@@ -11,7 +11,6 @@
 
 namespace Zenstruck\Foundry;
 
-use Symfony\Component\Validator\Constraints\GroupSequence;
 use Zenstruck\Foundry\Object\Event\AfterInstantiate;
 use Zenstruck\Foundry\Object\Event\BeforeInstantiate;
 use Zenstruck\Foundry\Object\Instantiator;
@@ -38,11 +37,6 @@ abstract class ObjectFactory extends Factory
 
     /** @phpstan-var array<class-string, object> */
     private array $reusedObjects = [];
-
-    private bool $validationEnabled = false;
-
-    /** @var string|GroupSequence|list<string>|null */
-    private string|GroupSequence|array|null $validationGroups = [];
 
     /**
      * @return class-string<T>
@@ -112,76 +106,6 @@ abstract class ObjectFactory extends Factory
         $clone->afterInstantiate[] = $callback;
 
         return $clone;
-    }
-
-    /**
-     * @param string|GroupSequence|list<string>|null $groups
-     *
-     * @psalm-return static<T>
-     * @phpstan-return static
-     */
-    public function withValidation(string|GroupSequence|array|null $groups = null): static
-    {
-        if (!Configuration::instance()->validationAvailable) {
-            throw new \LogicException('Validation is not available. Make sure the "symfony/validator" package is installed and validation enabled.');
-        }
-
-        $clone = clone $this;
-        $clone->validationEnabled = true;
-
-        if (null !== $groups) {
-            $clone->validationGroups = $groups;
-        }
-
-        return $clone;
-    }
-
-    /**
-     * @psalm-return static<T>
-     * @phpstan-return static
-     */
-    public function withoutValidation(): static
-    {
-        $clone = clone $this;
-        $clone->validationEnabled = false;
-
-        return $clone;
-    }
-
-    /**
-     * @param string|GroupSequence|list<string>|null $groups
-     *
-     * @psalm-return static<T>
-     * @phpstan-return static
-     */
-    public function withValidationGroups(string|GroupSequence|array|null $groups): static
-    {
-        if (!Configuration::instance()->validationAvailable) {
-            throw new \LogicException('Validation is not available. Make sure the "symfony/validator" package is installed and validation enabled.');
-        }
-
-        $clone = clone $this;
-        $clone->validationGroups = $groups;
-
-        return $clone;
-    }
-
-    /**
-     * @internal
-     */
-    public function validationEnabled(): bool
-    {
-        return $this->validationEnabled;
-    }
-
-    /**
-     * @return string|GroupSequence|list<string>|null
-     *
-     * @internal
-     */
-    public function getValidationGroups(): string|GroupSequence|array|null
-    {
-        return $this->validationGroups;
     }
 
     /**
@@ -257,8 +181,6 @@ abstract class ObjectFactory extends Factory
      */
     protected function initializeInternal(): static
     {
-        $this->validationEnabled = Configuration::isBooted() && Configuration::instance()->validationEnabled;
-
         if (!Configuration::isBooted() || !Configuration::instance()->hasEventDispatcher()) {
             return $this;
         }

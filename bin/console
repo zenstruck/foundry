@@ -12,5 +12,7 @@ foreach ($argv ?? [] as $i => $arg) {
         break;
     }
 }
+
 $application = new Application(new TestKernel($_ENV['APP_ENV'], true));
+
 $application->run();
