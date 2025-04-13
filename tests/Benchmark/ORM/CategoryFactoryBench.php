@@ -3,15 +3,15 @@
 namespace Zenstruck\Foundry\Tests\Benchmark\ORM;
 
 use Zenstruck\Foundry\Tests\Benchmark\Persistence\PersistentFactoryBench;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\StandardCategoryFactory;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\StandardContactFactory;
 
 class CategoryFactoryBench extends PersistentFactoryBench
 {
-    protected static function factory(): CategoryFactory
+    protected static function factory(): StandardCategoryFactory
     {
-        return CategoryFactory::new([
-            'contacts' => ContactFactory::new()->many(5),
-        ]);
+        return StandardCategoryFactory::new([
+            'contacts' => StandardContactFactory::new()->noRandom()->many(5),
+        ])->noRandom();
     }
 }

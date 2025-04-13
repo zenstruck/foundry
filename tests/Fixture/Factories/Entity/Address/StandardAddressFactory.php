@@ -26,6 +26,13 @@ final class StandardAddressFactory extends PersistentObjectFactory
         return StandardAddress::class;
     }
 
+    public function noRandom(): static
+    {
+        return $this->with([
+            'city' => 'some city',
+        ]);
+    }
+
     protected function defaults(): array|callable
     {
         return [

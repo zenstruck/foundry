@@ -26,6 +26,13 @@ final class StandardCategoryFactory extends PersistentObjectFactory
         return StandardCategory::class;
     }
 
+    public function noRandom(): static
+    {
+        return $this->with([
+            'name' => 'some name',
+        ]);
+    }
+
     protected function defaults(): array|callable
     {
         return [

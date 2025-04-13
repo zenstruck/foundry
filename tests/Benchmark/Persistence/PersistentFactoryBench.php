@@ -13,15 +13,16 @@ use Zenstruck\Foundry\Tests\Benchmark\KernelBench;
 #[BeforeClassMethods(['_resetDatabaseBeforeFirstBench'])]
 #[BeforeMethods(['_bootFoundry', '_resetDatabaseBeforeEachBench'])]
 #[Warmup(1)]
-#[Revs(10)]
 abstract class PersistentFactoryBench extends KernelBench
 {
+    #[Revs(100)]
     public function bench_create(): void
     {
         static::factory()->create();
     }
 
     #[ParamProviders('_param_bench_many')]
+    #[Revs(10)]
     public function bench_create_many(array $params): void
     {
         static::factory()->many($params['count'])->create();
@@ -32,7 +33,7 @@ abstract class PersistentFactoryBench extends KernelBench
         return [
             '1' => ['count' => 1],
             '10' => ['count' => 10],
-            '50' => ['count' => 50]
+//            '50' => ['count' => 50]
         ];
     }
 
