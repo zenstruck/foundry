@@ -15,11 +15,6 @@ use Zenstruck\Foundry\Tests\Benchmark\KernelBench;
 #[Warmup(1)]
 abstract class PersistentFactoryBench extends KernelBench
 {
-    #[Revs(100)]
-    public function bench_create(): void
-    {
-        static::factory()->create();
-    }
 
     #[ParamProviders('_param_bench_many')]
     #[Revs(10)]
