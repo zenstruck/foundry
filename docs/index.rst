@@ -201,7 +201,7 @@ This command will generate a ``PostFactory`` class that looks like this:
             # config/packages/zenstruck_foundry.yaml
             zenstruck_foundry:
                 make_factory:
-                    default_namespace: 'App\\MyFactories'
+                    default_namespace: 'App\MyFactories'
 
     You can override this configuration by using the ``--namespace`` option.
 
