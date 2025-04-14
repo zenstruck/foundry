@@ -18,6 +18,7 @@ use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
 use Zenstruck\Foundry\Tests\Fixture\Factories\ArrayFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\ServiceStory;
+use Zenstruck\Foundry\Tests\Fixture\Events\FoundryEventListener;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -50,5 +51,7 @@ final class TestKernel extends FoundryTestKernel
         $c->register(ArrayFactory::class)->setAutowired(true)->setAutoconfigured(true);
         $c->register(Object1Factory::class)->setAutowired(true)->setAutoconfigured(true);
         $c->register(ServiceStory::class)->setAutowired(true)->setAutoconfigured(true);
+
+        $c->register(FoundryEventListener::class)->setAutowired(true)->setAutoconfigured(true);
     }
 }
