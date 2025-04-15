@@ -76,16 +76,7 @@ final class PersistenceManager
         $om->persist($object);
         $this->flush($om);
 
-        if ($this->afterPersistCallbacks) {
-            $afterPersistCallbacks = $this->afterPersistCallbacks;
-            $this->afterPersistCallbacks = [];
-
-            foreach ($afterPersistCallbacks as $afterPersistCallback) {
-                $afterPersistCallback();
-            }
-
-            $this->save($object);
-        }
+        $this->callPostPersistCallbacks();
 
         return $object;
     }
@@ -127,11 +118,9 @@ final class PersistenceManager
 
         $this->flush = true;
 
-        foreach ($this->strategies as $strategy) {
-            foreach ($strategy->objectManagers() as $om) {
-                $this->flush($om);
-            }
-        }
+        $this->flushAllStrategies();
+
+        $this->callPostPersistCallbacks();
 
         return $result;
     }
@@ -348,6 +337,31 @@ final class PersistenceManager
 
             return 1 === \count($strategies) && $strategies[0] instanceof AbstractORMPersistenceStrategy;
         })();
+    }
+
+    private function flushAllStrategies(): void
+    {
+        foreach ($this->strategies as $strategy) {
+            foreach ($strategy->objectManagers() as $om) {
+                $this->flush($om);
+            }
+        }
+    }
+
+    private function callPostPersistCallbacks(): void
+    {
+        if (!$this->flush || [] === $this->afterPersistCallbacks) {
+            return;
+        }
+
+        $afterPersistCallbacks = $this->afterPersistCallbacks;
+        $this->afterPersistCallbacks = [];
+
+        foreach ($afterPersistCallbacks as $afterPersistCallback) {
+            $afterPersistCallback();
+        }
+
+        $this->flushAllStrategies();
     }
 
     /**
