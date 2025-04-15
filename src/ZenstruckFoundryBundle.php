@@ -348,6 +348,8 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
      */
     private function configureFaker(array $config, ContainerBuilder $container): void
     {
+        $container->setParameter('zenstruck_foundry.faker.seed', $config['seed']);
+
         if ($config['service']) {
             $container->setAlias('.zenstruck_foundry.faker', $config['service']);
 
@@ -359,7 +361,5 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
         if ($config['locale']) {
             $definition->addArgument($config['locale']);
         }
-
-        $container->setParameter('zenstruck_foundry.faker.seed', $config['seed']);
     }
 }
