@@ -121,10 +121,19 @@ final class Hydrator
     {
         $inverseValue = self::get($object, $property);
 
-        if (is_array($inverseValue) || $inverseValue instanceof \ArrayAccess) {
-            $inverseValue[] = $value;
-            self::set($object, $property, $inverseValue, catchErrors: true);
+        $shouldAdd = match (true) {
+            $inverseValue instanceof Collection => !$inverseValue->contains($value),
+            is_array($inverseValue) => !in_array($value, $inverseValue, true),
+            $inverseValue instanceof \Traversable => !in_array($value, iterator_to_array($inverseValue), true),
+            default => false,
+        };
+
+        if (!$shouldAdd) {
+            return;
         }
+
+        $inverseValue[] = $value;
+        self::set($object, $property, $inverseValue, catchErrors: true);
     }
 
     public static function get(object $object, string $property): mixed

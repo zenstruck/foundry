@@ -76,7 +76,11 @@ final class PersistenceManager
         $om->persist($object);
         $this->flush($om);
 
-        $this->callPostPersistCallbacks();
+        $callbacksCalled = $this->callPostPersistCallbacks();
+
+        if ($callbacksCalled) {
+            $this->flush($om);
+        }
 
         return $object;
     }
@@ -120,7 +124,11 @@ final class PersistenceManager
 
         $this->flushAllStrategies();
 
-        $this->callPostPersistCallbacks();
+        $callbacksCalled = $this->callPostPersistCallbacks();
+
+        if ($callbacksCalled) {
+            $this->flushAllStrategies();
+        }
 
         return $result;
     }
@@ -348,10 +356,13 @@ final class PersistenceManager
         }
     }
 
-    private function callPostPersistCallbacks(): void
+    /**
+     * @return bool whether or not some callbacks were called
+     */
+    private function callPostPersistCallbacks(): bool
     {
         if (!$this->flush || [] === $this->afterPersistCallbacks) {
-            return;
+            return false;
         }
 
         $afterPersistCallbacks = $this->afterPersistCallbacks;
@@ -361,7 +372,7 @@ final class PersistenceManager
             $afterPersistCallback();
         }
 
-        $this->flushAllStrategies();
+        return true;
     }
 
     /**
