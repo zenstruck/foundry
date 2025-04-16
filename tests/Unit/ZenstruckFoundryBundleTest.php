@@ -20,20 +20,110 @@ use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Config\Definition\Loader\DefinitionFileLoader;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
 use Zenstruck\Foundry\ZenstruckFoundryBundle;
 
 final class ZenstruckFoundryBundleTest extends TestCase
 {
-    private function buildConfiguration(array $config = []): array
+    private ZenstruckFoundryBundle $bundle;
+    private ContainerBuilder $container;
+    private ContainerConfigurator $configurator;
+
+    protected function setUp(): void
     {
-        $treeBuilder = new TreeBuilder('zenstruck_foundry');
-        $definitionLoader = new DefinitionFileLoader($treeBuilder, new FileLocator());
-        $configurator = new DefinitionConfigurator($treeBuilder, $definitionLoader, __DIR__,'');
+        $this->container = new ContainerBuilder(new ParameterBag([
+            'kernel.bundles'         => [],
+            'kernel.cache_dir'       => sys_get_temp_dir(),
+            'kernel.root_dir'        => sys_get_temp_dir(),
+            'kernel.project_dir'     => sys_get_temp_dir(),
+            'kernel.environment'     => 'test',
+            'kernel.name'            => 'kernel',
+            'kernel.debug'           => true,
+            'kernel.container_class' => Container::class,
+        ]));
 
-        (new ZenstruckFoundryBundle())->configure($configurator);
+        $this->bundle = new ZenstruckFoundryBundle();
 
-        return (new Processor())->process($treeBuilder->buildTree(), $config);
+        $instancof = [];
+        $fileLoader = new PhpFileLoader($this->container, new FileLocator(__DIR__));
+
+        $this->configurator = new ContainerConfigurator($this->container, $fileLoader, $instancof, __DIR__, '');
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function faker_seed_default_value(): void
+    {
+        $config = self::buildConfiguration();
+
+        $this->bundle->loadExtension($config,  $this->configurator, $this->container);
+
+        self::assertTrue($this->container->hasParameter('zenstruck_foundry.faker.seed'));
+        self::assertNull($this->container->getParameter('zenstruck_foundry.faker.seed'));
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function faker_seed_value_overridden(): void
+    {
+        $config = self::buildConfiguration([['faker' => ['seed' => $expected = 1234]]]);
+
+        $this->bundle->loadExtension($config,  $this->configurator, $this->container);
+
+        self::assertTrue($this->container->hasParameter('zenstruck_foundry.faker.seed'));
+        self::assertSame($expected, $this->container->getParameter('zenstruck_foundry.faker.seed'));
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function container_has_default_faker_service_definition(): void
+    {
+        $this->bundle->loadExtension(self::buildConfiguration(),  $this->configurator, $this->container);
+
+        self::assertTrue($this->container->hasDefinition('.zenstruck_foundry.faker'));
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function container_has_default_faker_service_definition_with_locale(): void
+    {
+        $config = self::buildConfiguration([['faker' => ['locale' => $expected = 'en_US']]]);
+
+        $this->bundle->loadExtension($config,  $this->configurator, $this->container);
+
+        self::assertTrue($this->container->hasDefinition('.zenstruck_foundry.faker'));
+
+        $definition = $this->container->getDefinition('.zenstruck_foundry.faker');
+        self::assertSame($expected, $definition->getArgument(0));
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function container_has_aliased_as_default_faker_service_when_custom_service_was_configured(): void
+    {
+        $config = self::buildConfiguration([['faker' => ['service' => $expected = self::class]]]);
+        $this->container->setDefinition($expected, new Definition($expected));
+
+        $this->bundle->loadExtension($config,  $this->configurator, $this->container);
+
+        self::assertTrue($this->container->hasAlias('.zenstruck_foundry.faker'));
+        self::assertSame($expected, $this->container->get('.zenstruck_foundry.faker')::class);
     }
 
     /**
@@ -80,6 +170,17 @@ final class ZenstruckFoundryBundleTest extends TestCase
             'make_story' => [
                 'default_namespace' => 'Story',
             ]
-        ], $this->buildConfiguration());
+        ], self::buildConfiguration());
+    }
+
+    private static function buildConfiguration(array $config = []): array
+    {
+        $treeBuilder = new TreeBuilder('zenstruck_foundry');
+        $definitionLoader = new DefinitionFileLoader($treeBuilder, new FileLocator());
+        $configurator = new DefinitionConfigurator($treeBuilder, $definitionLoader, __DIR__,'');
+
+        (new ZenstruckFoundryBundle())->configure($configurator);
+
+        return (new Processor())->process($treeBuilder->buildTree(), $config);
     }
 }
