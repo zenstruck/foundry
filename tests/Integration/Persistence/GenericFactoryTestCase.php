@@ -599,6 +599,43 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     }
 
     /**
+     * @test
+     */
+    #[Test]
+    public function it_actually_calls_post_persist_hook_after_persist_when_in_flush_after(): void
+    {
+        $object = flush_after(
+            function() {
+                return static::factory()->afterPersist(
+                    static function(GenericModel $o) {
+                        $o->setProp1((string) $o->id);
+                    }
+                )->create();
+            }
+        );
+
+        self::assertSame((string) $object->id, $object->getProp1());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function it_actually_calls_post_persist_hook_after_persist_when_in_create_many(): void
+    {
+        $objects = static::factory()->afterPersist(
+            static function(GenericModel $o) {
+                $o->setProp1((string) $o->id);
+            }
+        )->many(2)->create();
+
+        self::assertCount(2, $objects);
+        foreach ($objects as $object) {
+            self::assertSame((string) $object->id, $object->getProp1());
+        }
+    }
+
+    /**
      * @return class-string<GenericModel>
      */
     protected function modelClass(): string

@@ -97,7 +97,7 @@ final class Hydrator
         return $clone;
     }
 
-    public static function set(object $object, string $property, mixed $value): void
+    public static function set(object $object, string $property, mixed $value, bool $catchErrors = false): void
     {
         $value = ForceValue::unwrap($value);
 
@@ -108,7 +108,32 @@ final class Hydrator
             $value = new ArrayCollection($value);
         }
 
-        self::accessibleProperty($object, $property)->setValue($object, $value);
+        try {
+            self::accessibleProperty($object, $property)->setValue($object, $value);
+        } catch (\Throwable $e) {
+            if (!$catchErrors) {
+                throw $e;
+            }
+        }
+    }
+
+    public static function add(object $object, string $property, mixed $value): void
+    {
+        $inverseValue = self::get($object, $property);
+
+        $shouldAdd = match (true) {
+            $inverseValue instanceof Collection => !$inverseValue->contains($value),
+            is_array($inverseValue) => !in_array($value, $inverseValue, true),
+            $inverseValue instanceof \Traversable => !in_array($value, iterator_to_array($inverseValue), true),
+            default => false,
+        };
+
+        if (!$shouldAdd) {
+            return;
+        }
+
+        $inverseValue[] = $value;
+        self::set($object, $property, $inverseValue, catchErrors: true);
     }
 
     public static function get(object $object, string $property): mixed

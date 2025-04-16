@@ -19,6 +19,7 @@ use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\ORM\AbstractORMPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\NoPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
+use Zenstruck\Foundry\Persistence\Relationship\RelationshipMetadata;
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 
 /**
@@ -75,15 +76,10 @@ final class PersistenceManager
         $om->persist($object);
         $this->flush($om);
 
-        if ($this->afterPersistCallbacks) {
-            $afterPersistCallbacks = $this->afterPersistCallbacks;
-            $this->afterPersistCallbacks = [];
+        $callbacksCalled = $this->callPostPersistCallbacks();
 
-            foreach ($afterPersistCallbacks as $afterPersistCallback) {
-                $afterPersistCallback();
-            }
-
-            $this->save($object);
+        if ($callbacksCalled) {
+            $this->flush($om);
         }
 
         return $object;
@@ -126,10 +122,12 @@ final class PersistenceManager
 
         $this->flush = true;
 
-        foreach ($this->strategies as $strategy) {
-            foreach ($strategy->objectManagers() as $om) {
-                $this->flush($om);
-            }
+        $this->flushAllStrategies();
+
+        $callbacksCalled = $this->callPostPersistCallbacks();
+
+        if ($callbacksCalled) {
+            $this->flushAllStrategies();
         }
 
         return $result;
@@ -257,12 +255,12 @@ final class PersistenceManager
      * @param class-string $parent
      * @param class-string $child
      */
-    public function inverseRelationshipMetadata(string $parent, string $child, string $field): ?InverseRelationshipMetadata
+    public function bidirectionalRelationshipMetadata(string $parent, string $child, string $field): ?RelationshipMetadata
     {
         $parent = unproxy($parent);
         $child = unproxy($child);
 
-        return $this->strategyFor($parent)->inversedRelationshipMetadata($parent, $child, $field);
+        return $this->strategyFor($parent)->bidirectionalRelationshipMetadata($parent, $child, $field);
     }
 
     /**
@@ -347,6 +345,34 @@ final class PersistenceManager
 
             return 1 === \count($strategies) && $strategies[0] instanceof AbstractORMPersistenceStrategy;
         })();
+    }
+
+    private function flushAllStrategies(): void
+    {
+        foreach ($this->strategies as $strategy) {
+            foreach ($strategy->objectManagers() as $om) {
+                $this->flush($om);
+            }
+        }
+    }
+
+    /**
+     * @return bool whether or not some callbacks were called
+     */
+    private function callPostPersistCallbacks(): bool
+    {
+        if (!$this->flush || [] === $this->afterPersistCallbacks) {
+            return false;
+        }
+
+        $afterPersistCallbacks = $this->afterPersistCallbacks;
+        $this->afterPersistCallbacks = [];
+
+        foreach ($afterPersistCallbacks as $afterPersistCallback) {
+            $afterPersistCallback();
+        }
+
+        return true;
     }
 
     /**
