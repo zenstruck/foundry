@@ -12,7 +12,6 @@
 namespace Zenstruck\Foundry\Persistence;
 
 use Doctrine\Persistence\ObjectRepository;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\VarExporter\Exception\LogicException as VarExportLogicException;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\FoundryNotBooted;
@@ -24,11 +23,9 @@ use Zenstruck\Foundry\Object\Hydrator;
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
-
 use Zenstruck\Foundry\Persistence\Relationship\ManyToOneRelationship;
 use Zenstruck\Foundry\Persistence\Relationship\OneToManyRelationship;
 use Zenstruck\Foundry\Persistence\Relationship\OneToOneRelationship;
-use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 
 use function Zenstruck\Foundry\force;
 use function Zenstruck\Foundry\get;
@@ -282,6 +279,17 @@ abstract class PersistentObjectFactory extends ObjectFactory
         return $this->persistMode()->isPersisting();
     }
 
+    /**
+     * @internal
+     */
+    public function notRootFactory(): static
+    {
+        $clone = clone $this;
+        $clone->isRootFactory = false;
+
+        return $clone;
+    }
+
     protected function normalizeParameter(string $field, mixed $value): mixed
     {
         if (!Configuration::instance()->isPersistenceAvailable()) {
@@ -489,16 +497,5 @@ abstract class PersistentObjectFactory extends ObjectFactory
         } catch (FoundryNotBooted) {
             return false;
         }
-    }
-
-    /**
-     * @internal
-     */
-    public function notRootFactory(): static
-    {
-        $clone = clone $this;
-        $clone->isRootFactory = false;
-
-        return $clone;
     }
 }
