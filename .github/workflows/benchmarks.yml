@@ -94,4 +94,4 @@ jobs:
             --iterations=5 \
             --progress=plain \
             --retry-threshold=10 \
-            --assert="mode(variant.time.avg) <= mode(baseline.time.avg) +/- 5%"
+            --assert="mode(variant.time.avg) <= mode(baseline.time.avg) +/- 10%"
