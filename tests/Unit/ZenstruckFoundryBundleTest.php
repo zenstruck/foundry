@@ -105,6 +105,7 @@ final class ZenstruckFoundryBundleTest extends TestCase
 
         $this->bundle->loadExtension($config,  $this->configurator, $this->container);
 
+        self::assertTrue($this->container->hasParameter('zenstruck_foundry.faker.seed'));
         self::assertTrue($this->container->hasDefinition('.zenstruck_foundry.faker'));
 
         $definition = $this->container->getDefinition('.zenstruck_foundry.faker');
@@ -124,6 +125,7 @@ final class ZenstruckFoundryBundleTest extends TestCase
 
         self::assertTrue($this->container->hasAlias('.zenstruck_foundry.faker'));
         self::assertSame($expected, $this->container->get('.zenstruck_foundry.faker')::class);
+        self::assertTrue($this->container->hasParameter('zenstruck_foundry.faker.seed'));
     }
 
     /**
