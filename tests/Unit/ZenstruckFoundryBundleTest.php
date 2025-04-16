@@ -50,10 +50,10 @@ final class ZenstruckFoundryBundleTest extends TestCase
 
         $this->bundle = new ZenstruckFoundryBundle();
 
-        $instancof = [];
+        $instanceof = [];
         $fileLoader = new PhpFileLoader($this->container, new FileLocator(__DIR__));
 
-        $this->configurator = new ContainerConfigurator($this->container, $fileLoader, $instancof, __DIR__, '');
+        $this->configurator = new ContainerConfigurator($this->container, $fileLoader, $instanceof, __DIR__, '');
     }
 
     /**
