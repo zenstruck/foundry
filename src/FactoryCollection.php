@@ -148,7 +148,7 @@ final class FactoryCollection implements \IteratorAggregate
     {
         if ($this->isRootFactory && $this->factory instanceof PersistentObjectFactory && $this->factory->isPersisting()) {
             return flush_after(
-               fn() => \array_map(static fn(Factory $f) => $f->create($attributes), $this->all())
+                fn() => \array_map(static fn(Factory $f) => $f->create($attributes), $this->all())
             );
         }
 

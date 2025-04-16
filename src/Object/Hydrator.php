@@ -123,8 +123,8 @@ final class Hydrator
 
         $shouldAdd = match (true) {
             $inverseValue instanceof Collection => !$inverseValue->contains($value),
-            is_array($inverseValue) => !in_array($value, $inverseValue, true),
-            $inverseValue instanceof \Traversable => !in_array($value, iterator_to_array($inverseValue), true),
+            \is_array($inverseValue) => !\in_array($value, $inverseValue, true),
+            $inverseValue instanceof \Traversable => !\in_array($value, \iterator_to_array($inverseValue), true),
             default => false,
         };
 
