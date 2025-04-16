@@ -26,6 +26,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
 use Zenstruck\Foundry\ZenstruckFoundryBundle;
 
@@ -99,7 +100,7 @@ final class ZenstruckFoundryBundleTest extends TestCase
      * @test
      */
     #[Test]
-    public function container_has_default_faker_service_definition_with_locale(): void
+    public function default_faker_service_can_receive_a_locale_via_configuration(): void
     {
         $config = self::buildConfiguration([['faker' => ['locale' => $expected = 'en_US']]]);
 
@@ -116,7 +117,7 @@ final class ZenstruckFoundryBundleTest extends TestCase
      * @test
      */
     #[Test]
-    public function container_has_aliased_as_default_faker_service_when_custom_service_was_configured(): void
+    public function faker_service_can_be_overridden_with_configuration(): void
     {
         $config = self::buildConfiguration([['faker' => ['service' => $expected = self::class]]]);
         $this->container->setDefinition($expected, new Definition($expected));
@@ -126,6 +127,82 @@ final class ZenstruckFoundryBundleTest extends TestCase
         self::assertTrue($this->container->hasAlias('.zenstruck_foundry.faker'));
         self::assertSame($expected, $this->container->get('.zenstruck_foundry.faker')::class);
         self::assertTrue($this->container->hasParameter('zenstruck_foundry.faker.seed'));
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function container_has_default_instanciator(): void
+    {
+        $this->bundle->loadExtension(self::buildConfiguration(),  $this->configurator, $this->container);
+
+        self::assertTrue($this->container->hasDefinition('.zenstruck_foundry.instantiator'));
+        self::assertSame([Instantiator::class, 'withConstructor'], $this->container->getDefinition('.zenstruck_foundry.instantiator')->getFactory());
+        self::assertEmpty($this->container->getDefinition('.zenstruck_foundry.instantiator')->getMethodCalls());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function service_can_be_overridden_with_configuration(): void
+    {
+        $config = self::buildConfiguration([['instantiator' => ['service' => $expected = self::class]]]);
+        $this->container->setDefinition($expected, new Definition($expected));
+
+        $this->bundle->loadExtension($config,  $this->configurator, $this->container);
+
+        self::assertTrue($this->container->hasAlias('.zenstruck_foundry.instantiator'));
+        self::assertSame($expected, $this->container->get('.zenstruck_foundry.instantiator')::class);
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function create_instantiator_without_constructor_configuration(): void
+    {
+        $config = self::buildConfiguration([['instantiator' => ['use_constructor' => false]]]);
+
+        $this->bundle->loadExtension($config,  $this->configurator, $this->container);
+
+        self::assertTrue($this->container->hasDefinition('.zenstruck_foundry.instantiator'));
+
+        self::assertSame([Instantiator::class, 'withoutConstructor'], $this->container->getDefinition('.zenstruck_foundry.instantiator')->getFactory());
+        self::assertSame([], $this->container->getDefinition('.zenstruck_foundry.instantiator')->getMethodCalls());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function create_instantiator_without_constructor_and_with_extra_configuration(): void
+    {
+        $config = self::buildConfiguration([['instantiator' => ['use_constructor' => false, 'allow_extra_attributes' => true]]]);
+
+        $this->bundle->loadExtension($config,  $this->configurator, $this->container);
+
+        self::assertTrue($this->container->hasDefinition('.zenstruck_foundry.instantiator'));
+
+        self::assertSame([Instantiator::class, 'withoutConstructor'], $this->container->getDefinition('.zenstruck_foundry.instantiator')->getFactory());
+        self::assertSame([['allowExtra', [], true]], $this->container->getDefinition('.zenstruck_foundry.instantiator')->getMethodCalls());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function create_instantiator_without_constructor_and_with_extra_and_with_forced_properties_configuration(): void
+    {
+        $config = self::buildConfiguration([['instantiator' => ['use_constructor' => false, 'allow_extra_attributes' => true, 'always_force_properties' => true]]]);
+
+        $this->bundle->loadExtension($config,  $this->configurator, $this->container);
+
+        self::assertTrue($this->container->hasDefinition('.zenstruck_foundry.instantiator'));
+
+        self::assertSame([Instantiator::class, 'withoutConstructor'], $this->container->getDefinition('.zenstruck_foundry.instantiator')->getFactory());
+        self::assertSame([['allowExtra', [], true], ['alwaysForce', [], true]], $this->container->getDefinition('.zenstruck_foundry.instantiator')->getMethodCalls());
     }
 
     /**
