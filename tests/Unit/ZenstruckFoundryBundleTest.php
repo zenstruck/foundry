@@ -28,11 +28,15 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
+use Zenstruck\Foundry\Tests\Fixture\ExtendedGenerator;
 use Zenstruck\Foundry\ZenstruckFoundryBundle;
 
+/**
+ * @author Silas Joisten <silasjoisten@proton.me>
+ */
 final class ZenstruckFoundryBundleTest extends TestCase
 {
-    
+
     private ZenstruckFoundryBundle $bundle;
     private ContainerBuilder $container;
     private ContainerConfigurator $configurator;
@@ -120,7 +124,7 @@ final class ZenstruckFoundryBundleTest extends TestCase
     #[Test]
     public function faker_service_can_be_overridden_with_configuration(): void
     {
-        $config = self::buildConfiguration([['faker' => ['service' => $expected = self::class]]]);
+        $config = self::buildConfiguration([['faker' => ['service' => $expected = ExtendedGenerator::class]]]);
         $this->container->setDefinition($expected, new Definition($expected));
 
         $this->bundle->loadExtension($config,  $this->configurator, $this->container);
@@ -149,7 +153,7 @@ final class ZenstruckFoundryBundleTest extends TestCase
     #[Test]
     public function service_can_be_overridden_with_configuration(): void
     {
-        $config = self::buildConfiguration([['instantiator' => ['service' => $expected = self::class]]]);
+        $config = self::buildConfiguration([['instantiator' => ['service' => $expected = ExtendedGenerator::class]]]);
         $this->container->setDefinition($expected, new Definition($expected));
 
         $this->bundle->loadExtension($config,  $this->configurator, $this->container);
