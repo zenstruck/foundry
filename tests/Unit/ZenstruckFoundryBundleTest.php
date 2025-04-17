@@ -32,6 +32,7 @@ use Zenstruck\Foundry\ZenstruckFoundryBundle;
 
 final class ZenstruckFoundryBundleTest extends TestCase
 {
+    
     private ZenstruckFoundryBundle $bundle;
     private ContainerBuilder $container;
     private ContainerConfigurator $configurator;
