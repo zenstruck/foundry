@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Config\Definition\Loader\DefinitionFileLoader;
@@ -36,6 +38,7 @@ use Zenstruck\Foundry\ZenstruckFoundryBundle;
  */
 final class ZenstruckFoundryBundleTest extends TestCase
 {
+    use ExpectDeprecationTrait;
 
     private ZenstruckFoundryBundle $bundle;
     private ContainerBuilder $container;
@@ -78,10 +81,15 @@ final class ZenstruckFoundryBundleTest extends TestCase
 
     /**
      * @test
+     *
+     * @group legacy
      */
     #[Test]
+    #[Group('legacy')]
     public function faker_seed_value_overridden(): void
     {
+        self::expectDeprecation('Since zenstruck/foundry 2.4: The "faker.seed" configuration is deprecated and will be removed in 3.0. Use environment variable "FOUNDRY_FAKER_SEED" instead.');
+
         $config = self::buildConfiguration([['faker' => ['seed' => $expected = 1234]]]);
 
         $this->bundle->loadExtension($config,  $this->configurator, $this->container);
