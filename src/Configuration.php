@@ -55,7 +55,9 @@ final class Configuration
         private readonly ?PersistenceManager $persistence = null,
         ?int $forcedFakerSeed = null,
     ) {
-        $this->faker->seed(self::fakerSeed($forcedFakerSeed));
+        if (null === self::$instance) {
+            $this->faker->seed(self::fakerSeed($forcedFakerSeed));
+        }
 
         $this->instantiator = $instantiator;
     }
