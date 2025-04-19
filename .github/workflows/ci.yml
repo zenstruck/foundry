@@ -178,6 +178,43 @@ jobs:
           ./phpunit --testsuite reset-database --bootstrap tests/bootstrap-reset-database.php
         shell: bash
 
+  test-no-framework:
+    name: No framework - PHP${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ 8.1, 8.2, 8.3, 8.4 ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: flex
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v2
+        with:
+          composer-options: --prefer-dist
+
+      - name: Remove
+        run: |
+          composer remove --dev \
+            dama/doctrine-test-bundle \
+            doctrine/doctrine-bundle \
+            doctrine/doctrine-migrations-bundle \
+            doctrine/mongodb-odm-bundle \
+            symfony/maker-bundle \
+            symfony/framework-bundle
+
+      - name: Test
+        run: |
+          vendor/bin/phpunit tests/Unit
+
   test-with-paratest:
     name: Test with paratest
     runs-on: ubuntu-latest
