@@ -18,4 +18,8 @@ use Faker\Generator;
  */
 final class ExtendedGenerator extends Generator
 {
+    public function customMethod(): string
+    {
+        return 'custom';
+    }
 }
