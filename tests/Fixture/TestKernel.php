@@ -47,6 +47,11 @@ final class TestKernel extends FoundryTestKernel
             ],
         ]);
 
+        // prevent a deprecation notice in Symfony 6.4
+        if (str_starts_with(self::VERSION, '6.4')) {
+            $c->loadFromExtension('framework', ['handle_all_throwables' => true]);
+        }
+
         $c->register(ArrayFactory::class)->setAutowired(true)->setAutoconfigured(true);
         $c->register(Object1Factory::class)->setAutowired(true)->setAutoconfigured(true);
         $c->register(ServiceStory::class)->setAutowired(true)->setAutoconfigured(true);

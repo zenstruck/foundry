@@ -6,6 +6,7 @@
          colors="true"
          failOnRisky="true"
          failOnWarning="true"
+         failOnDeprecation="true"
          cacheDirectory=".phpunit.cache"
          defaultTestSuite="main">
     <php>
@@ -23,7 +24,7 @@
             <directory>tests/Integration/ResetDatabase</directory>
         </testsuite>
     </testsuites>
-    <source ignoreSuppressionOfDeprecations="true">
+    <source ignoreSuppressionOfDeprecations="true" baseline="phpunit-deprecation-baseline.xml">
         <include>
             <directory>src</directory>
         </include>
