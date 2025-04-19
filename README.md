@@ -49,14 +49,10 @@ $ docker compose up --detach
 $ composer update
 
 # run main testsuite (with "schema" reset database strategy)
-$ composer test-schema
-# or
 $ ./phpunit
 
 # run "migrate" testsuite (with "migrate" reset database strategy)
-$ composer test-migrate
-# or
-$ ./phpunit --testsuite reset-database --bootstrap tests/bootstrap-reset-database.php
+$ ./phpunit --testsuite reset-database
 ```
 
 ### Overriding the default configuration
@@ -102,6 +98,32 @@ services:
 # .env.local
 DATABASE_URL="mysql://root:1234@127.0.0.1:3308/foundry_test?serverVersion=5.7.42"
 ```
+
+### Run the tests locally faster
+
+As long as you don't want to test Mongo, you can use the following `.env.local` file to run the tests faster locally:
+
+```dotenv
+# dama/doctrine-test-bundle makes Foundry testsuite really faster
+USE_DAMA_DOCTRINE_TEST_BUNDLE="1"
+
+# using both ODM and ORM makes the "reset db" mechanism slower
+MONGO_URL=""
+
+# Use the last version of PHPUnit
+PHPUNIT_VERSION="12"
+
+# Enable all features of Foundry
+USE_FOUNDRY_PHPUNIT_EXTENSION="1"
+```
+
+"maker" tests are also quite slow, so you can skip them with using the following command:
+
+```bash
+$ ./phpunit --exclude-group=maker
+```
+
+Enjoy blazing fast tests! :rocket:
 
 ### Running the documentation linter locally
 

@@ -12,6 +12,14 @@
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Filesystem\Filesystem;
 
+$command = \implode(' ', $_SERVER['argv']);
+
+if (\str_contains($command, '--testsuite reset-database')) {
+    require __DIR__.'/bootstrap-reset-database.php';
+
+    return;
+}
+
 require \dirname(__DIR__).'/vendor/autoload.php';
 
 $fs = new Filesystem();

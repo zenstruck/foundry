@@ -87,17 +87,7 @@
         }
     },
     "scripts": {
-        "test": [
-            "@test-main",
-            "@test-reset-database"
-        ],
-        "test-main": "./phpunit --testsuite main",
-        "test-reset-database": "./phpunit --testsuite reset-database --bootstrap tests/bootstrap-reset-database.php",
         "post-install-cmd": ["@composer bin phpstan install", "@composer bin phpbench install"]
-    },
-    "scripts-descriptions": {
-        "test-main": "Main test suite",
-        "test-reset-database": "Test reset database test suite"
     },
     "minimum-stability": "dev",
     "prefer-stable": true
