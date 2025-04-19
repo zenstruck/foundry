@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Unit;
 
-use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
@@ -44,13 +44,13 @@ final class ZenstruckFoundryBundleTest extends TestCase
     protected function setUp(): void
     {
         $this->container = new ContainerBuilder(new ParameterBag([
-            'kernel.bundles'         => [],
-            'kernel.cache_dir'       => sys_get_temp_dir(),
-            'kernel.root_dir'        => sys_get_temp_dir(),
-            'kernel.project_dir'     => sys_get_temp_dir(),
-            'kernel.environment'     => 'test',
-            'kernel.name'            => 'kernel',
-            'kernel.debug'           => true,
+            'kernel.bundles' => [],
+            'kernel.cache_dir' => \sys_get_temp_dir(),
+            'kernel.root_dir' => \sys_get_temp_dir(),
+            'kernel.project_dir' => \sys_get_temp_dir(),
+            'kernel.environment' => 'test',
+            'kernel.name' => 'kernel',
+            'kernel.debug' => true,
             'kernel.container_class' => Container::class,
         ]));
 
@@ -70,7 +70,7 @@ final class ZenstruckFoundryBundleTest extends TestCase
     {
         $config = self::buildConfiguration();
 
-        $this->bundle->loadExtension($config,  $this->configurator, $this->container);
+        $this->bundle->loadExtension($config, $this->configurator, $this->container);
 
         self::assertTrue($this->container->hasParameter('zenstruck_foundry.faker.seed'));
         self::assertNull($this->container->getParameter('zenstruck_foundry.faker.seed'));
@@ -87,7 +87,7 @@ final class ZenstruckFoundryBundleTest extends TestCase
     {
         $config = self::buildConfiguration([['faker' => ['seed' => $expected = 1234]]]);
 
-        $this->bundle->loadExtension($config,  $this->configurator, $this->container);
+        $this->bundle->loadExtension($config, $this->configurator, $this->container);
 
         self::assertTrue($this->container->hasParameter('zenstruck_foundry.faker.seed'));
         self::assertSame($expected, $this->container->getParameter('zenstruck_foundry.faker.seed'));
@@ -99,7 +99,7 @@ final class ZenstruckFoundryBundleTest extends TestCase
     #[Test]
     public function container_has_default_faker_service_definition(): void
     {
-        $this->bundle->loadExtension(self::buildConfiguration(),  $this->configurator, $this->container);
+        $this->bundle->loadExtension(self::buildConfiguration(), $this->configurator, $this->container);
 
         self::assertTrue($this->container->hasDefinition('.zenstruck_foundry.faker'));
     }
@@ -112,7 +112,7 @@ final class ZenstruckFoundryBundleTest extends TestCase
     {
         $config = self::buildConfiguration([['faker' => ['locale' => $expected = 'en_US']]]);
 
-        $this->bundle->loadExtension($config,  $this->configurator, $this->container);
+        $this->bundle->loadExtension($config, $this->configurator, $this->container);
 
         self::assertTrue($this->container->hasParameter('zenstruck_foundry.faker.seed'));
         self::assertTrue($this->container->hasDefinition('.zenstruck_foundry.faker'));
@@ -130,7 +130,7 @@ final class ZenstruckFoundryBundleTest extends TestCase
         $config = self::buildConfiguration([['faker' => ['service' => $expected = ExtendedGenerator::class]]]);
         $this->container->setDefinition($expected, new Definition($expected));
 
-        $this->bundle->loadExtension($config,  $this->configurator, $this->container);
+        $this->bundle->loadExtension($config, $this->configurator, $this->container);
 
         self::assertTrue($this->container->hasAlias('.zenstruck_foundry.faker'));
         self::assertSame($expected, $this->container->get('.zenstruck_foundry.faker')::class);
@@ -143,7 +143,7 @@ final class ZenstruckFoundryBundleTest extends TestCase
     #[Test]
     public function container_has_default_instanciator(): void
     {
-        $this->bundle->loadExtension(self::buildConfiguration(),  $this->configurator, $this->container);
+        $this->bundle->loadExtension(self::buildConfiguration(), $this->configurator, $this->container);
 
         self::assertTrue($this->container->hasDefinition('.zenstruck_foundry.instantiator'));
         self::assertSame([Instantiator::class, 'withConstructor'], $this->container->getDefinition('.zenstruck_foundry.instantiator')->getFactory());
@@ -159,7 +159,7 @@ final class ZenstruckFoundryBundleTest extends TestCase
         $config = self::buildConfiguration([['instantiator' => ['service' => $expected = ExtendedGenerator::class]]]);
         $this->container->setDefinition($expected, new Definition($expected));
 
-        $this->bundle->loadExtension($config,  $this->configurator, $this->container);
+        $this->bundle->loadExtension($config, $this->configurator, $this->container);
 
         self::assertTrue($this->container->hasAlias('.zenstruck_foundry.instantiator'));
         self::assertSame($expected, $this->container->get('.zenstruck_foundry.instantiator')::class);
@@ -173,7 +173,7 @@ final class ZenstruckFoundryBundleTest extends TestCase
     {
         $config = self::buildConfiguration([['instantiator' => ['use_constructor' => false]]]);
 
-        $this->bundle->loadExtension($config,  $this->configurator, $this->container);
+        $this->bundle->loadExtension($config, $this->configurator, $this->container);
 
         self::assertTrue($this->container->hasDefinition('.zenstruck_foundry.instantiator'));
 
@@ -189,7 +189,7 @@ final class ZenstruckFoundryBundleTest extends TestCase
     {
         $config = self::buildConfiguration([['instantiator' => ['use_constructor' => false, 'allow_extra_attributes' => true]]]);
 
-        $this->bundle->loadExtension($config,  $this->configurator, $this->container);
+        $this->bundle->loadExtension($config, $this->configurator, $this->container);
 
         self::assertTrue($this->container->hasDefinition('.zenstruck_foundry.instantiator'));
 
@@ -205,7 +205,7 @@ final class ZenstruckFoundryBundleTest extends TestCase
     {
         $config = self::buildConfiguration([['instantiator' => ['use_constructor' => false, 'allow_extra_attributes' => true, 'always_force_properties' => true]]]);
 
-        $this->bundle->loadExtension($config,  $this->configurator, $this->container);
+        $this->bundle->loadExtension($config, $this->configurator, $this->container);
 
         self::assertTrue($this->container->hasDefinition('.zenstruck_foundry.instantiator'));
 
@@ -241,7 +241,7 @@ final class ZenstruckFoundryBundleTest extends TestCase
                     'mode' => ResetDatabaseMode::SCHEMA,
                     'migrations' => [
                         'configurations' => [],
-                    ]
+                    ],
                 ],
             ],
             'mongo' => [
@@ -256,7 +256,7 @@ final class ZenstruckFoundryBundleTest extends TestCase
             ],
             'make_story' => [
                 'default_namespace' => 'Story',
-            ]
+            ],
         ], self::buildConfiguration());
     }
 
@@ -264,7 +264,7 @@ final class ZenstruckFoundryBundleTest extends TestCase
     {
         $treeBuilder = new TreeBuilder('zenstruck_foundry');
         $definitionLoader = new DefinitionFileLoader($treeBuilder, new FileLocator());
-        $configurator = new DefinitionConfigurator($treeBuilder, $definitionLoader, __DIR__,'');
+        $configurator = new DefinitionConfigurator($treeBuilder, $definitionLoader, __DIR__, '');
 
         (new ZenstruckFoundryBundle())->configure($configurator);
 
