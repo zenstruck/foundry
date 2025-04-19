@@ -16,6 +16,7 @@ namespace Zenstruck\Foundry\Tests\Unit;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Config\Definition\Loader\DefinitionFileLoader;
@@ -43,6 +44,10 @@ final class ZenstruckFoundryBundleTest extends TestCase
 
     protected function setUp(): void
     {
+        if (!\class_exists(FrameworkBundle::class)) {
+            self::markTestSkipped('symfony/framework-bundle needed.');
+        }
+
         $this->container = new ContainerBuilder(new ParameterBag([
             'kernel.bundles' => [],
             'kernel.cache_dir' => \sys_get_temp_dir(),
