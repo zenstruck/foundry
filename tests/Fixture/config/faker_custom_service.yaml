@@ -1,0 +1,6 @@
+zenstruck_foundry:
+    faker:
+        service: 'Zenstruck\Foundry\Tests\Fixture\ExtendedGenerator'
+
+services:
+    Zenstruck\Foundry\Tests\Fixture\ExtendedGenerator: ~
