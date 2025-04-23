@@ -53,6 +53,7 @@ final class Configuration
         callable $instantiator,
         public readonly StoryRegistry $stories,
         private readonly ?PersistenceManager $persistence = null,
+        public readonly bool $flushOnce = false,
         ?int $forcedFakerSeed = null,
     ) {
         $this->faker->seed(self::fakerSeed($forcedFakerSeed));

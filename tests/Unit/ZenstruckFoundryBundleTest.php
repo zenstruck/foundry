@@ -238,6 +238,7 @@ final class ZenstruckFoundryBundleTest extends TestCase
                 'service' => null,
             ],
             'global_state' => [],
+            'persistence' => ['flush_once' => false],
             'orm' => [
                 'auto_persist' => true,
                 'reset' => [

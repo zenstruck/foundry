@@ -94,6 +94,15 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                     ->info('Stories or invokable services to be loaded before each test.')
                     ->scalarPrototype()->end()
                 ->end()
+                ->arrayNode('persistence')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->booleanNode('flush_once')
+                            ->info('Flush only once per call of `PersistentObjectFactory::create()` in userland.')
+                            ->defaultFalse()
+                        ->end()
+                    ->end()
+                ->end()
                 ->arrayNode('orm')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -278,6 +287,12 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                 ->replaceArgument(0, $config['mongo']['reset']['document_managers'])
             ;
         }
+
+        if ($config['persistence']['flush_once'] === false) {
+            trigger_deprecation('zenstruck/foundry', '2.5', 'Not setting "zenstruck_foundry.persistence.flush_once" to true is deprecated.');
+        }
+
+        $container->setParameter('zenstruck_foundry.persistence.flush_once', $config['persistence']['flush_once']);
     }
 
     public function build(ContainerBuilder $container): void

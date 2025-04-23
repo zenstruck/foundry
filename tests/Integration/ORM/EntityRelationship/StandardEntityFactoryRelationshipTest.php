@@ -24,7 +24,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Tag\TagFactory;
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
 #[RequiresPhpunit('>=11.4')]
-final class StandardEntityFactoryRelationshipTest extends EntityFactoryRelationshipTestCase
+class StandardEntityFactoryRelationshipTest extends EntityFactoryRelationshipTestCase
 {
     protected static function contactFactory(): ContactFactory
     {

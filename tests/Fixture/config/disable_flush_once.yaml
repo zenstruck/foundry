@@ -1,0 +1,3 @@
+zenstruck_foundry:
+    persistence:
+        flush_once: false

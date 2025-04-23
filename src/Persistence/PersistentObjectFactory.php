@@ -213,11 +213,15 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
         $this->throwIfCannotCreateObject();
 
-        if (PersistMode::PERSIST !== $this->persistMode() || !$this->isRootFactory) {
+        if (PersistMode::PERSIST !== $this->persistMode()) {
             return $object;
         }
 
         $configuration = Configuration::instance();
+
+        if ($configuration->flushOnce && !$this->isRootFactory) {
+            return $object;
+        }
 
         if (!$configuration->isPersistenceAvailable()) {
             throw new \LogicException('Persistence cannot be used in unit tests.');
