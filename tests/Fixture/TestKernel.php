@@ -37,17 +37,18 @@ final class TestKernel extends FoundryTestKernel
     {
         parent::configureContainer($c, $loader);
 
-        if ('dev' !== $this->getEnvironment()) {
-            $loader->load(\sprintf('%s/config/%s.yaml', __DIR__, $this->getEnvironment()));
-        }
-
         $c->loadFromExtension('zenstruck_foundry', [
+            'persistence' => ['flush_once' => true],
             'orm' => [
                 'reset' => [
                     'mode' => ResetDatabaseMode::SCHEMA,
                 ],
             ],
         ]);
+
+        if ('dev' !== $this->getEnvironment()) {
+            $loader->load(\sprintf('%s/config/%s.yaml', __DIR__, $this->getEnvironment()));
+        }
 
         $c->register(ArrayFactory::class)->setAutowired(true)->setAutoconfigured(true);
         $c->register(Object1Factory::class)->setAutowired(true)->setAutoconfigured(true);
