@@ -112,7 +112,7 @@ trait IsProxy // @phpstan-ignore trait.unused
 
     public function _repository(): ProxyRepositoryDecorator
     {
-        return new ProxyRepositoryDecorator(parent::class);
+        return new ProxyRepositoryDecorator(parent::class, Configuration::instance()->isInMemoryEnabled());
     }
 
     public function _assertPersisted(string $message = '{entity} is not persisted.'): static

@@ -37,7 +37,7 @@ final class FoundryExtension implements Runner\Extension\Extension
         $subscribers = [
             new BuildStoryOnTestPrepared(),
             new EnableInMemoryBeforeTest(),
-            new DisplayFakerSeedOnTestSuiteFinished()
+            new DisplayFakerSeedOnTestSuiteFinished(),
         ];
 
         if (ConstraintRequirement::from('>=11.4')->isSatisfiedBy(Runner\Version::id())) {
