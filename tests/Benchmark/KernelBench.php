@@ -146,9 +146,8 @@ abstract class KernelBench
         static::$class ??= static::getKernelClass();
 
         $env = $options['environment'] ?? $_ENV['APP_ENV'] ?? $_SERVER['APP_ENV'] ?? 'test';
-        $debug = $options['debug'] ?? $_ENV['APP_DEBUG'] ?? $_SERVER['APP_DEBUG'] ?? true;
 
-        return new static::$class($env, $debug);
+        return new static::$class($env, debug: false);
     }
 
     /**

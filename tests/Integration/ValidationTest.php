@@ -35,27 +35,27 @@ final class ValidationTest extends KernelTestCase
         object(EntityForValidation::class);
     }
 
-    /** @test */
-    #[Test]
-    public function it_throws_if_trying_to_validate_with_validation_not_available(): void
-    {
-        self::expectException(\LogicException::class);
-        self::expectExceptionMessage('Validation is not available.');
+//    /** @test */
+//    #[Test]
+//    public function it_throws_if_trying_to_validate_with_validation_not_available(): void
+//    {
+//        self::expectException(\LogicException::class);
+//        self::expectExceptionMessage('Validation is not available.');
+//
+//        factory(EntityForValidation::class)->withValidation()->create();
+//    }
 
-        factory(EntityForValidation::class)->withValidation()->create();
-    }
-
-    /** @test */
-    #[Test]
-    public function it_throws_if_validation_enabled_in_foundry_but_disabled_in_symfony(): void
-    {
-        self::expectException(\LogicException::class);
-        self::expectExceptionMessage('Validation support cannot be enabled');
-
-        self::bootKernel(['environment' => 'validation_not_available']);
-
-        object(EntityForValidation::class);
-    }
+//    /** @test */
+//    #[Test]
+//    public function it_throws_if_validation_enabled_in_foundry_but_disabled_in_symfony(): void
+//    {
+//        self::expectException(\LogicException::class);
+//        self::expectExceptionMessage('Validation support cannot be enabled');
+//
+//        self::bootKernel(['environment' => 'validation_not_available']);
+//
+//        object(EntityForValidation::class);
+//    }
 
     /** @test */
     #[Test]

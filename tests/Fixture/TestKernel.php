@@ -15,6 +15,7 @@ use Symfony\Bundle\MakerBundle\MakerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
+use Zenstruck\Foundry\Tests\Fixture\Events\FoundryEventListener;
 use Zenstruck\Foundry\Tests\Fixture\Factories\ArrayFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 use Zenstruck\Foundry\Tests\Fixture\InMemory\InMemoryAddressRepository;
