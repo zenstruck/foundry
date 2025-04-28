@@ -16,6 +16,8 @@ use Zenstruck\Foundry\Exception\FactoriesTraitNotUsed;
 use Zenstruck\Foundry\Exception\FoundryNotBooted;
 use Zenstruck\Foundry\Exception\PersistenceDisabled;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
+use Zenstruck\Foundry\InMemory\CannotEnableInMemory;
+use Zenstruck\Foundry\InMemory\InMemoryRepositoryRegistry;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
 
 /**
@@ -44,16 +46,19 @@ final class Configuration
 
     private static ?int $fakerSeed = null;
 
+    private bool $inMemory = false;
+
     /**
      * @phpstan-param InstantiatorCallable $instantiator
      */
     public function __construct(
-        public readonly FactoryRegistry $factories,
+        public readonly FactoryRegistryInterface $factories,
         public readonly Faker\Generator $faker,
         callable $instantiator,
         public readonly StoryRegistry $stories,
         private readonly ?PersistenceManager $persistence = null,
         ?int $forcedFakerSeed = null,
+        public readonly ?InMemoryRepositoryRegistry $inMemoryRepositoryRegistry = null,
     ) {
         if (null === self::$instance) {
             $this->faker->seed(self::fakerSeed($forcedFakerSeed));
@@ -135,5 +140,22 @@ final class Configuration
     {
         StoryRegistry::reset();
         self::$instance = null;
+    }
+
+    /**
+     * @throws CannotEnableInMemory
+     */
+    public function enableInMemory(): void
+    {
+        if (null === $this->inMemoryRepositoryRegistry) {
+            throw CannotEnableInMemory::noInMemoryRepositoryRegistry();
+        }
+
+        $this->inMemory = true;
+    }
+
+    public function isInMemoryEnabled(): bool
+    {
+        return $this->inMemory;
     }
 }

@@ -34,7 +34,11 @@ final class FoundryExtension implements Runner\Extension\Extension
             Configuration::shutdown();
         }
 
-        $subscribers = [new BuildStoryOnTestPrepared(), new DisplayFakerSeedOnTestSuiteFinished()];
+        $subscribers = [
+            new BuildStoryOnTestPrepared(),
+            new EnableInMemoryBeforeTest(),
+            new DisplayFakerSeedOnTestSuiteFinished()
+        ];
 
         if (ConstraintRequirement::from('>=11.4')->isSatisfiedBy(Runner\Version::id())) {
             // those deal with data provider events which can be useful only if PHPUnit >=11.4 is used
