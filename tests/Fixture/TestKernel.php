@@ -54,5 +54,7 @@ final class TestKernel extends FoundryTestKernel
         $c->register(ServiceStory::class)->setAutowired(true)->setAutoconfigured(true);
         $c->register(InMemoryAddressRepository::class)->setAutowired(true)->setAutoconfigured(true);
         $c->register(InMemoryContactRepository::class)->setAutowired(true)->setAutoconfigured(true);
+
+        $c->register(FoundryEventListener::class)->setAutowired(true)->setAutoconfigured(true);
     }
 }

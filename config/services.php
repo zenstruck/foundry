@@ -5,7 +5,9 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Faker;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\FactoryRegistry;
+use Zenstruck\Foundry\Object\Event\AfterInstantiate;
 use Zenstruck\Foundry\Object\Instantiator;
+use Zenstruck\Foundry\Object\ValidationListener;
 use Zenstruck\Foundry\StoryRegistry;
 
 return static function (ContainerConfigurator $container): void {
@@ -32,9 +34,16 @@ return static function (ContainerConfigurator $container): void {
             service('.zenstruck_foundry.instantiator'),
             service('.zenstruck_foundry.story_registry'),
             service('.zenstruck_foundry.persistence_manager')->nullOnInvalid(),
+            service('event_dispatcher'),
             '%env(default:zenstruck_foundry.faker.seed:int:FOUNDRY_FAKER_SEED)%',
+            param('.zenstruck_foundry.validation_enabled'),
+            abstract_arg('validation_available'),
             service('.zenstruck_foundry.in_memory.repository_registry'),
         ])
         ->public()
+
+        ->set('.zenstruck_foundry.validation_listener', ValidationListener::class)
+        ->args([service('validator')])
+        ->tag('kernel.event_listener', ['event' => AfterInstantiate::class, 'method' => '__invoke'])
     ;
 };
