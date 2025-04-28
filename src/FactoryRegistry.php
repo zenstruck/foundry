@@ -11,12 +11,14 @@
 
 namespace Zenstruck\Foundry;
 
+use Zenstruck\Foundry\Exception\CannotCreateFactory;
+
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @internal
  */
-final class FactoryRegistry
+final class FactoryRegistry implements FactoryRegistryInterface
 {
     /**
      * @param Factory<mixed>[] $factories
@@ -25,14 +27,7 @@ final class FactoryRegistry
     {
     }
 
-    /**
-     * @template T of Factory
-     *
-     * @param class-string<T> $class
-     *
-     * @return T|null
-     */
-    public function get(string $class): ?Factory
+    public function get(string $class): Factory
     {
         foreach ($this->factories as $factory) {
             if ($class === $factory::class) {
@@ -40,6 +35,10 @@ final class FactoryRegistry
             }
         }
 
-        return null;
+        try {
+            return new $class();
+        } catch (\ArgumentCountError $e) {
+            throw CannotCreateFactory::argumentCountError($e);
+        }
     }
 }

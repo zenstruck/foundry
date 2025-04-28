@@ -17,6 +17,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
+use Zenstruck\Foundry\InMemory\DependencyInjection\InMemoryCompilerPass;
+use Zenstruck\Foundry\InMemory\InMemoryRepository;
 use Zenstruck\Foundry\Mongo\MongoResetter;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\ORM\ResetDatabase\MigrateDatabaseResetter;
@@ -278,6 +280,10 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                 ->replaceArgument(0, $config['mongo']['reset']['document_managers'])
             ;
         }
+
+        $configurator->import('../config/in_memory.php');
+
+        $container->registerForAutoconfiguration(InMemoryRepository::class)->addTag('foundry.in_memory.repository');
     }
 
     public function build(ContainerBuilder $container): void
@@ -285,6 +291,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
         parent::build($container);
 
         $container->addCompilerPass($this);
+        $container->addCompilerPass(new InMemoryCompilerPass());
     }
 
     public function process(ContainerBuilder $container): void
