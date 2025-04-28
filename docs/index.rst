@@ -2104,6 +2104,71 @@ You will need to configure manually Foundry. Unfortunately, this may mean duplic
 
 .. _stories:
 
+In-memory Behavior
+~~~~~~~~~~~~~~~~~~
+
+Foundry allows to use "in-memory" repositories in your factories. This is mainly useful for `DDD <https://en.wikipedia.org/wiki/Domain-driven_design>`_
+applications or with `hexagonal architecture <https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)>`, where
+repositories in the domain are usually interfaces for which main implementations are a Doctrine one. You can tell Foundry to
+use the "in-memory" version of these repositories.
+
+First, you need to create an "in-memory" version of your repository. This repository must implement the
+``Zenstruck\Foundry\InMemory\InMemoryRepository`` interface. You can use the trait
+``Zenstruck\Foundry\InMemory\InMemoryRepositoryTrait`` to help you with this:
+
+::
+
+    use App\Domain\Address\DomainAddressRepositoryInterface;
+    use Zenstruck\Foundry\InMemory\InMemoryRepository;
+    use Zenstruck\Foundry\InMemory\InMemoryRepositoryTrait;
+
+    /**
+     * @implements InMemoryRepository<Address>
+     */
+    final class InMemoryAddressRepository implements InMemoryRepository, DomainAddressRepositoryInterface
+    {
+        /** @use InMemoryRepositoryTrait<Address> */
+        use InMemoryRepositoryTrait;
+
+        public static function _class(): string
+        {
+            return Address::class;
+        }
+
+        // + all methods implementing "DomainAddressRepository"
+    }
+
+Then, the "in-memory" repository should be used in Symfony's container, as the main repository implementation. For this
+purpose, you can either use a new environment ``test-in-memory``, or declare use ``InMeMemoryKernel``.
+
+In your tests, use the ``#[AsInMemoryTest]`` attribute, which will disable persistence of the factories, and register an
+"after instantiate" hook, which will store the objects in their respective "in memory" repositories:
+
+::
+
+    use Zenstruck\Foundry\InMemory\AsInMemoryTest;
+
+    #[AsInMemoryTest]
+    class SomeTest extends KernelTestCase
+    {
+        private InMemoryAddressRepository $addressRepository;
+
+        protected function setUp(): void
+        {
+            $this->addressRepository = self::getContainer()->get(InMemoryAddressRepository::class);
+        }
+
+        #[Test]
+        public function object_should_be_accessible_from_in_memory_repository(): void
+        {
+            $address = AddressFactory::createOne();
+
+            self::assertSame([$address], $this->addressRepository->_all());
+        }
+    }
+
+A ``GenericInMemoryRepository`` class is also added for convenience, when the given "in-memory" repository is missing.
+
 Stories
 -------
 

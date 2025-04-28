@@ -271,7 +271,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
      */
     public function persistMode(): PersistMode
     {
-        return $this->isPersistenceEnabled() ? $this->persist : PersistMode::WITHOUT_PERSISTING;
+        return $this->isPersistenceEnabled()  && !$this->isInMemoryEnabled() ? $this->persist : PersistMode::WITHOUT_PERSISTING;
     }
 
     final public function isPersisting(): bool
@@ -494,6 +494,15 @@ abstract class PersistentObjectFactory extends ObjectFactory
     {
         try {
             return Configuration::instance()->isPersistenceEnabled();
+        } catch (FoundryNotBooted) {
+            return false;
+        }
+    }
+
+    private function isInMemoryEnabled(): bool
+    {
+        try {
+            return Configuration::instance()->isInMemoryEnabled();
         } catch (FoundryNotBooted) {
             return false;
         }
