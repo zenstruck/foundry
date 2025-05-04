@@ -294,7 +294,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
 
         $container->registerForAutoconfiguration(InMemoryRepository::class)->addTag('foundry.in_memory.repository');
 
-        if ($config['persistence']['flush_once'] === false) {
+        if (false === $config['persistence']['flush_once']) {
             trigger_deprecation('zenstruck/foundry', '2.5', 'Not setting "zenstruck_foundry.persistence.flush_once" to true is deprecated. This option will be forced to true in 3.0');
         }
 
