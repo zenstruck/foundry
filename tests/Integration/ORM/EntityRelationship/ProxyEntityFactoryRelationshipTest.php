@@ -17,6 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\Proxy as DoctrineProxy;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use Zenstruck\Assert;
@@ -33,6 +34,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Tag\ProxyTagFactory;
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
 #[RequiresPhpunit('>=11.4')]
+#[IgnoreDeprecations]
 final class ProxyEntityFactoryRelationshipTest extends EntityFactoryRelationshipTestCase
 {
     /** @test */

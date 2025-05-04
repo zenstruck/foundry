@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithReadonly\EntityWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericProxyEntityFactory;
@@ -21,7 +22,9 @@ use function Zenstruck\Foundry\Persistence\proxy_factory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ * @group legacy
  */
+#[IgnoreDeprecations]
 final class GenericEntityProxyFactoryTest extends GenericProxyFactoryTestCase
 {
     use RequiresORM;

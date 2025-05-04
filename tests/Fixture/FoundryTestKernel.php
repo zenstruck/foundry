@@ -72,12 +72,25 @@ abstract class FoundryTestKernel extends Kernel
 
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
     {
-        $c->loadFromExtension('framework', [
+        $frameworkConfiguration = [
             'http_method_override' => false,
             'secret' => 'S3CRET',
             'router' => ['utf8' => true],
             'test' => true,
-        ]);
+            'uid' => ['default_uuid_version' => 7, 'time_based_uuid_version' => 7],
+        ];
+
+        if (\str_starts_with(self::VERSION, '6.4')) {
+            // prevent a deprecation notice in Symfony 6.4
+            $frameworkConfiguration['handle_all_throwables'] = true;
+        }
+
+        if (\str_starts_with(self::VERSION, '7.3')) {
+            // prevent a deprecation notice in Symfony 7.3
+            $frameworkConfiguration['property_info']['with_constructor_extractor'] = true;
+        }
+
+        $c->loadFromExtension('framework', $frameworkConfiguration);
 
         if (self::hasORM()) {
             $c->loadFromExtension('doctrine', [

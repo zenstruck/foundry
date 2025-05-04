@@ -13,10 +13,15 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericProxyEntityFactory;
 use Zenstruck\Foundry\Tests\Integration\Persistence\GenericRepositoryDecoratorTestCase;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
+/**
+ * @group legacy
+ */
+#[IgnoreDeprecations]
 final class ProxyGenericEntityRepositoryDecoratorTest extends GenericRepositoryDecoratorTestCase
 {
     use RequiresORM;
