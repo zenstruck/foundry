@@ -32,6 +32,7 @@ return static function (ContainerConfigurator $container): void {
             service('.zenstruck_foundry.instantiator'),
             service('.zenstruck_foundry.story_registry'),
             service('.zenstruck_foundry.persistence_manager')->nullOnInvalid(),
+            param('zenstruck_foundry.persistence.flush_once'),
             '%env(default:zenstruck_foundry.faker.seed:int:FOUNDRY_FAKER_SEED)%',
             service('.zenstruck_foundry.in_memory.repository_registry'),
         ])

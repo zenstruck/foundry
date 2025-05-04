@@ -43,7 +43,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: 2.x
+          ref: 2.5.x
           fetch-depth: 1
 
       - name: Install dependencies

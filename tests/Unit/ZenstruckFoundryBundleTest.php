@@ -35,7 +35,9 @@ use Zenstruck\Foundry\ZenstruckFoundryBundle;
 
 /**
  * @author Silas Joisten <silasjoisten@proton.me>
+ * @group legacy
  */
+#[IgnoreDeprecations] // default configuration uses flush_once: false, which is deprecated
 final class ZenstruckFoundryBundleTest extends TestCase
 {
     private ZenstruckFoundryBundle $bundle;
@@ -238,6 +240,7 @@ final class ZenstruckFoundryBundleTest extends TestCase
                 'service' => null,
             ],
             'global_state' => [],
+            'persistence' => ['flush_once' => false],
             'orm' => [
                 'auto_persist' => true,
                 'reset' => [
