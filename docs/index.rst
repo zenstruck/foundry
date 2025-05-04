@@ -1174,6 +1174,27 @@ The ``flush_after()`` function forwards the callback’s return, in case you nee
         TagFactory::createOne(),
     ]);
 
+Flush once
+~~~~~~~~~~
+
+Foundry used to call ``ObjectManager::flush()`` for every entity (or ODM document) created. This could have a performance
+downside. Since 2.5, Foundry is able to only call ``flush()`` once per call of ``PersistentObjectFactory::create()`` in
+userland. "Flush once" can change some behaviors in a subtle way, so it can be enabled by configuration. Not enabling it
+is deprecated, but you can migrate at your own pace.
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        zenstruck_foundry:
+            persistence:
+                flush_once: true
+
+.. versionadded::  2.5
+
+    Flush once capability was introduced in Foundry 2.5.
+
+
 Not-persisted objects factory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
