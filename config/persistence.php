@@ -2,7 +2,9 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
+use Zenstruck\Foundry\Persistence\Proxy\KernelTerminateListener;
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 
 return static function (ContainerConfigurator $container): void {
@@ -18,4 +20,10 @@ return static function (ContainerConfigurator $container): void {
                 tagged_iterator('.foundry.persistence.schema_resetter'),
             ])
     ;
+
+    if (PHP_VERSION_ID >= 80400) {
+        $container->services()->set('.foundry.proxy.kernel_terminate_listener', KernelTerminateListener::class)
+            ->tag('kernel.event_listener', ['event' => TerminateEvent::class, 'method' => '__invoke'])
+        ;
+    }
 };
