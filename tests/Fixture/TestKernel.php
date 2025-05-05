@@ -14,7 +14,11 @@ namespace Zenstruck\Foundry\Tests\Fixture;
 use Symfony\Bundle\MakerBundle\MakerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
+use Zenstruck\Foundry\Tests\Fixture\App\Command\UpdateGenericModelCommand;
+use Zenstruck\Foundry\Tests\Fixture\App\Controller\DeleteGenericModel;
+use Zenstruck\Foundry\Tests\Fixture\App\Controller\UpdateGenericModel;
 use Zenstruck\Foundry\Tests\Fixture\Factories\ArrayFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 use Zenstruck\Foundry\Tests\Fixture\InMemory\InMemoryAddressRepository;
@@ -55,5 +59,14 @@ final class TestKernel extends FoundryTestKernel
         $c->register(ServiceStory::class)->setAutowired(true)->setAutoconfigured(true);
         $c->register(InMemoryAddressRepository::class)->setAutowired(true)->setAutoconfigured(true);
         $c->register(InMemoryContactRepository::class)->setAutowired(true)->setAutoconfigured(true);
+
+        $c->register(DeleteGenericModel::class)->setAutowired(true)->setAutoconfigured(true)->addTag('controller.service_arguments');
+        $c->register(UpdateGenericModel::class)->setAutowired(true)->setAutoconfigured(true)->addTag('controller.service_arguments');
+        $c->register(UpdateGenericModelCommand::class)->setAutowired(true)->setAutoconfigured(true);
+    }
+
+    protected function configureRoutes(RoutingConfigurator $routes): void
+    {
+        $routes->import(__DIR__.'/App/Controller/*.php', 'attribute');
     }
 }

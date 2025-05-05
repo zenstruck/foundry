@@ -20,6 +20,7 @@ use Zenstruck\Foundry\Tests\Fixture\Model\Base;
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 #[ORM\Entity]
+#[ORM\Table(name: 'contact')]
 #[ORM\InheritanceType(value: 'SINGLE_TABLE')]
 #[ORM\DiscriminatorColumn(name: 'type')]
 #[ORM\DiscriminatorMap(['simple' => Contact::class, 'specific' => ChildContact::class])]

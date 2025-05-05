@@ -22,6 +22,8 @@ use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
 use Zenstruck\Foundry\Persistence\Relationship\RelationshipMetadata;
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 
+use function Zenstruck\Foundry\set;
+
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
@@ -147,7 +149,7 @@ final class PersistenceManager
      *
      * @return T
      */
-    public function refresh(object &$object, bool $force = false): object
+    public function refresh(object &$object, bool $force = false, bool $allowRefreshDeletedObject = false): object
     {
         if (!$this->flush && !$force) {
             return $object;
@@ -155,6 +157,11 @@ final class PersistenceManager
 
         if ($object instanceof Proxy) {
             return $object->_refresh();
+        }
+
+        if (\PHP_VERSION_ID >= 80400 && ($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)) {
+            /** @var T $object */
+            $object = $reflector->initializeLazyObject($object);
         }
 
         $strategy = $this->strategyFor($object::class);
@@ -165,26 +172,37 @@ final class PersistenceManager
 
         $om = $strategy->objectManagerFor($object::class);
 
-        if ($strategy->contains($object)) {
-            try {
-                $om->refresh($object);
-            } catch (\LogicException|\Error) {
-                // prevent entities/documents with readonly properties to create an error
-                // LogicException is for ORM / Error is for ODM
-                // @see https://github.com/doctrine/orm/issues/9505
-            }
-
-            return $object;
-        }
-
         if ($strategy->isEmbeddable($object)) {
             return $object;
         }
 
-        $id = $om->getClassMetadata($object::class)->getIdentifierValues($object);
+        if (!$strategy->contains($object)) {
+            $objectFromDb = null;
 
-        if (!$id || !($object = $om->find($object::class, $id))) { // @phpstan-ignore parameterByRef.type
-            throw RefreshObjectFailed::objectNoLongExists();
+            $id = $om->getClassMetadata($object::class)->getIdentifierValues($object);
+
+            if ($id) {
+                // "merge" object if it is not managed
+                $objectFromDb = $om->find($object::class, $id);
+            }
+
+            if ($objectFromDb) {
+                $object = $objectFromDb;
+            } else {
+                if ($allowRefreshDeletedObject) {
+                    return $object;
+                }
+
+                throw RefreshObjectFailed::objectNoLongExists();
+            }
+        }
+
+        try {
+            $om->refresh($object);
+        } catch (\LogicException|\Error) {
+            // prevent entities/documents with readonly properties to create an error
+            // LogicException is for ORM / Error is for ODM
+            // @see https://github.com/doctrine/orm/issues/9505
         }
 
         return $object;
@@ -192,6 +210,11 @@ final class PersistenceManager
 
     public function isPersisted(object $object): bool
     {
+        if (\PHP_VERSION_ID >= 80400 && ($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)) {
+            /** @var object $object */
+            $object = $reflector->initializeLazyObject($object);
+        }
+
         // prevents doctrine to use its cache and think the object is persisted
         if ($this->strategyFor($object::class)->isScheduledForInsert($object)) {
             return false;

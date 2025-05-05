@@ -41,6 +41,7 @@ trait Factories
     #[After]
     public static function _shutdownFoundry(): void
     {
+        Configuration::instance()->persistedObjectsTracker?->reset();
         Configuration::shutdown();
     }
 

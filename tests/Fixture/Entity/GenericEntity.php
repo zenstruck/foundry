@@ -19,6 +19,7 @@ use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 #[ORM\Entity(repositoryClass: GenericEntityRepository::class)]
+#[ORM\Table(name: 'generic_entity')]
 class GenericEntity extends GenericModel
 {
 }

@@ -35,6 +35,7 @@ return static function (ContainerConfigurator $container): void {
             param('zenstruck_foundry.persistence.flush_once'),
             '%env(default:zenstruck_foundry.faker.seed:int:FOUNDRY_FAKER_SEED)%',
             service('.zenstruck_foundry.in_memory.repository_registry'),
+            service('.foundry.persistence.objects_tracker')->nullOnInvalid(),
         ])
         ->public()
     ;
