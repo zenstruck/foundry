@@ -14,7 +14,6 @@ namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\PersistenceDisabled;
 use Zenstruck\Foundry\Object\Instantiator;
@@ -38,7 +37,7 @@ use function Zenstruck\Foundry\Persistence\save;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-abstract class GenericFactoryTestCase extends WebTestCase
+abstract class GenericFactoryTestCase extends KernelTestCase
 {
     use Factories, ResetDatabase;
 

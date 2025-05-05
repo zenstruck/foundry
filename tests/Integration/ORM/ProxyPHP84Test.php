@@ -1,54 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
-use PHPUnit\Framework\Attributes\Depends;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Zenstruck\Foundry\Persistence\Proxy\CreatedObjectsTracker;
-use Zenstruck\Foundry\Test\Factories;
+use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+use Zenstruck\Foundry\Persistence\Proxy\PersistedObjectsTracker;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
+use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
+use Zenstruck\Foundry\Tests\Integration\Persistence\ProxyPHP84TestCase;
+use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
-final class ProxyPHP84Test extends WebTestCase
+final class ProxyPHP84Test extends ProxyPHP84TestCase
 {
-    use Factories;
-    
-    /**
-     * @test
-     * @requires PHP >= 8.4
-     */
-    #[Test]
-    #[RequiresPhp('>= 8.4')]
-    public function it_can_refresh_objects_with_php84_proxies(): void
-    {
-        $object = GenericEntityFactory::createOne();
-        self::ensureKernelShutdown();
-
-        self::assertSame('default1', $object->getProp1());
-        self::assertFalse((new \ReflectionClass($object))->isUninitializedLazyObject($object));
-
-        $client = self::createClient();
-        $client->request('GET', "/update/{$object->id}");
-
-        self::assertTrue((new \ReflectionClass($object))->isUninitializedLazyObject($object));
-        self::assertSame('foo', $object->getProp1());
-        self::assertFalse((new \ReflectionClass($object))->isUninitializedLazyObject($object));
-    }
-
-    /**
-     * @test
-     * @requires PHP >= 8.4
-     * @depends it_can_refresh_objects_with_php84_proxies
-     */
-    #[Test]
-    #[RequiresPhp('>= 8.4')]
-    #[Depends('it_can_refresh_objects_with_php84_proxies')]
-    public function it_can_refresh_objects_with_php84_tracker_is_empty_after_test(): void
-    {
-        self::assertSame(0, CreatedObjectsTracker::countObjects());
-    }
+    use RequiresORM;
 
     /**
      * @test
@@ -56,39 +35,53 @@ final class ProxyPHP84Test extends WebTestCase
      */
     #[Test]
     #[RequiresPhp('>= 8.4')]
-    public function tracker_only_keep_reference_for_objects_in_current_scope(): void
+    public function tracker_keeps_reference_only_for_objects_in_current_scope(): void
     {
         [$genericEntity] = GenericEntityFactory::new()->many(2)->create();
         ContactFactory::new()->many(2)->create();
 
         // 8 = 2 GenericEntity + 2 Contact + 2 Address + 2 Category
-        self::assertSame(8, CreatedObjectsTracker::countObjects());
-        self::assertSame(8, CreatedObjectsTracker::countObjectsWithValidRef());
+        self::assertSame(8, PersistedObjectsTracker::countObjects());
 
         self::ensureKernelShutdown();
 
-        self::assertSame(8, CreatedObjectsTracker::countObjects());
         // kernel shutdown cleared the EM, then one of the generic entities was removed from tracker
         // all other entities are kept, because they have circular references
-        self::assertSame(7, CreatedObjectsTracker::countObjectsWithValidRef());
+        self::assertSame(7, PersistedObjectsTracker::countObjects());
 
-        gc_collect_cycles();
-
-        self::assertSame(8, CreatedObjectsTracker::countObjects());
+        \gc_collect_cycles();
 
         // after gc collect, all entities created by ContactFactory are removed from tracker
-        self::assertSame(1, CreatedObjectsTracker::countObjectsWithValidRef());
+        self::assertSame(1, PersistedObjectsTracker::countObjects());
 
-        CreatedObjectsTracker::proxifyObjects();
-
-        // a call to proxifyObjects() will update the references in the tracker, to only keep the valid ones
-        self::assertSame(1, CreatedObjectsTracker::countObjects());
-        self::assertSame(1, CreatedObjectsTracker::countObjectsWithValidRef());
+        // refreshing again won't clear the tracked object because a reference still exists incurrent scope
+        Configuration::instance()->persistedObjectsTracker?->refresh();
+        self::assertSame(1, PersistedObjectsTracker::countObjects());
 
         unset($genericEntity);
-        CreatedObjectsTracker::proxifyObjects();
+        Configuration::instance()->persistedObjectsTracker?->refresh();
 
         // unsetting the generic entity will remove it from the tracker as well
-        self::assertSame(0, CreatedObjectsTracker::countObjects());
+        self::assertSame(0, PersistedObjectsTracker::countObjects());
+    }
+
+    protected static function factory(): PersistentObjectFactory
+    {
+        return GenericEntityFactory::new();
+    }
+
+    protected function dbms(): string
+    {
+        return 'orm';
+    }
+
+    protected function updateObject(GenericModel $object): void
+    {
+        $this->em()->getConnection()->executeQuery('UPDATE generic_entity SET prop1 = \'foo\' WHERE id = ?', [$object->id]);
+    }
+
+    private function em(): EntityManagerInterface
+    {
+        return self::getContainer()->get(EntityManagerInterface::class); // @phpstan-ignore return.type
     }
 }

@@ -3,8 +3,10 @@
 set -o errexit
 set -o nounset
 
+COMPOSER_BIN="php -d xdebug.mode=off $(which composer)"
+
 check_phpunit_version() {
-    INSTALLED_PHPUNIT_VERSION=$(composer info phpunit/phpunit | grep versions |  cut -c 14-)
+    INSTALLED_PHPUNIT_VERSION=$(${COMPOSER_BIN} info phpunit/phpunit | grep versions |  cut -c 14-)
 
     REQUIRED_PHPUNIT_VERSION="${1?}"
 
@@ -35,7 +37,7 @@ SHOULD_UPDATE_PHPUNIT=$(check_phpunit_version "${PHPUNIT_VERSION}")
 
 if [ "${SHOULD_UPDATE_PHPUNIT}" = "0" ]; then
   echo "ℹ️  Upgrading PHPUnit to ${PHPUNIT_VERSION}"
-  composer update dama/doctrine-test-bundle brianium/paratest "phpunit/phpunit:^${PHPUNIT_VERSION}" -W
+  ${COMPOSER_BIN} update dama/doctrine-test-bundle brianium/paratest "phpunit/phpunit:^${PHPUNIT_VERSION}" -W
 fi
 ### <<
 

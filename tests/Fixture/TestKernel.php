@@ -11,15 +11,14 @@
 
 namespace Zenstruck\Foundry\Tests\Fixture;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\MakerBundle\MakerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
-use Zenstruck\Foundry\Tests\Fixture\Entity\Address;
-use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
+use Zenstruck\Foundry\Tests\Fixture\App\Command\UpdateGenericModelCommand;
+use Zenstruck\Foundry\Tests\Fixture\App\Controller\DeleteGenericModel;
+use Zenstruck\Foundry\Tests\Fixture\App\Controller\UpdateGenericModel;
 use Zenstruck\Foundry\Tests\Fixture\Factories\ArrayFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 use Zenstruck\Foundry\Tests\Fixture\InMemory\InMemoryAddressRepository;
@@ -60,15 +59,14 @@ final class TestKernel extends FoundryTestKernel
         $c->register(ServiceStory::class)->setAutowired(true)->setAutoconfigured(true);
         $c->register(InMemoryAddressRepository::class)->setAutowired(true)->setAutoconfigured(true);
         $c->register(InMemoryContactRepository::class)->setAutowired(true)->setAutoconfigured(true);
+
+        $c->register(DeleteGenericModel::class)->setAutowired(true)->setAutoconfigured(true)->addTag('controller.service_arguments');
+        $c->register(UpdateGenericModel::class)->setAutowired(true)->setAutoconfigured(true)->addTag('controller.service_arguments');
+        $c->register(UpdateGenericModelCommand::class)->setAutowired(true)->setAutoconfigured(true);
     }
 
-    #[Route('/update/{id}', name: 'test')]
-    public function __invoke(EntityManagerInterface $entityManager, int $id): Response
+    protected function configureRoutes(RoutingConfigurator $routes): void
     {
-        $genericEntity = $entityManager->find(GenericEntity::class, $id);
-        $genericEntity?->setProp1('foo');
-        $entityManager->flush();
-
-        return new Response();
+        $routes->import(__DIR__.'/App/Controller/*.php', 'attribute');
     }
 }
