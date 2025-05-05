@@ -143,6 +143,6 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
     {
         Configuration::instance()->assertPersistenceEnabled();
 
-        return new ProxyRepositoryDecorator(static::class()); // @phpstan-ignore argument.type, return.type
+        return new ProxyRepositoryDecorator(static::class(), Configuration::instance()->isInMemoryEnabled()); // @phpstan-ignore argument.type, return.type
     }
 }

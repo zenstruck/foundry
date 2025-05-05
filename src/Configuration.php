@@ -155,6 +155,9 @@ final class Configuration
         $this->inMemory = true;
     }
 
+    /**
+     * @phpstan-assert-if-true InMemoryRepositoryRegistry $this->inMemoryRepositoryRegistry
+     */
     public function isInMemoryEnabled(): bool
     {
         return $this->inMemory;

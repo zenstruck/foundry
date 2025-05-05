@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ObjectRepository;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\InMemory\InMemoryDoctrineObjectRepositoryAdapter;
 use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
 
 /**
@@ -35,7 +36,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
      *
      * @param class-string<T> $class
      */
-    public function __construct(private string $class)
+    public function __construct(private string $class, private bool $inMemory = false)
     {
     }
 
@@ -240,6 +241,10 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
      */
     public function inner(): ObjectRepository
     {
+        if ($this->inMemory) {
+            return new InMemoryDoctrineObjectRepositoryAdapter($this->class);
+        }
+
         return Configuration::instance()->persistence()->repositoryFor($this->class);
     }
 
@@ -264,6 +269,13 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
             }
 
             if (!\is_object($value) || null === $embeddableProps = Configuration::instance()->persistence()->embeddablePropertiesFor($value, $this->getClassName())) {
+                $normalized[$key] = $value;
+
+                continue;
+            }
+
+            if ($this->inMemory) {
+                // embeddables should not be expanded in memory
                 $normalized[$key] = $value;
 
                 continue;

@@ -177,7 +177,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     {
         Configuration::instance()->assertPersistenceEnabled();
 
-        return new RepositoryDecorator(static::class()); // @phpstan-ignore return.type
+        return new RepositoryDecorator(static::class(), Configuration::instance()->isInMemoryEnabled()); // @phpstan-ignore return.type
     }
 
     final public static function assert(): RepositoryAssertions
