@@ -483,6 +483,10 @@ abstract class PersistentObjectFactory extends ObjectFactory
                         return;
                     }
 
+                    if (\PHP_VERSION_ID >= 80400 && !$factoryUsed instanceof PersistentProxyObjectFactory) {
+                        Configuration::instance()->persistedObjectsTracker?->add($object);
+                    }
+
                     $afterPersistCallbacks = [];
 
                     foreach ($factoryUsed->afterPersist as $afterPersist) {

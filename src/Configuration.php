@@ -19,6 +19,7 @@ use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\InMemory\CannotEnableInMemory;
 use Zenstruck\Foundry\InMemory\InMemoryRepositoryRegistry;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
+use Zenstruck\Foundry\Persistence\Proxy\PersistedObjectsTracker;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -60,6 +61,7 @@ final class Configuration
         public readonly bool $flushOnce = false,
         ?int $forcedFakerSeed = null,
         public readonly ?InMemoryRepositoryRegistry $inMemoryRepositoryRegistry = null,
+        public readonly ?PersistedObjectsTracker $persistedObjectsTracker = null,
     ) {
         if (null === self::$instance) {
             $this->faker->seed(self::fakerSeed($forcedFakerSeed));
