@@ -12,6 +12,7 @@
 namespace Zenstruck\Foundry\Persistence;
 
 use Doctrine\Persistence\ObjectRepository;
+use Zenstruck\Assert;
 use Zenstruck\Foundry\AnonymousFactoryGenerator;
 use Zenstruck\Foundry\Configuration;
 
@@ -36,7 +37,7 @@ function repository(string $class): RepositoryDecorator
  */
 function proxy_repository(string $class): ProxyRepositoryDecorator
 {
-    return new ProxyRepositoryDecorator($class, Configuration::instance()->isInMemoryEnabled()); // @phpstan-ignore return.type, argument.type
+    return new ProxyRepositoryDecorator($class, Configuration::instance()->isInMemoryEnabled()); // @phpstan-ignore return.type
 }
 
 /**
@@ -95,6 +96,14 @@ function persist(string $class, array|callable $attributes = []): object
  */
 function proxy(object $object): object
 {
+    if (\PHP_VERSION_ID >= 80400) {
+        trigger_deprecation(
+            'zenstruck/foundry',
+            '2.6',
+            'Proxy usage is deprecated in PHP 8.4. Use directly PersistentObjectFactory, Foundry now leverages the native PHP lazy system to auto-refresh objects.',
+        );
+    }
+
     return ProxyGenerator::wrap($object);
 }
 
@@ -137,6 +146,22 @@ function refresh(object &$object): object
 }
 
 /**
+ * For refreshing all persistent objects created by Foundry, that are currently in use.
+ *
+ * @throws \BadMethodCallException if called with PHP <8.4
+ */
+function refresh_all(): void
+{
+    $objectsTracker = Configuration::instance()->persistedObjectsTracker;
+
+    if (\PHP_VERSION_ID < 80400 || null === $objectsTracker) {
+        throw new \BadMethodCallException('Cannot use refresh_all() before PHP 8.4.');
+    }
+
+    $objectsTracker->refresh();
+}
+
+/**
  * @template T of object
  *
  * @param T $object
@@ -174,6 +199,24 @@ function disable_persisting(): void
 function enable_persisting(): void
 {
     Configuration::instance()->persistence()->enablePersisting();
+}
+
+function assert_persisted(object $object, string $message = '{entity} is not persisted.'): void
+{
+    Configuration::instance()->assertPersistenceEnabled();
+
+    Assert::that(
+        Configuration::instance()->persistence()->isPersisted($object)
+    )->isTrue($message, ['entity' => $object::class]);
+}
+
+function assert_not_persisted(object $object, string $message = '{entity} is persisted.'): void
+{
+    Configuration::instance()->assertPersistenceEnabled();
+
+    Assert::that(
+        Configuration::instance()->persistence()->isPersisted($object)
+    )->isFalse($message, ['entity' => $object::class]);
 }
 
 /**

@@ -23,6 +23,24 @@ use Doctrine\Persistence\ObjectRepository;
 final class ProxyRepositoryDecorator extends RepositoryDecorator
 {
     /**
+     * @internal
+     *
+     * @param class-string<T> $class
+     */
+    public function __construct(string $class, bool $inMemory = false)
+    {
+        if (\PHP_VERSION_ID >= 80400) {
+            trigger_deprecation(
+                'zenstruck/foundry',
+                '2.6',
+                'Proxy usage is deprecated in PHP 8.4. Use directly PersistentObjectFactory, Foundry now leverages the native PHP lazy system to auto-refresh objects.',
+            );
+        }
+
+        parent::__construct($class, $inMemory); // @phpstan-ignore argument.type
+    }
+
+    /**
      * @return T|Proxy<T>|null
      * @psalm-return (T&Proxy<T>)|null
      */
