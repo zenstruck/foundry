@@ -16,6 +16,8 @@ use PHPUnit\Framework\Attributes\Before;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
 
+use Zenstruck\Foundry\Persistence\Proxy\CreatedObjectsTracker;
+
 use function Zenstruck\Foundry\Persistence\initialize_proxy_object;
 
 /**
@@ -42,6 +44,7 @@ trait Factories
     public static function _shutdownFoundry(): void
     {
         Configuration::shutdown();
+        CreatedObjectsTracker::reset();
     }
 
     /**
