@@ -69,6 +69,11 @@ parameters:
         - identifier: missingType.callable
           path: tests/Fixture/Maker/expected/
 
+        # we're currently running static analysis with PHP 8.3
+        - message: '#Call to an undefined method ReflectionClass\<(.*)\>::isUninitializedLazyObject\(\).#'
+        - message: '#Call to an undefined method ReflectionClass\<(.*)\>::resetAsLazyProxy\(\).#'
+        - message: '#Call to an undefined method ReflectionClass\<(.*)\>::initializeLazyObject\(\).#'
+
     excludePaths:
         - tests/Fixture/Maker/expected/can_create_factory_with_auto_activated_not_persisted_option.php
         - tests/Fixture/Maker/expected/can_create_factory_interactively.php

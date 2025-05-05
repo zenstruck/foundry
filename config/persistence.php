@@ -2,9 +2,11 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
+use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
-use Zenstruck\Foundry\Persistence\Proxy\KernelTerminateListener;
+use Zenstruck\Foundry\Persistence\Proxy\PersistedObjectsTracker;
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 
 return static function (ContainerConfigurator $container): void {
@@ -22,8 +24,11 @@ return static function (ContainerConfigurator $container): void {
     ;
 
     if (PHP_VERSION_ID >= 80400) {
-        $container->services()->set('.foundry.proxy.kernel_terminate_listener', KernelTerminateListener::class)
-            ->tag('kernel.event_listener', ['event' => TerminateEvent::class, 'method' => '__invoke'])
+        $container->services()->set('.foundry.persistence.objects_tracker', PersistedObjectsTracker::class)
+            ->tag('kernel.reset', ['method' => 'refresh'])
+            ->tag('kernel.event_listener', ['event' => TerminateEvent::class, 'method' => 'refresh'])
+            ->tag('kernel.event_listener', ['event' => ConsoleTerminateEvent::class, 'method' => 'refresh'])
+            ->tag('kernel.event_listener', ['event' => WorkerMessageHandledEvent::class, 'method' => 'refresh']) // @phpstan-ignore class.notFound
         ;
     }
 };

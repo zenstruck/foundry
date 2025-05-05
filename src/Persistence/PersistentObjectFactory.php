@@ -27,8 +27,6 @@ use Zenstruck\Foundry\Persistence\Relationship\ManyToOneRelationship;
 use Zenstruck\Foundry\Persistence\Relationship\OneToManyRelationship;
 use Zenstruck\Foundry\Persistence\Relationship\OneToOneRelationship;
 
-use Zenstruck\Foundry\Persistence\Proxy\CreatedObjectsTracker;
-
 use function Zenstruck\Foundry\force;
 use function Zenstruck\Foundry\get;
 use function Zenstruck\Foundry\set;
@@ -456,12 +454,12 @@ abstract class PersistentObjectFactory extends ObjectFactory
         return parent::initializeInternal()
             ->afterInstantiate(
                 static function(object $object, array $parameters, PersistentObjectFactory $factoryUsed): void {
-                    if (PHP_VERSION_ID >= 80400) {
-                        CreatedObjectsTracker::add($object);
-                    }
-
                     if (!$factoryUsed->isPersisting()) {
                         return;
+                    }
+
+                    if (\PHP_VERSION_ID >= 80400 && !$factoryUsed instanceof PersistentProxyObjectFactory) {
+                        Configuration::instance()->persistedObjectsTracker?->add($object);
                     }
 
                     $afterPersistCallbacks = [];
