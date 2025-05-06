@@ -17,6 +17,7 @@ namespace Zenstruck\Foundry\InMemory;
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  *
  * @template T of object
+ * @experimental
  */
 interface InMemoryRepository
 {
