@@ -16,6 +16,7 @@ namespace Zenstruck\Foundry\InMemory;
 /**
  * @template T of object
  * @phpstan-require-implements InMemoryRepository
+ * @experimental
  *
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */

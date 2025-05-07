@@ -15,6 +15,7 @@ namespace Zenstruck\Foundry\InMemory;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ * @experimental
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD)]
 final class AsInMemoryTest

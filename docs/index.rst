@@ -2133,6 +2133,11 @@ applications or with `hexagonal architecture <https://en.wikipedia.org/wiki/Hexa
 repositories in the domain are usually interfaces for which main implementations are a Doctrine one. You can tell Foundry to
 use the "in-memory" version of these repositories.
 
+.. versionadded:: 2.5
+
+    The "in-memory" behavior is experimental. Experimental features are not
+    covered by the backward compatibility promise.
+
 First, you need to create an "in-memory" version of your repository. This repository must implement the
 ``Zenstruck\Foundry\InMemory\InMemoryRepository`` interface. You can use the trait
 ``Zenstruck\Foundry\InMemory\InMemoryRepositoryTrait`` to help you with this:
@@ -2160,7 +2165,7 @@ First, you need to create an "in-memory" version of your repository. This reposi
     }
 
 Then, the "in-memory" repository should be used in Symfony's container, as the main repository implementation. For this
-purpose, you can either use a new environment ``test-in-memory``, or declare use ``InMeMemoryKernel``.
+purpose, you can either use a new environment ``test-in-memory``, or use a ``InMeMemoryKernel``.
 
 In your tests, use the ``#[AsInMemoryTest]`` attribute, which will disable persistence of the factories, and register an
 "after instantiate" hook, which will store the objects in their respective "in memory" repositories:
@@ -2185,6 +2190,13 @@ In your tests, use the ``#[AsInMemoryTest]`` attribute, which will disable persi
             $address = AddressFactory::createOne();
 
             self::assertSame([$address], $this->addressRepository->_all());
+
+            // The following assertion is also true, `YourFactory::repository()` returns a special "in-memory" repository
+            // no request to the database will be made.
+            self::assertSame(1, AddressFactory::repository()->count(1));
+
+            // You can even use `YourFactory::repository()->assert()`
+            AddressFactory::repository()->assert()->count(1);
         }
     }
 

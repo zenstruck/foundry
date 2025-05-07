@@ -17,6 +17,7 @@ namespace Zenstruck\Foundry\InMemory;
  * @template T of object
  * @implements InMemoryRepository<T>
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ * @experimental
  *
  * This class will be used when a specific "in-memory" repository does not exist for a given class.
  */
