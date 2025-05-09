@@ -12,11 +12,14 @@
 namespace Zenstruck\Foundry;
 
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
+use Zenstruck\Foundry\Attribute\AsFixture;
 use Zenstruck\Foundry\InMemory\DependencyInjection\InMemoryCompilerPass;
 use Zenstruck\Foundry\InMemory\InMemoryRepository;
 use Zenstruck\Foundry\Mongo\MongoResetter;
@@ -25,6 +28,7 @@ use Zenstruck\Foundry\ORM\ResetDatabase\MigrateDatabaseResetter;
 use Zenstruck\Foundry\ORM\ResetDatabase\OrmResetter;
 use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
 use Zenstruck\Foundry\ORM\ResetDatabase\SchemaDatabaseResetter;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -224,6 +228,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
         $this->configureMakers($configurator, $container, $config);
         $this->configurePersistence($container, $configurator, $config);
         $this->configureInMemory($configurator, $container);
+        $this->configureFixturesStory($configurator, $container);
     }
 
     public function build(ContainerBuilder $container): void
@@ -243,6 +248,21 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                 ->addMethodCall('addProvider', [new Reference($id)])
             ;
         }
+
+        // fixture stories
+        $fixtureStories = [];
+        foreach ($container->findTaggedServiceIds('foundry.story.fixture') as $id => $tags) {
+            if (count($tags) !== 1) {
+                throw new LogicException('Tag "foundry.story.fixture" must be used only once per service.');
+            }
+
+            // todo test names collision
+            $fixtureStories[$tags[0]['name']] = new Reference($id);
+        }
+
+        $container->findDefinition('.zenstruck_foundry.story.load_story-command')
+            ->setArgument('$stories', ServiceLocatorTagPass::register($container, $fixtureStories))
+        ;
     }
 
     /**
@@ -310,6 +330,9 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
         }
     }
 
+    /**
+     * @param array<string, mixed> $config
+     */
     private function configureMakers(ContainerConfigurator $configurator, ContainerBuilder $container, array $config): void
     {
         /** @var array<string, string> $bundles */
@@ -348,6 +371,9 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
             ->setArgument('$forceProperties', $config['instantiator']['always_force_properties'] ?? false);
     }
 
+    /**
+     * @param array<string, mixed> $config
+     */
     private function configurePersistence(ContainerBuilder $container, ContainerConfigurator $configurator, array $config): void
     {
         if (false === $config['persistence']['flush_once']) {
@@ -416,5 +442,24 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
     {
         $configurator->import('../config/in_memory.php');
         $container->registerForAutoconfiguration(InMemoryRepository::class)->addTag('foundry.in_memory.repository');
+    }
+
+    private function configureFixturesStory(ContainerConfigurator $configurator, ContainerBuilder $container): void
+    {
+        $container->registerAttributeForAutoconfiguration(
+            AsFixture::class,
+            // @phpstan-ignore argument.type
+            static function(ChildDefinition $definition, AsFixture $attribute, \ReflectionClass $reflector) {
+                if (false === $reflector->getParentClass() || $reflector->getParentClass()->getName() !== Story::class) {
+                    throw new LogicException(
+                        \sprintf("Only stories can be marked with \"%s\" attribute, class \"%s\" is not a story.", AsFixture::class, $reflector->getName())
+                    );
+                }
+
+                $definition->addTag('foundry.story.fixture', ['name' => $attribute->name]);
+            }
+        );
+
+
     }
 }
