@@ -221,84 +221,9 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
         $this->configureInstantiator($config['instantiator'], $container);
         $this->configureFaker($config['faker'], $container);
         $this->configureGlobalState($config['global_state'], $container);
-
-        /** @var array<string, string> $bundles */
-        $bundles = $container->getParameter('kernel.bundles');
-
-        if (isset($bundles['MakerBundle'])) {
-            $configurator->import('../config/makers.php');
-
-            $makeFactoryDefinition = $container->getDefinition('.zenstruck_foundry.maker.factory');
-            $makeFactoryDefinition->setArgument('$defaultNamespace', $config['make_factory']['default_namespace']);
-            $makeFactoryDefinition->setArgument('$addHints', $config['make_factory']['add_hints']);
-
-            $makeStoryDefinition = $container->getDefinition('.zenstruck_foundry.maker.story');
-            $makeStoryDefinition->setArgument('$defaultNamespace', $config['make_story']['default_namespace']);
-
-            if (!isset($bundles['DoctrineBundle'])) {
-                $container->removeDefinition('.zenstruck_foundry.maker.factory.orm_default_properties_guesser');
-            }
-
-            if (!isset($bundles['DoctrineMongoDBBundle'])) {
-                $container->removeDefinition('.zenstruck_foundry.maker.factory.odm_default_properties_guesser');
-            }
-
-            if (!isset($bundles['DoctrineBundle']) && !isset($bundles['DoctrineMongoDBBundle'])) {
-                $container->removeDefinition('.zenstruck_foundry.maker.factory.doctrine_scalar_fields_default_properties_guesser');
-            }
-
-            $container->getDefinition('.zenstruck_foundry.maker.factory.generator')
-                ->setArgument('$forceProperties', $config['instantiator']['always_force_properties'] ?? false);
-        } else {
-            $configurator->import('../config/command_stubs.php');
-        }
-
-        if (isset($bundles['DoctrineBundle']) || isset($bundles['DoctrineMongoDBBundle'])) {
-            $configurator->import('../config/persistence.php');
-        }
-
-        if (isset($bundles['DoctrineBundle'])) {
-            $configurator->import('../config/orm.php');
-
-            $container->getDefinition('.zenstruck_foundry.persistence.database_resetter.orm.abstract')
-                ->replaceArgument('$managers', $config['orm']['reset']['entity_managers'])
-                ->replaceArgument('$connections', $config['orm']['reset']['connections'])
-            ;
-
-            /** @var ResetDatabaseMode $resetMode */
-            $resetMode = $config['orm']['reset']['mode'];
-            $container->getDefinition(OrmResetter::class)
-                ->setClass(
-                    match ($resetMode) {
-                        ResetDatabaseMode::SCHEMA => SchemaDatabaseResetter::class,
-                        ResetDatabaseMode::MIGRATE => MigrateDatabaseResetter::class,
-                    }
-                );
-
-            if (ResetDatabaseMode::MIGRATE === $resetMode) {
-                $container->getDefinition(OrmResetter::class)
-                    ->replaceArgument('$configurations', $config['orm']['reset']['migrations']['configurations'])
-                ;
-            }
-        }
-
-        if (isset($bundles['DoctrineMongoDBBundle'])) {
-            $configurator->import('../config/mongo.php');
-
-            $container->getDefinition(MongoResetter::class)
-                ->replaceArgument(0, $config['mongo']['reset']['document_managers'])
-            ;
-        }
-
-        $configurator->import('../config/in_memory.php');
-
-        $container->registerForAutoconfiguration(InMemoryRepository::class)->addTag('foundry.in_memory.repository');
-
-        if (false === $config['persistence']['flush_once']) {
-            trigger_deprecation('zenstruck/foundry', '2.5', 'Not setting "zenstruck_foundry.persistence.flush_once" to true is deprecated. This option will be forced to true in 3.0');
-        }
-
-        $container->setParameter('zenstruck_foundry.persistence.flush_once', $config['persistence']['flush_once']);
+        $this->configureMakers($configurator, $container, $config);
+        $this->configurePersistence($container, $configurator, $config);
+        $this->configureInMemory($configurator, $container);
     }
 
     public function build(ContainerBuilder $container): void
@@ -383,5 +308,113 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
         if ($config['locale']) {
             $definition->addArgument($config['locale']);
         }
+    }
+
+    private function configureMakers(ContainerConfigurator $configurator, ContainerBuilder $container, array $config): void
+    {
+        /** @var array<string, string> $bundles */
+        $bundles = $container->getParameter('kernel.bundles');
+
+        if (!isset($bundles['MakerBundle'])) {
+            $configurator->import('../config/command_stubs.php');
+
+            return;
+        }
+
+        $configurator->import('../config/makers.php');
+
+        $makeFactoryDefinition = $container->getDefinition('.zenstruck_foundry.maker.factory');
+        $makeFactoryDefinition->setArgument('$defaultNamespace', $config['make_factory']['default_namespace']);
+        $makeFactoryDefinition->setArgument('$addHints', $config['make_factory']['add_hints']);
+
+        $makeStoryDefinition = $container->getDefinition('.zenstruck_foundry.maker.story');
+        $makeStoryDefinition->setArgument('$defaultNamespace', $config['make_story']['default_namespace']);
+
+        if (!isset($bundles['DoctrineBundle'])) {
+            $container->removeDefinition('.zenstruck_foundry.maker.factory.orm_default_properties_guesser');
+        }
+
+        if (!isset($bundles['DoctrineMongoDBBundle'])) {
+            $container->removeDefinition('.zenstruck_foundry.maker.factory.odm_default_properties_guesser');
+        }
+
+        if (!isset($bundles['DoctrineBundle']) && !isset($bundles['DoctrineMongoDBBundle'])) {
+            $container->removeDefinition(
+                '.zenstruck_foundry.maker.factory.doctrine_scalar_fields_default_properties_guesser'
+            );
+        }
+
+        $container->getDefinition('.zenstruck_foundry.maker.factory.generator')
+            ->setArgument('$forceProperties', $config['instantiator']['always_force_properties'] ?? false);
+    }
+
+    private function configurePersistence(ContainerBuilder $container, ContainerConfigurator $configurator, array $config): void
+    {
+        if (false === $config['persistence']['flush_once']) {
+            trigger_deprecation('zenstruck/foundry', '2.5', 'Not setting "zenstruck_foundry.persistence.flush_once" to true is deprecated. This option will be forced to true in 3.0');
+        }
+
+        $container->setParameter('zenstruck_foundry.persistence.flush_once', $config['persistence']['flush_once']);
+
+        /** @var array<string, string> $bundles */
+        $bundles = $container->getParameter('kernel.bundles');
+
+        if (isset($bundles['DoctrineBundle']) || isset($bundles['DoctrineMongoDBBundle'])) {
+            $configurator->import('../config/persistence.php');
+        } else {
+            return;
+        }
+
+        if (isset($bundles['DoctrineBundle'])) {
+            $this->configureOrm($configurator, $container, $config['orm']);
+        }
+
+        if (isset($bundles['DoctrineMongoDBBundle'])) {
+            $this->configureMongo($configurator, $container, $config['mongo']);
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $ormConfig
+     */
+    private function configureOrm(ContainerConfigurator $configurator, ContainerBuilder $container, $ormConfig): void
+    {
+        $configurator->import('../config/orm.php');
+
+        $container->getDefinition('.zenstruck_foundry.persistence.database_resetter.orm.abstract')
+            ->replaceArgument('$managers', $ormConfig['reset']['entity_managers'])
+            ->replaceArgument('$connections', $ormConfig['reset']['connections']);
+
+        /** @var ResetDatabaseMode $resetMode */
+        $resetMode = $ormConfig['reset']['mode'];
+        $container->getDefinition(OrmResetter::class)
+            ->setClass(
+                match ($resetMode) {
+                    ResetDatabaseMode::SCHEMA => SchemaDatabaseResetter::class,
+                    ResetDatabaseMode::MIGRATE => MigrateDatabaseResetter::class,
+                }
+            );
+
+        if (ResetDatabaseMode::MIGRATE === $resetMode) {
+            $container->getDefinition(OrmResetter::class)
+                ->replaceArgument('$configurations', $ormConfig['reset']['migrations']['configurations']);
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $mongoConfig
+     */
+    private function configureMongo(ContainerConfigurator $configurator, ContainerBuilder $container, array $mongoConfig): void
+    {
+        $configurator->import('../config/mongo.php');
+
+        $container->getDefinition(MongoResetter::class)
+            ->replaceArgument(0, $mongoConfig['reset']['document_managers']);
+    }
+
+    private function configureInMemory(ContainerConfigurator $configurator, ContainerBuilder $container): void
+    {
+        $configurator->import('../config/in_memory.php');
+        $container->registerForAutoconfiguration(InMemoryRepository::class)->addTag('foundry.in_memory.repository');
     }
 }
