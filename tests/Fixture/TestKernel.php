@@ -19,6 +19,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\ArrayFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 use Zenstruck\Foundry\Tests\Fixture\InMemory\InMemoryAddressRepository;
 use Zenstruck\Foundry\Tests\Fixture\InMemory\InMemoryContactRepository;
+use Zenstruck\Foundry\Tests\Fixture\Stories\Fixtures\FixtureInGroupStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\Fixtures\FixtureStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\ServiceStory;
 
@@ -57,5 +58,6 @@ final class TestKernel extends FoundryTestKernel
         $c->register(InMemoryAddressRepository::class)->setAutowired(true)->setAutoconfigured(true);
         $c->register(InMemoryContactRepository::class)->setAutowired(true)->setAutoconfigured(true);
         $c->register(FixtureStory::class)->setAutowired(true)->setAutoconfigured(true);
+        $c->register(FixtureInGroupStory::class)->setAutowired(true)->setAutoconfigured(true);
     }
 }

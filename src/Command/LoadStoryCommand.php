@@ -26,7 +26,9 @@ final class LoadStoryCommand extends Command
 {
     public function __construct(
         /** @var ServiceLocator<Story> */
-        private readonly ServiceLocator $stories
+        private readonly ServiceLocator $stories,
+        /** @var ServiceLocator<list<Story>> */
+        private readonly ServiceLocator $groupedStories,
     )
     {
         parent::__construct();
@@ -39,12 +41,27 @@ final class LoadStoryCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if ($name = $input->getArgument('name')) {
-            if (!$this->stories->has($name)) {
-                throw new InvalidArgumentException("Fixture with name \"$name\" does not exist.");
-            }
+        $stories = [];
 
-            $this->stories->get($name)->build();
+        if (null === ($name = $input->getArgument('name'))) {
+            // todo: ask interactively
+        }
+
+        if ($this->stories->has($name)) {
+            $stories = [$this->stories->get($name)];
+        }
+
+        if ($this->groupedStories->has($name)) {
+            $stories = $this->groupedStories->get($name);
+        }
+
+        if (!$stories) {
+            throw new InvalidArgumentException("Fixture with name \"$name\" does not exist.");
+        }
+
+        foreach ($stories as $story) {
+            // todo add some output
+            $story->build();
         }
 
         return self::SUCCESS;

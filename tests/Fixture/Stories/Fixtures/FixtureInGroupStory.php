@@ -6,8 +6,8 @@ use Zenstruck\Foundry\Attribute\AsFixture;
 use Zenstruck\Foundry\Story;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 
-#[AsFixture(name: 'fixture-story', groups: ['single-fixture-in-group', 'multiple-fixtures-in-group'])]
-final class FixtureStory extends Story
+#[AsFixture(name: 'fixture-story-for-group', groups: ['multiple-fixtures-in-group'])]
+final class FixtureInGroupStory extends Story
 {
     public function build(): void
     {
