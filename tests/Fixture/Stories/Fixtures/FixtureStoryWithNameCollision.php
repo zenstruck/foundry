@@ -7,7 +7,7 @@ use Zenstruck\Foundry\Story;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 
 #[AsFixture(name: 'fixture-story')]
-final class FixtureStoryWithSameName extends Story
+final class FixtureStoryWithNameCollision extends Story
 {
     public function build(): void
     {

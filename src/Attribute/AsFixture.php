@@ -23,6 +23,8 @@ final class AsFixture
 {
     public function __construct(
         public readonly string $name,
+        /** @var list<string> */
+        public readonly array $groups = [],
     ) {
     }
 }

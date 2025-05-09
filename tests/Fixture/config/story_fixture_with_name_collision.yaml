@@ -1,0 +1,4 @@
+services:
+    Zenstruck\Foundry\Tests\Fixture\Stories\Fixtures\FixtureStoryWithNameCollision:
+        autowire: true
+        autoconfigure: true
