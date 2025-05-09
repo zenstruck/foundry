@@ -1,0 +1,16 @@
+<?php
+
+namespace Zenstruck\Foundry\Tests\Fixture\Stories\Fixtures;
+
+use Zenstruck\Foundry\Attribute\AsFixture;
+use Zenstruck\Foundry\Story;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
+
+#[AsFixture(name: 'fixture-story')]
+final class FixtureStoryWithSameName extends Story
+{
+    public function build(): void
+    {
+        GenericEntityFactory::createMany(5);
+    }
+}

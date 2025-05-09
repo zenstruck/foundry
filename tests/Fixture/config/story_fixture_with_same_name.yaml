@@ -1,0 +1,4 @@
+services:
+    Zenstruck\Foundry\Tests\Fixture\Stories\Fixtures\FixtureStoryWithSameName:
+        autowire: true
+        autoconfigure: true

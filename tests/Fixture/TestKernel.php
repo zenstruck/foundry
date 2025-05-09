@@ -19,7 +19,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\ArrayFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 use Zenstruck\Foundry\Tests\Fixture\InMemory\InMemoryAddressRepository;
 use Zenstruck\Foundry\Tests\Fixture\InMemory\InMemoryContactRepository;
-use Zenstruck\Foundry\Tests\Fixture\Stories\FixtureStory;
+use Zenstruck\Foundry\Tests\Fixture\Stories\Fixtures\FixtureStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\ServiceStory;
 
 /**
