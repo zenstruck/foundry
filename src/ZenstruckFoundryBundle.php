@@ -250,14 +250,20 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
         }
 
         // fixture stories
+        /** @var array<string, Reference> $fixtureStories */
         $fixtureStories = [];
         foreach ($container->findTaggedServiceIds('foundry.story.fixture') as $id => $tags) {
             if (count($tags) !== 1) {
                 throw new LogicException('Tag "foundry.story.fixture" must be used only once per service.');
             }
 
-            // todo test names collision
-            $fixtureStories[$tags[0]['name']] = new Reference($id);
+            $name = $tags[0]['name'];
+
+            if (isset($fixtureStories[$name])) {
+                throw new LogicException("Cannot use #[AsFixture] name \"{$name}\" for service \"{$id}\". This name is already used by service \"{$fixtureStories[$name]}\".");
+            }
+
+            $fixtureStories[$name] = new Reference($id);
         }
 
         $container->findDefinition('.zenstruck_foundry.story.load_story-command')
@@ -459,7 +465,5 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                 $definition->addTag('foundry.story.fixture', ['name' => $attribute->name]);
             }
         );
-
-
     }
 }
