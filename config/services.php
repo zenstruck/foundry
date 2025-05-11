@@ -40,6 +40,8 @@ return static function (ContainerConfigurator $container): void {
         ->public()
 
         ->set('.zenstruck_foundry.story.load_story-command', LoadStoryCommand::class)
+        ->arg('$databaseResetters', tagged_iterator('.foundry.persistence.database_resetter'))
+        ->arg('$kernel', service('kernel'))
         ->tag('console.command', [
             'command' => 'foundry:load-story',
             'aliases' => ['foundry:load-stories'],
