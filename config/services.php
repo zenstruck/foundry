@@ -3,7 +3,6 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Faker;
-use Zenstruck\Foundry\Command\LoadStoryCommand;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\FactoryRegistry;
 use Zenstruck\Foundry\Object\Instantiator;
@@ -38,14 +37,5 @@ return static function (ContainerConfigurator $container): void {
             service('.zenstruck_foundry.in_memory.repository_registry'),
         ])
         ->public()
-
-        ->set('.zenstruck_foundry.story.load_story-command', LoadStoryCommand::class)
-        ->arg('$databaseResetters', tagged_iterator('.foundry.persistence.database_resetter'))
-        ->arg('$kernel', service('kernel'))
-        ->tag('console.command', [
-            'command' => 'foundry:load-story',
-            'aliases' => ['foundry:load-stories'],
-            'description' => 'Load stories which are marked with #[AsFixture]',
-        ])
     ;
 };

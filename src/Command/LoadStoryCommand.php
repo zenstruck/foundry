@@ -13,10 +13,12 @@ namespace Zenstruck\Foundry\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Configuration;
@@ -32,10 +34,10 @@ use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 final class LoadStoryCommand extends Command
 {
     public function __construct(
-        /** @var ServiceLocator<Story> */
-        private readonly ServiceLocator $stories,
-        /** @var ServiceLocator<list<Story>> */
-        private readonly ServiceLocator $groupedStories,
+        /** @var array<string, class-string<Story>> */
+        private readonly array $stories,
+        /** @var array<string, array<string, class-string<Story>>> */
+        private readonly array $groupedStories,
         /** @var iterable<BeforeFirstTestResetter> */
         private iterable $databaseResetters,
         private KernelInterface $kernel,
@@ -54,6 +56,12 @@ final class LoadStoryCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if (count($this->stories) === 0) {
+            throw new LogicException('No story as fixture available: add attribute #[AsFixture] to your story classes before running this command.');
+        }
+
+        $io = new SymfonyStyle($input, $output);
+
         if (!$input->getOption('append')) {
             $this->resetDatabase();
         }
@@ -61,25 +69,41 @@ final class LoadStoryCommand extends Command
         $stories = [];
 
         if (null === ($name = $input->getArgument('name'))) {
-            // todo: ask interactively
+            $storyNames = array_keys($this->stories);
+            if (count($this->groupedStories) > 0) {
+                $storyNames[] = '(choose a group of stories...)';
+            }
+            $name = $io->choice('Choose a story to load:', $storyNames);
+
+            if (!isset($this->stories[$name])) {
+                $groupsNames = array_keys($this->groupedStories);
+                $name = $io->choice('Choose a group of stories:', $groupsNames);
+            }
         }
 
-        if ($this->stories->has($name)) {
-            $stories = [$this->stories->get($name)];
+        if (isset($this->stories[$name])) {
+            $io->comment("Loading story with name \"{$name}\"...");
+            $stories = [$name => $this->stories[$name]];
         }
 
-        if ($this->groupedStories->has($name)) {
-            $stories = $this->groupedStories->get($name);
+        if (isset($this->groupedStories[$name])) {
+            $io->comment("Loading stories group \"{$name}\"...");
+            $stories = $this->groupedStories[$name];
         }
 
         if (!$stories) {
-            throw new InvalidArgumentException("Fixture with name \"$name\" does not exist.");
+            throw new InvalidArgumentException("Story with name \"$name\" does not exist.");
         }
 
-        foreach ($stories as $story) {
-            // todo add some output
-            $story::load();
+        foreach ($stories as $name => $storyClass) {
+            $storyClass::load();
+
+            if ($io->isVerbose()) {
+                $io->info("Story \"$storyClass\" loaded (name: $name).");
+            }
         }
+
+        $io->success('Stories successfully loaded!');
 
         return self::SUCCESS;
     }
