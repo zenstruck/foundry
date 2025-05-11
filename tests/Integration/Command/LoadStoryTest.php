@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\Command;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -75,7 +76,7 @@ final class LoadStoryTest extends KernelTestCase
      * @test
      */
     #[Test]
-    public function it_can_load_one_single_story_based_its_group_name(): void
+    public function it_can_load_one_single_story_based_on_its_group_name(): void
     {
         $this->commandTester()->execute(['name' => 'single-fixture-in-group']);
 
@@ -86,11 +87,34 @@ final class LoadStoryTest extends KernelTestCase
      * @test
      */
     #[Test]
-    public function it_can_load_multiple_stories_based_their_group_name(): void
+    public function it_can_load_multiple_stories_based_on_their_group_name(): void
     {
         $this->commandTester()->execute(['name' => 'multiple-fixtures-in-group']);
 
         GenericEntityFactory::assert()->count(2);
+        GenericEntityFactory::assert()->count(1, ['prop1' => 'fixture-story']);
+        GenericEntityFactory::assert()->count(1, ['prop1' => 'fixture-story-for-group']);
+    }
+
+    /**
+     * @test
+     * @dataProvider provideFixturesWhichLoadAnotherFixtureCases
+     */
+    #[Test]
+    #[DataProvider('provideFixturesWhichLoadAnotherFixtureCases')]
+    public function it_can_load_fixture_which_loads_another_fixture(string $name): void
+    {
+        $this->commandTester()->execute(['name' => $name]);
+
+        GenericEntityFactory::assert()->count(2);
+        GenericEntityFactory::assert()->count(1, ['prop1' => 'fixture-using-another-fixture']);
+        GenericEntityFactory::assert()->count(1, ['prop1' => 'fixture-story']);
+    }
+
+    public static function provideFixturesWhichLoadAnotherFixtureCases(): iterable
+    {
+        yield 'by fixture name' =>  ['fixture-using-another-fixture'];
+        yield 'by group name' =>  ['fixture-using-another-fixture-group'];
     }
 
     private function commandTester(array $options = []): CommandTester

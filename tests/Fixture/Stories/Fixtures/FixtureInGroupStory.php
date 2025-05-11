@@ -11,6 +11,6 @@ final class FixtureInGroupStory extends Story
 {
     public function build(): void
     {
-        GenericEntityFactory::createOne();
+        GenericEntityFactory::createOne(['prop1' => 'fixture-story-for-group']);
     }
 }
