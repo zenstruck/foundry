@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 use Zenstruck\Foundry\Attribute\AsFixture;
+use Zenstruck\Foundry\DependencyInjection\AsFixtureStoryCompilerPass;
 use Zenstruck\Foundry\InMemory\DependencyInjection\InMemoryCompilerPass;
 use Zenstruck\Foundry\InMemory\InMemoryRepository;
 use Zenstruck\Foundry\Mongo\MongoResetter;
@@ -237,6 +238,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
 
         $container->addCompilerPass($this);
         $container->addCompilerPass(new InMemoryCompilerPass());
+        $container->addCompilerPass(new AsFixtureStoryCompilerPass());
     }
 
     public function process(ContainerBuilder $container): void
@@ -248,46 +250,6 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                 ->addMethodCall('addProvider', [new Reference($id)])
             ;
         }
-
-        // todo use proper compiler pass
-        // fixture stories
-        /** @var array<string, Reference> $fixtureStories */
-        $fixtureStories = [];
-        $groupedFixtureStories = [];
-        foreach ($container->findTaggedServiceIds('foundry.story.fixture') as $id => $tags) {
-            if (count($tags) !== 1) {
-                throw new LogicException('Tag "foundry.story.fixture" must be used only once per service.');
-            }
-
-            $name = $tags[0]['name'];
-
-            if (isset($fixtureStories[$name])) {
-                throw new LogicException("Cannot use #[AsFixture] name \"{$name}\" for service \"{$id}\". This name is already used by service \"{$fixtureStories[$name]}\".");
-            }
-
-            $fixtureStories[$name] = new Reference($id);
-
-            $groups = $tags[0]['groups'];
-            if (!$groups) {
-                continue;
-            }
-
-            foreach ($groups as $group) {
-                $groupedFixtureStories[$group] ??= [];
-                $groupedFixtureStories[$group][] = new Reference($id);
-            }
-        }
-
-        if ($collisionNames = array_intersect(array_keys($fixtureStories), array_keys($groupedFixtureStories))) {
-            $collisionNames = implode('", "', $collisionNames);
-            // todo: better message
-            throw new LogicException("Cannot use #[AsFixture] group(s) \"{$collisionNames}\" They collide with fixture names.");
-        }
-
-        $container->findDefinition('.zenstruck_foundry.story.load_story-command')
-            ->setArgument('$stories', ServiceLocatorTagPass::register($container, $fixtureStories))
-            ->setArgument('$groupedStories', ServiceLocatorTagPass::register($container, $groupedFixtureStories))
-        ;
     }
 
     /**
