@@ -61,7 +61,7 @@ final class LoadStoryCommand extends Command
 
         foreach ($stories as $story) {
             // todo add some output
-            $story->build();
+            $story::load();
         }
 
         return self::SUCCESS;
