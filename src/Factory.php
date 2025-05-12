@@ -103,7 +103,7 @@ abstract class Factory
     abstract public function create(array|callable $attributes = []): mixed;
 
     /**
-     * @return FactoryCollection<T, static>
+     * @return FactoryCollection<static>
      */
     final public function many(int $count): FactoryCollection
     {
@@ -111,7 +111,7 @@ abstract class Factory
     }
 
     /**
-     * @return FactoryCollection<T, static>
+     * @return FactoryCollection<static>
      */
     final public function range(int $min, int $max): FactoryCollection
     {
@@ -120,7 +120,7 @@ abstract class Factory
 
     /**
      * @phpstan-param Sequence $sequence
-     * @return FactoryCollection<T, static>
+     * @return FactoryCollection<static>
      */
     final public function sequence(iterable|callable $sequence): FactoryCollection
     {
@@ -134,7 +134,7 @@ abstract class Factory
     /**
      * @param list<mixed> $values
      *
-     * @return FactoryCollection<T, static>
+     * @return FactoryCollection<static>
      */
     final public function distribute(string $field, array $values): FactoryCollection
     {
@@ -262,7 +262,7 @@ abstract class Factory
     /**
      * @internal
      *
-     * @param FactoryCollection<mixed, Factory<mixed>> $collection
+     * @param FactoryCollection<Factory<mixed>> $collection
      *
      * @return self<mixed>[]
      */

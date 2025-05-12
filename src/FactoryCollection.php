@@ -17,8 +17,7 @@ use Zenstruck\Foundry\Persistence\PersistMode;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
- * @template T
- * @template TFactory of Factory<T>
+ * @template TFactory of Factory
  * @implements \IteratorAggregate<TFactory>
  *
  * @phpstan-import-type Attributes from Factory
@@ -77,7 +76,7 @@ final class FactoryCollection implements \IteratorAggregate
     /**
      * @param array<TFactory> $factories
      *
-     * @return self<T, TFactory>
+     * @return self<TFactory>
      *
      * @internal
      */
@@ -93,7 +92,7 @@ final class FactoryCollection implements \IteratorAggregate
     /**
      * @param TFactory $factory
      *
-     * @return self<T, TFactory>
+     * @return self<TFactory>
      */
     public static function many(Factory $factory, int $count): self
     {
@@ -103,7 +102,7 @@ final class FactoryCollection implements \IteratorAggregate
     /**
      * @param TFactory $factory
      *
-     * @return self<T, TFactory>
+     * @return self<TFactory>
      */
     public static function range(Factory $factory, int $min, int $max): self
     {
@@ -117,7 +116,7 @@ final class FactoryCollection implements \IteratorAggregate
     /**
      * @param TFactory $factory
      * @phpstan-param  iterable<Attributes> $items
-     * @return self<T, TFactory>
+     * @return self<TFactory>
      */
     public static function sequence(Factory $factory, iterable $items): self
     {
@@ -127,7 +126,7 @@ final class FactoryCollection implements \IteratorAggregate
     /**
      * @phpstan-param Attributes $attributes
      *
-     * @return list<T>
+     * @return list<template-type<TFactory, Factory, 'T'>>
      */
     public function create(array|callable $attributes = []): array
     {
@@ -167,7 +166,7 @@ final class FactoryCollection implements \IteratorAggregate
     /**
      * @param list<mixed> $values
      *
-     * @return self<T, TFactory>
+     * @return self<TFactory>
      */
     public function distribute(string $field, array $values): self
     {

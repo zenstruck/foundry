@@ -691,7 +691,7 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
     }
 
     /**
-     * @param FactoryCollection<Contact, PersistentObjectFactory<Contact>>|list<Factory<Contact>>|list<Contact> $contacts
+     * @param FactoryCollection<PersistentObjectFactory<Contact>>|list<Factory<Contact>>|list<Contact> $contacts
      */
     private function one_to_many(FactoryCollection|array $contacts): void
     {
@@ -711,7 +711,7 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
     }
 
     /**
-     * @param FactoryCollection<Contact, PersistentObjectFactory<Contact>>|list<Factory<Contact>>|list<Contact> $contacts
+     * @param FactoryCollection<PersistentObjectFactory<Contact>>|list<Factory<Contact>>|list<Contact> $contacts
      */
     private function many_to_many(FactoryCollection|array $contacts): void
     {

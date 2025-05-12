@@ -68,9 +68,9 @@ final class PersistentObjectFactoryTest extends TestCase
     /**
      * @test
      * @dataProvider factoryCollectionDataProvider
-     * @param FactoryCollection<GenericEntity, GenericEntityFactory> $collection
+     * @param FactoryCollection<GenericEntityFactory> $collection
      */
-    #[Test] // @phpstan-ignore generics.notSubtype
+    #[Test]
     #[DataProvider('factoryCollectionDataProvider')]
     public function can_use_factory_collection_methods_in_data_providers(FactoryCollection $collection): void
     {
