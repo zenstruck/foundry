@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Unit;
 
 use Faker;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Configuration;
@@ -80,6 +81,7 @@ final class FactoryTest extends TestCase
      * @test
      */
     #[Test]
+    #[IgnoreDeprecations]
     public function can_use_user_defined_proxy_persistent_factory_in_unit_test(): void
     {
         $object = GenericProxyEntityFactory::createOne();
@@ -121,6 +123,7 @@ final class FactoryTest extends TestCase
      * @test
      */
     #[Test]
+    #[IgnoreDeprecations]
     public function proxy_attributes_can_be_used_in_unit_test(): void
     {
         $object = ProxyContactFactory::createOne([
