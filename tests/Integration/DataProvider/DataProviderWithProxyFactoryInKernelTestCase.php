@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Integration\DataProvider;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use PHPUnit\Framework\Attributes\Test;
@@ -33,6 +34,7 @@ use function Zenstruck\Foundry\Persistence\unproxy;
  */
 #[RequiresPhpunit('>=11.4')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
+#[IgnoreDeprecations]
 abstract class DataProviderWithProxyFactoryInKernelTestCase extends KernelTestCase
 {
     use Factories;

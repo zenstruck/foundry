@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\DataProvider;
 
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
@@ -23,6 +24,7 @@ use Zenstruck\Foundry\Tests\Integration\RequiresMongo;
  */
 #[RequiresPhpunit('>=11.4')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
+#[IgnoreDeprecations]
 final class GenericDocumentProxyFactoryTest extends DataProviderWithProxyFactoryInKernelTestCase
 {
     use RequiresMongo;
