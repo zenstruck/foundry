@@ -51,9 +51,9 @@ assertType("list<UserForObjectFactory>", UserObjectFactory::createSequence([]));
 // methods with FactoryCollection
 $factoryCollection = FactoryCollection::class;
 $factory = UserObjectFactory::class;
-assertType("{$factoryCollection}<UserForObjectFactory, {$factory}>", UserObjectFactory::new()->many(2));
-assertType("{$factoryCollection}<UserForObjectFactory, {$factory}>", UserObjectFactory::new()->range(1, 2));
-assertType("{$factoryCollection}<UserForObjectFactory, {$factory}>", UserObjectFactory::new()->sequence([]));
+assertType("{$factoryCollection}<{$factory}>", UserObjectFactory::new()->many(2));
+assertType("{$factoryCollection}<{$factory}>", UserObjectFactory::new()->range(1, 2));
+assertType("{$factoryCollection}<{$factory}>", UserObjectFactory::new()->sequence([]));
 assertType("list<UserForObjectFactory>", UserObjectFactory::new()->many(2)->create());
 assertType("list<UserForObjectFactory>", UserObjectFactory::new()->range(1, 2)->create());
 assertType("list<UserForObjectFactory>", UserObjectFactory::new()->sequence([])->create());

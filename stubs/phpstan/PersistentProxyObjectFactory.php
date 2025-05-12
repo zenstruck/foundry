@@ -58,9 +58,9 @@ assertType("list<{$proxyType}>", UserProxyFactory::findBy(['name' => 'foo']));
 // methods with FactoryCollection
 $factoryCollection = FactoryCollection::class;
 $factory = UserProxyFactory::class;
-assertType("{$factoryCollection}<{$proxyType}, {$factory}>", UserProxyFactory::new()->many(2));
-assertType("{$factoryCollection}<{$proxyType}, {$factory}>", UserProxyFactory::new()->range(1, 2));
-assertType("{$factoryCollection}<{$proxyType}, {$factory}>", UserProxyFactory::new()->sequence([]));
+assertType("{$factoryCollection}<{$factory}>", UserProxyFactory::new()->many(2));
+assertType("{$factoryCollection}<{$factory}>", UserProxyFactory::new()->range(1, 2));
+assertType("{$factoryCollection}<{$factory}>", UserProxyFactory::new()->sequence([]));
 assertType("list<{$proxyType}>", UserProxyFactory::new()->many(2)->create());
 assertType("list<{$proxyType}>", UserProxyFactory::new()->range(1, 2)->create());
 assertType("list<{$proxyType}>", UserProxyFactory::new()->sequence([])->create());

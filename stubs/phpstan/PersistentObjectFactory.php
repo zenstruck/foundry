@@ -57,9 +57,9 @@ assertType("list<UserForPersistentFactory>", UserFactory::findBy(['name' => 'foo
 // methods with FactoryCollection
 $factoryCollection = FactoryCollection::class;
 $factory = UserFactory::class;
-assertType("{$factoryCollection}<UserForPersistentFactory, {$factory}>", UserFactory::new()->many(2));
-assertType("{$factoryCollection}<UserForPersistentFactory, {$factory}>", UserFactory::new()->range(1, 2));
-assertType("{$factoryCollection}<UserForPersistentFactory, {$factory}>", UserFactory::new()->sequence([]));
+assertType("{$factoryCollection}<{$factory}>", UserFactory::new()->many(2));
+assertType("{$factoryCollection}<{$factory}>", UserFactory::new()->range(1, 2));
+assertType("{$factoryCollection}<{$factory}>", UserFactory::new()->sequence([]));
 assertType("list<UserForPersistentFactory>", UserFactory::new()->many(2)->create());
 assertType("list<UserForPersistentFactory>", UserFactory::new()->range(1, 2)->create());
 assertType("list<UserForPersistentFactory>", UserFactory::new()->sequence([])->create());
