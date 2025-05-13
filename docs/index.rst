@@ -2129,13 +2129,13 @@ In-memory Behavior
 ~~~~~~~~~~~~~~~~~~
 
 Foundry allows to use "in-memory" repositories in your factories. This is mainly useful for `DDD <https://en.wikipedia.org/wiki/Domain-driven_design>`_
-applications or with `hexagonal architecture <https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)>`, where
-repositories in the domain are usually interfaces for which main implementations are a Doctrine one. You can tell Foundry to
+applications or with `hexagonal architecture <https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)>_`, where
+repositories in the domain are usually interfaces for which main implementations are Doctrine ones. You can tell Foundry to
 use the "in-memory" version of these repositories.
 
 .. versionadded:: 2.5
 
-    The "in-memory" behavior is experimental. Experimental features are not
+    The "in-memory" behavior was added in Foundry 2.5 and is experimental. Experimental features are not
     covered by the backward compatibility promise.
 
 First, you need to create an "in-memory" version of your repository. This repository must implement the
@@ -2156,6 +2156,7 @@ First, you need to create an "in-memory" version of your repository. This reposi
         /** @use InMemoryRepositoryTrait<Address> */
         use InMemoryRepositoryTrait;
 
+        // The class returned by this method is the class managed by this repository
         public static function _class(): string
         {
             return Address::class;
@@ -2165,7 +2166,7 @@ First, you need to create an "in-memory" version of your repository. This reposi
     }
 
 Then, the "in-memory" repository should be used in Symfony's container, as the main repository implementation. For this
-purpose, you can either use a new environment ``test-in-memory``, or use a ``InMeMemoryKernel``.
+purpose, you can either use a new environment ``test-in-memory``, or use a ``InMemoryKernel``.
 
 In your tests, use the ``#[AsInMemoryTest]`` attribute, which will disable persistence of the factories, and register an
 "after instantiate" hook, which will store the objects in their respective "in memory" repositories:
@@ -2175,7 +2176,7 @@ In your tests, use the ``#[AsInMemoryTest]`` attribute, which will disable persi
     use Zenstruck\Foundry\InMemory\AsInMemoryTest;
 
     #[AsInMemoryTest]
-    class SomeTest extends KernelTestCase
+    final class SomeTest extends KernelTestCase
     {
         private InMemoryAddressRepository $addressRepository;
 
@@ -2198,9 +2199,18 @@ In your tests, use the ``#[AsInMemoryTest]`` attribute, which will disable persi
             // You can even use `YourFactory::repository()->assert()`
             AddressFactory::repository()->assert()->count(1);
         }
+
+        protected static function getKernelClass(): string
+        {
+            // This is one of the ways to use the "in-memory" repositories in a "kernel test":
+            // the "InMemoryKernel" would use "in-memory" repositories instead of the main ones.
+            return InMemoryKernel::class;
+        }
     }
 
-A ``GenericInMemoryRepository`` class is also added for convenience, when the given "in-memory" repository is missing.
+A ``GenericInMemoryRepository`` class is also provided for convenience, when the "in-memory" repository is missing for a
+specific class. This way, you're not forced to create a "in-memory" version for all your repositories, but only for the
+ones used in the current test.
 
 Stories
 -------
