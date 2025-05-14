@@ -1782,7 +1782,7 @@ PHPUnit Data Providers
 ~~~~~~~~~~~~~~~~~~~~~~
 
 It is possible to use factories in
-`PHPUnit data providers <https://phpunit.readthedocs.io/en/9.3/writing-tests-for-phpunit.html#data-providers>`_.
+`PHPUnit data providers <https://docs.phpunit.de/en/11.5/writing-tests-for-phpunit.html#data-providers>`_.
 Their usage depends on whether you're using Foundry's `PHPUnit Extension`_ or not.:
 
 With PHPUnit Extension
