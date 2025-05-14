@@ -2138,6 +2138,10 @@ use the "in-memory" version of these repositories.
     The "in-memory" behavior was added in Foundry 2.5 and is experimental. Experimental features are not
     covered by the backward compatibility promise.
 
+.. warning::
+
+    The `PHPUnit Extension`_ for Foundry is needed to use "in-memory" behavior (along with PHPUnit ^11.4).
+
 First, you need to create an "in-memory" version of your repository. This repository must implement the
 ``Zenstruck\Foundry\InMemory\InMemoryRepository`` interface. You can use the trait
 ``Zenstruck\Foundry\InMemory\InMemoryRepositoryTrait`` to help you with this:
