@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Attribute;
 
-use Zenstruck\Foundry\Story;
-
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */

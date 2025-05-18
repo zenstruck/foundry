@@ -14,8 +14,8 @@ namespace Zenstruck\Foundry;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
@@ -29,7 +29,6 @@ use Zenstruck\Foundry\ORM\ResetDatabase\MigrateDatabaseResetter;
 use Zenstruck\Foundry\ORM\ResetDatabase\OrmResetter;
 use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
 use Zenstruck\Foundry\ORM\ResetDatabase\SchemaDatabaseResetter;
-use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -437,10 +436,8 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
             AsFixture::class,
             // @phpstan-ignore argument.type
             static function(ChildDefinition $definition, AsFixture $attribute, \ReflectionClass $reflector) {
-                if (false === $reflector->getParentClass() || $reflector->getParentClass()->getName() !== Story::class) {
-                    throw new LogicException(
-                        \sprintf("Only stories can be marked with \"%s\" attribute, class \"%s\" is not a story.", AsFixture::class, $reflector->getName())
-                    );
+                if (false === $reflector->getParentClass() || Story::class !== $reflector->getParentClass()->getName()) {
+                    throw new LogicException(\sprintf('Only stories can be marked with "%s" attribute, class "%s" is not a story.', AsFixture::class, $reflector->getName()));
                 }
 
                 $definition->addTag('foundry.story.fixture', ['name' => $attribute->name, 'groups' => $attribute->groups]);

@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Command;
 
+use DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
@@ -19,14 +20,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Zenstruck\Foundry\Configuration;
-use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\Persistence\ResetDatabase\BeforeFirstTestResetter;
-use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 use Zenstruck\Foundry\Story;
-use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
@@ -41,8 +37,7 @@ final class LoadStoryCommand extends Command
         /** @var iterable<BeforeFirstTestResetter> */
         private iterable $databaseResetters,
         private KernelInterface $kernel,
-    )
-    {
+    ) {
         parent::__construct();
     }
 
@@ -56,7 +51,7 @@ final class LoadStoryCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if (count($this->stories) === 0) {
+        if (0 === \count($this->stories)) {
             throw new LogicException('No story as fixture available: add attribute #[AsFixture] to your story classes before running this command.');
         }
 
@@ -69,14 +64,18 @@ final class LoadStoryCommand extends Command
         $stories = [];
 
         if (null === ($name = $input->getArgument('name'))) {
-            $storyNames = array_keys($this->stories);
-            if (count($this->groupedStories) > 0) {
-                $storyNames[] = '(choose a group of stories...)';
+            if (1 === \count($this->stories)) {
+                $name = \array_keys($this->stories)[0];
+            } else {
+                $storyNames = \array_keys($this->stories);
+                if (\count($this->groupedStories) > 0) {
+                    $storyNames[] = '(choose a group of stories...)';
+                }
+                $name = $io->choice('Choose a story to load:', $storyNames);
             }
-            $name = $io->choice('Choose a story to load:', $storyNames);
 
             if (!isset($this->stories[$name])) {
-                $groupsNames = array_keys($this->groupedStories);
+                $groupsNames = \array_keys($this->groupedStories);
                 $name = $io->choice('Choose a group of stories:', $groupsNames);
             }
         }
@@ -92,14 +91,14 @@ final class LoadStoryCommand extends Command
         }
 
         if (!$stories) {
-            throw new InvalidArgumentException("Story with name \"$name\" does not exist.");
+            throw new InvalidArgumentException("Story with name \"{$name}\" does not exist.");
         }
 
         foreach ($stories as $name => $storyClass) {
             $storyClass::load();
 
             if ($io->isVerbose()) {
-                $io->info("Story \"$storyClass\" loaded (name: $name).");
+                $io->info("Story \"{$storyClass}\" loaded (name: {$name}).");
             }
         }
 
@@ -110,6 +109,11 @@ final class LoadStoryCommand extends Command
 
     private function resetDatabase(): void
     {
+        // it is very not likely that we need dama when running this command
+        if (\class_exists(StaticDriver::class) && StaticDriver::isKeepStaticConnections()) {
+            StaticDriver::setKeepStaticConnections(false);
+        }
+
         foreach ($this->databaseResetters as $databaseResetter) {
             $databaseResetter->resetBeforeFirstTest($this->kernel);
         }

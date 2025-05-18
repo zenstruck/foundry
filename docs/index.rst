@@ -1160,7 +1160,7 @@ once. To do this, wrap the operations in a ``flush_after()`` callback:
         TagFactory::createMany(200); // instantiated/persisted but not flushed
     }); // single flush
 
-The ``flush_after()`` function forwards the callback’s return, in case you need to use the objects in your tests:
+The ``flush_after()`` function forwards the callback's return, in case you need to use the objects in your tests:
 
 ::
 
@@ -2411,6 +2411,10 @@ Mark with the attribute ``#[AsFixture]`` the stories your want to be loaded by t
 
 ``bin/console foundry:load-stories category`` will now load the story ``CategoryStory`` in your database.
 
+.. note::
+
+    If only a single story exists, you can omit the argument and just call ``bin/console foundry:load-stories`` to load it.
+
 You can also load stories by group, by using the ``groups`` option:
 
 ::
@@ -2425,7 +2429,7 @@ You can also load stories by group, by using the ``groups`` option:
 
 ``bin/console foundry:load-stories all-stories`` will load both stories ``CategoryStory`` and ``PostStory``.
 
-.. note::
+.. tip::
 
     It is possible to call a story inside another story, by using `OtherStory::load();`. Because the stories are only
     loaded once, it will work regardless of the order of the stories.

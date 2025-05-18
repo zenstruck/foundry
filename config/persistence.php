@@ -24,7 +24,7 @@ return static function (ContainerConfigurator $container): void {
             ->arg('$kernel', service('kernel'))
             ->tag('console.command', [
                 'command' => 'foundry:load-stories',
-                'aliases' => ['foundry:load-fixtures'],
+                'aliases' => ['foundry:load-fixtures', 'foundry:load-fixture', 'foundry:load-story'],
                 'description' => 'Load stories which are marked with #[AsFixture] attribute.',
             ])
     ;

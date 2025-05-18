@@ -1,15 +1,24 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Tests\Integration\Command;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
@@ -18,9 +27,9 @@ use Zenstruck\Foundry\Tests\Fixture\Stories\Fixtures\FixtureStoryWithNameCollisi
 use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
-final class LoadStoryTest extends KernelTestCase
+final class LoadStoryCommandTest extends KernelTestCase
 {
-    use RequiresORM, ResetDatabase, Factories;
+    use Factories, RequiresORM, ResetDatabase;
 
     /**
      * @test
@@ -81,7 +90,7 @@ final class LoadStoryTest extends KernelTestCase
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
-            sprintf(
+            \sprintf(
                 'Cannot use #[AsFixture] name "fixture-story" for service "%s". This name is already used by service "%s".',
                 FixtureStoryWithNameCollision::class,
                 FixtureStory::class,
@@ -145,8 +154,8 @@ final class LoadStoryTest extends KernelTestCase
 
     public static function provideFixturesWhichLoadAnotherFixtureCases(): iterable
     {
-        yield 'by fixture name' =>  ['fixture-using-another-fixture'];
-        yield 'by group name' =>  ['fixture-using-another-fixture-group'];
+        yield 'by fixture name' => ['fixture-using-another-fixture'];
+        yield 'by group name' => ['fixture-using-another-fixture-group'];
     }
 
     /**
@@ -217,6 +226,21 @@ final class LoadStoryTest extends KernelTestCase
         GenericEntityFactory::assert()->count(1, ['prop1' => 'fixture-story-for-group']);
 
         self::assertStringContainsString('Loading stories group "multiple-fixtures-in-group"', $commandTester->getDisplay());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function if_no_name_provided_and_on_one_story_fixture_it_loads_it_automatically(): void
+    {
+        $commandTester = $this->commandTester(['environment' => 'stories_as_fixture_unique']);
+        $commandTester->execute(['--append' => true]);
+
+        GenericEntityFactory::assert()->count(1);
+        GenericEntityFactory::assert()->count(1, ['prop1' => 'fixture-story']);
+
+        self::assertStringContainsString('Loading story with name "fixture-story"', $commandTester->getDisplay());
     }
 
     private function commandTester(array $options = []): CommandTester
