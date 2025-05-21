@@ -229,6 +229,12 @@ abstract class PersistentObjectFactory extends ObjectFactory
      */
     public function create(callable|array $attributes = []): object
     {
+        $configuration = Configuration::instance();
+
+        if ($configuration->inADataProvider() && \PHP_VERSION_ID >= 80400 && !$this instanceof PersistentProxyObjectFactory) {
+            return ProxyGenerator::wrapFactoryNativeProxy($this, $attributes);
+        }
+
         $object = parent::create($attributes);
 
         foreach ($this->tempAfterInstantiate as $callback) {
@@ -242,8 +248,6 @@ abstract class PersistentObjectFactory extends ObjectFactory
         if (PersistMode::PERSIST !== $this->persistMode()) {
             return $object;
         }
-
-        $configuration = Configuration::instance();
 
         if ($configuration->flushOnce && !$this->isRootFactory) {
             return $object;
