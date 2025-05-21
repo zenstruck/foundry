@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Integration\DataProvider;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use PHPUnit\Framework\Attributes\Test;
@@ -28,6 +29,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
  * @requires PHPUnit >=11.4
  */
 #[RequiresPhpunit('>=11.4')]
+#[RequiresPhp('<8.4')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 final class DataProviderWithNonProxyFactoryInKernelTestCaseTest extends KernelTestCase
 {

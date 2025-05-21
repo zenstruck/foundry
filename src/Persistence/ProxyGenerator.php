@@ -60,6 +60,25 @@ final class ProxyGenerator
     }
 
     /**
+     * @template T of object
+     *
+     * @param PersistentObjectFactory<T> $factory
+     * @phpstan-param Attributes $attributes
+     *
+     * @return T
+     */
+    public static function wrapFactoryNativeProxy(PersistentObjectFactory $factory, callable|array $attributes): object
+    {
+        if (\PHP_VERSION_ID < 80400) {
+            throw new \LogicException('Native proxy generation requires PHP 8.4 or higher.');
+        }
+
+        $reflector = new \ReflectionClass($factory::class());
+
+        return $reflector->newLazyProxy(static fn() => $factory->create($attributes)); // @phpstan-ignore-line
+    }
+
+    /**
      * @template T
      *
      * @param T $what
@@ -78,6 +97,10 @@ final class ProxyGenerator
 
         if ($what instanceof Proxy) {
             return $what->_real($withAutoRefresh); // @phpstan-ignore return.type
+        }
+
+        if (\PHP_VERSION_ID >= 80400 && \is_object($what) && ($reflector = new \ReflectionClass($what))->isUninitializedLazyObject($what)) {
+            return $reflector->initializeLazyObject($what);
         }
 
         return $what;
