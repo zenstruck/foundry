@@ -15,12 +15,9 @@ namespace Zenstruck\Foundry\Utils\Rector;
 
 use PhpParser\Node;
 use PhpParser\Node\FunctionLike;
-use PHPStan\Type\ArrayType;
 use PHPStan\Type\ClosureType;
-use PHPStan\Type\Generic\GenericObjectType;
-use PHPStan\Type\TypeWithClassName;
+use PHPStan\Type\ErrorType;
 use Rector\Rector\AbstractRector;
-use Rector\StaticTypeMapper\ValueObject\Type\FullyQualifiedObjectType;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 use Zenstruck\Foundry\Persistence\Proxy;
@@ -102,8 +99,8 @@ final class RemoveUnproxifyArrayMap extends AbstractRector
 
         $paramType = $this->getType($callable->getParams()[0]);
 
-        if (!$paramType instanceof TypeWithClassName || !\is_a($paramType->getClassName(), Proxy::class, allow_string: true)) {
-            return false; // let's only handle param when it is fully typed as a Proxy
+        if (count($classNames = $paramType->getObjectClassNames()) !== 1 || !\is_a($classNames[0], Proxy::class, allow_string: true)) {
+            return false; // let's only handle callables with one param of type Proxy
         }
 
         // assert the body of the callable is a single ->object() / ->_real() call on its unique param
@@ -120,33 +117,32 @@ final class RemoveUnproxifyArrayMap extends AbstractRector
     {
         $array = $this->getType($node->getArgs()[1]->value);
 
-        if (!$array instanceof ArrayType) {
-            return false; // this should not happen: second argument of an array_map call IS an array
-        }
-
         $iterableType = $array->getIterableValueType();
-        if (!$iterableType instanceof TypeWithClassName) {
-            // if it is not a TypeWithClassName, we could be in on of these situations, which we cannot handle
+        if (!$iterableType->isObject()->yes()) {
+            // if iterable type is not an object, we could be in on of these situations, which we cannot handle
             // - the parameter is badly typed
             // - the iterable type is not an object
             // - we have a more complex type
             return false;
         }
 
-        $className = $iterableType->getClassName();
+        $classNames = $iterableType->getObjectClassNames();
 
-        if (!\is_a($className, Proxy::class, allow_string: true)) {
+        if (1 !== \count($classNames)) {
+            return false; // we have a more complex type, we cannot handle this
+        }
+
+        if (!\is_a($classNames[0], Proxy::class, allow_string: true)) {
             return true; // the objects in array param are NOT a proxy, we should make the replacement
         }
 
         // otherwise, let's check if we have a Proxy<Object> with Object is not persistable.
 
-        if (!$iterableType instanceof GenericObjectType) {
-            return false; // not a fully typed generic, cannot guess if Object is persistable
-        }
+        $templateType = $iterableType->getTemplateType(Proxy::class, 'TProxiedObject');
 
-        return 1 === \count($iterableType->getTypes())
-            && ($genericType = $iterableType->getTypes()[0]) instanceof TypeWithClassName
-            && !$this->persistenceResolver->shouldUseProxyFactory($genericType->getClassName()); // @phpstan-ignore-line
+        return !$templateType instanceof ErrorType
+            && $templateType->isObject()->yes()
+            && count($templateType->getObjectClassNames()) === 1
+            && !$this->persistenceResolver->shouldUseProxyFactory($templateType->getObjectClassNames()[0]); // @phpstan-ignore argument.type
     }
 }

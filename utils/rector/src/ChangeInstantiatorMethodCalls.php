@@ -17,15 +17,21 @@ use PhpParser\Node;
 use PhpParser\Node\Name\FullyQualified;
 use PHPStan\Analyser\Scope;
 use PHPStan\Type\ObjectType;
-use Rector\Rector\AbstractScopeAwareRector;
+use Rector\PHPStan\ScopeFetcher;
+use Rector\Rector\AbstractRector;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\ObjectFactory;
 
-final class ChangeInstantiatorMethodCalls extends AbstractScopeAwareRector
+final class ChangeInstantiatorMethodCalls extends AbstractRector
 {
+    public function __construct(
+        private readonly ScopeFetcher $scopeFetcher
+    ) {
+    }
+
     public function getRuleDefinition(): RuleDefinition
     {
         return new RuleDefinition(
@@ -59,11 +65,11 @@ final class ChangeInstantiatorMethodCalls extends AbstractScopeAwareRector
         return [Node\Expr\MethodCall::class, Node\Expr\New_::class];
     }
 
-    public function refactorWithScope(Node $node, Scope $scope)
+    public function refactor(Node $node): ?Node
     {
         return match (true) {
             $node instanceof Node\Expr\MethodCall => $this->changeMethodCalls($node),
-            $node instanceof Node\Expr\New_ => $this->useNamedConstructor($node, $scope),
+            $node instanceof Node\Expr\New_ => $this->useNamedConstructor($node, $this->scopeFetcher->fetch($node)),
             default => null,
         };
     }

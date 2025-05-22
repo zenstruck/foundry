@@ -43,9 +43,9 @@ final class DummyPersistentModelFactory extends ModelFactory
 
 namespace Zenstruck\Foundry\Utils\Rector\Tests\Fixtures;
 
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentObject;
 use Zenstruck\Foundry\Persistence\Proxy;

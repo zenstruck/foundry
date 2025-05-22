@@ -84,7 +84,7 @@ final class ChangeFactoryMethodCalls extends AbstractRector
         );
     }
 
-    public function refactor(Node $node): Node|int|null
+    public function refactor(Node $node): Node|null
     {
         return match ($node::class) {
             MethodCall::class => $this->changeMethodCall($node),
@@ -93,7 +93,7 @@ final class ChangeFactoryMethodCalls extends AbstractRector
         };
     }
 
-    public function changeMethodCall(MethodCall $node): Node|int|null
+    public function changeMethodCall(MethodCall $node): Node|null
     {
         if (!$this->isObjectType($node->var, new ObjectType(Factory::class))) {
             return null;
@@ -108,7 +108,7 @@ final class ChangeFactoryMethodCalls extends AbstractRector
         if ('withoutPersisting' === $this->getName($node->name)) {
             $type = $this->getType($node->var);
             $classes = $type->getObjectClassNames();
-            if (1 === \count($classes) && $this->persistenceResolver->shouldTransformFactoryIntoObjectFactory($classes[0])) { // @phpstan-ignore-line
+            if (1 === \count($classes) && $this->persistenceResolver->shouldTransformFactoryIntoObjectFactory($classes[0])) { // @phpstan-ignore argument.type
                 return $node->var;
             }
 

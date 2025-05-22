@@ -154,7 +154,7 @@ final class AddProxyToFactoryCollectionTypeInPhpDoc extends AbstractRector
     {
         $type = $this->staticTypeMapper->mapPHPStanPhpDocTypeNodeToPHPStanType($typeNode, $node);
 
-        return match ($type::class) { // @phpstan-ignore-line
+        return match ($type::class) { // @phpstan-ignore return.type
             FullyQualifiedObjectType::class => $type->getClassName(),
             ShortenedObjectType::class, AliasedObjectType::class => $type->getFullyQualifiedName(),
             default => null,

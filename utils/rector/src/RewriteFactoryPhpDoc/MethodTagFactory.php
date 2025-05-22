@@ -7,6 +7,7 @@ namespace Zenstruck\Foundry\Utils\Rector\RewriteFactoryPhpDoc;
 use Doctrine\Persistence\ObjectRepository;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprNode;
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprNullNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueParameterNode;
@@ -93,7 +94,8 @@ final class MethodTagFactory
                     array_keys(self::METHODS[$methodName]['params']),
                     self::METHODS[$methodName]['params']
                 ),
-                description: ''
+                description: '',
+                templateTypes: [],
             )
         );
     }
@@ -117,7 +119,8 @@ final class MethodTagFactory
                 ),
                 methodName: 'repository',
                 parameters: [],
-                description: ''
+                description: '',
+                templateTypes: [],
             )
         );
     }
@@ -219,7 +222,7 @@ final class MethodTagFactory
             ),
             self::PARAM_SORTED_FIELD => $createParameter(
                 type: new IdentifierTypeNode('string'),
-                default: new ConstExprStringNode("'id'")
+                default: new ConstExprStringNode('id', ConstExprStringNode::SINGLE_QUOTED)
             ),
             self::PARAM_INT => $createParameter(
                 type: new IdentifierTypeNode('int'),
@@ -231,7 +234,7 @@ final class MethodTagFactory
                         new IdentifierTypeNode('null'),
                     ]
                 ),
-                default: new ConstExprStringNode('null')
+                default: new ConstExprNullNode()
             ),
         };
     }

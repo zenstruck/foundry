@@ -62,7 +62,7 @@ final class ChangeFunctionsCalls extends AbstractRector
         );
     }
 
-    public function refactor(Node $node): Node|int|null
+    public function refactor(Node $node): Node|null
     {
         return match ($node::class) {
             Node\Expr\FuncCall::class => $this->replaceFunctions($node),

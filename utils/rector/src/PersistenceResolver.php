@@ -43,7 +43,7 @@ final class PersistenceResolver
 
     public function __construct(?string $objectManagerLoader = null)
     {
-        $this->doctrineMetadataResolver = new ObjectMetadataResolver($objectManagerLoader, \sys_get_temp_dir().'/rector-doctrine'); // @phpstan-ignore-line
+        $this->doctrineMetadataResolver = new ObjectMetadataResolver($objectManagerLoader, \sys_get_temp_dir().'/rector-doctrine'); // @phpstan-ignore phpstanApi.constructor
     }
 
     /** @param class-string<ObjectFactory> $factoryClass */
@@ -95,10 +95,10 @@ final class PersistenceResolver
         $mongoAttribute = $this->getMongoAttribute($targetClass);
 
         if ($mongoAttribute) {
-            return $mongoAttribute->repositoryClass ?? DocumentRepository::class; // @phpstan-ignore-line
+            return $mongoAttribute->repositoryClass ?? DocumentRepository::class; // @phpstan-ignore return.type
         }
 
-        return $this->doctrineMetadataResolver->getClassMetadata($targetClass)?->customRepositoryClassName ?? EntityRepository::class;  // @phpstan-ignore-line
+        return $this->doctrineMetadataResolver->getClassMetadata($targetClass)->customRepositoryClassName ?? EntityRepository::class;
     }
 
     /**
@@ -106,7 +106,7 @@ final class PersistenceResolver
      */
     private function isPersisted(string $targetClass): bool
     {
-        $isPersisted = (bool) $this->doctrineMetadataResolver->getClassMetadata($targetClass); // @phpstan-ignore-line
+        $isPersisted = (bool) $this->doctrineMetadataResolver->getClassMetadata($targetClass);
 
         if ($isPersisted || !\class_exists(DocumentManager::class)) {
             return $isPersisted;

@@ -11,9 +11,7 @@
 
 namespace Zenstruck\Foundry\Utils\Rector;
 
-use Rector\Set\Contract\SetListInterface;
-
-final class FoundrySetList implements SetListInterface
+final class FoundrySetList
 {
     /** @var string */
     public const UP_TO_FOUNDRY_2 = __DIR__.'/../config/foundry-set.php';

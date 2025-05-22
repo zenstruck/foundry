@@ -1,8 +1,6 @@
 parameters:
     inferPrivatePropertyTypeFromConstructor: true
-    checkMissingIterableValueType: false
     checkUninitializedProperties: true
-    checkGenericClassInNonGenericObjectType: false
     paths:
         - ./src
         - ./tests
@@ -13,3 +11,6 @@ parameters:
     excludePaths:
         - ./tests/Fixtures
 
+    ignoreErrors:
+        - identifier: missingType.iterableValue
+        - identifier: missingType.generics

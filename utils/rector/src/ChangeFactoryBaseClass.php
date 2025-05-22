@@ -176,7 +176,7 @@ final class ChangeFactoryBaseClass extends AbstractRector
 
         $baseClassChanged = $this->changeBaseClass($node);
         $methodChanged = $this->changeFactoryMethods($node);
-        
+
         return $methodChanged || $baseClassChanged ? $node : null;
     }
 
@@ -193,8 +193,8 @@ final class ChangeFactoryBaseClass extends AbstractRector
         if ($parentFactoryReflection->getName() !== ModelFactory::class) {
             return false;
         }
-        
-        if ($this->persistenceResolver->shouldTransformFactoryIntoObjectFactory($this->getName($node))) { // @phpstan-ignore-line
+
+        if ($this->persistenceResolver->shouldTransformFactoryIntoObjectFactory($this->getName($node))) { // @phpstan-ignore argument.type
             $newFactoryClass = ObjectFactory::class;
         } else {
             $newFactoryClass = PersistentProxyObjectFactory::class;
@@ -232,7 +232,7 @@ final class ChangeFactoryBaseClass extends AbstractRector
                         new FullyQualifiedIdentifierTypeNode($newFactoryClass),
                         [
                             new FullyQualifiedIdentifierTypeNode(
-                                $this->persistenceResolver->targetClass($this->getName($node) ?? '') // @phpstan-ignore-line
+                                $this->persistenceResolver->targetClass($this->getName($node) ?? '')  // @phpstan-ignore argument.type
                             ),
                         ]
                     ),

@@ -15,13 +15,12 @@ namespace Zenstruck\Foundry\Utils\Rector;
 
 use PhpParser\Node;
 use PHPStan\Analyser\MutatingScope;
-use PHPStan\Type\Generic\GenericObjectType;
-use PHPStan\Type\NullType;
+use PHPStan\Reflection\MissingMethodFromReflectionException;
+use PHPStan\Type\ErrorType;
 use PHPStan\Type\ObjectType;
-use PHPStan\Type\TypeWithClassName;
 use PHPStan\Type\UnionType;
+use Rector\PHPStan\ScopeFetcher;
 use Rector\Rector\AbstractRector;
-use Rector\StaticTypeMapper\ValueObject\Type\FullyQualifiedObjectType;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 use Zenstruck\Foundry\Persistence\Proxy;
@@ -32,6 +31,7 @@ final class RemoveProxyRealObjectMethodCallsForNotProxifiedObjects extends Abstr
 
     public function __construct(
         ?PersistenceResolver $persistenceResolver,
+        private readonly ScopeFetcher $scopeFetcher,
     ) {
         $this->persistenceResolver = $persistenceResolver ?? new PersistenceResolver();
     }
@@ -134,34 +134,40 @@ final class RemoveProxyRealObjectMethodCallsForNotProxifiedObjects extends Abstr
                 return false;
             }
 
-            if ($types[0] instanceof NullType) {
+            if ($types[0]->isNull()) { // @phpstan-ignore if.alwaysTrue
                 $type = $types[1];
-            } elseif ($types[1] instanceof NullType) {
+            } elseif ($types[1]->isNull()) { // @phpstan-ignore elseif.alwaysTrue
                 $type = $types[0];
             } else {
                 return false;
             }
         }
 
-        return $type instanceof GenericObjectType
-            && 1 === \count($types = $type->getTypes())
-            && $types[0] instanceof ObjectType
-            && !$this->persistenceResolver->shouldUseProxyFactory($types[0]->getClassName()); // @phpstan-ignore-line
+        $templateType = $type->getTemplateType(Proxy::class, 'TProxiedObject');
+
+        return !$templateType instanceof ErrorType
+            && $templateType->isObject()->yes()
+            && count($templateType->getObjectClassNames()) === 1
+            && !$this->persistenceResolver->shouldUseProxyFactory($templateType->getObjectClassNames()[0]); // @phpstan-ignore argument.type
     }
 
     private function isRegularObjectWithoutGivenMethod(Node\Expr\MethodCall|Node\Expr\NullsafeMethodCall $node): bool
     {
         $type = $this->getType($node->var);
 
-        if (!$type instanceof TypeWithClassName) {
+        if (!$type->isObject()->yes()) {
+            return false;
+        }
+
+        if (count($classReflections = $type->getObjectClassReflections()) !== 1) {
             return false;
         }
 
         try {
-            (new \ReflectionClass($type->getClassName()))->getMethod($this->getName($node->name) ?? ''); // @phpstan-ignore-line
+            $classReflections[0]->getMethod($this->getName($node->name) ?? '', $this->scopeFetcher->fetch($node));
 
             return false;
-        } catch (\ReflectionException) {
+        } catch (MissingMethodFromReflectionException) {
             return true;
         }
     }
