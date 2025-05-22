@@ -162,12 +162,23 @@ abstract class ObjectFactory extends Factory
                 continue;
             }
 
-            if (!$type instanceof \ReflectionNamedType) {
+            if (!$type instanceof \ReflectionNamedType || $type->isBuiltin()) {
                 continue;
             }
 
             if (isset($this->reusedObjects[$type->getName()])) {
                 $attributes[$property->getName()] = $this->reusedObjects[$type->getName()];
+
+                continue;
+            }
+
+            // test if reused object is a subclass of the property's type
+            foreach ($this->reusedObjects as $reusedObject) {
+                if (is_a($reusedObject, $type->getName())) {
+                    $attributes[$property->getName()] = $reusedObject;
+
+                    break;
+                }
             }
         }
 

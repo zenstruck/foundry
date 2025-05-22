@@ -16,9 +16,13 @@ namespace Zenstruck\Foundry\Tests\Unit;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Test\Factories;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\RelationshipOnInterface;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\AddressFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
+
+use function Zenstruck\Foundry\factory;
+use function Zenstruck\Foundry\object;
 
 final class ReuseEntityTest extends TestCase
 {
@@ -160,5 +164,19 @@ final class ReuseEntityTest extends TestCase
             ->create(['address' => AddressFactory::new()]);
 
         self::assertNotSame($address, $contact->getAddress());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function reused_object_on_interface_property(): void
+    {
+        $otherEntity = factory(RelationshipOnInterface\OtherEntity::class)
+            ->reuse($entity = object(RelationshipOnInterface\Entity::class))
+            ->create()
+        ;
+
+        self::assertSame($entity, $otherEntity->entity);
     }
 }
