@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry;
 
+use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistMode;
 
@@ -146,7 +147,7 @@ final class FactoryCollection implements \IteratorAggregate
      */
     public function create(array|callable $attributes = []): array
     {
-        if ($this->isRootFactory && $this->factory instanceof PersistentObjectFactory && $this->factory->isPersisting()) {
+        if (Configuration::instance()->flushOnce && $this->isRootFactory && $this->factory instanceof PersistentObjectFactory && $this->factory->isPersisting()) {
             return flush_after(
                 fn() => \array_map(static fn(Factory $f) => $f->create($attributes), $this->all())
             );
