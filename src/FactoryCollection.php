@@ -212,6 +212,26 @@ final class FactoryCollection implements \IteratorAggregate
         );
     }
 
+    /**
+     * @internal
+     */
+    public function reuse(object ...$objects): static
+    {
+        if (0 === \count($objects)) {
+            return $this;
+        }
+
+        $factories = $this->all();
+
+        return new self(
+            $this->factory,
+            static fn() => \array_map(
+                static fn(Factory $f) => $f instanceof ObjectFactory ? $f->reuse(...$objects) : $f,
+                $factories,
+            )
+        );
+    }
+
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->all());

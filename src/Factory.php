@@ -185,7 +185,7 @@ abstract class Factory
         // "reused" attributes will override the ones from "defaults()"
         // but should be overridden by the other states of the factory
         if ($this instanceof ObjectFactory) {
-            $mergedAttributes[] = $this->reusedAttributes();
+            $mergedAttributes[] = $this->normalizeReusedAttributes();
         }
 
         $mergedAttributes = [...$mergedAttributes, ...$this->attributes, $attributes];

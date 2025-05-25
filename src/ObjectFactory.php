@@ -13,6 +13,8 @@ namespace Zenstruck\Foundry;
 
 use Zenstruck\Foundry\Object\Instantiator;
 
+use function Zenstruck\Foundry\Persistence\unproxy;
+
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
@@ -33,7 +35,7 @@ abstract class ObjectFactory extends Factory
     /** @phpstan-var InstantiatorCallable|null */
     private $instantiator;
 
-    /** @phpstan-var array<class-string, object> */
+    /** @var array<class-string, object> */
     private array $reusedObjects = [];
 
     /**
@@ -110,18 +112,23 @@ abstract class ObjectFactory extends Factory
      * @psalm-return static<T>
      * @phpstan-return static
      */
-    final public function reuse(object $object): static
+    final public function reuse(object ...$objects): static
     {
-        if (isset($this->reusedObjects[$object::class])) {
-            throw new \InvalidArgumentException(\sprintf('An object of class "%s" is already being reused.', $object::class));
-        }
-
-        if ($object instanceof Factory) {
-            throw new \InvalidArgumentException('Cannot reuse a factory.');
+        if (0 === \count($objects)) {
+            return $this;
         }
 
         $clone = clone $this;
-        $clone->reusedObjects[$object::class] = $object;
+
+        foreach ($objects as $object) {
+            $object = unproxy($object, withAutoRefresh: false);
+
+            if ($object instanceof Factory) {
+                throw new \InvalidArgumentException('Cannot reuse a factory.');
+            }
+
+            $clone->reusedObjects[$object::class] = $object;
+        }
 
         return $clone;
     }
@@ -145,7 +152,7 @@ abstract class ObjectFactory extends Factory
      * @internal
      * @phpstan-return Parameters
      */
-    final protected function reusedAttributes(): array
+    final protected function normalizeReusedAttributes(): array
     {
         if ([] === $this->reusedObjects) {
             return [];
@@ -183,5 +190,14 @@ abstract class ObjectFactory extends Factory
         }
 
         return $attributes;
+    }
+
+    /**
+     * @return list<object>
+     * @internal
+     */
+    final protected function reusedObjects(): array
+    {
+        return \array_values($this->reusedObjects);
     }
 }

@@ -23,6 +23,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
 
 use function Zenstruck\Foundry\factory;
 use function Zenstruck\Foundry\object;
+use function Zenstruck\Foundry\Persistence\proxy;
 
 final class ReuseEntityTest extends TestCase
 {
@@ -47,14 +48,42 @@ final class ReuseEntityTest extends TestCase
      * @test
      */
     #[Test]
-    public function it_throws_if_recycling_two_objects_of_same_type(): void
+    public function it_can_reuse_a_proxy_object(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $address = AddressFactory::createOne();
 
-        ContactFactory::new()
-            ->reuse(AddressFactory::createOne())
-            ->reuse(AddressFactory::createOne())
+        $contact = ContactFactory::new()
+            ->reuse(proxy($address))
             ->create();
+
+        self::assertSame($address, $contact->getAddress());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function last_reused_object_is_used_if_recycling_two_objects_of_same_type(): void
+    {
+        $contact = ContactFactory::new()
+            ->reuse(AddressFactory::createOne())
+            ->reuse($address = AddressFactory::createOne())
+            ->create();
+
+        self::assertSame($address, $contact->getAddress());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function it_throws_if_recycling_two_objects_of_same_type_with_spread_parameters(): void
+    {
+        $contact = ContactFactory::new()
+            ->reuse(AddressFactory::createOne(), $address = AddressFactory::createOne())
+            ->create();
+
+        self::assertSame($address, $contact->getAddress());
     }
 
     /**
@@ -95,6 +124,23 @@ final class ReuseEntityTest extends TestCase
         $contact = ContactFactory::new()
             ->reuse($address)
             ->reuse($category)
+            ->create();
+
+        self::assertSame($address, $contact->getAddress());
+        self::assertSame($category, $contact->getCategory());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function it_can_call_reuse_multiple_times_with_spread_parameters(): void
+    {
+        $address = AddressFactory::createOne();
+        $category = CategoryFactory::createOne();
+
+        $contact = ContactFactory::new()
+            ->reuse($address, $category)
             ->create();
 
         self::assertSame($address, $contact->getAddress());
@@ -178,5 +224,40 @@ final class ReuseEntityTest extends TestCase
         ;
 
         self::assertSame($entity, $otherEntity->entity);
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function it_can_reuse_objects_in_collection(): void
+    {
+        $address = AddressFactory::createOne();
+
+        $contacts = ContactFactory::new()
+            ->reuse($address)
+            ->many(2)
+            ->create();
+
+        self::assertSame($address, $contacts[0]->getAddress());
+        self::assertSame($address, $contacts[1]->getAddress());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function it_propagates_reused_objects_to_collection(): void
+    {
+        $address = AddressFactory::createOne();
+
+        $category = CategoryFactory::new()
+            ->reuse($address)
+            ->create(['contacts' => ContactFactory::new()->many(2)]);
+
+        self::assertCount(2, $category->getContacts());
+        foreach ($category->getContacts() as $contact) {
+            self::assertSame($address, $contact->getAddress());
+        }
     }
 }

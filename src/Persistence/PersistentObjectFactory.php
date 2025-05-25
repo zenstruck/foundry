@@ -301,7 +301,9 @@ abstract class PersistentObjectFactory extends ObjectFactory
         }
 
         if ($value instanceof self) {
-            $value = $value->withPersistMode($this->persist)->notRootFactory();
+            $value = $value
+                ->withPersistMode($this->persist)
+                ->notRootFactory();
 
             $pm = Configuration::instance()->persistence();
 
@@ -311,9 +313,12 @@ abstract class PersistentObjectFactory extends ObjectFactory
             if ($relationshipMetadata instanceof OneToOneRelationship && !$relationshipMetadata->isOwning) {
                 $inverseField = $relationshipMetadata->inverseField();
 
-                $value = $value->withPersistMode(
-                    $this->isPersisting() ? PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT : PersistMode::WITHOUT_PERSISTING
-                );
+                $value = $value
+                    ->reuse(...$this->reusedObjects(), ...$value->reusedObjects())
+                    ->withPersistMode(
+                        $this->isPersisting() ? PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT : PersistMode::WITHOUT_PERSISTING
+                    )
+                ;
 
                 if (($fieldType = (new \ReflectionClass(static::class()))->getProperty($field)->getType())?->allowsNull()) {
                     $this->tempAfterInstantiate[] = static function(object $object) use ($value, $inverseField, $field) {
@@ -363,9 +368,9 @@ abstract class PersistentObjectFactory extends ObjectFactory
             $this->tempAfterInstantiate[] = function(object $object) use ($collection, $inverseRelationshipMetadata, $field) {
                 $inverseField = $inverseRelationshipMetadata->inverseField();
 
-                $inverseObjects = $collection->withPersistMode(
-                    $this->isPersisting() ? PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT : PersistMode::WITHOUT_PERSISTING
-                )
+                $inverseObjects = $collection
+                    ->reuse(...$this->reusedObjects())
+                    ->withPersistMode($this->isPersisting() ? PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT : PersistMode::WITHOUT_PERSISTING)
                     ->create([$inverseField => $object]);
 
                 $inverseObjects = unproxy($inverseObjects, withAutoRefresh: false);
