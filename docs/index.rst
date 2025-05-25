@@ -4,9 +4,6 @@ Foundry
 Foundry makes creating fixtures data fun again, via an expressive, auto-completable, on-demand fixtures system with
 Symfony and Doctrine:
 
-The factories can be used inside `DoctrineFixturesBundle <https://symfony.com/bundles/DoctrineFixturesBundle/current/index.html>`_
-to load fixtures or inside your tests, :ref:`where it has even more features <using-in-your-tests>`.
-
 Foundry supports ``doctrine/orm`` (with `doctrine/doctrine-bundle <https://github.com/doctrine/doctrinebundle>`_),
 ``doctrine/mongodb-odm`` (with `doctrine/mongodb-odm-bundle <https://github.com/doctrine/DoctrineMongoDBBundle>`_)
 or a combination of these.
@@ -1284,52 +1281,6 @@ You can even create associative arrays, with the nice DX provided by Foundry:
     // will create ['prop1' => 'foo', 'prop2' => 'default value 2']
     $array = SomeArrayFactory::createOne(['prop1' => 'foo']);
 
-Using with DoctrineFixturesBundle
----------------------------------
-
-Foundry works out of the box with `DoctrineFixturesBundle <https://symfony.com/bundles/DoctrineFixturesBundle/current/index.html>`_.
-You can simply use your factories and stories right within your fixture files:
-
-::
-
-    // src/DataFixtures/AppFixtures.php
-    namespace App\DataFixtures;
-
-    use App\Factory\CategoryFactory;
-    use App\Factory\CommentFactory;
-    use App\Factory\PostFactory;
-    use App\Factory\TagFactory;
-    use Doctrine\Bundle\FixturesBundle\Fixture;
-    use Doctrine\Persistence\ObjectManager;
-
-    class AppFixtures extends Fixture
-    {
-        public function load(ObjectManager $manager)
-        {
-            // create 10 Category's
-            CategoryFactory::createMany(10);
-
-            // create 20 Tag's
-            TagFactory::createMany(20);
-
-            // create 50 Post's
-            PostFactory::createMany(50, function() {
-                return [
-                    // each Post will have a random Category (chosen from those created above)
-                    'category' => CategoryFactory::random(),
-
-                    // each Post will have between 0 and 6 Tag's (chosen from those created above)
-                    'tags' => TagFactory::randomRange(0, 6),
-
-                    // each Post will have between 0 and 10 Comment's that are created new
-                    'comments' => CommentFactory::new()->range(0, 10),
-                ];
-            });
-        }
-    }
-
-Run the ``doctrine:fixtures:load`` as normal to seed your database.
-
 Using in your Tests
 -------------------
 
@@ -2449,6 +2400,53 @@ You can use the ``#[WithStory]`` attribute to load stories in your tests:
     }
 
 If used on the class, the story will be loaded before each test method.
+
+Loading stories as fixtures in your database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 2.6
+
+    Command ``foundry:load-stories`` and attribute ``#[AsFixture]`` were added in 2.6.
+
+Using command ``bin/console foundry:load-stories``, you can load stories as fixtures in your database.
+This is mainly useful to load fixtures in "dev" mode.
+
+Mark with the attribute ``#[AsFixture]`` the stories your want to be loaded by the command:
+
+::
+
+    use Zenstruck\Foundry\Attribute\AsFixture;
+
+    #[AsFixture(name: 'category')]
+    final class CategoryStory extends Story
+    {
+        // ...
+    }
+
+``bin/console foundry:load-stories category`` will now load the story ``CategoryStory`` in your database.
+
+.. note::
+
+    If only a single story exists, you can omit the argument and just call ``bin/console foundry:load-stories`` to load it.
+
+You can also load stories by group, by using the ``groups`` option:
+
+::
+
+    use Zenstruck\Foundry\Attribute\AsFixture;
+
+    #[AsFixture(name: 'category', groups: ['all-stories'])]
+    final class CategoryStory extends Story {}
+
+    #[AsFixture(name: 'post', groups: ['all-stories'])]
+    final class PostStory extends Story {}
+
+``bin/console foundry:load-stories all-stories`` will load both stories ``CategoryStory`` and ``PostStory``.
+
+.. tip::
+
+    It is possible to call a story inside another story, by using `OtherStory::load();`. Because the stories are only
+    loaded once, it will work regardless of the order of the stories.
 
 Static Analysis
 ---------------
