@@ -1636,7 +1636,7 @@ Without auto-refreshing enabled, the above call to ``$post->getTitle()`` would r
         $post->setTitle('New Title'); // or using ->forceSet('title', 'New Title')
         $post->setBody('New Body'); // or using ->forceSet('body', 'New Body')
         $post->_enableAutoRefresh();
-        $post->save();
+        $post->_save();
 
         $post->getBody(); // "New Body"
         $post->getTitle(); // "New Title"
