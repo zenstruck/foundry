@@ -1163,7 +1163,7 @@ once. To do this, wrap the operations in a ``flush_after()`` callback:
         TagFactory::createMany(200); // instantiated/persisted but not flushed
     }); // single flush
 
-The ``flush_after()`` function forwards the callback’s return, in case you need to use the objects in your tests:
+The ``flush_after()`` function forwards the callback's return, in case you need to use the objects in your tests:
 
 ::
 
