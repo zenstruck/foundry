@@ -993,7 +993,7 @@ the LazyValue can be `memoized <https://en.wikipedia.org/wiki/Memoization>`_ so 
 
 ::
 
-        use Zenstruck\Foundry\Attributes\LazyValue;
+        use Zenstruck\Foundry\LazyValue;
 
         class TaskFactory extends PersistentProxyObjectFactory
         {
