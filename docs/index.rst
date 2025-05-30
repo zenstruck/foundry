@@ -1281,6 +1281,287 @@ You can even create associative arrays, with the nice DX provided by Foundry:
     // will create ['prop1' => 'foo', 'prop2' => 'default value 2']
     $array = SomeArrayFactory::createOne(['prop1' => 'foo']);
 
+Stories
+-------
+
+Stories are useful if you find your test's *arrange* step is getting complex (loading lots of fixtures) or duplicating
+logic between tests and/or your dev fixtures. They are used to extract a specific database *state* into a *story*.
+Stories can be loaded in your fixtures and in your tests, they can also depend on other stories.
+
+Create a story using the maker command:
+
+.. code-block:: terminal
+
+    $ php bin/console make:story Post
+
+.. note::
+
+    Creates ``PostStory.php`` in ``src/Story``, add ``--test`` flag to create in ``tests/Story``.
+
+Modify the *build* method to set the state for this story:
+
+::
+
+    // src/Story/PostStory.php
+    namespace App\Story;
+
+    use App\Factory\CategoryFactory;
+    use App\Factory\PostFactory;
+    use App\Factory\TagFactory;
+    use Zenstruck\Foundry\Story;
+
+    final class PostStory extends Story
+    {
+        public function build(): void
+        {
+            // create 10 Category's
+            CategoryFactory::createMany(10);
+
+            // create 20 Tag's
+            TagFactory::createMany(20);
+
+            // create 50 Post's
+            PostFactory::createMany(50, function() {
+                return [
+                    // each Post will have a random Category (created above)
+                    'category' => CategoryFactory::random(),
+
+                    // each Post will between 0 and 6 Tag's (created above)
+                    'tags' => TagFactory::randomRange(0, 6),
+                ];
+            });
+        }
+    }
+
+Use the new story in your tests, dev fixtures, or even other stories:
+
+::
+
+    PostStory::load(); // loads the state defined in PostStory::build()
+
+    PostStory::load(); // does nothing - already loaded
+
+.. note::
+
+    Objects persisted in stories are cleared after each test (unless it is a
+    :ref:`Global State Story <global-state>`).
+
+Stories as Services
+~~~~~~~~~~~~~~~~~~~
+
+If your stories require dependencies, you can define them as a service:
+
+::
+
+    // src/Story/PostStory.php
+    namespace App\Story;
+
+    use App\Factory\PostFactory;
+    use App\Service\MyService;
+    use Zenstruck\Foundry\Story;
+
+    final class PostStory extends Story
+    {
+        public function __construct(
+            private MyService $myService,
+        ) {
+        }
+
+        public function build(): void
+        {
+            // $this->myService can be used here to help build this story
+        }
+    }
+
+If using a standard Symfony Flex app, this will be autowired/autoconfigured. If not, register the service and tag
+with ``foundry.story``.
+
+Story State
+~~~~~~~~~~~
+
+Another feature of *stories* is the ability for them to *remember* the objects they created to be referenced later:
+
+::
+
+    // src/Story/CategoryStory.php
+    namespace App\Story;
+
+    use App\Factory\CategoryFactory;
+    use Zenstruck\Foundry\Story;
+
+    final class CategoryStory extends Story
+    {
+        public function build(): void
+        {
+            $this->addState('php', CategoryFactory::createOne(['name' => 'php']));
+
+            // factories are created when added as state
+            $this->addState('symfony', CategoryFactory::new(['name' => 'symfony']));
+        }
+    }
+
+Later, you can access the story's state when creating other fixtures:
+
+::
+
+    PostFactory::createOne(['category' => CategoryStory::get('php')]);
+
+    // or use the magic method (functionally equivalent to above)
+    PostFactory::createOne(['category' => CategoryStory::php()]);
+
+.. tip::
+
+    Unlike factories, stories are not tied to a specific type, and then they cannot be generic, but you can leverage
+    the magic method and PHPDoc to improve autocompletion and fix static analysis issues with stories:
+
+    ::
+
+        // src/Story/CategoryStory.php
+        namespace App\Story;
+
+        use App\Factory\CategoryFactory;
+        use Zenstruck\Foundry\Persistence\Proxy;
+        use Zenstruck\Foundry\Story;
+
+        /**
+         * @method static Category&Proxy<Category> php()
+         */
+        final class CategoryStory extends Story
+        {
+            public function build(): void
+            {
+                $this->addState('php', CategoryFactory::createOne(['name' => 'php']));
+            }
+        }
+
+    Now your IDE will know ``CategoryStory::php()`` returns an object of type ``Category``.
+
+    Using a magic method also does not require a prior ``::load()`` call on the story, it will initialize itself.
+
+.. note::
+
+    Story state is cleared after each test (unless it is a :ref:`Global State Story <global-state>`).
+
+Story Pools
+~~~~~~~~~~~
+
+Stories can store (as state) *pools* of objects:
+
+::
+
+    // src/Story/ProvinceStory.php
+    namespace App\Story;
+
+    use App\Factory\ProvinceFactory;
+    use Zenstruck\Foundry\Story;
+
+    final class ProvinceStory extends Story
+    {
+        public function build(): void
+        {
+            // add collection to a "pool"
+            $this->addToPool('be', ProvinceFactory::createMany(5, ['country' => 'BE']));
+
+            // equivalent to above
+            $this->addToPool('be', ProvinceFactory::new(['country' => 'BE'])->many(5));
+
+            // add single object to a pool
+            $this->addToPool('be', ProvinceFactory::createOne(['country' => 'BE']));
+
+            // add single object to single pool and make available as "state"
+            $this->addState('be-1', ProvinceFactory::createOne(['country' => 'BE']), 'be');
+        }
+    }
+
+Objects can be fetched from pools in your tests, fixtures or other stories:
+
+::
+
+    ProvinceStory::getRandom('be'); // random Province|Proxy from "be" pool
+    ProvinceStory::getRandomSet('be', 3); // 3 random Province|Proxy's from "be" pool
+    ProvinceStory::getRandomRange('be', 1, 4); // between 1 and 4 random Province|Proxy's from "be" pool
+    ProvinceStory::getPool('be'); // all Province|Proxy's from "be" pool
+
+#[WithStory] Attribute
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 2.3
+
+    The ``#[WithStory]`` attribute was added in Foundry 2.3.
+
+.. warning::
+
+    The `PHPUnit Extension`_ for Foundry is needed to use ``#[WithStory]`` attribute.
+
+You can use the ``#[WithStory]`` attribute to load stories in your tests:
+
+::
+
+    use App\Story\CategoryStory;
+    use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+    use Zenstruck\Foundry\Attribute\WithStory;
+
+    // You can use the attribute on the class...
+    #[WithStory(CategoryStory::class)]
+    final class NeedsCategoriesTest extends KernelTestCase
+    {
+        // ... or on the method
+        #[WithStory(CategoryStory::class)]
+        public function testThatNeedStories(): void
+        {
+            // ...
+        }
+    }
+
+If used on the class, the story will be loaded before each test method.
+
+Local Development Fixtures
+--------------------------
+
+.. versionadded:: 2.6
+
+    The ``foundry:load-stories`` command and ``#[AsFixture]`` attribute were added in 2.6.
+
+Using ``bin/console foundry:load-stories``, you can load stories as fixtures in your database.
+This is mainly useful to load fixtures in "dev" mode.
+
+Mark `Stories`_ you want loaded by the command with the ``#[AsFixture]`` attribute:
+
+::
+
+    use Zenstruck\Foundry\Attribute\AsFixture;
+
+    #[AsFixture(name: 'category')]
+    final class CategoryStory extends Story
+    {
+        // ...
+    }
+
+``bin/console foundry:load-stories category`` will now load the story ``CategoryStory`` in your database.
+
+.. note::
+
+    If only a single story exists, you can omit the argument and just call ``bin/console foundry:load-stories`` to load it.
+
+You can also load stories by group, by using the ``groups`` option:
+
+::
+
+    use Zenstruck\Foundry\Attribute\AsFixture;
+
+    #[AsFixture(name: 'category', groups: ['all-stories'])]
+    final class CategoryStory extends Story {}
+
+    #[AsFixture(name: 'post', groups: ['all-stories'])]
+    final class PostStory extends Story {}
+
+``bin/console foundry:load-stories all-stories`` will load both stories ``CategoryStory`` and ``PostStory``.
+
+.. tip::
+
+    It is possible to call a story inside another story, by using `OtherStory::load();`. Because the stories are only
+    loaded once, it will work regardless of the order of the stories.
+
 Using in your Tests
 -------------------
 
@@ -2166,287 +2447,6 @@ In your tests, use the ``#[AsInMemoryTest]`` attribute, which will disable persi
 A ``GenericInMemoryRepository`` class is also provided for convenience, when the "in-memory" repository is missing for a
 specific class. This way, you're not forced to create a "in-memory" version for all your repositories, but only for the
 ones used in the current test.
-
-Stories
--------
-
-Stories are useful if you find your test's *arrange* step is getting complex (loading lots of fixtures) or duplicating
-logic between tests and/or your dev fixtures. They are used to extract a specific database *state* into a *story*.
-Stories can be loaded in your fixtures and in your tests, they can also depend on other stories.
-
-Create a story using the maker command:
-
-.. code-block:: terminal
-
-    $ php bin/console make:story Post
-
-.. note::
-
-    Creates ``PostStory.php`` in ``src/Story``, add ``--test`` flag to create in ``tests/Story``.
-
-Modify the *build* method to set the state for this story:
-
-::
-
-    // src/Story/PostStory.php
-    namespace App\Story;
-
-    use App\Factory\CategoryFactory;
-    use App\Factory\PostFactory;
-    use App\Factory\TagFactory;
-    use Zenstruck\Foundry\Story;
-
-    final class PostStory extends Story
-    {
-        public function build(): void
-        {
-            // create 10 Category's
-            CategoryFactory::createMany(10);
-
-            // create 20 Tag's
-            TagFactory::createMany(20);
-
-            // create 50 Post's
-            PostFactory::createMany(50, function() {
-                return [
-                    // each Post will have a random Category (created above)
-                    'category' => CategoryFactory::random(),
-
-                    // each Post will between 0 and 6 Tag's (created above)
-                    'tags' => TagFactory::randomRange(0, 6),
-                ];
-            });
-        }
-    }
-
-Use the new story in your tests, dev fixtures, or even other stories:
-
-::
-
-    PostStory::load(); // loads the state defined in PostStory::build()
-
-    PostStory::load(); // does nothing - already loaded
-
-.. note::
-
-    Objects persisted in stories are cleared after each test (unless it is a
-    :ref:`Global State Story <global-state>`).
-
-Stories as Services
-~~~~~~~~~~~~~~~~~~~
-
-If your stories require dependencies, you can define them as a service:
-
-::
-
-    // src/Story/PostStory.php
-    namespace App\Story;
-
-    use App\Factory\PostFactory;
-    use App\Service\MyService;
-    use Zenstruck\Foundry\Story;
-
-    final class PostStory extends Story
-    {
-        public function __construct(
-            private MyService $myService,
-        ) {
-        }
-
-        public function build(): void
-        {
-            // $this->myService can be used here to help build this story
-        }
-    }
-
-If using a standard Symfony Flex app, this will be autowired/autoconfigured. If not, register the service and tag
-with ``foundry.story``.
-
-Story State
-~~~~~~~~~~~
-
-Another feature of *stories* is the ability for them to *remember* the objects they created to be referenced later:
-
-::
-
-    // src/Story/CategoryStory.php
-    namespace App\Story;
-
-    use App\Factory\CategoryFactory;
-    use Zenstruck\Foundry\Story;
-
-    final class CategoryStory extends Story
-    {
-        public function build(): void
-        {
-            $this->addState('php', CategoryFactory::createOne(['name' => 'php']));
-
-            // factories are created when added as state
-            $this->addState('symfony', CategoryFactory::new(['name' => 'symfony']));
-        }
-    }
-
-Later, you can access the story's state when creating other fixtures:
-
-::
-
-    PostFactory::createOne(['category' => CategoryStory::get('php')]);
-
-    // or use the magic method (functionally equivalent to above)
-    PostFactory::createOne(['category' => CategoryStory::php()]);
-
-.. tip::
-
-    Unlike factories, stories are not tied to a specific type, and then they cannot be generic, but you can leverage
-    the magic method and PHPDoc to improve autocompletion and fix static analysis issues with stories:
-
-    ::
-
-        // src/Story/CategoryStory.php
-        namespace App\Story;
-
-        use App\Factory\CategoryFactory;
-        use Zenstruck\Foundry\Persistence\Proxy;
-        use Zenstruck\Foundry\Story;
-
-        /**
-         * @method static Category&Proxy<Category> php()
-         */
-        final class CategoryStory extends Story
-        {
-            public function build(): void
-            {
-                $this->addState('php', CategoryFactory::createOne(['name' => 'php']));
-            }
-        }
-
-    Now your IDE will know ``CategoryStory::php()`` returns an object of type ``Category``.
-
-    Using a magic method also does not require a prior ``::load()`` call on the story, it will initialize itself.
-
-.. note::
-
-    Story state is cleared after each test (unless it is a :ref:`Global State Story <global-state>`).
-
-Story Pools
-~~~~~~~~~~~
-
-Stories can store (as state) *pools* of objects:
-
-::
-
-    // src/Story/ProvinceStory.php
-    namespace App\Story;
-
-    use App\Factory\ProvinceFactory;
-    use Zenstruck\Foundry\Story;
-
-    final class ProvinceStory extends Story
-    {
-        public function build(): void
-        {
-            // add collection to a "pool"
-            $this->addToPool('be', ProvinceFactory::createMany(5, ['country' => 'BE']));
-
-            // equivalent to above
-            $this->addToPool('be', ProvinceFactory::new(['country' => 'BE'])->many(5));
-
-            // add single object to a pool
-            $this->addToPool('be', ProvinceFactory::createOne(['country' => 'BE']));
-
-            // add single object to single pool and make available as "state"
-            $this->addState('be-1', ProvinceFactory::createOne(['country' => 'BE']), 'be');
-        }
-    }
-
-Objects can be fetched from pools in your tests, fixtures or other stories:
-
-::
-
-    ProvinceStory::getRandom('be'); // random Province|Proxy from "be" pool
-    ProvinceStory::getRandomSet('be', 3); // 3 random Province|Proxy's from "be" pool
-    ProvinceStory::getRandomRange('be', 1, 4); // between 1 and 4 random Province|Proxy's from "be" pool
-    ProvinceStory::getPool('be'); // all Province|Proxy's from "be" pool
-
-#[WithStory] Attribute
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 2.3
-
-    The ``#[WithStory]`` attribute was added in Foundry 2.3.
-
-.. warning::
-
-    The `PHPUnit Extension`_ for Foundry is needed to use ``#[WithStory]`` attribute.
-
-You can use the ``#[WithStory]`` attribute to load stories in your tests:
-
-::
-
-    use App\Story\CategoryStory;
-    use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-    use Zenstruck\Foundry\Attribute\WithStory;
-
-    // You can use the attribute on the class...
-    #[WithStory(CategoryStory::class)]
-    final class NeedsCategoriesTest extends KernelTestCase
-    {
-        // ... or on the method
-        #[WithStory(CategoryStory::class)]
-        public function testThatNeedStories(): void
-        {
-            // ...
-        }
-    }
-
-If used on the class, the story will be loaded before each test method.
-
-Loading stories as fixtures in your database
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 2.6
-
-    Command ``foundry:load-stories`` and attribute ``#[AsFixture]`` were added in 2.6.
-
-Using command ``bin/console foundry:load-stories``, you can load stories as fixtures in your database.
-This is mainly useful to load fixtures in "dev" mode.
-
-Mark with the attribute ``#[AsFixture]`` the stories your want to be loaded by the command:
-
-::
-
-    use Zenstruck\Foundry\Attribute\AsFixture;
-
-    #[AsFixture(name: 'category')]
-    final class CategoryStory extends Story
-    {
-        // ...
-    }
-
-``bin/console foundry:load-stories category`` will now load the story ``CategoryStory`` in your database.
-
-.. note::
-
-    If only a single story exists, you can omit the argument and just call ``bin/console foundry:load-stories`` to load it.
-
-You can also load stories by group, by using the ``groups`` option:
-
-::
-
-    use Zenstruck\Foundry\Attribute\AsFixture;
-
-    #[AsFixture(name: 'category', groups: ['all-stories'])]
-    final class CategoryStory extends Story {}
-
-    #[AsFixture(name: 'post', groups: ['all-stories'])]
-    final class PostStory extends Story {}
-
-``bin/console foundry:load-stories all-stories`` will load both stories ``CategoryStory`` and ``PostStory``.
-
-.. tip::
-
-    It is possible to call a story inside another story, by using `OtherStory::load();`. Because the stories are only
-    loaded once, it will work regardless of the order of the stories.
 
 Static Analysis
 ---------------
