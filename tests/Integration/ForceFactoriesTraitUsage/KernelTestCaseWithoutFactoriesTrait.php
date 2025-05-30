@@ -18,13 +18,15 @@ use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\ObjectStory;
 
-abstract class KernelTestCaseWithoutFactoriesTraitTestCase extends KernelTestCase
+/**
+ * @require-extends KernelTestCase
+ */
+trait KernelTestCaseWithoutFactoriesTrait
 {
     #[Test]
     public function not_using_foundry_should_not_throw(): void
@@ -76,7 +78,7 @@ abstract class KernelTestCaseWithoutFactoriesTraitTestCase extends KernelTestCas
      * In user land, Foundry can work without the trait, because it may have been booted in a previous test.
      */
     #[Before]
-    public function _beforeHook(): void
+    public function _bootFoundry(): void
     {
         Configuration::boot(static function(): Configuration {
             return static::getContainer()->get('.zenstruck_foundry.configuration'); // @phpstan-ignore return.type

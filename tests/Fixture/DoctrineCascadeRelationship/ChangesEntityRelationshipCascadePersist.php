@@ -17,6 +17,8 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\MappingException;
 use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Metadata\Version\ConstraintRequirement;
+use PHPUnit\Runner\Version as PHPunitVersion;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
@@ -73,9 +75,11 @@ trait ChangesEntityRelationshipCascadePersist
      */
     public static function provideCascadeRelationshipsCombinations(): iterable
     {
-        yield []; // @phpstan-ignore generator.valueType
+        if (ConstraintRequirement::from('>=12')->isSatisfiedBy(PHPunitVersion::id())) {
+            yield []; // @phpstan-ignore generator.valueType
+            return;
+        }
 
-        return;
 
         // @phpstan-ignore deadCode.unreachable
         if (!\getenv('DATABASE_URL') || !self::$methodName) {

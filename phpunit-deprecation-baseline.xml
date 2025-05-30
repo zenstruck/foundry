@@ -3,6 +3,7 @@
  <file path="vendor/symfony/deprecation-contracts/function.php">
   <line number="25" hash="c6af5d66288d0667e424978000f29571e4954b81">
    <issue><![CDATA[Since symfony/framework-bundle 6.4: Not setting the "framework.php_errors.log" config option is deprecated. It will default to "true" in 7.0.]]></issue>
+   <issue><![CDATA[Since symfony/var-exporter 7.3: Generating lazy proxy for class "Zenstruck\Foundry\Tests\Integration\ForceFactoriesTraitUsage\SomeObject" is deprecated; leverage native lazy objects instead.]]></issue>
   </line>
  </file>
 </files>
