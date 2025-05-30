@@ -751,6 +751,19 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         static::categoryFactory()::assert()->count(2);
     }
 
+    /** @test */
+    #[Test]
+    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[UsingRelationships(Contact::class, ['category'])]
+    public function call_many_with_zero_do_nothing(): void
+    {
+        static::contactFactory()
+            ->many(0)
+            ->create();
+
+        static::contactFactory()::assert()->count(0);
+    }
+
     /** @return PersistentObjectFactory<Contact> */
     protected static function contactFactoryWithoutCategory(): PersistentObjectFactory
     {
