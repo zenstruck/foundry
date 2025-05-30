@@ -209,6 +209,7 @@ jobs:
             doctrine/doctrine-migrations-bundle \
             doctrine/mongodb-odm-bundle \
             symfony/maker-bundle \
+            symfony/phpunit-bridge \
             symfony/framework-bundle
 
       - name: Test

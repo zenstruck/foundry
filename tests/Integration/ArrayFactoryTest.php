@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Integration;
 
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\LazyValue;
@@ -28,6 +29,7 @@ final class ArrayFactoryTest extends KernelTestCase
      * @test
      */
     #[Test]
+    #[IgnoreDeprecations]
     public function can_create_with_defaults(): void
     {
         $this->assertSame(

@@ -14,8 +14,6 @@ namespace Zenstruck\Foundry;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistMode;
 
-use function Zenstruck\Foundry\Persistence\flush_after;
-
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
@@ -146,13 +144,16 @@ final class FactoryCollection implements \IteratorAggregate
      */
     public function create(array|callable $attributes = []): array
     {
+        $factories = $this->all();
+
         if (Configuration::instance()->flushOnce && $this->isRootFactory && $this->factory instanceof PersistentObjectFactory && $this->factory->isPersisting()) {
-            return flush_after(
-                fn() => \array_map(static fn(Factory $f) => $f->create($attributes), $this->all())
-            );
+            $lastFactory = array_pop($factories);
+            // @phpstan-ignore method.notFound (phpstan does not understand that we only have persistent factories here)
+            $factories = array_map(static fn(Factory $f) => $f->notRootFactory(), $factories);
+            $factories[] = $lastFactory;
         }
 
-        return \array_map(static fn(Factory $f) => $f->create($attributes), $this->all());
+        return \array_map(static fn(Factory $f) => $f->create($attributes), $factories);
     }
 
     /**

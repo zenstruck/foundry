@@ -34,6 +34,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
 
 use function Zenstruck\Foundry\lazy;
+use function Zenstruck\Foundry\Persistence\flush_after;
 use function Zenstruck\Foundry\Persistence\refresh;
 use function Zenstruck\Foundry\Persistence\unproxy;
 
@@ -710,6 +711,44 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
             )->create();
 
         self::assertNotNull($address->getContact());
+    }
+
+    /** @test */
+    #[Test]
+    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[UsingRelationships(Contact::class, ['category'])]
+    public function find_or_create_used_in_many_actually_create_only_one_object(): void
+    {
+        static::contactFactory()
+            ->many(2)
+            ->create(['category' => lazy(fn() => static::categoryFactory()::findOrCreate([]))]);
+
+        static::contactFactory()::assert()->count(2);
+        static::categoryFactory()::assert()->count(1);
+    }
+
+    /** @test */
+    #[Test]
+    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[UsingRelationships(Contact::class, ['category'])]
+    public function ensure_inverse_one_to_many_is_hydrated_before_persisting_in_flush_after(): void
+    {
+        flush_after(
+            static function() {
+                $contactFactory = static::contactFactory()
+                    ->afterPersist(static function(Contact $contact) {
+                        self::assertNotNull($contact->getCategory());
+                    });
+
+                static::categoryFactory()::createMany(
+                    2,
+                    ['contacts' => lazy(static fn() => $contactFactory->many(2)->create(['category' => null]))]
+                );
+            }
+        );
+
+        static::contactFactory()::assert()->count(4);
+        static::categoryFactory()::assert()->count(2);
     }
 
     /** @return PersistentObjectFactory<Contact> */
