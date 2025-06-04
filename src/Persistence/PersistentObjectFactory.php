@@ -449,12 +449,6 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
     final protected function initializeInternal(): static
     {
-        if (!Configuration::isBooted()) {
-            return $this;
-        }
-
-        $this->persist = $this->isPersistenceEnabled() ? PersistMode::PERSIST : PersistMode::WITHOUT_PERSISTING;
-
         // Schedule any new object for insert right after instantiation
         return parent::initializeInternal()
             ->afterInstantiate(

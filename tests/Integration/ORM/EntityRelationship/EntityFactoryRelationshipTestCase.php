@@ -764,6 +764,27 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         static::contactFactory()::assert()->count(0);
     }
 
+    /**
+     * @test
+     * @dataProvider provideCanUseFactoryInDataProviderWithRelationshipCases
+     * @param PersistentObjectFactory<Contact> $factory
+     */
+    #[Test]
+    #[DataProvider('provideCanUseFactoryInDataProviderWithRelationshipCases')]
+    public function can_create_many_with_factory_from_data_provider_with_relationship(PersistentObjectFactory $factory): void
+    {
+        $objects = $factory->many(2)->create();
+
+        self::assertCount(2, $objects);
+    }
+
+    public static function provideCanUseFactoryInDataProviderWithRelationshipCases(): iterable
+    {
+        yield [
+            static::contactFactory()
+        ];
+    }
+
     /** @return PersistentObjectFactory<Contact> */
     protected static function contactFactoryWithoutCategory(): PersistentObjectFactory
     {
