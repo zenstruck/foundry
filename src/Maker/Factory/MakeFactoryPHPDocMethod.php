@@ -45,6 +45,7 @@ final class MakeFactoryPHPDocMethod
             $methods[] = new self($makeFactoryData->getObjectShortName(), 'all()', returnsCollection: true);
             $methods[] = new self($makeFactoryData->getObjectShortName(), 'findBy(array $attributes)', returnsCollection: true);
             $methods[] = new self($makeFactoryData->getObjectShortName(), 'randomRange(int $min, int $max, array $attributes = [])', returnsCollection: true);
+            $methods[] = new self($makeFactoryData->getObjectShortName(), 'randomRangeOrCreate(int $min, int $max, array $attributes = [])', returnsCollection: true);
             $methods[] = new self($makeFactoryData->getObjectShortName(), 'randomSet(int $number, array $attributes = [])', returnsCollection: true);
 
             if (null !== $makeFactoryData->getRepositoryReflectionClass()) {

@@ -34,6 +34,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
  * @method static Category[]|Proxy[]                        createSequence(iterable|callable $sequence)
  * @method static Category[]|Proxy[]                        findBy(array $attributes)
  * @method static Category[]|Proxy[]                        randomRange(int $min, int $max, array $attributes = [])
+ * @method static Category[]|Proxy[]                        randomRangeOrCreate(int $min, int $max, array $attributes = [])
  * @method static Category[]|Proxy[]                        randomSet(int $number, array $attributes = [])
  *
  * @phpstan-method        Category&Proxy<Category> create(array|callable $attributes = [])
@@ -50,6 +51,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
  * @phpstan-method static list<Category&Proxy<Category>> createSequence(iterable|callable $sequence)
  * @phpstan-method static list<Category&Proxy<Category>> findBy(array $attributes)
  * @phpstan-method static list<Category&Proxy<Category>> randomRange(int $min, int $max, array $attributes = [])
+ * @phpstan-method static list<Category&Proxy<Category>> randomRangeOrCreate(int $min, int $max, array $attributes = [])
  * @phpstan-method static list<Category&Proxy<Category>> randomSet(int $number, array $attributes = [])
  */
 final class CategoryFactory extends PersistentProxyObjectFactory

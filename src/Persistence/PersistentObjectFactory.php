@@ -117,6 +117,32 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
+     * @param int<0, max> $min
+     * @param int<0, max> $max
+     * @phpstan-param Parameters  $criteria
+     *
+     * @return list<T>
+     */
+    public static function randomRangeOrCreate(int $min, int $max, array $criteria = []): array
+    {
+        $targetCount = mt_rand($min, $max);
+
+        try {
+            return static::repository()->randomRange($min, $targetCount, $criteria);
+        } catch (NotEnoughObjects) {
+            $foundObjects = static::repository()->findBy($criteria);
+        } catch (PersistenceNotAvailable|PersistenceDisabled) {
+            $foundObjects = [];
+        }
+
+        $objectsToCreate = $targetCount - count($foundObjects);
+
+        $newObjects = static::createMany($objectsToCreate, $criteria);
+
+        return [...$foundObjects, ...$newObjects];
+    }
+
+    /**
      * @phpstan-param Parameters $criteria
      *
      * @return list<T>

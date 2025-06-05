@@ -64,6 +64,8 @@ $var = UserProxyFactory::createSequence([]);
 /** @psalm-check-type-exact $var = list<UserForProxyFactory&Proxy<UserForProxyFactory>> */
 $var = UserProxyFactory::randomRange(1, 2);
 /** @psalm-check-type-exact $var = list<UserForProxyFactory&Proxy<UserForProxyFactory>> */
+$var = UserProxyFactory::randomRangeOrCreate(1, 2);
+/** @psalm-check-type-exact $var = list<UserForProxyFactory&Proxy<UserForProxyFactory>> */
 $var = UserProxyFactory::randomSet(2);
 /** @psalm-check-type-exact $var = list<UserForProxyFactory&Proxy<UserForProxyFactory>> */
 $var = UserProxyFactory::findBy(['name' => 'foo']);

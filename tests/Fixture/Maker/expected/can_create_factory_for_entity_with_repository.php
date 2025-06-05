@@ -35,6 +35,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Repository\GenericEntityRepository;
  * @method static GenericEntity[]|Proxy[]                          createSequence(iterable|callable $sequence)
  * @method static GenericEntity[]|Proxy[]                          findBy(array $attributes)
  * @method static GenericEntity[]|Proxy[]                          randomRange(int $min, int $max, array $attributes = [])
+ * @method static GenericEntity[]|Proxy[]                          randomRangeOrCreate(int $min, int $max, array $attributes = [])
  * @method static GenericEntity[]|Proxy[]                          randomSet(int $number, array $attributes = [])
  *
  * @phpstan-method        GenericEntity&Proxy<GenericEntity> create(array|callable $attributes = [])
@@ -51,6 +52,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Repository\GenericEntityRepository;
  * @phpstan-method static list<GenericEntity&Proxy<GenericEntity>> createSequence(iterable|callable $sequence)
  * @phpstan-method static list<GenericEntity&Proxy<GenericEntity>> findBy(array $attributes)
  * @phpstan-method static list<GenericEntity&Proxy<GenericEntity>> randomRange(int $min, int $max, array $attributes = [])
+ * @phpstan-method static list<GenericEntity&Proxy<GenericEntity>> randomRangeOrCreate(int $min, int $max, array $attributes = [])
  * @phpstan-method static list<GenericEntity&Proxy<GenericEntity>> randomSet(int $number, array $attributes = [])
  */
 final class GenericEntityFactory extends PersistentProxyObjectFactory

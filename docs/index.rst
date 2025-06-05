@@ -237,6 +237,7 @@ This command will generate a ``PostFactory`` class that looks like this:
          * @method static Post[]&Proxy[] createSequence(iterable|callable $sequence)
          * @method static Post[]|Proxy[] findBy(array $attributes)
          * @method static Post[]|Proxy[] randomRange(int $min, int $max, array $attributes = []))
+         * @method static Post[]|Proxy[] randomRangeOrCreate(int $min, int $max, array $attributes = [])
          * @method static Post[]|Proxy[] randomSet(int $number, array $attributes = []))
          *
          * @phpstan-method Proxy<Post>&Post create(array|callable $attributes = [])
@@ -252,6 +253,7 @@ This command will generate a ``PostFactory`` class that looks like this:
          * @phpstan-method static list<Proxy<Post>&Post> createSequence(array|callable $sequence)
          * @phpstan-method static list<Proxy<Post>&Post> findBy(array $attributes)
          * @phpstan-method static list<Proxy<Post>&Post> randomRange(int $min, int $max, array $attributes = [])
+         * @phpstan-method static list<Proxy<Post>&Post> randomRangeOrCreate(int $min, int $max, array $attributes = [])
          * @phpstan-method static list<Proxy<Post>&Post> randomSet(int $number, array $attributes = [])
          * @phpstan-method static RepositoryProxy<Post>&Post repository()
          */

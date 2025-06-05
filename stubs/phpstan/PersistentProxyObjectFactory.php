@@ -52,6 +52,7 @@ assertType("list<{$proxyType}>", UserProxyFactory::createMany(1));
 assertType("list<{$proxyType}>", UserProxyFactory::createRange(1, 2));
 assertType("list<{$proxyType}>", UserProxyFactory::createSequence([]));
 assertType("list<{$proxyType}>", UserProxyFactory::randomRange(1, 2));
+assertType("list<{$proxyType}>", UserProxyFactory::randomRangeOrCreate(1, 2));
 assertType("list<{$proxyType}>", UserProxyFactory::randomSet(2));
 assertType("list<{$proxyType}>", UserProxyFactory::findBy(['name' => 'foo']));
 
@@ -117,6 +118,7 @@ assertType("string", UserProxyFactory::createMany(1)[0]->name);
 assertType("string", UserProxyFactory::createRange(1, 2)[0]->name);
 assertType("string", UserProxyFactory::createSequence([])[0]->name);
 assertType("string", UserProxyFactory::randomRange(1, 2)[0]->name);
+assertType("string", UserProxyFactory::randomRangeOrCreate(1,2)[0]->name);
 assertType("string", UserProxyFactory::randomSet(2)[0]->name);
 assertType("string", UserProxyFactory::findBy(['name' => 'foo'])[0]->name);
 
