@@ -75,7 +75,7 @@ case ${PHPUNIT_VERSION} in
     ;;
 esac
 
-PHPUNIT_EXEC="${PHPUNIT_EXEC} ${@}"
+PHPUNIT_EXEC="${PHPUNIT_EXEC} $*"
 
 echo "${PHPUNIT_EXEC}"
 $PHPUNIT_EXEC
