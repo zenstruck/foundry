@@ -1,0 +1,12 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Zenstruck\Foundry\Tests\Fixture\Stories\Fixtures\FixtureStory: ~
+
+zenstruck_foundry:
+    global_state:
+        - Zenstruck\Foundry\Tests\Fixture\Stories\GlobalStory
+
+

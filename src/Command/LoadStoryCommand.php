@@ -58,6 +58,12 @@ final class LoadStoryCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         if (!$input->getOption('append')) {
+            if (!$io->confirm('The database will be recreated! Do you want to continue?')) {
+                $io->warning('Aborting command execution. Use the --append option to skip database reset.');
+
+                return self::SUCCESS;
+            }
+
             $this->resetDatabase();
         }
 

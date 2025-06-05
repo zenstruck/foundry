@@ -21,11 +21,14 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Tests\Fixture\Entity\GlobalEntity;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\Fixtures\FixtureStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\Fixtures\FixtureStoryWithNameCollision;
 use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
+
+use function Zenstruck\Foundry\Persistence\repository;
 
 final class LoadStoryCommandTest extends KernelTestCase
 {
@@ -180,6 +183,21 @@ final class LoadStoryCommandTest extends KernelTestCase
      * @test
      */
     #[Test]
+    public function user_can_refuse_to_reset_database(): void
+    {
+        $commandTester = $this->commandTester(['environment' => 'stories_as_fixtures']);
+        $commandTester->setInputs(['no']);
+        $commandTester->execute(['name' => 'fixture-story']);
+
+        self::assertStringContainsString('[WARNING] Aborting command execution', $commandTester->getDisplay());
+
+        GenericEntityFactory::assert()->count(0);
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
     public function it_does_not_reset_database_if_append_option_is_used(): void
     {
         if (TestKernel::usesDamaDoctrineTestBundle()) {
@@ -241,6 +259,21 @@ final class LoadStoryCommandTest extends KernelTestCase
         GenericEntityFactory::assert()->count(1, ['prop1' => 'fixture-story']);
 
         self::assertStringContainsString('Loading story with name "fixture-story"', $commandTester->getDisplay());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function it_does_not_load_global_state(): void
+    {
+        if (TestKernel::usesDamaDoctrineTestBundle()) {
+            self::markTestSkipped('test not applicable when using the DAMA: it somehow creates an infinite loop.');
+        }
+
+        $this->commandTester(['environment' => 'story_fixture_and_global_state'])->execute([]);
+
+        repository(GlobalEntity::class)->assert()->count(0);
     }
 
     private function commandTester(array $options = []): CommandTester
