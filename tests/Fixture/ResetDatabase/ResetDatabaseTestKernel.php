@@ -52,6 +52,27 @@ final class ResetDatabaseTestKernel extends FoundryTestKernel
         return \str_starts_with((string) \getenv('DATABASE_URL'), 'sqlite:');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    private static function resetConfiguration(): array
+    {
+        if (self::usesAutoResetMode()) {
+            return ['mode' => ResetDatabaseMode::AUTO];
+        }
+
+        if (!FoundryTestKernel::usesMigrations()) {
+            return ['mode' => ResetDatabaseMode::SCHEMA];
+        }
+
+        return [
+            'mode' => ResetDatabaseMode::MIGRATE,
+            'migrations' => [
+                'configurations' => ($configFile = self::migrationFile()) ? [$configFile] : [],
+            ],
+        ];
+    }
+
     protected function configureContainer(ContainerConfigurator $configurator, LoaderInterface $loader, ContainerBuilder $c): void
     {
         parent::configureContainer($configurator, $loader, $c);
@@ -64,14 +85,7 @@ final class ResetDatabaseTestKernel extends FoundryTestKernel
                 GlobalInvokableService::class,
             ],
             'orm' => [
-                'reset' => FoundryTestKernel::usesMigrations()
-                        ? [
-                            'mode' => ResetDatabaseMode::MIGRATE,
-                            'migrations' => [
-                                'configurations' => ($configFile = self::migrationFile()) ? [$configFile] : [],
-                            ],
-                        ]
-                        : ['mode' => ResetDatabaseMode::SCHEMA],
+                'reset' => self::resetConfiguration(),
             ],
         ]);
 
