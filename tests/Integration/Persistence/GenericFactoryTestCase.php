@@ -290,36 +290,72 @@ abstract class GenericFactoryTestCase extends KernelTestCase
      * @test
      */
     #[Test]
-    public function random_range_or_create(): void
+    public function random_range_or_create_enough_object(): void
     {
         static::factory()->create(['prop1' => 'a']);
-        static::factory()->create(['prop1' => 'b']);
-        static::factory()->create(['prop1' => 'b']);
-        static::factory()->create(['prop1' => 'b']);
+        static::factory()->create(['prop1' => 'a']);
+        static::factory()->create(['prop1' => 'a']);
 
-        $range = static::factory()::randomRangeOrCreate(0, 3);
+        $range = static::factory()::randomRangeOrCreate(2, 3);
 
-        $this->assertGreaterThanOrEqual(0, \count($range));
+        $this->assertGreaterThanOrEqual(2, \count($range));
         $this->assertLessThanOrEqual(3, \count($range));
 
         foreach ($range as $object) {
-            $this->assertContains($object->getProp1(), ['a', 'b']);
+            $this->assertSame('a', $object->getProp1());
         }
+    }
 
-        $range = static::factory()::randomRangeOrCreate(0, 3, ['prop1' => 'b']);
+    /**
+     * @test
+     */
+    #[Test]
+    public function random_range_or_create_not_enough_object(): void
+    {
+        static::factory()->create(['prop1' => 'a']);
 
-        $this->assertGreaterThanOrEqual(0, \count($range));
+        $range = static::factory()::randomRangeOrCreate(2, 3);
+
+        $this->assertGreaterThanOrEqual(2, \count($range));
+        $this->assertLessThanOrEqual(3, \count($range));
+
+        static::factory()::assert()
+            ->exists(['prop1' => 'default1']);
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function random_range_or_create_not_enough_object_with_criteria(): void
+    {
+        static::factory()->create(['prop1' => 'a']);
+        static::factory()->create(['prop1' => 'b']);
+
+        $range = static::factory()::randomRangeOrCreate(2, 3, ['prop1' => 'b']);
+
+        $this->assertGreaterThanOrEqual(2, \count($range));
         $this->assertLessThanOrEqual(3, \count($range));
 
         foreach ($range as $object) {
             $this->assertSame('b', $object->getProp1());
         }
+    }
 
-        static::factory()::truncate();
-        $range = static::factory()::randomRangeOrCreate(1, 2, ['prop1' => 'c']);
+    /**
+     * @test
+     */
+    #[Test]
+    public function random_range_or_create_no_object_with_criteria(): void
+    {
+        static::factory()->create(['prop1' => 'a']);
+        static::factory()->create(['prop1' => 'b']);
 
-        $this->assertGreaterThanOrEqual(1, \count($range));
-        $this->assertLessThanOrEqual(2, \count($range));
+        $range = static::factory()::randomRangeOrCreate(2, 3, ['prop1' => 'c']);
+
+        $this->assertGreaterThanOrEqual(2, \count($range));
+        $this->assertLessThanOrEqual(3, \count($range));
+
         foreach ($range as $object) {
             $this->assertSame('c', $object->getProp1());
         }

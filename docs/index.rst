@@ -373,6 +373,10 @@ Using your Factory
     $posts = PostFactory::randomRange(0, 5); // array containing 0-5 "Post|Proxy" objects
     $posts = PostFactory::randomRange(0, 5, ['author' => 'kevin']); // filter by the passed attributes
 
+    // or automatically persist a new random range of objects if none exists
+    $posts = PostFactory::randomRangeOrCreate(0, 5); // array containing 0-5 "Post|Proxy" objects
+    $posts = PostFactory::randomRangeOrCreate(0, 5, ['author' => 'kevin']); // filter by or create with the passed attributes
+
 Reusable Factory "States"
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
