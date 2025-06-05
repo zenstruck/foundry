@@ -20,4 +20,10 @@ enum ResetDatabaseMode: string
 {
     case SCHEMA = 'schema';
     case MIGRATE = 'migrate';
+    case AUTO = 'auto';
+
+    public function requiresMigrationConfiguration(): bool
+    {
+        return self::SCHEMA !== $this;
+    }
 }
