@@ -24,6 +24,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithEmbeddableEntity;
+use Zenstruck\Foundry\Tests\Fixture\Entity\WithUidColumn;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
 use Zenstruck\Foundry\Tests\Fixture\ObjectWithEnum;
 use Zenstruck\Foundry\Tests\Fixture\ObjectWithNonWriteable;
@@ -79,6 +80,27 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertStringContainsString('Note: pass --test if you want to generate factories in your tests/ directory', $output);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/CategoryFactory.php'));
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_create_factory_with_uid(): void
+    {
+        if (!\getenv('DATABASE_URL')) {
+            self::markTestSkipped('doctrine/orm not enabled.');
+        }
+
+        $tester = $this->makeFactoryCommandTester();
+
+        $tester->execute(['class' => WithUidColumn::class]);
+
+        $output = $tester->getDisplay();
+
+        $this->assertStringContainsString('Note: pass --test if you want to generate factories in your tests/ directory', $output);
+
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/WithUidColumnFactory.php'));
     }
 
     /**
