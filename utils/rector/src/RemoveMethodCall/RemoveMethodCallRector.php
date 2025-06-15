@@ -15,7 +15,6 @@ namespace Zenstruck\Foundry\Utils\Rector\RemoveMethodCall;
 
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
-use PHPStan\Type\ObjectType;
 use Rector\Contract\Rector\ConfigurableRectorInterface;
 use Rector\Rector\AbstractRector;
 use Webmozart\Assert\Assert;
@@ -32,16 +31,13 @@ final class RemoveMethodCallRector extends AbstractRector implements Configurabl
     }
 
     /** @param Node\Stmt\Expression $node */
-    public function refactor(Node $node) : Node|int|null
+    public function refactor(Node $node) : int|null
     {
         $method = $node->expr;
 
         if ($method instanceof Node\Expr\MethodCall && !$method->isFirstClassCallable() && $method->var instanceof Node\Expr\Variable) {
             foreach ($this->removeMethodCalls as $removeMethodCall) {
                 if (!$this->isName($method->name, $removeMethodCall->methodName)) {
-                    continue;
-                }
-                if (!$this->isObjectType($method->var, new ObjectType($removeMethodCall->objectType))) {
                     continue;
                 }
 

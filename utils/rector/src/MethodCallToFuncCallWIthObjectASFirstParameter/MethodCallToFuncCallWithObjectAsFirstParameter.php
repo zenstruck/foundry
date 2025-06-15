@@ -5,7 +5,6 @@ namespace Zenstruck\Foundry\Utils\Rector\MethodCallToFuncCallWIthObjectASFirstPa
 final class MethodCallToFuncCallWithObjectAsFirstParameter
 {
     public function __construct(
-        public readonly string $objectType,
         public readonly string $methodName,
         public readonly string $functionName
     ) {

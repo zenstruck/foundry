@@ -14,11 +14,9 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Utils\Rector;
 
 use PhpParser\Node;
-use Rector\Contract\Rector\ConfigurableRectorInterface;
 use Rector\Rector\AbstractRector;
-use Webmozart\Assert\Assert;
 
-final class RemoveWithoutAutorefreshCallRector extends AbstractRector implements ConfigurableRectorInterface
+final class RemoveWithoutAutorefreshCallRector extends AbstractRector
 {
     /** @return array<class-string<Node>> */
     public function getNodeTypes() : array
@@ -36,6 +34,7 @@ final class RemoveWithoutAutorefreshCallRector extends AbstractRector implements
             || !$method->var instanceof Node\Expr\Variable
             || !$this->isName($method->name, '_withoutAutoRefresh')
             || !isset($method->args[0])
+            || $method->args[0] instanceof Node\VariadicPlaceholder
         ) {
             return null;
         }
@@ -66,14 +65,5 @@ final class RemoveWithoutAutorefreshCallRector extends AbstractRector implements
         }
 
         return null;
-    }
-
-    /**
-     * @param mixed[] $configuration
-     */
-    public function configure(array $configuration) : void
-    {
-        Assert::allIsInstanceOf($configuration, RemoveMethodCall::class);
-        $this->removeMethodCalls = $configuration;
     }
 }

@@ -5,7 +5,6 @@ namespace Zenstruck\Foundry\Utils\Rector\RemoveMethodCall;
 final class RemoveMethodCall
 {
     public function __construct(
-        public readonly string $objectType,
         public readonly string $methodName,
     ) {
     }

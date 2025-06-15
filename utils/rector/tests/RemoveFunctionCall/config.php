@@ -12,16 +12,14 @@ declare(strict_types=1);
  */
 
 use Rector\Config\RectorConfig;
-use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\Utils\Rector\RemoveMethodCall\RemoveMethodCall;
-use Zenstruck\Foundry\Utils\Rector\RemoveMethodCall\RemoveMethodCallRector;
+use Zenstruck\Foundry\Utils\Rector\RemoveFunctionCall\RemoveFunctionCall;
+use Zenstruck\Foundry\Utils\Rector\RemoveFunctionCall\RemoveFunctionCallRector;
 
-return static function(RectorConfig $rectorConfig): void {
-
+return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->ruleWithConfiguration(
-        RemoveMethodCallRector::class,
+        RemoveFunctionCallRector::class,
         [
-            new RemoveMethodCall('_enableAutoRefresh'),
+            new RemoveFunctionCall('Zenstruck\Foundry\Persistence\proxy'),
         ]
     );
 };

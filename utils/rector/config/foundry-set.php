@@ -12,36 +12,52 @@ declare(strict_types=1);
  */
 
 use Rector\Config\RectorConfig;
-use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Utils\Rector\MethodCallToFuncCallWIthObjectASFirstParameter\MethodCallToFuncCallWithObjectAsFirstParameter;
 use Zenstruck\Foundry\Utils\Rector\MethodCallToFuncCallWIthObjectASFirstParameter\MethodCallToFuncCallWIthObjectAsFirstParameterRector;
+use Zenstruck\Foundry\Utils\Rector\RemoveFunctionCall\RemoveFunctionCall;
+use Zenstruck\Foundry\Utils\Rector\RemoveFunctionCall\RemoveFunctionCallRector;
 use Zenstruck\Foundry\Utils\Rector\RemoveMethodCall\RemoveMethodCall;
 use Zenstruck\Foundry\Utils\Rector\RemoveMethodCall\RemoveMethodCallRector;
+use Zenstruck\Foundry\Utils\Rector\RemoveWithoutAutorefreshCallRector;
 
 return static function(RectorConfig $rectorConfig): void {
-    if (\PHP_VERSION_ID < 80400) {
-        throw new \LogicException('Cannot use Foundry rector suite with PHP < 8.4');
-    }
+//    if (\PHP_VERSION_ID < 80400) {
+//        throw new \LogicException('Cannot use Foundry rector suite with PHP < 8.4');
+//    }
 
     $rectorConfig->ruleWithConfiguration(
         MethodCallToFuncCallWIthObjectAsFirstParameterRector::class,
         [
-            new MethodCallToFuncCallWithObjectAsFirstParameter(Proxy::class, '_get', 'Zenstruck\Foundry\get'),
-            new MethodCallToFuncCallWithObjectAsFirstParameter(Proxy::class, '_set', 'Zenstruck\Foundry\set'),
+            new MethodCallToFuncCallWithObjectAsFirstParameter('_get', 'Zenstruck\Foundry\get'),
+            new MethodCallToFuncCallWithObjectAsFirstParameter('_set', 'Zenstruck\Foundry\set'),
 
-            new MethodCallToFuncCallWithObjectAsFirstParameter(Proxy::class, '_save', 'Zenstruck\Foundry\Persistence\save'),
-            new MethodCallToFuncCallWithObjectAsFirstParameter(Proxy::class, '_refresh', 'Zenstruck\Foundry\Persistence\refresh'),
-            new MethodCallToFuncCallWithObjectAsFirstParameter(Proxy::class, '_delete', 'Zenstruck\Foundry\Persistence\delete'),
-            new MethodCallToFuncCallWithObjectAsFirstParameter(Proxy::class, '_assertPersisted', 'Zenstruck\Foundry\Persistence\assert_persisted'),
-            new MethodCallToFuncCallWithObjectAsFirstParameter(Proxy::class, '_assertNotPersisted', 'Zenstruck\Foundry\Persistence\assert_not_persisted'),
+            new MethodCallToFuncCallWithObjectAsFirstParameter('_save', 'Zenstruck\Foundry\Persistence\save'),
+            new MethodCallToFuncCallWithObjectAsFirstParameter('_refresh', 'Zenstruck\Foundry\Persistence\refresh'),
+            new MethodCallToFuncCallWithObjectAsFirstParameter('_delete', 'Zenstruck\Foundry\Persistence\delete'),
+            new MethodCallToFuncCallWithObjectAsFirstParameter(
+                '_assertPersisted', 'Zenstruck\Foundry\Persistence\assert_persisted'
+            ),
+            new MethodCallToFuncCallWithObjectAsFirstParameter(
+                '_assertNotPersisted', 'Zenstruck\Foundry\Persistence\assert_not_persisted'
+            ),
         ]
     );
 
     $rectorConfig->ruleWithConfiguration(
         RemoveMethodCallRector::class,
         [
-            new RemoveMethodCall(Proxy::class, '_enableAutoRefresh'),
-            new RemoveMethodCall(Proxy::class, '_disableAutoRefresh'),
+            new RemoveMethodCall('_enableAutoRefresh'),
+            new RemoveMethodCall('_disableAutoRefresh'),
         ]
     );
+
+    $rectorConfig->ruleWithConfiguration(
+        RemoveFunctionCallRector::class,
+        [
+            new RemoveFunctionCall('Zenstruck\Foundry\Persistence\proxy'),
+            new RemoveFunctionCall('Zenstruck\Foundry\Persistence\unproxy'),
+        ]
+    );
+
+    $rectorConfig->rules([RemoveWithoutAutorefreshCallRector::class]);
 };

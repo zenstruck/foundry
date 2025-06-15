@@ -21,14 +21,8 @@ return static function(RectorConfig $rectorConfig): void {
     $rectorConfig->ruleWithConfiguration(
         MethodCallToFuncCallWIthObjectAsFirstParameterRector::class,
         [
-            new MethodCallToFuncCallWithObjectAsFirstParameter(Proxy::class, '_get', 'Zenstruck\Foundry\get'),
-            new MethodCallToFuncCallWithObjectAsFirstParameter(Proxy::class, '_set', 'Zenstruck\Foundry\set'),
-
-            new MethodCallToFuncCallWithObjectAsFirstParameter(Proxy::class, '_save', 'Zenstruck\Foundry\Persistence\save'),
-            new MethodCallToFuncCallWithObjectAsFirstParameter(Proxy::class, '_refresh', 'Zenstruck\Foundry\Persistence\refresh'),
-            new MethodCallToFuncCallWithObjectAsFirstParameter(Proxy::class, '_delete', 'Zenstruck\Foundry\Persistence\delete'),
-            new MethodCallToFuncCallWithObjectAsFirstParameter(Proxy::class, '_assertPersisted', 'Zenstruck\Foundry\Persistence\assert_persisted'),
-            new MethodCallToFuncCallWithObjectAsFirstParameter(Proxy::class, '_assertNotPersisted', 'Zenstruck\Foundry\Persistence\assert_not_persisted'),
+            new MethodCallToFuncCallWithObjectAsFirstParameter('_set', 'Zenstruck\Foundry\set'),
+            new MethodCallToFuncCallWithObjectAsFirstParameter('_save', 'Zenstruck\Foundry\Persistence\save'),
         ]
     );
 };

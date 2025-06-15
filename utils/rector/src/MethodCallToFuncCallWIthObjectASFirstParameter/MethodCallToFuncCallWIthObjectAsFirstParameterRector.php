@@ -49,9 +49,6 @@ final class MethodCallToFuncCallWIthObjectAsFirstParameterRector extends Abstrac
             if (!$this->isName($node->name, $methodCallToFuncCall->methodName)) {
                 continue;
             }
-            if (!$this->isObjectType($node->var, new ObjectType($methodCallToFuncCall->objectType))) {
-                continue;
-            }
             return new FuncCall(new FullyQualified($methodCallToFuncCall->functionName), [new Arg($node->var), ...$node->getArgs()]);
         }
         return null;
