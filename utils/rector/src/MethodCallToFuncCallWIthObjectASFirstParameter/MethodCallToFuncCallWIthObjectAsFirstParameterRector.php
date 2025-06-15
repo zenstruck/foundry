@@ -21,10 +21,7 @@ use PhpParser\Node\Name\FullyQualified;
 use PHPStan\Type\ObjectType;
 use Rector\Contract\Rector\ConfigurableRectorInterface;
 use Rector\Rector\AbstractRector;
-use Rector\Transform\ValueObject\MethodCallToFuncCall;
-use Symplify\RuleDocGenerator\ValueObject\CodeSample\ConfiguredCodeSample;
-use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
-use RectorPrefix202506\Webmozart\Assert\Assert;
+use Webmozart\Assert\Assert;
 
 final class MethodCallToFuncCallWIthObjectAsFirstParameterRector extends AbstractRector implements ConfigurableRectorInterface
 {
@@ -64,7 +61,7 @@ final class MethodCallToFuncCallWIthObjectAsFirstParameterRector extends Abstrac
      */
     public function configure(array $configuration) : void
     {
-        \RectorPrefix202506\Webmozart\Assert\Assert::allIsInstanceOf($configuration, MethodCallToFuncCallWithObjectAsFirstParameter::class);
+        Assert::allIsInstanceOf($configuration, MethodCallToFuncCallWithObjectAsFirstParameter::class);
         $this->methodCallsToFuncCalls = $configuration;
     }
 }

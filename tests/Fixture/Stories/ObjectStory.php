@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Fixture\Stories;
 
+use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Story;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
@@ -18,7 +19,7 @@ use Zenstruck\Foundry\Tests\Fixture\Object1;
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  *
- * @method static Object1 foo()
+ * @method static Proxy<Object1>|Object1 foo()
  */
 final class ObjectStory extends Story
 {

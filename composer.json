@@ -23,6 +23,7 @@
         "symfony/property-access": "^6.4|^7.0",
         "symfony/property-info": "^6.4|^7.0",
         "symfony/var-exporter": "^6.4.9|~7.0.9|^7.1.2",
+        "webmozart/assert": "^1.11",
         "zenstruck/assert": "^1.4"
     },
     "require-dev": {

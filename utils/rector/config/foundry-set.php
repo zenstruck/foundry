@@ -15,6 +15,8 @@ use Rector\Config\RectorConfig;
 use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Utils\Rector\MethodCallToFuncCallWIthObjectASFirstParameter\MethodCallToFuncCallWithObjectAsFirstParameter;
 use Zenstruck\Foundry\Utils\Rector\MethodCallToFuncCallWIthObjectASFirstParameter\MethodCallToFuncCallWIthObjectAsFirstParameterRector;
+use Zenstruck\Foundry\Utils\Rector\RemoveMethodCall\RemoveMethodCall;
+use Zenstruck\Foundry\Utils\Rector\RemoveMethodCall\RemoveMethodCallRector;
 
 return static function(RectorConfig $rectorConfig): void {
     if (\PHP_VERSION_ID < 80400) {
@@ -32,6 +34,14 @@ return static function(RectorConfig $rectorConfig): void {
             new MethodCallToFuncCallWithObjectAsFirstParameter(Proxy::class, '_delete', 'Zenstruck\Foundry\Persistence\delete'),
             new MethodCallToFuncCallWithObjectAsFirstParameter(Proxy::class, '_assertPersisted', 'Zenstruck\Foundry\Persistence\assert_persisted'),
             new MethodCallToFuncCallWithObjectAsFirstParameter(Proxy::class, '_assertNotPersisted', 'Zenstruck\Foundry\Persistence\assert_not_persisted'),
+        ]
+    );
+
+    $rectorConfig->ruleWithConfiguration(
+        RemoveMethodCallRector::class,
+        [
+            new RemoveMethodCall(Proxy::class, '_enableAutoRefresh'),
+            new RemoveMethodCall(Proxy::class, '_disableAutoRefresh'),
         ]
     );
 };
