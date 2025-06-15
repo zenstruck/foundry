@@ -11,19 +11,11 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\Utils\Rector\Tests\Fixtures;
+use Rector\Config\RectorConfig;
+use Zenstruck\Foundry\Utils\Rector\RemoveWithoutAutorefreshCallRector;
 
-use Doctrine\ORM\Mapping as ORM;
-
-#[ORM\Entity()]
-class DummyPersistentObject
-{
-    #[ORM\Id]
-    #[ORM\Column(type: 'uuid')]
-    public ?int $id;
-
-    public function doSomething(): void
-    {
-
-    }
-}
+return static function (RectorConfig $rectorConfig): void {
+    $rectorConfig->rules(
+        [RemoveWithoutAutorefreshCallRector::class],
+    );
+};
