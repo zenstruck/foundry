@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- https://phpunit.readthedocs.io/en/9.5/configuration.html -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         colors="true"
+         bootstrap="utils/rector/tests/bootstrap.php"
+         failOnRisky="true"
+         failOnWarning="true">
+
+    <php>
+        <ini name="error_reporting" value="-1"/>
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0&amp;max[direct]=0&amp;quiet[]=indirect&amp;quiet[]=other"/>
+        <env name="SHELL_VERBOSITY" value="0"/>
+    </php>
+
+    <testsuites>
+        <testsuite name="Rector">
+            <directory>./utils/rector/tests/</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
