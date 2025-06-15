@@ -15,7 +15,6 @@ namespace Zenstruck\Foundry\Utils\Rector\RemoveFunctionCall;
 
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
-use PHPStan\Type\ObjectType;
 use Rector\Contract\Rector\ConfigurableRectorInterface;
 use Rector\Rector\AbstractRector;
 use Webmozart\Assert\Assert;

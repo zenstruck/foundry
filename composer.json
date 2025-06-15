@@ -71,7 +71,7 @@
             "App\\Tests\\": "tests/Fixture/Maker/tmp/tests",
             "Zenstruck\\Foundry\\Utils\\Rector\\Tests\\": "utils/rector/tests/"
         },
-        "exclude-from-classmap": ["tests/Fixture/Maker/expected"]
+        "exclude-from-classmap": ["tests/Fixture/Maker/expected", "utils/rector/tests/**/Fixtures/"]
     },
     "config": {
         "preferred-install": "dist",
