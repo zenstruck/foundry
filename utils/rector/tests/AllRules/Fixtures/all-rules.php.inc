@@ -2,6 +2,7 @@
 
 use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObjectFactory;
 use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentProxyFactory;
+use App\SomeObject;
 
 use function Zenstruck\Foundry\Persistence\proxy;
 use function Zenstruck\Foundry\Persistence\unproxy;
@@ -32,12 +33,20 @@ $proxy = proxy($object);
 $proxy->_enableAutoRefresh();
 $proxy->_save();
 
+/**
+ * @param Proxy<SomeObject> $param
+ * @return Proxy<SomeObject>
+ */
+function function1()
+{
+}
 ?>
 -----
 <?php
 
 use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObjectFactory;
 use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentProxyFactory;
+use App\SomeObject;
 
 use function Zenstruck\Foundry\Persistence\proxy;
 use function Zenstruck\Foundry\Persistence\unproxy;
@@ -65,4 +74,11 @@ $object = DummyObjectFactory::createOne();
 $proxy = $object;
 \Zenstruck\Foundry\Persistence\save($proxy);
 
+/**
+ * @param \App\SomeObject $param
+ * @return \App\SomeObject
+ */
+function function1()
+{
+}
 ?>

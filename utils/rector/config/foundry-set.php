@@ -12,12 +12,14 @@ declare(strict_types=1);
  */
 
 use Rector\Config\RectorConfig;
+use Zenstruck\Foundry\Utils\Rector\ChangeFactoryBaseClassRector;
 use Zenstruck\Foundry\Utils\Rector\MethodCallToFuncCallWIthObjectASFirstParameter\MethodCallToFuncCallWithObjectAsFirstParameter;
 use Zenstruck\Foundry\Utils\Rector\MethodCallToFuncCallWIthObjectASFirstParameter\MethodCallToFuncCallWIthObjectAsFirstParameterRector;
 use Zenstruck\Foundry\Utils\Rector\RemoveFunctionCall\RemoveFunctionCall;
 use Zenstruck\Foundry\Utils\Rector\RemoveFunctionCall\RemoveFunctionCallRector;
 use Zenstruck\Foundry\Utils\Rector\RemoveMethodCall\RemoveMethodCall;
 use Zenstruck\Foundry\Utils\Rector\RemoveMethodCall\RemoveMethodCallRector;
+use Zenstruck\Foundry\Utils\Rector\RemovePhpDocProxyTypeHintRector;
 use Zenstruck\Foundry\Utils\Rector\RemoveWithoutAutorefreshCallRector;
 
 return static function(RectorConfig $rectorConfig): void {
@@ -59,5 +61,9 @@ return static function(RectorConfig $rectorConfig): void {
         ]
     );
 
-    $rectorConfig->rules([RemoveWithoutAutorefreshCallRector::class]);
+    $rectorConfig->rules([
+        RemoveWithoutAutorefreshCallRector::class,
+        ChangeFactoryBaseClassRector::class,
+        RemovePhpDocProxyTypeHintRector::class,
+    ]);
 };
