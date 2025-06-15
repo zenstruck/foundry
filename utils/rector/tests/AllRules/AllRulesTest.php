@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace Zenstruck\Foundry\Utils\Rector\Tests\AllRules;
+
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Rector\Testing\PHPUnit\AbstractRectorTestCase;

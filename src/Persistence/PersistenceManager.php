@@ -22,6 +22,8 @@ use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
 use Zenstruck\Foundry\Persistence\Relationship\RelationshipMetadata;
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 
+use function Zenstruck\Foundry\set;
+
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *

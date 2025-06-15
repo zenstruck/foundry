@@ -23,7 +23,6 @@
         "symfony/property-access": "^6.4|^7.0",
         "symfony/property-info": "^6.4|^7.0",
         "symfony/var-exporter": "^6.4.9|~7.0.9|^7.1.2",
-        "webmozart/assert": "^1.11",
         "zenstruck/assert": "^1.4"
     },
     "require-dev": {
@@ -50,7 +49,8 @@
         "symfony/translation-contracts": "^3.4",
         "symfony/uid": "^6.4|^7.0",
         "symfony/var-dumper": "^6.4|^7.0",
-        "symfony/yaml": "^6.4|^7.0"
+        "symfony/yaml": "^6.4|^7.0",
+        "webmozart/assert": "^1.11"
     },
     "autoload": {
         "psr-4": {

@@ -21,9 +21,9 @@ use Zenstruck\Foundry\Utils\Rector\RemoveMethodCall\RemoveMethodCallRector;
 use Zenstruck\Foundry\Utils\Rector\RemoveWithoutAutorefreshCallRector;
 
 return static function(RectorConfig $rectorConfig): void {
-//    if (\PHP_VERSION_ID < 80400) {
-//        throw new \LogicException('Cannot use Foundry rector suite with PHP < 8.4');
-//    }
+    if (\PHP_VERSION_ID < 80400) {
+        throw new \LogicException('Cannot use Foundry rector suite with PHP < 8.4');
+    }
 
     $rectorConfig->ruleWithConfiguration(
         MethodCallToFuncCallWIthObjectAsFirstParameterRector::class,

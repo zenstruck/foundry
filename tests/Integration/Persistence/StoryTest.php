@@ -242,7 +242,7 @@ final class StoryTest extends KernelTestCase
     public function can_use_story_with_simple_object(): void
     {
         ObjectStory::load();
-        self::assertInstanceOf(Object1::class, ObjectStory::fo);
+        self::assertInstanceOf(Object1::class, ObjectStory::foo());
     }
 
     /**
