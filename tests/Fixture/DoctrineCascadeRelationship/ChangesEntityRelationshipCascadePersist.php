@@ -17,6 +17,8 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\MappingException;
 use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Metadata\Version\ConstraintRequirement;
+use PHPUnit\Runner\Version as PHPunitVersion;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
@@ -73,11 +75,18 @@ trait ChangesEntityRelationshipCascadePersist
      */
     public static function provideCascadeRelationshipsCombinations(): iterable
     {
+        if (ConstraintRequirement::from('>=12')->isSatisfiedBy(PHPunitVersion::id())) {
+            yield []; // @phpstan-ignore generator.valueType
+
+            return;
+        }
+
+        // @phpstan-ignore deadCode.unreachable
         if (!\getenv('DATABASE_URL') || !self::$methodName) {
             // this test requires the ORM, but trait RequiresORM is analysed after data provider are called
             // then we need to return at least one empty array to avoid an error
             // in PHPUnit 12, we will be able to use #[RequiresEnvironmentVariable('DATABASE_URL')] to prevent this
-            yield ['']; // @phpstan-ignore generator.valueType
+            yield []; // @phpstan-ignore generator.valueType
 
             return;
         }

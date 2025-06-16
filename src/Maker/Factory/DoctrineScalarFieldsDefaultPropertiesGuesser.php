@@ -15,6 +15,7 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Doctrine\ORM\Mapping\FieldMapping;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * @internal
@@ -37,6 +38,7 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
         'DATETIMETZ_IMMUTABLE' => '\DateTimeImmutable::createFromMutable(self::faker()->dateTime()),',
         'DECIMAL' => 'self::faker()->randomFloat(),',
         'FLOAT' => 'self::faker()->randomFloat(),',
+        'GUID' => 'self::faker()->uuid(),',
         'INTEGER' => 'self::faker()->randomNumber(),',
         'INT' => 'self::faker()->randomNumber(),',
         'JSON' => '[],',
@@ -47,6 +49,7 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
         'TEXT' => 'self::faker()->text({length}),',
         'TIME_MUTABLE' => 'self::faker()->datetime(),',
         'TIME_IMMUTABLE' => '\DateTimeImmutable::createFromMutable(self::faker()->datetime()),',
+        'UUID' => 'Uuid::fromString(self::faker()->uuid()),',
     ];
 
     public function __invoke(SymfonyStyle $io, MakeFactoryData $makeFactoryData, MakeFactoryQuery $makeFactoryQuery): void
@@ -83,6 +86,10 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
 
             $value = "null, // TODO add {$type} type manually";
             $length = $this->extractFieldMappingData($property, 'length', '');
+
+            if ('UUID' === $type) {
+                $makeFactoryData->addUse(Uuid::class);
+            }
 
             if (\array_key_exists($type, self::DEFAULTS)) {
                 $value = self::DEFAULTS[$type];

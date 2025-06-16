@@ -14,8 +14,12 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Integration\ForceFactoriesTraitUsage;
 
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Test\ResetDatabase;
 
 #[RequiresPhpunit('>=11.0')]
-final class KernelTestCaseWithoutFactoriesTraitTest extends KernelTestCaseWithoutFactoriesTraitTestCase
+final class KernelTestCaseWithOnlyResetDatabaseTraitTestWithoutFactoriesTrait extends KernelTestCase
 {
+    use KernelTestCaseWithoutFactoriesTrait;
+    use ResetDatabase;
 }

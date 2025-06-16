@@ -79,7 +79,7 @@ final class StoryTest extends KernelTestCase
      */
     #[Test]
     #[DataProvider('storiesProvider')]
-    public function can_access_story_state(string $story): void
+    public function can_access_story_state(string $story, string $factory): void
     {
         $this->assertSame('foo', $story::get('foo')->getProp1());
         $this->assertSame('bar', $story::get('bar')->getProp1());
@@ -99,7 +99,7 @@ final class StoryTest extends KernelTestCase
      */
     #[Test]
     #[DataProvider('storiesProvider')]
-    public function can_access_story_state_with_magic_call(string $story): void
+    public function can_access_story_state_with_magic_call(string $story, string $factory): void
     {
         $this->assertSame('foo', $story::foo()->getProp1());
         $this->assertSame('bar', $story::bar()->getProp1());
@@ -119,7 +119,7 @@ final class StoryTest extends KernelTestCase
      */
     #[Test]
     #[DataProvider('storiesProvider')]
-    public function can_access_story_state_with_magic_call_on_instance(string $story): void
+    public function can_access_story_state_with_magic_call_on_instance(string $story, string $factory): void
     {
         $this->assertSame('foo', $story::load()->foo()->getProp1());
         $this->assertSame('bar', $story::load()->bar()->getProp1());
@@ -139,7 +139,7 @@ final class StoryTest extends KernelTestCase
      */
     #[Test]
     #[DataProvider('storiesProvider')]
-    public function cannot_access_invalid_object(string $story): void
+    public function cannot_access_invalid_object(string $story, string $factory): void
     {
         $this->expectException(\InvalidArgumentException::class);
 
