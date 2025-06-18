@@ -32,6 +32,8 @@ $object = DummyObjectFactory::createOne();
 $proxy = proxy($object);
 $proxy->_enableAutoRefresh();
 $proxy->_save();
+$proxy = $proxy->_real();
+$object = $proxy->_real();
 
 /**
  * @param Proxy<SomeObject> $param
@@ -73,6 +75,7 @@ $prop = \Zenstruck\Foundry\get($object, 'property');
 $object = DummyObjectFactory::createOne();
 $proxy = $object;
 \Zenstruck\Foundry\Persistence\save($proxy);
+$object = $proxy;
 
 /**
  * @param \App\SomeObject $param

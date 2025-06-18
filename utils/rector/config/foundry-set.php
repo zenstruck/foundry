@@ -50,6 +50,7 @@ return static function(RectorConfig $rectorConfig): void {
         [
             new RemoveMethodCall('_enableAutoRefresh'),
             new RemoveMethodCall('_disableAutoRefresh'),
+            new RemoveMethodCall('_real'),
         ]
     );
 

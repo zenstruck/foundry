@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Utils\Rector\RemoveMethodCall;
 
 use PhpParser\Node;
-use PhpParser\NodeVisitor;
 use Rector\Contract\Rector\ConfigurableRectorInterface;
 use Rector\Rector\AbstractRector;
 use Webmozart\Assert\Assert;
@@ -27,22 +26,40 @@ final class RemoveMethodCallRector extends AbstractRector implements Configurabl
     /** @return array<class-string<Node>> */
     public function getNodeTypes() : array
     {
-        return [Node\Stmt\Expression::class];
+        return [Node\Expr\MethodCall::class, Node\Expr\NullsafeMethodCall::class, Node\Stmt\Expression::class];
     }
 
-    /** @param Node\Stmt\Expression $node */
-    public function refactor(Node $node) : int|null
+    /** @param Node\Expr\MethodCall|Node\Expr\NullsafeMethodCall|Node\Stmt\Expression $node */
+    public function refactor(Node $node) : Node|int|null
     {
-        $method = $node->expr;
-
-        if ($method instanceof Node\Expr\MethodCall && !$method->isFirstClassCallable() && $method->var instanceof Node\Expr\Variable) {
-            foreach ($this->removeMethodCalls as $removeMethodCall) {
-                if (!$this->isName($method->name, $removeMethodCall->methodName)) {
-                    continue;
+        foreach ($this->removeMethodCalls as $removeMethodCall) {
+            if ($node instanceof Node\Stmt\Expression) {
+                // remove calls like "$a->method();"
+                if ($this->isOnlyMethodCall($node->expr, $removeMethodCall)
+                ) {
+                    return \PhpParser\NodeVisitor::REMOVE_NODE;
                 }
 
-                return NodeVisitor::REMOVE_NODE;
+                // remove calls like "$a = $a->method();"
+                if (
+                    $node->expr instanceof Node\Expr\Assign
+                    && $node->expr->var instanceof Node\Expr\Variable
+                    && $this->isOnlyMethodCall($node->expr->expr, $removeMethodCall)
+                    && $node->expr->expr->var instanceof Node\Expr\Variable
+                    && $node->expr->var->name === $node->expr->expr->var->name
+                ) {
+                    return \PhpParser\NodeVisitor::REMOVE_NODE;
+                }
+
+                continue;
             }
+
+
+            if (!$this->isName($node->name, $removeMethodCall->methodName)) {
+                continue;
+            }
+
+            return $node->var;
         }
 
         return null;
@@ -55,5 +72,15 @@ final class RemoveMethodCallRector extends AbstractRector implements Configurabl
     {
         Assert::allIsInstanceOf($configuration, RemoveMethodCall::class);
         $this->removeMethodCalls = $configuration;
+    }
+
+    /**
+     * @phpstan-assert-if-true Node\Expr\MethodCall|Node\Expr\NullsafeMethodCall $expr
+     */
+    private function isOnlyMethodCall(Node\Expr $expr, RemoveMethodCall $removeMethodCall): bool
+    {
+        return ($expr instanceof Node\Expr\MethodCall || $expr instanceof Node\Expr\NullsafeMethodCall)
+            && $this->isName($expr->name, $removeMethodCall->methodName)
+            && $expr->var instanceof Node\Expr\Variable;
     }
 }
