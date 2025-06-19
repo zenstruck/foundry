@@ -16,6 +16,7 @@ namespace Zenstruck\Foundry\Utils\Rector;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\NodeFinder;
+use PHPStan\Analyser\MutatingScope;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ExtendsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
@@ -24,6 +25,7 @@ use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfoFactory;
 use Rector\BetterPhpDocParser\PhpDocManipulator\PhpDocTagRemover;
 use Rector\BetterPhpDocParser\ValueObject\Type\FullyQualifiedIdentifierTypeNode;
 use Rector\Comments\NodeDocBlock\DocBlockUpdater;
+use Rector\NodeTypeResolver\Node\AttributeKey;
 use Rector\Rector\AbstractRector;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
@@ -35,6 +37,7 @@ final class ChangeFactoryBaseClassRector extends AbstractRector
         private readonly PhpDocInfoFactory $phpDocInfoFactory,
         private readonly DocBlockUpdater $docBlockUpdater,
         private readonly NodeFinder  $nodeFinder,
+
     ) {
     }
 
@@ -51,7 +54,11 @@ final class ChangeFactoryBaseClassRector extends AbstractRector
      */
     public function refactor(Node $node): ?Node
     {
-        if (!$this->isObjectType($node, new ObjectType(PersistentProxyObjectFactory::class))) {
+        /** @var \PHPStan\Analyser\Scope $scope */
+        $scope = $node->getAttribute(AttributeKey::SCOPE);
+
+        if (!($reflection = $scope?->getClassReflection())
+            || $reflection->getParentClass()?->getName() !== PersistentProxyObjectFactory::class) {
             return null;
         }
 
