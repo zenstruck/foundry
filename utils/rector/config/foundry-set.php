@@ -32,7 +32,6 @@ return static function(RectorConfig $rectorConfig): void {
         MethodCallToFuncCallWIthObjectAsFirstParameterRector::class,
         [
             new MethodCallToFuncCallWithObjectAsFirstParameter('_get', 'Zenstruck\Foundry\get'),
-            new MethodCallToFuncCallWithObjectAsFirstParameter('_set', 'Zenstruck\Foundry\set'),
 
             new MethodCallToFuncCallWithObjectAsFirstParameter('_save', 'Zenstruck\Foundry\Persistence\save'),
             new MethodCallToFuncCallWithObjectAsFirstParameter('_refresh', 'Zenstruck\Foundry\Persistence\refresh'),

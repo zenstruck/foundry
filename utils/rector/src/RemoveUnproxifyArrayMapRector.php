@@ -77,7 +77,6 @@ final class RemoveUnproxifyArrayMapRector extends AbstractRector
 
         if (!$paramType->accepts(new ObjectType(Proxy::class), true)->yes()
             || $paramType instanceof MixedType
-            || $paramType instanceof ErrorType
         ) {
             return false;
         }

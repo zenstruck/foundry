@@ -54,7 +54,7 @@ final class ChangeFactoryBaseClassRector extends AbstractRector
      */
     public function refactor(Node $node): ?Node
     {
-        /** @var \PHPStan\Analyser\Scope $scope */
+        /** @var \PHPStan\Analyser\Scope|null $scope */
         $scope = $node->getAttribute(AttributeKey::SCOPE);
 
         if (!($reflection = $scope?->getClassReflection())

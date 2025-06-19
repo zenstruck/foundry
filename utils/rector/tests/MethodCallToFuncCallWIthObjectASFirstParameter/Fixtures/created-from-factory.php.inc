@@ -8,9 +8,9 @@ $object->_save();
 $object = $object->_save();
 $other = $object->_save();
 
-$object->_set('property', 'value');
+$object->_get('property');
 
-DummyPersistentProxyFactory::new()->create()->_set('id', 123);
+DummyPersistentProxyFactory::new()->create()->_get('id');
 ?>
 -----
 <?php
@@ -23,7 +23,7 @@ $object = DummyPersistentProxyFactory::createOne();
 $object = \Zenstruck\Foundry\Persistence\save($object);
 $other = \Zenstruck\Foundry\Persistence\save($object);
 
-\Zenstruck\Foundry\set($object, 'property', 'value');
+\Zenstruck\Foundry\get($object, 'property');
 
-\Zenstruck\Foundry\set(DummyPersistentProxyFactory::new()->create(), 'id', 123);
+\Zenstruck\Foundry\get(DummyPersistentProxyFactory::new()->create(), 'id');
 ?>

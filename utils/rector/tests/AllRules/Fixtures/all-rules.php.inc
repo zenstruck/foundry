@@ -71,7 +71,7 @@ $other = \Zenstruck\Foundry\Persistence\save($object);
 \Zenstruck\Foundry\Persistence\delete($object);
 
 $prop = \Zenstruck\Foundry\get($object, 'property');
-\Zenstruck\Foundry\set($object, 'property', 'value');
+$object->_set('property', 'value');
 
 \Zenstruck\Foundry\Persistence\assert_persisted($object);
 \Zenstruck\Foundry\Persistence\assert_persisted($object, 'with message');
