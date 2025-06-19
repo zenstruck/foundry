@@ -10,6 +10,7 @@ $other = $object->_save();
 
 $object->_set('property', 'value');
 
+DummyPersistentProxyFactory::new()->create()->_set('id', 123);
 ?>
 -----
 <?php
@@ -24,4 +25,5 @@ $other = \Zenstruck\Foundry\Persistence\save($object);
 
 \Zenstruck\Foundry\set($object, 'property', 'value');
 
+\Zenstruck\Foundry\set(DummyPersistentProxyFactory::new()->create(), 'id', 123);
 ?>

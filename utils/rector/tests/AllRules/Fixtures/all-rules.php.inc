@@ -1,5 +1,6 @@
 <?php
 
+use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObjectFactory;
 use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentProxyFactory;
 use App\SomeObject;
@@ -42,10 +43,16 @@ $object = $proxy->_real();
 function function1()
 {
 }
+
+array_map(
+    fn (Proxy $proxy) => $proxy->_real(),
+    [DummyObject::new()]
+);
 ?>
 -----
 <?php
 
+use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObjectFactory;
 use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentProxyFactory;
 use App\SomeObject;
@@ -84,4 +91,6 @@ $object = $proxy;
 function function1()
 {
 }
+
+[DummyObject::new()];
 ?>

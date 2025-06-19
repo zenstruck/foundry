@@ -20,6 +20,7 @@ use Zenstruck\Foundry\Utils\Rector\RemoveFunctionCall\RemoveFunctionCallRector;
 use Zenstruck\Foundry\Utils\Rector\RemoveMethodCall\RemoveMethodCall;
 use Zenstruck\Foundry\Utils\Rector\RemoveMethodCall\RemoveMethodCallRector;
 use Zenstruck\Foundry\Utils\Rector\RemovePhpDocProxyTypeHintRector;
+use Zenstruck\Foundry\Utils\Rector\RemoveUnproxifyArrayMapRector;
 use Zenstruck\Foundry\Utils\Rector\RemoveWithoutAutorefreshCallRector;
 
 return static function(RectorConfig $rectorConfig): void {
@@ -66,5 +67,6 @@ return static function(RectorConfig $rectorConfig): void {
         RemoveWithoutAutorefreshCallRector::class,
         ChangeFactoryBaseClassRector::class,
         RemovePhpDocProxyTypeHintRector::class,
+        RemoveUnproxifyArrayMapRector::class,
     ]);
 };
