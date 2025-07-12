@@ -1858,7 +1858,7 @@ Without auto-refreshing enabled, the above call to ``$post->getTitle()`` would r
         $post->setTitle('New Title');
         $post->setBody('New Body'); // exception thrown because of "unsaved changes" to $post from above
 
-    To overcome this, you need to first disable auto-refreshing, then re-enable after making/saving the changes:
+To overcome this, you need to first disable auto-refreshing, then re-enable after making/saving the changes:
 
 ::
 
