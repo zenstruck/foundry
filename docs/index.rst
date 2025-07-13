@@ -2292,7 +2292,7 @@ You can improve the speed by reducing the *work factor* of your encoder:
 Pre-Encode Passwords
 ....................
 
-Pre-encode user passwords with a known value via ``bin/console security:encode-password`` and set this in
+Pre-encode user passwords with a known value via ``bin/console security:hash-password`` and set this in
 ``defaults()``. Add the known value as a ``const`` on your factory:
 
 ::
