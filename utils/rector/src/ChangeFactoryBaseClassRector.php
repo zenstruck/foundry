@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Utils\Rector;
 
+use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\NodeFinder;
@@ -20,6 +21,8 @@ use PHPStan\Analyser\MutatingScope;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ExtendsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\Type\ObjectType;
 use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfoFactory;
 use Rector\BetterPhpDocParser\PhpDocManipulator\PhpDocTagRemover;
@@ -70,15 +73,14 @@ final class ChangeFactoryBaseClassRector extends AbstractRector
 
     private function updateExtendsPhpDoc(Class_ $node): void
     {
-        $targetClass = $this->extractTargetClass($node);
+        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($node);
+        $phpDocNode = $phpDocInfo->getPhpDocNode();
+
+        $targetClass = $this->extractTargetClass($node, $phpDocNode);
 
         if (!$targetClass) {
             return;
         }
-
-        $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($node);
-
-        $phpDocNode = $phpDocInfo->getPhpDocNode();
 
         $extendsPhpDocNodes = [
             ...$phpDocNode->getExtendsTagValues(),
@@ -98,9 +100,7 @@ final class ChangeFactoryBaseClassRector extends AbstractRector
                 new ExtendsTagValueNode(
                     type: new GenericTypeNode(
                         new FullyQualifiedIdentifierTypeNode(PersistentObjectFactory::class),
-                        [
-                            new FullyQualifiedIdentifierTypeNode($targetClass),
-                        ]
+                        [$targetClass]
                     ),
                     description: ''
                 )
@@ -110,8 +110,23 @@ final class ChangeFactoryBaseClassRector extends AbstractRector
         $this->docBlockUpdater->updateRefactoredNodeWithPhpDocInfo($node);
     }
 
-    private function extractTargetClass(Class_ $node): ?string
+    private function extractTargetClass(Class_ $node, PhpDocNode $phpDocNode): ?TypeNode
     {
+        $extendsPhpDocNodes = array_values([
+            ...$phpDocNode->getExtendsTagValues(),
+            ...$phpDocNode->getExtendsTagValues('@phpstan-extends'),
+            ...$phpDocNode->getExtendsTagValues('@psalm-extends'),
+        ]);
+
+        if (isset($extendsPhpDocNodes[0])
+            && $extendsPhpDocNodes[0] instanceof ExtendsTagValueNode
+            && $extendsPhpDocNodes[0]->type instanceof GenericTypeNode
+            && isset($extendsPhpDocNodes[0]->type->genericTypes[0])
+            && $extendsPhpDocNodes[0]->type->genericTypes[0] instanceof IdentifierTypeNode
+        ) {
+            return $extendsPhpDocNodes[0]->type->genericTypes[0];
+        }
+
         /** @var Node\Stmt\ClassMethod|null $classMethod */
         $classMethod = $this->nodeFinder->findFirst($node->stmts, function (Node $node): bool {
             return $node instanceof Node\Stmt\ClassMethod
@@ -130,6 +145,6 @@ final class ChangeFactoryBaseClassRector extends AbstractRector
 
         $name = $this->getName($returnStatement->expr->class);
 
-        return "\\$name";
+        return new FullyQualifiedIdentifierTypeNode("\\$name");
     }
 }

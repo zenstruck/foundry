@@ -18,7 +18,7 @@ use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 /**
  * @extends PersistentProxyObjectFactory<DummyPersistentObject>
  */
-final class DummyPersistentProxyFactory extends PersistentProxyObjectFactory
+class DummyPersistentProxyFactory extends PersistentProxyObjectFactory
 {
     protected function defaults(): array
     {

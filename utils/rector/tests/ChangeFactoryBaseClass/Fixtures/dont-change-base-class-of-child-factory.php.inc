@@ -1,9 +1,9 @@
 <?php
 
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use App\SomeClass;
+use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentProxyFactory;
 
-class ParentFactory extends PersistentProxyObjectFactory
+class ParentFactory extends DummyPersistentProxyFactory
 {
     protected function defaults(): array|callable
     {
@@ -14,35 +14,5 @@ class ParentFactory extends PersistentProxyObjectFactory
     {
         return SomeClass::class;
     }
-}
-
-class ChildFactory extends ParentFactory
-{
-}
-?>
------
-<?php
-
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use App\SomeClass;
-
-/**
- * @extends \Zenstruck\Foundry\Persistence\PersistentObjectFactory<\App\SomeClass>
- */
-class ParentFactory extends \Zenstruck\Foundry\Persistence\PersistentObjectFactory
-{
-    protected function defaults(): array|callable
-    {
-        return [];
-    }
-
-    public static function class(): string
-    {
-        return SomeClass::class;
-    }
-}
-
-class ChildFactory extends ParentFactory
-{
 }
 ?>
