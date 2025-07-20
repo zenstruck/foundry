@@ -1,6 +1,7 @@
 <?php
 
 use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject;
 use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObjectFactory;
 use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentProxyFactory;
 use App\SomeObject;
@@ -37,11 +38,28 @@ $proxy = $proxy->_real();
 $object = $proxy->_real();
 
 /**
- * @param Proxy<SomeObject> $param
- * @return Proxy<SomeObject>
+ * @param Proxy<DummyObject> $param
+ * @return Proxy<DummyObject>
  */
 function function1()
 {
+}
+
+/**
+ * @return Proxy<DummyObject>
+ */
+function functionWithReturnChange()
+{
+
+}
+
+/**
+ * @return Proxy<DummyObject>&DummyObject
+ * @phpstan-return Proxy<DummyObject>
+ */
+function functionWithReturnChange2(): Proxy
+{
+
 }
 
 array_map(
@@ -53,6 +71,7 @@ array_map(
 <?php
 
 use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject;
 use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObjectFactory;
 use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyPersistentProxyFactory;
 use App\SomeObject;
@@ -71,7 +90,7 @@ $other = \Zenstruck\Foundry\Persistence\save($object);
 \Zenstruck\Foundry\Persistence\delete($object);
 
 $prop = \Zenstruck\Foundry\get($object, 'property');
-$object->_set('property', 'value');
+\Zenstruck\Foundry\set($object, 'property', 'value');
 
 \Zenstruck\Foundry\Persistence\assert_persisted($object);
 \Zenstruck\Foundry\Persistence\assert_persisted($object, 'with message');
@@ -85,11 +104,27 @@ $proxy = $object;
 $object = $proxy;
 
 /**
- * @param \App\SomeObject $param
- * @return \App\SomeObject
+ * @param \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject $param
+ * @return \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject
  */
-function function1()
+function function1(): \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject
 {
+}
+
+/**
+ * @return \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject
+ */
+function functionWithReturnChange(): \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject
+{
+
+}
+
+/**
+ * @return \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject
+ */
+function functionWithReturnChange2(): \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject
+{
+
 }
 
 [DummyObject::new()];

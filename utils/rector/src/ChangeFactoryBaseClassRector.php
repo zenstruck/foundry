@@ -119,8 +119,6 @@ final class ChangeFactoryBaseClassRector extends AbstractRector
         ]);
 
         if (isset($extendsPhpDocNodes[0])
-            && $extendsPhpDocNodes[0] instanceof ExtendsTagValueNode
-            && $extendsPhpDocNodes[0]->type instanceof GenericTypeNode
             && isset($extendsPhpDocNodes[0]->type->genericTypes[0])
             && $extendsPhpDocNodes[0]->type->genericTypes[0] instanceof IdentifierTypeNode
         ) {
