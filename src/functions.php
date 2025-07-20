@@ -51,10 +51,17 @@ function object(string $class, array|callable $attributes = []): object
 
 /**
  * "Force set" (using reflection) an object property.
+ *
+ * @template T of object
+ * @param T $object
+ *
+ * @return T
  */
-function set(object $object, string $property, mixed $value): void
+function set(object $object, string $property, mixed $value): object
 {
     Hydrator::set($object, $property, $value);
+
+    return $object;
 }
 
 /**
