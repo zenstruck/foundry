@@ -46,9 +46,10 @@ function function1()
 }
 
 /**
+ * @param Proxy<DummyObject> $param
  * @return Proxy<DummyObject>
  */
-function functionWithReturnChange()
+function functionWithReturnChange(Proxy $param)
 {
 
 }
@@ -112,9 +113,10 @@ function function1(): \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject
 }
 
 /**
+ * @param \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject $param
  * @return \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject
  */
-function functionWithReturnChange(): \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject
+function functionWithReturnChange(\Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject $param): \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject
 {
 
 }

@@ -83,7 +83,7 @@ final class ChangeProxyReturnTypesRector extends AbstractRector
         } else {
             // if the target classe name does not exist, it is likely a generic type
             // so we should remove the return type
-            $node->returnType = null;
+            $node->returnType = new Node\Name('object');
         }
 
         foreach ($this->getReturnTagNodes($phpDocNode) as $returnTagNode) {

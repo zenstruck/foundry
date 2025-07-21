@@ -8,17 +8,17 @@ use Zenstruck\Foundry\Persistence\Proxy;
 class SomeClass
 {
     /**
-     * @return Proxy<T>
+     * @param Proxy<T> $param
      */
-    public function method1()
+    public function method1($param)
     {
 
     }
 
     /**
-     * @return Proxy<T>
+     * @param Proxy<T> $param
      */
-    public function method2(): Proxy
+    public function method2(Proxy $param)
     {
 
     }
@@ -35,17 +35,17 @@ use Zenstruck\Foundry\Persistence\Proxy;
 class SomeClass
 {
     /**
-     * @return T
+     * @param T $param
      */
-    public function method1(): object
+    public function method1(object $param)
     {
 
     }
 
     /**
-     * @return T
+     * @param T $param
      */
-    public function method2(): object
+    public function method2(object $param)
     {
 
     }

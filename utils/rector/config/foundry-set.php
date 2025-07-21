@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
 use Zenstruck\Foundry\Utils\Rector\ChangeFactoryBaseClassRector;
+use Zenstruck\Foundry\Utils\Rector\ChangeProxyParamTypesRector;
 use Zenstruck\Foundry\Utils\Rector\ChangeProxyReturnTypesRector;
 use Zenstruck\Foundry\Utils\Rector\MethodCallToFuncCallWIthObjectASFirstParameter\MethodCallToFuncCallWithObjectAsFirstParameter;
 use Zenstruck\Foundry\Utils\Rector\MethodCallToFuncCallWIthObjectASFirstParameter\MethodCallToFuncCallWIthObjectAsFirstParameterRector;
@@ -67,6 +68,7 @@ return static function(RectorConfig $rectorConfig): void {
     $rectorConfig->rules([
         RemoveWithoutAutorefreshCallRector::class,
         ChangeFactoryBaseClassRector::class,
+        ChangeProxyParamTypesRector::class,
         ChangeProxyReturnTypesRector::class,
         RemovePhpDocProxyTypeHintRector::class,
         RemoveUnproxifyArrayMapRector::class,
