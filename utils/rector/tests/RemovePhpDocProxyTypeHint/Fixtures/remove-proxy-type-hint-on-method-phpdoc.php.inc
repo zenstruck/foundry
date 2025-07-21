@@ -4,10 +4,9 @@ use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject;
 
 /**
- * @param Proxy<DummyObject> $param
- * @return Proxy<DummyObject>
+ * @method Proxy<DummyObject> someMethod()
  */
-function function1()
+class SomeClass
 {
 }
 ?>
@@ -18,10 +17,9 @@ use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject;
 
 /**
- * @param \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject $param
- * @return \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject
+ * @method \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject someMethod()
  */
-function function1()
+class SomeClass
 {
 }
 ?>

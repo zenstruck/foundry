@@ -14,12 +14,16 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Utils\Rector;
 
 use PhpParser\Node;
-use PHPStan\Analyser\MutatingScope;
 use PHPStan\Analyser\NameScope;
 use PHPStan\PhpDoc\TypeNodeResolver;
 use PHPStan\PhpDoc\TypeStringResolver;
+use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\VarTagValueNode;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
+use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Type\Generic\GenericObjectType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
@@ -28,10 +32,10 @@ use PHPStan\Type\VerbosityLevel;
 use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfo;
 use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfoFactory;
 use Rector\Comments\NodeDocBlock\DocBlockUpdater;
-use Rector\NodeTypeResolver\Node\AttributeKey;
 use Rector\Rector\AbstractRector;
 use Rector\StaticTypeMapper\Naming\NameScopeFactory;
 use Rector\StaticTypeMapper\StaticTypeMapper;
+use Rector\StaticTypeMapper\ValueObject\Type\NonExistingObjectType;
 use Zenstruck\Foundry\Persistence\Proxy;
 
 /**
@@ -46,6 +50,7 @@ final class RemovePhpDocProxyTypeHintRector extends AbstractRector
         private readonly NameScopeFactory $nameScopeFactory,
         private readonly TypeNodeResolver $typeNodeResolver,
         private readonly DocBlockUpdater $docBlockUpdater,
+        private readonly ReflectionProvider $reflectionProvider,
     ) {
     }
 
@@ -54,26 +59,26 @@ final class RemovePhpDocProxyTypeHintRector extends AbstractRector
      */
     public function getNodeTypes(): array
     {
-        return [Node\FunctionLike::class];
+        return [
+            Node\Stmt\ClassMethod::class,
+            Node\Stmt\Function_::class,
+            Node\Stmt\Class_::class,
+            Node\Stmt\Expression::class,
+        ];
     }
 
-    /**
-     * @param Node\FunctionLike $node
-     */
     public function refactor(Node $node): ?Node
     {
-        if (!$node instanceof Node\Stmt\ClassMethod && !$node instanceof Node\Stmt\Function_) {
-            return null;
-        }
-
         $phpDocInfo = $this->phpDocInfoFactory->createFromNodeOrEmpty($node);
 
         $nameScope = $this->nameScopeFactory->createNameScopeFromNodeWithoutTemplateTypes($node);
 
         $returnTypeChanged = $this->handleReturnType($phpDocInfo, $nameScope);
         $paramTypeChanged = $this->handleParameterTypes($phpDocInfo, $nameScope);
+        $methodTypeChanged = $this->handleMethodTypes($phpDocInfo, $nameScope);
+        $varTypeChanged = $this->handleVarTypes($phpDocInfo, $nameScope);
 
-        if ($returnTypeChanged || $paramTypeChanged) {
+        if ($returnTypeChanged || $paramTypeChanged || $methodTypeChanged || $varTypeChanged) {
             $this->docBlockUpdater->updateRefactoredNodeWithPhpDocInfo($node);
 
             return $node;
@@ -107,27 +112,70 @@ final class RemovePhpDocProxyTypeHintRector extends AbstractRector
         return $nodeChanged;
     }
 
-    private function handleTag(ParamTagValueNode|ReturnTagValueNode $tagValueNode, NameScope $nameScope): bool
+    private function handleMethodTypes(PhpDocInfo $phpDocInfo, NameScope $nameScope): bool
     {
-        $tagType = $this->typeNodeResolver->resolve($tagValueNode->type, $nameScope);
+        $methodTags = $phpDocInfo->getPhpDocNode()->getMethodTagValues();
+
+        $nodeChanged = false;
+        foreach ($methodTags as $methodTag) {
+            if ($this->handleTag($methodTag, $nameScope)) {
+                $nodeChanged = true;
+            }
+        }
+
+        return $nodeChanged;
+    }
+
+    private function handleVarTypes(PhpDocInfo $phpDocInfo, NameScope $nameScope): bool
+    {
+        $varTags = $phpDocInfo->getPhpDocNode()->getVarTagValues();
+
+        $nodeChanged = false;
+        foreach ($varTags as $varTag) {
+            if ($this->handleTag($varTag, $nameScope)) {
+                $nodeChanged = true;
+            }
+        }
+
+        return $nodeChanged;
+    }
+
+    private function handleTag(ParamTagValueNode|ReturnTagValueNode|MethodTagValueNode|VarTagValueNode $docNode, NameScope $nameScope): bool
+    {
+        if ($docNode instanceof MethodTagValueNode) {
+            if ($docNode->returnType === null) {
+                return false;
+            }
+
+            $typeProperty = 'returnType';
+        } else {
+            $typeProperty = 'type';
+        }
+
+        // @phpstan-ignore property.notFound,property.notFound
+        $tagType = $this->typeNodeResolver->resolve($docNode->$typeProperty, $nameScope);
+
+        // prevent to change something when Proxy is not part of the type found
+        if (!str_contains($tagType->describe(VerbosityLevel::value()), 'Proxy')) {
+            return false;
+        }
 
         if ($tagType->isArray()->yes()) {
             $arrayType = TypeTraverser::map($tagType, function (Type $type, callable $traverse): Type {
-                if ($type instanceof GenericObjectType
-                    && $type->getClassName() === Proxy::class
+                if ($type instanceof GenericObjectType && $type->getClassName() === Proxy::class
                 ) {
+                    if (!$this->reflectionProvider->hasClass($type->getTypes()[0]->getObjectClassNames()[0])) {
+                        return new NonExistingObjectType($type->getTypes()[0]->getObjectClassNames()[0]);
+                    }
+
                     return new ObjectType($type->getTypes()[0]->getObjectClassNames()[0]);
                 }
 
                 return $traverse($type);
             });
 
-            // prevent to change something when Proxy is not part of the type found
-            if (!str_contains($arrayType->describe(VerbosityLevel::value()), 'Proxy')) {
-                return false;
-            }
-
-            $tagValueNode->type = $this->staticTypeMapper->mapPHPStanTypeToPHPStanPhpDocTypeNode($arrayType);
+            // @phpstan-ignore property.notFound,property.notFound
+            $docNode->$typeProperty = $this->staticTypeMapper->mapPHPStanTypeToPHPStanPhpDocTypeNode($arrayType);
 
             return true;
         }
@@ -144,7 +192,15 @@ final class RemovePhpDocProxyTypeHintRector extends AbstractRector
 
         $type = $this->typeStringResolver->resolve($matches[1]);
 
-        $tagValueNode->type = $this->staticTypeMapper->mapPHPStanTypeToPHPStanPhpDocTypeNode($type);
+        $typeNode = $this->staticTypeMapper->mapPHPStanTypeToPHPStanPhpDocTypeNode($type);
+
+        if ($typeNode instanceof IdentifierTypeNode && !$this->reflectionProvider->hasClass($typeNode->name)) {
+            // if class does not exist, it's most likely a generic type, so we remove the leading backslash
+            $typeNode = new IdentifierTypeNode(ltrim($typeNode->name, '\\'));
+        }
+
+        // @phpstan-ignore property.notFound,property.notFound
+        $docNode->$typeProperty = $typeNode;
 
         return true;
     }

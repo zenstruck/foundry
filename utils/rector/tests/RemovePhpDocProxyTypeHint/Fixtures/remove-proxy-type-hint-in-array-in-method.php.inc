@@ -1,32 +1,38 @@
 <?php
 
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use App\SomeObject;
 use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject;
 
 class SomeClass
 {
     /**
-     * @param array<Proxy<SomeObject>> $param
-     * @return array<int, Proxy<SomeObject>>
+     * @param array<Proxy<DummyObject>> $param
+     * @return array<int, Proxy<DummyObject>>
      */
     public function method1()
     {
     }
 
     /**
-     * @param list<SomeObject&Proxy<SomeObject>> $param
-     * @return list<Proxy<SomeObject>&SomeObject>
+     * @param list<DummyObject&Proxy<DummyObject>> $param
+     * @return list<Proxy<DummyObject>&DummyObject>
      */
     public function method2()
     {
     }
 
     /**
-     * @param array{0: Proxy<SomeObject>, 1: Proxy<SomeObject>&SomeObject} $param
-     * @return array<string, Proxy<SomeObject>>
+     * @param array{0: Proxy<DummyObject>, 1: Proxy<DummyObject>&DummyObject} $param
+     * @return array<string, Proxy<DummyObject>>
      */
     public function method3()
+    {
+    }
+
+    /**
+     * @param array<Proxy<T>> $param
+     */
+    public function method4()
     {
     }
 }
@@ -34,33 +40,39 @@ class SomeClass
 -----
 <?php
 
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use App\SomeObject;
 use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject;
 
 class SomeClass
 {
     /**
-     * @param \App\SomeObject[] $param
-     * @return \App\SomeObject[]
+     * @param \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject[] $param
+     * @return \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject[]
      */
     public function method1()
     {
     }
 
     /**
-     * @param list<\App\SomeObject> $param
-     * @return list<\App\SomeObject>
+     * @param list<\Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject> $param
+     * @return list<\Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject>
      */
     public function method2()
     {
     }
 
     /**
-     * @param array{App\SomeObject, App\SomeObject} $param
-     * @return array<string, \App\SomeObject>
+     * @param array{Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject, Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject} $param
+     * @return array<string, \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject>
      */
     public function method3()
+    {
+    }
+
+    /**
+     * @param T[] $param
+     */
+    public function method4()
     {
     }
 }

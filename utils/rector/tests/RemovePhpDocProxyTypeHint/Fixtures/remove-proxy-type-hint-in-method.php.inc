@@ -1,32 +1,39 @@
 <?php
 
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use App\SomeObject;
 use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject;
 
 class SomeClass
 {
     /**
-     * @param Proxy<SomeObject> $param
-     * @return Proxy<SomeObject>
+     * @param Proxy<DummyObject> $param
+     * @return Proxy<DummyObject>
      */
     public function method1()
     {
     }
 
     /**
-     * @param SomeObject&Proxy<SomeObject> $param
-     * @return SomeObject&Proxy<SomeObject>
+     * @param DummyObject&Proxy<DummyObject> $param
+     * @return DummyObject&Proxy<DummyObject>
      */
     public function method2()
     {
     }
 
     /**
-     * @param Proxy<SomeObject>&SomeObject $param
-     * @return Proxy<SomeObject>&SomeObject
+     * @param Proxy<DummyObject>&DummyObject $param
+     * @return Proxy<DummyObject>&DummyObject
      */
     public function method3()
+    {
+    }
+
+    /**
+     * @param Proxy<T>&T $param
+     * @return Proxy<T>&T
+     */
+    public function method4()
     {
     }
 }
@@ -34,33 +41,40 @@ class SomeClass
 -----
 <?php
 
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use App\SomeObject;
 use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject;
 
 class SomeClass
 {
     /**
-     * @param \App\SomeObject $param
-     * @return \App\SomeObject
+     * @param \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject $param
+     * @return \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject
      */
     public function method1()
     {
     }
 
     /**
-     * @param \App\SomeObject $param
-     * @return \App\SomeObject
+     * @param \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject $param
+     * @return \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject
      */
     public function method2()
     {
     }
 
     /**
-     * @param \App\SomeObject $param
-     * @return \App\SomeObject
+     * @param \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject $param
+     * @return \Zenstruck\Foundry\Utils\Rector\Tests\Fixtures\DummyObject
      */
     public function method3()
+    {
+    }
+
+    /**
+     * @param T $param
+     * @return T
+     */
+    public function method4()
     {
     }
 }
