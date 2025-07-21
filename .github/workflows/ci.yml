@@ -163,7 +163,7 @@ jobs:
           dependency-versions: ${{ matrix.deps }}
           composer-options: --prefer-dist
         env:
-          SYMFONY_REQUIRE: 7.1.*
+          SYMFONY_REQUIRE: 7.3.*
 
       - name: Set up MySQL
         if: contains(matrix.database, 'mysql')
@@ -230,7 +230,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.4
+          php-version: 8.3
           coverage: none
           tools: flex
 
@@ -240,7 +240,7 @@ jobs:
           dependency-versions: highest
           composer-options: --prefer-dist
         env:
-          SYMFONY_REQUIRE: 7.2.*
+          SYMFONY_REQUIRE: 7.3.*
 
       - name: Set up MySQL
         run: sudo /etc/init.d/mysql start

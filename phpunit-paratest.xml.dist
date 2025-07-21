@@ -11,7 +11,7 @@
         <ini name="error_reporting" value="-1"/>
         <server name="KERNEL_CLASS" value="Zenstruck\Foundry\Tests\Fixture\TestKernel"/>
         <server name="SHELL_VERBOSITY" value="-1"/>
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>
+        <env name="PARATEST" value="1"/>
     </php>
     <testsuites>
         <testsuite name="main">

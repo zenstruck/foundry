@@ -75,13 +75,14 @@ trait ChangesEntityRelationshipCascadePersist
      */
     public static function provideCascadeRelationshipsCombinations(): iterable
     {
-        if (ConstraintRequirement::from('>=12')->isSatisfiedBy(PHPunitVersion::id())) {
+        // paratest does not still provide option --do-not-fail-on-phpunit-warning
+        // so we need to skip all relationships permutations for paratest
+        if (isset($_ENV['PARATEST'])) {
             yield []; // @phpstan-ignore generator.valueType
 
             return;
         }
 
-        // @phpstan-ignore deadCode.unreachable
         if (!\getenv('DATABASE_URL') || !self::$methodName) {
             // this test requires the ORM, but trait RequiresORM is analysed after data provider are called
             // then we need to return at least one empty array to avoid an error
