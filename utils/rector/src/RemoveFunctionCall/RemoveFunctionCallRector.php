@@ -17,7 +17,6 @@ use PhpParser\Node;
 use PhpParser\NodeVisitor;
 use Rector\Contract\Rector\ConfigurableRectorInterface;
 use Rector\Rector\AbstractRector;
-use Webmozart\Assert\Assert;
 
 final class RemoveFunctionCallRector extends AbstractRector implements ConfigurableRectorInterface
 {
@@ -67,7 +66,11 @@ final class RemoveFunctionCallRector extends AbstractRector implements Configura
      */
     public function configure(array $configuration) : void
     {
-        Assert::allIsInstanceOf($configuration, RemoveFunctionCall::class);
+        foreach ($configuration as $configItem) {
+            if (!$configItem instanceof RemoveFunctionCall) {
+                throw new \InvalidArgumentException(sprintf('Expected instance of "%s", got "%s".', RemoveFunctionCall::class, get_debug_type($configItem)));
+            }
+        }
         $this->removeFunctionCalls = $configuration;
     }
 }

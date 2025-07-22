@@ -16,7 +16,6 @@ namespace Zenstruck\Foundry\Utils\Rector\RemoveMethodCall;
 use PhpParser\Node;
 use Rector\Contract\Rector\ConfigurableRectorInterface;
 use Rector\Rector\AbstractRector;
-use Webmozart\Assert\Assert;
 
 final class RemoveMethodCallRector extends AbstractRector implements ConfigurableRectorInterface
 {
@@ -70,7 +69,12 @@ final class RemoveMethodCallRector extends AbstractRector implements Configurabl
      */
     public function configure(array $configuration) : void
     {
-        Assert::allIsInstanceOf($configuration, RemoveMethodCall::class);
+        foreach ($configuration as $configItem) {
+            if (!$configItem instanceof RemoveMethodCall) {
+                throw new \InvalidArgumentException(sprintf('Expected instance of "%s", got "%s".', RemoveMethodCall::class, get_debug_type($configItem)));
+            }
+        }
+
         $this->removeMethodCalls = $configuration;
     }
 

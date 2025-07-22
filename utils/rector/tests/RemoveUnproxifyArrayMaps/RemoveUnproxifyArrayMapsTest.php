@@ -11,7 +11,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\Utils\Rector\Tests\ChangeDisableEnablePersist;
+namespace Zenstruck\Foundry\Utils\Rector\Tests\RemoveUnproxifyArrayMaps;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;

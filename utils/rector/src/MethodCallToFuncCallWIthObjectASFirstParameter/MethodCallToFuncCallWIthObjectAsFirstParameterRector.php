@@ -18,10 +18,8 @@ use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Name\FullyQualified;
-use PHPStan\Type\ObjectType;
 use Rector\Contract\Rector\ConfigurableRectorInterface;
 use Rector\Rector\AbstractRector;
-use Webmozart\Assert\Assert;
 
 final class MethodCallToFuncCallWIthObjectAsFirstParameterRector extends AbstractRector implements ConfigurableRectorInterface
 {
@@ -58,7 +56,11 @@ final class MethodCallToFuncCallWIthObjectAsFirstParameterRector extends Abstrac
      */
     public function configure(array $configuration) : void
     {
-        Assert::allIsInstanceOf($configuration, MethodCallToFuncCallWithObjectAsFirstParameter::class);
+        foreach ($configuration as $configItem) {
+            if (!$configItem instanceof MethodCallToFuncCallWithObjectAsFirstParameter) {
+                throw new \InvalidArgumentException(sprintf('Expected instance of "%s", got "%s".', MethodCallToFuncCallWithObjectAsFirstParameter::class, get_debug_type($configItem)));
+            }
+        }
         $this->methodCallsToFuncCalls = $configuration;
     }
 }
