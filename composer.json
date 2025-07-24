@@ -49,12 +49,14 @@
         "symfony/translation-contracts": "^3.4",
         "symfony/uid": "^6.4|^7.0|^8.0",
         "symfony/var-dumper": "^6.4|^7.0|^8.0",
-        "symfony/yaml": "^6.4|^7.0|^8.0"
+        "symfony/yaml": "^6.4|^7.0|^8.0",
+        "webmozart/assert": "^1.11"
     },
     "autoload": {
         "psr-4": {
             "Zenstruck\\Foundry\\": "src/",
-            "Zenstruck\\Foundry\\Psalm\\": "utils/psalm"
+            "Zenstruck\\Foundry\\Psalm\\": "utils/psalm",
+            "Zenstruck\\Foundry\\Utils\\Rector\\": "utils/rector/src/"
         },
         "files": [
             "src/functions.php",
@@ -66,9 +68,10 @@
         "psr-4": {
             "Zenstruck\\Foundry\\Tests\\": ["tests/"],
             "App\\": "tests/Fixture/Maker/tmp/src",
-            "App\\Tests\\": "tests/Fixture/Maker/tmp/tests"
+            "App\\Tests\\": "tests/Fixture/Maker/tmp/tests",
+            "Zenstruck\\Foundry\\Utils\\Rector\\Tests\\": "utils/rector/tests/"
         },
-        "exclude-from-classmap": ["tests/Fixture/Maker/expected"]
+        "exclude-from-classmap": ["tests/Fixture/Maker/expected", "utils/rector/tests/**/Fixtures/"]
     },
     "config": {
         "preferred-install": "dist",
