@@ -1,0 +1,15 @@
+parameters:
+    inferPrivatePropertyTypeFromConstructor: true
+    checkUninitializedProperties: true
+    paths:
+        - ./src
+        - ./tests
+    level: 8
+    bootstrapFiles:
+        - ./../../vendor/autoload.php
+        - ./../../bin/tools/rector/vendor/autoload.php
+    excludePaths:
+        - ./tests/Fixtures
+
+    ignoreErrors:
+        - identifier: missingType.iterableValue
