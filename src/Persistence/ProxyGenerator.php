@@ -15,6 +15,7 @@ use Doctrine\Persistence\Proxy as DoctrineProxy;
 use Symfony\Component\VarExporter\LazyObjectInterface;
 use Symfony\Component\VarExporter\LazyProxyTrait;
 use Symfony\Component\VarExporter\ProxyHelper;
+use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
 
 /**
@@ -99,7 +100,11 @@ final class ProxyGenerator
             return $what->_real($withAutoRefresh); // @phpstan-ignore return.type
         }
 
-        if (\PHP_VERSION_ID >= 80400 && \is_object($what) && ($reflector = new \ReflectionClass($what))->isUninitializedLazyObject($what)) {
+        if (
+            \PHP_VERSION_ID >= 80400
+            && \is_object($what)
+            && ($reflector = new \ReflectionClass($what))->isUninitializedLazyObject($what)
+        ) {
             return $reflector->initializeLazyObject($what);
         }
 

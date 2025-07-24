@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Integration\DataProvider;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
@@ -27,11 +28,12 @@ use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11.4
+ * @requires PHPUnit >=12
  */
-#[RequiresPhpunit('>=11.4')]
+#[RequiresPhpunit('>=12')]
 #[RequiresPhp('>=8.4')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
+#[RequiresEnvironmentVariable('USE_PHP_84_LAZY_OBJECTS', '1')]
 final class DataProviderWithPersistentFactoryAndPHP84InKernelTest extends KernelTestCase
 {
     use Factories;
