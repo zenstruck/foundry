@@ -11,13 +11,13 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\Utils\Rector\Tests\MethodCallToFuncCallWIthObjectASFirstParameter;
+namespace Zenstruck\Foundry\Utils\Rector\Tests\MethodCallToFuncCallWithObjectAsFirstParameter;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Rector\Testing\PHPUnit\AbstractRectorTestCase;
 
-final class MethodCallToFuncCallWIthObjectASFirstParameterTest extends AbstractRectorTestCase
+final class MethodCallToFuncCallWithObjectAsFirstParameterTest extends AbstractRectorTestCase
 {
     #[Test]
     #[DataProvider('provideData')]

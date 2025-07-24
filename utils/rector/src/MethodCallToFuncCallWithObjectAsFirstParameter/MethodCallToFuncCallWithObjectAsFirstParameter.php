@@ -1,6 +1,6 @@
 <?php
 
-namespace Zenstruck\Foundry\Utils\Rector\MethodCallToFuncCallWIthObjectASFirstParameter;
+namespace Zenstruck\Foundry\Utils\Rector\MethodCallToFuncCallWithObjectAsFirstParameter;
 
 final class MethodCallToFuncCallWithObjectAsFirstParameter
 {

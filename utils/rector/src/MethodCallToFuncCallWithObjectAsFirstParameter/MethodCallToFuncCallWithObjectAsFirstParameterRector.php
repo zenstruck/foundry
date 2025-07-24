@@ -11,7 +11,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\Utils\Rector\MethodCallToFuncCallWIthObjectASFirstParameter;
+namespace Zenstruck\Foundry\Utils\Rector\MethodCallToFuncCallWithObjectAsFirstParameter;
 
 use PhpParser\Node;
 use PhpParser\Node\Arg;
@@ -21,7 +21,7 @@ use PhpParser\Node\Name\FullyQualified;
 use Rector\Contract\Rector\ConfigurableRectorInterface;
 use Rector\Rector\AbstractRector;
 
-final class MethodCallToFuncCallWIthObjectAsFirstParameterRector extends AbstractRector implements ConfigurableRectorInterface
+final class MethodCallToFuncCallWithObjectAsFirstParameterRector extends AbstractRector implements ConfigurableRectorInterface
 {
     /**
      * @var MethodCallToFuncCallWithObjectAsFirstParameter[]
