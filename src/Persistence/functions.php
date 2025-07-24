@@ -228,7 +228,7 @@ function assert_not_persisted(object $object, string $message = '{entity} is per
  */
 function initialize_proxy_object(mixed $what): void
 {
-    if (\PHP_VERSION_ID >= 80400 && is_object($what) && ($reflector = new \ReflectionClass($what))->isUninitializedLazyObject($what)) {
+    if (\PHP_VERSION_ID >= 80400 && \is_object($what) && ($reflector = new \ReflectionClass($what))->isUninitializedLazyObject($what)) {
         $reflector->initializeLazyObject($what);
 
         return;
