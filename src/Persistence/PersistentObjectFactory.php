@@ -231,7 +231,10 @@ abstract class PersistentObjectFactory extends ObjectFactory
     {
         $configuration = Configuration::instance();
 
-        if ($configuration->inADataProvider() && \PHP_VERSION_ID >= 80400 && !$this instanceof PersistentProxyObjectFactory) {
+        if ($configuration->inADataProvider()
+            && Configuration::autoRefreshWithLazyObjectsIsEnabled()
+            && !$this instanceof PersistentProxyObjectFactory
+        ) {
             return ProxyGenerator::wrapFactoryNativeProxy($this, $attributes);
         }
 
@@ -487,7 +490,10 @@ abstract class PersistentObjectFactory extends ObjectFactory
                         return;
                     }
 
-                    if (\PHP_VERSION_ID >= 80400 && !$factoryUsed instanceof PersistentProxyObjectFactory) {
+                    if (
+                        Configuration::autoRefreshWithLazyObjectsIsEnabled()
+                        && !$factoryUsed instanceof PersistentProxyObjectFactory
+                    ) {
                         Configuration::instance()->persistedObjectsTracker?->add($object);
                     }
 

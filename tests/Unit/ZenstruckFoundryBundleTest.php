@@ -14,11 +14,13 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Loader\DefinitionFileLoader;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
@@ -28,6 +30,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
 use Zenstruck\Foundry\Tests\Fixture\ExtendedGenerator;
@@ -222,12 +225,59 @@ final class ZenstruckFoundryBundleTest extends TestCase
 
     /**
      * @test
+     * @requires PHP < 8.4
+     */
+    #[Test]
+    #[RequiresPhp('<8.4')]
+    public function cannot_enable_auto_refresh_with_lazy_objects_if_not_php84(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Cannot enable auto-refresh with lazy objects if not using at least PHP 8.4');
+
+        $config = self::buildConfiguration([['enable_auto_refresh_with_lazy_objects' => true]]);
+
+        $this->bundle->loadExtension($config, $this->configurator, $this->container);
+    }
+
+    /**
+     * @test
+     * @requires PHP >= 8.4
+     */
+    #[Test]
+    #[RequiresPhp('>=8.4')]
+    public function can_enable_auto_refresh_with_lazy_objects_if_at_leat_php84(): void
+    {
+        $config = self::buildConfiguration([['enable_auto_refresh_with_lazy_objects' => true]]);
+
+        $this->bundle->loadExtension($config, $this->configurator, $this->container);
+
+        self::assertTrue($config['enable_auto_refresh_with_lazy_objects']);
+    }
+
+    /**
+     * @test
+     * @requires PHP >= 8.4
+     */
+    #[Test]
+    #[RequiresPhp('>=8.4')]
+    public function can_disable_auto_refresh_with_lazy_objects_if_at_leat_php84(): void
+    {
+        $config = self::buildConfiguration([['enable_auto_refresh_with_lazy_objects' => false]]);
+
+        $this->bundle->loadExtension($config, $this->configurator, $this->container);
+
+        self::assertFalse($config['enable_auto_refresh_with_lazy_objects']);
+    }
+
+    /**
+     * @test
      */
     #[Test]
     public function configuration_default_values(): void
     {
         self::assertSame([
             'auto_refresh_proxies' => null,
+            'enable_auto_refresh_with_lazy_objects' => null,
             'faker' => [
                 'locale' => null,
                 'seed' => null,

@@ -62,6 +62,7 @@ final class Configuration
         ?int $forcedFakerSeed = null,
         public readonly ?InMemoryRepositoryRegistry $inMemoryRepositoryRegistry = null,
         public readonly ?PersistedObjectsTracker $persistedObjectsTracker = null,
+        private readonly bool $enableAutoRefreshWithLazyObjects = false,
     ) {
         if (null === self::$instance) {
             $this->faker->seed(self::fakerSeed($forcedFakerSeed));
@@ -163,5 +164,10 @@ final class Configuration
     public function isInMemoryEnabled(): bool
     {
         return $this->inMemory;
+    }
+
+    public static function autoRefreshWithLazyObjectsIsEnabled(): bool
+    {
+        return self::isBooted() && self::instance()->enableAutoRefreshWithLazyObjects;
     }
 }

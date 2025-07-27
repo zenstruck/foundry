@@ -43,6 +43,7 @@ final class TestKernel extends FoundryTestKernel
 
         $c->loadFromExtension('zenstruck_foundry', [
             'persistence' => ['flush_once' => true],
+            'enable_auto_refresh_with_lazy_objects' => self::usePHP84LazyObjects(),
             'orm' => [
                 'reset' => [
                     'mode' => ResetDatabaseMode::SCHEMA,

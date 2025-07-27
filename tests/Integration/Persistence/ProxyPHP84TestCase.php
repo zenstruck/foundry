@@ -12,22 +12,32 @@
 namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
 use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\RequiresPhp;
+use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy\PersistedObjectsTracker;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
+use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 
 use function Zenstruck\Foundry\Persistence\assert_not_persisted;
 use function Zenstruck\Foundry\Persistence\assert_persisted;
 use function Zenstruck\Foundry\Persistence\refresh_all;
 
+/**
+ * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ * @requires PHPUnit >=12
+ */
+#[RequiresPhpunit('>=12')]
+#[RequiresEnvironmentVariable('USE_PHP_84_LAZY_OBJECTS', '1')]
 abstract class ProxyPHP84TestCase extends WebTestCase
 {
     use Factories, ResetDatabase;
@@ -193,4 +203,9 @@ abstract class ProxyPHP84TestCase extends WebTestCase
     abstract protected function dbms(): string;
 
     abstract protected function updateObject(GenericModel $object): void;
+
+    protected static function createKernel(array $options = []): KernelInterface
+    {
+        return new TestKernel('enable_auto_refresh_with_lazy_objects', debug: true);
+    }
 }

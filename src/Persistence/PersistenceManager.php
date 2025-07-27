@@ -157,7 +157,10 @@ final class PersistenceManager
             return $object->_refresh();
         }
 
-        if (\PHP_VERSION_ID >= 80400 && ($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)) {
+        if (
+            \PHP_VERSION_ID >= 80400
+            && ($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)
+        ) {
             /** @var T $object */
             $object = $reflector->initializeLazyObject($object);
         }
@@ -208,7 +211,10 @@ final class PersistenceManager
 
     public function isPersisted(object $object): bool
     {
-        if (\PHP_VERSION_ID >= 80400 && ($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)) {
+        if (
+            \PHP_VERSION_ID >= 80400
+            && ($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)
+        ) {
             /** @var object $object */
             $object = $reflector->initializeLazyObject($object);
         }
