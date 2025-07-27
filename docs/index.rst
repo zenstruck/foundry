@@ -1543,11 +1543,22 @@ Mark `Stories`_ you want loaded by the command with the ``#[AsFixture]`` attribu
         // ...
     }
 
-``bin/console foundry:load-stories category`` will now load the story ``CategoryStory`` in your database.
+``bin/console foundry:load-stories category`` will first reset your database, then load the story ``CategoryStory``
+in your database.
+
+.. note::
+
+    For the ORM, by default, the database schema is created with ``doctrine:schema:create``. See `Database Reset`_
+    for how to use migrations or further customize this behavior.
 
 .. note::
 
     If only a single story exists, you can omit the argument and just call ``bin/console foundry:load-stories`` to load it.
+
+.. tip::
+
+    Use the ``--append`` option to add the story to the database without resetting it first:
+    ``bin/console foundry:load-stories category --append``
 
 You can also load stories by group, by using the ``groups`` option:
 
