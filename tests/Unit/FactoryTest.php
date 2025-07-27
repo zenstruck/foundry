@@ -92,8 +92,10 @@ final class FactoryTest extends TestCase
 
     /**
      * @test
+     * @group legacy
      */
     #[Test]
+    #[IgnoreDeprecations]
     public function can_use_user_anonymous_proxy_persistent_factory_in_unit_test(): void
     {
         $object = proxy_factory(GenericEntity::class, ['prop1' => 'prop1'])->create();
@@ -149,8 +151,10 @@ final class FactoryTest extends TestCase
 
     /**
      * @test
+     * @group legacy
      */
     #[Test]
+    #[IgnoreDeprecations]
     public function instantiating_with_proxy_attribute_normalizes_to_underlying_object(): void
     {
         $object = ProxyContactFactory::createOne([
