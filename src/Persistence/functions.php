@@ -96,10 +96,10 @@ function persist(string $class, array|callable $attributes = []): object
  */
 function proxy(object $object): object
 {
-    if (\PHP_VERSION_ID >= 80400) {
+    if (Configuration::autoRefreshWithLazyObjectsIsEnabled()) {
         trigger_deprecation(
             'zenstruck/foundry',
-            '2.6',
+            '2.7',
             'Proxy usage is deprecated in PHP 8.4. Use directly PersistentObjectFactory, Foundry now leverages the native PHP lazy system to auto-refresh objects.',
         );
     }
@@ -154,8 +154,12 @@ function refresh_all(): void
 {
     $objectsTracker = Configuration::instance()->persistedObjectsTracker;
 
-    if (\PHP_VERSION_ID < 80400 || null === $objectsTracker) {
+    if (\PHP_VERSION_ID < 80400) {
         throw new \BadMethodCallException('Cannot use refresh_all() before PHP 8.4.');
+    }
+
+    if (!Configuration::autoRefreshWithLazyObjectsIsEnabled() || null === $objectsTracker) {
+        throw new \BadMethodCallException('Cannot use refresh_all() if auto refresh with lazy objects is not enabled.');
     }
 
     $objectsTracker->refresh();
@@ -228,7 +232,11 @@ function assert_not_persisted(object $object, string $message = '{entity} is per
  */
 function initialize_proxy_object(mixed $what): void
 {
-    if (\PHP_VERSION_ID >= 80400 && \is_object($what) && ($reflector = new \ReflectionClass($what))->isUninitializedLazyObject($what)) {
+    if (
+        \PHP_VERSION_ID >= 80400
+        && \is_object($what)
+        && ($reflector = new \ReflectionClass($what))->isUninitializedLazyObject($what)
+    ) {
         $reflector->initializeLazyObject($what);
 
         return;

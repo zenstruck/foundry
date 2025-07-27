@@ -4,7 +4,8 @@
         <line number="25" hash="c6af5d66288d0667e424978000f29571e4954b81">
             <issue><![CDATA[Since symfony/framework-bundle 6.4: Not setting the "framework.php_errors.log" config option is deprecated. It will default to "true" in 7.0.]]></issue>
             <issue><![CDATA[Since symfony/var-exporter 7.3: Generating lazy proxy for class "Zenstruck\Foundry\Tests\Integration\ForceFactoriesTraitUsage\SomeObject" is deprecated; leverage native lazy objects instead.]]></issue>
-            <issue><![CDATA[Since zenstruck/foundry 2.6: Proxy usage is deprecated in PHP 8.4. Use directly PersistentObjectFactory, Foundry now leverages the native PHP lazy system to auto-refresh objects.]]></issue>
+            <issue><![CDATA[Since zenstruck/foundry 2.7: Proxy usage is deprecated in PHP 8.4. Use directly PersistentObjectFactory, Foundry now leverages the native PHP lazy system to auto-refresh objects.]]></issue>
+            <issue><![CDATA[Since zenstruck/foundry 2.7: Not setting a value for "zenstruck_foundry.enable_auto_refresh_with_lazy_objects" is deprecated. This option will be forced to true in 3.0.]]></issue>
         </line>
     </file>
 </files>

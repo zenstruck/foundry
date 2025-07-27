@@ -17,6 +17,7 @@ jobs:
         symfony: [ 6.4.*, 7.3.*, 8.0.*-dev ]
         database: [ mysql|mongo ]
         phpunit: [ 11, 12 ]
+        use-php-84-lazy-objects: [ 1 ]
 
         # default values:
         # deps: [ highest ]
@@ -55,11 +56,15 @@ jobs:
 
           # using Foundry's PHPUnit extension
           - {php: 8.4, symfony: '*', phpunit: 12, database: mysql|mongo, use-phpunit-extension: 1}
+
+          # disable lazy objects in PHP 8.4
+          - {php: 8.4, symfony: '*', phpunit: 12, database: mysql|mongo, use-php-84-lazy-objects: 0}
     env:
       DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || contains(matrix.database, 'sqlite') && 'sqlite:///%kernel.project_dir%/var/data.db' || '' }}
       MONGO_URL: ${{ contains(matrix.database, 'mongo') && 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb' || '' }}
       USE_DAMA_DOCTRINE_TEST_BUNDLE: ${{ contains(matrix.database, 'sql') && 1 || 0 }}
       USE_FOUNDRY_PHPUNIT_EXTENSION: ${{ matrix.use-phpunit-extension || 0 }}
+      USE_PHP_84_LAZY_OBJECTS: ${{ matrix.use-php-84-lazy-objects }}
       PHPUNIT_VERSION: ${{ matrix.phpunit }}
     services:
       postgres:

@@ -51,6 +51,14 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                     ->defaultNull()
                     ->setDeprecated('zenstruck/foundry', '2.0', 'Since 2.0 auto_refresh_proxies defaults to true and this configuration has no effect.')
                 ->end()
+                ->booleanNode('enable_auto_refresh_with_lazy_objects')
+                    ->info('Enable auto-refresh using PHP 8.4 lazy objects (cannot be enabled if PHP < 8.4).')
+                    ->defaultNull()
+                    ->validate()
+                        ->ifTrue(fn(?bool $enableAutoRefreshWithLazyObjects): bool => $enableAutoRefreshWithLazyObjects && \PHP_VERSION_ID < 80400)
+                        ->thenInvalid('Cannot enable auto-refresh with lazy objects if not using at least PHP 8.4.')
+                    ->end()
+                ->end()
                 ->arrayNode('faker')
                     ->addDefaultsIfNotSet()
                     ->info('Configure the faker used by your factories.')
@@ -228,7 +236,8 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
         $this->configureMakers($configurator, $container, $config);
         $this->configurePersistence($container, $configurator, $config);
         $this->configureInMemory($configurator, $container);
-        $this->configureFixturesStory($configurator, $container);
+        $this->configureFixturesStory($container);
+        $this->configureAutoRefreshWithLazyObjects($container, $config['enable_auto_refresh_with_lazy_objects'] ?? null);
     }
 
     public function build(ContainerBuilder $container): void
@@ -389,7 +398,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
     /**
      * @param array<string, mixed> $ormConfig
      */
-    private function configureOrm(ContainerConfigurator $configurator, ContainerBuilder $container, $ormConfig): void
+    private function configureOrm(ContainerConfigurator $configurator, ContainerBuilder $container, array $ormConfig): void
     {
         $configurator->import('../config/orm.php');
 
@@ -430,7 +439,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
         $container->registerForAutoconfiguration(InMemoryRepository::class)->addTag('foundry.in_memory.repository');
     }
 
-    private function configureFixturesStory(ContainerConfigurator $configurator, ContainerBuilder $container): void
+    private function configureFixturesStory(ContainerBuilder $container): void
     {
         $container->registerAttributeForAutoconfiguration(
             AsFixture::class,
@@ -443,5 +452,16 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                 $definition->addTag('foundry.story.fixture', ['name' => $attribute->name, 'groups' => $attribute->groups]);
             }
         );
+    }
+
+    private function configureAutoRefreshWithLazyObjects(ContainerBuilder $container, ?bool $enableAutoRefreshWithLazyObjects): void
+    {
+        $container->setParameter('zenstruck_foundry.enable_auto_refresh_with_lazy_objects', $enableAutoRefreshWithLazyObjects ?? false);
+
+        if (null === $enableAutoRefreshWithLazyObjects && \PHP_VERSION_ID >= 80400) {
+            trigger_deprecation('zenstruck/foundry', '2.7', 'Not setting a value for "zenstruck_foundry.enable_auto_refresh_with_lazy_objects" is deprecated. This option will be forced to true in 3.0.');
+
+            $container->removeDefinition('.foundry.persistence.objects_tracker');
+        }
     }
 }
