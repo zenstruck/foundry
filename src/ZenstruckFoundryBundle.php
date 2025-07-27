@@ -55,9 +55,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                     ->info('Enable auto-refresh using PHP 8.4 lazy objects (cannot be enabled if PHP < 8.4).')
                     ->defaultNull()
                     ->validate()
-                        ->ifTrue(function(?bool $enableAutoRefreshWithLazyObjects): bool {
-                            return $enableAutoRefreshWithLazyObjects && \PHP_VERSION_ID < 80400;
-                        })
+                        ->ifTrue(fn(?bool $enableAutoRefreshWithLazyObjects): bool => $enableAutoRefreshWithLazyObjects && \PHP_VERSION_ID < 80400)
                         ->thenInvalid('Cannot enable auto-refresh with lazy objects if not using at least PHP 8.4.')
                     ->end()
                 ->end()
@@ -460,7 +458,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
     {
         $container->setParameter('zenstruck_foundry.enable_auto_refresh_with_lazy_objects', $enableAutoRefreshWithLazyObjects ?? false);
 
-        if ($enableAutoRefreshWithLazyObjects === null && \PHP_VERSION_ID >= 80400) {
+        if (null === $enableAutoRefreshWithLazyObjects && \PHP_VERSION_ID >= 80400) {
             trigger_deprecation('zenstruck/foundry', '2.7', 'Not setting a value for "zenstruck_foundry.enable_auto_refresh_with_lazy_objects" is deprecated. This option will be forced to true in 3.0.');
 
             $container->removeDefinition('.foundry.persistence.objects_tracker');

@@ -15,7 +15,6 @@ use Doctrine\Persistence\Proxy as DoctrineProxy;
 use Symfony\Component\VarExporter\LazyObjectInterface;
 use Symfony\Component\VarExporter\LazyProxyTrait;
 use Symfony\Component\VarExporter\ProxyHelper;
-use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
 
 /**

@@ -26,7 +26,6 @@ use Zenstruck\Foundry\Persistence\Proxy\PersistedObjectsTracker;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
-
 use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 
 use function Zenstruck\Foundry\Persistence\assert_not_persisted;

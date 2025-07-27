@@ -12,7 +12,6 @@
 namespace Zenstruck\Foundry\Persistence;
 
 use Doctrine\Persistence\ObjectRepository;
-use Zenstruck\Foundry\Configuration;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
