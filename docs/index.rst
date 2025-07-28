@@ -314,7 +314,7 @@ Using your Factory
     $post = PostFactory::createOne();
 
     // create/persist 5 Posts with random data from defaults()
-    PostFactory::createMany(5); // returns Post[]|Proxy[]
+    PostFactory::createMany(5); // returns Post[]
     PostFactory::createMany(5, ['title' => 'My Title']);
 
     // Create 5 posts with incremental title
@@ -326,7 +326,7 @@ Using your Factory
     );
 
     // find a persisted object for the given attributes, if not found, create with the attributes
-    PostFactory::findOrCreate(['title' => 'My Title']); // returns Post|Proxy
+    PostFactory::findOrCreate(['title' => 'My Title']); // returns Post
 
     PostFactory::first(); // get the first object (assumes an auto-incremented "id" column)
     PostFactory::first('createdAt'); // assuming "createdAt" is a datetime column, this will return latest object
@@ -338,15 +338,15 @@ Using your Factory
     PostFactory::count(); // the number of persisted Posts
     PostFactory::count(['category' => $category]); // the number of persisted Posts with the given category
 
-    PostFactory::all(); // Post[]|Proxy[] all the persisted Posts
+    PostFactory::all(); // Post[] all the persisted Posts
 
-    PostFactory::findBy(['author' => 'kevin']); // Post[]|Proxy[] matching the filter
+    PostFactory::findBy(['author' => 'kevin']); // Post[] matching the filter
 
-    $post = PostFactory::find(5); // Post|Proxy with the id of 5
-    $post = PostFactory::find(['title' => 'My First Post']); // Post|Proxy matching the filter
+    $post = PostFactory::find(5); // Post with the id of 5
+    $post = PostFactory::find(['title' => 'My First Post']); // Post matching the filter
 
     // get a random object that has been persisted
-    $post = PostFactory::random(); // returns Post|Proxy
+    $post = PostFactory::random(); // returns Post
     $post = PostFactory::random(['author' => 'kevin']); // filter by the passed attributes
 
     // or automatically persist a new random object if none exists
@@ -354,15 +354,15 @@ Using your Factory
     $post = PostFactory::randomOrCreate(['author' => 'kevin']); // filter by or create with the passed attributes
 
     // get a random set of objects that have been persisted
-    $posts = PostFactory::randomSet(4); // array containing 4 "Post|Proxy" objects
+    $posts = PostFactory::randomSet(4); // array containing 4 "Post" objects
     $posts = PostFactory::randomSet(4, ['author' => 'kevin']); // filter by the passed attributes
 
     // random range of persisted objects
-    $posts = PostFactory::randomRange(0, 5); // array containing 0-5 "Post|Proxy" objects
+    $posts = PostFactory::randomRange(0, 5); // array containing 0-5 "Post" objects
     $posts = PostFactory::randomRange(0, 5, ['author' => 'kevin']); // filter by the passed attributes
 
     // or automatically persist a new random range of objects if none exists
-    $posts = PostFactory::randomRangeOrCreate(0, 5); // array containing 0-5 "Post|Proxy" objects
+    $posts = PostFactory::randomRangeOrCreate(0, 5); // array containing 0-5 "Post" objects
     $posts = PostFactory::randomRangeOrCreate(0, 5, ['author' => 'kevin']); // filter by or create with the passed attributes
 
 Reusable Factory "States"
@@ -668,7 +668,7 @@ You can override your factory's ``initialize()`` method to add default state/log
 
 ::
 
-    final class PostFactory extends PersistentProxyObjectFactory
+    final class PostFactory extends PersistentObjectFactory
     {
         // ...
 
@@ -987,7 +987,7 @@ the LazyValue can be `memoized <https://en.wikipedia.org/wiki/Memoization>`_ so 
 
         use Zenstruck\Foundry\LazyValue;
 
-        class TaskFactory extends PersistentProxyObjectFactory
+        class TaskFactory extends PersistentObjectFactory
         {
             // ...
 
@@ -1089,7 +1089,7 @@ Foundry can be used to create factories for entities that you don't have factori
 ::
 
     use App\Entity\Post;
-    use function Zenstruck\Foundry\Persistence\persist_proxy;
+    use function Zenstruck\Foundry\Persistence\persistent_factory;
     use function Zenstruck\Foundry\Persistence\repository;
 
     $factory = persistent_factory(Post::class);
@@ -1112,23 +1112,23 @@ Foundry can be used to create factories for entities that you don't have factori
 
     $repository->truncate(); // empty the database table
     $repository->count(); // the number of persisted Post's
-    $repository->all(); // Post[]|Proxy[] all the persisted Post's
+    $repository->all(); // Post[] all the persisted Post's
 
-    $repository->findBy(['author' => 'kevin']); // Post[]|Proxy[] matching the filter
+    $repository->findBy(['author' => 'kevin']); // Post[] matching the filter
 
-    $repository->find(5); // Post|Proxy with the id of 5
-    $repository->find(['title' => 'My First Post']); // Post|Proxy matching the filter
+    $repository->find(5); // Post with the id of 5
+    $repository->find(['title' => 'My First Post']); // Post matching the filter
 
     // get a random object that has been persisted
-    $repository->random(); // returns Post|Proxy
+    $repository->random(); // returns Post
     $repository->random(['author' => 'kevin']); // filter by the passed attributes
 
     // get a random set of objects that have been persisted
-    $repository->randomSet(4); // array containing 4 "Post|Proxy" objects
+    $repository->randomSet(4); // array containing 4 "Post" objects
     $repository->randomSet(4, ['author' => 'kevin']); // filter by the passed attributes
 
     // random range of persisted objects
-    $repository->randomRange(0, 5); // array containing 0-5 "Post|Proxy" objects
+    $repository->randomRange(0, 5); // array containing 0-5 "Post" objects
     $repository->randomRange(0, 5, ['author' => 'kevin']); // filter by the passed attributes
 
 .. note::
@@ -1434,7 +1434,7 @@ Later, you can access the story's state when creating other fixtures:
         use Zenstruck\Foundry\Story;
 
         /**
-         * @method static Category&Proxy<Category> php()
+         * @method static Category<Category> php()
          */
         final class CategoryStory extends Story
         {
@@ -1582,8 +1582,7 @@ are testing.
 Foundry allows each individual test to fully follow the `AAA <https://www.thephilocoder.com/unit-testing-aaa-pattern/>`_
 ("Arrange", "Act", "Assert") testing pattern. You create your fixtures using "factories" at the beginning of each test.
 You only create fixtures that are applicable for the test. Additionally, these fixtures are created with only the
-attributes required for the test - attributes that are not applicable are filled with random data. The created fixture
-objects are wrapped in a "proxy" that helps with pre and post assertions.
+attributes required for the test - attributes that are not applicable are filled with random data.
 
 Let's look at an example:
 
@@ -2363,7 +2362,7 @@ Pre-encode user passwords with a known value via ``bin/console security:hash-pas
 
 ::
 
-    class UserFactory extends PersistentProxyObjectFactory
+    class UserFactory extends PersistentObjectFactory
     {
         public const DEFAULT_PASSWORD = '1234'; // the password used to create the pre-encoded version below
 
