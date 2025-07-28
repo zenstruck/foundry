@@ -26,13 +26,7 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
     {
         parent::__construct();
 
-        if (\PHP_VERSION_ID >= 80400) {
-            trigger_deprecation(
-                'zenstruck/foundry',
-                '2.7',
-                'Proxy usage is deprecated in PHP 8.4. Use directly PersistentObjectFactory, Foundry now leverages the native PHP lazy system to auto-refresh objects (it can be enabled with "zenstruck_foundry.enable_auto_refresh_with_lazy_objects" configuration).',
-            );
-        }
+        Configuration::triggerProxyDeprecation();
     }
 
     /**
