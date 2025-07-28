@@ -12,14 +12,14 @@
 namespace App\Factory;
 
 use Doctrine\ORM\EntityRepository;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Repository\GenericEntityRepository;
 
 /**
- * @extends PersistentProxyObjectFactory<GenericEntity>
+ * @extends PersistentObjectFactory<GenericEntity>
  *
  * @method        GenericEntity|Proxy                              create(array|callable $attributes = [])
  * @method static GenericEntity|Proxy                              createOne(array $attributes = [])
@@ -55,7 +55,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Repository\GenericEntityRepository;
  * @phpstan-method static list<GenericEntity&Proxy<GenericEntity>> randomRangeOrCreate(int $min, int $max, array $attributes = [])
  * @phpstan-method static list<GenericEntity&Proxy<GenericEntity>> randomSet(int $number, array $attributes = [])
  */
-final class GenericEntityFactory extends PersistentProxyObjectFactory
+final class GenericEntityFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

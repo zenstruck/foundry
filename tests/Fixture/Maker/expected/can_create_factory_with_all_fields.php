@@ -11,13 +11,13 @@
 
 namespace App\Factory;
 
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 
 /**
- * @extends PersistentProxyObjectFactory<GenericEntity>
+ * @extends PersistentObjectFactory<GenericEntity>
  */
-final class GenericEntityFactory extends PersistentProxyObjectFactory
+final class GenericEntityFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

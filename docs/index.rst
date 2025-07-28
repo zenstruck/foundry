@@ -209,53 +209,6 @@ This command will generate a ``PostFactory`` class that looks like this:
                 make_factory:
                     add_hints: false
 
-.. note::
-
-    You can add the option ``--with-phpdoc`` in order to add the following ``@method`` docblocks.
-    This would ease autocompletion in your IDE (might be not useful anymore since Foundry v2, at least in PHPStorm):
-
-::
-
-        /**
-         * @method        Post create(array|callable $attributes = [])
-         * @method static Post createOne(array $attributes = [])
-         * @method static Post find(object|array|mixed $criteria)
-         * @method static Post findOrCreate(array $attributes)
-         * @method static Post first(string $sortBy = 'id')
-         * @method static Post last(string $sortBy = 'id')
-         * @method static Post random(array $attributes = [])
-         * @method static Post randomOrCreate(array $attributes = []))
-         * @method static PostRepository|RepositoryProxy repository()
-         * @method static Post[] all()
-         * @method static Post[] createMany(int $number, array|callable $attributes = [])
-         * @method static Post[] createSequence(iterable|callable $sequence)
-         * @method static Post[] findBy(array $attributes)
-         * @method static Post[] randomRange(int $min, int $max, array $attributes = []))
-         * @method static Post[] randomRangeOrCreate(int $min, int $max, array $attributes = [])
-         * @method static Post[] randomSet(int $number, array $attributes = []))
-         *
-         * @phpstan-method Post create(array|callable $attributes = [])
-         * @phpstan-method static Post createOne(array $attributes = [])
-         * @phpstan-method static Post find(object|array|mixed $criteria)
-         * @phpstan-method static Post findOrCreate(array $attributes)
-         * @phpstan-method static Post first(string $sortBy = 'id')
-         * @phpstan-method static Post last(string $sortBy = 'id')
-         * @phpstan-method static Post random(array $attributes = [])
-         * @phpstan-method static Post randomOrCreate(array $attributes = [])
-         * @phpstan-method static list<Post> all()
-         * @phpstan-method static list<Post> createMany(int $number, array|callable $attributes = [])
-         * @phpstan-method static list<Post> createSequence(array|callable $sequence)
-         * @phpstan-method static list<Post> findBy(array $attributes)
-         * @phpstan-method static list<Post> randomRange(int $min, int $max, array $attributes = [])
-         * @phpstan-method static list<Post> randomRangeOrCreate(int $min, int $max, array $attributes = [])
-         * @phpstan-method static list<Post> randomSet(int $number, array $attributes = [])
-         * @phpstan-method static RepositoryDecorator<Post, ObjectRepository<Post>> repository()
-         */
-        final class PostFactory extends PersistentObjectFactory
-        {
-            // ...
-        }
-
 .. _defaults:
 
 In the ``defaults()``, you can return an array of all default values that any new object

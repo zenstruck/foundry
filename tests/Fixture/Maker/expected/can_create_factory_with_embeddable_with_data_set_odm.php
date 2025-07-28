@@ -11,13 +11,13 @@
 
 namespace App\Factory;
 
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Document\WithEmbeddableDocument;
 
 /**
- * @extends PersistentProxyObjectFactory<WithEmbeddableDocument>
+ * @extends PersistentObjectFactory<WithEmbeddableDocument>
  */
-final class WithEmbeddableDocumentFactory extends PersistentProxyObjectFactory
+final class WithEmbeddableDocumentFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

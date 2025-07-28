@@ -11,13 +11,13 @@
 
 namespace App\Factory;
 
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 
 /**
- * @extends PersistentProxyObjectFactory<Category>
+ * @extends PersistentObjectFactory<Category>
  */
-final class CategoryFactory extends PersistentProxyObjectFactory
+final class CategoryFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
