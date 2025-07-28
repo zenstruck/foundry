@@ -20,7 +20,7 @@ final class AsFixtureStoryCompilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        if (!$container->has('.zenstruck_foundry.story.load_story-command')) {
+        if (!$container->has('.zenstruck_foundry.command.load_fixtures')) {
             return;
         }
 
@@ -58,7 +58,7 @@ final class AsFixtureStoryCompilerPass implements CompilerPassInterface
             throw new LogicException("Cannot use #[AsFixture] group(s) \"{$collisionNames}\", they collide with fixture names.");
         }
 
-        $container->findDefinition('.zenstruck_foundry.story.load_story-command')
+        $container->findDefinition('.zenstruck_foundry.command.load_fixtures')
             ->setArgument('$stories', $fixtureStories)
             ->setArgument('$groupedStories', $groupedFixtureStories);
     }

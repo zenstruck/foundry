@@ -1526,9 +1526,9 @@ Local Development Fixtures
 
 .. versionadded:: 2.6
 
-    The ``foundry:load-stories`` command and ``#[AsFixture]`` attribute were added in 2.6.
+    The ``foundry:load-fixtures`` command and ``#[AsFixture]`` attribute were added in 2.6.
 
-Using ``bin/console foundry:load-stories``, you can load stories as fixtures in your database.
+Using ``bin/console foundry:load-fixtures``, you can load stories as fixtures in your database.
 This is mainly useful to load fixtures in "dev" mode.
 
 Mark `Stories`_ you want loaded by the command with the ``#[AsFixture]`` attribute:
@@ -1543,11 +1543,11 @@ Mark `Stories`_ you want loaded by the command with the ``#[AsFixture]`` attribu
         // ...
     }
 
-``bin/console foundry:load-stories category`` will now load the story ``CategoryStory`` in your database.
+``bin/console foundry:load-fixtures category`` will now load the story ``CategoryStory`` in your database.
 
 .. note::
 
-    If only a single story exists, you can omit the argument and just call ``bin/console foundry:load-stories`` to load it.
+    If only a single story exists, you can omit the argument and just call ``bin/console foundry:load-fixtures`` to load it.
 
 You can also load stories by group, by using the ``groups`` option:
 
@@ -1555,13 +1555,13 @@ You can also load stories by group, by using the ``groups`` option:
 
     use Zenstruck\Foundry\Attribute\AsFixture;
 
-    #[AsFixture(name: 'category', groups: ['all-stories'])]
+    #[AsFixture(name: 'category', groups: ['all'])]
     final class CategoryStory extends Story {}
 
-    #[AsFixture(name: 'post', groups: ['all-stories'])]
+    #[AsFixture(name: 'post', groups: ['all'])]
     final class PostStory extends Story {}
 
-``bin/console foundry:load-stories all-stories`` will load both stories ``CategoryStory`` and ``PostStory``.
+``bin/console foundry:load-fixtures all`` will load both stories ``CategoryStory`` and ``PostStory``.
 
 .. tip::
 

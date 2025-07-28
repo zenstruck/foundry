@@ -26,8 +26,10 @@ use Zenstruck\Foundry\Story;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ *
+ * @internal
  */
-final class LoadStoryCommand extends Command
+final class LoadFixturesCommand extends Command
 {
     public function __construct(
         /** @var array<string, class-string<Story>> */

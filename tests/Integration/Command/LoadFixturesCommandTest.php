@@ -30,7 +30,7 @@ use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 use function Zenstruck\Foundry\Persistence\repository;
 
-final class LoadStoryCommandTest extends KernelTestCase
+final class LoadFixturesCommandTest extends KernelTestCase
 {
     use Factories, RequiresORM, ResetDatabase;
 
@@ -280,10 +280,10 @@ final class LoadStoryCommandTest extends KernelTestCase
     {
         // randomly choose the real command name or an alias
         $commands = [
-            'foundry:load-stories',
-            'foundry:load-story',
             'foundry:load-fixtures',
             'foundry:load-fixture',
+            'foundry:load-stories',
+            'foundry:load-story',
         ];
 
         return new CommandTester((new Application(self::bootKernel($options)))->find(
