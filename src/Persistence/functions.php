@@ -96,13 +96,7 @@ function persist(string $class, array|callable $attributes = []): object
  */
 function proxy(object $object): object
 {
-    if (Configuration::autoRefreshWithLazyObjectsIsEnabled()) {
-        trigger_deprecation(
-            'zenstruck/foundry',
-            '2.7',
-            'Proxy usage is deprecated in PHP 8.4. Use directly PersistentObjectFactory, Foundry now leverages the native PHP lazy system to auto-refresh objects.',
-        );
-    }
+    Configuration::triggerProxyDeprecation();
 
     return ProxyGenerator::wrap($object);
 }
@@ -118,6 +112,8 @@ function proxy(object $object): object
  */
 function unproxy(mixed $what, bool $withAutoRefresh = true): mixed
 {
+    Configuration::triggerProxyDeprecation();
+
     return ProxyGenerator::unwrap($what, $withAutoRefresh);
 }
 
