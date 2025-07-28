@@ -13,6 +13,8 @@ namespace Zenstruck\Foundry\Tests\Integration\Maker;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
@@ -32,8 +34,10 @@ use Zenstruck\Foundry\Tests\Fixture\ObjectWithNonWriteable;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  * @group maker
+ * @requires PHP >=8.4
  */
 #[Group('maker')]
+#[RequiresPhp('>=8.4')]
 final class MakeFactoryTest extends MakerTestCase
 {
     private const PHPSTAN_PATH = __DIR__.'/../../..'.FactoryGenerator::PHPSTAN_PATH;
@@ -154,6 +158,7 @@ final class MakeFactoryTest extends MakerTestCase
      */
     #[Test]
     #[DataProvider('scaToolProvider')]
+    #[IgnoreDeprecations]
     public function can_create_factory_with_static_analysis_annotations(string $scaTool): void
     {
         if (!\getenv('DATABASE_URL')) {
@@ -182,6 +187,7 @@ final class MakeFactoryTest extends MakerTestCase
      * @test
      */
     #[Test]
+    #[IgnoreDeprecations]
     public function can_create_factory_for_entity_with_repository(): void
     {
         if (!\getenv('DATABASE_URL')) {

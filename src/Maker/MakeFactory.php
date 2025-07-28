@@ -77,6 +77,14 @@ final class MakeFactory extends AbstractMaker
 
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
     {
+        if ($input->getOption('with-phpdoc') && \PHP_VERSION_ID >= 80400) {
+            trigger_deprecation(
+                'zenstruck/foundry',
+                '2.7',
+                'The --with-phpdoc option is deprecated and will be removed in 3.0.',
+            );
+        }
+
         if (!$this->doctrineEnabled() && !$input->getOption('no-persistence')) {
             $io->text('// Note: Doctrine not enabled: auto-activating <fg=yellow>--no-persistence</> option.');
             $io->newLine();

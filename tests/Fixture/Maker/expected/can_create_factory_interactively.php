@@ -11,13 +11,13 @@
 
 namespace App\Factory;
 
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 
 /**
- * @extends PersistentProxyObjectFactory<Contact>
+ * @extends PersistentObjectFactory<Contact>
  */
-final class ContactFactory extends PersistentProxyObjectFactory
+final class ContactFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

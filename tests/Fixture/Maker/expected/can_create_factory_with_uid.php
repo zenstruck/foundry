@@ -12,13 +12,13 @@
 namespace App\Factory;
 
 use Symfony\Component\Uid\Uuid;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithUidColumn;
 
 /**
- * @extends PersistentProxyObjectFactory<WithUidColumn>
+ * @extends PersistentObjectFactory<WithUidColumn>
  */
-final class WithUidColumnFactory extends PersistentProxyObjectFactory
+final class WithUidColumnFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services

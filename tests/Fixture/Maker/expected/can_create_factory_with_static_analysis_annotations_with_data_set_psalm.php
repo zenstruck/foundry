@@ -12,13 +12,13 @@
 namespace App\Tests\Factory;
 
 use Doctrine\ORM\EntityRepository;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 
 /**
- * @extends PersistentProxyObjectFactory<Category>
+ * @extends PersistentObjectFactory<Category>
  *
  * @method        Category|Proxy                            create(array|callable $attributes = [])
  * @method static Category|Proxy                            createOne(array $attributes = [])
@@ -54,7 +54,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
  * @psalm-method static list<Category&Proxy<Category>> randomRangeOrCreate(int $min, int $max, array $attributes = [])
  * @psalm-method static list<Category&Proxy<Category>> randomSet(int $number, array $attributes = [])
  */
-final class CategoryFactory extends PersistentProxyObjectFactory
+final class CategoryFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
