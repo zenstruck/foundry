@@ -23,8 +23,7 @@ return static function (ContainerConfigurator $container): void {
             ->arg('$databaseResetters', tagged_iterator('.foundry.persistence.database_resetter'))
             ->arg('$kernel', service('kernel'))
             ->tag('console.command', [
-                'command' => 'foundry:load-stories',
-                'aliases' => ['foundry:load-fixtures', 'foundry:load-fixture', 'foundry:load-story'],
+                'command' => 'foundry:load-stories|foundry:load-fixtures|foundry:load-story',
                 'description' => 'Load stories which are marked with #[AsFixture] attribute.',
             ])
     ;

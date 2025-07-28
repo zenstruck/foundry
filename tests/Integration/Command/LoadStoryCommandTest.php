@@ -278,6 +278,16 @@ final class LoadStoryCommandTest extends KernelTestCase
 
     private function commandTester(array $options = []): CommandTester
     {
-        return new CommandTester((new Application(self::bootKernel($options)))->find('foundry:load-stories'));
+        // randomly choose the real command name or an alias
+        $commands = [
+            'foundry:load-stories',
+            'foundry:load-story',
+            'foundry:load-fixtures',
+            'foundry:load-fixture',
+        ];
+
+        return new CommandTester((new Application(self::bootKernel($options)))->find(
+            $commands[\array_rand($commands)]
+        ));
     }
 }
