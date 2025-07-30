@@ -554,6 +554,36 @@ If you have a collection of values that you want to distribute over a collection
 
     The ``distribute()`` method was added in Foundry 2.4.
 
+Apply State Method over a Collection
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is also possible to call a "state method" on each element of a collection by using the method ``FactoryCollection::applyStateMethod()``
+(after a ``many()``, a ``sequence()``, or a ``distribute()``):
+
+::
+
+    final class PostFactory extends PersistentObjectFactory
+    {
+        // ...
+
+        public function published(): self
+        {
+            return $this->with(['published_at' => self::faker()->dateTime()]);
+        }
+
+        public function title(string $title): self
+        {
+            return $this->with(['title' => $title]);
+        }
+    }
+
+    $post = PostFactory::new()
+        ->many(3)
+        ->applyStateMethod('published')
+        ->applyStateMethod('title', static fn(int $i) => ["title $i"])
+        ->create()
+    ;
+
 Faker
 ~~~~~
 

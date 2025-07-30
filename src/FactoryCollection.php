@@ -22,6 +22,7 @@ use Zenstruck\Foundry\Persistence\PersistMode;
  * @implements \IteratorAggregate<TFactory>
  *
  * @phpstan-import-type Attributes from Factory
+ * @phpstan-import-type Parameters from Factory
  */
 final class FactoryCollection implements \IteratorAggregate
 {
@@ -232,6 +233,69 @@ final class FactoryCollection implements \IteratorAggregate
             static fn() => \array_map(
                 static fn(Factory $f) => $f instanceof ObjectFactory ? $f->reuse(...$objects) : $f,
                 $factories,
+            )
+        );
+    }
+
+    /**
+     * @phpstan-param callable(int):mixed[] $attributes
+     * @internal
+     */
+    public function applyStateMethod(string $stateMethodName, ?callable $attributes = null): static
+    {
+        $attributes ??= fn(int $index) => [];
+
+        try {
+            $refectionMethod = new \ReflectionMethod($this->factory, $stateMethodName);
+        } catch (\ReflectionException $e) {
+            throw new \InvalidArgumentException(
+                \sprintf('State method "%s" does not exist on factory "%s".', $stateMethodName, $this->factory::class),
+                previous: $e
+            );
+        }
+
+        if ($refectionMethod->isStatic()) {
+            throw new \InvalidArgumentException(
+                \sprintf('Method "%s::%s()" is static and cannot be used as a state method.', $this->factory::class, $stateMethodName),
+            );
+        }
+
+        $factories = $this->all();
+
+        $stateMethodNumberOfRequiredParameters = $refectionMethod->getNumberOfRequiredParameters();
+        $stateMethodNumberOfParameters = $refectionMethod->getNumberOfParameters();
+        $stateMethodParameterNames = array_map(static fn(\ReflectionParameter $p) => $p->getName(), $refectionMethod->getParameters());
+
+        return new self(
+            $this->factory,
+            static fn() => \array_map(
+                static function (Factory $f, int $index) use ($stateMethodName, $attributes, $stateMethodNumberOfRequiredParameters, $stateMethodNumberOfParameters, $stateMethodParameterNames) {
+                    $parameters = $attributes($index + 1);
+
+                    if (count($parameters) < $stateMethodNumberOfRequiredParameters || count($parameters) > $stateMethodNumberOfParameters) {
+                        throw new \InvalidArgumentException(\sprintf('Invalid number of parameters for state method "%s::%s()".', $f::class, $stateMethodName));
+                    }
+
+                    if (!array_is_list($parameters) && $extraParameters = array_diff(array_keys($parameters), $stateMethodParameterNames)) {
+                        throw new \InvalidArgumentException(
+                            \sprintf(
+                                'Parameter(s) "%s" don\'t exist for state method "%s::%s()".',
+                                implode(',', $extraParameters),
+                                $f::class, $stateMethodName
+                            )
+                        );
+                    }
+
+                    $newFactory = $f->$stateMethodName(...$parameters);
+
+                    if ($newFactory::class !== $f::class) {
+                        throw new \InvalidArgumentException(\sprintf('State method "%s::%s()" does not return a "%1$s".', $f::class, $stateMethodName));
+                    }
+
+                    return $newFactory;
+                },
+                $factories,
+                array_keys($factories),
             )
         );
     }
