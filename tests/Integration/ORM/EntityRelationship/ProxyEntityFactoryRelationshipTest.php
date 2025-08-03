@@ -18,6 +18,7 @@ use Doctrine\Persistence\Proxy as DoctrineProxy;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\IgnorePhpunitWarnings;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use Zenstruck\Assert;
@@ -28,6 +29,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\ProxyAddressFactory
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\ProxyCategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ProxyContactFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Tag\ProxyTagFactory;
+use Zenstruck\Foundry\Tests\Integration\ORM\EdgeCasesRelationshipTest;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -41,6 +43,7 @@ final class ProxyEntityFactoryRelationshipTest extends EntityFactoryRelationship
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(Contact::class, ['category'])]
+    #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
     public function doctrine_proxies_are_converted_to_foundry_proxies(): void
     {
         static::contactFactory()->create(['category' => static::categoryFactory()]);
@@ -64,6 +67,7 @@ final class ProxyEntityFactoryRelationshipTest extends EntityFactoryRelationship
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(Contact::class, ['category'])]
+    #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
     public function it_can_add_proxy_to_many_to_one(): void
     {
         $contact = static::contactFactory()->create();
@@ -79,6 +83,7 @@ final class ProxyEntityFactoryRelationshipTest extends EntityFactoryRelationship
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(Contact::class, ['tags'])]
+    #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
     public function it_can_add_proxy_to_one_to_many(): void
     {
         $contact = static::contactFactory()->create();

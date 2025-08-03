@@ -28,7 +28,8 @@ final class DoctrineCascadeRelationshipMetadata implements \Stringable
 
     public function __toString(): string
     {
-        $name = \sprintf('%s::$%s - %s', $this->class, $this->field, $this->cascade ? 'cascade' : 'no cascade');
+        // @phpstan-ignore argument.type
+        $name = \sprintf('%s::$%s - %s', substr(strrchr($this->class, '\\'), 1), $this->field, $this->cascade ? 'cascade' : 'no cascade');
 
         if ($this->orphanRemoval) {
             $name = "{$name} - (orphan removal)";
@@ -67,19 +68,19 @@ final class DoctrineCascadeRelationshipMetadata implements \Stringable
         for ($i = 0; $i < $total; ++$i) {
             $temp = [];
 
-            $permutationName = "\n";
+            $permutationName = [];
             for ($j = 0; $j < \count($relationshipFields); ++$j) {
                 $metadata = self::fromArray($relationshipFields[$j], cascade: (bool) (($i >> $j) & 1));
 
                 $temp[] = $metadata;
-                $permutationName = "{$permutationName}$metadata\n";
+                $permutationName[] = (string) $metadata;
 
                 if ($relationshipFields[$j]['isOneToMany']) {
                     $hasOneToMany = true;
                 }
             }
 
-            yield $permutationName => $temp;
+            yield implode(' / ', $permutationName) => $temp;
         }
 
         if (!$hasOneToMany) {
@@ -89,12 +90,12 @@ final class DoctrineCascadeRelationshipMetadata implements \Stringable
         // if we have at least one OneToMany relationship, we need to test with orphan removal
         // let's add only one permutation with orphan removal (and all cascade to true)
         $temp = [];
-        $permutationName = "\n";
+        $permutationName = [];
         foreach ($relationshipFields as $relationshipField) {
             $metadata = self::fromArray($relationshipField, cascade: true, orphanRemoval: $relationshipField['isOneToMany']);
             $temp[] = $metadata;
-            $permutationName = "{$permutationName}$metadata\n";
+            $permutationName[] = (string) $metadata;
         }
-        yield $permutationName => $temp;
+        yield implode(' / ', $permutationName) => $temp;
     }
 }
