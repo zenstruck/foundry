@@ -129,11 +129,11 @@ final class ProxyGenerator
          * (?!__)                               # 4. Negative lookahead to exclude magic methods (like __serialize)
          * \w+                                  # 5. Method name
          * \s*\([^\)]*\)\s*                     # 6. Parameters inside parentheses (not captured)
-         * ):?\s*\??[\w\\\\]*                   # 7. Optional return type, can be nullable (starts with `?`), supports namespaced types (`\Foo\Bar`)
+         * ):?\s*\??[\w\\\\|&]*                 # 7. Optional return type, can be nullable (starts with `?`), supports namespaced types (`\Foo\Bar`), union types and intersection types
          * \s*\{\s*$                            # 8. Opening brace `{` at the end of the line, with optional spaces before
          */
         $proxyCode = \preg_replace_callback(
-            '/^(\s*(?:public|protected|private)?\s*function\s+(?!__)\w+\s*\([^\)]*\)\s*):?\s*\??[\w\\\\]*\s*\{\s*$/m',
+            '/^(\s*(?:public|protected|private)?\s*function\s+(?!__)\w+\s*\([^\)]*\)\s*):?\s*\??[\w\\\\|&]*\s*\{\s*$/m',
             fn($matches) => \rtrim($matches[0])."\n    \$this->_autoRefresh();",
             $proxyCode
         );

@@ -77,6 +77,27 @@ final class ProxyGeneratorTest extends TestCase
         $proxyfiedObj = ProxyGenerator::wrap(new ClassWithoutReturnType());
         self::assertSame(1, $proxyfiedObj->returnsSeomthing());
     }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function it_can_generate_proxy_for_class_with_method_with_union_return_type(): void
+    {
+        $proxyfiedObj = ProxyGenerator::wrap(new ClassWithUnionReturnType());
+        self::assertSame(1, $proxyfiedObj->returnsUnionType());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function it_can_generate_proxy_for_class_with_method_with_intersectionReturnType(): void
+    {
+        $proxyfiedObj = ProxyGenerator::wrap(new ClassWithInterSectionReturnType());
+        self::assertInstanceOf(One::class, $proxyfiedObj->returnsIntersectionType());
+        self::assertInstanceOf(Two::class, $proxyfiedObj->returnsIntersectionType());
+    }
 }
 
 class ClassWithNoTypeHintInUnserialize
@@ -114,5 +135,24 @@ class ClassWithSelfReturnType
     public function returnsSelf(): self
     {
         return $this;
+    }
+}
+
+class ClassWithUnionReturnType
+{
+    public function returnsUnionType(): int|string|\DateTimeImmutable
+    {
+        return 1;
+    }
+}
+
+interface One {}
+interface Two {}
+
+class ClassWithInterSectionReturnType
+{
+    public function returnsIntersectionType(): One&Two
+    {
+        return new class implements One, Two {};
     }
 }
