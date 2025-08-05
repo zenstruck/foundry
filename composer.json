@@ -20,9 +20,9 @@
         "fakerphp/faker": "^1.23",
         "symfony/deprecation-contracts": "^2.2|^3.0",
         "symfony/polyfill-php84": "^1.32",
-        "symfony/property-access": "^6.4|^7.0",
-        "symfony/property-info": "^6.4|^7.0",
-        "symfony/var-exporter": "^6.4.9|~7.0.9|^7.1.2",
+        "symfony/property-access": "^6.4|^7.0|^8.0",
+        "symfony/property-info": "^6.4|^7.0|^8.0",
+        "symfony/var-exporter": "^6.4.9|~7.0.9|^7.1.2|^8.0.0",
         "zenstruck/assert": "^1.4"
     },
     "require-dev": {
@@ -38,16 +38,16 @@
         "doctrine/persistence": "^2.0|^3.0|^4.0",
         "doctrine/orm": "^2.16|^3.0",
         "phpunit/phpunit": "^9.5.0 || ^10.0 || ^11.0 || ^12.0",
-        "symfony/console": "^6.4|^7.0",
-        "symfony/dotenv": "^6.4|^7.0",
-        "symfony/framework-bundle": "^6.4|^7.0",
+        "symfony/console": "^6.4|^7.0|^8.0",
+        "symfony/dotenv": "^6.4|^7.0|^8.0",
+        "symfony/framework-bundle": "^6.4|^7.0|^8.0",
         "symfony/maker-bundle": "^1.55",
-        "symfony/phpunit-bridge": "^6.4|^7.0",
-        "symfony/runtime": "^6.4|^7.0",
+        "symfony/phpunit-bridge": "^6.4|^7.0|^8.0",
+        "symfony/runtime": "^6.4|^7.0|^8.0",
         "symfony/translation-contracts": "^3.4",
-        "symfony/uid": "^6.4|^7.0",
-        "symfony/var-dumper": "^6.4|^7.0",
-        "symfony/yaml": "^6.4|^7.0"
+        "symfony/uid": "^6.4|^7.0|^8.0",
+        "symfony/var-dumper": "^6.4|^7.0|^8.0",
+        "symfony/yaml": "^6.4|^7.0|^8.0"
     },
     "autoload": {
         "psr-4": {
