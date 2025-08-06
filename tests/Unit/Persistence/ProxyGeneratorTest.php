@@ -98,6 +98,16 @@ final class ProxyGeneratorTest extends TestCase
         self::assertInstanceOf(One::class, $proxyfiedObj->returnsIntersectionType());
         self::assertInstanceOf(Two::class, $proxyfiedObj->returnsIntersectionType());
     }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function it_can_generate_proxy_for_class_with_method_with_attribute_added_by_proxy_helper(): void
+    {
+        $proxyfiedObj = ProxyGenerator::wrap(new ClassWithAttributeAddedByProxyHelper());
+        self::assertSame(1, $proxyfiedObj->jsonSerialize());
+    }
 }
 
 class ClassWithNoTypeHintInUnserialize
@@ -158,5 +168,13 @@ class ClassWithInterSectionReturnType
     public function returnsIntersectionType(): One&Two
     {
         return new class implements One, Two {};
+    }
+}
+
+class ClassWithAttributeAddedByProxyHelper implements \JsonSerializable
+{
+    public function jsonSerialize(): mixed
+    {
+        return 1;
     }
 }

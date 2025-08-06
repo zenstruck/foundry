@@ -124,16 +124,17 @@ final class ProxyGenerator
          * Add `$this->_autoRefresh();` after every method declaration.
          *
          * (\s*                                 # 1. Optional indentation
-         * (?:public|protected|private)?\s*     # 2. Optional visibility
-         * function\s+                          # 3. The "function" keyword followed by space
-         * (?!__)                               # 4. Negative lookahead to exclude magic methods (like __serialize)
-         * \w+                                  # 5. Method name
-         * \s*\([^\)]*\)\s*                     # 6. Parameters inside parentheses (not captured)
-         * ):?\s*\??[\w\\\\|&]*                 # 7. Optional return type, can be nullable (starts with `?`), supports namespaced types (`\Foo\Bar`), union types and intersection types
-         * \s*\{\s*$                            # 8. Opening brace `{` at the end of the line, with optional spaces before
+         * (?:#\[\\\ReturnTypeWillChange\]\s*)? # 2. Optional ReturnTypeWillChange attribute (This gets added by the ProxyHelper)
+         * (?:public|protected|private)?\s*     # 3. Optional visibility
+         * function\s+                          # 4. The "function" keyword followed by space
+         * (?!__)                               # 5. Negative lookahead to exclude magic methods (like __serialize)
+         * \w+                                  # 6. Method name
+         * \s*\([^\)]*\)\s*                     # 7. Parameters inside parentheses (not captured)
+         * ):?\s*\??[\w\\\\|&]*                 # 8. Optional return type, can be nullable (starts with `?`), supports namespaced types (`\Foo\Bar`), union types and intersection types
+         * \s*\{\s*$                            # 9. Opening brace `{` at the end of the line, with optional spaces before
          */
         $proxyCode = \preg_replace_callback(
-            '/^(\s*(?:public|protected|private)?\s*function\s+(?!__)\w+\s*\([^\)]*\)\s*):?\s*\??[\w\\\\|&]*\s*\{\s*$/m',
+            '/^(\s*(?:#\[\\\ReturnTypeWillChange\]\s*)?(?:public|protected|private)?\s*function\s+(?!__)\w+\s*\([^\)]*\)\s*):?\s*\??[\w\\\\|&]*\s*\{\s*$/m',
             fn($matches) => \rtrim($matches[0])."\n    \$this->_autoRefresh();",
             $proxyCode
         );
