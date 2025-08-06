@@ -22,7 +22,7 @@
         "symfony/polyfill-php84": "^1.32",
         "symfony/property-access": "^6.4|^7.0|^8.0",
         "symfony/property-info": "^6.4|^7.0|^8.0",
-        "symfony/var-exporter": "^6.4.9|~7.0.9|^7.1.2|^8.0.0",
+        "symfony/var-exporter": "^6.4.9|~7.0.9|^7.1.2|^8.0",
         "zenstruck/assert": "^1.4"
     },
     "require-dev": {

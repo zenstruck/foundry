@@ -6,9 +6,4 @@
             <issue><![CDATA[Since symfony/var-exporter 7.3: Generating lazy proxy for class "Zenstruck\Foundry\Tests\Integration\ForceFactoriesTraitUsage\SomeObject" is deprecated; leverage native lazy objects instead.]]></issue>
         </line>
     </file>
-    <file path="vendor/doctrine/deprecations/src/Deprecation.php">
-        <line number="208" hash="815824609bbd80ce3a5cc8a6a19c2e6dd0c6985c">
-            <issue><![CDATA[Using nullable columns in a primary key index is deprecated. (Table.php:182 called by Table.php:197, https://github.com/doctrine/dbal/pull/6787, package doctrine/dbal)]]></issue>
-        </line>
-    </file>
 </files>
