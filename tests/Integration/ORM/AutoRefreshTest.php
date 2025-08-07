@@ -22,10 +22,10 @@ use Zenstruck\Foundry\Persistence\Proxy\PersistedObjectsTracker;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
-use Zenstruck\Foundry\Tests\Integration\Persistence\ProxyPHP84TestCase;
+use Zenstruck\Foundry\Tests\Integration\Persistence\AutoRefreshTestCase;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
-final class ProxyPHP84Test extends ProxyPHP84TestCase
+final class AutoRefreshTest extends AutoRefreshTestCase
 {
     use RequiresORM;
 

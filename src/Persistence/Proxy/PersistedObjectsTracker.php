@@ -30,9 +30,11 @@ final class PersistedObjectsTracker
         self::proxifyObjects();
     }
 
-    public function add(object $object): void
+    public function add(object ...$objects): void
     {
-        self::$buffer[] = \WeakReference::create($object);
+        foreach ($objects as $object) {
+            self::$buffer[] = \WeakReference::create($object);
+        }
     }
 
     public function reset(): void

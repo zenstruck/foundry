@@ -18,10 +18,10 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Document\GenericDocument;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericDocumentFactory;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
-use Zenstruck\Foundry\Tests\Integration\Persistence\ProxyPHP84TestCase;
+use Zenstruck\Foundry\Tests\Integration\Persistence\AutoRefreshTestCase;
 use Zenstruck\Foundry\Tests\Integration\RequiresMongo;
 
-final class ProxyPHP84Test extends ProxyPHP84TestCase
+final class AutoRefreshTest extends AutoRefreshTestCase
 {
     use RequiresMongo;
 

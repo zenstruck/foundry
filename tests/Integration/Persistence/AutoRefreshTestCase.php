@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\RequiresPhp;
@@ -38,7 +39,7 @@ use function Zenstruck\Foundry\Persistence\refresh_all;
  */
 #[RequiresPhpunit('>=12')]
 #[RequiresEnvironmentVariable('USE_PHP_84_LAZY_OBJECTS', '1')]
-abstract class ProxyPHP84TestCase extends WebTestCase
+abstract class AutoRefreshTestCase extends WebTestCase
 {
     use Factories, ResetDatabase;
 
@@ -193,6 +194,85 @@ abstract class ProxyPHP84TestCase extends WebTestCase
 
         self::assertSame('foo', $object1->getProp1());
         self::assertSame('foo', $object2->getProp1());
+    }
+
+    /**
+     * @test
+     * @requires PHP >= 8.4
+     * @dataProvider provideRepositoryMethod
+     */
+    #[Test]
+    #[RequiresPhp('>= 8.4')]
+    #[DataProvider('provideRepositoryMethod')]
+    public function it_can_refresh_objects_fetched_from_repository_decorator(string $methodName, array $params): void
+    {
+        $this->factory()->many(2)->create();
+
+        $objectTracker = Configuration::instance()->persistedObjectsTracker;
+        self::assertNotNull($objectTracker);
+        $objectTracker->reset();
+
+        $objects = \call_user_func([$this->factory()::repository(), $methodName], ...$params); // @phpstan-ignore argument.type
+        if (!\is_array($objects)) {
+            $objects = [$objects];
+        }
+        self::assertGreaterThan(0, \count($objects));
+        self::assertContainsOnlyInstancesOf(GenericModel::class, $objects);
+
+        self::ensureKernelShutdown();
+
+        foreach ($objects as $object) {
+            $this->updateObject($object);
+            self::assertSame('default1', $object->getProp1());
+        }
+
+        refresh_all();
+
+        foreach ($objects as $object) {
+            self::assertSame('foo', $object->getProp1());
+        }
+    }
+
+    public static function provideRepositoryMethod(): iterable
+    {
+        yield ['first', ['sortBy' => 'id']];
+        yield ['last', ['sortBy' => 'id']];
+        yield ['find', ['id' => ['prop1' => 'default1']]];
+        yield ['findOneBy', ['criteria' => ['prop1' => 'default1']]];
+        yield ['findBy', ['criteria' => ['prop1' => 'default1']]];
+        yield ['findAll', []];
+    }
+
+    /**
+     * @test
+     * @requires PHP >= 8.4
+     */
+    #[Test]
+    #[RequiresPhp('>= 8.4')]
+    public function it_can_refresh_object_fetched_find_and_id(): void
+    {
+        $id = $this->factory()->create()->id;
+
+        $objectTracker = Configuration::instance()->persistedObjectsTracker;
+        self::assertNotNull($objectTracker);
+        $objectTracker->reset();
+
+        self::assertNull(
+            $this->factory()::repository()->find(42)
+        );
+
+        $object = $this->factory()::repository()->find($id);
+        self::assertInstanceOf(GenericModel::class, $object);
+
+        self::ensureKernelShutdown();
+
+        $this->updateObject($object);
+
+        self::assertSame('default1', $object->getProp1());
+
+        refresh_all();
+
+        self::assertSame('foo', $object->getProp1());
     }
 
     /**

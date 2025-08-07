@@ -100,6 +100,10 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
         /** @var T|null $object */
         $object = $this->inner()->find(ProxyGenerator::unwrap($id));
 
+        if ($object) {
+            Configuration::instance()->persistedObjectsTracker?->add($object);
+        }
+
         return $object;
     }
 
@@ -116,7 +120,11 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
      */
     public function findAll(): array
     {
-        return \array_values($this->inner()->findAll());
+        $objects = \array_values($this->inner()->findAll());
+
+        Configuration::instance()->persistedObjectsTracker?->add(...$objects);
+
+        return $objects;
     }
 
     /**
@@ -127,7 +135,11 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
      */
     public function findBy(array $criteria, ?array $orderBy = null, $limit = null, $offset = null): array
     {
-        return \array_values($this->inner()->findBy($this->normalize($criteria), $orderBy, $limit, $offset));
+        $objects = \array_values($this->inner()->findBy($this->normalize($criteria), $orderBy, $limit, $offset));
+
+        Configuration::instance()->persistedObjectsTracker?->add(...$objects);
+
+        return $objects;
     }
 
     /**
@@ -135,7 +147,13 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
      */
     public function findOneBy(array $criteria): ?object
     {
-        return $this->inner()->findOneBy($this->normalize($criteria));
+        $object = $this->inner()->findOneBy($this->normalize($criteria));
+
+        if ($object) {
+            Configuration::instance()->persistedObjectsTracker?->add($object);
+        }
+
+        return $object;
     }
 
     public function getClassName(): string
