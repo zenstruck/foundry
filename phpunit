@@ -74,10 +74,6 @@ case ${PHPUNIT_VERSION} in
     if [ "${USE_FOUNDRY_PHPUNIT_EXTENSION:-0}" = "1" ]; then
       PHPUNIT_EXEC="${PHPUNIT_EXEC} --extension "${FOUNDRY_EXTENSION}""
     fi
-
-    if [ "${PHPUNIT_VERSION}" = "12" ]; then
-      PHPUNIT_EXEC="${PHPUNIT_EXEC} --do-not-fail-on-deprecation"
-    fi
     ;;
 esac
 

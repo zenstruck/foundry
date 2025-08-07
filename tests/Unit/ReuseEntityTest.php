@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Test\Factories;
@@ -48,6 +49,7 @@ final class ReuseEntityTest extends TestCase
      * @test
      */
     #[Test]
+    #[IgnoreDeprecations]
     public function it_can_reuse_a_proxy_object(): void
     {
         $address = AddressFactory::createOne();

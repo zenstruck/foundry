@@ -23,6 +23,7 @@ use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+use Zenstruck\Foundry\Persistence\ProxyGenerator;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\ChangesEntityRelationshipCascadePersist;
@@ -217,7 +218,7 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
     #[UsingRelationships(Contact::class, ['address'])]
     public function many_to_one_unmanaged_raw_entity(): void
     {
-        $address = unproxy(static::addressFactory()->create(['city' => 'Some city']));
+        $address = ProxyGenerator::unwrap(static::addressFactory()->create(['city' => 'Some city']));
 
         /** @var EntityManagerInterface $em */
         $em = self::getContainer()->get(EntityManagerInterface::class);
@@ -249,11 +250,11 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         static::categoryFactory()::assert()->count(1);
 
         foreach ($category->getContacts() as $contact) {
-            self::assertSame(unproxy($category), $contact->getCategory());
+            self::assertSame(ProxyGenerator::unwrap($category), $contact->getCategory());
         }
 
         foreach ($category->getSecondaryContacts() as $contact) {
-            self::assertSame(unproxy($category), $contact->getSecondaryCategory());
+            self::assertSame(ProxyGenerator::unwrap($category), $contact->getSecondaryCategory());
         }
     }
 
@@ -328,7 +329,7 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
 
         self::assertCount(2, $category->getContacts());
         foreach ($category->getContacts() as $contact) {
-            self::assertSame(unproxy($category), $contact->getCategory());
+            self::assertSame(ProxyGenerator::unwrap($category), $contact->getCategory());
         }
         static::contactFactory()::assert()->count(2);
         static::categoryFactory()::assert()->count(1);
@@ -566,7 +567,7 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         static::categoryFactory()::assert()->count(1);
         static::contactFactory()::assert()->count(1);
         self::assertCount(1, $category->getContacts());
-        self::assertSame(unproxy($category), $category->getContacts()[0]?->getCategory());
+        self::assertSame(ProxyGenerator::unwrap($category), $category->getContacts()[0]?->getCategory());
     }
 
     /** @test */
@@ -600,7 +601,7 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
                 'category' => static::categoryFactory()
                     ->afterPersist(function(Category $category) {
                         $category->addSecondaryContact(
-                            unproxy(static::contactFactory()::createOne())
+                            ProxyGenerator::unwrap(static::contactFactory()::createOne())
                         );
                     }),
             ]
@@ -851,8 +852,8 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
 
         self::assertCount(2, $category->getContacts());
 
-        self::assertSame(unproxy($category), $contact1->getCategory());
-        self::assertSame(unproxy($category), $contact2->getCategory());
+        self::assertSame(ProxyGenerator::unwrap($category), $contact1->getCategory());
+        self::assertSame(ProxyGenerator::unwrap($category), $contact2->getCategory());
     }
 
     /**

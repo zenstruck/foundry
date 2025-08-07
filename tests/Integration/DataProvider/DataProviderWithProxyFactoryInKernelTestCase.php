@@ -21,6 +21,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Persistence\ProxyGenerator;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
@@ -47,7 +48,7 @@ abstract class DataProviderWithProxyFactoryInKernelTestCase extends KernelTestCa
         static::factory()::assert()->count(1);
 
         self::assertInstanceOf(Proxy::class, $providedData);
-        self::assertNotInstanceOf(Proxy::class, unproxy($providedData)); // asserts two proxies are not nested
+        self::assertNotInstanceOf(Proxy::class, ProxyGenerator::unwrap($providedData)); // asserts two proxies are not nested
         self::assertSame('value set in data provider', $providedData->getProp1());
     }
 

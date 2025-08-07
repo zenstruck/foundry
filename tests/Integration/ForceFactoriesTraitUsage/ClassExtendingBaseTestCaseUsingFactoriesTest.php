@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\ForceFactoriesTraitUsage;
 
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 
@@ -20,6 +21,7 @@ use function Zenstruck\Foundry\factory;
 use function Zenstruck\Foundry\Persistence\proxy;
 
 #[RequiresPhpunit('>=11.0')]
+#[IgnoreDeprecations]
 final class ClassExtendingBaseTestCaseUsingFactoriesTest extends KernelTestCaseWithFactoriesTraitBaseTestCase
 {
     #[Test]

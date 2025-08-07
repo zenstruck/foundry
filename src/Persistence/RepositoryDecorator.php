@@ -98,7 +98,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
         }
 
         /** @var T|null $object */
-        $object = $this->inner()->find(unproxy($id));
+        $object = $this->inner()->find(ProxyGenerator::unwrap($id));
 
         return $object;
     }

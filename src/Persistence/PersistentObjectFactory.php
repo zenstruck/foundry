@@ -330,7 +330,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     protected function normalizeParameter(string $field, mixed $value): mixed
     {
         if (!Configuration::instance()->isPersistenceAvailable()) {
-            return unproxy(parent::normalizeParameter($field, $value));
+            return ProxyGenerator::unwrap(parent::normalizeParameter($field, $value));
         }
 
         if ($value instanceof self) {
@@ -357,13 +357,13 @@ abstract class PersistentObjectFactory extends ObjectFactory
                     $this->tempAfterInstantiate[] = static function(object $object) use ($value, $inverseField, $field) {
                         $inverseObject = $value->create([$inverseField => $object]);
 
-                        set($object, $field, unproxy($inverseObject, withAutoRefresh: false));
+                        set($object, $field, ProxyGenerator::unwrap($inverseObject, withAutoRefresh: false));
                     };
 
                     // we're using "force" here to avoid a potential type check in a setter
                     return force(null);
                 } elseif (($inverseFieldType = (new \ReflectionClass($value::class()))->getProperty($inverseField)->getType())?->allowsNull()) {
-                    $inverseObject = unproxy(
+                    $inverseObject = ProxyGenerator::unwrap(
                         // we're using "force" here to avoid a potential type check in a setter
                         $value->create([$inverseField => force(null)]),
                         withAutoRefresh: false
@@ -382,7 +382,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
             }
         }
 
-        return unproxy(parent::normalizeParameter($field, $value), withAutoRefresh: false);
+        return ProxyGenerator::unwrap(parent::normalizeParameter($field, $value), withAutoRefresh: false);
     }
 
     protected function normalizeCollection(string $field, FactoryCollection $collection): array
@@ -406,7 +406,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
                     ->withPersistMode($this->isPersisting() ? PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT : PersistMode::WITHOUT_PERSISTING)
                     ->create([$inverseField => $object]);
 
-                $inverseObjects = unproxy($inverseObjects, withAutoRefresh: false);
+                $inverseObjects = ProxyGenerator::unwrap($inverseObjects, withAutoRefresh: false);
 
                 // if the collection is indexed by a field, index the array
                 if ($inverseRelationshipMetadata->collectionIndexedBy) {
@@ -435,7 +435,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     {
         $configuration = Configuration::instance();
 
-        $object = unproxy($object, withAutoRefresh: false);
+        $object = ProxyGenerator::unwrap($object, withAutoRefresh: false);
 
         if (!$configuration->isPersistenceAvailable()) {
             return $object;

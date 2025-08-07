@@ -96,7 +96,7 @@ final class PersistenceManager
     public function scheduleForInsert(object $object, array $afterPersistCallbacks = []): object
     {
         if ($object instanceof Proxy) {
-            $object = unproxy($object);
+            $object = ProxyGenerator::unwrap($object);
         }
 
         $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
@@ -225,7 +225,7 @@ final class PersistenceManager
         }
 
         if ($object instanceof Proxy) {
-            $object = unproxy($object);
+            $object = ProxyGenerator::unwrap($object);
         }
 
         $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
@@ -259,7 +259,7 @@ final class PersistenceManager
      */
     public function truncate(string $class): void
     {
-        $class = unproxy($class);
+        $class = ProxyGenerator::unwrap($class);
 
         $this->strategyFor($class)->truncate($class);
     }
@@ -273,7 +273,7 @@ final class PersistenceManager
      */
     public function repositoryFor(string $class): ObjectRepository
     {
-        $class = unproxy($class);
+        $class = ProxyGenerator::unwrap($class);
 
         return $this->strategyFor($class)->objectManagerFor($class)->getRepository($class);
     }
@@ -284,8 +284,8 @@ final class PersistenceManager
      */
     public function bidirectionalRelationshipMetadata(string $parent, string $child, string $field): ?RelationshipMetadata
     {
-        $parent = unproxy($parent);
-        $child = unproxy($child);
+        $parent = ProxyGenerator::unwrap($parent);
+        $child = ProxyGenerator::unwrap($child);
 
         return $this->strategyFor($parent)->bidirectionalRelationshipMetadata($parent, $child, $field);
     }
@@ -334,10 +334,10 @@ final class PersistenceManager
      */
     public function embeddablePropertiesFor(object $object, string $owner): ?array
     {
-        $owner = unproxy($owner);
+        $owner = ProxyGenerator::unwrap($owner);
 
         try {
-            return $this->strategyFor($owner)->embeddablePropertiesFor(unproxy($object), $owner);
+            return $this->strategyFor($owner)->embeddablePropertiesFor(ProxyGenerator::unwrap($object), $owner);
         } catch (NoPersistenceStrategy) {
             return null;
         }

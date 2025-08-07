@@ -178,6 +178,6 @@ trait IsProxy // @phpstan-ignore trait.unused
     // used in ProxyGenerator
     private function unproxyArgs(array $args): array
     {
-        return \array_map(unproxy(...), $args);
+        return \array_map(ProxyGenerator::unwrap(...), $args);
     }
 }

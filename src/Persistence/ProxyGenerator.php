@@ -56,7 +56,7 @@ final class ProxyGenerator
      */
     public static function wrapFactory(PersistentProxyObjectFactory $factory, callable|array $attributes): Proxy
     {
-        return self::generateClassFor($factory)::createLazyProxy(static fn() => unproxy($factory->create($attributes))); // @phpstan-ignore-line
+        return self::generateClassFor($factory)::createLazyProxy(static fn() => self::unwrap($factory->create($attributes))); // @phpstan-ignore-line
     }
 
     /**
