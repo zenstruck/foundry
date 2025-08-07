@@ -255,6 +255,10 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
         $configuration->persistence()->save($object);
 
+        if (!$this instanceof PersistentProxyObjectFactory) {
+            $configuration->persistence()->refresh($object);
+        }
+
         return $object;
     }
 

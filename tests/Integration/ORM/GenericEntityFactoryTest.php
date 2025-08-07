@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\Test;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithUninitializedFields;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\EmptyConstructorFactory;
@@ -60,8 +61,10 @@ final class GenericEntityFactoryTest extends GenericFactoryTestCase
 
     /**
      * @test
+     * @group legacy
      */
     #[Test]
+    #[IgnoreDeprecations]
     public function generate_entity_with_uninitialized_field_with_proxy(): void
     {
         $entity = proxy_factory(EntityWithUninitializedFields::class)->create();
