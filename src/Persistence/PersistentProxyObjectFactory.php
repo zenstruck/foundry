@@ -26,7 +26,7 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
     {
         parent::__construct();
 
-        Configuration::triggerProxyDeprecation();
+        Configuration::triggerProxyDeprecation('Class PersistentProxyObjectFactory is deprecated and will be removed in Foundry 3.');
     }
 
     /**

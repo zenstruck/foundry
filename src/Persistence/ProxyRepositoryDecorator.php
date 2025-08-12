@@ -30,7 +30,7 @@ final class ProxyRepositoryDecorator extends RepositoryDecorator
      */
     public function __construct(string $class, bool $inMemory = false)
     {
-        Configuration::triggerProxyDeprecation();
+        Configuration::triggerProxyDeprecation('Class ProxyRepositoryDecorator is deprecated and will be removed in Foundry 3.');
 
         parent::__construct($class, $inMemory); // @phpstan-ignore argument.type
     }

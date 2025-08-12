@@ -37,6 +37,8 @@ function repository(string $class): RepositoryDecorator
  */
 function proxy_repository(string $class): ProxyRepositoryDecorator
 {
+    Configuration::triggerProxyDeprecation('Function proxy_repository() is deprecated and will be removed in Foundry 3.');
+
     return new ProxyRepositoryDecorator($class, Configuration::instance()->isInMemoryEnabled()); // @phpstan-ignore return.type
 }
 
@@ -67,6 +69,8 @@ function persistent_factory(string $class, array|callable $attributes = []): Per
  */
 function proxy_factory(string $class, array|callable $attributes = []): PersistentProxyObjectFactory
 {
+    Configuration::triggerProxyDeprecation('Function proxy_factory() is deprecated and will be removed in Foundry 3.');
+
     return AnonymousFactoryGenerator::create($class, PersistentProxyObjectFactory::class)::new($attributes);
 }
 
@@ -96,7 +100,7 @@ function persist(string $class, array|callable $attributes = []): object
  */
 function proxy(object $object): object
 {
-    Configuration::triggerProxyDeprecation();
+    Configuration::triggerProxyDeprecation('Function proxy() is deprecated and will be removed in Foundry 3.');
 
     return ProxyGenerator::wrap($object);
 }
@@ -112,7 +116,7 @@ function proxy(object $object): object
  */
 function unproxy(mixed $what, bool $withAutoRefresh = true): mixed
 {
-    Configuration::triggerProxyDeprecation();
+    Configuration::triggerProxyDeprecation('Function unproxy() is deprecated and will be removed in Foundry 3.');
 
     return ProxyGenerator::unwrap($what, $withAutoRefresh);
 }

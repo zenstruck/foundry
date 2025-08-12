@@ -211,6 +211,10 @@ final class PersistenceManager
 
     public function isPersisted(object $object): bool
     {
+        if ($object instanceof Proxy) {
+            $object = $object->_real(withAutoRefresh: false);
+        }
+
         if (
             \PHP_VERSION_ID >= 80400
             && ($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)
