@@ -14,27 +14,39 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\Proxy;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\IgnorePhpunitWarnings;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\RequiresPhp;
+use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy\PersistedObjectsTracker;
+use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\ChangesEntityRelationshipCascadePersist;
+use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\UsingRelationships;
+use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\AddressFactory;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
-use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
 use Zenstruck\Foundry\Tests\Integration\Persistence\AutoRefreshTestCase;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
+use function Zenstruck\Foundry\Persistence\refresh_all;
+
+/**
+ * @requires PHPUnit >=12
+ */
+#[RequiresPhpunit('>=12')]
+#[RequiresEnvironmentVariable('USE_PHP_84_LAZY_OBJECTS', '1')]
+#[RequiresPhp('>= 8.4')]
 final class AutoRefreshTest extends AutoRefreshTestCase
 {
-    use RequiresORM;
+    use ChangesEntityRelationshipCascadePersist, RequiresORM;
 
-    /**
-     * @test
-     * @requires PHP >= 8.4
-     */
     #[Test]
-    #[RequiresPhp('>= 8.4')]
     public function tracker_keeps_reference_only_for_objects_in_current_scope(): void
     {
         [$genericEntity] = GenericEntityFactory::new()->many(2)->create();
@@ -65,6 +77,63 @@ final class AutoRefreshTest extends AutoRefreshTestCase
         self::assertSame(0, PersistedObjectsTracker::countObjects());
     }
 
+    #[Test]
+    #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
+    #[UsingRelationships(Contact::class, ['category', 'address'])]
+    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    public function it_can_refresh_objects_with_relationships(): void
+    {
+        $contact = ContactFactory::createOne([
+            'address' => AddressFactory::new(['city' => 'city']),
+            'category' => CategoryFactory::new(['name' => 'name']),
+            'name' => 'name'
+        ]);
+
+        $address = $contact->getAddress();
+        $category = $contact->getCategory();
+
+        refresh_all();
+
+        self::assertTrue((new \ReflectionClass($contact))->isUninitializedLazyObject($contact));
+        self::assertTrue((new \ReflectionClass($address))->isUninitializedLazyObject($address));
+
+        self::assertNotNull($category);
+        self::assertTrue((new \ReflectionClass($category))->isUninitializedLazyObject($category));
+
+        self::assertSame($address, $contact->getAddress());
+        self::assertSame($category, $contact->getCategory());
+
+        self::assertSame('name', $contact->getCategory()->getName());
+        self::assertSame('city', $contact->getAddress()->getCity());
+    }
+
+    #[Test]
+    #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
+    public function it_can_refresh_with_doctrine_proxies(): void
+    {
+        $contact = ContactFactory::createOne();
+
+        $address = $contact->getAddress();
+        $category = $contact->getCategory();
+
+        self::ensureKernelShutdown();
+
+        self::assertTrue((new \ReflectionClass($contact))->isUninitializedLazyObject($contact));
+        self::assertTrue((new \ReflectionClass($address))->isUninitializedLazyObject($address));
+
+        self::assertNotNull($category);
+        self::assertTrue((new \ReflectionClass($category))->isUninitializedLazyObject($category));
+
+        self::assertInstanceOf(Proxy::class, $contact->getAddress());
+        self::assertInstanceOf(Proxy::class, $contact->getCategory());
+
+        self::assertNotSame($address, $contact->getAddress());
+        self::assertNotSame($category, $contact->getCategory());
+
+        self::assertSame($address->getCity(), $contact->getAddress()->getCity());
+        self::assertSame($category->getName(), $contact->getCategory()->getName());
+    }
+
     protected static function factory(): PersistentObjectFactory
     {
         return GenericEntityFactory::new();
@@ -75,9 +144,12 @@ final class AutoRefreshTest extends AutoRefreshTestCase
         return 'orm';
     }
 
-    protected function updateObject(GenericModel $object): void
+    protected function updateObject(mixed $objectId): void
     {
-        $this->em()->getConnection()->executeQuery('UPDATE generic_entity SET prop1 = \'foo\' WHERE id = ?', [$object->id]);
+        $this->em()->getConnection()->executeQuery(
+            'UPDATE generic_entity SET prop1 = \'foo\' WHERE id = ?',
+            [$objectId]
+        );
     }
 
     private function em(): EntityManagerInterface

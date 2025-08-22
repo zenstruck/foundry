@@ -8,7 +8,7 @@ on:
 
 jobs:
   tests:
-    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}, PU:${{ matrix.phpunit }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.use-phpunit-extension == 1 && ' (phpunit extension)' || '' }}
+    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}, PU:${{ matrix.phpunit }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.use-phpunit-extension == 1 && ' (phpunit extension)' || '' }}${{ (matrix.use-php-84-lazy-objects != 1 || matrix.php != '8.4') && ' (legacy proxy)' || '' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

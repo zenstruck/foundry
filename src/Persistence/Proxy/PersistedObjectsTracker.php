@@ -37,7 +37,7 @@ final class PersistedObjectsTracker
         }
     }
 
-    public function reset(): void
+    public static function reset(): void
     {
         self::$buffer = [];
     }

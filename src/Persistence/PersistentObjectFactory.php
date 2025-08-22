@@ -475,7 +475,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
         try {
             return $configuration->persistence()->refresh($object);
-        } catch (RefreshObjectFailed|VarExportLogicException) {
+        } catch (RefreshObjectFailed|VarExportLogicException) { // @phpstan-ignore catch.neverThrown (thrown by var exporter)
             return $object;
         }
     }

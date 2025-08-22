@@ -14,13 +14,21 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Integration\Mongo;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
+use PHPUnit\Framework\Attributes\RequiresPhp;
+use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Document\GenericDocument;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericDocumentFactory;
-use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
 use Zenstruck\Foundry\Tests\Integration\Persistence\AutoRefreshTestCase;
 use Zenstruck\Foundry\Tests\Integration\RequiresMongo;
 
+/**
+ * @requires PHPUnit >=12
+ */
+#[RequiresPhpunit('>=12')]
+#[RequiresEnvironmentVariable('USE_PHP_84_LAZY_OBJECTS', '1')]
+#[RequiresPhp('>= 8.4')]
 final class AutoRefreshTest extends AutoRefreshTestCase
 {
     use RequiresMongo;
@@ -35,10 +43,10 @@ final class AutoRefreshTest extends AutoRefreshTestCase
         return 'mongo';
     }
 
-    protected function updateObject(GenericModel $object): void
+    protected function updateObject(mixed $objectId): void
     {
         $this->documentManager()->getDocumentCollection(GenericDocument::class)
-            ->updateOne(['_id' => $object->id], ['$set' => ['prop1' => 'foo']])
+            ->updateOne(['_id' => $objectId], ['$set' => ['prop1' => 'foo']])
         ;
     }
 
