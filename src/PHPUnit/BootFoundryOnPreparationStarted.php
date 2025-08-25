@@ -17,30 +17,27 @@ use PHPUnit\Event;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
-use Zenstruck\Foundry\InMemory\AsInMemoryTest;
 use Zenstruck\Foundry\Test\UnitTestConfig;
 
 /**
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-final class BootFoundryOnDataProviderMethodCalled implements Event\Test\DataProviderMethodCalledSubscriber
+final class BootFoundryOnPreparationStarted implements Event\Test\PreparationStartedSubscriber
 {
-    public function notify(Event\Test\DataProviderMethodCalled $event): void
+    public function notify(Event\Test\PreparationStarted $event): void
     {
-        $this->bootFoundryForDataProvider($event->testMethod()->className());
-
-        $testMethod = $event->testMethod();
-
-        if (AsInMemoryTest::shouldEnableInMemory($testMethod->className(), $testMethod->methodName())) {
-            Configuration::instance()->enableInMemory();
+        if (!$event->test()->isTestMethod()) {
+            return;
         }
+
+        $this->bootFoundry($event->test()->className());
     }
 
     /**
      * @param class-string $className
      */
-    private function bootFoundryForDataProvider(string $className): void
+    private function bootFoundry(string $className): void
     {
         if (!\is_subclass_of($className, TestCase::class)) {
             return;
@@ -48,13 +45,13 @@ final class BootFoundryOnDataProviderMethodCalled implements Event\Test\DataProv
 
         // unit test
         if (!\is_subclass_of($className, KernelTestCase::class)) {
-            Configuration::bootForDataProvider(UnitTestConfig::build());
+            Configuration::boot(UnitTestConfig::build());
 
             return;
         }
 
         // integration test
-        Configuration::bootForDataProvider(static function() use ($className): Configuration {
+        Configuration::boot(static function() use ($className): Configuration {
             if (!KernelTestCaseHelper::getContainerForTestClass($className)->has('.zenstruck_foundry.configuration')) {
                 throw new \LogicException('ZenstruckFoundryBundle is not enabled. Ensure it is added to your config/bundles.php.');
             }

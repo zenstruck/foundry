@@ -42,7 +42,7 @@ trait ResetDatabase
      * @internal
      * @before
      */
-    #[Before]
+    #[Before(10)]
     public static function _resetDatabaseBeforeEachTest(): void
     {
         if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.alreadyNarrowedType

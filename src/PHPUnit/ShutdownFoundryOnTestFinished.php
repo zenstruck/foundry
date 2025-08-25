@@ -20,12 +20,10 @@ use Zenstruck\Foundry\Configuration;
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-final class ShutdownFoundryOnDataProviderMethodFinished implements Event\Test\DataProviderMethodFinishedSubscriber
+final class ShutdownFoundryOnTestFinished implements Event\Test\FinishedSubscriber
 {
-    public function notify(Event\Test\DataProviderMethodFinished $event): void
+    public function notify(Event\Test\Finished $event): void
     {
-        KernelTestCaseHelper::tearDownClass($event->testMethod()->className());
-
         Configuration::shutdown();
     }
 }

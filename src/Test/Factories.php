@@ -16,6 +16,8 @@ use PHPUnit\Framework\Attributes\Before;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
 
+use Zenstruck\Foundry\PHPUnit\FoundryExtension;
+
 use function Zenstruck\Foundry\Persistence\initialize_proxy_object;
 
 /**
@@ -27,58 +29,31 @@ trait Factories
      * @internal
      * @before
      */
-    #[Before]
+    #[Before(5)]
     public function _beforeHook(): void
     {
+        $this->_loadDataProvidedProxies(); // todo remove
+
+        if (FoundryExtension::isEnabled()) {
+            trigger_deprecation('zenstruck/foundry', '2.7', sprintf('Trait %s is deprecated and will be removed in Foundry 3.', Factories::class));
+
+            return;
+        }
+
         $this->_bootFoundry();
-        $this->_loadDataProvidedProxies();
     }
 
     /**
      * @internal
      * @after
      */
-    #[After]
+    #[After(5)]
     public static function _shutdownFoundry(): void
     {
-        Configuration::shutdown();
-    }
-
-    /**
-     * @see \Zenstruck\Foundry\PHPUnit\BootFoundryOnDataProviderMethodCalled
-     * @internal
-     */
-    public static function _bootForDataProvider(): void
-    {
-        if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.impossibleType, function.alreadyNarrowedType
-            // unit test
-            Configuration::bootForDataProvider(UnitTestConfig::build());
-
+        if (FoundryExtension::isEnabled()) {
             return;
         }
 
-        // integration test
-        Configuration::bootForDataProvider(static function(): Configuration {
-            if (!static::getContainer()->has('.zenstruck_foundry.configuration')) { // @phpstan-ignore staticMethod.notFound
-                throw new \LogicException('ZenstruckFoundryBundle is not enabled. Ensure it is added to your config/bundles.php.');
-            }
-
-            return static::getContainer()->get('.zenstruck_foundry.configuration'); // @phpstan-ignore staticMethod.notFound, return.type
-        });
-    }
-
-    /**
-     * @internal
-     * @see \Zenstruck\Foundry\PHPUnit\ShutdownFoundryOnDataProviderMethodFinished
-     */
-    public static function _shutdownAfterDataProvider(): void
-    {
-        if (\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.impossibleType, function.alreadyNarrowedType
-            self::ensureKernelShutdown(); // @phpstan-ignore staticMethod.notFound
-            static::$class = null; // @phpstan-ignore staticProperty.notFound
-            static::$kernel = null; // @phpstan-ignore staticProperty.notFound
-            static::$booted = false; // @phpstan-ignore staticProperty.notFound
-        }
         Configuration::shutdown();
     }
 

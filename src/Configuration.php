@@ -19,6 +19,8 @@ use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\InMemory\CannotEnableInMemory;
 use Zenstruck\Foundry\InMemory\InMemoryRepositoryRegistry;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
+use Zenstruck\Foundry\PHPUnit\FoundryExtension;
+use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Persistence\Proxy\PersistedObjectsTracker;
 
 /**
@@ -132,6 +134,10 @@ final class Configuration
     {
         PersistedObjectsTracker::reset();
         self::$instance = $configuration;
+
+        if (FoundryExtension::shouldBeEnabled()) {
+            trigger_deprecation('zenstruck/foundry', '2.7', 'Not using Foundry\'s PHPUnit extension is deprecated and will throw an error in Foundry 3.');
+        }
     }
 
     /** @param \Closure():self|self $configuration */

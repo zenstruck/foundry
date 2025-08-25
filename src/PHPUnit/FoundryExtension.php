@@ -22,30 +22,62 @@ use Zenstruck\Foundry\Configuration;
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-final class FoundryExtension implements Runner\Extension\Extension
-{
-    public function bootstrap(
-        TextUI\Configuration\Configuration $configuration,
-        Runner\Extension\Facade $facade,
-        Runner\Extension\ParameterCollection $parameters,
-    ): void {
-        // shutdown Foundry if for some reason it has been booted before
-        if (Configuration::isBooted()) {
-            Configuration::shutdown();
+
+if (interface_exists(Runner\Extension\Extension::class)) {
+    final class FoundryExtension implements Runner\Extension\Extension
+    {
+        private static bool $enabled = false;
+
+        public function bootstrap(
+            TextUI\Configuration\Configuration $configuration,
+            Runner\Extension\Facade $facade,
+            Runner\Extension\ParameterCollection $parameters,
+        ): void {
+            // shutdown Foundry if for some reason it has been booted before
+            if (Configuration::isBooted()) {
+                Configuration::shutdown();
+            }
+
+            $subscribers = [
+                new BuildStoryOnTestPrepared(),
+                new EnableInMemoryBeforeTest(),
+                new DisplayFakerSeedOnTestSuiteFinished(),
+                new BootFoundryOnPreparationStarted(),
+                new ShutdownFoundryOnTestFinished(),
+            ];
+
+            if (ConstraintRequirement::from('>=11.4')->isSatisfiedBy(Runner\Version::id())) {
+                // those deal with data provider events which can be useful only if PHPUnit >=11.4 is used
+                $subscribers[] = new BootFoundryOnDataProviderMethodCalled();
+                $subscribers[] = new ShutdownFoundryOnDataProviderMethodFinished();
+            }
+
+            $facade->registerSubscribers(...$subscribers);
+
+            self::$enabled = true;
         }
 
-        $subscribers = [
-            new BuildStoryOnTestPrepared(),
-            new EnableInMemoryBeforeTest(),
-            new DisplayFakerSeedOnTestSuiteFinished(),
-        ];
-
-        if (ConstraintRequirement::from('>=11.4')->isSatisfiedBy(Runner\Version::id())) {
-            // those deal with data provider events which can be useful only if PHPUnit >=11.4 is used
-            $subscribers[] = new BootFoundryOnDataProviderMethodCalled();
-            $subscribers[] = new ShutdownFoundryOnDataProviderMethodFinished();
+        public static function shouldBeEnabled(): bool
+        {
+            return !self::isEnabled() && ConstraintRequirement::from('>=10')->isSatisfiedBy(Runner\Version::id());
         }
 
-        $facade->registerSubscribers(...$subscribers);
+        public static function isEnabled(): bool
+        {
+            return self::$enabled;
+        }
+    }
+} else {
+    final class FoundryExtension
+    {
+        public static function shouldBeEnabled(): bool
+        {
+            return false;
+        }
+
+        public static function isEnabled(): bool
+        {
+            return false;
+        }
     }
 }
