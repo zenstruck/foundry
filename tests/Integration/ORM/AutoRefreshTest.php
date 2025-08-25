@@ -47,6 +47,23 @@ final class AutoRefreshTest extends AutoRefreshTestCase
     use ChangesEntityRelationshipCascadePersist, RequiresORM;
 
     #[Test]
+    public function it_can_refresh_after_services_reset(): void
+    {
+        $object = $this->factory()->create();
+        $objectId = $object->id;
+
+        self::getContainer()->get('services_resetter')->reset(); // @phpstan-ignore method.notFound
+        self::assertTrue((new \ReflectionClass($object))->isUninitializedLazyObject($object));
+
+        $this->updateObject($objectId);
+
+        self::assertSame('foo', $object->getProp1());
+
+        // service reset did clear the EM, thus the object is not managed anymore
+        self::assertFalse($this->objectManager()->contains($object));
+    }
+
+    #[Test]
     public function tracker_keeps_reference_only_for_objects_in_current_scope(): void
     {
         [$genericEntity] = GenericEntityFactory::new()->many(2)->create();
@@ -66,12 +83,11 @@ final class AutoRefreshTest extends AutoRefreshTestCase
         // after gc collect, all entities created by ContactFactory are removed from tracker
         self::assertSame(1, PersistedObjectsTracker::countObjects());
 
-        // refreshing again won't clear the tracked object because a reference still exists incurrent scope
+        // refreshing again won't clear the tracked object because a reference still exists in current scope
         Configuration::instance()->persistedObjectsTracker?->refresh();
         self::assertSame(1, PersistedObjectsTracker::countObjects());
 
         unset($genericEntity);
-        Configuration::instance()->persistedObjectsTracker?->refresh();
 
         // unsetting the generic entity will remove it from the tracker as well
         self::assertSame(0, PersistedObjectsTracker::countObjects());
@@ -86,7 +102,7 @@ final class AutoRefreshTest extends AutoRefreshTestCase
         $contact = ContactFactory::createOne([
             'address' => AddressFactory::new(['city' => 'city']),
             'category' => CategoryFactory::new(['name' => 'name']),
-            'name' => 'name'
+            'name' => 'name',
         ]);
 
         $address = $contact->getAddress();
@@ -115,13 +131,15 @@ final class AutoRefreshTest extends AutoRefreshTestCase
 
         $address = $contact->getAddress();
         $category = $contact->getCategory();
+        self::assertNotNull($category);
+
+        $this->objectManager()->getConnection()->executeQuery('UPDATE address SET city = \'foo\' WHERE id = ?', [$address->id]);
+        $this->objectManager()->getConnection()->executeQuery('UPDATE category SET name = \'foo\' WHERE id = ?', [$category->id]);
 
         self::ensureKernelShutdown();
 
         self::assertTrue((new \ReflectionClass($contact))->isUninitializedLazyObject($contact));
         self::assertTrue((new \ReflectionClass($address))->isUninitializedLazyObject($address));
-
-        self::assertNotNull($category);
         self::assertTrue((new \ReflectionClass($category))->isUninitializedLazyObject($category));
 
         self::assertInstanceOf(Proxy::class, $contact->getAddress());
@@ -132,6 +150,9 @@ final class AutoRefreshTest extends AutoRefreshTestCase
 
         self::assertSame($address->getCity(), $contact->getAddress()->getCity());
         self::assertSame($category->getName(), $contact->getCategory()->getName());
+
+        self::assertSame('foo', $address->getCity());
+        self::assertSame('foo', $category->getName());
     }
 
     protected static function factory(): PersistentObjectFactory
@@ -146,13 +167,13 @@ final class AutoRefreshTest extends AutoRefreshTestCase
 
     protected function updateObject(mixed $objectId): void
     {
-        $this->em()->getConnection()->executeQuery(
+        $this->objectManager()->getConnection()->executeQuery(
             'UPDATE generic_entity SET prop1 = \'foo\' WHERE id = ?',
             [$objectId]
         );
     }
 
-    private function em(): EntityManagerInterface
+    protected function objectManager(): EntityManagerInterface
     {
         return self::getContainer()->get(EntityManagerInterface::class); // @phpstan-ignore return.type
     }

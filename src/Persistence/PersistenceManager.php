@@ -16,8 +16,11 @@ use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
+use Zenstruck\Foundry\Object\Hydrator;
 use Zenstruck\Foundry\ORM\AbstractORMPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\NoPersistenceStrategy;
+use Zenstruck\Foundry\Persistence\Exception\ObjectHasUnsavedChanges;
+use Zenstruck\Foundry\Persistence\Exception\ObjectNoLongerExist;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
 use Zenstruck\Foundry\Persistence\Relationship\RelationshipMetadata;
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
@@ -144,10 +147,49 @@ final class PersistenceManager
      * @template T of object
      *
      * @param T $object
+     */
+    public function autorefresh(object $object, object $clone): void
+    {
+        $strategy = $this->strategyFor($object::class);
+        $om = $strategy->objectManagerFor($object::class);
+
+        $id = $strategy->getIdentifierValues($clone);
+
+        if ($id) {
+            try {
+                $om->refresh($object);
+
+                if ($strategy->getIdentifierValues($object)) {
+                    // no identifier values means the object no longer exists
+                    return;
+                }
+            } catch (\Throwable $e) {
+            }
+
+            // let's detach the object, in order to prevent Doctrine cache
+            $om->detach($object);
+            if ($refreshedObject = $om->find($object::class, $id)) {
+                Hydrator::hydrateFromOtherObject($object, $refreshedObject);
+
+                return;
+            }
+        }
+
+        // the object no longer exists
+        Hydrator::hydrateFromOtherObject($object, $clone);
+        $om->detach($object);
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param T $object
      *
      * @return T
+     *
+     * @throws RefreshObjectFailed
      */
-    public function refresh(object &$object, bool $force = false, bool $allowRefreshDeletedObject = false): object
+    public function refresh(object &$object, bool $force = false): object
     {
         if (!$this->flush && !$force) {
             return $object;
@@ -167,44 +209,35 @@ final class PersistenceManager
 
         $strategy = $this->strategyFor($object::class);
 
-        if ($strategy->hasChanges($object)) {
-            throw RefreshObjectFailed::objectHasUnsavedChanges($object::class);
-        }
-
-        $om = $strategy->objectManagerFor($object::class);
-
         if ($strategy->isEmbeddable($object)) {
             return $object;
         }
 
-        if (!$strategy->contains($object)) {
-            $objectFromDb = null;
-
-            $id = $om->getClassMetadata($object::class)->getIdentifierValues($object);
-
-            if ($id) {
-                // "merge" object if it is not managed
-                $objectFromDb = $om->find($object::class, $id);
-            }
-
-            if ($objectFromDb) {
-                $object = $objectFromDb;
-            } else {
-                if ($allowRefreshDeletedObject) {
-                    return $object;
-                }
-
-                throw RefreshObjectFailed::objectNoLongExists();
-            }
+        if ($strategy->hasChanges($object)) {
+            throw new ObjectHasUnsavedChanges($object::class);
         }
 
-        try {
-            $om->refresh($object);
-        } catch (\LogicException|\Error) {
-            // prevent entities/documents with readonly properties to create an error
-            // LogicException is for ORM / Error is for ODM
-            // @see https://github.com/doctrine/orm/issues/9505
+        $om = $strategy->objectManagerFor($object::class);
+
+        if ($strategy->contains($object)) {
+            try {
+                $om->refresh($object);
+            } catch (\LogicException|\Error) {
+                // prevent entities/documents with readonly properties to create an error
+                // LogicException is for ORM / Error is for ODM
+                // @see https://github.com/doctrine/orm/issues/9505
+            }
+
+            return $object;
         }
+
+        $id = $strategy->getIdentifierValues($object);
+
+        if (!$id || !($objectFromDB = $om->find($object::class, $id))) {
+            throw new ObjectNoLongerExist($object);
+        }
+
+        $object = $objectFromDB;
 
         return $object;
     }
@@ -223,8 +256,10 @@ final class PersistenceManager
             $object = $reflector->initializeLazyObject($object);
         }
 
+        $persistenceStrategy = $this->strategyFor($object::class);
+
         // prevents doctrine to use its cache and think the object is persisted
-        if ($this->strategyFor($object::class)->isScheduledForInsert($object)) {
+        if ($persistenceStrategy->isScheduledForInsert($object)) {
             return false;
         }
 
@@ -232,8 +267,8 @@ final class PersistenceManager
             $object = ProxyGenerator::unwrap($object);
         }
 
-        $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
-        $id = $om->getClassMetadata($object::class)->getIdentifierValues($object);
+        $om = $persistenceStrategy->objectManagerFor($object::class);
+        $id = $persistenceStrategy->getIdentifierValues($object);
 
         return $id && null !== $om->find($object::class, $id);
     }

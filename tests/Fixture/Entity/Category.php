@@ -20,6 +20,7 @@ use Zenstruck\Foundry\Tests\Fixture\Model\Base;
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 #[ORM\Entity]
+#[ORM\Table('category')]
 class Category extends Base
 {
     /** @var Collection<int,Contact> */

@@ -18,6 +18,7 @@ use Zenstruck\Foundry\Tests\Fixture\Model\Base;
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 #[ORM\Entity]
+#[ORM\Table('address')]
 class Address extends Base
 {
     #[ORM\OneToOne(targetEntity: Contact::class, mappedBy: 'address')]

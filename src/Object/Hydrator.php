@@ -141,6 +141,29 @@ final class Hydrator
         return self::accessibleProperty($object, $property)->getValue($object);
     }
 
+    /**
+     * @template T of object
+     *
+     * @param T $object
+     * @param T $other
+     */
+    public static function hydrateFromOtherObject(object $object, object $other): void
+    {
+        $classes = [$object::class, ...\array_values(\class_parents($object))];
+
+        $properties = [];
+        foreach ($classes as $class) {
+            $reflector = new \ReflectionClass($class);
+            foreach ($reflector->getProperties() as $property) {
+                $properties[$property->getName()] = $property->getName();
+            }
+        }
+
+        foreach ($properties as $property) {
+            self::set($object, $property, self::get($other, $property), catchErrors: true);
+        }
+    }
+
     private static function accessibleProperty(object $object, string $name): \ReflectionProperty
     {
         $class = new \ReflectionClass($object);

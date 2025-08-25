@@ -41,4 +41,20 @@ final class DeleteGenericModel
 
         return new Response();
     }
+
+    #[Route('/orm/db/delete/{id}')]
+    public function ormDbDelete(EntityManagerInterface $entityManager, int $id): Response
+    {
+        $entityManager->getConnection()->delete('generic_entity', ['id' => $id]);
+
+        return new Response();
+    }
+
+    #[Route('/mongo/db/delete/{id}')]
+    public function mongoDbDelete(DocumentManager $documentManager, int $id): Response
+    {
+        $documentManager->getDocumentCollection(GenericDocument::class)->deleteOne(['_id' => $id]);
+
+        return new Response();
+    }
 }

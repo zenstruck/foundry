@@ -22,21 +22,21 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 #[AsController]
 final class UpdateGenericModel
 {
-    #[Route('/orm/update/{id}')]
-    public function ormDelete(EntityManagerInterface $entityManager, int $id): Response
+    #[Route('/orm/update/{id}/{newValue}')]
+    public function ormDelete(EntityManagerInterface $entityManager, int $id, string $newValue = 'foo'): Response
     {
         $genericEntity = $entityManager->find(GenericEntity::class, $id);
-        $genericEntity?->setProp1('foo');
+        $genericEntity?->setProp1($newValue);
         $entityManager->flush();
 
         return new Response();
     }
 
-    #[Route('/mongo/update/{id}')]
-    public function mongoDelete(DocumentManager $entityManager, int $id): Response
+    #[Route('/mongo/update/{id}/{newValue}')]
+    public function mongoDelete(DocumentManager $entityManager, int $id, string $newValue = 'foo'): Response
     {
         $genericDocument = $entityManager->find(GenericDocument::class, $id);
-        $genericDocument?->setProp1('foo');
+        $genericDocument?->setProp1($newValue);
         $entityManager->flush();
 
         return new Response();

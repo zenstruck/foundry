@@ -17,6 +17,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
+use PHPUnit\Framework\Attributes\Test;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Document\GenericDocument;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericDocumentFactory;
@@ -33,6 +34,22 @@ final class AutoRefreshTest extends AutoRefreshTestCase
 {
     use RequiresMongo;
 
+    #[Test]
+    public function it_can_refresh_after_services_reset(): void
+    {
+        $object = $this->factory()->create();
+        $objectId = $object->id;
+
+        self::getContainer()->get('services_resetter')->reset(); // @phpstan-ignore method.notFound
+        self::assertTrue((new \ReflectionClass($object))->isUninitializedLazyObject($object));
+
+        $this->updateObject($objectId);
+
+        self::assertSame('foo', $object->getProp1());
+
+        self::assertTrue($this->objectManager()->contains($object));
+    }
+
     protected static function factory(): PersistentObjectFactory
     {
         return GenericDocumentFactory::new();
@@ -45,12 +62,12 @@ final class AutoRefreshTest extends AutoRefreshTestCase
 
     protected function updateObject(mixed $objectId): void
     {
-        $this->documentManager()->getDocumentCollection(GenericDocument::class)
+        $this->objectManager()->getDocumentCollection(GenericDocument::class)
             ->updateOne(['_id' => $objectId], ['$set' => ['prop1' => 'foo']])
         ;
     }
 
-    private function documentManager(): DocumentManager
+    protected function objectManager(): DocumentManager
     {
         return self::getContainer()->get(DocumentManager::class); // @phpstan-ignore return.type
     }

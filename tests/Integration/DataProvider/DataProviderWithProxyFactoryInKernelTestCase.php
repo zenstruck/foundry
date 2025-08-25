@@ -27,8 +27,6 @@ use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
 
-use function Zenstruck\Foundry\Persistence\unproxy;
-
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  * @requires PHPUnit >=11.4

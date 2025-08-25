@@ -95,9 +95,6 @@ You'll also need to update the PHPDoc `@extends` annotation to use the new class
   - `_assertPersisted()` => `\Zenstruck\Foundry\Persistence\assert_persisted()`
   - `_assertNotPersisted()` => `\Zenstruck\Foundry\Persistence\assert_not_persisted()`
 
-> [!NOTE]
-> Calls to `Proxy::refresh()` also need to be replaced, but they are not covered by a Rector rule.
-
 - Remove `Proxy` type for parameters in the prototype in methods and functions (covered by `ChangeProxyParamTypesRector`).
 - Remove `Proxy` return type in methods and functions (covered by `ChangeProxyReturnTypesRector`).
 - Remove all `Proxy` type hints in PHPDoc (covered by `RemovePhpDocProxyTypeHintRector`).

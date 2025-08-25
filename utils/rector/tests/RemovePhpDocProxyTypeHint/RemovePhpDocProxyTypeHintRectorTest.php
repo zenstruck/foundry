@@ -28,7 +28,6 @@ final class RemovePhpDocProxyTypeHintRectorTest extends AbstractRectorTestCase
 
     public static function provideData(): \Iterator
     {
-        // todo
         return self::yieldFilesFromDirectory(__DIR__.'/Fixtures');
     }
 

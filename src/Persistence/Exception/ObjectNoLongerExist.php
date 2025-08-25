@@ -13,6 +13,10 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Persistence\Exception;
 
-abstract class RefreshObjectFailed extends \RuntimeException
+final class ObjectNoLongerExist extends RefreshObjectFailed
 {
+    public function __construct(public readonly object $originalObject)
+    {
+        parent::__construct('object no longer exists...');
+    }
 }

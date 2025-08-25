@@ -16,7 +16,7 @@ use Zenstruck\Assert;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\Object\Hydrator;
-use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
+use Zenstruck\Foundry\Persistence\Exception\ObjectNoLongerExist;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -152,10 +152,7 @@ trait IsProxy // @phpstan-ignore trait.unused
             // we don't want that "transparent" calls to _refresh() to trigger a PersistenceNotAvailable exception
             // or a RefreshObjectFailed exception when the object was deleted
             $this->_refresh();
-        } catch (PersistenceNotAvailable|RefreshObjectFailed $e) {
-            if ($e instanceof RefreshObjectFailed && false === $e->objectWasDeleted()) {
-                throw $e;
-            }
+        } catch (PersistenceNotAvailable|ObjectNoLongerExist) {
         }
     }
 

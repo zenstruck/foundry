@@ -39,7 +39,6 @@ use Zenstruck\Foundry\Tests\Integration\ORM\EdgeCasesRelationshipTest;
 use function Zenstruck\Foundry\lazy;
 use function Zenstruck\Foundry\Persistence\flush_after;
 use function Zenstruck\Foundry\Persistence\refresh;
-use function Zenstruck\Foundry\Persistence\unproxy;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>

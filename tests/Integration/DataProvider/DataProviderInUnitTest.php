@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Integration\DataProvider;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use PHPUnit\Framework\Attributes\Test;
@@ -30,7 +31,6 @@ use Zenstruck\Foundry\Tests\Fixture\Object1;
 use Zenstruck\Foundry\Tests\Fixture\Object2;
 
 use function Zenstruck\Foundry\faker;
-use function Zenstruck\Foundry\Persistence\unproxy;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
@@ -57,6 +57,7 @@ final class DataProviderInUnitTest extends TestCase
 
     #[Test]
     #[DataProvider('createObjectWithPersistentObjectFactoryInDataProvider')]
+    #[IgnoreDeprecations]
     public function assert_it_can_create_object_with_persistent_factory_in_data_provider(mixed $providedData, mixed $expectedData): void
     {
         self::assertEquals($expectedData, ProxyGenerator::unwrap($providedData));

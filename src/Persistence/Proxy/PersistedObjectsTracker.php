@@ -63,10 +63,8 @@ final class PersistedObjectsTracker
                     }
 
                     $clone = clone $object;
-                    $reflector->resetAsLazyProxy($object, function() use ($clone, $reflector) {
-                        Configuration::instance()->persistence()->refresh($clone, allowRefreshDeletedObject: true);
-
-                        return $reflector->initializeLazyObject($clone);
+                    $reflector->resetAsLazyGhost($object, function($object) use ($clone) {
+                        Configuration::instance()->persistence()->autorefresh($object, $clone);
                     });
 
                     return \WeakReference::create($object);

@@ -80,6 +80,14 @@ abstract class PersistenceStrategy
     abstract public function truncate(string $class): void;
 
     /**
+     * @return array<string, mixed>
+     */
+    public function getIdentifierValues(object $object): array
+    {
+        return $this->classMetadata($object::class)->getIdentifierValues($object);
+    }
+
+    /**
      * @return list<string>
      */
     abstract public function managedNamespaces(): array;

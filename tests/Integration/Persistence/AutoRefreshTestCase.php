@@ -11,12 +11,14 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
+use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -46,20 +48,6 @@ abstract class AutoRefreshTestCase extends WebTestCase
     use Factories, ResetDatabase;
 
     #[Test]
-    public function it_can_refresh_after_services_reset(): void
-    {
-        $object = $this->factory()->create();
-        $objectId = $object->id;
-
-        self::getContainer()->get('services_resetter')->reset(); // @phpstan-ignore method.notFound
-        self::assertTrue((new \ReflectionClass($object))->isUninitializedLazyObject($object));
-
-        $this->updateObject($objectId);
-
-        self::assertSame('foo', $object->getProp1());
-    }
-
-    #[Test]
     public function it_can_refresh_after_kernel_shutdown(): void
     {
         $object = $this->factory()->create();
@@ -71,6 +59,9 @@ abstract class AutoRefreshTestCase extends WebTestCase
         $this->updateObject($objectId);
 
         self::assertSame('foo', $object->getProp1());
+
+        // service reset did clear the EM, thus the object is not managed anymore
+        self::assertFalse($this->objectManager()->contains($object));
     }
 
     #[Test]
@@ -92,7 +83,7 @@ abstract class AutoRefreshTestCase extends WebTestCase
     }
 
     #[Test]
-    public function it_can_refresh_objects_with_php84_proxies(): void
+    public function it_can_refresh_after_update_with_browser(): void
     {
         $client = self::createClient();
 
@@ -103,6 +94,8 @@ abstract class AutoRefreshTestCase extends WebTestCase
         $client->request('GET', "/{$this->dbms()}/update/{$object->id}");
         self::assertResponseIsSuccessful();
 
+        self::assertTrue($this->objectManager()->contains($object));
+
         self::assertTrue((new \ReflectionClass($object))->isUninitializedLazyObject($object));
         assert_persisted($object);
         self::assertSame('foo', $object->getProp1());
@@ -110,15 +103,38 @@ abstract class AutoRefreshTestCase extends WebTestCase
     }
 
     #[Test]
-    #[Depends('it_can_refresh_objects_with_php84_proxies')]
-    public function it_can_refresh_objects_with_php84_tracker_is_empty_after_test(): void
+    public function it_can_refresh_twice_after_update_with_browser(): void
+    {
+        $client = self::createClient();
+
+        $object = $this->factory()->create();
+        self::assertSame('default1', $object->getProp1());
+
+        $client->request('GET', "/{$this->dbms()}/update/{$object->id}/foo");
+        self::assertResponseIsSuccessful();
+        self::assertSame('foo', $object->getProp1());
+
+        $client->request('GET', "/{$this->dbms()}/update/{$object->id}/bar");
+        self::assertResponseIsSuccessful();
+        self::assertSame('bar', $object->getProp1());
+    }
+
+    #[Test]
+    #[Depends('it_can_refresh_after_update_with_browser')]
+    public function tracker_is_empty_after_test(): void
     {
         self::assertSame(0, PersistedObjectsTracker::countObjects());
     }
 
     #[Test]
-    public function deleting_an_object_does_not_create_a_refresh_error(): void
+    #[TestWith(['deleteDirectlyInDb' => false, 'clearOM' => true])]
+    #[TestWith(['deleteDirectlyInDb' => false, 'clearOM' => false])]
+    #[TestWith(['deleteDirectlyInDb' => true, 'clearOM' => true])]
+    #[TestWith(['deleteDirectlyInDb' => true, 'clearOM' => false])]
+    public function deleting_an_object_does_not_create_a_refresh_error(bool $deleteDirectlyInDb, bool $clearOM): void
     {
+        $client = self::createClient();
+
         $object = $this->factory()->create();
         $prop1 = $object->getProp1();
         assert_persisted($object);
@@ -126,11 +142,15 @@ abstract class AutoRefreshTestCase extends WebTestCase
         self::assertSame('default1', $object->getProp1());
         self::assertFalse((new \ReflectionClass($object))->isUninitializedLazyObject($object));
 
-        self::ensureKernelShutdown();
-
-        $client = self::createClient();
-        $client->request('GET', "/{$this->dbms()}/delete/{$object->id}");
+        $client->request(
+            'DELETE',
+            $deleteDirectlyInDb ? "/{$this->dbms()}/db/delete/{$object->id}" : "/{$this->dbms()}/delete/{$object->id}"
+        );
         self::assertResponseIsSuccessful();
+
+        if ($clearOM) {
+            $this->objectManager()->clear();
+        }
 
         self::assertTrue((new \ReflectionClass($object))->isUninitializedLazyObject($object));
         self::assertSame($prop1, $object->getProp1());
@@ -140,10 +160,10 @@ abstract class AutoRefreshTestCase extends WebTestCase
     #[Test]
     public function it_can_refresh_the_same_object_multiple_times(): void
     {
-        $object = $this->factory()->create();
-        self::ensureKernelShutdown();
-
         $client = self::createClient();
+
+        $object = $this->factory()->create();
+
         $client->request('GET', "/{$this->dbms()}/update/{$object->id}");
         self::assertResponseIsSuccessful();
 
@@ -279,6 +299,8 @@ abstract class AutoRefreshTestCase extends WebTestCase
     abstract protected function dbms(): string;
 
     abstract protected function updateObject(mixed $objectId): void;
+
+    abstract protected function objectManager(): ObjectManager;
 
     protected static function createKernel(array $options = []): KernelInterface
     {

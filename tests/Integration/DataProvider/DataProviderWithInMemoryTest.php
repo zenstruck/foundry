@@ -31,8 +31,6 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ProxyContactFactory
 use Zenstruck\Foundry\Tests\Fixture\InMemory\InMemoryContactRepository;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
-use function Zenstruck\Foundry\Persistence\unproxy;
-
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  * @requires PHPUnit 11.4
