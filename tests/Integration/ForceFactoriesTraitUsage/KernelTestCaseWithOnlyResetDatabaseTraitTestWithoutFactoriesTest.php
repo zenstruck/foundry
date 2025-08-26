@@ -22,4 +22,5 @@ final class KernelTestCaseWithOnlyResetDatabaseTraitTestWithoutFactoriesTest ext
 {
     use KernelTestCaseWithoutFactoriesTrait;
     use ResetDatabase;
+    use SkipWithPHPUnitExtension;
 }

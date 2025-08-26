@@ -11,35 +11,24 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\Tests\Integration\ForceFactoriesTraitUsage;
+namespace Zenstruck\Foundry\Tests\Integration\ForceFactoriesTraitUsage\UsingExtension;
 
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
+use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
+use PHPUnit\Framework\TestCase;
+use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 
 #[RequiresPhpunit('>=11.0')]
-final class KernelTestCaseWithBothTraitsTest extends KernelTestCase
+#[RequiresPhpunitExtension(FoundryExtension::class)]
+final class UnitTestCaseWithoutFactoriesTraitTest extends TestCase
 {
-    use Factories, ResetDatabase, SkipWithPHPUnitExtension;
-
     #[Test]
     public function should_not_throw(): void
     {
-        Object1Factory::createOne();
-
         $this->expectNotToPerformAssertions();
-    }
-
-    #[Test]
-    public function should_not_throw_even_when_kernel_is_booted(): void
-    {
-        self::getContainer()->get('.zenstruck_foundry.configuration');
 
         Object1Factory::createOne();
-
-        $this->expectNotToPerformAssertions();
     }
 }

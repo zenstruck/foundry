@@ -22,7 +22,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 #[RequiresPhpunit('>=11.0')]
 final class KernelTestCaseWithFactoriesTraitTest extends KernelTestCase
 {
-    use Factories;
+    use Factories, SkipWithPHPUnitExtension;
 
     #[Test]
     public function should_not_throw(): void

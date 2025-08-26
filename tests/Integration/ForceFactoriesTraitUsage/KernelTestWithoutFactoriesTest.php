@@ -19,5 +19,5 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 #[RequiresPhpunit('>=11.0')]
 final class KernelTestWithoutFactoriesTest extends KernelTestCase
 {
-    use KernelTestCaseWithoutFactoriesTrait;
+    use KernelTestCaseWithoutFactoriesTrait, SkipWithPHPUnitExtension;
 }

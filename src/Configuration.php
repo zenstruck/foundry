@@ -119,7 +119,9 @@ final class Configuration
             throw new FoundryNotBooted();
         }
 
-        FactoriesTraitNotUsed::throwIfComingFromKernelTestCaseWithoutFactoriesTrait();
+        if (!FoundryExtension::isEnabled()) {
+            FactoriesTraitNotUsed::throwIfComingFromKernelTestCaseWithoutFactoriesTrait();
+        }
 
         return \is_callable(self::$instance) ? (self::$instance)() : self::$instance;
     }

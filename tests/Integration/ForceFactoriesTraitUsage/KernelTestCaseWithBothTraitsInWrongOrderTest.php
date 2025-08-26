@@ -23,7 +23,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 #[RequiresPhpunit('>=11.0')]
 final class KernelTestCaseWithBothTraitsInWrongOrderTest extends KernelTestCase
 {
-    use Factories, ResetDatabase;
+    use Factories, ResetDatabase, SkipWithPHPUnitExtension;
 
     #[Test]
     public function should_not_throw(): void

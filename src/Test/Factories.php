@@ -32,15 +32,15 @@ trait Factories
     #[Before(5)]
     public function _beforeHook(): void
     {
-        $this->_loadDataProvidedProxies(); // todo remove
-
-        if (FoundryExtension::isEnabled()) {
-            trigger_deprecation('zenstruck/foundry', '2.7', sprintf('Trait %s is deprecated and will be removed in Foundry 3.', Factories::class));
+        if (!FoundryExtension::isEnabled()) {
+            $this->_bootFoundry();
 
             return;
         }
 
-        $this->_bootFoundry();
+        trigger_deprecation('zenstruck/foundry', '2.7', sprintf('Trait %s is deprecated and will be removed in Foundry 3.', Factories::class));
+
+        $this->_loadDataProvidedProxies(); // todo remove
     }
 
     /**
