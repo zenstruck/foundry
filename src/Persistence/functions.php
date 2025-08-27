@@ -152,13 +152,13 @@ function refresh(object &$object): object
  */
 function refresh_all(): void
 {
-    $objectsTracker = Configuration::instance()->persistedObjectsTracker;
-
     if (\PHP_VERSION_ID < 80400) {
         throw new \BadMethodCallException('Cannot use refresh_all() before PHP 8.4.');
     }
 
-    if (!Configuration::autoRefreshWithLazyObjectsIsEnabled() || null === $objectsTracker) {
+    $objectsTracker = Configuration::instance()->persistedObjectsTracker;
+
+    if (null === $objectsTracker) {
         throw new \BadMethodCallException('Cannot use refresh_all() if auto refresh with lazy objects is not enabled.');
     }
 

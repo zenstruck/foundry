@@ -291,6 +291,36 @@ abstract class AutoRefreshTestCase extends WebTestCase
         self::assertSame('foo', $object->getProp1());
     }
 
+    #[Test]
+    public function it_can_disable_autorefresh(): void
+    {
+        $object = $this->factory()->withoutAutorefresh()->create();
+        $objectId = $object->id;
+
+        self::getContainer()->get('services_resetter')->reset(); // @phpstan-ignore method.notFound
+        self::assertFalse((new \ReflectionClass($object))->isUninitializedLazyObject($object));
+
+        $this->updateObject($objectId);
+
+        self::assertSame('default1', $object->getProp1());
+    }
+
+    #[Test]
+    public function it_can_enable_autorefresh_when_disabled_globally(): void
+    {
+        self::bootKernel(['disable_auto_refresh' => true]);
+
+        $object = $this->factory()->withAutorefresh()->create();
+        $objectId = $object->id;
+
+        self::getContainer()->get('services_resetter')->reset(); // @phpstan-ignore method.notFound
+        self::assertTrue((new \ReflectionClass($object))->isUninitializedLazyObject($object));
+
+        $this->updateObject($objectId);
+
+        self::assertSame('foo', $object->getProp1());
+    }
+
     /**
      * @return PersistentObjectFactory<GenericModel>
      */
@@ -304,6 +334,10 @@ abstract class AutoRefreshTestCase extends WebTestCase
 
     protected static function createKernel(array $options = []): KernelInterface
     {
+        if (true === ($options['disable_auto_refresh'] ?? false)) {
+            return parent::createKernel($options);
+        }
+
         return new TestKernel('enable_auto_refresh_with_lazy_objects', debug: true);
     }
 }

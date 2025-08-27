@@ -51,6 +51,15 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
     private bool $isRootFactory = true;
 
+    private bool $autorefreshEnabled = false;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->autorefreshEnabled = Configuration::autoRefreshWithLazyObjectsIsEnabled();
+    }
+
     /**
      * @phpstan-param mixed|Parameters $criteriaOrId
      *
@@ -232,7 +241,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
         $configuration = Configuration::instance();
 
         if ($configuration->inADataProvider()
-            && Configuration::autoRefreshWithLazyObjectsIsEnabled()
+            && \PHP_VERSION_ID >= 80400
             && $this->isPersisting()
             && !$this instanceof PersistentProxyObjectFactory
         ) {
@@ -278,6 +287,30 @@ abstract class PersistentObjectFactory extends ObjectFactory
     {
         $clone = clone $this;
         $clone->persist = PersistMode::WITHOUT_PERSISTING;
+
+        return $clone;
+    }
+
+    final public function withAutorefresh(): static
+    {
+        if (\PHP_VERSION_ID < 80400) {
+            throw new \LogicException('Auto-refresh requires PHP 8.4 or higher.');
+        }
+
+        $clone = clone $this;
+        $clone->autorefreshEnabled = true;
+
+        return $clone;
+    }
+
+    final public function withoutAutorefresh(): static
+    {
+        if (\PHP_VERSION_ID < 80400) {
+            throw new \LogicException('Auto-refresh requires PHP 8.4 or higher.');
+        }
+
+        $clone = clone $this;
+        $clone->autorefreshEnabled = false;
 
         return $clone;
     }
@@ -492,7 +525,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
                     }
 
                     if (
-                        Configuration::autoRefreshWithLazyObjectsIsEnabled()
+                        $factoryUsed->autorefreshEnabled
                         && !$factoryUsed instanceof PersistentProxyObjectFactory
                     ) {
                         Configuration::instance()->persistedObjectsTracker?->add($object);
