@@ -34,7 +34,7 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
     final public function create(callable|array $attributes = []): object
     {
         $configuration = Configuration::instance();
-        if ($configuration->inADataProvider()) {
+        if ($configuration->inADataProvider() && $this->isPersisting()) {
             return ProxyGenerator::wrapFactory($this, $attributes);
         }
 

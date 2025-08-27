@@ -221,8 +221,13 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42'
-      MONGO_URL: ''
+      MONGO_URL: 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb'
       USE_DAMA_DOCTRINE_TEST_BUNDLE: 1
+    services:
+      mongo:
+        image: 'mongo:4'
+        ports:
+          - 27017:27017
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

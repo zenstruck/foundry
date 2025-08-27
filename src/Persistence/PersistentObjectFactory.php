@@ -510,8 +510,8 @@ abstract class PersistentObjectFactory extends ObjectFactory
         }
 
         if (
-            !$configuration->isPersistenceAvailable()
-            || $this instanceof PersistentProxyObjectFactory
+            $this instanceof PersistentProxyObjectFactory
+            || !$this->isPersisting()
         ) {
             return;
         }

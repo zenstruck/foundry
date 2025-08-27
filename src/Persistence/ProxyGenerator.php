@@ -15,6 +15,7 @@ use Doctrine\Persistence\Proxy as DoctrineProxy;
 use Symfony\Component\VarExporter\LazyObjectInterface;
 use Symfony\Component\VarExporter\LazyProxyTrait;
 use Symfony\Component\VarExporter\ProxyHelper;
+use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
 
 /**
@@ -56,7 +57,13 @@ final class ProxyGenerator
      */
     public static function wrapFactory(PersistentProxyObjectFactory $factory, callable|array $attributes): Proxy
     {
-        return self::generateClassFor($factory)::createLazyProxy(static fn() => unproxy($factory->create($attributes))); // @phpstan-ignore-line
+        return self::generateClassFor($factory)::createLazyProxy(static function () use ($factory, $attributes) { // @phpstan-ignore staticMethod.notFound
+            if (Configuration::instance()->inADataProvider() && $factory->isPersisting()) {
+                throw new \LogicException('Cannot access to a persisted object from a data provider.');
+            }
+
+            return unproxy($factory->create($attributes));
+        });
     }
 
     /**

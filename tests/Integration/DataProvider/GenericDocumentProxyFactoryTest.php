@@ -14,7 +14,9 @@ namespace Zenstruck\Foundry\Tests\Integration\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericDocumentFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericProxyDocumentFactory;
 use Zenstruck\Foundry\Tests\Integration\RequiresMongo;
 
@@ -25,12 +27,17 @@ use Zenstruck\Foundry\Tests\Integration\RequiresMongo;
 #[RequiresPhpunit('>=11.4')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 #[IgnoreDeprecations]
-final class GenericDocumentProxyFactoryTest extends DataProviderWithProxyFactoryInKernelTestCase
+final class GenericDocumentProxyFactoryTest extends DataProviderWithPersistentFactoryInKernelTestCase
 {
     use RequiresMongo;
 
-    protected static function factory(): GenericProxyDocumentFactory
+    protected static function proxyFactory(): GenericProxyDocumentFactory
     {
         return GenericProxyDocumentFactory::new();
+    }
+
+    protected static function factory(): PersistentObjectFactory
+    {
+        return GenericDocumentFactory::new();
     }
 }
