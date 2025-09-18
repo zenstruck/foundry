@@ -1816,7 +1816,7 @@ Object Proxy
 .. warning::
 
     Object proxy are deprecated since Foundry 2.7. Please use `auto-refresh`_ mechanism instead (PHP 8.4 only).
-    See `the upgrade guide to v2.7 <https://github.com/zenstruck/foundry/blob/1.x/UPGRADE-2.7.md>`_
+    See `the upgrade guide to v2.7 <https://github.com/zenstruck/foundry/blob/2.x/UPGRADE-2.7.md>`_
 
 Objects created by a factory extending ``PersistentProxyObjectFactory`` are wrapped in a special *Proxy* object.
 These objects allow your doctrine entities to have `Active Record <https://en.wikipedia.org/wiki/Active_record_pattern>`_ *like* behavior:
