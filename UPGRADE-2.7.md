@@ -12,15 +12,7 @@ and to reduce the maintenance burden of this feature.
 > The new auto-refresh mechanism only applies for PHP 8.4,
 > if you're still not using PHP 8.4, there is nothing to do (yet!)
 
-First, you need to configure whether you want to use the new auto-refresh mechanism:
-
-```yaml
-zenstruck_foundry:
-    # from Foundry 2.7, with PHP >=8.4, not setting this configuration is deprecated
-    enable_auto_refresh_with_lazy_objects: true
-```
-
-In both cases, you'll need to migrate your factories and code to remove all the `Proxy`-related code:
+You'll need to migrate your factories and code to remove all the `Proxy`-related code:
 - remove all `_real()` calls
 - more generally, replace all proxy methods, by their [function equivalent](https://github.com/zenstruck/foundry/blob/2.x/src/Persistence/functions.php)
 - replace `PersistentProxyObjectFactory` to `PersistentObjectFactory`
