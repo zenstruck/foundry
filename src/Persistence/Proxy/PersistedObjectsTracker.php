@@ -21,18 +21,13 @@ final class PersistedObjectsTracker
     /**
      * This buffer of objects needs to be static to be kept between two kernel.reset events.
      *
-     * @var list<\WeakReference<object>>
+     * @var \WeakMap<object, mixed> keys: objects, values: value ids
      */
-    private static array $buffer = [];
-
-    /**
-     * @var \WeakMap<object, mixed>
-     */
-    private static \WeakMap $ids;
+    private static \WeakMap $buffer;
 
     public function __construct()
     {
-        self::$ids ??= new \WeakMap();
+        self::$buffer ??= new \WeakMap();
     }
 
     public function refresh(): void
@@ -43,41 +38,33 @@ final class PersistedObjectsTracker
     public function add(object ...$objects): void
     {
         foreach ($objects as $object) {
-            self::$buffer[] = \WeakReference::create($object);
-
-            $id = Configuration::instance()->persistence()->getIdentifierValues($object);
-            if ($id) {
-                self::$ids[$object] = $id;
+            if (self::$buffer->offsetExists($object) && self::$buffer[$object]) {
+                continue;
             }
+
+            self::$buffer[$object] = Configuration::instance()->persistence()->getIdentifierValues($object);
         }
     }
 
     public static function updateIds(): void
     {
-        foreach (self::$buffer as $reference) {
-            if (null === $object = $reference->get()) {
+        foreach (self::$buffer as $object => $id) {
+            if ($id) {
                 continue;
             }
 
-            if (self::$ids->offsetExists($object)) {
-                continue;
-            }
-
-            self::$ids[$object] = Configuration::instance()->persistence()->getIdentifierValues($object);
+            self::$buffer[$object] = Configuration::instance()->persistence()->getIdentifierValues($object);
         }
     }
 
     public static function reset(): void
     {
-        self::$buffer = [];
-        self::$ids = new \WeakMap();
+        self::$buffer = new \WeakMap();
     }
 
     public static function countObjects(): int
     {
-        return \count(
-            \array_filter(self::$buffer, static fn(\WeakReference $weakRef) => null !== $weakRef->get())
-        );
+        return \count(self::$buffer);
     }
 
     private static function proxifyObjects(): void
@@ -86,30 +73,21 @@ final class PersistedObjectsTracker
             return;
         }
 
-        self::$buffer = \array_values(
-            \array_map(
-                static function(\WeakReference $weakRef) {
-                    $object = $weakRef->get() ?? throw new \LogicException('Object cannot be null.');
+        foreach (self::$buffer as $object => $id) {
+            if (!$id) {
+                continue;
+            }
 
-                    $reflector = new \ReflectionClass($object);
+            $reflector = new \ReflectionClass($object);
 
-                    if ($reflector->isUninitializedLazyObject($object)) {
-                        return \WeakReference::create($object);
-                    }
+            if ($reflector->isUninitializedLazyObject($object)) {
+                continue;
+            }
 
-                    $clone = clone $object;
-                    $reflector->resetAsLazyGhost($object, function($object) use ($clone) {
-                        $id = self::$ids[$object] ?? throw new \LogicException('Canot find the id for object');
-
-                        Configuration::instance()->persistence()->autorefresh($object, $id, $clone);
-                    });
-
-                    return \WeakReference::create($object);
-                },
-
-                // remove all empty references
-                \array_filter(self::$buffer, static fn(\WeakReference $weakRef) => null !== $weakRef->get()),
-            )
-        );
+            $clone = clone $object;
+            $reflector->resetAsLazyGhost($object, function($object) use ($clone, $id) {
+                Configuration::instance()->persistence()->autorefresh($object, $id, $clone);
+            });
+        }
     }
 }

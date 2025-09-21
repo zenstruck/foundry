@@ -329,6 +329,30 @@ abstract class AutoRefreshTestCase extends WebTestCase
         self::assertSame('foo', $object->getProp1());
     }
 
+    #[Test]
+    public function repository_method_returns_up_to_date_objects(): void
+    {
+        [$object1, $object2] = $this->factory()->many(2)->create();
+
+        self::assertSame(2, PersistedObjectsTracker::countObjects());
+
+        $this->updateObject($object1->id);
+        $this->updateObject($object2->id);
+
+        [$newObject1, $newObject2] = $this->factory()::all();
+
+        self::assertSame(2, PersistedObjectsTracker::countObjects());
+
+        self::assertSame($object1, $newObject1);
+        self::assertSame($object2, $newObject2);
+
+        self::assertSame('foo', $newObject1->getProp1());
+        self::assertSame('foo', $newObject2->getProp1());
+
+        self::assertSame('foo', $object1->getProp1());
+        self::assertSame('foo', $object2->getProp1());
+    }
+
     /**
      * @return PersistentObjectFactory<GenericModel>
      */

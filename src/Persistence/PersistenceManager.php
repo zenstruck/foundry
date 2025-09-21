@@ -419,6 +419,23 @@ final class PersistenceManager
         })();
     }
 
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $class
+     * @param array<string, mixed> $criteria
+     * @param array<string, string>|null $orderBy
+     * @phpstan-param array<string, 'asc'|'desc'|'ASC'|'DESC'>|null $orderBy
+     *
+     * @return list<T>
+     */
+    public function findBy(string $class, array $criteria = [], ?array $orderBy = null, ?int $limit = null, ?int $offset = null): array
+    {
+        $class = ProxyGenerator::unwrap($class);
+
+        return $this->strategyFor($class)->findBy($class, $criteria, $orderBy, $limit, $offset);
+    }
+
     private function flushAllStrategies(): void
     {
         foreach ($this->strategies as $strategy) {
