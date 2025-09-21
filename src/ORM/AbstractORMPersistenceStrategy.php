@@ -13,6 +13,7 @@ namespace Zenstruck\Foundry\ORM;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\Mapping\MappingException;
 use Zenstruck\Foundry\Persistence\PersistenceStrategy;
 
@@ -95,5 +96,34 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
         }
 
         return \array_values(\array_merge(...$namespaces));
+    }
+
+    final public function findBy(string $class, array $criteria, ?array $orderBy = null, ?int $limit = null, ?int $offset = null): array
+    {
+        $qb = $this->objectManagerFor($class)->getRepository($class)->createQueryBuilder('o');
+
+        foreach ($criteria as $field => $value) {
+            $paramName = str_replace('.', '_', $field);
+            $qb->andWhere('o.'.$field.' = :'.$paramName);
+            $qb->setParameter($paramName, $value);
+        }
+
+        if ($orderBy) {
+            foreach ($orderBy as $field => $direction) {
+                $qb->addOrderBy('o.'.$field, $direction);
+            }
+        }
+
+        if ($limit) {
+            $qb->setMaxResults($limit);
+        }
+
+        if ($offset) {
+            $qb->setFirstResult($offset);
+        }
+
+        return $qb->getQuery()
+            ->setHint(Query::HINT_REFRESH, true)
+            ->getResult();
     }
 }

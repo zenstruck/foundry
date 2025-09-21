@@ -21,9 +21,14 @@ final class PersistedObjectsTracker
     /**
      * This buffer of objects needs to be static to be kept between two kernel.reset events.
      *
-     * @var list<\WeakReference<object>>
+     * @var \WeakMap<object, bool>
      */
-    private static $buffer = [];
+    private static \WeakMap $buffer;
+
+    public function __construct()
+    {
+        self::$buffer ??= new \WeakMap();
+    }
 
     public function refresh(): void
     {
@@ -33,46 +38,37 @@ final class PersistedObjectsTracker
     public function add(object ...$objects): void
     {
         foreach ($objects as $object) {
-            self::$buffer[] = \WeakReference::create($object);
+            if (self::$buffer->offsetExists($object)) {
+                continue;
+            }
+
+            self::$buffer[$object] = true;
         }
     }
 
     public static function reset(): void
     {
-        self::$buffer = [];
+        self::$buffer = new \WeakMap();
     }
 
     public static function countObjects(): int
     {
-        return \count(
-            \array_filter(self::$buffer, static fn(\WeakReference $weakRef) => null !== $weakRef->get())
-        );
+        return \count(self::$buffer);
     }
 
     private static function proxifyObjects(): void
     {
-        self::$buffer = \array_values(
-            \array_map(
-                static function(\WeakReference $weakRef) {
-                    $object = $weakRef->get() ?? throw new \LogicException('Object cannot be null.');
+        foreach (self::$buffer as $object => $_) {
+            $reflector = new \ReflectionClass($object);
 
-                    $reflector = new \ReflectionClass($object);
+            if ($reflector->isUninitializedLazyObject($object)) {
+                continue;
+            }
 
-                    if ($reflector->isUninitializedLazyObject($object)) {
-                        return \WeakReference::create($object);
-                    }
-
-                    $clone = clone $object;
-                    $reflector->resetAsLazyGhost($object, function($object) use ($clone) {
-                        Configuration::instance()->persistence()->autorefresh($object, $clone);
-                    });
-
-                    return \WeakReference::create($object);
-                },
-
-                // remove all empty references
-                \array_filter(self::$buffer, static fn(\WeakReference $weakRef) => null !== $weakRef->get()),
-            )
-        );
+            $clone = clone $object;
+            $reflector->resetAsLazyGhost($object, function($object) use ($clone) {
+                Configuration::instance()->persistence()->autorefresh($object, $clone);
+            });
+        }
     }
 }
