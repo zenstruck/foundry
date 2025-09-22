@@ -42,7 +42,7 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
     {
         $configuration = Configuration::instance();
         if ($configuration->inADataProvider() && $this->isPersisting()) {
-            return ProxyGenerator::wrapFactory($this, $attributes);
+            return PersistentObjectFromDataProviderRegistry::instance()->deferObjectCreation($this->with($attributes));
         }
 
         return proxy(parent::create($attributes)); // @phpstan-ignore function.unresolvableReturnType

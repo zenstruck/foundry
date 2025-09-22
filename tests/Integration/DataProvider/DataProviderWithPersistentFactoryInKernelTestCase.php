@@ -29,6 +29,7 @@ use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
+use function Zenstruck\Foundry\Persistence\assert_persisted;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
@@ -51,6 +52,9 @@ abstract class DataProviderWithPersistentFactoryInKernelTestCase extends KernelT
         self::assertInstanceOf(Proxy::class, $providedData);
         self::assertNotInstanceOf(Proxy::class, ProxyGenerator::unwrap($providedData)); // asserts two proxies are not nested
         self::assertSame('value set in data provider', $providedData->getProp1());
+
+        static::proxyFactory()::assert()->count(1);
+        $providedData->_assertPersisted();
     }
 
     public static function createOneProxyObjectInDataProvider(): iterable
@@ -136,20 +140,24 @@ abstract class DataProviderWithPersistentFactoryInKernelTestCase extends KernelT
     #[RequiresPhp('>=8.4')]
     public function assert_it_can_create_one_object_in_data_provider_without_proxy_with_php_84(mixed $providedData): void
     {
-        static::proxyFactory()::assert()->count(1);
+        static::factory()::assert()->count(1);
 
+        self::assertNotInstanceOf(Proxy::class, $providedData);
         self::assertInstanceOf(GenericModel::class, $providedData);
         self::assertSame('value set in data provider', $providedData->getProp1());
+
+        assert_persisted($providedData);
+        static::factory()::assert()->count(1);
     }
 
     public static function createOneObjectInDataProvider(): iterable
     {
         yield 'createOne()' => [
-            static::proxyFactory()::createOne(['prop1' => 'value set in data provider']),
+            static::factory()::createOne(['prop1' => 'value set in data provider']),
         ];
 
         yield 'create()' => [
-            static::proxyFactory()->create(['prop1' => 'value set in data provider']),
+            static::factory()->create(['prop1' => 'value set in data provider']),
         ];
     }
 

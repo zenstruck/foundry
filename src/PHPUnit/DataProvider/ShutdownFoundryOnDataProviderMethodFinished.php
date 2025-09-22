@@ -11,10 +11,11 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\PHPUnit;
+namespace Zenstruck\Foundry\PHPUnit\DataProvider;
 
 use PHPUnit\Event;
 use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\PHPUnit\KernelTestCaseHelper;
 
 /**
  * @internal

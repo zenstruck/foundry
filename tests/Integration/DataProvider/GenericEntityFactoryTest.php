@@ -16,9 +16,9 @@ use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericDocumentFactory;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericProxyDocumentFactory;
-use Zenstruck\Foundry\Tests\Integration\RequiresMongo;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericProxyEntityFactory;
+use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
@@ -27,17 +27,17 @@ use Zenstruck\Foundry\Tests\Integration\RequiresMongo;
 #[RequiresPhpunit('>=11.4')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 #[IgnoreDeprecations]
-final class GenericDocumentProxyFactoryTest extends DataProviderWithPersistentFactoryInKernelTestCase
+final class GenericEntityFactoryTest extends DataProviderWithPersistentFactoryInKernelTestCase
 {
-    use RequiresMongo;
+    use RequiresORM;
 
-    protected static function proxyFactory(): GenericProxyDocumentFactory
+    protected static function proxyFactory(): GenericProxyEntityFactory
     {
-        return GenericProxyDocumentFactory::new();
+        return GenericProxyEntityFactory::new();
     }
 
     protected static function factory(): PersistentObjectFactory
     {
-        return GenericDocumentFactory::new();
+        return GenericEntityFactory::new();
     }
 }

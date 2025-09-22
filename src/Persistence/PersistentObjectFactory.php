@@ -245,7 +245,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
             && $this->isPersisting()
             && !$this instanceof PersistentProxyObjectFactory
         ) {
-            return ProxyGenerator::wrapFactoryNativeProxy($this, $attributes);
+            return PersistentObjectFromDataProviderRegistry::instance()->deferObjectCreation($this->with($attributes));
         }
 
         $object = parent::create($attributes);

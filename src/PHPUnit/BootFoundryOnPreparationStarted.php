@@ -27,11 +27,14 @@ final class BootFoundryOnPreparationStarted implements Event\Test\PreparationSta
 {
     public function notify(Event\Test\PreparationStarted $event): void
     {
-        if (!$event->test()->isTestMethod()) {
+        $test = $event->test();
+
+        if (!$test->isTestMethod()) {
             return;
         }
+        /** @var Event\Code\TestMethod $test */
 
-        $this->bootFoundry($event->test()->className());
+        $this->bootFoundry($test->className());
     }
 
     /**

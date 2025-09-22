@@ -47,7 +47,9 @@ final class BuildStoryOnTestPrepared implements Event\Test\PreparedSubscriber
             throw new \InvalidArgumentException(\sprintf('The test class "%s" must extend "%s" to use the "%s" attribute.', $test->className(), KernelTestCase::class, WithStory::class));
         }
 
-        FactoriesTraitNotUsed::throwIfClassDoesNotHaveFactoriesTrait($test->className());
+        if (!FoundryExtension::isEnabled()) {
+            FactoriesTraitNotUsed::throwIfClassDoesNotHaveFactoriesTrait($test->className());
+        }
 
         foreach ($withStoryAttributes as $withStoryAttribute) {
             $withStoryAttribute->newInstance()->story::load();

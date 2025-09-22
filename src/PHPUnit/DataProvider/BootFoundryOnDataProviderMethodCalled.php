@@ -11,13 +11,15 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\PHPUnit;
+namespace Zenstruck\Foundry\PHPUnit\DataProvider;
 
 use PHPUnit\Event;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\InMemory\AsInMemoryTest;
+use Zenstruck\Foundry\Persistence\PersistentObjectFromDataProviderRegistry;
+use Zenstruck\Foundry\PHPUnit\KernelTestCaseHelper;
 use Zenstruck\Foundry\Test\UnitTestConfig;
 
 /**
@@ -29,6 +31,12 @@ final class BootFoundryOnDataProviderMethodCalled implements Event\Test\DataProv
     public function notify(Event\Test\DataProviderMethodCalled $event): void
     {
         $this->bootFoundryForDataProvider($event->testMethod()->className());
+
+        PersistentObjectFromDataProviderRegistry::instance()->addDataset(
+            $event->testMethod()->className(),
+            $event->testMethod()->methodName(),
+            "{$event->dataProviderMethod()->className()}::{$event->dataProviderMethod()->methodName()}"(...) // @phpstan-ignore callable.nonCallable
+        );
 
         $testMethod = $event->testMethod();
 

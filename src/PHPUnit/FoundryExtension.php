@@ -17,6 +17,9 @@ use PHPUnit\Metadata\Version\ConstraintRequirement;
 use PHPUnit\Runner;
 use PHPUnit\TextUI;
 use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\PHPUnit\DataProvider\BootFoundryOnDataProviderMethodCalled;
+use Zenstruck\Foundry\PHPUnit\DataProvider\ShutdownFoundryOnDataProviderMethodFinished;
+use Zenstruck\Foundry\PHPUnit\DataProvider\TriggerDataProviderPersistenceOnTestPrepared;
 
 /**
  * @internal
@@ -50,6 +53,7 @@ if (interface_exists(Runner\Extension\Extension::class)) {
                 // those deal with data provider events which can be useful only if PHPUnit >=11.4 is used
                 $subscribers[] = new BootFoundryOnDataProviderMethodCalled();
                 $subscribers[] = new ShutdownFoundryOnDataProviderMethodFinished();
+                $subscribers[] = new TriggerDataProviderPersistenceOnTestPrepared();
             }
 
             $facade->registerSubscribers(...$subscribers);
