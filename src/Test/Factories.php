@@ -15,7 +15,6 @@ use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\Before;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
-
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 
 use function Zenstruck\Foundry\Persistence\initialize_proxy_object;
@@ -33,7 +32,7 @@ trait Factories
     public function _beforeHook(): void
     {
         if (FoundryExtension::isEnabled()) {
-            trigger_deprecation('zenstruck/foundry', '2.8', sprintf('Trait %s is deprecated and will be removed in Foundry 3.', Factories::class));
+            trigger_deprecation('zenstruck/foundry', '2.8', \sprintf('Trait %s is deprecated and will be removed in Foundry 3. See https://github.com/zenstruck/foundry/blob/2.x/UPGRADE-2.8.md to upgrade.', Factories::class));
 
             return;
         }

@@ -24,6 +24,6 @@ final class AllRulesTest extends AbstractRectorTestCase
 
     public function provideConfigFilePath(): string
     {
-        return __DIR__.'/../../config/foundry-set.php';
+        return __DIR__.'/../../config/foundry-2.7.php';
     }
 }

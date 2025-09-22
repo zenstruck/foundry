@@ -138,7 +138,7 @@ final class Configuration
         self::$instance = $configuration;
 
         if (FoundryExtension::shouldBeEnabled()) {
-            trigger_deprecation('zenstruck/foundry', '2.8', 'Not using Foundry\'s PHPUnit extension is deprecated and will throw an error in Foundry 3.');
+            trigger_deprecation('zenstruck/foundry', '2.8', 'Not using Foundry\'s PHPUnit extension is deprecated and will throw an error in Foundry 3. See https://github.com/zenstruck/foundry/blob/2.x/UPGRADE-2.8.md to upgrade.');
         }
     }
 

@@ -1606,28 +1606,46 @@ Let's look at an example:
 
 .. _enable-foundry-in-your-testcase:
 
-Enable Foundry in your TestCase
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Globally Enable Foundry In PHPUnit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Add the ``Factories`` trait for tests using factories:
+Add Foundry's `PHPUnit Extension`_ in your `phpunit.xml` file:
 
-::
+.. configuration-block::
 
-    use App\Factory\PostFactory;
-    use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-    use Zenstruck\Foundry\Test\Factories;
+    .. code-block:: xml
 
-    class MyTest extends WebTestCase
-    {
-        use Factories;
+        <phpunit>
+            <extensions>
+                <bootstrap class="Zenstruck\Foundry\PHPUnit\FoundryExtension"/>
+            </extensions>
+        </phpunit>
 
-        public function test_1(): void
+.. versionadded::  2.8
+
+    The ability to globally enable Foundry with PHPUnit extension was introduced in Foundry 2.8 and requires at least
+    PHPUnit 10.
+
+.. note::
+
+    If you're still using PHPUnit 9, Foundry can be enabled by adding the trait ``Zenstruck\Foundry\Test\Factories``
+    in each test::
+
+        use App\Factory\PostFactory;
+        use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+        use Zenstruck\Foundry\Test\Factories;
+
+        class MyTest extends WebTestCase
         {
-            $post = PostFactory::createOne();
+            use Factories;
 
-            // ...
+            public function test_something(): void
+            {
+                $post = PostFactory::createOne();
+
+                // ...
+            }
         }
-    }
 
 Database Reset
 ~~~~~~~~~~~~~~
@@ -1780,7 +1798,7 @@ Foundry provides a mechanism to automatically refresh inside a functional test t
 
     class MyTest extends WebTestCase
     {
-        use Factories, ResetDatabase;
+        use ResetDatabase;
 
         public function test_with_autorefresh(): void
         {
@@ -2378,8 +2396,6 @@ any bundle configuration you have will not be picked up.
 
     class MyUnitTest extends TestCase
     {
-        use Factories;
-
         public function some_test(): void
         {
             $post = PostFactory::createOne();
