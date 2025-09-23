@@ -34,7 +34,7 @@ final class BuildStoryOnTestPrepared implements Event\Test\PreparedSubscriber
         /** @var Event\Code\TestMethod $test */
         $reflectionClass = new \ReflectionClass($test->className());
         $withStoryAttributes = [
-            ...$this->collectWithStoryAttributesFromClassAndParents($reflectionClass),
+            ...AttributeReader::collectAttributesFromClassAndParents(WithStory::class, $reflectionClass),
             ...$reflectionClass->getMethod($test->methodName())->getAttributes(WithStory::class),
         ];
 
@@ -49,20 +49,5 @@ final class BuildStoryOnTestPrepared implements Event\Test\PreparedSubscriber
         foreach ($withStoryAttributes as $withStoryAttribute) {
             $withStoryAttribute->newInstance()->story::load();
         }
-    }
-
-    /**
-     * @return list<\ReflectionAttribute<WithStory>>
-     */
-    private function collectWithStoryAttributesFromClassAndParents(\ReflectionClass $class): array // @phpstan-ignore missingType.generics
-    {
-        return [
-            ...$class->getAttributes(WithStory::class),
-            ...(
-                $class->getParentClass()
-                    ? $this->collectWithStoryAttributesFromClassAndParents($class->getParentClass())
-                    : []
-            ),
-        ];
     }
 }

@@ -43,6 +43,8 @@ final class ResetDatabaseTestKernel extends FoundryTestKernel
         parent::configureContainer($c, $loader);
 
         $c->loadFromExtension('zenstruck_foundry', [
+            'persistence' => ['flush_once' => true],
+            'enable_auto_refresh_with_lazy_objects' => self::usePHP84LazyObjects(),
             'global_state' => [
                 GlobalStory::class,
                 GlobalInvokableService::class,

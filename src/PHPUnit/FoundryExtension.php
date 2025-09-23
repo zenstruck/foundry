@@ -13,13 +13,18 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\PHPUnit;
 
+use PHPUnit\Event;
+use PHPUnit\Event\TestSuite\Started as TestSuiteStarted;
 use PHPUnit\Metadata\Version\ConstraintRequirement;
 use PHPUnit\Runner;
 use PHPUnit\TextUI;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\PHPUnit\DataProvider\BootFoundryOnDataProviderMethodCalled;
+use Zenstruck\Foundry\PHPUnit\DataProvider\DataProviderSubscriberInterface;
 use Zenstruck\Foundry\PHPUnit\DataProvider\ShutdownFoundryOnDataProviderMethodFinished;
 use Zenstruck\Foundry\PHPUnit\DataProvider\TriggerDataProviderPersistenceOnTestPrepared;
+use Zenstruck\Foundry\PHPUnit\ResetDatabase\ResetDatabaseOnTestPrepared;
+use Zenstruck\Foundry\PHPUnit\ResetDatabase\ResetDatabaseOnTestSuiteStarted;
 
 /**
  * @internal
@@ -40,19 +45,28 @@ if (\interface_exists(Runner\Extension\Extension::class)) {
                 Configuration::shutdown();
             }
 
-            $subscribers = [
-                new BootFoundryOnTestPrepared(),
-                new EnableInMemoryOnTestPrepared(),
-                new BuildStoryOnTestPrepared(),
-                new ShutdownFoundryOnTestFinished(),
-                new DisplayFakerSeedOnTestSuiteFinished(),
-            ];
+            // order matters within each event
+            $subscribers = array_merge(...[
+                Event\TestSuite\Started::class => [new ResetDatabaseOnTestSuiteStarted()],
+                Event\Test\DataProviderMethodCalled::class => [new BootFoundryOnDataProviderMethodCalled()],
+                Event\Test\DataProviderMethodFinished::class => [new ShutdownFoundryOnDataProviderMethodFinished()],
+                Event\Test\Prepared::class => [
+                    new TriggerDataProviderPersistenceOnTestPrepared(),
+                    new BootFoundryOnTestPrepared(),
+                    new EnableInMemoryOnTestPrepared(),
+                    new BuildStoryOnTestPrepared(),
+                    new ResetDatabaseOnTestPrepared(),
+                ],
+                Event\Test\Finished::class => [new ShutdownFoundryOnTestFinished()],
+                Event\TestRunner\Finished::class => [new DisplayFakerSeedOnTestSuiteFinished()],
+            ]);
 
-            if (ConstraintRequirement::from('>=11.4')->isSatisfiedBy(Runner\Version::id())) {
-                // those deal with data provider events which can be useful only if PHPUnit >=11.4 is used
-                $subscribers[] = new BootFoundryOnDataProviderMethodCalled();
-                $subscribers[] = new ShutdownFoundryOnDataProviderMethodFinished();
-                $subscribers[] = new TriggerDataProviderPersistenceOnTestPrepared();
+            // Foundry can only handle data provider since PHPUnit 11.4
+            if (!ConstraintRequirement::from('>=11.4')->isSatisfiedBy(Runner\Version::id())) {
+                $subscribers = array_filter(
+                    $subscribers,
+                    static fn($subscriber) => !$subscriber instanceof DataProviderSubscriberInterface
+                );
             }
 
             $facade->registerSubscribers(...$subscribers);

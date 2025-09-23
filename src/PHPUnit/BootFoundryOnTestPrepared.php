@@ -54,11 +54,11 @@ final class BootFoundryOnTestPrepared implements Event\Test\PreparedSubscriber
 
         // integration test
         Configuration::boot(static function() use ($className): Configuration {
-            if (!KernelTestCaseHelper::getContainerForTestClass($className)->has('.zenstruck_foundry.configuration')) {
+            if (!KernelTestCaseHelper::getContainer($className)->has('.zenstruck_foundry.configuration')) {
                 throw new \LogicException('ZenstruckFoundryBundle is not enabled. Ensure it is added to your config/bundles.php.');
             }
 
-            return KernelTestCaseHelper::getContainerForTestClass($className)->get('.zenstruck_foundry.configuration'); // @phpstan-ignore return.type
+            return KernelTestCaseHelper::getContainer($className)->get('.zenstruck_foundry.configuration'); // @phpstan-ignore return.type
         });
     }
 }

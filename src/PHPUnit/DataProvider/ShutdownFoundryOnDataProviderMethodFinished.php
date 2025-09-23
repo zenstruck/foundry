@@ -19,7 +19,7 @@ use Zenstruck\Foundry\PHPUnit\KernelTestCaseHelper;
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-final class ShutdownFoundryOnDataProviderMethodFinished implements Event\Test\DataProviderMethodFinishedSubscriber
+final class ShutdownFoundryOnDataProviderMethodFinished implements Event\Test\DataProviderMethodFinishedSubscriber, DataProviderSubscriberInterface
 {
     public function notify(Event\Test\DataProviderMethodFinished $event): void
     {
