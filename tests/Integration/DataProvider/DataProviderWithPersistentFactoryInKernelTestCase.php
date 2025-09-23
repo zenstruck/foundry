@@ -29,6 +29,7 @@ use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
+
 use function Zenstruck\Foundry\Persistence\assert_persisted;
 
 /**

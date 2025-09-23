@@ -133,6 +133,7 @@ jobs:
       DATABASE_RESET_MODE: ${{ matrix.reset-database-mode == 1 && 1 || 0 }}
       MIGRATION_CONFIGURATION_FILE: ${{ matrix.migration-configuration-file == 'no' && '' || format('tests/Fixture/MigrationTests/configs/{0}.php', matrix.migration-configuration-file) }}
       PHPUNIT_VERSION: 11
+      USE_FOUNDRY_PHPUNIT_EXTENSION: 1
     services:
       postgres:
         image: ${{ contains(matrix.database, 'pgsql') && 'postgres:15' || '' }}

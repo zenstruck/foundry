@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Persistence;
 
 /**
@@ -56,8 +65,8 @@ final class PersistentObjectFromDataProviderRegistry
 
         $dataProviderResult = $dataProviderResult();
 
-        if (!is_array($dataProviderResult)) {
-            $dataProviderResult = iterator_to_array($dataProviderResult);
+        if (!\is_array($dataProviderResult)) {
+            $dataProviderResult = \iterator_to_array($dataProviderResult);
         }
 
         $testCaseContext = $this->testCaseContext($className, $methodName);
@@ -79,7 +88,7 @@ final class PersistentObjectFromDataProviderRegistry
             return $this->objectsBuffer[] = ProxyGenerator::wrapFactory($factory);
         }
 
-        return array_shift($this->objectsBuffer); // @phpstan-ignore return.type
+        return \array_shift($this->objectsBuffer); // @phpstan-ignore return.type
     }
 
     public function triggerPersistenceForDataset(string $className, string $methodName, int|string $dataSetName): void

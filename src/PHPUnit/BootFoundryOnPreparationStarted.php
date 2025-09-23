@@ -33,7 +33,6 @@ final class BootFoundryOnPreparationStarted implements Event\Test\PreparationSta
             return;
         }
         /** @var Event\Code\TestMethod $test */
-
         $this->bootFoundry($test->className());
     }
 
@@ -55,11 +54,11 @@ final class BootFoundryOnPreparationStarted implements Event\Test\PreparationSta
 
         // integration test
         Configuration::boot(static function() use ($className): Configuration {
-            if (!KernelTestCaseHelper::getContainerForTestClass($className)->has('.zenstruck_foundry.configuration')) {
+            if (!KernelTestCaseHelper::getContainer($className)->has('.zenstruck_foundry.configuration')) {
                 throw new \LogicException('ZenstruckFoundryBundle is not enabled. Ensure it is added to your config/bundles.php.');
             }
 
-            return KernelTestCaseHelper::getContainerForTestClass($className)->get('.zenstruck_foundry.configuration'); // @phpstan-ignore return.type
+            return KernelTestCaseHelper::getContainer($className)->get('.zenstruck_foundry.configuration'); // @phpstan-ignore return.type
         });
     }
 }

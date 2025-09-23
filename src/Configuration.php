@@ -19,9 +19,8 @@ use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\InMemory\CannotEnableInMemory;
 use Zenstruck\Foundry\InMemory\InMemoryRepositoryRegistry;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
-use Zenstruck\Foundry\PHPUnit\FoundryExtension;
-use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Persistence\Proxy\PersistedObjectsTracker;
+use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
