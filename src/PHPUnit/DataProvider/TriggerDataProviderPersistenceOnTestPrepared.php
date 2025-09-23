@@ -30,7 +30,6 @@ final class TriggerDataProviderPersistenceOnTestPrepared implements Event\Test\P
             return;
         }
         /** @var Event\Code\TestMethod $test */
-
         if (!$test->testData()->hasDataFromDataProvider() || $test->metadata()->isDataProvider()->isEmpty()) {
             return;
         }
