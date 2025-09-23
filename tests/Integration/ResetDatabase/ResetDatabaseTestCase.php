@@ -15,11 +15,15 @@ namespace Zenstruck\Foundry\Tests\Integration\ResetDatabase;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
+use Zenstruck\Foundry\Test\Factories;
+use Zenstruck\Foundry\Test\ResetDatabase as ResetDatabaseTrait;
 use Zenstruck\Foundry\Tests\Fixture\ResetDatabase\ResetDatabaseTestKernel;
 
 #[ResetDatabase]
 abstract class ResetDatabaseTestCase extends KernelTestCase
 {
+    use Factories, ResetDatabaseTrait;
+
     protected static function getKernelClass(): string
     {
         return ResetDatabaseTestKernel::class;

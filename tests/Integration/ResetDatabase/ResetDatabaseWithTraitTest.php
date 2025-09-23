@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Integration\ResetDatabase;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
 /**
@@ -21,5 +22,5 @@ use Zenstruck\Foundry\Test\ResetDatabase;
  */
 final class ResetDatabaseWithTraitTest extends KernelTestCase
 {
-    use ResetDatabase, ResetDatabaseTestsTrait;
+    use Factories, ResetDatabase, ResetDatabaseTestsTrait;
 }

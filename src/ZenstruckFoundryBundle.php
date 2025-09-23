@@ -33,6 +33,7 @@ use Zenstruck\Foundry\ORM\ResetDatabase\MigrateDatabaseResetter;
 use Zenstruck\Foundry\ORM\ResetDatabase\OrmResetter;
 use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
 use Zenstruck\Foundry\ORM\ResetDatabase\SchemaDatabaseResetter;
+use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
