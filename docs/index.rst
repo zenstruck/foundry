@@ -715,6 +715,7 @@ to create hooks globally:
 .. versionadded::  2.8
 
     The ``#[AsFoundryHook]`` attribute was added in Foundry 2.8.
+
 .. note::
 
     If you want to save data to the database in an ``AfterPersist`` listener, Foundry won't flush automatically, and you

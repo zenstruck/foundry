@@ -32,6 +32,9 @@ final class StubCommand extends Command
         $this->ignoreValidationErrors();
     }
 
+    /**
+     * @throws   \RuntimeException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         throw new \RuntimeException($this->message);

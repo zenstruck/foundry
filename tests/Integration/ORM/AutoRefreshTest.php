@@ -23,7 +23,7 @@ use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Persistence\Proxy\PersistedObjectsTracker;
+use Zenstruck\Foundry\Persistence\PersistedObjectsTracker;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\ChangesEntityRelationshipCascadePersist;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\UsingRelationships;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;

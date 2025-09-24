@@ -530,13 +530,6 @@ abstract class PersistentObjectFactory extends ObjectFactory
                         return;
                     }
 
-                    if (
-                        $factoryUsed->isAutorefreshEnabled()
-                        && !$factoryUsed instanceof PersistentProxyObjectFactory
-                    ) {
-                        Configuration::instance()->persistedObjectsTracker?->add($object);
-                    }
-
                     $afterPersistCallbacks = [];
 
                     foreach (\array_merge(...$factoryUsed->afterPersist) as $afterPersist) {
@@ -567,7 +560,10 @@ abstract class PersistentObjectFactory extends ObjectFactory
         );
     }
 
-    private function isAutorefreshEnabled(): bool
+    /**
+     * @internal
+     */
+    public function isAutorefreshEnabled(): bool
     {
         return $this->autorefreshEnabled ??= Configuration::autoRefreshWithLazyObjectsIsEnabled();
     }

@@ -85,10 +85,6 @@ final class PersistenceManager
             $this->flush($om);
         }
 
-        if (Configuration::instance()->autoRefreshWithLazyObjectsIsEnabled()) {
-            Configuration::instance()->persistedObjectsTracker?->updateIds();
-        }
-
         return $object;
     }
 
@@ -426,10 +422,6 @@ final class PersistenceManager
             foreach ($strategy->objectManagers() as $om) {
                 $this->flush($om);
             }
-        }
-
-        if (Configuration::instance()->autoRefreshWithLazyObjectsIsEnabled()) {
-            Configuration::instance()->persistedObjectsTracker?->updateIds();
         }
     }
 

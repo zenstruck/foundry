@@ -9,9 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\Persistence\Proxy;
+namespace Zenstruck\Foundry\Persistence;
 
 use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\Persistence\Event\AfterPersist;
 
 /**
  * @internal
@@ -23,11 +24,11 @@ final class PersistedObjectsTracker
      *
      * @var \WeakMap<object, mixed> keys: objects, values: value ids
      */
-    private static \WeakMap $buffer;
+    private static \WeakMap $trackedObjects;
 
     public function __construct()
     {
-        self::$buffer ??= new \WeakMap();
+        self::$trackedObjects ??= new \WeakMap();
     }
 
     public function refresh(): void
@@ -35,43 +36,39 @@ final class PersistedObjectsTracker
         self::proxifyObjects();
     }
 
+    /**
+     * @param AfterPersist<object> $event
+     */
+    public function afterPersistHook(AfterPersist $event): void
+    {
+        if ($event->factory instanceof PersistentProxyObjectFactory || !$event->factory->isAutorefreshEnabled()) {
+            return;
+        }
+
+        $this->add($event->object);
+    }
+
     public function add(object ...$objects): void
     {
         foreach ($objects as $object) {
-            if (self::$buffer->offsetExists($object) && self::$buffer[$object]) {
-                self::proxifyObject($object, self::$buffer[$object]);
+            if (self::$trackedObjects->offsetExists($object) && self::$trackedObjects[$object]) {
+                self::proxifyObject($object, self::$trackedObjects[$object]);
 
                 continue;
             }
 
-            self::$buffer[$object] = Configuration::instance()->persistence()->getIdentifierValues($object);
-        }
-    }
-
-    public function updateIds(): void
-    {
-        foreach (self::$buffer as $object => $id) {
-            if (\is_array($id)) {
-                // in mongodb, id can be an array with null values, which is not a valid id and must be updated
-                $id = \array_filter($id);
-            }
-
-            if ($id) {
-                continue;
-            }
-
-            self::$buffer[$object] = Configuration::instance()->persistence()->getIdentifierValues($object);
+            self::$trackedObjects[$object] = Configuration::instance()->persistence()->getIdentifierValues($object);
         }
     }
 
     public static function reset(): void
     {
-        self::$buffer = new \WeakMap();
+        self::$trackedObjects = new \WeakMap();
     }
 
     public static function countObjects(): int
     {
-        return \count(self::$buffer);
+        return \count(self::$trackedObjects);
     }
 
     private static function proxifyObjects(): void
@@ -80,7 +77,7 @@ final class PersistedObjectsTracker
             return;
         }
 
-        foreach (self::$buffer as $object => $id) {
+        foreach (self::$trackedObjects as $object => $id) {
             if (!$id) {
                 continue;
             }

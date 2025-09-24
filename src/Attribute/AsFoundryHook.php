@@ -19,7 +19,7 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 final class AsFoundryHook extends AsEventListener
 {
     public function __construct(
-        /** @var class-string */
+        /** @var class-string|null */
         public readonly ?string $objectClass = null,
         int $priority = 0,
     ) {
