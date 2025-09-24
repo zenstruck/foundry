@@ -15,6 +15,7 @@ namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\IgnorePhpunitWarnings;
 use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\RequiresPhp;
@@ -26,6 +27,7 @@ use Zenstruck\Foundry\Persistence\Proxy\PersistedObjectsTracker;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\ChangesEntityRelationshipCascadePersist;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\UsingRelationships;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithCloneMethod;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\AddressFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
@@ -33,6 +35,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Integration\Persistence\AutoRefreshTestCase;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
+use function Zenstruck\Foundry\Persistence\persistent_factory;
 use function Zenstruck\Foundry\Persistence\refresh_all;
 
 /**
@@ -122,8 +125,26 @@ final class AutoRefreshTest extends AutoRefreshTestCase
         self::assertSame('city', $contact->getAddress()->getCity());
     }
 
+    /**
+     * The previous test creates entities with circular dependencies,
+     * so the PersistedObjectsTracker still have references to them.
+     *
+     * Let's ensure we don't leave the test in an invalide state when the container is reset
+     */
     #[Test]
-    #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
+    #[Depends('it_can_refresh_objects_with_relationships')]
+    public function assert_test_starts_with_a_non_booted_kernel(): void
+    {
+        self::assertSame(0, PersistedObjectsTracker::countObjects());
+
+        self::assertFalse(self::$booted);
+
+        // ensure we can get a client without the error:
+        // Booting the kernel before calling "WebTestCase::createClient()" is not supported
+        self::createClient();
+    }
+
+    #[Test]
     public function it_can_refresh_with_doctrine_proxies(): void
     {
         $contact = ContactFactory::createOne();
@@ -149,6 +170,22 @@ final class AutoRefreshTest extends AutoRefreshTestCase
 
         self::assertSame('foo', $address->getCity());
         self::assertSame('foo', $category->getName());
+    }
+
+    #[Test]
+    public function it_can_refresh_entity_which_removes_its_id_in_clone(): void
+    {
+        $entity = persistent_factory(EntityWithCloneMethod::class)->create();
+        $entityId = $entity->id;
+
+        $this->objectManager()->getConnection()->executeQuery('UPDATE entity_with_clone_method SET prop = \'foo\' WHERE id = ?', [$entity->id]);
+
+        self::ensureKernelShutdown();
+
+        self::assertTrue((new \ReflectionClass($entity))->isUninitializedLazyObject($entity));
+
+        self::assertSame('foo', $entity->prop);
+        self::assertSame($entityId, $entity->id);
     }
 
     protected static function factory(): PersistentObjectFactory

@@ -23,7 +23,17 @@ final class PersistedObjectsTracker
      *
      * @var list<\WeakReference<object>>
      */
-    private static $buffer = [];
+    private static array $buffer = [];
+
+    /**
+     * @var \WeakMap<object, mixed>
+     */
+    private static \WeakMap $ids;
+
+    public function __construct()
+    {
+        self::$ids ??= new \WeakMap();
+    }
 
     public function refresh(): void
     {
@@ -34,12 +44,33 @@ final class PersistedObjectsTracker
     {
         foreach ($objects as $object) {
             self::$buffer[] = \WeakReference::create($object);
+
+            $id = Configuration::instance()->persistence()->getIdentifierValues($object);
+            if ($id) {
+                self::$ids[$object] = $id;
+            }
+        }
+    }
+
+    public static function updateIds(): void
+    {
+        foreach (self::$buffer as $reference) {
+            if (null === $object = $reference->get()) {
+                continue;
+            }
+
+            if (self::$ids->offsetExists($object)) {
+                continue;
+            }
+
+            self::$ids[$object] = Configuration::instance()->persistence()->getIdentifierValues($object);
         }
     }
 
     public static function reset(): void
     {
         self::$buffer = [];
+        self::$ids = new \WeakMap();
     }
 
     public static function countObjects(): int
@@ -51,6 +82,10 @@ final class PersistedObjectsTracker
 
     private static function proxifyObjects(): void
     {
+        if (!Configuration::isBooted()) {
+            return;
+        }
+
         self::$buffer = \array_values(
             \array_map(
                 static function(\WeakReference $weakRef) {
@@ -64,7 +99,9 @@ final class PersistedObjectsTracker
 
                     $clone = clone $object;
                     $reflector->resetAsLazyGhost($object, function($object) use ($clone) {
-                        Configuration::instance()->persistence()->autorefresh($object, $clone);
+                        $id = self::$ids[$object] ?? throw new \LogicException('Canot find the id for object');
+
+                        Configuration::instance()->persistence()->autorefresh($object, $id, $clone);
                     });
 
                     return \WeakReference::create($object);

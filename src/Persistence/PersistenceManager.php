@@ -22,6 +22,7 @@ use Zenstruck\Foundry\Persistence\Exception\NoPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\ObjectHasUnsavedChanges;
 use Zenstruck\Foundry\Persistence\Exception\ObjectNoLongerExist;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
+use Zenstruck\Foundry\Persistence\Proxy\PersistedObjectsTracker;
 use Zenstruck\Foundry\Persistence\Relationship\RelationshipMetadata;
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 
@@ -84,6 +85,8 @@ final class PersistenceManager
         if ($callbacksCalled) {
             $this->flush($om);
         }
+
+        PersistedObjectsTracker::updateIds();
 
         return $object;
     }
@@ -148,18 +151,16 @@ final class PersistenceManager
      *
      * @param T $object
      */
-    public function autorefresh(object $object, object $clone): void
+    public function autorefresh(object $object, mixed $id, object $clone): void
     {
         $strategy = $this->strategyFor($object::class);
         $om = $strategy->objectManagerFor($object::class);
-
-        $id = $strategy->getIdentifierValues($clone);
 
         if ($id) {
             try {
                 $om->refresh($object);
 
-                if ($strategy->getIdentifierValues($object)) {
+                if ($this->getIdentifierValues($object)) {
                     // no identifier values means the object no longer exists
                     return;
                 }
@@ -396,6 +397,11 @@ final class PersistenceManager
     public function resetDatabaseManager(): ResetDatabaseManager
     {
         return $this->resetDatabaseManager;
+    }
+
+    public function getIdentifierValues(object $object): mixed
+    {
+        return $this->strategyFor($object::class)->getIdentifierValues($object);
     }
 
     public static function isOrmOnly(): bool

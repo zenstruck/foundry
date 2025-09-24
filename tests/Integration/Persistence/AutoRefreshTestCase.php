@@ -62,6 +62,7 @@ abstract class AutoRefreshTestCase extends WebTestCase
 
         // service reset did clear the EM, thus the object is not managed anymore
         self::assertFalse($this->objectManager()->contains($object));
+        self::assertSame($objectId, $object->id);
     }
 
     #[Test]
@@ -80,6 +81,9 @@ abstract class AutoRefreshTestCase extends WebTestCase
 
         self::assertSame('foo', $object1->getProp1());
         self::assertSame('foo', $object2->getProp1());
+
+        self::assertSame($objectId1, $object1->id);
+        self::assertSame($objectId2, $object2->id);
     }
 
     #[Test]
@@ -88,6 +92,8 @@ abstract class AutoRefreshTestCase extends WebTestCase
         $client = self::createClient();
 
         $object = $this->factory()->create();
+        $objectId = $object->id;
+
         self::assertSame('default1', $object->getProp1());
         self::assertFalse((new \ReflectionClass($object))->isUninitializedLazyObject($object));
 
@@ -100,6 +106,8 @@ abstract class AutoRefreshTestCase extends WebTestCase
         assert_persisted($object);
         self::assertSame('foo', $object->getProp1());
         self::assertFalse((new \ReflectionClass($object))->isUninitializedLazyObject($object));
+
+        self::assertSame($objectId, $object->id);
     }
 
     #[Test]
