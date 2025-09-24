@@ -15,15 +15,19 @@ use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
+use Zenstruck\Foundry\Attribute\AsFoundryHook;
 use Zenstruck\Foundry\Attribute\AsFixture;
 use Zenstruck\Foundry\DependencyInjection\AsFixtureStoryCompilerPass;
 use Zenstruck\Foundry\InMemory\DependencyInjection\InMemoryCompilerPass;
 use Zenstruck\Foundry\InMemory\InMemoryRepository;
 use Zenstruck\Foundry\Mongo\MongoResetter;
+use Zenstruck\Foundry\Object\Event\Event;
+use Zenstruck\Foundry\Object\Event\HookListenerFilter;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\ORM\ResetDatabase\MigrateDatabaseResetter;
 use Zenstruck\Foundry\ORM\ResetDatabase\OrmResetter;
@@ -238,6 +242,25 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
         $this->configureInMemory($configurator, $container);
         $this->configureFixturesStory($container);
         $this->configureAutoRefreshWithLazyObjects($container, $config['enable_auto_refresh_with_lazy_objects'] ?? null);
+
+        $container->registerAttributeForAutoconfiguration(
+            AsFoundryHook::class,
+            // @phpstan-ignore argument.type
+            static function(ChildDefinition $definition, AsFoundryHook $attribute, \ReflectionMethod $reflector) {
+                if (1 !== \count($reflector->getParameters())
+                    || !$reflector->getParameters()[0]->getType()
+                    || !$reflector->getParameters()[0]->getType() instanceof \ReflectionNamedType
+                    || !\is_a($reflector->getParameters()[0]->getType()->getName(), Event::class, true)
+                ) {
+                    throw new LogicException(\sprintf("In order to use \"%s\" attribute, method \"{$reflector->class}::{$reflector->name}()\" must have a single parameter that is a subclass of \"%s\".", AsFoundryHook::class, Event::class));
+                }
+                $definition->addTag('foundry.hook', [
+                    'class' => $attribute->objectClass,
+                    'method' => $reflector->getName(),
+                    'event' => $reflector->getParameters()[0]->getType()->getName(),
+                ]);
+            }
+        );
     }
 
     public function build(ContainerBuilder $container): void
@@ -257,6 +280,21 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                 ->getDefinition('.zenstruck_foundry.faker')
                 ->addMethodCall('addProvider', [new Reference($id)])
             ;
+        }
+
+        // events
+        $i = 0;
+        foreach ($container->findTaggedServiceIds('foundry.hook') as $id => $tags) {
+            foreach ($tags as $tag) {
+                $container
+                    ->setDefinition("foundry.hook.{$tag['event']}.{$i}", new Definition(class: HookListenerFilter::class))
+                    ->setArgument(0, [new Reference($id), $tag['method']])
+                    ->setArgument(1, $tag['class'])
+                    ->addTag('kernel.event_listener', ['event' => $tag['event']])
+                ;
+
+                ++$i;
+            }
         }
     }
 
