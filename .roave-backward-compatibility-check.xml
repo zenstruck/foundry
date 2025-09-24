@@ -7,5 +7,6 @@
         <ignored-regex>#\[BC\] SKIPPED: Roave\\BetterReflection\\Reflection\\ReflectionClass "Psalm\\Plugin\\PluginEntryPointInterface" could not be found in the located source#</ignored-regex>
         <ignored-regex>#\[BC\] SKIPPED: Roave\\BetterReflection\\Reflection\\ReflectionClass "Psalm\\Plugin\\EventHandler\\AfterMethodCallAnalysisInterface" could not be found in the located source#</ignored-regex>
         <ignored-regex>#(.*)Zenstruck\\Foundry\\Utils\\Rector(.*)#</ignored-regex>
+        <ignored-regex>#(.*)initializeInternal(.*)#</ignored-regex>
     </baseline>
 </roave-bc-check>

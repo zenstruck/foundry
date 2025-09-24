@@ -59,6 +59,7 @@ final class GenericEntityFactoryTest extends GenericFactoryTestCase
 
     /**
      * @test
+     * @dataProvider afterPersistDecideFlushProvider
      *
      * @phpstan-ignore missingType.callable
      */

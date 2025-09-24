@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Foundry;
 
+use Zenstruck\Foundry\Object\Event\AfterInstantiate;
+use Zenstruck\Foundry\Object\Event\BeforeInstantiate;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Persistence\ProxyGenerator;
 
@@ -203,6 +205,33 @@ abstract class ObjectFactory extends Factory
         }
 
         return $attributes;
+    }
+
+    /**
+     * @internal
+     */
+    protected function initializeInternal(): static
+    {
+        if (!Configuration::isBooted() || !Configuration::instance()->hasEventDispatcher()) {
+            return $this;
+        }
+
+        return $this->beforeInstantiate(
+            static function(array $parameters, string $objectClass, self $usedFactory): array {
+                Configuration::instance()->eventDispatcher()->dispatch(
+                    $hook = new BeforeInstantiate($parameters, $objectClass, $usedFactory)
+                );
+
+                return $hook->parameters;
+            }
+        )
+            ->afterInstantiate(
+                static function(object $object, array $parameters, self $usedFactory): void {
+                    Configuration::instance()->eventDispatcher()->dispatch(
+                        new AfterInstantiate($object, $parameters, $usedFactory)
+                    );
+                }
+            );
     }
 
     /**

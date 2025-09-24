@@ -664,6 +664,57 @@ You can also add hooks directly in your factory class:
 
 Read `Initialization`_ to learn more about the ``initialize()`` method.
 
+Events
+~~~~~~
+
+In addition to hooks, Foundry also leverages `symfony/event-dispatcher` and dispatches events that you can listen to,
+allowing to create hooks globally, as Symfony services:
+
+::
+
+    use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+    use Zenstruck\Foundry\Object\Event\AfterInstantiate;
+    use Zenstruck\Foundry\Object\Event\BeforeInstantiate;
+    use Zenstruck\Foundry\Persistence\Event\AfterPersist;
+
+    final class FoundryEventListener
+    {
+        #[AsEventListener]
+        public function beforeInstantiate(BeforeInstantiate $event): void
+        {
+            // do something before the object is instantiated:
+            // $event->parameters is what will be used to instantiate the object, manipulate as required
+            // $event->objectClass is the class of the object being instantiated
+            // $event->factory is the factory instance which creates the object
+        }
+
+        #[AsEventListener]
+        public function afterInstantiate(AfterInstantiate $event): void
+        {
+            // $event->object is the instantiated object
+            // $event->parameters contains the attributes used to instantiate the object and any extras
+            // $event->factory is the factory instance which creates the object
+        }
+
+        #[AsEventListener]
+        public function afterPersist(AfterPersist $event): void
+        {
+            // this event is only called if the object was persisted
+            // $event->object is the persisted Post object
+            // $event->parameters contains the attributes used to instantiate the object and any extras
+            // $event->factory is the factory instance which creates the object
+        }
+    }
+
+.. versionadded::  2.8
+
+    Those events are triggered since Foundry 2.8.
+
+.. note::
+
+    If you want to save data to the database in an ``AfterPersist`` listener, Foundry won't flush automatically, and you
+    will need to explicitly call ``EntityManager::flush()`` inside the listener.
+
 Initialization
 ~~~~~~~~~~~~~~
 

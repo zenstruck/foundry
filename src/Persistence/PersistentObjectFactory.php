@@ -21,6 +21,7 @@ use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Object\Hydrator;
 use Zenstruck\Foundry\ObjectFactory;
+use Zenstruck\Foundry\Persistence\Event\AfterPersist;
 use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
 use Zenstruck\Foundry\Persistence\Relationship\ManyToOneRelationship;
@@ -516,10 +517,13 @@ abstract class PersistentObjectFactory extends ObjectFactory
         }
     }
 
+    /**
+     * @internal
+     */
     final protected function initializeInternal(): static
     {
         // Schedule any new object for insert right after instantiation
-        return parent::initializeInternal()
+        $factory = parent::initializeInternal()
             ->afterInstantiate(
                 static function(object $object, array $parameters, PersistentObjectFactory $factoryUsed): void {
                     if (!$factoryUsed->isPersisting()) {
@@ -547,6 +551,20 @@ abstract class PersistentObjectFactory extends ObjectFactory
                 self::PRIORITY_SCHEDULE_FOR_INSERT
             )
         ;
+
+        if (!Configuration::isBooted() || !Configuration::instance()->hasEventDispatcher()) {
+            return $factory;
+        }
+
+        return $factory->afterPersist(
+            static function(object $object, array $parameters, self $factoryUsed): bool {
+                Configuration::instance()->eventDispatcher()->dispatch(
+                    new AfterPersist($object, $parameters, $factoryUsed)
+                );
+
+                return false; // don't perform a flush after the hook
+            }
+        );
     }
 
     private function isAutorefreshEnabled(): bool
