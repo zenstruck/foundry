@@ -35,7 +35,7 @@ final class PersistenceManager
     private bool $flush = true;
     private bool $persist = true;
 
-    /** @var list<callable():void> */
+    /** @var list<callable():bool> */
     private array $afterPersistCallbacks = [];
 
     /**
@@ -79,9 +79,9 @@ final class PersistenceManager
         $om->persist($object);
         $this->flush($om);
 
-        $callbacksCalled = $this->callPostPersistCallbacks();
+        $shouldFlush = $this->callPostPersistCallbacks();
 
-        if ($callbacksCalled) {
+        if ($shouldFlush) {
             $this->flush($om);
         }
 
@@ -96,7 +96,7 @@ final class PersistenceManager
      * @template T of object
      *
      * @param T                     $object
-     * @param list<callable():void> $afterPersistCallbacks
+     * @param list<callable():bool> $afterPersistCallbacks
      *
      * @return T
      */
@@ -445,11 +445,15 @@ final class PersistenceManager
         $afterPersistCallbacks = $this->afterPersistCallbacks;
         $this->afterPersistCallbacks = [];
 
+        $shouldFlush = false;
+
         foreach ($afterPersistCallbacks as $afterPersistCallback) {
-            $afterPersistCallback();
+            if ($afterPersistCallback()) {
+                $shouldFlush = true;
+            }
         }
 
-        return true;
+        return $shouldFlush;
     }
 
     /**

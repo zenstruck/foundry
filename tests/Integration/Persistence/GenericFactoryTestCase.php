@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;

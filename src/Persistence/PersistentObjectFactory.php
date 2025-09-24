@@ -45,7 +45,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
     private PersistMode $persist = PersistMode::PERSIST;
 
-    /** @phpstan-var array<int, list<callable(T, Parameters, static):void>> */
+    /** @phpstan-var array<int, list<callable(T, Parameters, static):void|callable(T, Parameters, static):bool>> */
     private array $afterPersist = [];
 
     /** @var list<callable(T):void> */
@@ -322,7 +322,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
-     * @phpstan-param callable(T, Parameters, static):void $callback
+     * @phpstan-param callable(T, Parameters, static):void|callable(T, Parameters, static):bool $callback return value tells if a flush should be performed after the callback
      */
     final public function afterPersist(callable $callback, int $priority = 0): static
     {
@@ -536,8 +536,9 @@ abstract class PersistentObjectFactory extends ObjectFactory
                     $afterPersistCallbacks = [];
 
                     foreach (\array_merge(...$factoryUsed->afterPersist) as $afterPersist) {
-                        $afterPersistCallbacks[] = static function() use ($object, $afterPersist, $parameters, $factoryUsed): void {
-                            $afterPersist($object, $parameters, $factoryUsed);
+                        $afterPersistCallbacks[] = static function() use ($object, $afterPersist, $parameters, $factoryUsed): bool {
+                            // this condition is needed to avoid BC breaks: only avoid flush if the callback explicitly returns false
+                            return !($afterPersist($object, $parameters, $factoryUsed) === false);
                         };
                     }
 
