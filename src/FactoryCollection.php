@@ -239,7 +239,6 @@ final class FactoryCollection implements \IteratorAggregate
 
     /**
      * @phpstan-param callable(int):mixed[] $attributes
-     * @internal
      */
     public function applyStateMethod(string $stateMethodName, ?callable $attributes = null): static
     {
