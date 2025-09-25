@@ -23,11 +23,14 @@ use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy\PersistedObjectsTracker;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\ChangesEntityRelationshipCascadePersist;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\UsingRelationships;
+use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithCloneMethod;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithReadonly\EntityWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\AddressFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
@@ -35,7 +38,9 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Integration\Persistence\AutoRefreshTestCase;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
+use function Zenstruck\Foundry\factory;
 use function Zenstruck\Foundry\Persistence\persistent_factory;
+use function Zenstruck\Foundry\Persistence\proxy_factory;
 use function Zenstruck\Foundry\Persistence\refresh_all;
 
 /**
@@ -209,5 +214,13 @@ final class AutoRefreshTest extends AutoRefreshTestCase
     protected function objectManager(): EntityManagerInterface
     {
         return self::getContainer()->get(EntityManagerInterface::class); // @phpstan-ignore return.type
+    }
+
+    /**
+     * @return PersistentObjectFactory<EntityWithReadonly>
+     */
+    protected function objectWithReadonlyFactory(): PersistentObjectFactory // @phpstan-ignore method.childReturnType
+    {
+        return persistent_factory(EntityWithReadonly::class);
     }
 }

@@ -19,10 +19,14 @@ use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Document\GenericDocument;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericDocumentFactory;
 use Zenstruck\Foundry\Tests\Integration\Persistence\AutoRefreshTestCase;
 use Zenstruck\Foundry\Tests\Integration\RequiresMongo;
+use function Zenstruck\Foundry\Persistence\persistent_factory;
+use function Zenstruck\Foundry\Persistence\proxy_factory;
 
 /**
  * @requires PHPUnit >=12
@@ -70,5 +74,13 @@ final class AutoRefreshTest extends AutoRefreshTestCase
     protected function objectManager(): DocumentManager
     {
         return self::getContainer()->get(DocumentManager::class); // @phpstan-ignore return.type
+    }
+
+    /**
+     * @return PersistentObjectFactory<DocumentWithReadonly>
+     */
+    protected function objectWithReadonlyFactory(): PersistentObjectFactory // @phpstan-ignore method.childReturnType
+    {
+        return persistent_factory(DocumentWithReadonly::class);
     }
 }

@@ -25,12 +25,17 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy\PersistedObjectsTracker;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithReadonly;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithReadonly\EntityWithReadonly;
+use Zenstruck\Foundry\Tests\Fixture\Model\Embeddable;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
 use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 
+use function Zenstruck\Foundry\factory;
 use function Zenstruck\Foundry\Persistence\assert_not_persisted;
 use function Zenstruck\Foundry\Persistence\assert_persisted;
 use function Zenstruck\Foundry\Persistence\refresh;
@@ -353,6 +358,25 @@ abstract class AutoRefreshTestCase extends WebTestCase
         self::assertSame('foo', $object2->getProp1());
     }
 
+    #[Test]
+    public function repository_method_returns_up_to_date_objects_with_readonly_props(): void
+    {
+        [$object1, $object2] = $this->objectWithReadonlyFactory()->many(2)->create([
+            'prop' => 1,
+            'embedded' => factory(Embeddable::class, ['prop1' => 'value1']),
+            'date' => new \DateTimeImmutable(),
+        ]);
+
+        self::assertSame(2, PersistedObjectsTracker::countObjects());
+
+        [$newObject1, $newObject2] = $this->objectWithReadonlyFactory()::all();
+
+        self::assertSame(2, PersistedObjectsTracker::countObjects());
+
+        self::assertSame($object1, $newObject1);
+        self::assertSame($object2, $newObject2);
+    }
+
     /**
      * @return PersistentObjectFactory<GenericModel>
      */
@@ -363,6 +387,11 @@ abstract class AutoRefreshTestCase extends WebTestCase
     abstract protected function updateObject(mixed $objectId): void;
 
     abstract protected function objectManager(): ObjectManager;
+
+    /**
+     * @return PersistentObjectFactory<DocumentWithReadonly|EntityWithReadonly>
+     */
+    abstract protected function objectWithReadonlyFactory(): PersistentObjectFactory;
 
     protected static function createKernel(array $options = []): KernelInterface
     {

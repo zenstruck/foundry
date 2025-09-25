@@ -136,7 +136,14 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
         if ($this->inMemory) {
             $results = $this->inner()->findBy($this->normalize($criteria), $orderBy, $limit, $offset);
         } else {
-            $results = Configuration::instance()->persistence()->findBy($this->class, $this->normalize($criteria), $orderBy, $limit, $offset);
+            try {
+                $results = Configuration::instance()->persistence()->findBy($this->class, $this->normalize($criteria), $orderBy, $limit, $offset);
+            } catch (\LogicException|\Error) {
+                // prevent entities/documents with readonly properties to create an error
+                // LogicException is for ORM / Error is for ODM
+                // @see https://github.com/doctrine/orm/issues/9505
+                $results = $this->inner()->findBy($this->normalize($criteria), $orderBy, $limit, $offset);
+            }
         }
 
         $objects = \array_values($results);
