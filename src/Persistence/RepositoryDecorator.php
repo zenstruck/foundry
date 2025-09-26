@@ -199,7 +199,13 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
             $offset = \random_int(0, $count - 1);
         }
 
-        return $this->findBy($criteria, limit: 1, offset: $offset)[0];
+        $result = $this->findBy($criteria, limit: 1, offset: $offset);
+
+        if (!\count($result)) {
+            throw new NotEnoughObjects(\sprintf('At least %d "%s" object(s) must have been persisted (%d persisted).', 1, $this->getClassName(), 0));
+        }
+
+        return $result[0];
     }
 
     /**
