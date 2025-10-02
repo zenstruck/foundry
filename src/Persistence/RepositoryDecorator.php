@@ -133,20 +133,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
      */
     public function findBy(array $criteria, ?array $orderBy = null, $limit = null, $offset = null): array
     {
-        if ($this->inMemory) {
-            $results = $this->inner()->findBy($this->normalize($criteria), $orderBy, $limit, $offset);
-        } else {
-            try {
-                $results = Configuration::instance()->persistence()->findBy($this->class, $this->normalize($criteria), $orderBy, $limit, $offset);
-            } catch (\LogicException|\Error) {
-                // prevent entities/documents with readonly properties to create an error
-                // LogicException is for ORM / Error is for ODM
-                // @see https://github.com/doctrine/orm/issues/9505
-                $results = $this->inner()->findBy($this->normalize($criteria), $orderBy, $limit, $offset);
-            }
-        }
-
-        $objects = \array_values($results);
+        $objects = \array_values($this->inner()->findBy($this->normalize($criteria), $orderBy, $limit, $offset));
 
         if (!$this instanceof ProxyRepositoryDecorator) {
             Configuration::instance()->persistedObjectsTracker?->add(...$objects);

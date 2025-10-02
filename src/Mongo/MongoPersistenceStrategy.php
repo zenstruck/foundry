@@ -95,32 +95,4 @@ final class MongoPersistenceStrategy extends PersistenceStrategy
 
         return $uow->isScheduledForInsert($object) || $uow->isScheduledForUpsert($object);
     }
-
-    public function findBy(string $class, array $criteria, ?array $orderBy = null, ?int $limit = null, ?int $offset = null): array
-    {
-        $qb = $this->objectManagerFor($class)
-            ->getRepository($class)
-            ->createQueryBuilder()
-            ->refresh();
-
-        foreach ($criteria as $field => $value) {
-            $qb->field($field)->equals($value);
-        }
-
-        if ($orderBy) {
-            foreach ($orderBy as $field => $direction) {
-                $qb->sort($field, $direction);
-            }
-        }
-
-        if ($limit) {
-            $qb->limit($limit);
-        }
-
-        if ($offset) {
-            $qb->skip($offset);
-        }
-
-        return $qb->getQuery()->execute()->toArray(); // @phpstan-ignore method.nonObject
-    }
 }

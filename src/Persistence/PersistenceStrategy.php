@@ -93,20 +93,6 @@ abstract class PersistenceStrategy
     abstract public function managedNamespaces(): array;
 
     /**
-     * Uses a query builder to be able to pass hints to UoW and to force Doctrine to return fresh objects.
-     *
-     * @template T of object
-     *
-     * @param class-string<T>            $class
-     * @param array<string, mixed>       $criteria
-     * @param array<string, string>|null $orderBy
-     * @phpstan-param array<string, 'asc'|'desc'|'ASC'|'DESC'>|null $orderBy
-     *
-     * @return list<T>
-     */
-    abstract public function findBy(string $class, array $criteria, ?array $orderBy = null, ?int $limit = null, ?int $offset = null): array;
-
-    /**
      * @param class-string $owner
      *
      * @return array<string,mixed>|null

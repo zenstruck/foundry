@@ -39,6 +39,8 @@ final class PersistedObjectsTracker
     {
         foreach ($objects as $object) {
             if (self::$buffer->offsetExists($object) && self::$buffer[$object]) {
+                self::proxifyObject($object, self::$buffer[$object]);
+
                 continue;
             }
 
@@ -78,16 +80,21 @@ final class PersistedObjectsTracker
                 continue;
             }
 
-            $reflector = new \ReflectionClass($object);
-
-            if ($reflector->isUninitializedLazyObject($object)) {
-                continue;
-            }
-
-            $clone = clone $object;
-            $reflector->resetAsLazyGhost($object, function($object) use ($clone, $id) {
-                Configuration::instance()->persistence()->autorefresh($object, $id, $clone);
-            });
+            self::proxifyObject($object, $id);
         }
+    }
+
+    private static function proxifyObject(object $object, mixed $id): void
+    {
+        $reflector = new \ReflectionClass($object);
+
+        if ($reflector->isUninitializedLazyObject($object)) {
+            return;
+        }
+
+        $clone = clone $object;
+        $reflector->resetAsLazyGhost($object, function($object) use ($clone, $id) {
+            Configuration::instance()->persistence()->autorefresh($object, $id, $clone);
+        });
     }
 }
