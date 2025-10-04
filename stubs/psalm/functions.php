@@ -7,7 +7,7 @@ use function Zenstruck\Foundry\Persistence\persistent_factory;
 use function Zenstruck\Foundry\Persistence\proxy;
 use function Zenstruck\Foundry\Persistence\repository;
 
-class User
+final class User
 {
     public function __construct(
         public string $name

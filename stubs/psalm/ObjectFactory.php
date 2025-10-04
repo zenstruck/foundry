@@ -6,7 +6,7 @@ use Zenstruck\Foundry\ObjectFactory;
 
 use function PHPStan\Testing\assertType;
 
-class UserForObjectFactory
+final class UserForObjectFactory
 {
     public function __construct(
         public string $name
@@ -19,11 +19,13 @@ class UserForObjectFactory
  */
 final class UserObjectFactory extends ObjectFactory
 {
+    #[\Override]
     public static function class(): string
     {
         return UserForObjectFactory::class;
     }
 
+    #[\Override]
     protected function defaults(): array|callable
     {
         return [];

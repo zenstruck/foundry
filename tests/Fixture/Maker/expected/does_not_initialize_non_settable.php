@@ -28,6 +28,7 @@ final class ObjectWithNonWriteableFactory extends ObjectFactory
     {
     }
 
+    #[\Override]
     public static function class(): string
     {
         return ObjectWithNonWriteable::class;
@@ -38,6 +39,7 @@ final class ObjectWithNonWriteableFactory extends ObjectFactory
      *
      * @todo add your default values here
      */
+    #[\Override]
     protected function defaults(): array|callable
     {
         return [
@@ -49,6 +51,7 @@ final class ObjectWithNonWriteableFactory extends ObjectFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
      */
+    #[\Override]
     protected function initialize(): static
     {
         return $this

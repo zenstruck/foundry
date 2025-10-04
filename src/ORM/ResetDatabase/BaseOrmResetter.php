@@ -66,7 +66,7 @@ abstract class BaseOrmResetter implements OrmResetter
                 // we don't need to create the sqlite database - it's created when the schema is created
                 // let's only drop the .db file
 
-                $dbPath = $connection->getParams()['path'] ?? null;
+                $dbPath = $connection->getParams()['path'] ?? null; // @phpstan-ignore method.internal
                 if ($dbPath && (new Filesystem())->exists($dbPath)) {
                     \file_put_contents($dbPath, '');
                 }

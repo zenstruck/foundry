@@ -7,7 +7,7 @@ use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 
-class UserForPersistentFactory
+final class UserForPersistentFactory
 {
     public function __construct(
         public string $name
@@ -19,11 +19,13 @@ class UserForPersistentFactory
  */
 final class UserFactory extends PersistentObjectFactory
 {
+    #[\Override]
     public static function class(): string
     {
         return UserForPersistentFactory::class;
     }
 
+    #[\Override]
     protected function defaults(): array|callable
     {
         return [];

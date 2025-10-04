@@ -19,11 +19,13 @@ use Zenstruck\Foundry\Tests\Fixture\Object1;
  */
 final class Object1Factory extends ObjectFactory
 {
+    #[\Override]
     public static function class(): string
     {
         return Object1::class;
     }
 
+    #[\Override]
     protected function defaults(): array
     {
         return [

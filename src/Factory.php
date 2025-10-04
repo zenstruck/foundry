@@ -45,7 +45,7 @@ abstract class Factory
         }
 
         try {
-            $factory ??= new static(); // @phpstan-ignore new.static
+            $factory ??= new static(); // @phpstan-ignore new.static, new.staticInAbstractClassStaticMethod
         } catch (\ArgumentCountError $e) {
             throw CannotCreateFactory::argumentCountError($e);
         }

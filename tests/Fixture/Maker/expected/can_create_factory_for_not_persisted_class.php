@@ -28,6 +28,7 @@ final class Object1Factory extends ObjectFactory
     {
     }
 
+    #[\Override]
     public static function class(): string
     {
         return Object1::class;
@@ -38,6 +39,7 @@ final class Object1Factory extends ObjectFactory
      *
      * @todo add your default values here
      */
+    #[\Override]
     protected function defaults(): array|callable
     {
         return [
@@ -50,6 +52,7 @@ final class Object1Factory extends ObjectFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
      */
+    #[\Override]
     protected function initialize(): static
     {
         return $this

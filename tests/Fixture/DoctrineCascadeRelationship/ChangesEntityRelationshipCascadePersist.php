@@ -47,7 +47,7 @@ trait ChangesEntityRelationshipCascadePersist
             throw new \LogicException('Cannot use trait "ChangesEntityRelationshipCascadePersist" without KernelTestCase.');
         }
 
-        $testMethod = new \ReflectionMethod(static::class, $this->name());
+        $testMethod = new \ReflectionMethod(static::class, $this->name()); // @phpstan-ignore method.internal
         $usingRelationshipsAttributes = $testMethod->getAttributes(UsingRelationships::class);
 
         if (!$usingRelationshipsAttributes) {
@@ -61,7 +61,7 @@ trait ChangesEntityRelationshipCascadePersist
 
         /** @var ChangeCascadePersistOnLoadClassMetadataListener $changeCascadePersistListener */
         $changeCascadePersistListener = self::getContainer()->get(ChangeCascadePersistOnLoadClassMetadataListener::class);
-        $changeCascadePersistListener->withMetadata(\array_values($this->providedData()));
+        $changeCascadePersistListener->withMetadata(\array_values($this->providedData())); // @phpstan-ignore method.internal
 
         /** @var CacheItemPoolInterface $doctrineMetadataCache */
         $doctrineMetadataCache = self::getContainer()->get('doctrine.orm.default_metadata_cache');

@@ -132,7 +132,7 @@ trait Factories
             return;
         }
 
-        $providedData = \method_exists($this, 'getProvidedData') ? $this->getProvidedData() : $this->providedData(); // @phpstan-ignore method.notFound
+        $providedData = \method_exists($this, 'getProvidedData') ? $this->getProvidedData() : $this->providedData(); // @phpstan-ignore method.notFound, method.internal
 
         initialize_proxy_object($providedData);
     }

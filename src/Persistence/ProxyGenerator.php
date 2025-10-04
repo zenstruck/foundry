@@ -82,7 +82,7 @@ final class ProxyGenerator
 
         $reflector = new \ReflectionClass($factory::class());
 
-        return $reflector->newLazyProxy(static function() use ($factory, $attributes) { // @phpstan-ignore-line
+        return $reflector->newLazyProxy(static function() use ($factory, $attributes) {
             if (Configuration::instance()->inADataProvider() && $factory->isPersisting()) {
                 throw new \LogicException('Cannot access to a persisted object from a data provider.');
             }

@@ -56,7 +56,7 @@ final class DoctrineCascadeRelationshipMetadata implements \Stringable
         if (!\getenv('USE_DAMA_DOCTRINE_TEST_BUNDLE')) {
             $metadata = self::fromArray($relationshipFields[0]);
 
-            yield "{$metadata}\n" => [$metadata];
+            yield "{$metadata}" => [$metadata];
 
             return;
         }

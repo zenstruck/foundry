@@ -65,6 +65,7 @@ final class CategoryFactory extends PersistentObjectFactory
     {
     }
 
+    #[\Override]
     public static function class(): string
     {
         return Category::class;
@@ -75,6 +76,7 @@ final class CategoryFactory extends PersistentObjectFactory
      *
      * @todo add your default values here
      */
+    #[\Override]
     protected function defaults(): array|callable
     {
         return [
@@ -85,6 +87,7 @@ final class CategoryFactory extends PersistentObjectFactory
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
      */
+    #[\Override]
     protected function initialize(): static
     {
         return $this

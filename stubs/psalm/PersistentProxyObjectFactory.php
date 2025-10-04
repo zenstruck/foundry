@@ -7,7 +7,7 @@ use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 
-class UserForProxyFactory
+final class UserForProxyFactory
 {
     public function __construct(
         public string $name
@@ -19,11 +19,13 @@ class UserForProxyFactory
  */
 final class UserProxyFactory extends PersistentProxyObjectFactory
 {
+    #[\Override]
     public static function class(): string
     {
         return UserForProxyFactory::class;
     }
 
+    #[\Override]
     protected function defaults(): array|callable
     {
         return [];

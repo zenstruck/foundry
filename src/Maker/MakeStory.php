@@ -69,7 +69,7 @@ final class MakeStory extends AbstractMaker
         }
 
         $argument = $command->getDefinition()->getArgument('name');
-        $value = $io->ask($argument->getDescription(), null, static fn(?string $value = null): string => Validator::notBlank($value));
+        $value = $io->ask($argument->getDescription(), null, static fn(?string $value = null): string => Validator::notBlank($value)); // @phpstan-ignore staticMethod.internalClass
         $input->setArgument($argument->getName(), $value);
     }
 

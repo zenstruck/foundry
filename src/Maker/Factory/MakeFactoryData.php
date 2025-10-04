@@ -219,6 +219,11 @@ final class MakeFactoryData
         return $this->addHints;
     }
 
+    public function shouldAddOverrideAttributes(): bool
+    {
+        return \PHP_VERSION_ID >= 80300;
+    }
+
     private static function propertyInfo(): ReflectionExtractor
     {
         return self::$propertyInfo ??= new ReflectionExtractor();
