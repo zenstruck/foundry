@@ -28,7 +28,7 @@ final class ResetDatabaseTestKernel extends FoundryTestKernel
     {
         yield from parent::registerBundles();
 
-        if (FoundryTestKernel::usesMigrations()) {
+        if (self::usesMigrations()) {
             yield new DoctrineMigrationsBundle();
         }
     }
@@ -38,23 +38,25 @@ final class ResetDatabaseTestKernel extends FoundryTestKernel
         parent::configureContainer($c, $loader);
 
         $c->loadFromExtension('zenstruck_foundry', [
+            'persistence' => ['flush_once' => true],
+            'enable_auto_refresh_with_lazy_objects' => self::usePHP84LazyObjects(),
             'global_state' => [
                 GlobalStory::class,
                 GlobalInvokableService::class,
             ],
             'orm' => [
-                'reset' => FoundryTestKernel::usesMigrations()
+                'reset' => self::usesMigrations()
                         ? [
                             'mode' => ResetDatabaseMode::MIGRATE,
                             'migrations' => [
-                                'configurations' => ($configFile = \getenv('MIGRATION_CONFIGURATION_FILE')) ? [$configFile] : [],
+                                'configurations' => ($configFile = self::migrationFiles()) ? $configFile : [],
                             ],
                         ]
                         : ['mode' => ResetDatabaseMode::SCHEMA],
             ],
         ]);
 
-        if (FoundryTestKernel::usesMigrations() && !\getenv('MIGRATION_CONFIGURATION_FILE')) {
+        if (self::usesMigrations() && self::migrationFiles() === []) {
             // if no configuration file was given in Foundry's config, let's use the main one as default.
             $c->loadFromExtension(
                 'doctrine_migrations',
@@ -75,5 +77,35 @@ final class ResetDatabaseTestKernel extends FoundryTestKernel
         if (self::hasMongo()) {
             $c->register(MongoResetterDecorator::class)->setAutowired(true)->setAutoconfigured(true);
         }
+    }
+
+    public static function usesMigrations(): bool
+    {
+        return 'migrate' === \getenv('DATABASE_RESET_MODE');
+    }
+
+    public static function shouldGenerateMigrations(): bool
+    {
+        return '0' !== \getenv('DATABASE_GENERATE_MIGRATIONS');
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function migrationFiles(): array
+    {
+        $files = json_decode(\getenv('MIGRATION_CONFIGURATION_FILES')?: '[]', flags: JSON_THROW_ON_ERROR);
+
+        if (!\is_array($files)) {
+            throw new \InvalidArgumentException('MIGRATION_CONFIGURATION_FILES must be a JSON array.');
+        }
+
+        foreach ($files as $file) {
+            if (!\file_exists($file)) {
+                throw new \InvalidArgumentException(\sprintf('Migration configuration file "%s" does not exist.', $file));
+            }
+        }
+
+        return $files; // @phpstan-ignore return.type
     }
 }

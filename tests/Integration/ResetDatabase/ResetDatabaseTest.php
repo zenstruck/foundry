@@ -26,6 +26,8 @@ use Zenstruck\Foundry\Tests\Fixture\FoundryTestKernel;
 use Zenstruck\Foundry\Tests\Fixture\ResetDatabase\MongoResetterDecorator;
 use Zenstruck\Foundry\Tests\Fixture\ResetDatabase\OrmResetterDecorator;
 
+use Zenstruck\Foundry\Tests\Fixture\ResetDatabase\ResetDatabaseTestKernel;
+
 use function Zenstruck\Foundry\Persistence\persist;
 use function Zenstruck\Foundry\Persistence\repository;
 
@@ -48,15 +50,7 @@ final class ResetDatabaseTest extends ResetDatabaseTestCase
             $output = new BufferedOutput()
         );
 
-        if (FoundryTestKernel::usesMigrations()) {
-            // The command actually fails, because of a bug in doctrine ORM 3!
-            // https://github.com/doctrine/migrations/issues/1406
-            self::assertSame(2, $exit, \sprintf('Schema is not valid: %s', $commandOutput = $output->fetch()));
-            self::assertStringContainsString('1 schema diff(s) detected', $commandOutput);
-            self::assertStringContainsString('DROP TABLE doctrine_migration_versions', $commandOutput);
-        } else {
-            self::assertSame(0, $exit, \sprintf('Schema is not valid: %s', $output->fetch()));
-        }
+        self::assertSame(0, $exit, \sprintf('Schema is not valid: %s', $output->fetch()));
     }
 
     /**

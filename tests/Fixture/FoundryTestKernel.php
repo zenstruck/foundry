@@ -60,11 +60,6 @@ abstract class FoundryTestKernel extends Kernel
         return (bool) \getenv('MONGO_URL');
     }
 
-    public static function usesMigrations(): bool
-    {
-        return 'migrate' === \getenv('DATABASE_RESET_MODE');
-    }
-
     public static function usesDamaDoctrineTestBundle(): bool
     {
         return (bool) \getenv('USE_DAMA_DOCTRINE_TEST_BUNDLE');
