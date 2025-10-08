@@ -51,14 +51,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
     private bool $isRootFactory = true;
 
-    private bool $autorefreshEnabled = false;
-
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->autorefreshEnabled = Configuration::autoRefreshWithLazyObjectsIsEnabled();
-    }
+    private bool|null $autorefreshEnabled = null;
 
     /**
      * @phpstan-param mixed|Parameters $criteriaOrId
@@ -525,7 +518,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
                     }
 
                     if (
-                        $factoryUsed->autorefreshEnabled
+                        $factoryUsed->isAutorefreshEnabled()
                         && !$factoryUsed instanceof PersistentProxyObjectFactory
                     ) {
                         Configuration::instance()->persistedObjectsTracker?->add($object);
@@ -543,6 +536,11 @@ abstract class PersistentObjectFactory extends ObjectFactory
                 }
             )
         ;
+    }
+
+    private function isAutorefreshEnabled(): bool
+    {
+        return $this->autorefreshEnabled ??= Configuration::autoRefreshWithLazyObjectsIsEnabled();
     }
 
     private function throwIfCannotCreateObject(): void
