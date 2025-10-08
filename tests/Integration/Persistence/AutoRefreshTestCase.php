@@ -37,6 +37,7 @@ use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 use function Zenstruck\Foundry\factory;
 use function Zenstruck\Foundry\Persistence\assert_not_persisted;
 use function Zenstruck\Foundry\Persistence\assert_persisted;
+use function Zenstruck\Foundry\Persistence\flush_after;
 use function Zenstruck\Foundry\Persistence\refresh;
 use function Zenstruck\Foundry\Persistence\refresh_all;
 
@@ -224,6 +225,22 @@ abstract class AutoRefreshTestCase extends WebTestCase
     }
 
     #[Test]
+    public function it_can_refresh_all_objects_in_flush_after(): void
+    {
+        [$object1, $object2] = flush_after(fn() => $this->factory()->many(2)->create());
+        $objectId1 = $object1->id;
+        $objectId2 = $object2->id;
+
+        refresh_all();
+
+        $this->updateObject($objectId1);
+        $this->updateObject($objectId2);
+
+        self::assertSame('foo', $object1->getProp1());
+        self::assertSame('foo', $object2->getProp1());
+    }
+
+    #[Test]
     #[DataProvider('provideRepositoryMethod')]
     public function it_can_refresh_objects_fetched_from_repository_decorator(string $methodName, array $params): void
     {
@@ -273,7 +290,7 @@ abstract class AutoRefreshTestCase extends WebTestCase
         PersistedObjectsTracker::reset();
 
         self::assertNull(
-            $this->factory()::repository()->find(42)
+            $this->factory()::repository()->find(43)
         );
 
         $object = $this->factory()::repository()->find($id);

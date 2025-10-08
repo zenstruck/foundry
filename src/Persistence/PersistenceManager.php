@@ -426,6 +426,7 @@ final class PersistenceManager
                 $this->flush($om);
             }
         }
+        PersistedObjectsTracker::updateIds();
     }
 
     /**
