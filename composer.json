@@ -50,7 +50,8 @@
         "symfony/uid": "^6.4|^7.0|^8.0",
         "symfony/var-dumper": "^6.4|^7.0|^8.0",
         "symfony/yaml": "^6.4|^7.0|^8.0",
-        "webmozart/assert": "^1.11"
+        "webmozart/assert": "^1.11",
+        "rector/rector": "dev-main"
     },
     "autoload": {
         "psr-4": {

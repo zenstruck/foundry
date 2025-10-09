@@ -9,6 +9,4 @@
  * file that was distributed with this source code.
  */
 
-require \dirname(__DIR__).'/../../bin/tools/rector/vendor/rector/rector/preload.php';
 require \dirname(__DIR__).'/../../vendor/autoload.php';
-require \dirname(__DIR__).'/../../bin/tools/rector/vendor/autoload.php';
