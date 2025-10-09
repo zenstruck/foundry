@@ -358,7 +358,7 @@ jobs:
         run: composer bin phpbench install
 
       - name: Run static analysis
-        run: bin/tools/phpstan/vendor/phpstan/phpstan/phpstan analyse
+        run: vendor/bin/phpstan analyse
 
       - name: Install Psalm
         run: composer bin psalm install
