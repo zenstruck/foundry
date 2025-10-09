@@ -28,7 +28,10 @@ final class RemoveMethodCallRector extends AbstractRector implements Configurabl
         return [Node\Expr\MethodCall::class, Node\Expr\NullsafeMethodCall::class, Node\Stmt\Expression::class];
     }
 
-    /** @param Node\Expr\MethodCall|Node\Expr\NullsafeMethodCall|Node\Stmt\Expression $node */
+    /**
+     * @param Node\Expr\MethodCall|Node\Expr\NullsafeMethodCall|Node\Stmt\Expression $node
+     * @return Node|null|\PhpParser\NodeVisitor::REMOVE_NODE
+     */
     public function refactor(Node $node) : Node|int|null
     {
         foreach ($this->removeMethodCalls as $removeMethodCall) {
