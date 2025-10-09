@@ -51,7 +51,7 @@
         "symfony/var-dumper": "^6.4|^7.0|^8.0",
         "symfony/yaml": "^6.4|^7.0|^8.0",
         "webmozart/assert": "^1.11",
-        "rector/rector": "dev-main"
+        "rector/rector": "^2.2"
     },
     "autoload": {
         "psr-4": {
