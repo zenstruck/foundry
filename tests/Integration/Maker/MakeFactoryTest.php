@@ -535,6 +535,11 @@ final class MakeFactoryTest extends MakerTestCase
         {
             $objects = scandir($dir);
 
+            if ($objects === false)
+            {
+                return;
+            }
+
             foreach ($objects as $object)
             {
                 if ($object != '.' && $object != '..')
