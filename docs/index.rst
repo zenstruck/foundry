@@ -181,6 +181,21 @@ This command will generate a ``PostFactory`` class that looks like this:
 
     Using ``make:factory --test`` will generate the factory in ``tests/Factory``.
 
+    If your entity has some properties with Doctrine relationships, the factories for the related entities must be registered
+    in the service container so that the maker command can find them. To do that, add the following to your ``services.yaml``.
+
+    .. code-block:: yaml
+
+        # config/packages/services.yaml
+        when@dev:
+            services:
+                _defaults:
+                    autowire: true
+                    autoconfigure: true
+
+                App\Tests\Factory\:
+                    resource: '../tests/Factory/'
+
 .. tip::
 
     You can globally configure which namespace the factories will be generated in:
