@@ -29,7 +29,7 @@ use Zenstruck\Foundry\Persistence\PersistenceManager;
  */
 final class FactoryGenerator
 {
-    public const PHPSTAN_PATH = '/vendor/bin/phpstan';
+    public const PHPSTAN_PATH = '/vendor/phpstan/phpstan/phpstan';
     public const PSALM_PATH = '/vendor/vimeo/psalm/psalm';
 
     /** @param \Traversable<int, DefaultPropertiesGuesser> $defaultPropertiesGuessers */
