@@ -24,8 +24,11 @@ final class RemoveWithoutAutorefreshCallRector extends AbstractRector
         return [Node\Stmt\Expression::class];
     }
 
-    /** @param Node\Stmt\Expression $node */
-    public function refactor(Node $node) : array|Node|null
+    /**
+     * @param Node\Stmt\Expression $node
+     * @return Node\Stmt\Expression|array<Node\Stmt>|null
+     */
+    public function refactor(Node $node) : Node\Stmt\Expression|null|array
     {
         $method = $node->expr;
 

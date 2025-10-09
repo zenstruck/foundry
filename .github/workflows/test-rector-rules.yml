@@ -33,6 +33,7 @@ jobs:
         run: |
           composer update phpunit/phpunit:^12 brianium/paratest -W
           composer bin phpstan install
+          composer bin rector install
 
       - name: Test
         run: vendor/bin/phpunit -c phpunit-rector.xml.dist
