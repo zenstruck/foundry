@@ -529,7 +529,7 @@ final class MakeFactoryTest extends MakerTestCase
      * Recursively remove a directory.
      * @see https://stackoverflow.com/questions/1653771/how-do-i-remove-a-directory-that-is-not-empty
      */
-    private function rrmdir($dir)
+    private function rrmdir(string $dir): void
     {
         if (is_dir($dir))
         {
