@@ -1,6 +1,0 @@
-{
-    "require": {
-        "rector/rector": "^2.0",
-        "phpstan/phpstan-doctrine": "^2.0"
-    }
-}
