@@ -181,20 +181,20 @@ This command will generate a ``PostFactory`` class that looks like this:
 
     Using ``make:factory --test`` will generate the factory in ``tests/Factory``.
 
-    If your entity has some properties with Doctrine relationships, the factories for the related entities must be registered
-    in the service container so that the maker command can find them. To do that, add the following to your ``services.yaml``.
+.. tip::
+
+    When using ``--test`` flag, we're still dealing with ``dev`` environment. And because we want the container to know about our factories,
+    we need to declare them as services even if they are in the ``tests`` directory. To do that, add the following to your configuration:
 
     .. code-block:: yaml
 
-        # config/packages/services.yaml
+        # config/packages/zenstruck_foundry.yaml
         when@dev:
             services:
-                _defaults:
+                App\Tests\Factory\:
+                    resource: '../../tests/Factory/'
                     autowire: true
                     autoconfigure: true
-
-                App\Tests\Factory\:
-                    resource: '../tests/Factory/'
 
 .. tip::
 
