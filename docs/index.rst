@@ -192,7 +192,7 @@ This command will generate a ``PostFactory`` class that looks like this:
         when@dev:
             services:
                 App\Tests\Factory\:
-                    resource: '../../tests/Factory/'
+                    resource: '%kernel.project_dir%/tests/Factory/'
                     autowire: true
                     autoconfigure: true
 
