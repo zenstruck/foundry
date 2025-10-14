@@ -13,14 +13,12 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\ResetDatabase;
 
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
-/**
- * @author Nicolas PHILIPPE <nikophil@gmail.com>
- */
-final class ResetDatabaseWithTraitTest extends KernelTestCase
+#[IgnoreDeprecations('In order to use Foundry correctly, you must use the trait')]
+final class GlobalStoryWithTraitsTest extends GlobalStoryTestCase
 {
-    use Factories, ResetDatabase, ResetDatabaseTestsTrait;
+    use Factories, ResetDatabase;
 }

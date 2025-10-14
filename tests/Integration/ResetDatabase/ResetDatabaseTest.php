@@ -13,75 +13,15 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\ResetDatabase;
 
-use PHPUnit\Framework\Attributes\Depends;
-use PHPUnit\Framework\Attributes\Test;
-use Zenstruck\Foundry\Persistence\PersistenceManager;
-use Zenstruck\Foundry\Tests\Fixture\FoundryTestKernel;
-use Zenstruck\Foundry\Tests\Fixture\ResetDatabase\MongoResetterDecorator;
-use Zenstruck\Foundry\Tests\Fixture\ResetDatabase\OrmResetterDecorator;
-use Zenstruck\Foundry\Tests\Fixture\ResetDatabase\ResetDatabaseTestKernel;
+use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
+use Zenstruck\Foundry\Attribute\ResetDatabase;
+use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
+#[ResetDatabase]
+#[RequiresPhpunitExtension(FoundryExtension::class)]
 final class ResetDatabaseTest extends ResetDatabaseTestCase
 {
-    use ResetDatabaseTestsTrait;
-
-    /**
-     * @test
-     */
-    #[Test]
-    public function can_extend_orm_reset_mechanism_first(): void
-    {
-        if (!FoundryTestKernel::hasORM()) {
-            self::markTestSkipped('ORM needed.');
-        }
-
-        self::assertTrue(OrmResetterDecorator::$calledBeforeFirstTest);
-
-        if (PersistenceManager::isOrmOnly() && FoundryTestKernel::usesDamaDoctrineTestBundle()) {
-            // in this case, the resetBeforeEachTest() method is never called
-            self::assertFalse(OrmResetterDecorator::$calledBeforeEachTest);
-        } else {
-            self::assertTrue(OrmResetterDecorator::$calledBeforeEachTest);
-        }
-
-        OrmResetterDecorator::reset();
-    }
-
-    /**
-     * @test
-     * @depends can_extend_orm_reset_mechanism_first
-     */
-    #[Test]
-    #[Depends('can_extend_orm_reset_mechanism_first')]
-    public function can_extend_orm_reset_mechanism_second(): void
-    {
-        if (!FoundryTestKernel::hasORM()) {
-            self::markTestSkipped('ORM needed.');
-        }
-
-        self::assertFalse(OrmResetterDecorator::$calledBeforeFirstTest);
-
-        if (PersistenceManager::isOrmOnly() && FoundryTestKernel::usesDamaDoctrineTestBundle()) {
-            // in this case, the resetBeforeEachTest() method is never called
-            self::assertFalse(OrmResetterDecorator::$calledBeforeEachTest);
-        } else {
-            self::assertTrue(OrmResetterDecorator::$calledBeforeEachTest);
-        }
-    }
-
-    /**
-     * @test
-     */
-    #[Test]
-    public function can_extend_mongo_reset_mechanism_first(): void
-    {
-        if (!FoundryTestKernel::hasMongo()) {
-            self::markTestSkipped('Mongo needed.');
-        }
-
-        self::assertTrue(MongoResetterDecorator::$calledBeforeEachTest);
-    }
 }
