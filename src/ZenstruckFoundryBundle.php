@@ -445,7 +445,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
             AsFixture::class,
             // @phpstan-ignore argument.type
             static function(ChildDefinition $definition, AsFixture $attribute, \ReflectionClass $reflector) {
-                if (false === $reflector->getParentClass() || Story::class !== $reflector->getParentClass()->getName()) {
+                if (false === $reflector->isSubclassOf(Story::class)) {
                     throw new LogicException(\sprintf('Only stories can be marked with "%s" attribute, class "%s" is not a story.', AsFixture::class, $reflector->getName()));
                 }
 
