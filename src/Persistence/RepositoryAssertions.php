@@ -113,22 +113,20 @@ final class RepositoryAssertions
 
     public function exists(mixed $criteria, string $message = 'Expected {entity} to exist but it does not.'): self
     {
-        Assert::that($this->repository->count($criteria))
-            ->isGreaterThan(0, $message, [
-                'entity' => $this->repository->getClassName(),
-                'criteria' => $criteria,
-            ]);
+        Assert::that($this->repository->find($criteria))->isNotEmpty($message, [
+            'entity' => $this->repository->getClassName(),
+            'criteria' => $criteria,
+        ]);
 
         return $this;
     }
 
     public function notExists(mixed $criteria, string $message = 'Expected {entity} to not exist but it does.'): self
     {
-        Assert::that($this->repository->count($criteria))
-            ->is(0, $message, [
-                'entity' => $this->repository->getClassName(),
-                'criteria' => $criteria,
-            ]);
+        Assert::that($this->repository->find($criteria))->isEmpty($message, [
+            'entity' => $this->repository->getClassName(),
+            'criteria' => $criteria,
+        ]);
 
         return $this;
     }

@@ -490,7 +490,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
         $assert->empty();
         $assert->empty(['prop1' => 'a']);
 
-        static::factory()::createOne(['prop1' => 'a']);
+        $object = static::factory()::createOne(['prop1' => 'a']);
         static::factory()::createOne(['prop1' => 'b']);
         static::factory()::createOne(['prop1' => 'b']);
 
@@ -508,6 +508,9 @@ abstract class GenericFactoryTestCase extends KernelTestCase
         $assert->countLessThanOrEqual(2, ['prop1' => 'b']);
         $assert->exists(['prop1' => 'a']);
         $assert->notExists(['prop1' => 'c']);
+
+        $assert->exists($object->id);
+        $assert->notExists(999);
     }
 
     /**
