@@ -23,7 +23,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 final class UpdateGenericModel
 {
     #[Route('/orm/update/{id}/{newValue}')]
-    public function ormDelete(EntityManagerInterface $entityManager, int $id, string $newValue = 'foo'): Response
+    public function ormUpdate(EntityManagerInterface $entityManager, int $id, string $newValue = 'foo'): Response
     {
         $genericEntity = $entityManager->find(GenericEntity::class, $id);
         $genericEntity?->setProp1($newValue);
@@ -33,7 +33,7 @@ final class UpdateGenericModel
     }
 
     #[Route('/mongo/update/{id}/{newValue}')]
-    public function mongoDelete(DocumentManager $entityManager, int $id, string $newValue = 'foo'): Response
+    public function mongoUpdate(DocumentManager $entityManager, int $id, string $newValue = 'foo'): Response
     {
         $genericDocument = $entityManager->find(GenericDocument::class, $id);
         $genericDocument?->setProp1($newValue);

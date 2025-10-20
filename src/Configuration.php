@@ -130,7 +130,6 @@ final class Configuration
     /** @param \Closure():self|self $configuration */
     public static function boot(\Closure|self $configuration): void
     {
-        PersistedObjectsTracker::reset();
         self::$instance = $configuration;
     }
 

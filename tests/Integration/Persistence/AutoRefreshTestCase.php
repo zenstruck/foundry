@@ -116,7 +116,7 @@ abstract class AutoRefreshTestCase extends WebTestCase
     }
 
     #[Test]
-    public function it_can_refresh_twice_after_update_with_browser(): void
+    public function it_can_refresh_twice_using_http_client(): void
     {
         $client = self::createClient();
 
@@ -133,10 +133,24 @@ abstract class AutoRefreshTestCase extends WebTestCase
     }
 
     #[Test]
-    #[Depends('it_can_refresh_after_update_with_browser')]
+    #[Depends('it_can_refresh_twice_using_http_client')]
     public function tracker_is_empty_after_test(): void
     {
         self::assertSame(0, PersistedObjectsTracker::countObjects());
+    }
+
+    #[Test]
+    public function it_can_refresh_the_objects_after_kernel_shutdown(): void
+    {
+        $object = $this->factory()->create();
+        self::assertSame('default1', $object->getProp1());
+
+        self::ensureKernelShutdown();
+        $client = self::createClient();
+
+        $client->request('GET', "/{$this->dbms()}/update/{$object->id}/foo");
+        self::assertResponseIsSuccessful();
+        self::assertSame('foo', $object->getProp1());
     }
 
     #[Test]
@@ -281,7 +295,7 @@ abstract class AutoRefreshTestCase extends WebTestCase
     }
 
     #[Test]
-    public function it_can_refresh_object_fetched_find_and_id(): void
+    public function it_can_refresh_object_fetched_using_find_and_an_id(): void
     {
         $id = $this->factory()->create()->id;
 
@@ -290,7 +304,7 @@ abstract class AutoRefreshTestCase extends WebTestCase
         PersistedObjectsTracker::reset();
 
         self::assertNull(
-            $this->factory()::repository()->find(43)
+            $this->factory()::repository()->find(99999)
         );
 
         $object = $this->factory()::repository()->find($id);
