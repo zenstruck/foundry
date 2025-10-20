@@ -36,6 +36,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Integration\Persistence\AutoRefreshTestCase;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
+use function Zenstruck\Foundry\Persistence\assert_persisted;
 use function Zenstruck\Foundry\Persistence\persistent_factory;
 use function Zenstruck\Foundry\Persistence\refresh_all;
 
@@ -187,6 +188,27 @@ final class AutoRefreshTest extends AutoRefreshTestCase
 
         self::assertSame('foo', $entity->prop);
         self::assertSame($entityId, $entity->id);
+    }
+
+    #[Test]
+    public function it_can_refresh_one_to_many(): void
+    {
+        $client = self::createClient();
+        $client->catchExceptions(false);
+
+        $category = CategoryFactory::createOne();
+        self::assertCount(0, $category->getContacts());
+        $id = $category->id;
+
+        self::assertFalse((new \ReflectionClass($category))->isUninitializedLazyObject($category));
+
+        ContactFactory::assert()->count(0);
+        $client->xmlHttpRequest('POST', "/orm/contacts?category_id={$id}");
+        self::assertResponseIsSuccessful();
+        ContactFactory::assert()->count(1);
+
+        self::assertTrue((new \ReflectionClass($category))->isUninitializedLazyObject($category));
+        self::assertCount(1, $category->getContacts());
     }
 
     protected static function factory(): PersistentObjectFactory
