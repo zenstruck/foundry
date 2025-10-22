@@ -460,7 +460,9 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
 
         if (null === $enableAutoRefreshWithLazyObjects && \PHP_VERSION_ID >= 80400) {
             trigger_deprecation('zenstruck/foundry', '2.7', 'Not setting a value for "zenstruck_foundry.enable_auto_refresh_with_lazy_objects" is deprecated. This option will be forced to true in 3.0.');
+        }
 
+        if ($container->has('.foundry.persistence.objects_tracker') && !$enableAutoRefreshWithLazyObjects) {
             $container->removeDefinition('.foundry.persistence.objects_tracker');
         }
     }

@@ -48,7 +48,7 @@ final class PersistedObjectsTracker
         }
     }
 
-    public static function updateIds(): void
+    public function updateIds(): void
     {
         foreach (self::$buffer as $object => $id) {
             if ($id) {
