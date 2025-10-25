@@ -7,8 +7,16 @@ $file = __DIR__.'/.php-cs-fixer.temp.php';
     \file_get_contents('https://raw.githubusercontent.com/zenstruck/.github/main/.php-cs-fixer.dist.php')
 );
 
+/** @var PhpCsFixer\Config $csFixerConfig */
+$csFixerConfig = require $file;
+$csFixerConfig->setFinder(
+    $csFixerConfig->getFinder()
+        ->in(__DIR__.'/utils')
+        ->in(__DIR__.'/config')
+);
+
 try {
-    return require $file;
+    return $csFixerConfig;
 } finally {
     \unlink($file);
 }
