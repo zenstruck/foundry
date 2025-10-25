@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<roave-bc-check
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="vendor/roave/backward-compatibility-check/resources/schema.xsd">
+    <baseline>
+        <ignored-regex>#\[BC\] SKIPPED: Roave\\BetterReflection\\Reflection\\ReflectionClass "Rector\\Rector\\AbstractRector" could not be found in the located source#</ignored-regex>
+        <ignored-regex>#\[BC\] SKIPPED: Roave\\BetterReflection\\Reflection\\ReflectionClass "Psalm\\Plugin\\PluginEntryPointInterface" could not be found in the located source#</ignored-regex>
+        <ignored-regex>#\[BC\] SKIPPED: Roave\\BetterReflection\\Reflection\\ReflectionClass "Psalm\\Plugin\\EventHandler\\AfterMethodCallAnalysisInterface" could not be found in the located source#</ignored-regex>
+    </baseline>
+</roave-bc-check>

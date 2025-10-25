@@ -1,0 +1,40 @@
+name: "Backward Compatibility Check"
+
+on:
+  pull_request:
+    branches:
+      - "*.x"
+    paths:
+      - .github/workflows/bc-check.yml
+      - src/**
+  push:
+    branches:
+      - "*.x"
+    paths:
+      - .github/workflows/bc-check.yml
+      - src/**
+
+jobs:
+  roave_bc_check:
+    name: "Roave BC Check"
+    runs-on: "ubuntu-22.04"
+    steps:
+      - uses: "actions/checkout@v5"
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v2
+        with:
+          composer-options: --prefer-dist
+
+      - name: Install PHP with extensions.
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+
+      - name: Install roave/backward-compatibility-check.
+        run: composer bin bc-check require roave/backward-compatibility-check
+
+      - name: Run roave/backward-compatibility-check.
+        run: bin/tools/bc-check/vendor/roave/backward-compatibility-check/bin/roave-backward-compatibility-check --install-development-dependencies

@@ -31,8 +31,6 @@ jobs:
 
       - name: Install Rector & PHPStan
         run: |
-          composer update phpunit/phpunit:^11 brianium/paratest -W
-
           composer bin phpstan install
           composer bin rector install
 
