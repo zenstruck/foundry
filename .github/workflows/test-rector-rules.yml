@@ -2,11 +2,11 @@ name: Rector Rules Test
 
 on:
   push:
-    paths:
-      - 'utils/rector/**'
+    paths: &paths
+      - .github/workflows/test-rector-rules.yml
+      - utils/rector/**
   pull_request:
-    paths:
-      - 'utils/rector/**'
+    paths: *paths
   schedule:
     - cron: '0 0 1,16 * *'
 

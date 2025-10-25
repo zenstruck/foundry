@@ -1,0 +1,24 @@
+name: Lint docs
+
+on:
+  push:
+    paths: &paths
+      - .github/workflows/lint-docs.yml
+      - docs/**
+  pull_request:
+    paths: *paths
+
+jobs:
+  lint-docs:
+    name: Lint Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v3
+
+      - name: DOCtor-RST
+        uses: docker://oskarstark/doctor-rst
+        with:
+          args: --short --error-format=github
+        env:
+          DOCS_DIR: 'docs/'

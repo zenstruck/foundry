@@ -2,17 +2,12 @@ name: "Backward Compatibility Check"
 
 on:
   pull_request:
-    branches:
-      - "*.x"
-    paths:
+    paths: &paths
       - .github/workflows/bc-check.yml
+      - bin/tools/bc-check
       - src/**
   push:
-    branches:
-      - "*.x"
-    paths:
-      - .github/workflows/bc-check.yml
-      - src/**
+    paths: *paths
 
 jobs:
   roave_bc_check:
@@ -37,4 +32,4 @@ jobs:
         run: composer bin bc-check require roave/backward-compatibility-check
 
       - name: Run roave/backward-compatibility-check.
-        run: bin/tools/bc-check/vendor/roave/backward-compatibility-check/bin/roave-backward-compatibility-check --install-development-dependencies
+        run: bin/tools/bc-check/vendor/roave/backward-compatibility-check/bin/roave-backward-compatibility-check --install-development-dependencies --format=github-actions

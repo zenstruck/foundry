@@ -1,10 +1,23 @@
-name: CI
+name: PHPUnit
 
 on:
   push:
+    paths: &paths
+      - .github/workflows/phpunit.yml
+      - config/**
+      - skeleton/**
+      - src/**
+      - tests/**
+      - composer.json
+      - phpunit*
   pull_request:
+    paths: *paths
   schedule:
     - cron: '0 0 1,16 * *'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   tests:
@@ -221,6 +234,7 @@ jobs:
         run: |
           vendor/bin/phpunit tests/Unit
 
+
   test-with-paratest:
     name: Test with paratest
     runs-on: ubuntu-latest
@@ -313,78 +327,3 @@ jobs:
         with:
           file: ./coverage.xml
 
-  composer-validate:
-    uses: zenstruck/.github/.github/workflows/php-composer-validate.yml@main
-
-  lint-docs:
-    name: Lint Documentation
-    runs-on: ubuntu-latest
-    steps:
-      - name: "Checkout code"
-        uses: actions/checkout@v3
-
-      - name: DOCtor-RST
-        uses: docker://oskarstark/doctor-rst
-        with:
-          args: --short --error-format=github
-        env:
-          DOCS_DIR: 'docs/'
-
-  static-analysis:
-    name: Static Analysis
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.4
-          coverage: none
-
-      - name: Install dependencies
-        uses: ramsey/composer-install@v2
-        with:
-          composer-options: --prefer-dist
-
-      - name: Validate PSR-4
-        run: composer dump-autoload --optimize --strict-psr --strict-ambiguous
-
-      - name: Install PHPStan
-        run: composer bin phpstan install
-
-      - name: Install PHPBench
-        run: composer bin phpbench install
-
-      - name: Run static analysis
-        run: bin/tools/phpstan/vendor/phpstan/phpstan/phpstan analyse
-
-      - name: Install Psalm
-        run: composer bin psalm install
-
-      - name: Run Psalm on factories generated with maker
-        run: bin/tools/psalm/vendor/vimeo/psalm/psalm
-
-  fixcs:
-    name: Run php-cs-fixer
-    needs: sync-with-template
-    if: (github.event_name == 'push' || github.event_name == 'schedule') && !startsWith(github.ref, 'refs/tags') && github.repository_owner == 'zenstruck'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: zenstruck/.github/actions/php-cs-fixer@main
-        with:
-          php: 8.1
-          key: ${{ secrets.GPG_PRIVATE_KEY }}
-          token: ${{ secrets.COMPOSER_TOKEN }}
-
-  sync-with-template:
-    name: Sync meta files
-    if: (github.event_name == 'push' || github.event_name == 'schedule') && !startsWith(github.ref, 'refs/tags') && github.repository_owner == 'zenstruck'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: zenstruck/.github/actions/sync-with-template@main
-        with:
-          key: ${{ secrets.GPG_PRIVATE_KEY }}
-          token: ${{ secrets.COMPOSER_TOKEN }}
-          phpcsconfig: false

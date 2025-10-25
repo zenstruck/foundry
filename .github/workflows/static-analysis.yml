@@ -1,0 +1,90 @@
+name: Static analysis
+
+on:
+  push:
+    paths: &paths
+      - .github/workflows/static-analysis.yml
+      - bin/tools/phpstan
+      - bin/tools/psalm
+      - config/**
+      - stubs/**
+      - src/**
+      - tests/**
+      - composer.json
+      - phpstan.neon
+      - psalm.xml
+  pull_request:
+    paths: *paths
+  schedule:
+    - cron: '0 0 1,16 * *'
+
+jobs:
+  phpstan:
+    name: PhpStan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          coverage: none
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v2
+        with:
+          composer-options: --prefer-dist
+
+      - name: Install PHPStan
+        run: composer bin phpstan install
+
+      - name: Install PHPBench
+        run: composer bin phpbench install
+
+      - name: Run PHPStan
+        run: bin/tools/phpstan/vendor/phpstan/phpstan/phpstan analyse
+
+  psalm:
+    name: Psalm on factories generated with maker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          coverage: none
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v2
+        with:
+          composer-options: --prefer-dist
+
+      - name: Install Psalm
+        run: composer bin psalm install
+
+      - name: Run Psalm
+        run: bin/tools/psalm/vendor/vimeo/psalm/psalm
+
+  composer-validate:
+    uses: zenstruck/.github/.github/workflows/php-composer-validate.yml@main
+
+  composer-validate-psr:
+    name: PhpStan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          coverage: none
+
+      - name: Validate PSR-4
+        run: composer dump-autoload --optimize --strict-psr --strict-ambiguous
