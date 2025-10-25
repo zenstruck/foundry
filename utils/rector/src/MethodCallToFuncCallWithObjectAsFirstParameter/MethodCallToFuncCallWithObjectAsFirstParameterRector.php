@@ -23,20 +23,16 @@ use Rector\Rector\AbstractRector;
 
 final class MethodCallToFuncCallWithObjectAsFirstParameterRector extends AbstractRector implements ConfigurableRectorInterface
 {
-    /**
-     * @var MethodCallToFuncCallWithObjectAsFirstParameter[]
-     */
+    /** @var MethodCallToFuncCallWithObjectAsFirstParameter[] */
     private array $methodCallsToFuncCalls = [];
-    /**
-     * @return array<class-string<Node>>
-     */
+
+    /** @return array<class-string<Node>> */
     public function getNodeTypes() : array
     {
         return [MethodCall::class];
     }
-    /**
-     * @param MethodCall $node
-     */
+
+    /** @param MethodCall $node */
     public function refactor(Node $node) : ?Node
     {
         if ($node->isFirstClassCallable()) {
@@ -51,9 +47,8 @@ final class MethodCallToFuncCallWithObjectAsFirstParameterRector extends Abstrac
         }
         return null;
     }
-    /**
-     * @param mixed[] $configuration
-     */
+
+    /** @param mixed[] $configuration */
     public function configure(array $configuration) : void
     {
         foreach ($configuration as $configItem) {
