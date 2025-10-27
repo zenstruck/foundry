@@ -1,10 +1,10 @@
-name: Rector Rules Test
+name: PHPStan extension Test
 
 on:
   push:
     paths: &paths
-      - .github/workflows/test-rector-rules.yml
-      - utils/rector/**
+      - .github/workflows/test-phpstan-extension.yml
+      - utils/phpstan/**
       - phpunit-utils.xml.dist
   pull_request:
     paths: *paths
@@ -16,8 +16,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test-rector-rules:
-    name: Test rector rules
+  test-phpstan-rules:
+    name: Test PHPStan extension
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -34,15 +34,14 @@ jobs:
         with:
           composer-options: --prefer-dist
 
-      - name: Install Rector & PHPStan
+      - name: Install PHPStan
         run: |
           composer bin phpstan install
-          composer bin rector install
 
       - name: Test
-        run: vendor/bin/phpunit -c phpunit-utils.xml.dist --bootstrap utils/rector/tests/bootstrap.php --testsuite Rector
+        run: vendor/bin/phpunit -c phpunit-utils.xml.dist --bootstrap utils/rector/tests/bootstrap.php --testsuite Phpstan
         shell: bash
 
       - name: Static analysis
-        run: bin/tools/phpstan/vendor/phpstan/phpstan/phpstan analyse -c utils/rector/phpstan.neon
+        run: bin/tools/phpstan/vendor/phpstan/phpstan/phpstan analyse -c utils/phpstan/phpstan.neon
         shell: bash

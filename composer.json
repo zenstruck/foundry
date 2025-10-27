@@ -56,7 +56,8 @@
         "psr-4": {
             "Zenstruck\\Foundry\\": "src/",
             "Zenstruck\\Foundry\\Psalm\\": "utils/psalm",
-            "Zenstruck\\Foundry\\Utils\\Rector\\": "utils/rector/src/"
+            "Zenstruck\\Foundry\\Utils\\Rector\\": "utils/rector/src/",
+            "Zenstruck\\Foundry\\Utils\\PHPStan\\": "utils/phpstan/src/"
         },
         "files": [
             "src/functions.php",
@@ -69,7 +70,8 @@
             "Zenstruck\\Foundry\\Tests\\": ["tests/"],
             "App\\": "tests/Fixture/Maker/tmp/src",
             "App\\Tests\\": "tests/Fixture/Maker/tmp/tests",
-            "Zenstruck\\Foundry\\Utils\\Rector\\Tests\\": "utils/rector/tests/"
+            "Zenstruck\\Foundry\\Utils\\Rector\\Tests\\": "utils/rector/tests/",
+            "Zenstruck\\Foundry\\Utils\\PHPStan\\Tests\\": "utils/phpstan/tests/"
         },
         "exclude-from-classmap": ["tests/Fixture/Maker/expected", "utils/rector/tests/**/Fixtures/"]
     },
