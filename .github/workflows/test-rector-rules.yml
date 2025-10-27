@@ -39,5 +39,5 @@ jobs:
         shell: bash
 
       - name: Static analysis
-        run: bin/tools/rector/vendor/phpstan/phpstan/phpstan analyse -c utils/rector/phpstan.neon
+        run: bin/tools/phpstan/vendor/phpstan/phpstan/phpstan analyse -c utils/rector/phpstan.neon
         shell: bash
