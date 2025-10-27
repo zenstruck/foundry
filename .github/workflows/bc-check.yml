@@ -9,6 +9,10 @@ on:
   push:
     paths: *paths
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   roave_bc_check:
     name: "Roave BC Check"

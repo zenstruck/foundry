@@ -11,6 +11,10 @@ on:
       - composer.json
       - phpbench.json
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   run:
     name: "Benchmarks ${{ matrix.database }} - ${{ matrix.with-dama && 'with Dama' || 'without Dama' }}"

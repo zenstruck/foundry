@@ -8,6 +8,10 @@ on:
   pull_request:
     paths: *paths
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint-docs:
     name: Lint Documentation
