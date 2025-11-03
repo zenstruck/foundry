@@ -27,7 +27,6 @@
     },
     "require-dev": {
         "bamarni/composer-bin-plugin": "^1.8",
-        "brianium/paratest": "^6|^7",
         "dama/doctrine-test-bundle": "^8.0",
         "doctrine/collections": "^1.7|^2.0",
         "doctrine/common": "^3.2.2",
