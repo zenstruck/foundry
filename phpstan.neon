@@ -41,13 +41,9 @@ parameters:
         - identifier: property.readOnlyByPhpDocDefaultValue
           paths:
             - src/Object/Hydrator.php
+            - src/Factory.php
             - src/ObjectFactory.php
             - src/Persistence/PersistentObjectFactory.php
-
-        # Hydrator and Factory are annotated @immutable
-        - identifier: property.uninitializedReadonlyByPhpDoc
-          paths:
-            - src/Factory.php
 
         # Hydrator and Factory are annotated @immutable
         - identifier: property.readOnlyByPhpDocAssignNotInConstructor
