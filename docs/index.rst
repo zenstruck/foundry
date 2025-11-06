@@ -713,7 +713,7 @@ attributes provided:
         ->instantiateWith(Instantiator::withConstructor()->allowExtra())
 
         // force set "title" and "body" when instantiating
-        ->instantiateWith(Instantiator::withConstructor()->alwaysForce(['title', 'body']))
+        ->instantiateWith(Instantiator::withConstructor()->alwaysForce('title', 'body'))
 
         // never use setters, always "force set" properties (even private/protected, does not use setter)
         ->instantiateWith(Instantiator::withConstructor()->alwaysForce())
