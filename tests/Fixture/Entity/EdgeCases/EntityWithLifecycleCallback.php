@@ -23,11 +23,18 @@ class EntityWithLifecycleCallback
     public ?int $id = null;
 
     #[ORM\Column(nullable: true)]
-    public ?string $prop = null;
+    public ?string $prop1 = null;
+
+    #[ORM\Column(nullable: true)]
+    public ?string $prop2 = null;
 
     #[ORM\PrePersist]
     public function prePersist(): void
     {
-        $this->prop = 'pre-persist';
+        $this->prop1 = 'pre-persist';
+
+        if ($this->prop2 === null) {
+            throw new \LogicException('prop2 should not be empty');
+        }
     }
 }

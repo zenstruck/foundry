@@ -714,6 +714,43 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     }
 
     /**
+     * @test
+     */
+    #[Test]
+    public function can_use_priorities_in_hooks(): void
+    {
+        $object = $this->factory()
+            ->beforeInstantiate(function(array $attributes) {
+                $attributes['prop1'] = ($attributes['prop1'] ?? '').'3';
+
+                return $attributes;
+            })
+            ->beforeInstantiate(function(array $attributes) {
+                $attributes['prop1'] = ($attributes['prop1'] ?? '').'2';
+
+                return $attributes;
+            }, priority: 1)
+            ->afterInstantiate(function(GenericModel $object) {
+                $object->setProp1("{$object->getProp1()}5");
+            })
+            ->afterInstantiate(function(GenericModel $object) {
+                $object->setProp1("{$object->getProp1()}4");
+            }, priority: 1)
+            ->afterPersist(function(GenericModel $object) {
+                $object->setProp1("{$object->getProp1()}7");
+            })
+            ->afterPersist(function(GenericModel $object) {
+                $object->setProp1("{$object->getProp1()}6");
+            }, priority: 1)
+            ->create(['prop1' => '1']);
+
+        $this->assertSame('1234567', $object->getProp1());
+
+        refresh($object);
+        $this->assertSame('1234567', $object->getProp1());
+    }
+
+    /**
      * @return class-string<GenericModel>
      */
     protected function modelClass(): string

@@ -612,7 +612,7 @@ Hooks
 ~~~~~
 
 The following hooks can be added to factories. Multiple hooks callbacks can be added, they are run in the order
-they were added.
+they were added, or by priority (higher priority hooks are executed first).
 
 ::
 
@@ -641,10 +641,15 @@ they were added.
         })
 
         // multiple events are allowed
-        ->beforeInstantiate(function($parameters) { return $parameters; })
-        ->afterInstantiate(function() {})
-        ->afterPersist(function() {})
+        // priority can be provided: all the following would be executed before the previous ones
+        ->beforeInstantiate(function($parameters) { return $parameters; }, priority: 10)
+        ->afterInstantiate(function() {}, priority: 10)
+        ->afterPersist(function() {}, priority: 10)
     ;
+
+.. versionadded::  2.8
+
+    Hook priority were added in Foundry 2.8.
 
 You can also add hooks directly in your factory class:
 

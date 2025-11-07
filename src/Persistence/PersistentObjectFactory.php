@@ -41,9 +41,11 @@ use function Zenstruck\Foundry\set;
  */
 abstract class PersistentObjectFactory extends ObjectFactory
 {
+    public const PRIORITY_SCHEDULE_FOR_INSERT = -10;
+
     private PersistMode $persist = PersistMode::PERSIST;
 
-    /** @phpstan-var list<callable(T, Parameters, static):void> */
+    /** @phpstan-var array<int, list<callable(T, Parameters, static):void>> */
     private array $afterPersist = [];
 
     /** @var list<callable(T):void> */
@@ -322,10 +324,17 @@ abstract class PersistentObjectFactory extends ObjectFactory
     /**
      * @phpstan-param callable(T, Parameters, static):void $callback
      */
-    final public function afterPersist(callable $callback): static
+    final public function afterPersist(callable $callback, int $priority = 0): static
     {
         $clone = clone $this;
-        $clone->afterPersist[] = $callback;
+
+        $afterPersist = $clone->afterPersist;
+
+        $afterPersist[$priority] ??= [];
+        $afterPersist[$priority][] = $callback;
+        krsort($afterPersist);
+
+        $clone->afterPersist = $afterPersist;
 
         return $clone;
     }
@@ -526,14 +535,15 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
                     $afterPersistCallbacks = [];
 
-                    foreach ($factoryUsed->afterPersist as $afterPersist) {
+                    foreach (array_merge(...$factoryUsed->afterPersist) as $afterPersist) {
                         $afterPersistCallbacks[] = static function() use ($object, $afterPersist, $parameters, $factoryUsed): void {
                             $afterPersist($object, $parameters, $factoryUsed);
                         };
                     }
 
                     Configuration::instance()->persistence()->scheduleForInsert($object, $afterPersistCallbacks);
-                }
+                },
+                self::PRIORITY_SCHEDULE_FOR_INSERT
             )
         ;
     }

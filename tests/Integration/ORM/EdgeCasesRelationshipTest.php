@@ -19,6 +19,7 @@ use PHPUnit\Framework\Attributes\IgnorePhpunitWarnings;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\ChangesEntityRelationshipCascadePersist;
@@ -327,11 +328,45 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
     #[Test]
     public function it_works_with_doctrine_lifecycle_callbacks(): void
     {
-        $entity = persistent_factory(EntityWithLifecycleCallback::class)->create();
-        self::assertSame('pre-persist', $entity->prop);
+        $entity = persistent_factory(EntityWithLifecycleCallback::class)->create(['prop2' => 'foo']);
+        self::assertSame('pre-persist', $entity->prop1);
 
         refresh($entity);
-        self::assertSame('pre-persist', $entity->prop);
+        self::assertSame('pre-persist', $entity->prop1);
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function after_persist_hook_occur_before_pre_persist_lifecycle_callback(): void
+    {
+        $entity = persistent_factory(EntityWithLifecycleCallback::class)
+            ->afterInstantiate(
+                static function(EntityWithLifecycleCallback $e) {
+                    // if not set, the prePersist lifecycle callback will throw
+                    $e->prop2 = 'foo';
+                }
+            )
+            ->create();
+        self::assertSame('foo', $entity->prop2);
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function it_can_declare_after_instantiate_properties_that_occur_after_pre_persist(): void
+    {
+        $entity = persistent_factory(EntityWithLifecycleCallback::class)
+            ->afterInstantiate(
+                static function(EntityWithLifecycleCallback $e) {
+                    $e->prop1 = "{$e->prop1} - after instantiate";
+                },
+                PersistentObjectFactory::PRIORITY_SCHEDULE_FOR_INSERT - 1 // after prePersist
+            )
+            ->create(['prop2' => 'foo']);
+        self::assertSame('pre-persist - after instantiate', $entity->prop1);
     }
 
     /**
