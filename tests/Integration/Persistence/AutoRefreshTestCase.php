@@ -53,6 +53,23 @@ abstract class AutoRefreshTestCase extends WebTestCase
     use Factories, ResetDatabase;
 
     #[Test]
+    public function it_can_refresh_after_services_reset(): void
+    {
+        $object = $this->factory()->create();
+        $objectId = $object->id;
+
+        self::getContainer()->get('services_resetter')->reset(); // @phpstan-ignore method.notFound
+        self::assertTrue((new \ReflectionClass($object))->isUninitializedLazyObject($object));
+
+        $this->updateObject($objectId);
+
+        self::assertSame('foo', $object->getProp1());
+
+        // service reset did clear the EM, thus the object is not managed anymore
+        self::assertFalse($this->objectManager()->contains($object));
+    }
+
+    #[Test]
     public function it_can_refresh_after_kernel_shutdown(): void
     {
         $object = $this->factory()->create();
