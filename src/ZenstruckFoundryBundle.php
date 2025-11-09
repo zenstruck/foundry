@@ -15,6 +15,7 @@ use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Reference;
@@ -25,6 +26,7 @@ use Zenstruck\Foundry\InMemory\DependencyInjection\InMemoryCompilerPass;
 use Zenstruck\Foundry\InMemory\InMemoryRepository;
 use Zenstruck\Foundry\Mongo\MongoResetter;
 use Zenstruck\Foundry\Object\Instantiator;
+use Zenstruck\Foundry\ORM\ResetDatabase\AutoDatabaseResetter;
 use Zenstruck\Foundry\ORM\ResetDatabase\MigrateDatabaseResetter;
 use Zenstruck\Foundry\ORM\ResetDatabase\OrmResetter;
 use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
@@ -413,10 +415,17 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                 match ($resetMode) {
                     ResetDatabaseMode::SCHEMA => SchemaDatabaseResetter::class,
                     ResetDatabaseMode::MIGRATE => MigrateDatabaseResetter::class,
+                    ResetDatabaseMode::AUTO => AutoDatabaseResetter::class,
                 }
             );
 
-        if (ResetDatabaseMode::MIGRATE === $resetMode) {
+        if (ResetDatabaseMode::AUTO === $resetMode) {
+            $container->getDefinition(OrmResetter::class)
+                ->replaceArgument('$dependencyFactory', new Reference('doctrine.migrations.dependency_factory', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+            ;
+        }
+
+        if ($resetMode->requiresMigrationConfiguration()) {
             $container->getDefinition(OrmResetter::class)
                 ->replaceArgument('$configurations', $ormConfig['reset']['migrations']['configurations']);
         }
