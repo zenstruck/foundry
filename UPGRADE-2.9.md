@@ -1,7 +1,7 @@
 # Migration guide from Foundry 2.8 to 2.9
 
-The main feature of Foundry 2.9 is the deprecation of the `Factories` trait, in favor of the [PHPUnit extension](https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#phpunit-extension)
-shipped by Foundry. It was necessary to remember to add the trait in every test class. And in some cases, Foundry could
+The main feature of Foundry 2.9 is the deprecation of the `Factories` and `ResetDatabase` traits, in favor of the [PHPUnit extension](https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#phpunit-extension)
+shipped by Foundry. It was necessary to remember to add the traits in every test class. And in some cases, Foundry could
 still work even if the trait wasn’t added to the test, which could lead to subtle bugs. Now, Foundry is globally enabled
 once for all.
 
@@ -27,7 +27,10 @@ in your `phpunit.xml` file:
 </phpunit>
 ```
 
-And then, remove all the `use Factories;` statements from your factories.
+And then:
+- remove all the `use Factories;` statements from your factories.
+- replace all the `use ResetDatabase;` statements by a `#[\Zenstruck\Foundry\Attribute\ResetDatabase]` attribute
+  on your test classes. Note that you can put the attribute on a parent class, it will be inherited by all its children.
 
 ## Rector rules
 

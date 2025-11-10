@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\PHPUnit;
 
 use PHPUnit\Event;
-use PHPUnit\Event\TestSuite\Started as TestSuiteStarted;
 use PHPUnit\Metadata\Version\ConstraintRequirement;
 use PHPUnit\Runner;
 use PHPUnit\TextUI;
@@ -45,21 +44,23 @@ if (\interface_exists(Runner\Extension\Extension::class)) {
                 Configuration::shutdown();
             }
 
-            // order matters within each event
-            $subscribers = array_merge(...[
+            // ⚠️ order matters within each event
+            $subscribers = [
                 Event\TestSuite\Started::class => [new ResetDatabaseOnTestSuiteStarted()],
                 Event\Test\DataProviderMethodCalled::class => [new BootFoundryOnDataProviderMethodCalled()],
                 Event\Test\DataProviderMethodFinished::class => [new ShutdownFoundryOnDataProviderMethodFinished()],
                 Event\Test\Prepared::class => [
-                    new TriggerDataProviderPersistenceOnTestPrepared(),
                     new BootFoundryOnTestPrepared(),
                     new EnableInMemoryOnTestPrepared(),
-                    new BuildStoryOnTestPrepared(),
                     new ResetDatabaseOnTestPrepared(),
+                    new BuildStoryOnTestPrepared(),
+                    new TriggerDataProviderPersistenceOnTestPrepared(),
                 ],
                 Event\Test\Finished::class => [new ShutdownFoundryOnTestFinished()],
                 Event\TestRunner\Finished::class => [new DisplayFakerSeedOnTestSuiteFinished()],
-            ]);
+            ];
+
+            $subscribers = array_merge(...array_values($subscribers));
 
             // Foundry can only handle data provider since PHPUnit 11.4
             if (!ConstraintRequirement::from('>=11.4')->isSatisfiedBy(Runner\Version::id())) {

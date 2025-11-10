@@ -1744,6 +1744,10 @@ this for you.
 Before the first test using the ``ResetDatabase`` attribute, it drops (if exists) and creates the test database.
 Then, by default, before each test, it resets the schema using ``doctrine:schema:drop``/``doctrine:schema:create``.
 
+.. versionadded::  2.9
+
+    ``#[ResetDatabase]`` attribute was added in Foundry 2.9 and requires at least PHPUnit 10.
+
 .. note::
 
     If you're still using PHPUnit 9, the database can be reset by adding the trait ``Zenstruck\Foundry\Test\ResetDatabase``::

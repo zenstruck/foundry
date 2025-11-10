@@ -45,8 +45,7 @@ final class ResetDatabaseOnTestSuiteStarted implements Event\TestSuite\StartedSu
         }
 
         ResetDatabaseManager::resetBeforeFirstTest(
-            static fn() => KernelTestCaseHelper::bootKernel($testClassName),
-            static fn() => KernelTestCaseHelper::ensureKernelShutdown($testClassName),
+            KernelTestCaseHelper::bootKernel($testClassName),
         );
     }
 }

@@ -37,13 +37,12 @@ final class ResetDatabaseOnTestPrepared implements Event\Test\PreparedSubscriber
             new \ReflectionClass($test->className())
         );
 
-        if ([] === $resetDatabaseAttributes) {
+        if ([] === $resetDatabaseAttributes || ResetDatabaseManager::canSkipSchemaReset()) {
             return;
         }
 
         ResetDatabaseManager::resetBeforeEachTest(
-            static fn() => KernelTestCaseHelper::bootKernel($test->className()),
-            static fn() => KernelTestCaseHelper::ensureKernelShutdown($test->className()),
+            KernelTestCaseHelper::bootKernel($test->className()),
         );
     }
 }
