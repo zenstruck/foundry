@@ -30,7 +30,7 @@
         "dama/doctrine-test-bundle": "^8.0",
         "doctrine/collections": "^1.7|^2.0",
         "doctrine/common": "^3.2.2",
-        "doctrine/doctrine-bundle": "^2.10",
+        "doctrine/doctrine-bundle": "^2.10|^3.0",
         "doctrine/doctrine-migrations-bundle": "^2.2|^3.0",
         "doctrine/mongodb-odm": "^2.4",
         "doctrine/mongodb-odm-bundle": "^4.6|^5.0",
