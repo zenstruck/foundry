@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Integration\DataProvider;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
@@ -27,8 +28,11 @@ use Zenstruck\Foundry\Persistence\ProxyGenerator;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericProxyEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
+use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
@@ -44,6 +48,7 @@ abstract class DataProviderWithPersistentFactoryInKernelTestCase extends KernelT
 
     #[Test]
     #[DataProvider('createOneProxyObjectInDataProvider')]
+    #[Group('legacy-proxy')]
     public function assert_it_can_create_one_object_in_data_provider(?GenericModel $providedData): void
     {
         static::proxyFactory()::assert()->count(1);
@@ -55,6 +60,11 @@ abstract class DataProviderWithPersistentFactoryInKernelTestCase extends KernelT
 
     public static function createOneProxyObjectInDataProvider(): iterable
     {
+        if (!TestKernel::canUseLegacyProxy()) {
+            yield [null];
+            return;
+        }
+
         yield 'createOne()' => [
             static::proxyFactory()::createOne(['prop1' => 'value set in data provider']),
         ];
@@ -66,6 +76,7 @@ abstract class DataProviderWithPersistentFactoryInKernelTestCase extends KernelT
 
     #[Test]
     #[DataProvider('createMultipleObjectsInDataProvider')]
+    #[Group('legacy-proxy')]
     public function assert_it_can_create_multiple_objects_in_data_provider(?array $providedData): void
     {
         self::assertIsArray($providedData);
@@ -76,6 +87,11 @@ abstract class DataProviderWithPersistentFactoryInKernelTestCase extends KernelT
 
     public static function createMultipleObjectsInDataProvider(): iterable
     {
+        if (!TestKernel::canUseLegacyProxy()) {
+            yield [[]];
+            return;
+        }
+
         yield 'createSequence()' => [
             static::proxyFactory()::createSequence([
                 ['prop1' => 'prop 1'],
@@ -93,6 +109,7 @@ abstract class DataProviderWithPersistentFactoryInKernelTestCase extends KernelT
 
     #[Test]
     #[DataProvider('useGetterOnProxyObjectCreatedInDataProvider')]
+    #[Group('legacy-proxy')]
     public function assert_using_getter_proxy_object_created_in_a_data_provider_throws(?\Throwable $e): void
     {
         self::assertInstanceOf(\LogicException::class, $e);
@@ -132,28 +149,6 @@ abstract class DataProviderWithPersistentFactoryInKernelTestCase extends KernelT
     }
 
     #[Test]
-    #[DataProvider('createOneObjectInDataProvider')]
-    #[RequiresPhp('>=8.4')]
-    public function assert_it_can_create_one_object_in_data_provider_without_proxy_with_php_84(mixed $providedData): void
-    {
-        static::proxyFactory()::assert()->count(1);
-
-        self::assertInstanceOf(GenericModel::class, $providedData);
-        self::assertSame('value set in data provider', $providedData->getProp1());
-    }
-
-    public static function createOneObjectInDataProvider(): iterable
-    {
-        yield 'createOne()' => [
-            static::proxyFactory()::createOne(['prop1' => 'value set in data provider']),
-        ];
-
-        yield 'create()' => [
-            static::proxyFactory()->create(['prop1' => 'value set in data provider']),
-        ];
-    }
-
-    #[Test]
     #[DataProvider('useGetterOnObjectCreatedInDataProvider')]
     public function assert_it_can_use_getter_on_non_persisted_object_created_in_data_provider(
         string $providedData,
@@ -170,11 +165,15 @@ abstract class DataProviderWithPersistentFactoryInKernelTestCase extends KernelT
             static::factory()::new()->withoutPersisting()->many(1)->create()[0]->getProp1(),
             'default1',
         ];
-        yield 'proxy factory' => [static::proxyFactory()::new()->withoutPersisting()->create()->_real(withAutoRefresh: false)->getProp1(), 'default1'];
-        yield 'proxy factory using many' => [
-            static::proxyFactory()::new()->withoutPersisting()->many(1)->create()[0]->_real(withAutoRefresh: false)->getProp1(),
-            'default1',
-        ];
+
+        if (TestKernel::canUseLegacyProxy()) {
+            yield 'proxy factory' => [static::proxyFactory()::new()->withoutPersisting()->create()->_real(withAutoRefresh: false)->getProp1(), 'default1'];
+            yield 'proxy factory using many' => [
+                static::proxyFactory()::new()->withoutPersisting()->many(1)->create()[0]->_real(withAutoRefresh: false)->getProp1(),
+                'default1',
+            ];
+        }
+
     }
 
     /**

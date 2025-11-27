@@ -84,6 +84,7 @@ final class PersistentObjectFactoryTest extends TestCase
 
     public static function factoryCollectionDataProvider(): iterable
     {
+        // @phpstan-ignore argument.type
         yield [
             GenericEntityFactory::new()->sequence([
                 [

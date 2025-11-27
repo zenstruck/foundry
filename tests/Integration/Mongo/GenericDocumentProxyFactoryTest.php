@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\Mongo;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithReadonly;
@@ -24,6 +25,7 @@ use function Zenstruck\Foundry\Persistence\proxy_factory;
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 #[IgnoreDeprecations]
+#[Group('legacy-proxy')]
 final class GenericDocumentProxyFactoryTest extends GenericProxyFactoryTestCase
 {
     use RequiresMongo;

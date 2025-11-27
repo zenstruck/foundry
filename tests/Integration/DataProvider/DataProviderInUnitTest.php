@@ -30,6 +30,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Object2Factory;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
 use Zenstruck\Foundry\Tests\Fixture\Object2;
 
+use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 use function Zenstruck\Foundry\faker;
 
 /**
@@ -66,7 +67,10 @@ final class DataProviderInUnitTest extends TestCase
     public static function createObjectWithPersistentObjectFactoryInDataProvider(): iterable
     {
         yield 'persistent factory' => [GenericEntityFactory::createOne(), new GenericEntity('default1')];
-        yield 'proxy persistent factory' => [GenericProxyEntityFactory::createOne(), new GenericEntity('default1')];
+
+        if (TestKernel::canUseLegacyProxy()) {
+            yield 'proxy persistent factory' => [GenericProxyEntityFactory::createOne(), new GenericEntity('default1')];
+        }
     }
 
     #[Test]
@@ -81,8 +85,11 @@ final class DataProviderInUnitTest extends TestCase
     {
         yield 'object factory' => [Object1Factory::createOne()->getProp1(), 'value1-constructor'];
         yield 'persistent factory' => [GenericEntityFactory::createOne()->getProp1(), 'default1'];
-        yield 'proxy persistent factory' => [GenericProxyEntityFactory::createOne()->getProp1(), 'default1'];
-        yield 'proxy persistent factory using many' => [GenericProxyEntityFactory::createMany(1)[0]->getProp1(), 'default1'];
+
+        if (TestKernel::canUseLegacyProxy()) {
+            yield 'proxy persistent factory' => [GenericProxyEntityFactory::createOne()->getProp1(), 'default1'];
+            yield 'proxy persistent factory using many' => [GenericProxyEntityFactory::createMany(1)[0]->getProp1(), 'default1'];
+        }
     }
 
     #[Test]

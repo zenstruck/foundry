@@ -194,6 +194,11 @@ final class Configuration
             return;
         }
 
+        if (!trait_exists(\Symfony\Component\VarExporter\LazyProxyTrait::class)) {
+            // Deprecation is not needed: PersistentProxyObjectFactory will actually throw when create() is called.
+            return;
+        }
+
         $message = <<<DEPRECATION
             Proxy usage is deprecated in PHP 8.4. You should extend directly PersistentObjectFactory in your factories.
             Foundry now leverages the native PHP lazy system to auto-refresh objects (it can be enabled with "zenstruck_foundry.enable_auto_refresh_with_lazy_objects" configuration).

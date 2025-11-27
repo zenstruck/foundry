@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\ForceFactoriesTraitUsage;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
@@ -27,6 +28,7 @@ final class ClassExtendingBaseTestCaseNotUsingFactoriesTest extends AnotherBaseT
 
     #[Test]
     #[IgnoreDeprecations]
+    #[Group('legacy-proxy')]
     public function using_foundry_should_trigger_deprecation(): void
     {
         $this->assertDeprecation();

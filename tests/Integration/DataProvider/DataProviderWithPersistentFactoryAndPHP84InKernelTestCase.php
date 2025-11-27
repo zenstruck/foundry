@@ -20,10 +20,10 @@ use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
 
 /**
@@ -34,7 +34,7 @@ use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
 #[RequiresPhp('>=8.4')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 #[RequiresEnvironmentVariable('USE_PHP_84_LAZY_OBJECTS', '1')]
-final class DataProviderWithPersistentFactoryAndPHP84InKernelTest extends KernelTestCase
+abstract class DataProviderWithPersistentFactoryAndPHP84InKernelTestCase extends KernelTestCase
 {
     use Factories;
     use ResetDatabase;
@@ -43,7 +43,7 @@ final class DataProviderWithPersistentFactoryAndPHP84InKernelTest extends Kernel
     #[DataProvider('createOneObjectInDataProvider')]
     public function assert_it_can_create_one_object_in_data_provider(?GenericModel $providedData): void
     {
-        GenericEntityFactory::assert()->count(1);
+        static::factory()::assert()->count(1);
 
         self::assertNotNull($providedData);
         self::assertFalse((new \ReflectionClass($providedData))->isUninitializedLazyObject($providedData));
@@ -53,11 +53,11 @@ final class DataProviderWithPersistentFactoryAndPHP84InKernelTest extends Kernel
     public static function createOneObjectInDataProvider(): iterable
     {
         yield 'createOne()' => [
-            GenericEntityFactory::createOne(['prop1' => 'value set in data provider']),
+            static::factory()::createOne(['prop1' => 'value set in data provider']),
         ];
 
         yield 'create()' => [
-            GenericEntityFactory::new()->create(['prop1' => 'value set in data provider']),
+            static::factory()::new()->create(['prop1' => 'value set in data provider']),
         ];
     }
 
@@ -66,7 +66,7 @@ final class DataProviderWithPersistentFactoryAndPHP84InKernelTest extends Kernel
     public function assert_it_can_create_multiple_objects_in_data_provider(?array $providedData): void
     {
         self::assertIsArray($providedData);
-        GenericEntityFactory::assert()->count(2);
+        static::factory()::assert()->count(2);
 
         foreach ($providedData as $providedDatum) {
             self::assertFalse((new \ReflectionClass($providedDatum))->isUninitializedLazyObject($providedDatum));
@@ -79,17 +79,22 @@ final class DataProviderWithPersistentFactoryAndPHP84InKernelTest extends Kernel
     public static function createMultipleObjectsInDataProvider(): iterable
     {
         yield 'createSequence()' => [
-            GenericEntityFactory::createSequence([
+            static::factory()::createSequence([
                 ['prop1' => 'prop 1'],
                 ['prop1' => 'prop 2'],
             ]),
         ];
 
         yield 'FactoryCollection::create()' => [
-            GenericEntityFactory::new()->sequence([
+            static::factory()::new()->sequence([
                 ['prop1' => 'prop 1'],
                 ['prop1' => 'prop 2'],
             ])->create(),
         ];
     }
+
+    /**
+     * @return PersistentObjectFactory<GenericModel>
+     */
+    abstract protected static function factory(): PersistentObjectFactory;
 }

@@ -11,14 +11,12 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\DataProvider;
 
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericProxyEntityFactory;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 /**
@@ -28,17 +26,11 @@ use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 #[RequiresPhpunit('>=11.4')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 #[IgnoreDeprecations]
-#[Group('legacy-proxy')]
-final class GenericEntityProxyFactoryTest extends DataProviderWithPersistentFactoryInKernelTestCase
+final class GenericEntityFactoryTest extends DataProviderWithPersistentFactoryAndPHP84InKernelTestCase
 {
     use RequiresORM;
 
-    protected static function proxyFactory(): GenericProxyEntityFactory
-    {
-        return GenericProxyEntityFactory::new();
-    }
-
-    protected static function factory(): PersistentObjectFactory
+    protected static function factory(): GenericEntityFactory
     {
         return GenericEntityFactory::new();
     }

@@ -17,6 +17,16 @@ check_phpunit_version() {
     fi
 }
 
+can_use_legacy_proxies() {
+    INSTALLED_SYMFONY_VERSION=$(${COMPOSER_BIN} info symfony/var-exporter | grep versions |  cut -c 15-)
+
+    if [[ "${INSTALLED_SYMFONY_VERSION}" == "8"* ]]; then
+      echo 0;
+    else
+      echo 1;
+    fi
+}
+
 ### >> load env vars from .env files if not in CI and not from a composer script
 if [ -z "${CI:-}" ] ; then
   source .env
@@ -73,6 +83,10 @@ case ${PHPUNIT_VERSION} in
 
     if [ "${USE_FOUNDRY_PHPUNIT_EXTENSION:-0}" = "1" ]; then
       PHPUNIT_EXEC="${PHPUNIT_EXEC} --extension "${FOUNDRY_EXTENSION}""
+    fi
+
+    if [ "$(can_use_legacy_proxies)" = "0" ]; then
+      PHPUNIT_EXEC="${PHPUNIT_EXEC} --exclude-group legacy-proxy"
     fi
     ;;
 esac

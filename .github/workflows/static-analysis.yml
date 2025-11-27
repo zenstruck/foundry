@@ -35,11 +35,14 @@ jobs:
         with:
           php-version: 8.4
           coverage: none
+          tools: flex
 
       - name: Install dependencies
         uses: ramsey/composer-install@v2
         with:
           composer-options: --prefer-dist
+        env:
+          SYMFONY_REQUIRE: 7.4.*
 
       - name: Install PHPStan
         run: composer bin phpstan install
@@ -78,7 +81,7 @@ jobs:
     uses: zenstruck/.github/.github/workflows/php-composer-validate.yml@main
 
   composer-validate-psr:
-    name: PhpStan
+    name: Validate PSR-4
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

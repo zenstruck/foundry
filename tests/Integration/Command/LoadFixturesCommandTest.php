@@ -219,7 +219,7 @@ final class LoadFixturesCommandTest extends KernelTestCase
     {
         $commandTester = $this->commandTester(['environment' => 'stories_as_fixtures']);
 
-        $commandTester->setInputs([0]);
+        $commandTester->setInputs(['0']);
         $commandTester->execute(['--append' => true]);
 
         GenericEntityFactory::assert()->count(1);
@@ -236,7 +236,7 @@ final class LoadFixturesCommandTest extends KernelTestCase
     {
         $commandTester = $this->commandTester(['environment' => 'stories_as_fixtures']);
 
-        $commandTester->setInputs([3, 1]); // ["chose a group to load", "multiple-fixtures-in-group"]
+            $commandTester->setInputs(['3', '1']); // ["chose a group to load", "multiple-fixtures-in-group"]
         $commandTester->execute(['--append' => true]);
 
         GenericEntityFactory::assert()->count(2);

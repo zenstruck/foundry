@@ -75,6 +75,11 @@ abstract class FoundryTestKernel extends Kernel
         return \PHP_VERSION_ID >= 80400 && \getenv('USE_PHP_84_LAZY_OBJECTS');
     }
 
+    public static function canUseLegacyProxy(): bool
+    {
+        return trait_exists(\Symfony\Component\VarExporter\LazyProxyTrait::class);
+    }
+
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
     {
         $frameworkConfiguration = [
@@ -90,15 +95,15 @@ abstract class FoundryTestKernel extends Kernel
             $frameworkConfiguration['handle_all_throwables'] = true;
         }
 
-        if (\str_starts_with(self::VERSION, '7.3')) {
-            // prevent a deprecation notice in Symfony 7.3
+        if (\str_starts_with(self::VERSION, '7.3') || \str_starts_with(self::VERSION, '7.4')) {
+            // prevent a deprecation notice in Symfony 7.3 - 7.4
             $frameworkConfiguration['property_info']['with_constructor_extractor'] = true;
         }
 
         $c->loadFromExtension('framework', $frameworkConfiguration);
 
         if (self::hasORM()) {
-            $c->loadFromExtension('doctrine', [
+            $doctrineConfig = [
                 'dbal' => ['url' => '%env(resolve:DATABASE_URL)%', 'use_savepoints' => true],
                 'orm' => [
                     'auto_generate_proxy_classes' => true,
@@ -136,11 +141,18 @@ abstract class FoundryTestKernel extends Kernel
                     ],
                     'controller_resolver' => ['auto_mapping' => false],
                 ],
-            ]);
+            ];
 
-            if (\PHP_VERSION_ID >= 80400) {
-                $c->loadFromExtension('doctrine', ['orm' => ['enable_native_lazy_objects' => true]]);
+            if (file_exists(__DIR__.'/../../vendor/doctrine/doctrine-bundle/UPGRADE-3.1.md')) {
+                unset($doctrineConfig['dbal']['use_savepoints']);
+                unset($doctrineConfig['orm']['auto_generate_proxy_classes']);
+                unset($doctrineConfig['orm']['auto_mapping']);
+                unset($doctrineConfig['controller_resolver']['auto_mapping']); // @phpstan-ignore unset.offset
+            } elseif (\PHP_VERSION_ID >= 80400 && file_exists(__DIR__.'/../../vendor/doctrine/doctrine-bundle/UPGRADE-2.18.md')) {
+                $doctrineConfig['orm']['enable_native_lazy_objects'] = true;
             }
+
+            $c->loadFromExtension('doctrine', $doctrineConfig);
 
             $c->register(ChangeCascadePersistOnLoadClassMetadataListener::class)
                 ->setAutowired(true)

@@ -35,15 +35,11 @@ class Contact extends Base
 
     /** @var Collection<int,Tag> */
     #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: 'contacts')]
-    #[ORM\JoinColumn(nullable: false)]
-    #[ORM\InverseJoinColumn(nullable: false)]
     protected Collection $tags;
 
     /** @var Collection<int,Tag> */
     #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: 'secondaryContacts')]
     #[ORM\JoinTable(name: 'category_tag_standard_secondary')]
-    #[ORM\JoinColumn(nullable: false)]
-    #[ORM\InverseJoinColumn(nullable: false)]
     protected Collection $secondaryTags;
 
     #[ORM\OneToOne(targetEntity: Address::class, inversedBy: 'contact')]

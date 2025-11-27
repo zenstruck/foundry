@@ -40,6 +40,10 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
      */
     final public function create(callable|array $attributes = []): object
     {
+        if (!trait_exists(\Symfony\Component\VarExporter\LazyProxyTrait::class)) {
+            throw new \LogicException('PersistentProxyObjectFactory can no longer be used with Symfony 8. See https://github.com/zenstruck/foundry/blob/2.x/UPGRADE-2.7.md to get rid of Foundry\'s proxy mechanism, and upgrade to Symfony 8.');
+        }
+
         $configuration = Configuration::instance();
         if ($configuration->inADataProvider() && $this->isPersisting()) {
             return ProxyGenerator::wrapFactory($this, $attributes);

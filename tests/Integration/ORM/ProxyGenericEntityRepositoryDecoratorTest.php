@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericProxyEntityFactory;
@@ -21,6 +22,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericProxyEntityFactory;
  * @group legacy
  */
 #[IgnoreDeprecations]
+#[Group('legacy-proxy')]
 final class ProxyGenericEntityRepositoryDecoratorTest extends GenericEntityRepositoryDecoratorTest
 {
     protected function factory(): PersistentObjectFactory

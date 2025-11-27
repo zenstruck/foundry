@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -50,6 +51,7 @@ final class ReuseEntityTest extends TestCase
      */
     #[Test]
     #[IgnoreDeprecations]
+    #[Group('legacy-proxy')]
     public function it_can_reuse_a_proxy_object(): void
     {
         $address = AddressFactory::createOne();

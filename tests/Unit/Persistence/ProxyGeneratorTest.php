@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Unit\Persistence;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -25,6 +26,7 @@ use Zenstruck\Foundry\Test\Factories;
  * @group legacy
  */
 #[IgnoreDeprecations]
+#[Group('legacy-proxy')]
 final class ProxyGeneratorTest extends TestCase
 {
     use Factories;

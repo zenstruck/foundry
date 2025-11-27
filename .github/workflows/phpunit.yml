@@ -27,7 +27,7 @@ jobs:
       fail-fast: false
       matrix:
         php: [ 8.2, 8.3, 8.4 ]
-        symfony: [ 6.4.*, 7.3.*, 8.0.*-dev ]
+        symfony: [ 6.4.*, 7.4.*, 8.0.* ]
         database: [ mysql|mongo ]
         phpunit: [ 11, 12 ]
         use-php-84-lazy-objects: [ 1 ]
@@ -41,37 +41,39 @@ jobs:
           - {php: 8.3, phpunit: 11}
           - {php: 8.4, phpunit: 11}
 
+          - {php: 8.2, symfony: 8.0.*}
+          - {php: 8.3, symfony: 8.0.*}
+
         include:
           # php 8.1
           - {php: 8.1, symfony: 6.4.*, phpunit: 9, database: mysql}
 
           # old PHPUnit versions
-          - {php: 8.3, symfony: '*', phpunit: 9, database: mysql}
-          - {php: 8.4, symfony: '*', phpunit: 10, database: mysql}
-          - {php: 8.4, symfony: '*', phpunit: 11, database: mysql}
+          - {php: 8.3, symfony: 7.4.*, phpunit: 9, database: mysql}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 11, database: mysql}
 
           # test with no database (PHPUnit 9 is used to prevent some problems with empty data providers)
-          - {php: 8.3, symfony: '*', phpunit: 9, database: none}
-          - {php: 8.3, symfony: '*', phpunit: 9, database: none, deps: lowest}
+          - {php: 8.3, symfony: 7.4.*, phpunit: 9, database: none}
+          - {php: 8.3, symfony: 7.4.*, phpunit: 9, database: none, deps: lowest}
 
           # One permutation per DBMS
-          - {php: 8.4, symfony: '*', phpunit: 12, database: mongo}
-          - {php: 8.4, symfony: '*', phpunit: 12, database: pgsql}
-          - {php: 8.4, symfony: '*', phpunit: 12, database: sqlite}
-          - {php: 8.4, symfony: '*', phpunit: 12, database: mysql}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 12, database: mongo}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 12, database: pgsql}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 12, database: sqlite}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 12, database: mysql}
 
           # lowest deps (one per DBMS)
-          - {php: 8.3, symfony: '*', phpunit: 9, database: mysql|mongo, deps: lowest}
-          - {php: 8.3, symfony: '*', phpunit: 9, database: mongo, deps: lowest}
-          - {php: 8.3, symfony: '*', phpunit: 9, database: pgsql, deps: lowest}
-          - {php: 8.3, symfony: '*', phpunit: 9, database: sqlite, deps: lowest}
-          - {php: 8.3, symfony: '*', phpunit: 9, database: mysql, deps: lowest}
+          - {php: 8.3, symfony: 7.4.*, phpunit: 9, database: mysql|mongo, deps: lowest}
+          - {php: 8.3, symfony: 7.4.*, phpunit: 9, database: mongo, deps: lowest}
+          - {php: 8.3, symfony: 7.4.*, phpunit: 9, database: pgsql, deps: lowest}
+          - {php: 8.3, symfony: 7.4.*, phpunit: 9, database: sqlite, deps: lowest}
+          - {php: 8.3, symfony: 7.4.*, phpunit: 9, database: mysql, deps: lowest}
 
           # using Foundry's PHPUnit extension
-          - {php: 8.4, symfony: '*', phpunit: 12, database: mysql|mongo, use-phpunit-extension: 1}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 12, database: mysql|mongo, use-phpunit-extension: 1}
 
           # disable lazy objects in PHP 8.4
-          - {php: 8.4, symfony: '*', phpunit: 12, database: mysql|mongo, use-php-84-lazy-objects: 0}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 12, database: mysql|mongo, use-php-84-lazy-objects: 0}
     env:
       DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || contains(matrix.database, 'sqlite') && 'sqlite:///%kernel.project_dir%/var/data.db' || '' }}
       MONGO_URL: ${{ contains(matrix.database, 'mongo') && 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb' || '' }}
@@ -181,7 +183,7 @@ jobs:
           dependency-versions: ${{ matrix.deps }}
           composer-options: --prefer-dist
         env:
-          SYMFONY_REQUIRE: 7.3.*
+          SYMFONY_REQUIRE: 7.4.*
 
       - name: Set up MySQL
         if: contains(matrix.database, 'mysql')
@@ -232,8 +234,7 @@ jobs:
 
       - name: Test
         run: |
-          vendor/bin/phpunit tests/Unit
-
+          vendor/bin/phpunit tests/Unit --exclude-group legacy-proxy
 
   test-with-paratest:
     name: Test with paratest
@@ -264,7 +265,7 @@ jobs:
           dependency-versions: highest
           composer-options: --prefer-dist
         env:
-          SYMFONY_REQUIRE: 7.3.*
+          SYMFONY_REQUIRE: 7.4.*
 
       - name: Set up MySQL
         run: sudo /etc/init.d/mysql start
@@ -285,7 +286,7 @@ jobs:
       MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
       USE_DAMA_DOCTRINE_TEST_BUNDLE: 1
       USE_FOUNDRY_PHPUNIT_EXTENSION: 1
-      PHPUNIT_VERSION: 11
+      PHPUNIT_VERSION: 12
     services:
       mongo:
         image: mongo:4
@@ -311,14 +312,17 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: 8.4
           coverage: xdebug
           ini-values: xdebug.mode=coverage
+          tools: flex
 
       - name: Install dependencies
         uses: ramsey/composer-install@v2
         with:
           composer-options: --prefer-dist
+        env:
+          SYMFONY_REQUIRE: 7.4.x
 
       - name: Test with coverage
         run: ./phpunit --coverage-text --coverage-clover coverage.xml
