@@ -57,15 +57,15 @@ $var = UserFactory::new()->with()->create();
 // methods returning a list of objects
 /** @psalm-check-type-exact $var = list<UserForPersistentFactory> */
 $var = UserFactory::all();
-/** @psalm-check-type-exact $var = list<UserForPersistentFactory> */
+/** @psalm-check-type-exact $var = non-empty-list<UserForPersistentFactory> */
 $var = UserFactory::createMany(1);
-/** @psalm-check-type-exact $var = list<UserForPersistentFactory> */
+/** @psalm-check-type-exact $var = non-empty-list<UserForPersistentFactory> */
 $var = UserFactory::createRange(1, 2);
 /** @psalm-check-type-exact $var = list<UserForPersistentFactory> */
 $var = UserFactory::createSequence([]);
-/** @psalm-check-type-exact $var = list<UserForPersistentFactory> */
+/** @psalm-check-type-exact $var = non-empty-list<UserForPersistentFactory> */
 $var = UserFactory::randomRange(1, 2);
-/** @psalm-check-type-exact $var = list<UserForPersistentFactory> */
+/** @psalm-check-type-exact $var = non-empty-list<UserForPersistentFactory> */
 $var = UserFactory::randomSet(2);
 /** @psalm-check-type-exact $var = list<UserForPersistentFactory> */
 $var = UserFactory::findBy(['name' => 'foo']);
