@@ -70,6 +70,7 @@ abstract class Factory
      * @phpstan-param Attributes $attributes
      *
      * @return list<T>
+     * @phpstan-return ($number is positive-int ? non-empty-list<T> : list<T>)
      */
     final public static function createMany(int $number, array|callable $attributes = []): array
     {
@@ -80,6 +81,7 @@ abstract class Factory
      * @phpstan-param Attributes $attributes
      *
      * @return list<T>
+     * @phpstan-return ($min is positive-int ? non-empty-list<T> : list<T>)
      */
     final public static function createRange(int $min, int $max, array|callable $attributes = []): array
     {

@@ -100,9 +100,9 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
     /**
      * @param positive-int $count
-     * @phpstan-param Parameters   $criteria
+     * @phpstan-param Parameters $criteria
      *
-     * @return list<T>
+     * @return non-empty-list<T>
      */
     public static function randomSet(int $count, array $criteria = []): array
     {
@@ -112,9 +112,10 @@ abstract class PersistentObjectFactory extends ObjectFactory
     /**
      * @param int<0, max> $min
      * @param int<0, max> $max
-     * @phpstan-param Parameters  $criteria
+     * @phpstan-param Parameters $criteria
      *
      * @return list<T>
+     * @phpstan-return ($min is positive-int ? non-empty-list<T> : list<T>)
      */
     public static function randomRange(int $min, int $max, array $criteria = []): array
     {
@@ -124,9 +125,10 @@ abstract class PersistentObjectFactory extends ObjectFactory
     /**
      * @param int<0, max> $min
      * @param int<0, max> $max
-     * @phpstan-param Parameters  $criteria
+     * @phpstan-param Parameters $criteria
      *
      * @return list<T>
+     * @phpstan-return ($min is positive-int ? non-empty-list<T> : list<T>)
      */
     public static function randomRangeOrCreate(int $min, int $max, array $criteria = []): array
     {
