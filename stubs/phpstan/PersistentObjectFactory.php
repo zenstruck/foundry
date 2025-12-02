@@ -47,11 +47,11 @@ assertType('UserForPersistentFactory', UserFactory::new()->with()->create());
 
 // methods returning a list of objects
 assertType("list<UserForPersistentFactory>", UserFactory::all());
-assertType("list<UserForPersistentFactory>", UserFactory::createMany(1));
-assertType("list<UserForPersistentFactory>", UserFactory::createRange(1, 2));
+assertType("non-empty-list<UserForPersistentFactory>", UserFactory::createMany(1));
+assertType("non-empty-list<UserForPersistentFactory>", UserFactory::createRange(1, 2));
 assertType("list<UserForPersistentFactory>", UserFactory::createSequence([]));
-assertType("list<UserForPersistentFactory>", UserFactory::randomRange(1, 2));
-assertType("list<UserForPersistentFactory>", UserFactory::randomSet(2));
+assertType("non-empty-list<UserForPersistentFactory>", UserFactory::randomRange(1, 2));
+assertType("non-empty-list<UserForPersistentFactory>", UserFactory::randomSet(2));
 assertType("list<UserForPersistentFactory>", UserFactory::findBy(['name' => 'foo']));
 
 // methods with FactoryCollection
@@ -78,8 +78,8 @@ assertType("UserForPersistentFactory|null", $repository->findOneBy([]));
 assertType('UserForPersistentFactory', $repository->random());
 assertType("list<UserForPersistentFactory>", $repository->findAll());
 assertType("list<UserForPersistentFactory>", $repository->findBy([]));
-assertType("list<UserForPersistentFactory>", $repository->randomSet(2));
-assertType("list<UserForPersistentFactory>", $repository->randomRange(1, 2));
+assertType("non-empty-list<UserForPersistentFactory>", $repository->randomSet(2));
+assertType("non-empty-list<UserForPersistentFactory>", $repository->randomRange(1, 2));
 assertType('int<0, max>', $repository->count());
 
 // test autocomplete with phpstorm

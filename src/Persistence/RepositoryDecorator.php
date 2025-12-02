@@ -204,9 +204,9 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
 
     /**
      * @param positive-int $count
-     * @phpstan-param Parameters   $criteria
+     * @phpstan-param Parameters $criteria
      *
-     * @return list<T>
+     * @return non-empty-list<T>
      */
     public function randomSet(int $count, array $criteria = []): array
     {
@@ -220,9 +220,10 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
     /**
      * @param int<0, max> $min
      * @param int<0, max> $max
-     * @phpstan-param Parameters  $criteria
+     * @phpstan-param Parameters $criteria
      *
      * @return list<T>
+     * @phpstan-return ($min is positive-int ? non-empty-list<T> : list<T>)
      */
     public function randomRange(int $min, int $max, array $criteria = []): array
     {

@@ -44,8 +44,8 @@ assertType(
 assertType('UserForObjectFactory', UserObjectFactory::new()->with()->create());
 
 // methods returning a list of objects
-assertType("list<UserForObjectFactory>", UserObjectFactory::createMany(1));
-assertType("list<UserForObjectFactory>", UserObjectFactory::createRange(1, 2));
+assertType("non-empty-list<UserForObjectFactory>", UserObjectFactory::createMany(1));
+assertType("non-empty-list<UserForObjectFactory>", UserObjectFactory::createRange(1, 2));
 assertType("list<UserForObjectFactory>", UserObjectFactory::createSequence([]));
 
 // methods with FactoryCollection

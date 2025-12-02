@@ -89,7 +89,7 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
     }
 
     /**
-     * @return list<T&Proxy<T>>
+     * @return non-empty-list<T&Proxy<T>>
      */
     final public static function randomSet(int $count, array $criteria = []): array
     {
@@ -98,6 +98,7 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
 
     /**
      * @return list<T&Proxy<T>>
+     * @phpstan-return ($min is positive-int ? non-empty-list<T&Proxy<T>> : list<T&Proxy<T>>)
      */
     final public static function randomRange(int $min, int $max, array $criteria = []): array
     {
@@ -106,6 +107,7 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
 
     /**
      * @return list<T&Proxy<T>>
+     * @phpstan-return ($min is positive-int ? non-empty-list<T&Proxy<T>> : list<T&Proxy<T>>)
      */
     public static function randomRangeOrCreate(int $min, int $max, array $criteria = []): array
     {

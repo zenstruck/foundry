@@ -48,12 +48,12 @@ assertType($proxyType, UserProxyFactory::new()->instantiateWith(Instantiator::wi
 
 // methods returning a list of objects
 assertType("list<{$proxyType}>", UserProxyFactory::all());
-assertType("list<{$proxyType}>", UserProxyFactory::createMany(1));
-assertType("list<{$proxyType}>", UserProxyFactory::createRange(1, 2));
+assertType("non-empty-list<{$proxyType}>", UserProxyFactory::createMany(1));
+assertType("non-empty-list<{$proxyType}>", UserProxyFactory::createRange(1, 2));
 assertType("list<{$proxyType}>", UserProxyFactory::createSequence([]));
-assertType("list<{$proxyType}>", UserProxyFactory::randomRange(1, 2));
-assertType("list<{$proxyType}>", UserProxyFactory::randomRangeOrCreate(1, 2));
-assertType("list<{$proxyType}>", UserProxyFactory::randomSet(2));
+assertType("non-empty-list<{$proxyType}>", UserProxyFactory::randomRange(1, 2));
+assertType("non-empty-list<{$proxyType}>", UserProxyFactory::randomRangeOrCreate(1, 2));
+assertType("non-empty-list<{$proxyType}>", UserProxyFactory::randomSet(2));
 assertType("list<{$proxyType}>", UserProxyFactory::findBy(['name' => 'foo']));
 
 // methods with FactoryCollection
