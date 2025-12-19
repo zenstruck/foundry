@@ -11,7 +11,6 @@
 
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Filesystem\Filesystem;
-use Zenstruck\Foundry\Tests\Fixture\FoundryTestKernel;
 use Zenstruck\Foundry\Tests\Fixture\ResetDatabase\ResetDatabaseTestKernel;
 
 use function Zenstruck\Foundry\application;
@@ -25,8 +24,9 @@ $fs->remove(__DIR__.'/../var/cache');
 
 (new Dotenv())->usePutenv()->loadEnv(__DIR__.'/../.env');
 
-if (FoundryTestKernel::usesMigrations()) {
-    $fs->mkdir(__DIR__.'/../var/cache/Migrations');
+if (ResetDatabaseTestKernel::usesMigrations() && ResetDatabaseTestKernel::shouldGenerateMigrations()) {
+    $fs->remove(__DIR__.'/../var/Migrations');
+    $fs->mkdir(__DIR__.'/../var/Migrations');
 
     $kernel = new ResetDatabaseTestKernel('test', true);
     $kernel->boot();
@@ -36,11 +36,17 @@ if (FoundryTestKernel::usesMigrations()) {
     runCommand($application, 'doctrine:database:drop --if-exists --force', canFail: true);
     runCommand($application, 'doctrine:database:create', canFail: true);
 
-    $configuration = '';
-    if (\getenv('MIGRATION_CONFIGURATION_FILE')) {
-        $configuration = '--configuration '.\getcwd().'/'.\getenv('MIGRATION_CONFIGURATION_FILE');
+    $configurationFiles = ResetDatabaseTestKernel::migrationFiles();
+
+    if (!$configurationFiles) {
+        runCommand($application, "doctrine:migrations:diff");
+    } else {
+        foreach ($configurationFiles as $configurationFile) {
+            $configuration = '--configuration '.\getcwd()."/{$configurationFile}";
+            runCommand($application, "doctrine:migrations:diff {$configuration}");
+        }
     }
-    runCommand($application, "doctrine:migrations:diff {$configuration}");
+
     runCommand($application, 'doctrine:database:drop --force', canFail: true);
 
     $kernel->shutdown();

@@ -52,7 +52,7 @@ $ composer update
 $ ./phpunit
 
 # run "migrate" testsuite (with "migrate" reset database strategy)
-$ ./phpunit --testsuite reset-database
+$ ./phpunit --testsuite reset-database --bootstrap tests/bootstrap-reset-database.php
 ```
 
 ### Overriding the default configuration
@@ -73,7 +73,7 @@ PHPUNIT_VERSION="11" # possible values: 9, 10, 11, 11.4
 
 # test reset database with migrations,
 # only relevant for "reset-database" testsuite
-MIGRATION_CONFIGURATION_FILE="tests/Fixture/MigrationTests/configs/migration-configuration.php"
+MIGRATION_CONFIGURATION_FILES="[\"tests/Fixture/ResetDatabase/migration-configs/migration-configuration.php\"]"
 
 # run test suite with postgreSQL
 $ vendor/bin/phpunit

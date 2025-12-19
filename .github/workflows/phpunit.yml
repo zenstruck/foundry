@@ -127,7 +127,7 @@ jobs:
         shell: bash
 
   test-reset-database:
-    name: Reset DB - D:${{ matrix.database }} ${{ matrix.use-dama == 1 && ' (dama)' || '' }} ${{ matrix.reset-database-mode == 'migrate' && ' (migrate)' || '' }} ${{ contains(matrix.with-migration-configuration-file, 'transactional') && '(configuration file transactional)' || contains(matrix.with-migration-configuration-file, 'configuration') && '(configuration file)' || '' }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}
+    name: Reset DB - D:${{ matrix.database }} ${{ matrix.use-dama == 1 && ' (dama)' || '' }} ${{ matrix.reset-database-mode == 'migrate' && ' (migrate)' || '' }} ${{ contains(matrix.migration-configuration-file, ',') && '(multi configuration files)' || contains(matrix.migration-configuration-file, 'transactional') && '(configuration file transactional)' || contains(matrix.migration-configuration-file, 'configuration') && '(configuration file)' || '' }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -135,19 +135,25 @@ jobs:
         database: [ mysql, pgsql, sqlite, mysql|mongo ]
         use-dama: [ 0, 1 ]
         reset-database-mode: [ schema, migrate ]
-        migration-configuration-file: ['no']
+        migration-configuration-file: ['[]']
         deps: [ highest, lowest ]
         include:
-          - { database: mongo, migration-configuration-file: 'no', use-dama: 0, reset-database-mode: schema }
-          - { database: pgsql, migration-configuration-file: 'migration-configuration', use-dama: 0, reset-database-mode: migration }
-          - { database: pgsql, migration-configuration-file: 'migration-configuration-transactional', use-dama: 0, reset-database-mode: migration }
+          - { database: mongo, migration-configuration-file: '[]', use-dama: 0, reset-database-mode: schema }
+          - { database: pgsql, migration-configuration-file: '["tests/Fixture/ResetDatabase/migration-configs/migration-configuration.php"]', use-dama: 0, reset-database-mode: migrate }
+          - { database: pgsql, migration-configuration-file: '["tests/Fixture/ResetDatabase/migration-configs/migration-configuration-transactional.php"]', use-dama: 0, reset-database-mode: migrate }
+          -
+            database: pgsql
+            use-dama: 0
+            reset-database-mode: migrate
+            migration-configuration-file: '["tests/Fixture/ResetDatabase/migration-configs/migration-configuration-transactional.php", "tests/Fixture/ResetDatabase/migration-configs/migration-dummy.php"]'
+            deps: highest
     env:
       DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || 'sqlite:///%kernel.project_dir%/var/data.db' }}
       MONGO_URL: ${{ contains(matrix.database, 'mongo') && 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb' || '' }}
       USE_DAMA_DOCTRINE_TEST_BUNDLE: ${{ matrix.use-dama == 1 && 1 || 0 }}
-      DATABASE_RESET_MODE: ${{ matrix.reset-database-mode == 1 && 1 || 0 }}
-      MIGRATION_CONFIGURATION_FILE: ${{ matrix.migration-configuration-file == 'no' && '' || format('tests/Fixture/MigrationTests/configs/{0}.php', matrix.migration-configuration-file) }}
-      PHPUNIT_VERSION: 11
+      DATABASE_RESET_MODE: ${{ matrix.reset-database-mode }}
+      MIGRATION_CONFIGURATION_FILES: ${{ matrix.migration-configuration-file }}
+      PHPUNIT_VERSION: 12
     services:
       postgres:
         image: ${{ contains(matrix.database, 'pgsql') && 'postgres:15' || '' }}
@@ -195,7 +201,7 @@ jobs:
 
           # We should be able to run the tests twice in order to check if the second run also starts from a fresh db
           # some bugs could be detected this way
-          ./phpunit --testsuite reset-database --bootstrap tests/bootstrap-reset-database.php
+          DATABASE_GENERATE_MIGRATIONS=0 ./phpunit --testsuite reset-database --bootstrap tests/bootstrap-reset-database.php
         shell: bash
 
   test-no-framework:

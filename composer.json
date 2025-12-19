@@ -32,6 +32,7 @@
         "doctrine/common": "^3.2.2",
         "doctrine/doctrine-bundle": "^2.10|^3.0|3.1.x-dev",
         "doctrine/doctrine-migrations-bundle": "^2.2|^3.0",
+        "doctrine/migrations": "dev-feat/unfroze-dependencies-after-command as 3.9.5",
         "doctrine/mongodb-odm": "^2.4",
         "doctrine/mongodb-odm-bundle": "^4.6|^5.0",
         "doctrine/orm": "^2.16|^3.0",
@@ -64,6 +65,12 @@
             "src/symfony_console.php"
         ]
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/nikophil/migrations"
+        }
+    ],
     "autoload-dev": {
         "psr-4": {
             "Zenstruck\\Foundry\\Tests\\": ["tests/"],
