@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
+use Composer\InstalledVersions;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
@@ -64,6 +66,10 @@ abstract class AutoRefreshTestCase extends WebTestCase
         $this->updateObject($objectId);
 
         self::assertSame('foo', $object->getProp1());
+
+        if ($this->objectManager() instanceof DocumentManager && version_compare(InstalledVersions::getVersion('doctrine/mongodb-odm-bundle') ?? '', '5.4.3', '<')) {
+            return;
+        }
 
         // service reset did clear the EM, thus the object is not managed anymore
         self::assertFalse($this->objectManager()->contains($object));
@@ -403,6 +409,20 @@ abstract class AutoRefreshTestCase extends WebTestCase
 
         self::assertSame('foo', $object1->getProp1());
         self::assertSame('foo', $object2->getProp1());
+    }
+
+    #[Test]
+    public function can_flush_when_persisted_objects_are_ghost_objects(): void
+    {
+        $this->factory()->create();
+        PersistedObjectsTracker::reset();
+
+        $this->factory()::repository()->first();
+        $this->factory()::repository()->first();
+
+        $this->objectManager()->flush();
+
+        $this->expectNotToPerformAssertions();
     }
 
     #[Test]

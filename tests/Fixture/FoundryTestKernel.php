@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Fixture;
 
+use Composer\InstalledVersions;
 use DAMA\DoctrineTestBundle\DAMADoctrineTestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
@@ -143,12 +144,12 @@ abstract class FoundryTestKernel extends Kernel
                 ],
             ];
 
-            if (\file_exists(__DIR__.'/../../vendor/doctrine/doctrine-bundle/UPGRADE-3.1.md')) {
+            if (version_compare(InstalledVersions::getVersion('doctrine/doctrine-bundle') ?? '', '3.0', '>=')) {
                 unset($doctrineConfig['dbal']['use_savepoints']);
                 unset($doctrineConfig['orm']['auto_generate_proxy_classes']);
                 unset($doctrineConfig['orm']['auto_mapping']);
                 unset($doctrineConfig['controller_resolver']['auto_mapping']); // @phpstan-ignore unset.offset
-            } elseif (\PHP_VERSION_ID >= 80400 && \file_exists(__DIR__.'/../../vendor/doctrine/doctrine-bundle/UPGRADE-2.18.md')) {
+            } elseif (\PHP_VERSION_ID >= 80400 && version_compare(InstalledVersions::getVersion('doctrine/orm') ?? '', '3.4', '>=')) {
                 $doctrineConfig['orm']['enable_native_lazy_objects'] = true;
             }
 

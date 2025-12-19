@@ -12,7 +12,9 @@
 namespace Zenstruck\Foundry\Persistence;
 
 use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\ORM\DoctrineOrmVersionGuesser;
 use Zenstruck\Foundry\Persistence\Event\AfterPersist;
+use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
 
 /**
  * @internal
@@ -33,7 +35,7 @@ final class PersistedObjectsTracker
 
     public function refresh(): void
     {
-        self::proxifyObjects();
+        self::resetObjectsAsLazyGhosts();
     }
 
     /**
@@ -52,7 +54,14 @@ final class PersistedObjectsTracker
     {
         foreach ($objects as $object) {
             if (self::$trackedObjects->offsetExists($object) && self::$trackedObjects[$object]) {
-                self::proxifyObject($object, self::$trackedObjects[$object]);
+                if (DoctrineOrmVersionGuesser::isOrmV3()) {
+                    self::resetObjectAsLazyGhost($object, self::$trackedObjects[$object]);
+                } else {
+                    try {
+                        refresh($object);
+                    } catch (RefreshObjectFailed) {
+                    }
+                }
 
                 continue;
             }
@@ -71,7 +80,7 @@ final class PersistedObjectsTracker
         return \count(self::$trackedObjects);
     }
 
-    private static function proxifyObjects(): void
+    private static function resetObjectsAsLazyGhosts(): void
     {
         if (!Configuration::isBooted()) {
             return;
@@ -82,11 +91,11 @@ final class PersistedObjectsTracker
                 continue;
             }
 
-            self::proxifyObject($object, $id);
+            self::resetObjectAsLazyGhost($object, $id);
         }
     }
 
-    private static function proxifyObject(object $object, mixed $id): void
+    private static function resetObjectAsLazyGhost(object $object, mixed $id): void
     {
         $reflector = new \ReflectionClass($object);
 
@@ -95,7 +104,7 @@ final class PersistedObjectsTracker
         }
 
         $clone = clone $object;
-        $reflector->resetAsLazyGhost($object, function($object) use ($clone, $id) {
+        $reflector->resetAsLazyGhost($object, function ($object) use ($clone, $id) {
             Configuration::instance()->persistence()->autorefresh($object, $id, $clone);
         });
     }

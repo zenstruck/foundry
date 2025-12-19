@@ -15,6 +15,7 @@ use Doctrine\Persistence\ObjectRepository;
 use Zenstruck\Assert;
 use Zenstruck\Foundry\AnonymousFactoryGenerator;
 use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
 
 /**
  * @template T of object
@@ -139,6 +140,8 @@ function save(object $object): object
  * @param T $object
  *
  * @return T
+ *
+ * @throws RefreshObjectFailed
  */
 function refresh(object &$object): object
 {

@@ -30,7 +30,7 @@
         "dama/doctrine-test-bundle": "^8.0",
         "doctrine/collections": "^1.7|^2.0",
         "doctrine/common": "^3.2.2",
-        "doctrine/doctrine-bundle": "^2.10|^3.0|3.1.x-dev",
+        "doctrine/doctrine-bundle": "^2.10|^3.0",
         "doctrine/doctrine-migrations-bundle": "^2.2|^3.0",
         "doctrine/mongodb-odm": "^2.4",
         "doctrine/mongodb-odm-bundle": "^4.6|^5.0",
@@ -43,7 +43,7 @@
         "symfony/event-dispatcher": "^6.4|^7.0|^8.0",
         "symfony/framework-bundle": "^6.4|^7.0|^8.0",
         "symfony/maker-bundle": "^1.55",
-        "symfony/phpunit-bridge": "^6.4|^7.0|^8.0",
+        "symfony/phpunit-bridge": "^6.4.26|^7.0|^8.0",
         "symfony/routing": "^6.4|^7.0|^8.0",
         "symfony/runtime": "^6.4|^7.0|^8.0",
         "symfony/translation-contracts": "^3.4",
@@ -84,8 +84,8 @@
     },
     "conflict": {
         "doctrine/persistence": "<2.0",
-        "symfony/event-dispatcher": "<6.4",
-        "symfony/framework-bundle": "<6.4"
+        "doctrine/cache": "<1.12.1",
+        "symfony/polyfill-php80": "<1.16"
     },
     "extra": {
         "bamarni-bin": {

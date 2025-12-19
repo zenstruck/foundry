@@ -31,7 +31,7 @@ abstract class GenericModel
 
     #[ORM\Column]
     #[MongoDB\Field(type: 'string')]
-    private string $prop1;
+    private ?string $prop1 = null; // @phpstan-ignore doctrine.columnType (made on purpose, Doctrine does not handle nullable properties the same way)
 
     #[ORM\Column]
     #[MongoDB\Field(type: 'int')]
@@ -48,7 +48,7 @@ abstract class GenericModel
 
     public function getProp1(): string
     {
-        return $this->prop1;
+        return $this->prop1; // @phpstan-ignore return.type
     }
 
     public function setProp1(string $prop1): void

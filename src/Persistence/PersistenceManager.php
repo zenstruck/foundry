@@ -18,6 +18,7 @@ use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\Object\Hydrator;
 use Zenstruck\Foundry\ORM\AbstractORMPersistenceStrategy;
+use Zenstruck\Foundry\ORM\DoctrineOrmVersionGuesser;
 use Zenstruck\Foundry\Persistence\Exception\NoPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\ObjectHasUnsavedChanges;
 use Zenstruck\Foundry\Persistence\Exception\ObjectNoLongerExist;
@@ -167,6 +168,10 @@ final class PersistenceManager
             // let's detach the object, in order to prevent Doctrine cache
             $om->detach($object);
             if ($refreshedObject = $om->find($object::class, $id)) {
+                if (!DoctrineOrmVersionGuesser::isOrmV3()) {
+                    $this->refresh($refreshedObject);
+                }
+
                 Hydrator::hydrateFromOtherObject($object, $refreshedObject);
 
                 return;

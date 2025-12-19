@@ -85,6 +85,10 @@ case ${PHPUNIT_VERSION} in
       PHPUNIT_EXEC="${PHPUNIT_EXEC} --extension "${FOUNDRY_EXTENSION}""
     fi
 
+    if [ "${WITH_LOWEST_DEPENDENCIES:-0}" = "1" ]; then
+      PHPUNIT_EXEC="${PHPUNIT_EXEC} --do-not-fail-on-deprecation --do-not-fail-on-phpunit-deprecation"
+    fi
+
     if [ "$(can_use_legacy_proxies)" = "0" ]; then
       PHPUNIT_EXEC="${PHPUNIT_EXEC} --exclude-group legacy-proxy"
     fi
