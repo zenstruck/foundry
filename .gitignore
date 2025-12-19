@@ -16,3 +16,4 @@
 /docker-compose.override.yaml
 /tests/Fixture/Maker/tmp/
 /.phpbench
+/config/reference.php

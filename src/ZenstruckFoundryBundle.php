@@ -48,7 +48,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
 
     public function configure(DefinitionConfigurator $definition): void
     {
-        $definition->rootNode() // @phpstan-ignore method.notFound
+        $definition->rootNode() // @phpstan-ignore class.notFound
             ->children()
                 ->booleanNode('auto_refresh_proxies')
                     ->info('Whether to auto-refresh proxies by default (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#auto-refresh)')

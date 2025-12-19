@@ -18,6 +18,7 @@ See https://github.com/zenstruck/foundry/blob/2.x/UPGRADE-2.7.md to upgrade.]]><
             <issue><![CDATA[Since doctrine/mongodb-odm 2.14: Not using native lazy objects is deprecated and will be impossible in Doctrine MongoDB ODM 3.0.]]></issue>
             <issue><![CDATA[Since symfony/framework-bundle 7.3: Not setting the "property_info.with_constructor_extractor" option explicitly is deprecated because its default value will change in version 8.0.]]></issue>
             <issue><![CDATA[Since symfony/console 7.4: The "Symfony\Component\Console\Application::add()" method is deprecated and will be removed in Symfony 8.0, use "Symfony\Component\Console\Application::addCommand()" instead.]]></issue>
+            <issue><![CDATA[Since doctrine/mongodb-odm 2.3: Document short namespace aliases are deprecated, use ::class constant instead.]]></issue>
         </line>
     </file>
     <file path="vendor/doctrine/deprecations/src/Deprecation.php">

@@ -815,6 +815,23 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         self::assertCount(2, $objects);
     }
 
+    /** @test */
+    #[Test]
+    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
+    #[UsingRelationships(Category::class, ['contacts'])]
+    public function it_sets_one_to_many_before_after_instantiate(): void
+    {
+        static::categoryFactory()
+            ->afterInstantiate(function(Category $category) {
+                self::assertCount(3, $category->getContacts());
+            })
+            ->create([
+                'contacts' => static::contactFactory()->many(3),
+            ])
+        ;
+    }
+
     public static function provideCanUseFactoryInDataProviderWithRelationshipCases(): iterable
     {
         yield [

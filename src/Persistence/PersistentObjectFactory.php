@@ -50,7 +50,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     private array $afterPersist = [];
 
     /** @var list<callable(T):void> */
-    private array $tempAfterInstantiate = [];
+    private array $inverseRelationshipCallbacks = [];
 
     private bool $isRootFactory = true;
 
@@ -248,12 +248,6 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
         $object = parent::create($attributes);
 
-        foreach ($this->tempAfterInstantiate as $callback) {
-            $callback($object);
-        }
-
-        $this->tempAfterInstantiate = [];
-
         $this->throwIfCannotCreateObject();
 
         if (PersistMode::PERSIST !== $this->persistMode()) {
@@ -401,7 +395,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
                 ;
 
                 if (($fieldType = (new \ReflectionClass(static::class()))->getProperty($field)->getType())?->allowsNull()) {
-                    $this->tempAfterInstantiate[] = static function(object $object) use ($value, $inverseField, $field) {
+                    $this->inverseRelationshipCallbacks[] = static function(object $object) use ($value, $inverseField, $field) {
                         $inverseObject = $value->create([$inverseField => $object]);
 
                         set($object, $field, ProxyGenerator::unwrap($inverseObject, withAutoRefresh: false));
@@ -416,7 +410,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
                         withAutoRefresh: false
                     );
 
-                    $this->tempAfterInstantiate[] = static function(object $object) use ($inverseObject, $inverseField) {
+                    $this->inverseRelationshipCallbacks[] = static function(object $object) use ($inverseObject, $inverseField) {
                         set($inverseObject, $inverseField, $object);
                     };
 
@@ -445,7 +439,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
         $collection = $collection->notRootFactory();
 
         if ($inverseRelationshipMetadata instanceof OneToManyRelationship) {
-            $this->tempAfterInstantiate[] = function(object $object) use ($collection, $inverseRelationshipMetadata, $field) {
+            $this->inverseRelationshipCallbacks[] = function(object $object) use ($collection, $inverseRelationshipMetadata, $field) {
                 $inverseField = $inverseRelationshipMetadata->inverseField();
 
                 $inverseObjects = $collection
@@ -497,13 +491,13 @@ abstract class PersistentObjectFactory extends ObjectFactory
         $inverseRelationship = $persistenceManager->bidirectionalRelationshipMetadata(static::class(), $object::class, $field);
 
         if ($inverseRelationship instanceof OneToOneRelationship) {
-            $this->tempAfterInstantiate[] = static function(object $newObject) use ($object, $inverseRelationship) {
+            $this->inverseRelationshipCallbacks[] = static function(object $newObject) use ($object, $inverseRelationship) {
                 Hydrator::set($object, $inverseRelationship->inverseField(), $newObject, catchErrors: true);
             };
         }
 
         if ($inverseRelationship instanceof ManyToOneRelationship) {
-            $this->tempAfterInstantiate[] = static function(object $newObject) use ($object, $inverseRelationship) {
+            $this->inverseRelationshipCallbacks[] = static function(object $newObject) use ($object, $inverseRelationship) {
                 Hydrator::add($object, $inverseRelationship->inverseField(), $newObject);
             };
         }
@@ -559,7 +553,17 @@ abstract class PersistentObjectFactory extends ObjectFactory
             return $factory;
         }
 
-        return $factory->afterPersist(
+        return $factory->afterInstantiate(
+            static function(object $object, array $parameters, self $factoryUsed): void {
+                $tempAfterInstantiateCallbacks = $factoryUsed->inverseRelationshipCallbacks;
+                $factoryUsed->inverseRelationshipCallbacks = [];
+                foreach ($tempAfterInstantiateCallbacks as $tempAfterInstantiateCallback) {
+                    $tempAfterInstantiateCallback($object);
+                }
+            },
+            priority: 1000
+        )
+            ->afterPersist(
             static function(object $object, array $parameters, self $factoryUsed): bool {
                 Configuration::instance()->eventDispatcher()->dispatch(
                     new AfterPersist($object, $parameters, $factoryUsed)
