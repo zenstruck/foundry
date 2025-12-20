@@ -26,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [ 8.2, 8.3, 8.4 ]
+        php: [ 8.3, 8.4, 8.5 ]
         symfony: [ 6.4.*, 7.4.*, 8.0.* ]
         database: [ mysql|mongo ]
         phpunit: [ 11, 12 ]
@@ -45,8 +45,9 @@ jobs:
           - {php: 8.3, symfony: 8.0.*}
 
         include:
-          # php 8.1
+          # old php versions
           - {php: 8.1, symfony: 6.4.*, phpunit: 9, database: mysql}
+          - {php: 8.2, symfony: 6.4.*, phpunit: 9, database: mysql}
 
           # old PHPUnit versions
           - {php: 8.3, symfony: 7.4.*, phpunit: 9, database: mysql}
@@ -133,6 +134,8 @@ jobs:
       - name: Test
         run: ./phpunit
         shell: bash
+        env:
+          SYMFONY_REQUIRE: ${{ matrix.symfony }}
 
   test-reset-database:
     name: Reset DB - D:${{ matrix.database }} ${{ matrix.use-dama == 1 && ' (dama)' || '' }} ${{ matrix.reset-database-mode == 'migrate' && ' (migrate)' || '' }} ${{ contains(matrix.with-migration-configuration-file, 'transactional') && '(configuration file transactional)' || contains(matrix.with-migration-configuration-file, 'configuration') && '(configuration file)' || '' }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}
@@ -182,7 +185,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.3
+          php-version: 8.5
           coverage: none
           tools: flex
 
@@ -206,6 +209,8 @@ jobs:
           # some bugs could be detected this way
           ./phpunit --testsuite reset-database --bootstrap tests/bootstrap-reset-database.php
         shell: bash
+        env:
+          SYMFONY_REQUIRE: 7.4.*
 
   test-no-framework:
     name: No framework - PHP${{ matrix.php }}
@@ -213,7 +218,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [ 8.1, 8.2, 8.3, 8.4 ]
+        php: [ 8.3, 8.4, 8.5 ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -265,7 +270,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.4
+          php-version: 8.5
           coverage: none
           tools: flex
 
@@ -275,7 +280,7 @@ jobs:
           dependency-versions: highest
           composer-options: --prefer-dist
         env:
-          SYMFONY_REQUIRE: 7.4.*
+          SYMFONY_REQUIRE: 8.0.*
 
       - name: Set up MySQL
         run: sudo /etc/init.d/mysql start
@@ -322,7 +327,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.4
+          php-version: 8.5
           coverage: xdebug
           ini-values: xdebug.mode=coverage
           tools: flex
@@ -332,7 +337,7 @@ jobs:
         with:
           composer-options: --prefer-dist
         env:
-          SYMFONY_REQUIRE: 7.4.x
+          SYMFONY_REQUIRE: 8.0.x
 
       - name: Test with coverage
         run: ./phpunit --coverage-text --coverage-clover coverage.xml

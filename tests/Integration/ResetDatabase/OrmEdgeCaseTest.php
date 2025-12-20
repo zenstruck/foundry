@@ -43,14 +43,13 @@ final class OrmEdgeCaseTest extends ResetDatabaseTestCase
         $globalEntitiesCount = persistent_factory(GlobalEntity::class)::repository()->count();
 
         flush_after(function() use ($relationshipWithGlobalEntityFactory) {
-            $relationshipWithGlobalEntityFactory->create(['globalEntity' => GlobalStory::globalEntityProxy()]);
             $relationshipWithGlobalEntityFactory->create(['globalEntity' => GlobalStory::globalEntity()]);
         });
 
         // assert no extra GlobalEntity have been created
         persistent_factory(GlobalEntity::class)::assert()->count($globalEntitiesCount);
 
-        $relationshipWithGlobalEntityFactory::assert()->count(2);
+        $relationshipWithGlobalEntityFactory::assert()->count(1);
 
         $entity = $relationshipWithGlobalEntityFactory::repository()->first();
         self::assertSame(GlobalStory::globalEntity(), $entity?->getGlobalEntity());

@@ -71,7 +71,7 @@ final class FactoriesTraitNotUsed extends \LogicException
             '2.4',
             'In order to use Foundry correctly, you must use the trait "%s" in your "%s" tests. This will throw an exception in 3.0.',
             Factories::class,
-            $classes[\array_key_last($classes)]
+            $classes[\array_key_last($classes)] // @phpstan-ignore offsetAccess.invalidOffset
         );
     }
 }

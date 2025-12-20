@@ -30,7 +30,7 @@ jobs:
       - name: Install PHP with extensions.
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.4"
+          php-version: "8.5"
 
       - name: Install roave/backward-compatibility-check.
         run: composer bin bc-check require roave/backward-compatibility-check

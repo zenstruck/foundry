@@ -48,7 +48,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
 
     public function configure(DefinitionConfigurator $definition): void
     {
-        $definition->rootNode() // @phpstan-ignore class.notFound
+        $definition->rootNode()
             ->children()
                 ->booleanNode('auto_refresh_proxies')
                     ->info('Whether to auto-refresh proxies by default (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#auto-refresh)')
@@ -75,7 +75,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                         ->scalarNode('seed')
                             ->setDeprecated('zenstruck/foundry', '2.4', 'The "faker.seed" configuration is deprecated and will be removed in 3.0. Use environment variable "FOUNDRY_FAKER_SEED" instead.')
                             ->info('Random number generator seed to produce the same fake values every run.')
-                            ->example(1234)
+                            ->example('1234')
                             ->defaultNull()
                         ->end()
                         ->scalarNode('service')
