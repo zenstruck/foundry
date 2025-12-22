@@ -169,7 +169,7 @@ final class PersistenceManager
             $om->detach($object);
             if ($refreshedObject = $om->find($object::class, $id)) {
                 if (!DoctrineOrmVersionGuesser::isOrmV3()) {
-                    $this->refresh($refreshedObject);
+                    $this->refresh($refreshedObject, canThrow: false);
                 }
 
                 Hydrator::hydrateFromOtherObject($object, $refreshedObject);
@@ -192,7 +192,7 @@ final class PersistenceManager
      *
      * @throws RefreshObjectFailed
      */
-    public function refresh(object &$object, bool $force = false): object
+    public function refresh(object &$object, bool $force = false, bool $canThrow = true): object
     {
         if (!$this->flush && !$force) {
             return $object;
@@ -217,6 +217,10 @@ final class PersistenceManager
         }
 
         if ($strategy->hasChanges($object)) {
+            if (!$canThrow) {
+                return $object;
+            }
+
             throw new ObjectHasUnsavedChanges($object::class);
         }
 
@@ -237,6 +241,10 @@ final class PersistenceManager
         $id = $strategy->getIdentifierValues($object);
 
         if (!$id || !($objectFromDB = $om->find($object::class, $id))) {
+            if (!$canThrow) {
+                return $object;
+            }
+
             throw new ObjectNoLongerExist($object);
         }
 

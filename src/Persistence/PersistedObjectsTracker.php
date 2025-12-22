@@ -57,10 +57,7 @@ final class PersistedObjectsTracker
                 if (DoctrineOrmVersionGuesser::isOrmV3()) {
                     self::resetObjectAsLazyGhost($object, self::$trackedObjects[$object]);
                 } else {
-                    try {
-                        refresh($object);
-                    } catch (RefreshObjectFailed) {
-                    }
+                    Configuration::instance()->persistence()->refresh($object, canThrow: false);
                 }
 
                 continue;
