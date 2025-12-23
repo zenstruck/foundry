@@ -114,6 +114,11 @@ jobs:
           coverage: none
           tools: flex
 
+      - name: Add the polyfill compatible with Doctrine ^2.16
+        if: ${{ matrix.deps == 'lowest' }}
+        shell: bash
+        run: composer require --dev symfony/polyfill-php80:^1.16 --no-update
+
       - name: Install dependencies
         uses: ramsey/composer-install@v2
         with:
@@ -121,7 +126,6 @@ jobs:
           composer-options: --prefer-dist
         env:
           SYMFONY_REQUIRE: ${{ matrix.symfony }}
-
       - name: Set up MySQL
         if: contains(matrix.database, 'mysql')
         run: sudo /etc/init.d/mysql start

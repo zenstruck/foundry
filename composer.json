@@ -84,8 +84,7 @@
     },
     "conflict": {
         "doctrine/persistence": "<2.0",
-        "doctrine/cache": "<1.12.1",
-        "symfony/polyfill-php80": "<1.16"
+        "doctrine/cache": "<1.12.1"
     },
     "extra": {
         "bamarni-bin": {

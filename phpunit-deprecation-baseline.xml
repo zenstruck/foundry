@@ -14,7 +14,6 @@ Foundry now leverages the native PHP lazy system to auto-refresh objects (it can
 See https://github.com/zenstruck/foundry/blob/2.x/UPGRADE-2.7.md to upgrade.]]></issue>
 
             <issue><![CDATA[Support for MySQL < 8 is deprecated and will be removed in DBAL 5 (AbstractMySQLDriver.php:75 called by AbstractDriverMiddleware.php:32, https://github.com/doctrine/dbal/pull/6343, package doctrine/dbal)]]></issue>
-            <issue><![CDATA[Since doctrine/doctrine-bundle 3.1: The "auto_mapping" option is deprecated and will be removed in DoctrineBundle 4.0, as it only accepts `false` since 3.0.]]></issue>
             <issue><![CDATA[Since doctrine/mongodb-odm 2.14: Not using native lazy objects is deprecated and will be impossible in Doctrine MongoDB ODM 3.0.]]></issue>
             <issue><![CDATA[Since symfony/framework-bundle 7.3: Not setting the "property_info.with_constructor_extractor" option explicitly is deprecated because its default value will change in version 8.0.]]></issue>
             <issue><![CDATA[Since symfony/console 7.4: The "Symfony\Component\Console\Application::add()" method is deprecated and will be removed in Symfony 8.0, use "Symfony\Component\Console\Application::addCommand()" instead.]]></issue>
