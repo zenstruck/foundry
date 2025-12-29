@@ -230,7 +230,7 @@ jobs:
         with:
           composer-options: --prefer-dist
 
-      - name: Remove
+      - name: Remove framework dependencies
         run: |
           composer remove --dev \
             dama/doctrine-test-bundle \
@@ -238,6 +238,7 @@ jobs:
             doctrine/doctrine-migrations-bundle \
             doctrine/mongodb-odm-bundle \
             symfony/maker-bundle \
+            symfony/flex \
             symfony/phpunit-bridge \
             symfony/framework-bundle
 

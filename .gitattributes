@@ -20,6 +20,7 @@
 /phpunit-paratest.xml.dist      export-ignore
 /psalm.xml                      export-ignore
 /stubs                          export-ignore
+/symfony.lock                   export-ignore
 /tests                          export-ignore
 /utils/rector/tests             export-ignore
 /utils/rector/composer.json     export-ignore

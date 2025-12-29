@@ -41,6 +41,7 @@
         "symfony/console": "^6.4|^7.0|^8.0",
         "symfony/dotenv": "^6.4|^7.0|^8.0",
         "symfony/event-dispatcher": "^6.4|^7.0|^8.0",
+        "symfony/flex": "^2.10",
         "symfony/framework-bundle": "^6.4|^7.0|^8.0",
         "symfony/maker-bundle": "^1.55",
         "symfony/phpunit-bridge": "^6.4.26|^7.0|^8.0",
@@ -94,6 +95,9 @@
         },
         "psalm": {
             "pluginClass": "Zenstruck\\Foundry\\Psalm\\FoundryPlugin"
+        },
+        "symfony": {
+            "allow-contrib": false
         }
     },
     "scripts": {
