@@ -15,6 +15,7 @@ namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericProxyEntityFactory;
 
@@ -22,7 +23,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericProxyEntityFactory;
  * @group legacy
  */
 #[IgnoreDeprecations]
-#[Group('legacy-proxy')]
+#[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
 final class ProxyGenericEntityRepositoryDecoratorTest extends GenericEntityRepositoryDecoratorTest
 {
     protected function factory(): PersistentObjectFactory

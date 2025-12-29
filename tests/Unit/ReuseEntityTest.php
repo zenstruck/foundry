@@ -15,6 +15,7 @@ namespace Zenstruck\Foundry\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Test\Factories;
@@ -51,7 +52,7 @@ final class ReuseEntityTest extends TestCase
      */
     #[Test]
     #[IgnoreDeprecations]
-    #[Group('legacy-proxy')]
+    #[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
     public function it_can_reuse_a_proxy_object(): void
     {
         $address = AddressFactory::createOne();

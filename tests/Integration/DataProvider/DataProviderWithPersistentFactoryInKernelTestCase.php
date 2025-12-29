@@ -16,6 +16,7 @@ namespace Zenstruck\Foundry\Tests\Integration\DataProvider;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
@@ -46,7 +47,7 @@ abstract class DataProviderWithPersistentFactoryInKernelTestCase extends KernelT
 
     #[Test]
     #[DataProvider('createOneProxyObjectInDataProvider')]
-    #[Group('legacy-proxy')]
+    #[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
     public function assert_it_can_create_one_object_in_data_provider(?GenericModel $providedData): void
     {
         static::proxyFactory()::assert()->count(1);
@@ -58,12 +59,6 @@ abstract class DataProviderWithPersistentFactoryInKernelTestCase extends KernelT
 
     public static function createOneProxyObjectInDataProvider(): iterable
     {
-        if (!TestKernel::canUseLegacyProxy()) {
-            yield [null];
-
-            return;
-        }
-
         yield 'createOne()' => [
             static::proxyFactory()::createOne(['prop1' => 'value set in data provider']),
         ];
@@ -75,7 +70,7 @@ abstract class DataProviderWithPersistentFactoryInKernelTestCase extends KernelT
 
     #[Test]
     #[DataProvider('createMultipleObjectsInDataProvider')]
-    #[Group('legacy-proxy')]
+    #[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
     public function assert_it_can_create_multiple_objects_in_data_provider(?array $providedData): void
     {
         self::assertIsArray($providedData);
@@ -86,12 +81,6 @@ abstract class DataProviderWithPersistentFactoryInKernelTestCase extends KernelT
 
     public static function createMultipleObjectsInDataProvider(): iterable
     {
-        if (!TestKernel::canUseLegacyProxy()) {
-            yield [[]];
-
-            return;
-        }
-
         yield 'createSequence()' => [
             static::proxyFactory()::createSequence([
                 ['prop1' => 'prop 1'],
@@ -109,7 +98,7 @@ abstract class DataProviderWithPersistentFactoryInKernelTestCase extends KernelT
 
     #[Test]
     #[DataProvider('useGetterOnProxyObjectCreatedInDataProvider')]
-    #[Group('legacy-proxy')]
+    #[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
     public function assert_using_getter_proxy_object_created_in_a_data_provider_throws(?\Throwable $e): void
     {
         self::assertInstanceOf(\LogicException::class, $e);

@@ -15,6 +15,7 @@ namespace Zenstruck\Foundry\Tests\Integration\ForceFactoriesTraitUsage;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 
@@ -26,7 +27,7 @@ use function Zenstruck\Foundry\Persistence\proxy;
 final class ClassExtendingBaseTestCaseUsingFactoriesTest extends KernelTestCaseWithFactoriesTraitBaseTestCase
 {
     #[Test]
-    #[Group('legacy-proxy')]
+    #[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
     public function not_using_foundry_should_not_throw(): void
     {
         $this->expectNotToPerformAssertions();

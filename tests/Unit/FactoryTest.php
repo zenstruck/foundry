@@ -16,6 +16,7 @@ namespace Zenstruck\Foundry\Tests\Unit;
 use Faker;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Configuration;
@@ -84,7 +85,7 @@ final class FactoryTest extends TestCase
      */
     #[Test]
     #[IgnoreDeprecations]
-    #[Group('legacy-proxy')]
+    #[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
     public function can_use_user_defined_proxy_persistent_factory_in_unit_test(): void
     {
         $object = GenericProxyEntityFactory::createOne();
@@ -99,7 +100,7 @@ final class FactoryTest extends TestCase
      */
     #[Test]
     #[IgnoreDeprecations]
-    #[Group('legacy-proxy')]
+    #[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
     public function can_use_user_anonymous_proxy_persistent_factory_in_unit_test(): void
     {
         $object = proxy_factory(GenericEntity::class, ['prop1' => 'prop1'])->create();
@@ -130,7 +131,7 @@ final class FactoryTest extends TestCase
      */
     #[Test]
     #[IgnoreDeprecations]
-    #[Group('legacy-proxy')]
+    #[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
     public function proxy_attributes_can_be_used_in_unit_test(): void
     {
         $object = ProxyContactFactory::createOne([
@@ -160,7 +161,7 @@ final class FactoryTest extends TestCase
      */
     #[Test]
     #[IgnoreDeprecations]
-    #[Group('legacy-proxy')]
+    #[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
     public function instantiating_with_proxy_attribute_normalizes_to_underlying_object(): void
     {
         $object = ProxyContactFactory::createOne([

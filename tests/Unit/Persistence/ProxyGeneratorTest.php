@@ -16,6 +16,7 @@ namespace Zenstruck\Foundry\Tests\Unit\Persistence;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Persistence\ProxyGenerator;
@@ -26,7 +27,7 @@ use Zenstruck\Foundry\Test\Factories;
  * @group legacy
  */
 #[IgnoreDeprecations]
-#[Group('legacy-proxy')]
+#[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
 final class ProxyGeneratorTest extends TestCase
 {
     use Factories;

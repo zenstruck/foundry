@@ -15,6 +15,7 @@ namespace Zenstruck\Foundry\Tests\Integration\ForceFactoriesTraitUsage;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 
@@ -28,7 +29,7 @@ final class ClassExtendingBaseTestCaseNotUsingFactoriesTest extends AnotherBaseT
 
     #[Test]
     #[IgnoreDeprecations]
-    #[Group('legacy-proxy')]
+    #[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
     public function using_foundry_should_trigger_deprecation(): void
     {
         $this->assertDeprecation();

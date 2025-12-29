@@ -15,6 +15,7 @@ namespace Zenstruck\Foundry\Tests\Integration\InMemory;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use PHPUnit\Framework\Attributes\Test;
@@ -183,7 +184,7 @@ final class DoctrineInMemoryDecoratorTest extends KernelTestCase
      */
     #[Test]
     #[IgnoreDeprecations]
-    #[Group('legacy-proxy')]
+    #[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
     public function it_can_find_by_entity_proxified(): void
     {
         ContactFactory::createMany(2, fn() => ['category' => CategoryFactory::createOne()]);

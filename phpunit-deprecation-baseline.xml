@@ -7,6 +7,7 @@
             <issue><![CDATA[Since symfony/var-exporter 7.3: Generating lazy proxy for class "Zenstruck\Foundry\Tests\Integration\ForceFactoriesTraitUsage\SomeObject" is deprecated; leverage native lazy objects instead.]]></issue>
             <issue><![CDATA[Since symfony/var-exporter 7.3: Using ProxyHelper::generateLazyGhost() is deprecated, use native lazy objects instead.]]></issue>
             <issue><![CDATA[Since symfony/var-exporter 7.3: The "Symfony\Component\VarExporter\LazyGhostTrait" trait is deprecated, use native lazy objects instead.]]></issue>
+            <issue><![CDATA[Since symfony/var-exporter 7.3: The "Symfony\Component\VarExporter\LazyProxyTrait" trait is deprecated, use native lazy objects instead.]]></issue>
 
             <issue><![CDATA[Since zenstruck/foundry 2.7: Proxy usage is deprecated in PHP 8.4. Use directly PersistentObjectFactory, Foundry now leverages the native PHP lazy system to auto-refresh objects.]]></issue>
             <issue><![CDATA[Since zenstruck/foundry 2.7: Proxy usage is deprecated in PHP 8.4. You should extend directly PersistentObjectFactory in your factories.

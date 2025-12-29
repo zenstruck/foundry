@@ -13,6 +13,7 @@ namespace Zenstruck\Foundry\Tests\Integration\DataProvider;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
@@ -28,7 +29,7 @@ use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 #[RequiresPhpunit('>=11.4')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 #[IgnoreDeprecations]
-#[Group('legacy-proxy')]
+#[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
 final class GenericEntityProxyFactoryTest extends DataProviderWithPersistentFactoryInKernelTestCase
 {
     use RequiresORM;

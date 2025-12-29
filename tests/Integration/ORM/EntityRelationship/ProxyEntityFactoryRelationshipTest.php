@@ -20,6 +20,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\IgnorePhpunitWarnings;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
@@ -39,7 +40,7 @@ use Zenstruck\Foundry\Tests\Integration\ORM\EdgeCasesRelationshipTest;
  */
 #[RequiresPhpunit('>=11.4')]
 #[IgnoreDeprecations]
-#[Group('legacy-proxy')]
+#[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
 final class ProxyEntityFactoryRelationshipTest extends EntityFactoryRelationshipTestCase
 {
     /** @test */
