@@ -112,6 +112,6 @@ final class ResetDatabaseManager
 
     private static function canSkipSchemaReset(): bool
     {
-        return PersistenceManager::isOrmOnly() && self::isDAMADoctrineTestBundleEnabled();
+        return self::isDAMADoctrineTestBundleEnabled() && PersistenceManager::isOrmOnly();
     }
 }

@@ -17,7 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 
-final class GetWebTestClientIsNotBrokenTest extends WebTestCase
+class GetWebTestClientIsNotBrokenTest extends WebTestCase
 {
     use Factories, RequiresORM;
 

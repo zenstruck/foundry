@@ -41,7 +41,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
 {
     public function boot(): void
     {
-        if ($this->container) {
+        if ($this->container && !Configuration::isBooted()) {
             Configuration::boot($this->container->get('.zenstruck_foundry.configuration')); // @phpstan-ignore argument.type
         }
     }
