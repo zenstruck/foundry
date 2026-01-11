@@ -1,0 +1,49 @@
+{
+    "name": "zenstruck/foundry-behat",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Nicolas PHILIPPE",
+            "email": "nikophil@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Zenstruck\\Foundry\\Behat\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Zenstruck\\Foundry\\Tests\\Fixture\\": "../../tests/Fixture/",
+            "Zenstruck\\Foundry\\Behat\\Tests\\": "tests"
+        }
+    },
+    "require": {
+        "php": "^8.1",
+        "behat/behat": "^3.22",
+        "friends-of-behat/symfony-extension": "^2.0",
+        "zenstruck/foundry": "^2.0"
+    },
+    "require-dev": {
+        "behat/mink-browserkit-driver": "^2.0",
+        "doctrine/orm": "^2.16|^3.0",
+        "doctrine/common": "^3.2.2",
+        "doctrine/doctrine-bundle": "^2.10|^3.0",
+        "friends-of-behat/mink-extension": "^2.0",
+        "symfony/flex": "^2.10",
+        "symfony/framework-bundle": "^6.4|^7.0|^8.0",
+        "symfony/uid": "^6.4|^7.0|^8.0"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "symfony/flex": true
+        }
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": false
+        }
+    }
+}

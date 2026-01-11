@@ -64,7 +64,8 @@
             "src/functions.php",
             "src/Persistence/functions.php",
             "src/symfony_console.php"
-        ]
+        ],
+        "exclude-from-classmap": ["src/Behat/"]
     },
     "autoload-dev": {
         "psr-4": {

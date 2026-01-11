@@ -75,3 +75,5 @@ parameters:
         - ./src/Maker/Factory/LegacyORMDefaultPropertiesGuesser.php
         - ./src/Maker/Factory/DoctrineScalarFieldsDefaultPropertiesGuesser.php
         - ./src/ORM/OrmV2PersistenceStrategy.php
+
+        - ./src/Behat

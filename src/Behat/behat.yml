@@ -1,0 +1,16 @@
+default:
+    suites:
+        default:
+            contexts:
+                - Behat\MinkExtension\Context\MinkContext
+                - Zenstruck\Foundry\Behat\Tests\FeatureContext
+    extensions:
+        Zenstruck\Foundry\Behat\FoundryExtension: ~
+        Behat\MinkExtension:
+            sessions:
+                symfony:
+                    symfony: ~
+        FriendsOfBehat\SymfonyExtension:
+            bootstrap: tests/bootstrap.php
+            kernel:
+                class: Zenstruck\Foundry\Behat\Tests\BehatTestKernel
