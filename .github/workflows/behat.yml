@@ -1,0 +1,63 @@
+name: Behat
+
+on:
+  push:
+    paths: &paths
+      - .github/workflows/behat.yml
+      - srcBehat
+      - composer.json
+  pull_request:
+    paths: *paths
+  schedule:
+    - cron: '0 0 1,16 * *'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+    working-directory: ./src/Behat
+
+jobs:
+  behat:
+    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ 8.2, 8.3, 8.4 ]
+        symfony: [ 6.4.*, 7.4.*, 8.0.* ]
+        deps: [ highest, lowest ]
+        exclude:
+          - {php: 8.2, symfony: 8.0.*}
+          - {php: 8.3, symfony: 8.0.*}
+    env:
+      DATABASE_URL: 'sqlite:///%kernel.project_dir%/var/data.db'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: flex
+
+      - name: Add the polyfill compatible with Doctrine ^2.16
+        if: ${{ matrix.deps == 'lowest' }}
+        run: composer require --dev symfony/polyfill-php80:^1.16 --no-update
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v2
+        with:
+          working-directory: "src/Behat"
+          dependency-versions: ${{ matrix.deps }}
+          composer-options: --prefer-dist
+        env:
+          SYMFONY_REQUIRE: ${{ matrix.symfony }}
+
+      - name: Test
+        run: vendor/bin/behat
