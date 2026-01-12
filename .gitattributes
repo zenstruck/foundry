@@ -19,7 +19,6 @@
 /phpunit-10.xml.dist            export-ignore
 /phpunit-paratest.xml.dist      export-ignore
 /psalm.xml                      export-ignore
-/src/Behat                      export-ignore
 /stubs                          export-ignore
 /symfony.lock                   export-ignore
 /tests                          export-ignore

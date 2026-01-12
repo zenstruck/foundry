@@ -21,6 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\ChangeCascadePersistOnLoadClassMetadataListener;
 use Zenstruck\Foundry\ZenstruckFoundryBundle;
@@ -113,14 +114,14 @@ abstract class FoundryTestKernel extends Kernel
                         'Entity' => [
                             'is_bundle' => false,
                             'type' => 'attribute',
-                            'dir' => "{$this->baseFixturePath()}/Entity",
+                            'dir' => '%kernel.project_dir%/tests/Fixture/Entity',
                             'prefix' => 'Zenstruck\Foundry\Tests\Fixture\Entity',
                             'alias' => 'Entity',
                         ],
                         'Model' => [
                             'is_bundle' => false,
                             'type' => 'attribute',
-                            'dir' => "{$this->baseFixturePath()}/Model",
+                            'dir' => '%kernel.project_dir%/tests/Fixture/Model',
                             'prefix' => 'Zenstruck\Foundry\Tests\Fixture\Model',
                             'alias' => 'Model',
                         ],
@@ -132,7 +133,7 @@ abstract class FoundryTestKernel extends Kernel
                                 'EntityInAnotherSchema' => [
                                     'is_bundle' => false,
                                     'type' => 'attribute',
-                                    'dir' => "{$this->baseFixturePath()}/EntityInAnotherSchema",
+                                    'dir' => '%kernel.project_dir%/tests/Fixture/EntityInAnotherSchema',
                                     'prefix' => 'Zenstruck\Foundry\Tests\Fixture\EntityInAnotherSchema',
                                     'alias' => 'Migrate',
                                 ],
@@ -175,14 +176,14 @@ abstract class FoundryTestKernel extends Kernel
                             'Document' => [
                                 'is_bundle' => false,
                                 'type' => 'attribute',
-                                'dir' => "{$this->baseFixturePath()}/Document",
+                                'dir' => '%kernel.project_dir%/tests/Fixture/Document',
                                 'prefix' => 'Zenstruck\Foundry\Tests\Fixture\Document',
                                 'alias' => 'Document',
                             ],
                             'Model' => [
                                 'is_bundle' => false,
                                 'type' => 'attribute',
-                                'dir' => "{$this->baseFixturePath()}/Model",
+                                'dir' => '%kernel.project_dir%/tests/Fixture/Model',
                                 'prefix' => 'Zenstruck\Foundry\Tests\Fixture\Model',
                                 'alias' => 'Model',
                             ],
@@ -195,8 +196,8 @@ abstract class FoundryTestKernel extends Kernel
         $c->register('logger', NullLogger::class);
     }
 
-    protected function baseFixturePath(): string
+    protected function configureRoutes(RoutingConfigurator $routes): void
     {
-        return '%kernel.project_dir%/tests/Fixture';
+        $routes->import(__DIR__.'/App/Controller/*.php', 'attribute');
     }
 }

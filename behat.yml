@@ -3,9 +3,11 @@ default:
         default:
             contexts:
                 - Behat\MinkExtension\Context\MinkContext
-                - Zenstruck\Foundry\Behat\Tests\FeatureContext
+                - Zenstruck\Foundry\Tests\Fixture\Behat\TestContext
+            paths:
+                - tests/behatFeatures
     extensions:
-        Zenstruck\Foundry\Behat\FoundryExtension: ~
+        Zenstruck\Foundry\Test\Behat\FoundryExtension: ~
         Behat\MinkExtension:
             sessions:
                 symfony:
@@ -13,4 +15,5 @@ default:
         FriendsOfBehat\SymfonyExtension:
             bootstrap: tests/bootstrap.php
             kernel:
-                class: Zenstruck\Foundry\Behat\Tests\BehatTestKernel
+                class: Zenstruck\Foundry\Tests\Fixture\Behat\BehatTestKernel
+

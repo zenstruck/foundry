@@ -72,9 +72,4 @@ final class TestKernel extends FoundryTestKernel
         $c->register(HelloWorld::class)->setAutowired(true)->setAutoconfigured(true)->addTag('controller.service_arguments');
         $c->register(UpdateGenericModelCommand::class)->setAutowired(true)->setAutoconfigured(true);
     }
-
-    protected function configureRoutes(RoutingConfigurator $routes): void
-    {
-        $routes->import(__DIR__.'/App/Controller/*.php', 'attribute');
-    }
 }

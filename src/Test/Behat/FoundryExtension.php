@@ -1,8 +1,8 @@
 <?php
 
-namespace Zenstruck\Foundry\Behat;
+namespace Zenstruck\Foundry\Test\Behat;
 
-use Behat\Testwork\EventDispatcher\ServiceContainer\EventDispatcherExtension;
+use Behat\Behat\EventDispatcher\ServiceContainer\EventDispatcherExtension;
 use Behat\Testwork\ServiceContainer\Extension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;

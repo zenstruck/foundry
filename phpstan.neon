@@ -20,6 +20,7 @@ parameters:
 
     bootstrapFiles:
         - bin/tools/phpbench/vendor/autoload.php
+        - bin/tools/behat/vendor/autoload.php
 
     ignoreErrors:
         # suppress strange behavior of PHPStan where it considers proxy() return type as *NEVER*
@@ -75,5 +76,3 @@ parameters:
         - ./src/Maker/Factory/LegacyORMDefaultPropertiesGuesser.php
         - ./src/Maker/Factory/DoctrineScalarFieldsDefaultPropertiesGuesser.php
         - ./src/ORM/OrmV2PersistenceStrategy.php
-
-        - ./src/Behat

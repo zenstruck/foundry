@@ -1,6 +1,6 @@
 <?php
 
-namespace Zenstruck\Foundry\Behat\Tests\App;
+namespace Zenstruck\Foundry\Tests\Fixture\App\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;

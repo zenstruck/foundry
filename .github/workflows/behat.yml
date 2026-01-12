@@ -4,7 +4,10 @@ on:
   push:
     paths: &paths
       - .github/workflows/behat.yml
-      - srcBehat
+      - bin/tools/behat
+      - src/Behat/**
+      - tests/Behat/**
+      - behat.yml
       - composer.json
   pull_request:
     paths: *paths
@@ -15,11 +18,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-defaults:
-  run:
-    shell: bash
-    working-directory: ./src/Behat
-
 jobs:
   behat:
     name: P:${{ matrix.php }}, S:${{ matrix.symfony }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}
@@ -27,12 +25,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [ 8.2, 8.3, 8.4 ]
-        symfony: [ 6.4.*, 7.4.*, 8.0.* ]
+        php: [ 8.3, 8.4, 8.5 ]
+        symfony: [ 6.4.*, 7.4.* ]
         deps: [ highest, lowest ]
-        exclude:
-          - {php: 8.2, symfony: 8.0.*}
-          - {php: 8.3, symfony: 8.0.*}
     env:
       DATABASE_URL: 'sqlite:///%kernel.project_dir%/var/data.db'
     steps:
@@ -53,9 +48,13 @@ jobs:
       - name: Install dependencies
         uses: ramsey/composer-install@v2
         with:
-          working-directory: "src/Behat"
           dependency-versions: ${{ matrix.deps }}
           composer-options: --prefer-dist
+        env:
+          SYMFONY_REQUIRE: ${{ matrix.symfony }}
+
+      - name: Install Behat
+        run: composer bin behat update ${{ matrix.deps == 'lowest' && '--prefer-lowest' || '' }} --prefer-dist
         env:
           SYMFONY_REQUIRE: ${{ matrix.symfony }}
 
