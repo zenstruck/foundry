@@ -36,7 +36,7 @@ final class TestContext implements Context
     }
 
     #[BeforeScenario]
-    public function createDB(): void
+    public function createDatabase(): void
     {
         $application = application($this->kernel);
 
