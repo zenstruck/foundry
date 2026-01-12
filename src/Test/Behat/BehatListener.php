@@ -1,6 +1,6 @@
 <?php
 
-namespace Zenstruck\Foundry\Behat;
+namespace Zenstruck\Foundry\Test\Behat;
 
 use Behat\Behat\EventDispatcher\Event\ExampleTested;
 use Behat\Behat\EventDispatcher\Event\ScenarioTested;
@@ -28,7 +28,7 @@ final class BehatListener implements EventSubscriberInterface
     public function bootFoundry(): void
     {
         Configuration::boot(
-            $this->symfonyKernel->getContainer()->get('.zenstruck_foundry.configuration')
+            $this->symfonyKernel->getContainer()->get('.zenstruck_foundry.configuration') // @phpstan-ignore argument.type
         );
     }
 
