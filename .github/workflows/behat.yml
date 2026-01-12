@@ -5,8 +5,9 @@ on:
     paths: &paths
       - .github/workflows/behat.yml
       - bin/tools/behat
-      - src/Behat/**
-      - tests/Behat/**
+      - src/Test/Behat/**
+      - tests/Fixture/Behat/**
+      - tests/behatFeatures/**
       - behat.yml
       - composer.json
   pull_request:
