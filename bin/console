@@ -5,6 +5,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 
 require_once __DIR__ . '/../tests/bootstrap.php';
+require_once __DIR__ . '/../bin/tools/behat/vendor/autoload.php';
 
 foreach ($argv ?? [] as $i => $arg) {
     if (($arg === '--env' || $arg === '-e') && isset($argv[$i + 1])) {
@@ -13,6 +14,6 @@ foreach ($argv ?? [] as $i => $arg) {
     }
 }
 
-$application = new Application(new TestKernel($_ENV['APP_ENV'], true));
+$application = new Application(new \Zenstruck\Foundry\Tests\Fixture\Behat\BehatTestKernel($_ENV['APP_ENV'], true));
 
 $application->run();

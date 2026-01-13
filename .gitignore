@@ -17,3 +17,6 @@
 /tests/Fixture/Maker/tmp/
 /.phpbench
 /config/reference.php
+/CLAUDE.md
+/.claude
+.grepai/

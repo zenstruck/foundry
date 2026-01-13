@@ -5,19 +5,31 @@ Feature: Test
     Then the response status code should be 200
     Then I should see "Hello World"
 
-  Scenario: Can persist entity
-    Given A contact is created
+  Scenario: Can persist entities
+    # Can name entities
+    Given a contact A is created
+    # Can create unnamed entities
+    And a contact is created
     When I am on "/"
     Then the response status code should be 200
     Then I should see "Hello World"
-    Then A contact should exist
+    # todo plurialize
+    Then 2 contact should exist
+
+  Scenario: Can visit pages twice and still access to EM
+    Given a contact is created
+    When I am on "/"
+    Then I should see "Hello World"
+    When I am on "/"
+    Then I should see "Hello World"
+    Then 1 contact should exist
 
   Scenario Outline: Persist entity
-    Given A contact is created
+    Given a contact is created
     When I am on "/"
     Then the response status code should be 200
     Then I should see "<data>"
-    Then A contact should exist
+    Then 1 contact should exist
 
     Examples:
       | data |
