@@ -20,7 +20,8 @@ namespace Zenstruck\Foundry\Attribute;
 final class FactoryShortName
 {
     public function __construct(
-        public readonly string $name,
+        public readonly string $shortName,
+        public readonly ?string $pluralName = null,
     ) {
     }
 }

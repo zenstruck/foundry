@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Test\Behat;
 
+use Symfony\Component\String\Inflector\EnglishInflector;
 use Zenstruck\Foundry\Attribute\FactoryShortName;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\ObjectFactory;
+use function Symfony\Component\String\u;
 
 /**
  * @internal
@@ -33,6 +35,8 @@ final class FactoryShortNameResolver
      */
     public function __construct(iterable $factories)
     {
+        $inflector = new EnglishInflector();
+
         foreach ($factories as $factory) {
             if (!$factory instanceof ObjectFactory) {
                 continue;
@@ -45,6 +49,10 @@ final class FactoryShortNameResolver
             // we don't want to force the user to resolve all potential conflicts at startup.
             $this->factoryMap[$shortName] ??= [];
             $this->factoryMap[$shortName][] = $factory;
+
+            $plural = \strtolower($this->factoryShortNameAttribute($factory::class)->pluralName ?? $inflector->pluralize($shortName)[0]);
+            $this->factoryMap[$plural] ??= [];
+            $this->factoryMap[$plural][] = $factory;
         }
     }
 
@@ -55,7 +63,7 @@ final class FactoryShortNameResolver
      */
     public function factoryFor(string $shortName): ObjectFactory
     {
-        $normalized = \strtolower((string)\preg_replace('/[\s_-]+/', '', $shortName));
+        $normalized = \strtolower($shortName);
 
         if (!isset($this->factoryMap[$normalized])) {
             throw FactoryNotResolvableException::forName($shortName);
@@ -75,22 +83,34 @@ final class FactoryShortNameResolver
      */
     private function shortNameFor(string $factoryClass): string
     {
+        $attribute = $this->factoryShortNameAttribute($factoryClass);
+
+        if ($attribute) {
+            return \strtolower($attribute->shortName);
+        }
+
+        $shortClass = u((new \ReflectionClass($factoryClass))->getShortName());
+
+        if ($shortClass->endsWith('Factory')) {
+            $shortClass = $shortClass->slice(0, -7);
+        }
+
+        return $shortClass
+            ->snake()
+            ->replace('_', ' ')
+            ->lower()
+            ->toString();
+    }
+
+    /**
+     * @param class-string<ObjectFactory<object>> $factoryClass
+     */
+    private function factoryShortNameAttribute(string $factoryClass): ?FactoryShortName
+    {
         $reflection = new \ReflectionClass($factoryClass);
 
-        // Check for #[FactoryShortName] attribute
         $attributes = $reflection->getAttributes(FactoryShortName::class);
 
-        if ([] !== $attributes) {
-            return \strtolower($attributes[0]->newInstance()->name);
-        }
-
-        // Auto-generate from class name
-        $shortClass = $reflection->getShortName();
-
-        if (\str_ends_with($shortClass, 'Factory')) {
-            $shortClass = \substr($shortClass, 0, -7);
-        }
-
-        return \strtolower($shortClass);
+        return ($attributes[0] ?? null)?->newInstance();
     }
 }

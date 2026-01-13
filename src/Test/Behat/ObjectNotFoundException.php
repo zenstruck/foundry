@@ -21,6 +21,6 @@ final class ObjectNotFoundException extends \RuntimeException
 {
     public static function forFactoryAndName(string $factoryShortName, string $name): self
     {
-        return new self("Object \"$name\" was not found for factory \"$factoryShortName\".");
+        return new self("Object \"$factoryShortName $name\" was not found.");
     }
 }

@@ -13,39 +13,42 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Test\Behat;
 
-use Zenstruck\Foundry\Object\Event\AfterInstantiate;
-use Zenstruck\Foundry\ObjectFactory;
-
 /**
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
 final class ObjectRegistry
 {
-    /** @var array<string, array<string, object>> */
+    /** @var array<class-string, array<string, object>> */
     private array $objects = [];
 
-    public function store(string $factoryShortName, string $objectName, object $object): void
+    public function store(object $object, string $objectName, string $factoryShortName): void
     {
-        if ($this->has($factoryShortName, $objectName)) {
-            throw ObjectAlreadyRegisteredException::forName($objectName);
+        if ($this->has($object::class, $objectName)) {
+            throw ObjectAlreadyRegisteredException::forFactoryAndName($factoryShortName, $objectName);
         }
 
-        $this->objects[$factoryShortName][$objectName] = $object;
+        $this->objects[$object::class][$objectName] = $object;
     }
 
-    public function get(string $factoryShortName, string $objectName): object
+    /**
+     * @param class-string $objectClass
+     */
+    public function get(string $factoryShortName, string $objectClass, string $objectName): object
     {
-        if (!$this->has($factoryShortName, $objectName)) {
+        if (!$this->has($objectClass, $objectName)) {
             throw ObjectNotFoundException::forFactoryAndName($factoryShortName, $objectName);
         }
 
-        return $this->objects[$factoryShortName][$objectName];
+        return $this->objects[$objectClass][$objectName];
     }
 
-    public function has(string $factoryShortName, string $objectName): bool
+    /**
+     * @param class-string $objectClass
+     */
+    public function has(string $objectClass, string $objectName): bool
     {
-        return isset($this->objects[$factoryShortName][$objectName]);
+        return isset($this->objects[$objectClass][$objectName]);
     }
 
     public function reset(): void

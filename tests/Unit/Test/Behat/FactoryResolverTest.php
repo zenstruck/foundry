@@ -31,6 +31,7 @@ final class FactoryResolverTest extends TestCase
         $resolver = new FactoryShortNameResolver([$factory = new PostFactory()]);
 
         self::assertSame($factory, $resolver->factoryFor('post'));
+        self::assertSame($factory, $resolver->factoryFor('posts'));
     }
 
     #[Test]
@@ -48,7 +49,10 @@ final class FactoryResolverTest extends TestCase
         $resolver = new FactoryShortNameResolver([$factory = new BlogPostFactory()]);
 
         self::assertSame($factory, $resolver->factoryFor('blog post'));
+        self::assertSame($factory, $resolver->factoryFor('blog posts'));
+
         self::assertSame($factory, $resolver->factoryFor('BlOg PoSt'));
+        self::assertSame($factory, $resolver->factoryFor('BlOg PoSts'));
     }
 
     #[Test]
@@ -57,6 +61,15 @@ final class FactoryResolverTest extends TestCase
         $resolver = new FactoryShortNameResolver([$factory = new CustomNameFactory()]);
 
         self::assertSame($factory, $resolver->factoryFor('custom'));
+        self::assertSame($factory, $resolver->factoryFor('customs'));
+    }
+
+    #[Test]
+    public function it_can_resolve_with_custom_plural_form(): void
+    {
+        $resolver = new FactoryShortNameResolver([$factory = new Article1Factory()]);
+
+        self::assertSame($factory, $resolver->factoryFor('several articles'));
     }
 
     #[Test]
@@ -147,7 +160,7 @@ final class ArticleFactory extends ObjectFactory
 }
 
 /** @extends ObjectFactory<\stdClass> */
-#[FactoryShortName('article')]
+#[FactoryShortName('article', 'several articles')]
 final class Article1Factory extends ObjectFactory
 {
     public static function class(): string

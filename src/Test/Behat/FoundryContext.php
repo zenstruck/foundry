@@ -32,22 +32,6 @@ final class FoundryContext implements Context
         $this->resolveFactory($factoryShortName, $objectName)->create();
     }
 
-    /**
-     * @return ObjectFactory<object>
-     */
-    private function resolveFactory(string $factoryShortName, ?string $objectName = null): ObjectFactory
-    {
-        $factory = $this->factoryResolver->factoryFor($factoryShortName);
-
-        if (!$objectName) {
-            return $factory;
-        }
-
-        return $factory->afterInstantiate(
-            fn(object $object) => $this->objectRegistry->store($factoryShortName, $objectName, $object)
-        );
-    }
-
     #[Given('a :factoryShortName is created with properties')]
     #[Given('a :factoryShortName :objectName is created with properties')]
     public function createObjectWithProperties(TableNode $table, string $factoryShortName, ?string $objectName = null): void
@@ -62,6 +46,20 @@ final class FoundryContext implements Context
             ->create(
                 $attributes[0]
             );
+    }
+
+    #[Given(':factoryShortName are created with properties')]
+    public function createObjectsWithProperties(TableNode $table, string $factoryShortName): void
+    {
+        $attributes = $table->getColumnsHash();
+
+        foreach ($attributes as $attribute) {
+            $objectName = $attribute['_ref'] ?? null;
+            unset($attribute['_ref']);
+
+            $this->resolveFactory($factoryShortName, $objectName)
+                ->create($attribute);
+        }
     }
 
     #[Then(':nb :factoryShortName should exist')]
@@ -98,11 +96,29 @@ final class FoundryContext implements Context
             throw new \InvalidArgumentException('Expected exactly one line of properties.');
         }
 
-        $object = $this->objectRegistry->get($factoryShortName, $objectName);
+        $factory = $this->factoryResolver->factoryFor($factoryShortName);
+
+        $object = $this->objectRegistry->get($factoryShortName, $factory::class(), $objectName);
         refresh($object);
 
         foreach ($attributes[0] as $key => $value) {
             Assert::that(get($object, $key))->is($value);
         }
+    }
+
+    /**
+     * @return ObjectFactory<object>
+     */
+    private function resolveFactory(string $factoryShortName, ?string $objectName = null): ObjectFactory
+    {
+        $factory = $this->factoryResolver->factoryFor($factoryShortName);
+
+        if (!$objectName) {
+            return $factory;
+        }
+
+        return $factory->afterInstantiate(
+            fn(object $object) => $this->objectRegistry->store($object, $objectName, $factoryShortName)
+        );
     }
 }

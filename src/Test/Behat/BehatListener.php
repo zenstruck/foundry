@@ -8,6 +8,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Configuration;
 
+/**
+ * @internal
+ * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ */
 final class BehatListener implements EventSubscriberInterface
 {
     public function __construct(
