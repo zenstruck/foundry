@@ -21,7 +21,7 @@ use Zenstruck\Foundry\ObjectFactory;
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-final class FactoryResolver
+final class FactoryShortNameResolver
 {
     /**
      * @var array<string, list<ObjectFactory<object>>>
@@ -38,7 +38,7 @@ final class FactoryResolver
                 continue;
             }
 
-            $shortName = $this->extractShortName($factory::class);
+            $shortName = $this->shortNameFor($factory::class);
 
             // we allow multiple factories to have the same shortName:
             // we'll only trigger an error when trying to access an unambiguous shortname
@@ -49,9 +49,31 @@ final class FactoryResolver
     }
 
     /**
+     * @return ObjectFactory<object>
+     *
+     * @throws FactoryNotResolvableException
+     */
+    public function factoryFor(string $shortName): ObjectFactory
+    {
+        $normalized = \strtolower((string)\preg_replace('/[\s_-]+/', '', $shortName));
+
+        if (!isset($this->factoryMap[$normalized])) {
+            throw FactoryNotResolvableException::forName($shortName);
+        }
+
+        $factories = $this->factoryMap[$normalized];
+
+        if (\count($factories) > 1) {
+            throw FactoryNotResolvableException::conflict($shortName, array_map(static fn(ObjectFactory $f) => $f::class, $factories));
+        }
+
+        return $factories[0];
+    }
+
+    /**
      * @param class-string<ObjectFactory<object>> $factoryClass
      */
-    private function extractShortName(string $factoryClass): string
+    private function shortNameFor(string $factoryClass): string
     {
         $reflection = new \ReflectionClass($factoryClass);
 
@@ -70,27 +92,5 @@ final class FactoryResolver
         }
 
         return \strtolower($shortClass);
-    }
-
-    /**
-     * @return ObjectFactory<object>
-     *
-     * @throws FactoryNotResolvableException
-     */
-    public function resolve(string $name): ObjectFactory
-    {
-        $normalized = \strtolower((string)\preg_replace('/[\s_-]+/', '', $name));
-
-        if (!isset($this->factoryMap[$normalized])) {
-            throw FactoryNotResolvableException::forName($name);
-        }
-
-        $factories = $this->factoryMap[$normalized];
-
-        if (\count($factories) > 1) {
-            throw FactoryNotResolvableException::conflict($name, array_map(static fn(ObjectFactory $f) => $f::class, $factories));
-        }
-
-        return $factories[0];
     }
 }

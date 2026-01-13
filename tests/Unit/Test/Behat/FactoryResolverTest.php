@@ -21,65 +21,65 @@ use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\FactoryRegistry;
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Test\Behat\FactoryNotResolvableException;
-use Zenstruck\Foundry\Test\Behat\FactoryResolver;
+use Zenstruck\Foundry\Test\Behat\FactoryShortNameResolver;
 
 final class FactoryResolverTest extends TestCase
 {
     #[Test]
     public function it_resolves_factory_by_auto_generated_name(): void
     {
-        $resolver = new FactoryResolver([$factory = new PostFactory()]);
+        $resolver = new FactoryShortNameResolver([$factory = new PostFactory()]);
 
-        self::assertSame($factory, $resolver->resolve('post'));
+        self::assertSame($factory, $resolver->factoryFor('post'));
     }
 
     #[Test]
     public function it_resolves_factory_case_insensitively(): void
     {
-        $resolver = new FactoryResolver([$factory = new PostFactory()]);
+        $resolver = new FactoryShortNameResolver([$factory = new PostFactory()]);
 
-        self::assertSame($factory, $resolver->resolve('Post'));
-        self::assertSame($factory, $resolver->resolve('POST'));
+        self::assertSame($factory, $resolver->factoryFor('Post'));
+        self::assertSame($factory, $resolver->factoryFor('POST'));
     }
 
     #[Test]
     public function it_resolves_factory_complex_short_name(): void
     {
-        $resolver = new FactoryResolver([$factory = new BlogPostFactory()]);
+        $resolver = new FactoryShortNameResolver([$factory = new BlogPostFactory()]);
 
-        self::assertSame($factory, $resolver->resolve('blog post'));
-        self::assertSame($factory, $resolver->resolve('BlOg PoSt'));
+        self::assertSame($factory, $resolver->factoryFor('blog post'));
+        self::assertSame($factory, $resolver->factoryFor('BlOg PoSt'));
     }
 
     #[Test]
     public function it_uses_attribute_short_name(): void
     {
-        $resolver = new FactoryResolver([$factory = new CustomNameFactory()]);
+        $resolver = new FactoryShortNameResolver([$factory = new CustomNameFactory()]);
 
-        self::assertSame($factory, $resolver->resolve('custom'));
+        self::assertSame($factory, $resolver->factoryFor('custom'));
     }
 
     #[Test]
     public function it_throws_when_factory_not_found(): void
     {
-        $resolver = new FactoryResolver([new PostFactory()]);
+        $resolver = new FactoryShortNameResolver([new PostFactory()]);
 
         $this->expectException(FactoryNotResolvableException::class);
         $this->expectExceptionMessage('Cannot resolve factory for "unknown"');
 
-        $resolver->resolve('unknown');
+        $resolver->factoryFor('unknown');
     }
 
     #[Test]
     #[DataProvider('factoriesWithConflictingShortNames')]
     public function it_throws_on_conflict(array $factories): void
     {
-        $resolver = new FactoryResolver($factories);
+        $resolver = new FactoryShortNameResolver($factories);
 
         $this->expectException(FactoryNotResolvableException::class);
         $this->expectExceptionMessage('Multiple factories found for "article"');
 
-        $resolver->resolve('article');
+        $resolver->factoryFor('article');
     }
 
     public static function factoriesWithConflictingShortNames(): iterable

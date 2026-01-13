@@ -238,6 +238,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
 
         $configurator->import('../config/services.php');
 
+        // todo: we should enable this only when in a behat run
         if (interface_exists(\Behat\Behat\Context\Context::class)) {
             $configurator->import('../config/behat.php');
         }

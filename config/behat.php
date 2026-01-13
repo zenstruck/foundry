@@ -11,21 +11,24 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Zenstruck\Foundry\InMemory\InMemoryRepositoryRegistry;
-use Zenstruck\Foundry\Test\Behat\FactoryResolver;
+use Zenstruck\Foundry\Test\Behat\FactoryShortNameResolver;
 use Zenstruck\Foundry\Test\Behat\FoundryContext;
+use Zenstruck\Foundry\Test\Behat\ObjectRegistry;
 
-return static function(ContainerConfigurator $container): void {
+return static function (ContainerConfigurator $container): void {
     $container->services()
-        ->set('.zenstruck_foundry.behat.factory_resolver', FactoryResolver::class)
+        ->set('.zenstruck_foundry.behat.factory_resolver', FactoryShortNameResolver::class)
         ->args([
             tagged_iterator('foundry.factory'),
         ])
+
+        ->set('.zenstruck_foundry.behat.object_registry', ObjectRegistry::class)
+        ->public()
 
         ->set(FoundryContext::class)
         ->autoconfigure()
         ->args([
             service('.zenstruck_foundry.behat.factory_resolver'),
-        ])
-    ;
+            service('.zenstruck_foundry.behat.object_registry'),
+        ]);
 };

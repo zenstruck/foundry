@@ -27,8 +27,12 @@ final class BehatListener implements EventSubscriberInterface
 
     public function bootFoundry(): void
     {
+        $container = $this->symfonyKernel->getContainer();
+
+        $container->get('.zenstruck_foundry.behat.object_registry')->reset(); // @phpstan-ignore method.notFound
+
         Configuration::boot(
-            $this->symfonyKernel->getContainer()->get('.zenstruck_foundry.configuration') // @phpstan-ignore argument.type
+            $container->get('.zenstruck_foundry.configuration') // @phpstan-ignore argument.type
         );
     }
 

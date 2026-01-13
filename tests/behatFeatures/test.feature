@@ -35,3 +35,12 @@ Feature: Test
       | data |
       | Hello |
       | World |
+
+  Scenario: Can create entity with properties via PyTable
+    Given a contact A is created with properties
+      | name     |
+      | John Doe |
+    Then 1 contact should exist
+    Then contact A should have properties
+      | name     |
+      | John Doe |
