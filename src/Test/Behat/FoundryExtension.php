@@ -34,5 +34,9 @@ final class FoundryExtension implements Extension
             ->setArgument('$symfonyKernel', new Reference('fob_symfony.kernel'))
             ->addTag(EventDispatcherExtension::SUBSCRIBER_TAG)
         ;
+
+        $container
+            ->register('.zenstruck_foundry.behat.context', FoundryContext::class)
+            ->addTag('behat.context');
     }
 }

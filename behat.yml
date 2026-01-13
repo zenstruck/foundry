@@ -4,6 +4,7 @@ default:
             contexts:
                 - Behat\MinkExtension\Context\MinkContext
                 - Zenstruck\Foundry\Tests\Fixture\Behat\TestContext
+                - Zenstruck\Foundry\Test\Behat\FoundryContext
             paths:
                 - tests/behatFeatures
     extensions:

@@ -14,6 +14,7 @@ namespace Zenstruck\Foundry\Tests\Fixture\ResetDatabase;
 use Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
 use Zenstruck\Foundry\Tests\Fixture\FoundryTestKernel;
 use Zenstruck\Foundry\Tests\Fixture\Stories\GlobalInvokableService;
@@ -33,9 +34,9 @@ final class ResetDatabaseTestKernel extends FoundryTestKernel
         }
     }
 
-    protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
+    protected function configureContainer(ContainerConfigurator $configurator, LoaderInterface $loader, ContainerBuilder $c): void
     {
-        parent::configureContainer($c, $loader);
+        parent::configureContainer($configurator, $loader, $c);
 
         $c->loadFromExtension('zenstruck_foundry', [
             'global_state' => [
