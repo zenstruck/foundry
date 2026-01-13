@@ -238,6 +238,10 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
 
         $configurator->import('../config/services.php');
 
+        if (interface_exists(\Behat\Behat\Context\Context::class)) {
+            $configurator->import('../config/behat.php');
+        }
+
         $this->configureInstantiator($config['instantiator'], $container);
         $this->configureFaker($config['faker'], $container);
         $this->configureGlobalState($config['global_state'], $container);
