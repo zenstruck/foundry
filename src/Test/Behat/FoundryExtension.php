@@ -32,15 +32,12 @@ final class FoundryExtension implements Extension
 
     public function load(ContainerBuilder $container, array $config): void
     {
-        $container->register('.zenstruck_foundry.behat.tag_parser', BehatTagParser::class);
-
         $container->register('.zenstruck_foundry.behat.listener.boot_configuration', BootConfigurationListener::class)
             ->setArgument('$symfonyKernel', new Reference('fob_symfony.kernel'))
             ->addTag(EventDispatcherExtension::SUBSCRIBER_TAG);
 
         $container->register('.zenstruck_foundry.behat.listener.load_fixture', LoadFixturesListener::class)
             ->setArgument('$symfonyKernel', new Reference('fob_symfony.kernel'))
-            ->setArgument('$tagParser', new Reference('.zenstruck_foundry.behat.tag_parser'))
             ->addTag(EventDispatcherExtension::SUBSCRIBER_TAG);
     }
 }

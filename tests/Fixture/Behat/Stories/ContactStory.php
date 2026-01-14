@@ -13,13 +13,16 @@ namespace Zenstruck\Foundry\Tests\Fixture\Behat\Stories;
 
 use Zenstruck\Foundry\Attribute\AsFixture;
 use Zenstruck\Foundry\Story;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
 
-#[AsFixture(name: 'behat-generic-entities')]
-final class BehatGenericEntitiesStory extends Story
+#[AsFixture(name: 'behat-contacts')]
+final class ContactStory extends Story
 {
     public function build(): void
     {
-        GenericEntityFactory::createOne(['prop1' => 'from-behat-generic-entities-story']);
+        $this->addState(
+            'john-doe',
+            ContactFactory::createOne(['name' => 'John Doe'])
+        );
     }
 }

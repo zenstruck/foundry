@@ -3,15 +3,12 @@
 namespace Zenstruck\Foundry\Test\Behat\Listener;
 
 use Behat\Behat\EventDispatcher\Event\AfterScenarioSetup;
-use Behat\Behat\EventDispatcher\Event\BeforeScenarioTested;
 use Behat\Behat\EventDispatcher\Event\ExampleTested;
 use Behat\Behat\EventDispatcher\Event\ScenarioTested;
 use Behat\Gherkin\Node\TaggedNodeInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Story\FixtureStoryResolver;
-use Zenstruck\Foundry\Test\Behat\BehatTagParser;
 
 /**
  * @internal
@@ -19,9 +16,10 @@ use Zenstruck\Foundry\Test\Behat\BehatTagParser;
  */
 final class LoadFixturesListener implements EventSubscriberInterface
 {
+    private const FIXTURE_TAG_PATTERN = '/^withFixture\(([^)]+)\)$/';
+
     public function __construct(
         private readonly KernelInterface $symfonyKernel,
-        private readonly BehatTagParser $tagParser,
     ) {
     }
 
@@ -36,14 +34,23 @@ final class LoadFixturesListener implements EventSubscriberInterface
     public function loadFixtureIfTagged(AfterScenarioSetup $event): void
     {
         $scenario = $event->getScenario();
+        $feature = $event->getFeature();
 
-        if (!$scenario instanceof TaggedNodeInterface) {
+        $tags = [];
+
+        if ($feature instanceof TaggedNodeInterface) {
+            $tags = [...$tags, ...$feature->getTags()];
+        }
+
+        if ($scenario instanceof TaggedNodeInterface) {
+            $tags = [...$tags, ...$scenario->getTags()];
+        }
+
+        if (!$tags) {
             return;
         }
 
-        $tags = $scenario->getTags();
-
-        $fixtureName = $this->tagParser->parseFixtureName($tags);
+        $fixtureName = $this->parseFixtureName($tags);
 
         if (null === $fixtureName) {
             return;
@@ -56,5 +63,29 @@ final class LoadFixturesListener implements EventSubscriberInterface
 
         $storyClass = $fixtureStoryResolver->resolve($fixtureName);
         $storyClass::load();
+    }
+
+    /**
+     * @param list<string> $tags
+     */
+    private function parseFixtureName(array $tags): ?string
+    {
+        $fixtureNames = [];
+
+        foreach ($tags as $tag) {
+            if (\preg_match(self::FIXTURE_TAG_PATTERN, $tag, $matches)) {
+                $fixtureNames[] = $matches[1];
+            }
+        }
+
+        if (0 === \count($fixtureNames)) {
+            return null;
+        }
+
+        if (\count($fixtureNames) > 1) {
+            throw new \RuntimeException('Multiple @withFixture tags found: you can only load one fixture per scenario.');
+        }
+
+        return $fixtureNames[0];
     }
 }

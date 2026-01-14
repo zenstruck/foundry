@@ -19,8 +19,9 @@ namespace Zenstruck\Foundry\Test\Behat;
  */
 final class ObjectAlreadyRegisteredException extends \RuntimeException
 {
-    public static function forFactoryAndName(string $factoryShortName, string $name): self
+    /** @param class-string $objectClass */
+    public static function forClassAndName(string $objectClass, string $name): self
     {
-        return new self("Object \"$factoryShortName $name\" is already registered in the ObjectRegistry.");
+        return new self("Object \"{$name}\" is already registered for class \"{$objectClass}\".");
     }
 }

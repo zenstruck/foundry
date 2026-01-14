@@ -21,6 +21,7 @@ use Zenstruck\Foundry\Persistence\PersistenceManager;
 use Zenstruck\Foundry\Persistence\PersistenceStrategy;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
+use Zenstruck\Foundry\Story\Event\StateAddedToStory;
 use Zenstruck\Foundry\Test\Behat\FactoryShortNameResolver;
 use Zenstruck\Foundry\Test\Behat\ObjectAlreadyRegisteredException;
 use Zenstruck\Foundry\Test\Behat\ObjectNotFoundException;
@@ -37,7 +38,7 @@ final class ObjectRegistryTest extends TestCase
     {
         $user = new User(id: 1, name: 'John');
 
-        $this->registry->store($user, 'john', 'user');
+        $this->registry->store($user, 'john');
 
         self::assertTrue($this->registry->has(User::class, 'john'));
     }
@@ -48,12 +49,12 @@ final class ObjectRegistryTest extends TestCase
         $user1 = new User(id: 1, name: 'John');
         $user2 = new User(id: 2, name: 'Jane');
 
-        $this->registry->store($user1, 'john', 'user');
+        $this->registry->store($user1, 'john');
 
         $this->expectException(ObjectAlreadyRegisteredException::class);
-        $this->expectExceptionMessage('Object "user john" is already registered in the ObjectRegistry.');
+        $this->expectExceptionMessage('Object "john" is already registered for class "Zenstruck\Foundry\Tests\Unit\Test\Behat\User".');
 
-        $this->registry->store($user2, 'john', 'user');
+        $this->registry->store($user2, 'john');
     }
 
     #[Test]
@@ -62,8 +63,8 @@ final class ObjectRegistryTest extends TestCase
         $user = new User(id: 1, name: 'John');
         $post = new Post(id: 1, title: 'John');
 
-        $this->registry->store($user, 'john', 'user');
-        $this->registry->store($post, 'john', 'post');
+        $this->registry->store($user, 'john');
+        $this->registry->store($post, 'john');
 
         self::assertTrue($this->registry->has(User::class, 'john'));
         self::assertTrue($this->registry->has(Post::class, 'john'));
@@ -73,7 +74,7 @@ final class ObjectRegistryTest extends TestCase
     public function it_checks_if_object_exists(): void
     {
         $user = new User(id: 1, name: 'John');
-        $this->registry->store($user, 'john', 'user');
+        $this->registry->store($user, 'john');
 
         self::assertTrue($this->registry->has(User::class, 'john'));
         self::assertFalse($this->registry->has(User::class, 'jane'));
@@ -84,7 +85,7 @@ final class ObjectRegistryTest extends TestCase
     public function it_gets_stored_object(): void
     {
         $user = new User(id: 1, name: 'John');
-        $this->registry->store($user, 'john', 'user');
+        $this->registry->store($user, 'john');
 
         $retrieved = $this->registry->get('user', 'john');
 
@@ -104,7 +105,7 @@ final class ObjectRegistryTest extends TestCase
     public function it_resets_all_stored_objects(): void
     {
         $user = new User(id: 1, name: 'John');
-        $this->registry->store($user, 'john', 'user');
+        $this->registry->store($user, 'john');
 
         $this->registry->reset();
 
@@ -163,10 +164,22 @@ final class ObjectRegistryTest extends TestCase
         $user1 = new User(id: 1, name: 'John');
         $user2 = new User(id: 2, name: 'Jane');
 
-        $this->registry->store($user1, 'john', 'user');
-        $this->registry->store($user2, 'jane', 'user');
+        $this->registry->store($user1, 'john');
+        $this->registry->store($user2, 'jane');
 
         self::assertSame(2, $this->registry->lastIdFor('user'));
+    }
+
+    #[Test]
+    public function it_stores_object_from_state_added_event(): void
+    {
+        $user = new User(id: 1, name: 'John');
+        $event = new StateAddedToStory($user, 'john');
+
+        $this->registry->storeAfterStateAddedToStory($event);
+
+        self::assertTrue($this->registry->has(User::class, 'john'));
+        self::assertSame($user, $this->registry->get('user', 'john'));
     }
 
     #[Test]

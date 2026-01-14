@@ -15,6 +15,7 @@ namespace Zenstruck\Foundry\Test\Behat;
 
 use Zenstruck\Foundry\Persistence\Event\AfterPersist;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
+use Zenstruck\Foundry\Story\Event\StateAddedToStory;
 
 /**
  * @internal
@@ -34,13 +35,21 @@ final class ObjectRegistry
     ) {
     }
 
-    public function store(object $object, string $objectName, string $factoryShortName): void
+    public function store(object $object, string $objectName): void
     {
         if ($this->has($object::class, $objectName)) {
-            throw ObjectAlreadyRegisteredException::forFactoryAndName($factoryShortName, $objectName);
+            throw ObjectAlreadyRegisteredException::forClassAndName($object::class, $objectName);
         }
 
         $this->objects[$object::class][$objectName] = $object;
+    }
+
+    /**
+     * @param StateAddedToStory<object> $event
+     */
+    public function storeAfterStateAddedToStory(StateAddedToStory $event): void
+    {
+        $this->store($event->object, $event->name);
     }
 
     /**

@@ -49,7 +49,7 @@ final class FoundryContext implements Context
         }
 
         return $factory->afterInstantiate(
-            fn(object $object) => $this->objectRegistry->store($object, $objectName, $factoryShortName)
+            fn(object $object) => $this->objectRegistry->store($object, $objectName)
         );
     }
 
