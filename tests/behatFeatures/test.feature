@@ -56,3 +56,12 @@ Feature: Test
     Then contact B should have properties
       | name     |
       | Jane Doe |
+
+  Scenario: Can reference another object
+    Given a category AB is created
+    And a contact A is created with properties
+      | name        | category          |
+      | John Doe    | ref(category, AB) |
+    Then contact A should have properties
+      | name        | category          |
+      | John Doe    | ref(category, AB) |
