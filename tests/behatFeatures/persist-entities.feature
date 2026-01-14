@@ -21,14 +21,14 @@ Feature: Test
     Then I should see "Hello World"
     When I am on "/"
     Then I should see "Hello World"
-    Then 1 contacts should exist
+    Then 1 contact should exist
 
   Scenario Outline: Persist entity
     Given a contact is created
     When I am on "/"
     Then the response status code should be 200
     Then I should see "<data>"
-    Then 1 contacts should exist
+    Then 1 contact should exist
 
     Examples:
       | data  |
@@ -39,7 +39,7 @@ Feature: Test
     Given a contact A is created with properties
       | name     |
       | John Doe |
-    Then 1 contacts should exist
+    Then 1 contact should exist
     Then contact A should have properties
       | name     |
       | John Doe |

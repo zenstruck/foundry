@@ -1,0 +1,84 @@
+<?php
+
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Zenstruck\Foundry\Story;
+
+use Zenstruck\Foundry\Story;
+
+/**
+ * @internal
+ *
+ * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ */
+final class FixtureStoryResolver
+{
+    public function __construct(
+        /** @var array<string, class-string<Story>> */
+        private readonly array $fixtureStories,
+        /** @var array<string, array<string, class-string<Story>>> */
+        private readonly array $groupedStories = [],
+    ) {
+    }
+
+    /**
+     * @return class-string<Story>
+     *
+     * @throws FixtureStoryNotFoundException
+     */
+    public function resolve(string $fixtureName): string
+    {
+        if (!isset($this->fixtureStories[$fixtureName])) {
+            throw FixtureStoryNotFoundException::forName($fixtureName, $this->availableFixtureNames());
+        }
+
+        return $this->fixtureStories[$fixtureName];
+    }
+
+    /**
+     * @return array<string, class-string<Story>>
+     *
+     * @throws FixtureStoryNotFoundException
+     */
+    public function resolveGroup(string $groupName): array
+    {
+        if (!isset($this->groupedStories[$groupName])) {
+            throw FixtureStoryNotFoundException::forGroup($groupName, $this->availableGroupNames());
+        }
+
+        return $this->groupedStories[$groupName];
+    }
+
+    public function hasFixture(string $name): bool
+    {
+        return isset($this->fixtureStories[$name]);
+    }
+
+    public function hasGroup(string $name): bool
+    {
+        return isset($this->groupedStories[$name]);
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function availableFixtureNames(): array
+    {
+        return \array_keys($this->fixtureStories);
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function availableGroupNames(): array
+    {
+        return \array_keys($this->groupedStories);
+    }
+}

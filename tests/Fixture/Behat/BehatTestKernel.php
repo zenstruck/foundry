@@ -42,5 +42,10 @@ final class BehatTestKernel extends FoundryTestKernel
             ->load('Zenstruck\\Foundry\\Tests\\Fixture\\Factories\\', __DIR__.'/../Factories')
             ->autowire()
             ->autoconfigure();
+
+        $configurator->services()
+            ->load('Zenstruck\\Foundry\\Tests\\Fixture\\Behat\\Stories\\', __DIR__.'/Stories')
+            ->autowire()
+            ->autoconfigure();
     }
 }

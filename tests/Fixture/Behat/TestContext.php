@@ -3,7 +3,6 @@
 namespace Zenstruck\Foundry\Tests\Fixture\Behat;
 
 use Behat\Behat\Context\Context;
-use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Hook\BeforeScenario;
 use Symfony\Component\HttpKernel\KernelInterface;
 use function Zenstruck\Foundry\application;
@@ -23,5 +22,6 @@ final class TestContext implements Context
 
         runCommand($application, 'doctrine:schema:drop --force');
         runCommand($application, 'doctrine:schema:create');
+        runCommand($application, 'doctrine:schema:update --force');
     }
 }
