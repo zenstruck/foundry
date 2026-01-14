@@ -31,7 +31,7 @@ Feature: Test
     Then 1 contacts should exist
 
     Examples:
-      | data |
+      | data  |
       | Hello |
       | World |
 
@@ -58,10 +58,36 @@ Feature: Test
       | Jane Doe |
 
   Scenario: Can reference another object
-    Given a category AB is created
+    Given a category MyCategory is created
+    And an address "the address" is created
     And a contact A is created with properties
-      | name        | category          |
-      | John Doe    | ref(category, AB) |
+      | name     | category                    | address                     |
+      | John Doe | <ref(category, MyCategory)> | <ref(address, the address)> |
+    When I am on "/"
     Then contact A should have properties
-      | name        | category          |
-      | John Doe    | ref(category, AB) |
+      | name     | category                    | address                     |
+      | John Doe | <ref(category, MyCategory)> | <ref(address, the address)> |
+    Then 1 contact should exist
+    Then 1 category should exist
+    Then 1 address should exist
+
+  Scenario: Can access last created entity ID
+    Given a "generic entity" "the object" is created with properties
+      | prop1 |
+      | foo   |
+    When I am on "/orm/update/<lastId>/bar"
+    Then the response status code should be 200
+    Then "generic entity" "the object" should have properties
+      | prop1 |
+      | bar   |
+
+  Scenario: Can access last created entity ID
+    Given a "generic entity" "the object" is created with properties
+      | prop1 |
+      | foo   |
+    And a contact is created
+    When I am on "/orm/update/<lastId(generic entity)>/bar"
+    Then the response status code should be 200
+    Then "generic entity" "the object" should have properties
+      | prop1 |
+      | bar   |

@@ -15,7 +15,6 @@ use Symfony\Bundle\MakerBundle\MakerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
 use Zenstruck\Foundry\Tests\Fixture\App\Command\UpdateGenericModelCommand;
 use Zenstruck\Foundry\Tests\Fixture\App\Controller\CreateContact;

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Zenstruck\Foundry\Persistence\Event\AfterPersist;
 use Zenstruck\Foundry\Test\Behat\FactoryShortNameResolver;
 use Zenstruck\Foundry\Test\Behat\FoundryContext;
 use Zenstruck\Foundry\Test\Behat\ObjectRegistry;
@@ -23,6 +24,11 @@ return static function (ContainerConfigurator $container): void {
         ])
 
         ->set('.zenstruck_foundry.behat.object_registry', ObjectRegistry::class)
+        ->args([
+            service('.zenstruck_foundry.behat.factory_resolver'),
+            service('.zenstruck_foundry.persistence_manager'),
+        ])
+        ->tag('foundry.hook', ['class' => null, 'method' => 'storeLastId', 'event' => AfterPersist::class])
         ->public()
 
         ->set(FoundryContext::class)

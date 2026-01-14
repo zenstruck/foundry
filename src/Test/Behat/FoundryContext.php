@@ -6,7 +6,9 @@ use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Step\Given;
 use Behat\Step\Then;
+use Behat\Transformation\Transform;
 use Zenstruck\Assert;
+use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
@@ -28,27 +30,62 @@ final class FoundryContext implements Context
     ) {
     }
 
-    #[Given('a :factoryShortName is created')]
-    #[Given('a :factoryShortName :objectName is created')]
+    #[Given('a(n) :factoryShortName is created')]
+    #[Given('a(n) :factoryShortName :objectName is created')]
     public function createObject(string $factoryShortName, ?string $objectName = null): void
     {
         $this->resolveFactory($factoryShortName, $objectName)->create();
     }
 
-    #[Given('a :factoryShortName is created with properties')]
-    #[Given('a :factoryShortName :objectName is created with properties')]
+    /**
+     * @return ObjectFactory<object>
+     */
+    private function resolveFactory(string $factoryShortName, ?string $objectName = null): ObjectFactory
+    {
+        $factory = $this->factoryResolver->factoryFor($factoryShortName);
+
+        if (!$objectName) {
+            return $factory;
+        }
+
+        return $factory->afterInstantiate(
+            fn(object $object) => $this->objectRegistry->store($object, $objectName, $factoryShortName)
+        );
+    }
+
+    #[Given('a(n) :factoryShortName is created with properties')]
+    #[Given('a(n) :factoryShortName :objectName is created with properties')]
     public function createObjectWithProperties(TableNode $table, string $factoryShortName, ?string $objectName = null): void
     {
-        $parametersList = $table->getColumnsHash();
+        $parametersList = $this->normalizeObjectParameters($table->getColumnsHash());
 
         if (count($parametersList) !== 1) {
             throw new \InvalidArgumentException('Expected exactly one line of properties, to create one object.');
         }
 
-        $objectProperties = $this->normalizeObjectParameters($parametersList[0]);
-
         $this->resolveFactory($factoryShortName, $objectName)
-            ->create($objectProperties);
+            ->create($parametersList[0]);
+    }
+
+    /**
+     * @phpstan-param list<Parameters> $parametersList
+     * @phpstan-return list<Parameters>
+     */
+    private function normalizeObjectParameters(array $parametersList): array
+    {
+        return array_map(
+            fn(array $parameters) => array_map(
+                function (mixed $value) {
+                    if (preg_match('/^<ref\((?<factoryShortName>[^,]+), (?<objectName>[^)]+)\)>$/', $value, $matches)) {
+                        return $this->objectRegistry->get($matches['factoryShortName'], $matches['objectName']);
+                    }
+
+                    return $value;
+                },
+                $parameters
+            ),
+            $parametersList
+        );
     }
 
     #[Given(':factoryShortName are created with properties')]
@@ -72,27 +109,6 @@ final class FoundryContext implements Context
             ->count($nb);
     }
 
-    #[Then(':factoryShortName :objectName should have properties')]
-    public function assertObjectHasProperties(TableNode $table, string $factoryShortName, string $objectName): void
-    {
-        $parametersList = $table->getColumnsHash();
-
-        if (count($parametersList) !== 1) {
-            throw new \InvalidArgumentException('Expected exactly one line of properties.');
-        }
-
-        $factory = $this->factoryResolver->factoryFor($factoryShortName);
-
-        $object = $this->objectRegistry->get($factoryShortName, $factory::class(), $objectName);
-        refresh($object);
-
-        $objectProperties = $this->normalizeObjectParameters($parametersList[0]);
-
-        foreach ($objectProperties as $key => $value) {
-            Assert::that(get($object, $key))->is($value);
-        }
-    }
-
     private function repositoryAssertionFor(string $factoryShortName): RepositoryAssertions
     {
         $factory = $this->factoryResolver->factoryFor($factoryShortName);
@@ -111,39 +127,35 @@ final class FoundryContext implements Context
         return $factory::assert();
     }
 
-    /**
-     * @return ObjectFactory<object>
-     */
-    private function resolveFactory(string $factoryShortName, ?string $objectName = null): ObjectFactory
+    #[Then(':factoryShortName :objectName should have properties')]
+    public function assertObjectHasProperties(TableNode $table, string $factoryShortName, string $objectName): void
     {
-        $factory = $this->factoryResolver->factoryFor($factoryShortName);
+        $parametersList = $this->normalizeObjectParameters($table->getColumnsHash());
 
-        if (!$objectName) {
-            return $factory;
+        if (count($parametersList) !== 1) {
+            throw new \InvalidArgumentException('Expected exactly one line of properties.');
         }
 
-        return $factory->afterInstantiate(
-            fn(object $object) => $this->objectRegistry->store($object, $objectName, $factoryShortName)
-        );
+        $object = $this->objectRegistry->get($factoryShortName, $objectName);
+
+        if (!Configuration::autoRefreshWithLazyObjectsIsEnabled()) {
+            refresh($object);
+        }
+
+        foreach ($parametersList[0] as $key => $value) {
+            Assert::that(get($object, $key))->is($value);
+        }
     }
 
-    /**
-     * @phpstan-param Parameters $parameters
-     * @phpstan-return Parameters
-     */
-    private function normalizeObjectParameters(array $parameters): array
+    #[Transform('/(.*)<lastId>(.*)/')]
+    public function transformLastId(string $before, string $after): string
     {
-        return array_map(
-            function(mixed $value) {
-                if (preg_match('/^ref\((?<factoryShortName>[^,]+), (?<objectName>[^)]+)\)$/', $value, $matches)) {
-                    $factory = $this->factoryResolver->factoryFor($matches['factoryShortName']);
+        return "{$before}{$this->objectRegistry->lastId()}{$after}";
+    }
 
-                    return $this->objectRegistry->get($matches['factoryShortName'], $factory::class(), $matches['objectName']);
-                }
-
-                return $value;
-            },
-            $parameters
-        );
+    #[Transform('/(.*)<lastId\((.*)\)>(.*)/')]
+    public function transformLastIdForSpecificObject(string $before, string $factoryShortName, string $after): string
+    {
+        return "{$before}{$this->objectRegistry->lastIdFor($factoryShortName)}{$after}";
     }
 }

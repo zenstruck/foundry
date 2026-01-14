@@ -1,4 +1,6 @@
 default:
+    testers:
+        stop_on_failure: true
     suites:
         default:
             contexts:

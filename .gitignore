@@ -13,6 +13,7 @@
 /docs/output/
 /docker/.makefile
 /.env.local
+/.env.test.local
 /docker-compose.override.yaml
 /tests/Fixture/Maker/tmp/
 /.phpbench

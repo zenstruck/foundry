@@ -75,7 +75,15 @@ final class FactoryShortNameResolver
             throw FactoryNotResolvableException::conflict($shortName, array_map(static fn(ObjectFactory $f) => $f::class, $factories));
         }
 
-        return $factories[0];
+        return $factories[0]::new();
+    }
+
+    /**
+     * @return class-string
+     */
+    public function targetObjectClassFor(string $shortName): string
+    {
+        return $this->factoryFor($shortName)::class();
     }
 
     /**

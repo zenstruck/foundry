@@ -24,8 +24,8 @@ final class BehatListener implements EventSubscriberInterface
         return [
             ScenarioTested::BEFORE => 'bootFoundry',
             ExampleTested::BEFORE => 'bootFoundry',
-            ScenarioTested::AFTER => 'shutdownFoundry',
-            ExampleTested::AFTER => 'shutdownFoundry',
+            ScenarioTested::AFTER => ['shutdownFoundry', -100],
+            ExampleTested::AFTER => ['shutdownFoundry', -100],
         ];
     }
 

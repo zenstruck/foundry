@@ -17,21 +17,25 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Attribute\FactoryShortName;
-use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\FactoryRegistry;
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Test\Behat\FactoryNotResolvableException;
 use Zenstruck\Foundry\Test\Behat\FactoryShortNameResolver;
 
 final class FactoryResolverTest extends TestCase
 {
+    public static function factoriesWithConflictingShortNames(): iterable
+    {
+        yield 'same short name in attribute' => [[new Article1Factory(), new Article2Factory()]];
+        yield 'same generated short name' => [[new Article1Factory(), new ArticleFactory()]];
+    }
+
     #[Test]
     public function it_resolves_factory_by_auto_generated_name(): void
     {
         $resolver = new FactoryShortNameResolver([$factory = new PostFactory()]);
 
-        self::assertSame($factory, $resolver->factoryFor('post'));
-        self::assertSame($factory, $resolver->factoryFor('posts'));
+        self::assertInstanceOf($factory::class, $resolver->factoryFor('post'));
+        self::assertInstanceOf($factory::class, $resolver->factoryFor('posts'));
     }
 
     #[Test]
@@ -39,8 +43,8 @@ final class FactoryResolverTest extends TestCase
     {
         $resolver = new FactoryShortNameResolver([$factory = new PostFactory()]);
 
-        self::assertSame($factory, $resolver->factoryFor('Post'));
-        self::assertSame($factory, $resolver->factoryFor('POST'));
+        self::assertInstanceOf($factory::class, $resolver->factoryFor('Post'));
+        self::assertInstanceOf($factory::class, $resolver->factoryFor('POST'));
     }
 
     #[Test]
@@ -48,11 +52,11 @@ final class FactoryResolverTest extends TestCase
     {
         $resolver = new FactoryShortNameResolver([$factory = new BlogPostFactory()]);
 
-        self::assertSame($factory, $resolver->factoryFor('blog post'));
-        self::assertSame($factory, $resolver->factoryFor('blog posts'));
+        self::assertInstanceOf($factory::class, $resolver->factoryFor('blog post'));
+        self::assertInstanceOf($factory::class, $resolver->factoryFor('blog posts'));
 
-        self::assertSame($factory, $resolver->factoryFor('BlOg PoSt'));
-        self::assertSame($factory, $resolver->factoryFor('BlOg PoSts'));
+        self::assertInstanceOf($factory::class, $resolver->factoryFor('BlOg PoSt'));
+        self::assertInstanceOf($factory::class, $resolver->factoryFor('BlOg PoSts'));
     }
 
     #[Test]
@@ -60,8 +64,8 @@ final class FactoryResolverTest extends TestCase
     {
         $resolver = new FactoryShortNameResolver([$factory = new CustomNameFactory()]);
 
-        self::assertSame($factory, $resolver->factoryFor('custom'));
-        self::assertSame($factory, $resolver->factoryFor('customs'));
+        self::assertInstanceOf($factory::class, $resolver->factoryFor('custom'));
+        self::assertInstanceOf($factory::class, $resolver->factoryFor('customs'));
     }
 
     #[Test]
@@ -69,7 +73,7 @@ final class FactoryResolverTest extends TestCase
     {
         $resolver = new FactoryShortNameResolver([$factory = new Article1Factory()]);
 
-        self::assertSame($factory, $resolver->factoryFor('several articles'));
+        self::assertInstanceOf($factory::class, $resolver->factoryFor('several articles'));
     }
 
     #[Test]
@@ -93,12 +97,6 @@ final class FactoryResolverTest extends TestCase
         $this->expectExceptionMessage('Multiple factories found for "article"');
 
         $resolver->factoryFor('article');
-    }
-
-    public static function factoriesWithConflictingShortNames(): iterable
-    {
-        yield 'same short name in attribute' => [[new Article1Factory(), new Article2Factory()]];
-        yield 'same generated short name' => [[new Article1Factory(), new ArticleFactory()]];
     }
 }
 
