@@ -8,5 +8,6 @@
         <ignored-regex>#\[BC\] SKIPPED: Roave\\BetterReflection\\Reflection\\ReflectionClass "Psalm\\Plugin\\EventHandler\\AfterMethodCallAnalysisInterface" could not be found in the located source#</ignored-regex>
         <ignored-regex>#(.*)Zenstruck\\Foundry\\Utils\\Rector(.*)#</ignored-regex>
         <ignored-regex>#(.*)initializeInternal(.*)#</ignored-regex>
+        <ignored-regex>#\[BC\] CHANGED: Method getIdentifierValues\(\) of class Zenstruck\\Foundry\\Persistence\\PersistenceStrategy became final#</ignored-regex>
     </baseline>
 </roave-bc-check>

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\DerivedIdentity;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
+use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetterInterface;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Persistence\PersistedObjectsTracker;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
@@ -32,6 +34,8 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithReadonly\EntityWi
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\AddressFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\EdgeCases\DerivedIdentity\InverseSideFactory;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\EdgeCases\DerivedIdentity\OwningSideFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Integration\Persistence\AutoRefreshTestCase;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
@@ -191,6 +195,23 @@ final class AutoRefreshTest extends AutoRefreshTestCase
 
         self::assertTrue((new \ReflectionClass($category))->isUninitializedLazyObject($category));
         self::assertCount(1, $category->getContacts());
+    }
+
+    #[Test]
+    public function it_can_refresh_entity_with_derived_identity(): void
+    {
+        $owningSideFactory = persistent_factory(DerivedIdentity\OwningSide::class);
+        $inverseSideFactory = persistent_factory(DerivedIdentity\InverseSide::class);
+
+        $inverseSide = $inverseSideFactory->create(['owningSide' => $owningSideFactory]);
+
+        $owningSideFactory::assert()->count(1);
+        $inverseSideFactory::assert()->count(1);
+
+        self::ensureKernelShutdown();
+        self::assertTrue((new \ReflectionClass($inverseSide))->isUninitializedLazyObject($inverseSide));
+
+        $inverseSide->getStatus();
     }
 
     protected static function factory(): PersistentObjectFactory

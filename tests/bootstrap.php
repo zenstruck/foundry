@@ -26,4 +26,4 @@ $fs = new Filesystem();
 
 $fs->remove(__DIR__.'/../var/cache');
 
-(new Dotenv())->usePutenv()->loadEnv(__DIR__.'/../.env');
+(new Dotenv())->usePutenv()->loadEnv(__DIR__.'/../.env', testEnvs: []);

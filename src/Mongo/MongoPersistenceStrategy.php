@@ -95,4 +95,9 @@ final class MongoPersistenceStrategy extends PersistenceStrategy
 
         return $uow->isScheduledForInsert($object) || $uow->isScheduledForUpsert($object);
     }
+
+    public function getIdentifierValues(object $object): array
+    {
+        return $this->classMetadata($object::class)->getIdentifierValues($object);
+    }
 }

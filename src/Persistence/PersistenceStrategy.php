@@ -82,10 +82,7 @@ abstract class PersistenceStrategy
     /**
      * @return array<string, mixed>
      */
-    public function getIdentifierValues(object $object): array
-    {
-        return $this->classMetadata($object::class)->getIdentifierValues($object);
-    }
+    abstract public function getIdentifierValues(object $object): array;
 
     /**
      * @return list<string>

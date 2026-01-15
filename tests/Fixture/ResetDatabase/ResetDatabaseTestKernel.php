@@ -76,4 +76,9 @@ final class ResetDatabaseTestKernel extends FoundryTestKernel
             $c->register(MongoResetterDecorator::class)->setAutowired(true)->setAutoconfigured(true);
         }
     }
+
+    public static function usesSqlite(): bool
+    {
+        return str_starts_with((string) \getenv('DATABASE_URL'), 'sqlite:');
+    }
 }
