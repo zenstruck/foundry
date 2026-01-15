@@ -1,14 +1,7 @@
 default:
     testers:
         stop_on_failure: true
-    suites:
-        main:
-            contexts:
-                - Behat\MinkExtension\Context\MinkContext
-                - Zenstruck\Foundry\Test\Behat\FoundryContext
-            paths:
-                - tests/behatFeatures/main
-                - tests/behatFeatures/reset-scenario
+
     extensions:
         Zenstruck\Foundry\Test\Behat\FoundryExtension:
             database_reset_mode: scenario
@@ -21,43 +14,94 @@ default:
             kernel:
                 class: Zenstruck\Foundry\Tests\Fixture\Behat\BehatTestKernel
 
-reset-manual:
+    suites:
+        main:
+            paths: [tests/behatFeatures/main]
+            contexts: &common_contexts
+                - Behat\MinkExtension\Context\MinkContext
+                - Zenstruck\Foundry\Test\Behat\FoundryContext
+
+main-dama:
+    extensions:
+        Zenstruck\Foundry\Test\Behat\FoundryExtension:
+            database_reset_mode: scenario
+            enable_dama_support: true
+
     suites:
         main: false
-        reset-manual:
-            contexts:
-                - Behat\MinkExtension\Context\MinkContext
-                - Zenstruck\Foundry\Tests\Fixture\Behat\ResetDisabledTestContext
-                - Zenstruck\Foundry\Test\Behat\FoundryContext
-            paths:
-                - tests/behatFeatures/reset-manual
+        main-dama:
+            paths: [tests/behatFeatures/main]
+            contexts: *common_contexts
+
+main-native-dama:
+    extensions:
+        DAMA\DoctrineTestBundle\Behat\ServiceContainer\DoctrineExtension: ~
+        Zenstruck\Foundry\Test\Behat\FoundryExtension:
+            database_reset_mode: scenario
+
+    suites:
+        main: false
+        main-native-dama:
+            paths: [tests/behatFeatures/main]
+            contexts: *common_contexts
+
+reset-manual:
     extensions:
         Zenstruck\Foundry\Test\Behat\FoundryExtension:
             database_reset_mode: manual
 
-reset-disabled:
     suites:
         main: false
-        reset-disabled:
-            contexts:
+        reset-manual:
+            paths: [tests/behatFeatures/reset-manual]
+            contexts: &common_contexts_with_reset_manual
                 - Behat\MinkExtension\Context\MinkContext
-                - Zenstruck\Foundry\Tests\Fixture\Behat\ResetDisabledTestContext
                 - Zenstruck\Foundry\Test\Behat\FoundryContext
-            paths:
-                - tests/behatFeatures/reset-disabled
+                - Zenstruck\Foundry\Tests\Fixture\Behat\ResetDisabledTestContext
+
+reset-manual-dama:
+    extensions:
+        Zenstruck\Foundry\Test\Behat\FoundryExtension:
+            database_reset_mode: manual
+            enable_dama_support: true
+
+    suites:
+        main: false
+        reset-manual-dama:
+            paths: [tests/behatFeatures/reset-manual]
+            contexts: *common_contexts_with_reset_manual
+
+reset-feature:
+    extensions:
+        Zenstruck\Foundry\Test\Behat\FoundryExtension:
+            database_reset_mode: feature
+
+    suites:
+        main: false
+        reset-feature:
+            paths: [tests/behatFeatures/reset-feature]
+            contexts: *common_contexts
+
+
+reset-feature-dama:
+    extensions:
+        Zenstruck\Foundry\Test\Behat\FoundryExtension:
+            database_reset_mode: feature
+            enable_dama_support: true
+
+    suites:
+        main: false
+        reset-feature-dama:
+            paths: [tests/behatFeatures/reset-feature]
+            contexts: *common_contexts
+
+reset-disabled:
     extensions:
         Zenstruck\Foundry\Test\Behat\FoundryExtension:
             database_reset_mode: disabled
 
-reset-feature:
     suites:
         main: false
-        reset-feature:
-            contexts:
-                - Behat\MinkExtension\Context\MinkContext
-                - Zenstruck\Foundry\Test\Behat\FoundryContext
-            paths:
-                - tests/behatFeatures/reset-feature
-    extensions:
-        Zenstruck\Foundry\Test\Behat\FoundryExtension:
-            database_reset_mode: feature
+        reset-disabled:
+            paths: [tests/behatFeatures/reset-disabled]
+            contexts: *common_contexts_with_reset_manual

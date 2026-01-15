@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Test\Behat\Listener;
 
-use Behat\Behat\EventDispatcher\Event\AfterScenarioTested;
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeScenarioTested;
 use Behat\Behat\EventDispatcher\Event\ExampleTested;
@@ -21,6 +20,7 @@ use Behat\Behat\EventDispatcher\Event\FeatureTested;
 use Behat\Behat\EventDispatcher\Event\ScenarioTested;
 use Behat\Gherkin\Node\TaggedNodeInterface;
 use Behat\Testwork\EventDispatcher\Event\ExerciseCompleted;
+use DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Configuration;
@@ -39,18 +39,22 @@ final class DatabaseResetListener implements EventSubscriberInterface
     public function __construct(
         private readonly KernelInterface $symfonyKernel,
         private readonly DatabaseResetMode $resetMode,
+        private readonly bool $damaSupportEnabled = false,
     ) {
+        $this->detectDAMAListenerConflict();
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
             ExerciseCompleted::BEFORE => 'resetBeforeSuite',
+            ExerciseCompleted::AFTER => 'disableStaticConnection',
+
             FeatureTested::BEFORE => 'beforeFeature',
             ScenarioTested::BEFORE => 'beforeScenario',
             ExampleTested::BEFORE => 'beforeScenario',
 
-            // a shutdown is needed after each scenario/feature to ensure StoriesRegistry is reset
+            // a shutdown is needed after each scenario to ensure StoriesRegistry is reset
             ScenarioTested::AFTER => 'shutdownFoundryAfterScenario',
             ExampleTested::AFTER => 'shutdownFoundryAfterScenario',
         ];
@@ -58,7 +62,18 @@ final class DatabaseResetListener implements EventSubscriberInterface
 
     public function resetBeforeSuite(): void
     {
+        if ($this->damaSupportEnabled) {
+            StaticDriver::setKeepStaticConnections(true);
+        }
+
         ResetDatabaseManager::resetBeforeFirstTest($this->symfonyKernel);
+    }
+
+    public function disableStaticConnection(): void
+    {
+        if ($this->damaSupportEnabled) {
+            StaticDriver::setKeepStaticConnections(false);
+        }
     }
 
     public function beforeFeature(BeforeFeatureTested $event): void
@@ -88,6 +103,11 @@ final class DatabaseResetListener implements EventSubscriberInterface
 
         $this->resetObjectRegistry();
         Configuration::shutdown();
+    }
+
+    private function detectDAMAListenerConflict(): void
+    {
+        // todo: il y a un paramètre "extensions" dans le container de behat qui permet de lister les extensions actives
     }
 
     private function hasResetTag(BeforeFeatureTested|BeforeScenarioTested $event): bool
@@ -123,6 +143,13 @@ final class DatabaseResetListener implements EventSubscriberInterface
 
         // when the DB is reset, any stories should be able to reload
         StoryRegistry::reset();
+
+        if ($this->damaSupportEnabled) {
+            StaticDriver::rollBack();
+            StaticDriver::beginTransaction();
+
+            return;
+        }
 
         ResetDatabaseManager::resetBeforeEachTest($this->symfonyKernel);
     }

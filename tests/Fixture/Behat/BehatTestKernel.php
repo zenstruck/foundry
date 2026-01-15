@@ -11,7 +11,7 @@ use Zenstruck\Foundry\Tests\Fixture\App\Controller\HelloWorldController;
 use Zenstruck\Foundry\Tests\Fixture\App\Controller\UpdateGenericModel;
 use Zenstruck\Foundry\Tests\Fixture\FoundryTestKernel;
 
-final class BehatTestKernel extends FoundryTestKernel
+class BehatTestKernel extends FoundryTestKernel
 {
     public function registerBundles(): iterable
     {

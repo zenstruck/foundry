@@ -16,8 +16,10 @@ namespace Zenstruck\Foundry\Test\Behat;
 use Behat\Behat\EventDispatcher\ServiceContainer\EventDispatcherExtension;
 use Behat\Testwork\ServiceContainer\Extension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
+use DAMA\DoctrineTestBundle\Behat\ServiceContainer\DoctrineExtension;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Zenstruck\Foundry\Test\Behat\Config\DatabaseResetMode;
 use Zenstruck\Foundry\Test\Behat\Listener\BootConfigurationListener;
@@ -47,6 +49,13 @@ final class FoundryExtension implements Extension
                     ->values(array_map(static fn(DatabaseResetMode $mode) => $mode->value, DatabaseResetMode::cases()))
                     ->defaultValue(DatabaseResetMode::MANUAL->value)
                 ->end()
+                ->booleanNode('enable_dama_support')
+                    ->defaultFalse()
+                ->end()
+            ->end()
+            ->validate()
+                ->ifTrue(static fn(array $v): bool => $v['enable_dama_support'] && DatabaseResetMode::DISABLED->value === $v['database_reset_mode'])
+                ->thenInvalid('Foundry\'s DAMA support cannot be enabled when database reset is disabled.')
             ->end();
     }
 
@@ -66,9 +75,29 @@ final class FoundryExtension implements Extension
             return;
         }
 
+        if ($this->damaNativeExtensionIsEnabled($container)) {
+            if ($config['enable_dama_support']) {
+                throw new LogicException('Foundry\'s Dama support cannot be enabled when the native Behat extension for "dama/doctrine-test-bundle" is enabled.');
+            }
+
+            if ($databaseResetMode === DatabaseResetMode::FEATURE) {
+                throw new LogicException('Database reset mode "feature" is not supported the native Behat extension for "dama/doctrine-test-bundle" is enabled. Please enable Foundry\'s DAMA support with "enable_dama_support: true" and disable the native extension to enable automatic database reset at feature level with DAMA support.');
+            }
+
+            if ($databaseResetMode === DatabaseResetMode::MANUAL) {
+                throw new LogicException('Database reset mode "manual" is not supported the native Behat extension for "dama/doctrine-test-bundle" is enabled. Please enable Foundry\'s DAMA support with "enable_dama_support: true" and disable the native extension to enable manual database reset with DAMA support.');
+            }
+        }
+
         $container->register('.zenstruck_foundry.behat.listener.database_reset', DatabaseResetListener::class)
             ->setArgument('$symfonyKernel', new Reference('fob_symfony.kernel'))
             ->setArgument('$resetMode', $databaseResetMode)
+            ->setArgument('$damaSupportEnabled', $config['enable_dama_support'])
             ->addTag(EventDispatcherExtension::SUBSCRIBER_TAG);
+    }
+
+    private function damaNativeExtensionIsEnabled(ContainerBuilder $container): bool
+    {
+        return in_array(DoctrineExtension::class, (array) $container->getParameter('extensions'), true);
     }
 }
