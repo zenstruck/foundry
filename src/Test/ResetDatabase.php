@@ -30,10 +30,11 @@ trait ResetDatabase
     #[BeforeClass]
     public static function _resetDatabaseBeforeFirstTest(): void
     {
-        ResetDatabaseManager::resetBeforeFirstTest(
-            static::_boot(...),
-            static::_shutdown(...),
-        );
+        $kernel = static::_boot(); // @phpstan-ignore staticClassAccess.privateMethod
+
+        ResetDatabaseManager::resetBeforeFirstTest($kernel);
+
+        static::_shutdown(); // @phpstan-ignore staticClassAccess.privateMethod
     }
 
     /**
@@ -43,10 +44,16 @@ trait ResetDatabase
     #[Before]
     public static function _resetDatabaseBeforeEachTest(): void
     {
-        ResetDatabaseManager::resetBeforeEachTest(
-            static::_boot(...),
-            static::_shutdown(...),
-        );
+        if (ResetDatabaseManager::canSkipSchemaReset()) {
+            // can fully skip booting the kernel
+            return;
+        }
+
+        $kernel = static::_boot(); // @phpstan-ignore staticClassAccess.privateMethod
+
+        ResetDatabaseManager::resetBeforeEachTest($kernel);
+
+        static::_shutdown(); // @phpstan-ignore staticClassAccess.privateMethod
     }
 
     /**

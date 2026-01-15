@@ -61,10 +61,11 @@ abstract class KernelBench
      */
     public static function _resetDatabaseBeforeFirstBench(): void
     {
-        ResetDatabaseManager::resetBeforeFirstTest(
-            static fn() => static::bootKernel(),
-            static fn() => static::ensureKernelShutdown(),
-        );
+        $kernel = static::bootKernel();
+
+        ResetDatabaseManager::resetBeforeFirstTest($kernel);
+
+        static::ensureKernelShutdown();
     }
 
     /**
@@ -72,10 +73,11 @@ abstract class KernelBench
      */
     public function _resetDatabaseBeforeEachBench(): void
     {
-        ResetDatabaseManager::resetBeforeEachTest(
-            static fn() => static::bootKernel(),
-            static fn() => static::ensureKernelShutdown(),
-        );
+        $kernel = static::bootKernel();
+
+        ResetDatabaseManager::resetBeforeEachTest($kernel);
+
+        static::ensureKernelShutdown();
     }
 
     /**

@@ -38,17 +38,12 @@ final class ResetDatabaseManager
     ) {
     }
 
-    /**
-     * @param callable():KernelInterface $createKernel
-     * @param callable():void            $shutdownKernel
-     */
-    public static function resetBeforeFirstTest(callable $createKernel, callable $shutdownKernel): void
+    public static function resetBeforeFirstTest(KernelInterface $kernel): void
     {
         if (self::$hasDatabaseBeenReset) {
             return;
         }
 
-        $kernel = $createKernel();
         $configuration = Configuration::instance();
 
         try {
@@ -66,23 +61,11 @@ final class ResetDatabaseManager
             $databaseResetter->resetBeforeFirstTest($kernel);
         }
 
-        $shutdownKernel();
-
         self::$hasDatabaseBeenReset = true;
     }
 
-    /**
-     * @param callable():KernelInterface $createKernel
-     * @param callable():void            $shutdownKernel
-     */
-    public static function resetBeforeEachTest(callable $createKernel, callable $shutdownKernel): void
+    public static function resetBeforeEachTest(KernelInterface $kernel): void
     {
-        if (self::canSkipSchemaReset()) {
-            // can fully skip booting the kernel
-            return;
-        }
-
-        $kernel = $createKernel();
         $configuration = Configuration::instance();
 
         try {
@@ -101,8 +84,6 @@ final class ResetDatabaseManager
         }
 
         $configuration->stories->loadGlobalStories();
-
-        $shutdownKernel();
     }
 
     public static function isDAMADoctrineTestBundleEnabled(): bool
@@ -110,7 +91,7 @@ final class ResetDatabaseManager
         return \class_exists(StaticDriver::class) && StaticDriver::isKeepStaticConnections();
     }
 
-    private static function canSkipSchemaReset(): bool
+    public static function canSkipSchemaReset(): bool
     {
         return self::isDAMADoctrineTestBundleEnabled() && PersistenceManager::isOrmOnly();
     }
