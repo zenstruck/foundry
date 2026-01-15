@@ -21,6 +21,20 @@ default:
             kernel:
                 class: Zenstruck\Foundry\Tests\Fixture\Behat\BehatTestKernel
 
+reset-manual:
+    suites:
+        main: false
+        reset-manual:
+            contexts:
+                - Behat\MinkExtension\Context\MinkContext
+                - Zenstruck\Foundry\Tests\Fixture\Behat\ResetDisabledTestContext
+                - Zenstruck\Foundry\Test\Behat\FoundryContext
+            paths:
+                - tests/behatFeatures/reset-manual
+    extensions:
+        Zenstruck\Foundry\Test\Behat\FoundryExtension:
+            database_reset_mode: manual
+
 reset-disabled:
     suites:
         main: false

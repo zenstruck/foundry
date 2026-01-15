@@ -13,14 +13,19 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Test\Behat\Listener;
 
+use Behat\Behat\EventDispatcher\Event\AfterScenarioTested;
+use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
+use Behat\Behat\EventDispatcher\Event\BeforeScenarioTested;
 use Behat\Behat\EventDispatcher\Event\ExampleTested;
 use Behat\Behat\EventDispatcher\Event\FeatureTested;
 use Behat\Behat\EventDispatcher\Event\ScenarioTested;
+use Behat\Gherkin\Node\TaggedNodeInterface;
 use Behat\Testwork\EventDispatcher\Event\ExerciseCompleted;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
+use Zenstruck\Foundry\StoryRegistry;
 use Zenstruck\Foundry\Test\Behat\Config\DatabaseResetMode;
 
 /**
@@ -29,7 +34,7 @@ use Zenstruck\Foundry\Test\Behat\Config\DatabaseResetMode;
  */
 final class DatabaseResetListener implements EventSubscriberInterface
 {
-    private bool $hasResetBeforeFirstTest = false;
+    private const RESET_DB_TAG = 'resetDB';
 
     public function __construct(
         private readonly KernelInterface $symfonyKernel,
@@ -46,7 +51,6 @@ final class DatabaseResetListener implements EventSubscriberInterface
             ExampleTested::BEFORE => 'beforeScenario',
 
             // a shutdown is needed after each scenario/feature to ensure StoriesRegistry is reset
-            FeatureTested::AFTER => 'shutdownFoundryAfterFeature',
             ScenarioTested::AFTER => 'shutdownFoundryAfterScenario',
             ExampleTested::AFTER => 'shutdownFoundryAfterScenario',
         ];
@@ -57,36 +61,23 @@ final class DatabaseResetListener implements EventSubscriberInterface
         ResetDatabaseManager::resetBeforeFirstTest($this->symfonyKernel);
     }
 
-    public function beforeFeature(): void
+    public function beforeFeature(BeforeFeatureTested $event): void
     {
-        if (DatabaseResetMode::FEATURE !== $this->resetMode) {
+        if (!$this->hasResetTag($event) && DatabaseResetMode::FEATURE !== $this->resetMode) {
             return;
         }
 
-        if (!$this->hasResetBeforeFirstTest) {
-            $this->hasResetBeforeFirstTest = true;
-        }
-
-        ResetDatabaseManager::resetBeforeEachTest($this->symfonyKernel);
+        $this->resetDatabase();
     }
 
-    public function beforeScenario(): void
+    public function beforeScenario(BeforeScenarioTested $event): void
     {
-        if (DatabaseResetMode::SCENARIO !== $this->resetMode) {
+        $hasResetTag = $this->hasResetTag($event);
+        if (!$hasResetTag && DatabaseResetMode::SCENARIO !== $this->resetMode) {
             return;
         }
 
-        if (!$this->hasResetBeforeFirstTest) {
-            $this->hasResetBeforeFirstTest = true;
-        }
-
-        ResetDatabaseManager::resetBeforeEachTest($this->symfonyKernel);
-    }
-
-    public function shutdownFoundryAfterFeature(): void
-    {
-        $this->symfonyKernel->getContainer()->get('.zenstruck_foundry.behat.object_registry')->reset(); // @phpstan-ignore method.notFound
-        Configuration::shutdown();
+        $this->resetDatabase();
     }
 
     public function shutdownFoundryAfterScenario(): void
@@ -95,7 +86,49 @@ final class DatabaseResetListener implements EventSubscriberInterface
             return;
         }
 
-        $this->symfonyKernel->getContainer()->get('.zenstruck_foundry.behat.object_registry')->reset(); // @phpstan-ignore method.notFound
+        $this->resetObjectRegistry();
         Configuration::shutdown();
+    }
+
+    private function hasResetTag(BeforeFeatureTested|BeforeScenarioTested $event): bool
+    {
+        $node = $event instanceof BeforeFeatureTested ? $event->getFeature() : $event->getScenario();
+
+        if (!$node instanceof TaggedNodeInterface) {
+            return false;
+        }
+
+        $hasResetDbTag = $node->hasTag(self::RESET_DB_TAG);
+
+        if (!$hasResetDbTag) {
+            return false;
+        }
+
+        if ($this->resetMode === DatabaseResetMode::SCENARIO) {
+            // todo: tester les erreurs !
+            // todo: ajouter des infos concernant le fichier de features
+            throw new \LogicException("Cannot use \"@resetDB\" tag with database_reset_mode set as \"{$this->resetMode->value}\".");
+        }
+
+        if ($this->resetMode === DatabaseResetMode::FEATURE && $event instanceof BeforeFeatureTested) {
+            throw new \LogicException("Cannot use \"@resetDB\" tag on a feature with database_reset_mode set as \"{$this->resetMode->value}\".");
+        }
+
+        return true;
+    }
+
+    private function resetDatabase(): void
+    {
+        $this->resetObjectRegistry();
+
+        // when the DB is reset, any stories should be able to reload
+        StoryRegistry::reset();
+
+        ResetDatabaseManager::resetBeforeEachTest($this->symfonyKernel);
+    }
+
+    private function resetObjectRegistry(): void
+    {
+        $this->symfonyKernel->getContainer()->get('.zenstruck_foundry.behat.object_registry')->reset(); // @phpstan-ignore method.notFound
     }
 }

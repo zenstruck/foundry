@@ -45,7 +45,7 @@ final class FoundryExtension implements Extension
             ->children()
                 ->enumNode('database_reset_mode')
                     ->values(array_map(static fn(DatabaseResetMode $mode) => $mode->value, DatabaseResetMode::cases()))
-                    ->defaultValue(DatabaseResetMode::DISABLED->value)
+                    ->defaultValue(DatabaseResetMode::MANUAL->value)
                 ->end()
             ->end();
     }
@@ -60,13 +60,15 @@ final class FoundryExtension implements Extension
             ->setArgument('$symfonyKernel', new Reference('fob_symfony.kernel'))
             ->addTag(EventDispatcherExtension::SUBSCRIBER_TAG);
 
-        $resetMode = DatabaseResetMode::from($config['database_reset_mode']);
+        $databaseResetMode = DatabaseResetMode::from($config['database_reset_mode']);
 
-        if (DatabaseResetMode::DISABLED !== $resetMode) {
-            $container->register('.zenstruck_foundry.behat.listener.database_reset', DatabaseResetListener::class)
-                ->setArgument('$symfonyKernel', new Reference('fob_symfony.kernel'))
-                ->setArgument('$resetMode', $resetMode)
-                ->addTag(EventDispatcherExtension::SUBSCRIBER_TAG);
+        if ($databaseResetMode === DatabaseResetMode::DISABLED) {
+            return;
         }
+
+        $container->register('.zenstruck_foundry.behat.listener.database_reset', DatabaseResetListener::class)
+            ->setArgument('$symfonyKernel', new Reference('fob_symfony.kernel'))
+            ->setArgument('$resetMode', $databaseResetMode)
+            ->addTag(EventDispatcherExtension::SUBSCRIBER_TAG);
     }
 }

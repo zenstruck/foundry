@@ -21,6 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 use function Zenstruck\Foundry\runCommand;
 
 /**
@@ -44,6 +45,10 @@ abstract class BaseOrmResetter implements OrmResetter
 
     final public function resetBeforeEachTest(KernelInterface $kernel): void
     {
+        if (ResetDatabaseManager::databaseHasBeenResetBeforeFirstTest()) {
+            self::$inFirstTest = false;
+        }
+
         if (self::$inFirstTest) {
             self::$inFirstTest = false;
 

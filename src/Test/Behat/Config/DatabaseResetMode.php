@@ -19,6 +19,7 @@ namespace Zenstruck\Foundry\Test\Behat\Config;
 enum DatabaseResetMode: string
 {
     case DISABLED = 'disabled';
+    case MANUAL = 'manual';
     case SCENARIO = 'scenario';
     case FEATURE = 'feature';
 }

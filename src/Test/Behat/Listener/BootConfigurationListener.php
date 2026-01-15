@@ -25,11 +25,13 @@ final class BootConfigurationListener implements EventSubscriberInterface
     {
         return [
             ExerciseCompleted::BEFORE => ['bootFoundry', 100],
+            ExerciseCompleted::AFTER => ['shutdownFoundry', -100],
+
             FeatureTested::BEFORE => ['bootFoundry', 100],
+            FeatureTested::AFTER => ['shutdownFoundryAfterFeature', -100],
+
             ScenarioTested::BEFORE => ['bootFoundry', 100],
             ExampleTested::BEFORE => ['bootFoundry', 100],
-
-            ExerciseCompleted::AFTER => ['shutdownFoundry', -100],
         ];
     }
 
@@ -46,6 +48,17 @@ final class BootConfigurationListener implements EventSubscriberInterface
 
     public function shutdownFoundry(): void
     {
+        Configuration::shutdown();
+    }
+
+    /**
+     * In any case, we want to shutdown Foundry after each feature:
+     * - to reset the object registry
+     * - to reset the story registry
+     */
+    public function shutdownFoundryAfterFeature(): void
+    {
+        $this->symfonyKernel->getContainer()->get('.zenstruck_foundry.behat.object_registry')->reset(); // @phpstan-ignore method.notFound
         Configuration::shutdown();
     }
 }

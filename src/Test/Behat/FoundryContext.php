@@ -147,6 +147,28 @@ final class FoundryContext implements Context
         }
     }
 
+    #[Then(':factoryShortName object named :objectName should exist')]
+    public function assertObjectExists(string $factoryShortName, string $objectName): void
+    {
+        Assert::that(
+            $this->objectRegistry->has(
+                $this->factoryResolver->targetObjectClassFor($factoryShortName),
+                $objectName
+            )
+        )->is(true, "Object with name \"$objectName\" of type \"$factoryShortName\" does not exist although it should.");
+    }
+
+    #[Then(':factoryShortName object named :objectName should not exist')]
+    public function assertObjectDoesNotExist(string $factoryShortName, string $objectName): void
+    {
+        Assert::that(
+            $this->objectRegistry->has(
+                $this->factoryResolver->targetObjectClassFor($factoryShortName),
+                $objectName
+            )
+        )->is(false, "Object with name \"$objectName\" of type \"$factoryShortName\" exists although it should not.");
+    }
+
     #[Transform('/(.*)<lastId>(.*)/')]
     public function transformLastId(string $before, string $after): string
     {

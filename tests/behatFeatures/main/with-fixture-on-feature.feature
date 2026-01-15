@@ -7,4 +7,3 @@ Feature: Test @withFixture tag
 
   Scenario: Ensure DB is fresh
     Then 1 contact should exist
-
