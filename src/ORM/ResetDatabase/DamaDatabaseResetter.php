@@ -15,6 +15,8 @@ namespace Zenstruck\Foundry\ORM\ResetDatabase;
 
 use DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\HttpKernel\RebootableInterface;
+use Zenstruck\Assert;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
@@ -27,6 +29,7 @@ final class DamaDatabaseResetter implements OrmResetter
 {
     public function __construct(
         private OrmResetter $decorated,
+        private string $kernelBuildDir,
     ) {
     }
 
@@ -50,12 +53,15 @@ final class DamaDatabaseResetter implements OrmResetter
             Configuration::instance()->stories->loadGlobalStories();
         }
 
-        // shutdown kernel before re-enabling static connections
-        // this would prevent any error if any ResetInterface execute sql queries (example: symfony/doctrine-messenger)
-        $kernel->shutdown();
-
         // re-enable static connections
         StaticDriver::setKeepStaticConnections(true);
+
+        if (!$kernel instanceof RebootableInterface) {
+            throw new \InvalidArgumentException('Kernel should be rebootable to work with DAMADoctrineTestBundle.');
+        }
+
+        // let's reboot the kernel to ensure the static connections will be re-created
+        $kernel->reboot($this->kernelBuildDir);
     }
 
     public function resetBeforeEachTest(KernelInterface $kernel): void

@@ -45,6 +45,7 @@ return static function(ContainerConfigurator $container): void {
                 ->decorate(OrmResetter::class, priority: 10)
                 ->args([
                     service('.inner'),
+                    param('kernel.build_dir')
                 ])
         ;
     }
