@@ -2,14 +2,13 @@
 
 namespace Zenstruck\Foundry\Test\Behat\Listener;
 
-use Behat\Behat\EventDispatcher\Event\BeforeScenarioTested;
 use Behat\Behat\EventDispatcher\Event\ExampleTested;
+use Behat\Behat\EventDispatcher\Event\FeatureTested;
 use Behat\Behat\EventDispatcher\Event\ScenarioTested;
-use Behat\Gherkin\Node\TaggedNodeInterface;
+use Behat\Testwork\EventDispatcher\Event\ExerciseCompleted;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Configuration;
-use Zenstruck\Foundry\Story\FixtureStoryResolver;
 
 /**
  * @internal
@@ -17,8 +16,6 @@ use Zenstruck\Foundry\Story\FixtureStoryResolver;
  */
 final class BootConfigurationListener implements EventSubscriberInterface
 {
-    public const BOOT_PRIORITY = 100;
-
     public function __construct(
         private readonly KernelInterface $symfonyKernel,
     ) {
@@ -27,22 +24,24 @@ final class BootConfigurationListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ScenarioTested::BEFORE => ['bootFoundry', self::BOOT_PRIORITY],
-            ExampleTested::BEFORE => ['bootFoundry', self::BOOT_PRIORITY],
-            ScenarioTested::AFTER => ['shutdownFoundry', -100],
-            ExampleTested::AFTER => ['shutdownFoundry', -100],
+            ExerciseCompleted::BEFORE => ['bootFoundry', 100],
+            FeatureTested::BEFORE => ['bootFoundry', 100],
+            ScenarioTested::BEFORE => ['bootFoundry', 100],
+            ExampleTested::BEFORE => ['bootFoundry', 100],
+
+            ExerciseCompleted::AFTER => ['shutdownFoundry', -100],
         ];
     }
 
-    public function bootFoundry(BeforeScenarioTested $event): void
+    public function bootFoundry(): void
     {
-        $container = $this->symfonyKernel->getContainer();
+        if (Configuration::isBooted()) {
+            return;
+        }
 
         Configuration::boot(
-            $container->get('.zenstruck_foundry.configuration') // @phpstan-ignore argument.type
+            fn() => $this->symfonyKernel->getContainer()->get('.zenstruck_foundry.configuration') // @phpstan-ignore argument.type
         );
-
-        $container->get('.zenstruck_foundry.behat.object_registry')->reset(); // @phpstan-ignore method.notFound
     }
 
     public function shutdownFoundry(): void

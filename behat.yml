@@ -34,3 +34,16 @@ reset-disabled:
     extensions:
         Zenstruck\Foundry\Test\Behat\FoundryExtension:
             database_reset_mode: disabled
+
+reset-feature:
+    suites:
+        main: false
+        reset-feature:
+            contexts:
+                - Behat\MinkExtension\Context\MinkContext
+                - Zenstruck\Foundry\Test\Behat\FoundryContext
+            paths:
+                - tests/behatFeatures/reset-feature
+    extensions:
+        Zenstruck\Foundry\Test\Behat\FoundryExtension:
+            database_reset_mode: feature

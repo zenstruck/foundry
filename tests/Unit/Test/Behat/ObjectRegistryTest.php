@@ -234,6 +234,7 @@ final class ObjectRegistryTest extends TestCase
         $this->resolver = new FactoryShortNameResolver([new UserFactory()]);
         $this->persistenceManager = $this->createPersistenceManager();
         $this->registry = new ObjectRegistry($this->resolver, $this->persistenceManager);
+        $this->registry->reset();
     }
 
     /**

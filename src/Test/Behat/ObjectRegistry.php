@@ -23,11 +23,15 @@ use Zenstruck\Foundry\Story\Event\StateAddedToStory;
  */
 final class ObjectRegistry
 {
+    /**
+     * We need to use static properties in order that this is kept between kernel resets
+     */
+
     /** @var array<class-string, array<string, object>> */
-    private array $objects = [];
+    private static array $objects = [];
 
     /** @var array<string, mixed> */
-    private array $lastId = [];
+    private static array $lastId = [];
 
     public function __construct(
         private readonly FactoryShortNameResolver $factoryShortNameResolver,
@@ -41,7 +45,7 @@ final class ObjectRegistry
             throw ObjectAlreadyRegisteredException::forClassAndName($object::class, $objectName);
         }
 
-        $this->objects[$object::class][$objectName] = $object;
+        self::$objects[$object::class][$objectName] = $object;
     }
 
     /**
@@ -57,7 +61,7 @@ final class ObjectRegistry
      */
     public function has(string $objectClass, string $objectName): bool
     {
-        return isset($this->objects[$objectClass][$objectName]);
+        return isset(self::$objects[$objectClass][$objectName]);
     }
 
     /**
@@ -65,7 +69,7 @@ final class ObjectRegistry
      */
     public function storeLastId(AfterPersist $event): void
     {
-        $this->lastId = $this->persistenceManager->getIdentifierValues($event->object);
+        self::$lastId = $this->persistenceManager->getIdentifierValues($event->object);
     }
 
     public function get(string $factoryShortName, string $objectName): object
@@ -76,22 +80,22 @@ final class ObjectRegistry
             throw ObjectNotFoundException::forFactoryAndName($factoryShortName, $objectName);
         }
 
-        return $this->objects[$objectClass][$objectName];
+        return self::$objects[$objectClass][$objectName];
     }
 
     public function reset(): void
     {
-        $this->objects = [];
-        $this->lastId = [];
+        self::$objects = [];
+        self::$lastId = [];
     }
 
     public function lastId(): int|string
     {
-        if (!$this->lastId) {
+        if (!self::$lastId) {
             throw new \RuntimeException('No last id found.');
         }
 
-        return $this->coerceIdToScalar($this->lastId);
+        return $this->coerceIdToScalar(self::$lastId);
     }
 
     /**
@@ -113,7 +117,7 @@ final class ObjectRegistry
 
     public function lastIdFor(string $factoryShortName): int|string
     {
-        $objects = $this->objects[$this->factoryShortNameResolver->targetObjectClassFor($factoryShortName)] ?? [];
+        $objects = self::$objects[$this->factoryShortNameResolver->targetObjectClassFor($factoryShortName)] ?? [];
 
         if (count($objects) === 0) {
             throw new \InvalidArgumentException("No object of type \"$factoryShortName\" found.");

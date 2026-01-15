@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Test\Behat\Listener;
 
 use Behat\Behat\EventDispatcher\Event\ExampleTested;
+use Behat\Behat\EventDispatcher\Event\FeatureTested;
 use Behat\Behat\EventDispatcher\Event\ScenarioTested;
 use Behat\Testwork\EventDispatcher\Event\ExerciseCompleted;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -40,32 +41,61 @@ final class DatabaseResetListener implements EventSubscriberInterface
     {
         return [
             ExerciseCompleted::BEFORE => 'resetBeforeSuite',
-            ScenarioTested::BEFORE => ['beforeScenario', BootConfigurationListener::BOOT_PRIORITY - 10],
-            ExampleTested::BEFORE => ['beforeScenario', BootConfigurationListener::BOOT_PRIORITY - 10],
+            FeatureTested::BEFORE => 'beforeFeature',
+            ScenarioTested::BEFORE => 'beforeScenario',
+            ExampleTested::BEFORE => 'beforeScenario',
+
+            // a shutdown is needed after each scenario/feature to ensure StoriesRegistry is reset
+            FeatureTested::AFTER => 'shutdownFoundryAfterFeature',
+            ScenarioTested::AFTER => 'shutdownFoundryAfterScenario',
+            ExampleTested::AFTER => 'shutdownFoundryAfterScenario',
         ];
     }
 
     public function resetBeforeSuite(): void
     {
-        $container = $this->symfonyKernel->getContainer();
-
-        Configuration::boot(
-            $container->get('.zenstruck_foundry.configuration') // @phpstan-ignore argument.type
-        );
-
         ResetDatabaseManager::resetBeforeFirstTest($this->symfonyKernel);
-
-        Configuration::shutdown();
     }
 
-    public function beforeScenario(): void
+    public function beforeFeature(): void
     {
+        if (DatabaseResetMode::FEATURE !== $this->resetMode) {
+            return;
+        }
+
         if (!$this->hasResetBeforeFirstTest) {
             $this->hasResetBeforeFirstTest = true;
         }
 
-        if (DatabaseResetMode::SCENARIO === $this->resetMode) {
-            ResetDatabaseManager::resetBeforeEachTest($this->symfonyKernel);
+        ResetDatabaseManager::resetBeforeEachTest($this->symfonyKernel);
+    }
+
+    public function beforeScenario(): void
+    {
+        if (DatabaseResetMode::SCENARIO !== $this->resetMode) {
+            return;
         }
+
+        if (!$this->hasResetBeforeFirstTest) {
+            $this->hasResetBeforeFirstTest = true;
+        }
+
+        ResetDatabaseManager::resetBeforeEachTest($this->symfonyKernel);
+    }
+
+    public function shutdownFoundryAfterFeature(): void
+    {
+        $this->symfonyKernel->getContainer()->get('.zenstruck_foundry.behat.object_registry')->reset(); // @phpstan-ignore method.notFound
+        Configuration::shutdown();
+    }
+
+    public function shutdownFoundryAfterScenario(): void
+    {
+        if (DatabaseResetMode::SCENARIO !== $this->resetMode) {
+            return;
+        }
+
+        $this->symfonyKernel->getContainer()->get('.zenstruck_foundry.behat.object_registry')->reset(); // @phpstan-ignore method.notFound
+        Configuration::shutdown();
     }
 }
