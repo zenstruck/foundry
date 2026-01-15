@@ -2,15 +2,16 @@ default:
     testers:
         stop_on_failure: true
     suites:
-        default:
+        main:
             contexts:
                 - Behat\MinkExtension\Context\MinkContext
-                - Zenstruck\Foundry\Tests\Fixture\Behat\TestContext
                 - Zenstruck\Foundry\Test\Behat\FoundryContext
             paths:
-                - tests/behatFeatures
+                - tests/behatFeatures/main
+                - tests/behatFeatures/reset-scenario
     extensions:
-        Zenstruck\Foundry\Test\Behat\FoundryExtension: ~
+        Zenstruck\Foundry\Test\Behat\FoundryExtension:
+            database_reset_mode: scenario
         Behat\MinkExtension:
             sessions:
                 symfony:
@@ -20,3 +21,16 @@ default:
             kernel:
                 class: Zenstruck\Foundry\Tests\Fixture\Behat\BehatTestKernel
 
+reset-disabled:
+    suites:
+        main: false
+        reset-disabled:
+            contexts:
+                - Behat\MinkExtension\Context\MinkContext
+                - Zenstruck\Foundry\Tests\Fixture\Behat\ResetDisabledTestContext
+                - Zenstruck\Foundry\Test\Behat\FoundryContext
+            paths:
+                - tests/behatFeatures/reset-disabled
+    extensions:
+        Zenstruck\Foundry\Test\Behat\FoundryExtension:
+            database_reset_mode: disabled

@@ -1,4 +1,4 @@
-Feature: Test
+Feature: Test persisting entities
 
   Scenario: View homepage
     When I am on "/"

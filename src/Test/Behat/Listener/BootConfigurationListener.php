@@ -17,6 +17,8 @@ use Zenstruck\Foundry\Story\FixtureStoryResolver;
  */
 final class BootConfigurationListener implements EventSubscriberInterface
 {
+    public const BOOT_PRIORITY = 100;
+
     public function __construct(
         private readonly KernelInterface $symfonyKernel,
     ) {
@@ -25,8 +27,8 @@ final class BootConfigurationListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ScenarioTested::BEFORE => ['bootFoundry', 100],
-            ExampleTested::BEFORE => ['bootFoundry', 100],
+            ScenarioTested::BEFORE => ['bootFoundry', self::BOOT_PRIORITY],
+            ExampleTested::BEFORE => ['bootFoundry', self::BOOT_PRIORITY],
             ScenarioTested::AFTER => ['shutdownFoundry', -100],
             ExampleTested::AFTER => ['shutdownFoundry', -100],
         ];
