@@ -57,48 +57,71 @@ final class FoundryContext implements Context
     #[Given('a(n) :factoryShortName :objectName is created with properties')]
     public function createObjectWithProperties(TableNode $table, string $factoryShortName, ?string $objectName = null): void
     {
-        $parametersList = $this->normalizeObjectParameters($table->getColumnsHash());
+        $factory = $this->resolveFactory($factoryShortName, $objectName);
+        $parametersList = $this->normalizeObjectParameters($table, $factory::class());
 
         if (count($parametersList) !== 1) {
             throw new \InvalidArgumentException('Expected exactly one line of properties, to create one object.');
         }
 
-        $this->resolveFactory($factoryShortName, $objectName)
-            ->create($parametersList[0]);
+        $factory->create($parametersList[0]);
     }
 
     /**
-     * @phpstan-param list<Parameters> $parametersList
+     * @param class-string $targetClass
      * @phpstan-return list<Parameters>
      */
-    private function normalizeObjectParameters(array $parametersList): array
+    private function normalizeObjectParameters(TableNode $table, string $targetClass): array
     {
         return array_map(
-            fn(array $parameters) => array_map(
-                function (mixed $value) {
-                    if (preg_match('/^<ref\((?<factoryShortName>[^,]+), (?<objectName>[^)]+)\)>$/', $value, $matches)) {
-                        return $this->objectRegistry->get($matches['factoryShortName'], $matches['objectName']);
+            function (array $parameters) use ($targetClass): array {
+                $normalized = [];
+                foreach ($parameters as $propertyName => $value) {
+                    if ($propertyName === '_ref') {
+                        $normalized['_ref'] = $value;
+
+                        continue;
                     }
 
-                    return $value;
-                },
-                $parameters
-            ),
-            $parametersList
+                    if (preg_match('/^<ref\((?<factoryShortName>[^,]+), (?<objectName>[^)]+)\)>$/', $value, $matches)) {
+                        $normalized[$propertyName] = $this->objectRegistry->getByFactoryShortName($matches['factoryShortName'], $matches['objectName']);
+
+                        continue;
+                    }
+
+                    $expectedType = $this->getPropertyType(new \ReflectionClass($targetClass), $propertyName);
+
+                    if ($expectedType) {
+                        try {
+                            $normalized[$propertyName] = $this->objectRegistry->getByObjectClass($expectedType, $value);
+                        } catch (ObjectNotFoundException $e) {
+                            throw ObjectNotFoundException::objectReferencedInTableDoesNotExist($propertyName, $e);
+                        }
+
+                        continue;
+                    }
+
+                    $normalized[$propertyName] = $value;
+                }
+
+                return $normalized;
+            },
+            $table->getColumnsHash()
         );
     }
 
     #[Given(':factoryShortName are created with properties')]
     public function createObjectsWithProperties(TableNode $table, string $factoryShortName): void
     {
-        $attributes = $table->getColumnsHash();
+        $targetClass = $this->factoryResolver->targetObjectClassFor($factoryShortName);
+        $parametersList = $this->normalizeObjectParameters($table, $targetClass);
 
-        foreach ($attributes as $attribute) {
-            $objectName = $attribute['_ref'] ?? null;
-            unset($attribute['_ref']);
+        foreach ($parametersList as $parameters) {
+            $objectName = $parameters['_ref'] ?? null;
+            unset($parameters['_ref']);
 
             $this->resolveFactory($factoryShortName, $objectName)
-                ->create($attribute);
+                ->create($parameters);
         }
     }
 
@@ -130,13 +153,16 @@ final class FoundryContext implements Context
     #[Then(':factoryShortName :objectName should have properties')]
     public function assertObjectHasProperties(TableNode $table, string $factoryShortName, string $objectName): void
     {
-        $parametersList = $this->normalizeObjectParameters($table->getColumnsHash());
+        $parametersList = $this->normalizeObjectParameters(
+            $table,
+            $this->factoryResolver->targetObjectClassFor($factoryShortName)
+        );
 
         if (count($parametersList) !== 1) {
             throw new \InvalidArgumentException('Expected exactly one line of properties.');
         }
 
-        $object = $this->objectRegistry->get($factoryShortName, $objectName);
+        $object = $this->objectRegistry->getByFactoryShortName($factoryShortName, $objectName);
 
         if (!Configuration::autoRefreshWithLazyObjectsIsEnabled()) {
             refresh($object);
@@ -179,5 +205,33 @@ final class FoundryContext implements Context
     public function transformLastIdForSpecificObject(string $before, string $factoryShortName, string $after): string
     {
         return "{$before}{$this->objectRegistry->lastIdFor($factoryShortName)}{$after}";
+    }
+
+    /**
+     * @param \ReflectionClass<object> $class
+     *
+     * @return class-string|null
+     */
+    private function getPropertyType(\ReflectionClass $class, string $propertyName): ?string
+    {
+        try {
+            $property = $class->getProperty($propertyName);
+        } catch (\ReflectionException) {
+            if ($class = $class->getParentClass()) {
+                return $this->getPropertyType($class, $propertyName);
+            }
+        }
+
+        if (
+            !isset($property)
+            || !($type = $property->getType()) instanceof \ReflectionNamedType
+            || $type->isBuiltin()
+            || !class_exists($type->getName())
+            || !$this->factoryResolver->hasFactoryForClass($type->getName())
+        ) {
+            return null;
+        }
+
+        return $type->getName();
     }
 }

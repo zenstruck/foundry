@@ -39,6 +39,14 @@ final class ObjectRegistry
     ) {
     }
 
+    /**
+     * @param StateAddedToStory<object> $event
+     */
+    public function storeAfterStateAddedToStory(StateAddedToStory $event): void
+    {
+        $this->store($event->object, $event->name);
+    }
+
     public function store(object $object, string $objectName): void
     {
         if ($this->has($object::class, $objectName)) {
@@ -46,14 +54,6 @@ final class ObjectRegistry
         }
 
         self::$objects[$object::class][$objectName] = $object;
-    }
-
-    /**
-     * @param StateAddedToStory<object> $event
-     */
-    public function storeAfterStateAddedToStory(StateAddedToStory $event): void
-    {
-        $this->store($event->object, $event->name);
     }
 
     /**
@@ -72,12 +72,26 @@ final class ObjectRegistry
         self::$lastId = $this->persistenceManager->getIdentifierValues($event->object);
     }
 
-    public function get(string $factoryShortName, string $objectName): object
+    public function getByFactoryShortName(string $factoryShortName, string $objectName): object
     {
         $objectClass = $this->factoryShortNameResolver->targetObjectClassFor($factoryShortName);
 
         if (!$this->has($objectClass, $objectName)) {
             throw ObjectNotFoundException::forFactoryAndName($factoryShortName, $objectName);
+        }
+
+        return self::$objects[$objectClass][$objectName];
+    }
+
+    /**
+     * @param class-string $objectClass
+     *
+     * @throws ObjectNotFoundException
+     */
+    public function getByObjectClass(string $objectClass, string $objectName): object
+    {
+        if (!$this->has($objectClass, $objectName)) {
+            throw ObjectNotFoundException::forClassAndName($objectClass, $objectName);
         }
 
         return self::$objects[$objectClass][$objectName];

@@ -87,6 +87,20 @@ final class FactoryShortNameResolver
     }
 
     /**
+     * @param class-string $className
+     */
+    public function hasFactoryForClass(string $className): bool
+    {
+        return array_any(
+            $this->factoryMap,
+            static fn(array $factories) => array_any(
+                $factories,
+                static fn(ObjectFactory $factory) => $factory::class() === $className,
+            )
+        );
+    }
+
+    /**
      * @param class-string<ObjectFactory<object>> $factoryClass
      */
     private function shortNameFor(string $factoryClass): string

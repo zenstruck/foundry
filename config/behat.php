@@ -18,6 +18,7 @@ use Zenstruck\Foundry\Test\Behat\FoundryContext;
 use Zenstruck\Foundry\Test\Behat\ObjectRegistry;
 
 return static function (ContainerConfigurator $container): void {
+    // todo: don't load me if not using behat!
     $container->services()
         ->set('.zenstruck_foundry.behat.factory_resolver', FactoryShortNameResolver::class)
         ->args([

@@ -87,7 +87,7 @@ final class ObjectRegistryTest extends TestCase
         $user = new User(id: 1, name: 'John');
         $this->registry->store($user, 'john');
 
-        $retrieved = $this->registry->get('user', 'john');
+        $retrieved = $this->registry->getByObjectClass(User::class, 'john');
 
         self::assertSame($user, $retrieved);
     }
@@ -96,9 +96,9 @@ final class ObjectRegistryTest extends TestCase
     public function it_throws_when_getting_non_existent_object(): void
     {
         $this->expectException(ObjectNotFoundException::class);
-        $this->expectExceptionMessage('Object "user john" was not found.');
+        $this->expectExceptionMessage('Object of class "Zenstruck\Foundry\Tests\Unit\Test\Behat\User" with name "john" was not found.');
 
-        $this->registry->get('user', 'john');
+        $this->registry->getByObjectClass(User::class, 'john');
     }
 
     #[Test]
@@ -179,7 +179,7 @@ final class ObjectRegistryTest extends TestCase
         $this->registry->storeAfterStateAddedToStory($event);
 
         self::assertTrue($this->registry->has(User::class, 'john'));
-        self::assertSame($user, $this->registry->get('user', 'john'));
+        self::assertSame($user, $this->registry->getByObjectClass(User::class, 'john'));
     }
 
     #[Test]

@@ -71,6 +71,17 @@ Feature: Test persisting entities
     Then 1 category should exist
     Then 1 address should exist
 
+  Scenario: Can reference another object with short syntax
+    Given a category MyCategory is created
+    And an address "the address" is created
+    And a contact A is created with properties
+      | name     | category   | address     |
+      | John Doe | MyCategory | the address |
+    When I am on "/"
+    Then contact A should have properties
+      | name     | category    | address |
+      | John Doe | MyCategory | the address |
+
   Scenario: Can access last created entity ID
     Given a "generic entity" "the object" is created with properties
       | prop1 |
