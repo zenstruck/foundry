@@ -77,15 +77,15 @@ final class FoundryExtension implements Extension
 
         if ($this->damaNativeExtensionIsEnabled($container)) {
             if ($config['enable_dama_support']) {
-                throw new LogicException('Foundry\'s Dama support cannot be enabled when the native Behat extension for "dama/doctrine-test-bundle" is enabled.');
+                throw DamaNativeExtensionIncompatibility::withFoundryDamaSupport();
             }
 
             if ($databaseResetMode === DatabaseResetMode::FEATURE) {
-                throw new LogicException('Database reset mode "feature" is not supported the native Behat extension for "dama/doctrine-test-bundle" is enabled. Please enable Foundry\'s DAMA support with "enable_dama_support: true" and disable the native extension to enable automatic database reset at feature level with DAMA support.');
+                throw DamaNativeExtensionIncompatibility::withFeatureResetDbMode();
             }
 
             if ($databaseResetMode === DatabaseResetMode::MANUAL) {
-                throw new LogicException('Database reset mode "manual" is not supported the native Behat extension for "dama/doctrine-test-bundle" is enabled. Please enable Foundry\'s DAMA support with "enable_dama_support: true" and disable the native extension to enable manual database reset with DAMA support.');
+                throw DamaNativeExtensionIncompatibility::withManualResetDbMode();
             }
         }
 
@@ -93,6 +93,7 @@ final class FoundryExtension implements Extension
             ->setArgument('$symfonyKernel', new Reference('fob_symfony.kernel'))
             ->setArgument('$resetMode', $databaseResetMode)
             ->setArgument('$damaSupportEnabled', $config['enable_dama_support'])
+            ->setArgument('$damaNativeExtensionIsEnabled', $this->damaNativeExtensionIsEnabled($container))
             ->addTag(EventDispatcherExtension::SUBSCRIBER_TAG);
     }
 
