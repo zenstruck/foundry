@@ -45,6 +45,10 @@ Feature: Test persisting entities
       | prop1 |
       | bar   |
 
+  Scenario: Throws if last id is not found (!)
+    When I am on "/orm/update/<lastId>/bar"
+    Then an "RuntimeException" exception should be thrown containing message "No last id found"
+
   Scenario: Can access last created entity ID
     Given a "generic entity" "the object" is created with properties
       | prop1 |
@@ -55,3 +59,7 @@ Feature: Test persisting entities
     Then "generic entity" "the object" should have properties
       | prop1 |
       | bar   |
+
+  Scenario: Throws if last id is not found (!)
+    When I am on "/orm/update/<lastId(generic entity)>/bar"
+    Then an "InvalidArgumentException" exception should be thrown containing message "No object of type \"generic entity\" found"

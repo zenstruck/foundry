@@ -13,5 +13,6 @@ namespace Zenstruck\Foundry\Tests\Fixture;
 
 enum IntBackedEnum: int
 {
-    case SOME_VALUE = 0;
+    case SOME_VALUE_0 = 0;
+    case SOME_VALUE_1 = 1;
 }

@@ -23,8 +23,10 @@ use function Zenstruck\Foundry\Persistence\refresh;
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  *
  * @phpstan-import-type Parameters from Factory
+ *
+ * @final
  */
-final class FoundryContext implements Context
+class FoundryContext implements Context
 {
     public function __construct(
         private readonly FactoryShortNameResolver $factoryResolver,
@@ -104,7 +106,11 @@ final class FoundryContext implements Context
                     }
 
                     if (preg_match('/^<ref\((?<factoryShortName>[^,]+), (?<objectName>[^)]+)\)>$/', $value, $matches)) {
-                        $normalized[$propertyName] = $this->objectRegistry->getByFactoryShortName($matches['factoryShortName'], $matches['objectName']);
+                        try {
+                            $normalized[$propertyName] = $this->objectRegistry->getByFactoryShortName($matches['factoryShortName'], $matches['objectName']);
+                        } catch (ObjectNotFoundException $e) {
+                            throw InvalidObjectParameter::objectReferencedInTableDoesNotExist($propertyName, $e);
+                        }
 
                         continue;
                     }
@@ -169,7 +175,8 @@ final class FoundryContext implements Context
         }
     }
 
-    #[Then(':nb :factoryShortName should exist')]
+    #[Then('/^(\d+) "([^"]*)" should exist$/')]
+    #[Then('/^(\d+) ([^"]*) should exist$/')]
     public function assertNbObjectsExist(int $nb, string $factoryShortName): void
     {
         $this->repositoryAssertionFor($factoryShortName)

@@ -21,7 +21,7 @@ final class FactoryNotResolvableException extends \RuntimeException
 {
     public static function forName(string $name): self
     {
-        return new self("Cannot resolve factory for \"$name\": short name does not exist");
+        return new self("Cannot resolve factory for name \"$name\": short name does not exist");
     }
 
     /**
@@ -30,7 +30,7 @@ final class FactoryNotResolvableException extends \RuntimeException
     public static function conflict(string $name, array $factories): self
     {
         return new self(\sprintf(
-            'Multiple factories found for "%s": %s. Use #[FactoryShortName] to disambiguate.',
+            'Multiple factories found for name "%s": %s. Use #[FactoryShortName] to disambiguate.',
             $name,
             \implode(', ', $factories)
         ));

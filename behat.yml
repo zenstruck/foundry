@@ -6,6 +6,7 @@ default:
         cache: var/cache/gherkin
 
     extensions:
+        Yceruto\BehatExtension\Extension\ExceptionExtension: ~
         Zenstruck\Foundry\Test\Behat\FoundryExtension:
             database_reset_mode: scenario
             enable_dama_support: true
@@ -23,7 +24,7 @@ default:
             paths: [tests/behatFeatures/main]
             contexts: &common_contexts
                 - Behat\MinkExtension\Context\MinkContext
-                - Zenstruck\Foundry\Test\Behat\FoundryContext
+                - Zenstruck\Foundry\Tests\Fixture\Behat\TestFoundryContext
 
 main-no-dama:
     extensions:

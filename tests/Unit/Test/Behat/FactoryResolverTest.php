@@ -82,7 +82,7 @@ final class FactoryResolverTest extends TestCase
         $resolver = new FactoryShortNameResolver([new PostFactory()]);
 
         $this->expectException(FactoryNotResolvableException::class);
-        $this->expectExceptionMessage('Cannot resolve factory for "unknown"');
+        $this->expectExceptionMessage('Cannot resolve factory for name "unknown"');
 
         $resolver->factoryFor('unknown');
     }
@@ -94,7 +94,7 @@ final class FactoryResolverTest extends TestCase
         $resolver = new FactoryShortNameResolver($factories);
 
         $this->expectException(FactoryNotResolvableException::class);
-        $this->expectExceptionMessage('Multiple factories found for "article"');
+        $this->expectExceptionMessage('Multiple factories found for name "article"');
 
         $resolver->factoryFor('article');
     }

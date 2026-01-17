@@ -6,6 +6,7 @@ use FriendsOfBehat\SymfonyExtension\Bundle\FriendsOfBehatSymfonyExtensionBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\Reference;
 use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
 use Zenstruck\Foundry\Tests\Fixture\App\Controller\HelloWorldController;
 use Zenstruck\Foundry\Tests\Fixture\App\Controller\UpdateGenericModel;
@@ -37,6 +38,16 @@ class BehatTestKernel extends FoundryTestKernel
         $c->register(HelloWorldController::class)->setAutowired(true)->setAutoconfigured(true)->addTag('controller.service_arguments');
         $c->register(UpdateGenericModel::class)->setAutowired(true)->setAutoconfigured(true)->addTag('controller.service_arguments');
         $c->register(ResetDisabledTestContext::class)->setAutowired(true)->setAutoconfigured(true);
+        $c->register(TestFoundryContext::class)
+            ->setAutowired(true)
+            ->setAutoconfigured(true)
+            ->setArguments([new Reference('.zenstruck_foundry.behat.factory_resolver'), new Reference('.zenstruck_foundry.behat.object_registry')])
+        ;
+
+        $configurator->services()
+            ->load('Zenstruck\\Foundry\\Tests\\Fixture\\Behat\\Factories\\', __DIR__.'/Factories')
+            ->autowire()
+            ->autoconfigure();
 
         $configurator->services()
             ->load('Zenstruck\\Foundry\\Tests\\Fixture\\Factories\\', __DIR__.'/../Factories')

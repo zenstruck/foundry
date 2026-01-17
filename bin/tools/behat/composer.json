@@ -4,11 +4,18 @@
         "behat/mink-browserkit-driver": "^2.0",
         "friends-of-behat/mink-extension": "^2.0",
         "friends-of-behat/symfony-extension": "^2.0",
-        "symfony/flex": "^2.10"
+        "symfony/flex": "^2.10",
+        "yceruto/behat-extension": "few-improvements-dev"
     },
     "config": {
         "allow-plugins": {
             "symfony/flex": true
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/nikophil/behat-extension"
+        }
+    ]
 }
