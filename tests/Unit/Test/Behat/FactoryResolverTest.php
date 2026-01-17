@@ -98,6 +98,31 @@ final class FactoryResolverTest extends TestCase
 
         $resolver->factoryFor('article');
     }
+
+    #[Test]
+    public function it_checks_if_factory_exists_for_class(): void
+    {
+        $resolver = new FactoryShortNameResolver([new PostFactory()]);
+
+        self::assertTrue($resolver->hasFactoryForClass(\stdClass::class));
+        self::assertFalse($resolver->hasFactoryForClass(\DateTime::class));
+    }
+
+    #[Test]
+    public function it_gets_short_name_for_class(): void
+    {
+        $resolver = new FactoryShortNameResolver([new PostFactory()]);
+
+        self::assertSame('post', $resolver->getShortNameForClass(\stdClass::class));
+    }
+
+    #[Test]
+    public function it_gets_short_name_for_class_with_custom_attribute(): void
+    {
+        $resolver = new FactoryShortNameResolver([new CustomNameFactory()]);
+
+        self::assertSame('custom', $resolver->getShortNameForClass(\stdClass::class));
+    }
 }
 
 /** @extends ObjectFactory<\stdClass> */

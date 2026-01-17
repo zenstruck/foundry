@@ -9,6 +9,7 @@ use Behat\Gherkin\Node\TaggedNodeInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Story\FixtureStoryResolver;
+use Zenstruck\Foundry\Test\Behat\FactoryShortNameResolver;
 
 /**
  * @internal
@@ -56,12 +57,7 @@ final class LoadFixturesListener implements EventSubscriberInterface
             return;
         }
 
-        $container = $this->symfonyKernel->getContainer();
-
-        /** @var FixtureStoryResolver $fixtureStoryResolver */
-        $fixtureStoryResolver = $container->get('.zenstruck_foundry.story.fixture_resolver');
-
-        $storyClass = $fixtureStoryResolver->resolve($fixtureName);
+        $storyClass = $this->fixtureStoryResolver()->resolve($fixtureName);
         $storyClass::load();
     }
 
@@ -87,5 +83,10 @@ final class LoadFixturesListener implements EventSubscriberInterface
         }
 
         return $fixtureNames[0];
+    }
+
+    private function fixtureStoryResolver(): FixtureStoryResolver
+    {
+        return $this->symfonyKernel->getContainer()->get('.zenstruck_foundry.story.fixture_resolver'); // @phpstan-ignore return.type
     }
 }

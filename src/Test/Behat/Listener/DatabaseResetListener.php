@@ -29,6 +29,7 @@ use Zenstruck\Foundry\StoryRegistry;
 use Zenstruck\Foundry\Test\Behat\Config\DatabaseResetMode;
 use Zenstruck\Foundry\Test\Behat\DamaNativeExtensionIncompatibility;
 use Zenstruck\Foundry\Test\Behat\InvalidResetDbTagException;
+use Zenstruck\Foundry\Test\Behat\ObjectRegistry;
 
 /**
  * @internal
@@ -166,7 +167,7 @@ final class DatabaseResetListener implements EventSubscriberInterface
         }
 
         if ($this->resetMode === DatabaseResetMode::SCENARIO) {
-            // todo: tester les erreurs !
+            // todo: il manque des tests unitaires de ces listeners ! et un peu ailleurs
             // todo: ajouter des infos concernant le fichier de features
             throw InvalidResetDbTagException::resetDbWithScenarioMode();
         }
@@ -201,6 +202,11 @@ final class DatabaseResetListener implements EventSubscriberInterface
 
     private function resetObjectRegistry(): void
     {
-        $this->symfonyKernel->getContainer()->get('.zenstruck_foundry.behat.object_registry')->reset(); // @phpstan-ignore method.notFound
+        $this->objectRegistry()->reset();
+    }
+
+    private function objectRegistry(): ObjectRegistry
+    {
+        return $this->symfonyKernel->getContainer()->get('.zenstruck_foundry.behat.object_registry'); // @phpstan-ignore return.type
     }
 }

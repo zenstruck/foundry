@@ -143,4 +143,20 @@ final class ObjectRegistry
             )
         );
     }
+
+    public function isStored(object $object): bool
+    {
+        return array_any(
+            self::$objects[$object::class] ?? [],
+            static fn(object $o) => $o === $object
+        );
+    }
+
+    public function getNameFor(object $object): string
+    {
+        return array_find_key(
+            self::$objects[$object::class] ?? [],
+            static fn(object $o) => $o === $object
+        ) ?? throw new \LogicException('Object is not stored in the registry.');
+    }
 }

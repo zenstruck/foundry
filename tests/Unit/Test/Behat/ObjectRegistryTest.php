@@ -18,9 +18,7 @@ use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\Event\AfterPersist;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
-use Zenstruck\Foundry\Persistence\PersistenceStrategy;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 use Zenstruck\Foundry\Story\Event\StateAddedToStory;
 use Zenstruck\Foundry\Test\Behat\FactoryShortNameResolver;
 use Zenstruck\Foundry\Test\Behat\ObjectAlreadyRegisteredException;
@@ -194,9 +192,9 @@ final class ObjectRegistryTest extends TestCase
     #[Test]
     public function it_throws_when_entity_has_multiple_identifiers(): void
     {
-        $persistenceManager = $this->createPersistenceManager(
-            static fn(): array => ['id1' => 1, 'id2' => 2]
-        );
+        $persistenceManager = $this->createStub(PersistenceManager::class);
+        $persistenceManager->method('getIdentifierValues')->willReturn(['id1' => 1, 'id2' => 2]);
+
         $registry = new ObjectRegistry($this->resolver, $persistenceManager);
 
         $user = new User(id: 42, name: 'John');
@@ -213,9 +211,9 @@ final class ObjectRegistryTest extends TestCase
     #[Test]
     public function it_throws_when_id_type_is_invalid(): void
     {
-        $persistenceManager = $this->createPersistenceManager(
-            static fn(): array => ['id' => ['invalid']]
-        );
+        $persistenceManager = $this->createStub(PersistenceManager::class);
+        $persistenceManager->method('getIdentifierValues')->willReturn(['id' => ['invalid']]);
+
         $registry = new ObjectRegistry($this->resolver, $persistenceManager);
 
         $user = new User(id: 42, name: 'John');
@@ -229,30 +227,51 @@ final class ObjectRegistryTest extends TestCase
         $registry->lastId();
     }
 
+    #[Test]
+    public function it_checks_if_object_is_stored(): void
+    {
+        $user = new User(id: 1, name: 'John');
+        $otherUser = new User(id: 2, name: 'Jane');
+
+        $this->registry->store($user, 'john');
+
+        self::assertTrue($this->registry->isStored($user));
+        self::assertFalse($this->registry->isStored($otherUser));
+    }
+
+    #[Test]
+    public function it_gets_name_for_stored_object(): void
+    {
+        $user = new User(id: 1, name: 'John');
+        $this->registry->store($user, 'john-doe');
+
+        self::assertSame('john-doe', $this->registry->getNameFor($user));
+    }
+
+    #[Test]
+    public function it_throws_when_getting_name_for_unstored_object(): void
+    {
+        $user = new User(id: 1, name: 'John');
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Object is not stored in the registry.');
+
+        $this->registry->getNameFor($user);
+    }
+
     protected function setUp(): void
     {
         $this->resolver = new FactoryShortNameResolver([new UserFactory()]);
-        $this->persistenceManager = $this->createPersistenceManager();
-        $this->registry = new ObjectRegistry($this->resolver, $this->persistenceManager);
-        $this->registry->reset();
-    }
-
-    /**
-     * @param callable(object): array<string, mixed>|null $getIdentifierValuesCallback
-     */
-    private function createPersistenceManager(?callable $getIdentifierValuesCallback = null): PersistenceManager
-    {
-        $strategy = $this->createStub(PersistenceStrategy::class);
-        $strategy->method('supports')->willReturn(true);
-        $strategy->method('getIdentifierValues')->willReturnCallback(
-            $getIdentifierValuesCallback ?? static function (object $object): array {
+        $this->persistenceManager = $this->createStub(PersistenceManager::class);
+        $this->persistenceManager->method('getIdentifierValues')->willReturnCallback(
+            static function (object $object): array {
                 assert($object instanceof User);
 
                 return ['id' => $object->id];
             }
         );
-
-        return new PersistenceManager([$strategy], new ResetDatabaseManager([], []));
+        $this->registry = new ObjectRegistry($this->resolver, $this->persistenceManager);
+        $this->registry->reset();
     }
 }
 

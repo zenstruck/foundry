@@ -1,0 +1,373 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Zenstruck\Foundry\Tests\Unit\Test\Behat\Listener;
+
+use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
+use Behat\Behat\EventDispatcher\Event\BeforeScenarioTested;
+use Behat\Gherkin\Node\FeatureNode;
+use Behat\Gherkin\Node\ScenarioNode;
+use Behat\Testwork\Environment\Environment;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\Persistence\PersistenceManager;
+use Zenstruck\Foundry\Test\Behat\Config\DatabaseResetMode;
+use Zenstruck\Foundry\Test\Behat\DamaNativeExtensionIncompatibility;
+use Zenstruck\Foundry\Test\Behat\FactoryShortNameResolver;
+use Zenstruck\Foundry\Test\Behat\InvalidResetDbTagException;
+use Zenstruck\Foundry\Test\Behat\Listener\DatabaseResetListener;
+use Zenstruck\Foundry\Test\Behat\ObjectRegistry;
+use Zenstruck\Foundry\Test\UnitTestConfig;
+
+final class DatabaseResetListenerTest extends TestCase
+{
+    /**
+     * @param list<string> $tags
+     * @param class-string<\Throwable> $exceptionClass
+     */
+    #[Test]
+    #[DataProvider('validateFeatureExceptionProvider')]
+    public function it_throws_exception_on_validate_feature(
+        DatabaseResetMode $mode,
+        array $tags,
+        string $exceptionClass,
+        string $exceptionMessage
+    ): void {
+        $listener = $this->createListener($mode);
+        $event = $this->createFeatureEvent($tags);
+
+        $this->expectException($exceptionClass);
+        $this->expectExceptionMessage($exceptionMessage);
+
+        $listener->validateFeature($event);
+    }
+
+    public static function validateFeatureExceptionProvider(): iterable
+    {
+        yield 'resetDB tag on feature with feature mode' => [
+            DatabaseResetMode::FEATURE,
+            ['resetDB'],
+            InvalidResetDbTagException::class,
+            'Cannot use "@resetDB" tag on a feature with database_reset_mode set as "feature".',
+        ];
+    }
+
+    /**
+     * @param list<string> $tags
+     * @param class-string<\Throwable> $exceptionClass
+     */
+    #[Test]
+    #[DataProvider('validateScenarioExceptionProvider')]
+    public function it_throws_exception_on_validate_scenario(
+        DatabaseResetMode $mode,
+        array $tags,
+        string $exceptionClass,
+        string $exceptionMessage
+    ): void {
+        $listener = $this->createListener($mode);
+        $event = $this->createScenarioEvent($tags);
+
+        $this->expectException($exceptionClass);
+        $this->expectExceptionMessage($exceptionMessage);
+
+        $listener->validateScenario($event);
+    }
+
+    public static function validateScenarioExceptionProvider(): iterable
+    {
+        yield 'resetDB tag on scenario with scenario mode' => [
+            DatabaseResetMode::SCENARIO,
+            ['resetDB'],
+            InvalidResetDbTagException::class,
+            'Cannot use "@noResetDB" tag with database_reset_mode set as "manual".',
+        ];
+
+        yield 'both resetDB and noResetDB tags on scenario' => [
+            DatabaseResetMode::MANUAL,
+            ['resetDB', 'noResetDB'],
+            InvalidResetDbTagException::class,
+            'Cannot use "@noResetDB" tag with database_reset_mode set as "manual".',
+        ];
+    }
+
+    /**
+     * @param list<string> $tags
+     */
+    #[Test]
+    #[DataProvider('resetDatabaseIfNeededBehaviorProvider')]
+    public function it_resets_database_and_registries_when_needed(
+        DatabaseResetMode $mode,
+        string $eventType,
+        array $tags,
+        bool $shouldReset,
+    ): void {
+        if ($shouldReset) {
+            Configuration::boot(UnitTestConfig::build());
+        }
+
+        try {
+            $listener = $this->createListener($mode);
+            $objectRegistry = $this->getObjectRegistry($listener);
+
+            $testObject = new \stdClass();
+            $objectRegistry->store($testObject, 'test-object');
+            self::assertTrue($objectRegistry->isStored($testObject));
+
+            $event = $eventType === 'feature' ? $this->createFeatureEvent($tags) : $this->createScenarioEvent($tags);
+
+            $listener->resetDatabaseIfNeeded($event);
+
+            if ($shouldReset) {
+                self::assertFalse($objectRegistry->isStored($testObject));
+            } else {
+                self::assertTrue($objectRegistry->isStored($testObject));
+            }
+        } finally {
+            if ($shouldReset && Configuration::isBooted()) {
+                Configuration::shutdown();
+            }
+        }
+    }
+
+    public static function resetDatabaseIfNeededBehaviorProvider(): iterable
+    {
+        yield 'scenario mode resets on scenario without tags' => [
+            DatabaseResetMode::SCENARIO,
+            'scenario',
+            [],
+            true,
+        ];
+
+        yield 'scenario mode does not reset with noResetDB tag' => [
+            DatabaseResetMode::SCENARIO,
+            'scenario',
+            ['noResetDB'],
+            false,
+        ];
+
+        yield 'feature mode resets on feature without tags' => [
+            DatabaseResetMode::FEATURE,
+            'feature',
+            [],
+            true,
+        ];
+
+        yield 'manual mode does not reset without resetDB tag' => [
+            DatabaseResetMode::MANUAL,
+            'scenario',
+            [],
+            false,
+        ];
+
+        yield 'manual mode resets with resetDB tag' => [
+            DatabaseResetMode::MANUAL,
+            'scenario',
+            ['resetDB'],
+            true,
+        ];
+
+        yield 'scenario mode does not reset on feature' => [
+            DatabaseResetMode::SCENARIO,
+            'feature',
+            [],
+            false,
+        ];
+
+        yield 'feature mode does not reset on scenario' => [
+            DatabaseResetMode::FEATURE,
+            'scenario',
+            [],
+            false,
+        ];
+    }
+
+    /**
+     * @param list<string> $tags
+     * @param class-string<\Throwable> $exceptionClass
+     */
+    #[Test]
+    #[DataProvider('resetDatabaseIfNeededExceptionProvider')]
+    public function it_throws_exception_on_reset_database_if_needed(
+        DatabaseResetMode $mode,
+        array $tags,
+        string $exceptionClass,
+        string $exceptionMessage,
+        bool $damaSupportEnabled = false,
+        bool $damaNativeExtensionIsEnabled = false
+    ): void {
+        $listener = $this->createListener($mode, $damaSupportEnabled, $damaNativeExtensionIsEnabled);
+        $event = $this->createScenarioEvent($tags);
+
+        $this->expectException($exceptionClass);
+        $this->expectExceptionMessage($exceptionMessage);
+
+        $listener->resetDatabaseIfNeeded($event);
+    }
+
+    public static function resetDatabaseIfNeededExceptionProvider(): iterable
+    {
+        yield 'noResetDB tag with dama native extension' => [
+            DatabaseResetMode::SCENARIO,
+            ['noResetDB'],
+            DamaNativeExtensionIncompatibility::class,
+            'Cannot use "@noResetDB" with native Behat extension for "dama/doctrine-test-bundle".',
+            false,
+            true,
+        ];
+
+        yield 'noResetDB tag with manual mode' => [
+            DatabaseResetMode::MANUAL,
+            ['noResetDB'],
+            InvalidResetDbTagException::class,
+            'Cannot use "@noResetDB" tag with database_reset_mode set as "manual".',
+        ];
+
+        yield 'noResetDB tag with feature mode' => [
+            DatabaseResetMode::FEATURE,
+            ['noResetDB'],
+            InvalidResetDbTagException::class,
+            'Cannot use "@noResetDB" with database_reset_mode set as "feature".',
+        ];
+    }
+
+    /**
+     * @param list<string> $tags
+     */
+    #[Test]
+    #[DataProvider('validateScenarioNoExceptionProvider')]
+    public function it_does_not_throw_on_validate_scenario(
+        DatabaseResetMode $mode,
+        array $tags,
+    ): void {
+        $this->expectNotToPerformAssertions();
+
+        $listener = $this->createListener($mode);
+        $event = $this->createScenarioEvent($tags);
+
+        $listener->validateScenario($event);
+    }
+
+    public static function validateScenarioNoExceptionProvider(): iterable
+    {
+        yield 'resetDB tag with manual mode' => [
+            DatabaseResetMode::MANUAL,
+            ['resetDB'],
+        ];
+
+        yield 'no tags with scenario mode' => [
+            DatabaseResetMode::SCENARIO,
+            [],
+        ];
+    }
+
+    #[Test]
+    public function it_does_not_throw_for_noResetDB_tag_with_scenario_mode(): void
+    {
+        $this->expectNotToPerformAssertions();
+
+        $listener = $this->createListener(DatabaseResetMode::SCENARIO);
+        $event = $this->createScenarioEvent(['noResetDB']);
+
+        $listener->resetDatabaseIfNeeded($event);
+    }
+
+    #[Test]
+    public function it_validates_feature_without_resetDB_tag_in_feature_mode(): void
+    {
+        $this->expectNotToPerformAssertions();
+
+        $listener = $this->createListener(DatabaseResetMode::FEATURE);
+        $event = $this->createFeatureEvent([]);
+
+        $listener->validateFeature($event);
+    }
+
+    private function createListener(
+        DatabaseResetMode $mode,
+        bool $damaSupportEnabled = false,
+        bool $damaNativeExtensionIsEnabled = false
+    ): DatabaseResetListener {
+        $factoryResolver = new FactoryShortNameResolver([]);
+        $objectRegistry = new ObjectRegistry($factoryResolver, $this->createStub(PersistenceManager::class));
+        $objectRegistry->reset();
+
+        $container = $this->createStub(ContainerInterface::class);
+        $container->method('get')
+            ->willReturnCallback(static fn(string $id) => match ($id) {
+                '.zenstruck_foundry.behat.object_registry' => $objectRegistry,
+                default => throw new \InvalidArgumentException("Unknown service: $id"),
+            });
+
+        $kernel = $this->createStub(KernelInterface::class);
+        $kernel->method('getContainer')->willReturn($container);
+
+        return new DatabaseResetListener($kernel, $mode, $damaSupportEnabled, $damaNativeExtensionIsEnabled);
+    }
+
+    private function getObjectRegistry(DatabaseResetListener $listener): ObjectRegistry
+    {
+        $reflection = new \ReflectionMethod($listener, 'objectRegistry');
+
+        return $reflection->invoke($listener);
+    }
+
+    /**
+     * @param list<string> $tags
+     */
+    private function createFeatureEvent(array $tags): BeforeFeatureTested
+    {
+        $feature = new FeatureNode(
+            'Test Feature',
+            'Description',
+            $tags,
+            null,
+            [],
+            'feature',
+            'en',
+            '/path/to/test.feature',
+            1
+        );
+
+        $environment = $this->createStub(Environment::class);
+
+        return new BeforeFeatureTested($environment, $feature);
+    }
+
+    /**
+     * @param list<string> $tags
+     */
+    private function createScenarioEvent(array $tags): BeforeScenarioTested
+    {
+        $scenario = new ScenarioNode('Test Scenario', $tags, [], 'scenario', 10);
+
+        $feature = new FeatureNode(
+            'Test Feature',
+            'Description',
+            [],
+            null,
+            [$scenario],
+            'feature',
+            'en',
+            '/path/to/test.feature',
+            1
+        );
+
+        $environment = $this->createStub(Environment::class);
+
+        return new BeforeScenarioTested($environment, $feature, $scenario);
+    }
+}

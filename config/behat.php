@@ -24,6 +24,7 @@ return static function (ContainerConfigurator $container): void {
         ->args([
             tagged_iterator('foundry.factory'),
         ])
+        ->public()
 
         ->set('.zenstruck_foundry.behat.object_registry', ObjectRegistry::class)
         ->args([

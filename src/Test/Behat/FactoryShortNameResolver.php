@@ -101,6 +101,20 @@ final class FactoryShortNameResolver
     }
 
     /**
+     * @param class-string $className
+     */
+    public function getShortNameForClass(string $className): string
+    {
+        return array_find_key( // @phpstan-ignore return.type (PHPStan bug)
+            $this->factoryMap,
+            static fn(array $factories) => array_any(
+                $factories,
+                static fn(ObjectFactory $factory) => $factory::class() === $className,
+            )
+        );
+    }
+
+    /**
      * @param class-string<ObjectFactory<object>> $factoryClass
      */
     private function shortNameFor(string $factoryClass): string

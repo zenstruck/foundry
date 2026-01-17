@@ -21,6 +21,7 @@ if (\str_contains($command, '--testsuite reset-database')) {
 }
 
 require \dirname(__DIR__).'/vendor/autoload.php';
+require \dirname(__DIR__).'/bin/tools/behat/vendor/autoload.php';
 
 $fs = new Filesystem();
 

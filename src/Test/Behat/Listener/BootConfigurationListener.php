@@ -9,6 +9,7 @@ use Behat\Testwork\EventDispatcher\Event\ExerciseCompleted;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\Test\Behat\ObjectRegistry;
 
 /**
  * @internal
@@ -58,7 +59,12 @@ final class BootConfigurationListener implements EventSubscriberInterface
      */
     public function shutdownFoundryAfterFeature(): void
     {
-        $this->symfonyKernel->getContainer()->get('.zenstruck_foundry.behat.object_registry')->reset(); // @phpstan-ignore method.notFound
+        $this->objectRegistry()->reset();
         Configuration::shutdown();
+    }
+
+    private function objectRegistry(): ObjectRegistry
+    {
+        return $this->symfonyKernel->getContainer()->get('.zenstruck_foundry.behat.object_registry'); // @phpstan-ignore return.type
     }
 }

@@ -22,6 +22,7 @@
             <directory>tests</directory>
             <exclude>tests/Integration/ResetDatabase</exclude>
             <exclude>tests/Integration/ForceFactoriesTraitUsage</exclude>
+            <exclude>tests/Unit/Test/Behat</exclude>
         </testsuite>
         <testsuite name="reset-database">
             <directory>tests/Integration/ResetDatabase</directory>

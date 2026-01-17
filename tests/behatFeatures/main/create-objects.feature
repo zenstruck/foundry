@@ -33,7 +33,7 @@ Feature: Test objects creation
 
   Scenario: Invalid property name handled (!)
     Given a contact A is created with properties
-      | foo     |
+      | foo |
       | bar |
     Then an "InvalidArgumentException" exception should be thrown containing message "Cannot set attribute \"foo\" for object"
 
@@ -72,12 +72,6 @@ Feature: Test objects creation
     Then 1 category should exist
     Then 1 address should exist
 
-  Scenario: Reference to a non existent objet handled (!)
-    Given a contact A is created with properties
-      | name     | category                    |
-      | John Doe | foo |
-    Then an "InvalidObjectParameter" exception should be thrown containing message "A reference to an object cannot be resolved in the table, at column \"category\""
-
   Scenario: Can reference another object with short syntax
     Given a category MyCategory is created
     And an address "the address" is created
@@ -88,12 +82,6 @@ Feature: Test objects creation
     Then contact A should have properties
       | name     | category   | address     |
       | John Doe | MyCategory | the address |
-
-  Scenario: Reference to a non existent objet with short syntax handled (!)
-    Given a contact A is created with properties
-      | name     | category                    |
-      | John Doe | foo |
-    Then an "InvalidObjectParameter" exception should be thrown containing message "A reference to an object cannot be resolved in the table, at column \"category\""
 
   Scenario: Can reference object with date
     Given a "generic entity" "GE" is created with properties
@@ -116,18 +104,18 @@ Feature: Test objects creation
   Scenario: Wrong assertion on string correctly handled (!)
     Given a "generic entity" "GE" is created with properties
       | prop1 | propInteger |
-      | foo   | 1 |
+      | foo   | 1           |
     Then "generic entity" "GE" should have properties
       | propInteger |
-      | 42   |
+      | 42          |
     Then an "AssertionFailedError" exception should be thrown matching pattern "/1(.*)42/"
 
   Scenario: Wrong assertion on date correctly handled (!)
     Given a "generic entity" "GE" is created with properties
-      | prop1 | date |
+      | prop1 | date       |
       | foo   | 2026-01-01 |
     Then "generic entity" "GE" should have properties
-      | date |
+      | date       |
       | 2026-01-02 |
     Then an "AssertionFailedError" exception should be thrown matching pattern "/2026/"
 
@@ -136,13 +124,13 @@ Feature: Test objects creation
       | prop1 | bool |
       | foo   | true |
     Then "generic entity" "GE" should have properties
-      | bool |
+      | bool  |
       | false |
     Then an "AssertionFailedError" exception should be thrown matching pattern "/true(.*)false/"
 
   Scenario: Wrong assertion on bool correctly handled (!)
     Given a "generic entity" "GE" is created with properties
-      | prop1 | bool |
+      | prop1 | bool  |
       | foo   | false |
     Then "generic entity" "GE" should have properties
       | bool |
@@ -154,21 +142,9 @@ Feature: Test objects creation
       | prop1 | stringEnum |
       | foo   | some_value |
     Then "generic entity" "GE" should have properties
-      | stringEnum |
+      | stringEnum  |
       | other_value |
     Then an "AssertionFailedError" exception should be thrown matching pattern "/StringBackedEnum/"
-
-  Scenario: Error on invalid enum value handled (!)
-    Given a "generic entity" "GE" is created with properties
-      | prop1 | stringEnum    |
-      | foo   | invalid_value |
-    Then an "InvalidObjectParameter" exception should be thrown containing message "Invalid enum value given \"invalid_value\", at column \"stringEnum\""
-
-  Scenario: Error on invalid date handled (!)
-    Given a "generic entity" "GE" is created with properties
-      | prop1 | date    |
-      | foo   | foo |
-    Then an "InvalidObjectParameter" exception should be thrown containing message "Invalid date given \"foo\", at column \"date\""
 
   Scenario: Can compare null
     Given a "generic entity" "GE" is created with properties
@@ -185,13 +161,13 @@ Feature: Test objects creation
       | foo   | null |
     When I am on "/"
     Then "generic entity" "GE" should have properties
-      | prop1 | bool |
+      | prop1 | bool   |
       | foo   | "null" |
     Then an "AssertionFailedError" exception should be thrown matching pattern "/null(.*)null/"
 
   Scenario: Wrong assertion with null works in the other way (!)
     Given a "generic entity" "GE" is created with properties
-      | prop1 | date |
+      | prop1 | date       |
       | foo   | 2026-01-01 |
     When I am on "/"
     Then "generic entity" "GE" should have properties

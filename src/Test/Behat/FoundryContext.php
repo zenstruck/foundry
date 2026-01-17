@@ -62,7 +62,7 @@ class FoundryContext implements Context
     public function createObjectWithProperties(TableNode $table, string $factoryShortName, ?string $objectName = null): void
     {
         $factory = $this->resolveFactory($factoryShortName, $objectName);
-        $parametersList = $this->normalizeObjectParameters($table, $factory::class());
+        $parametersList = $table->getColumnsHash();
 
         if (count($parametersList) !== 1) {
             throw new \InvalidArgumentException('Expected exactly one line of properties, to create one object.');
@@ -71,100 +71,10 @@ class FoundryContext implements Context
         $factory->create($parametersList[0]);
     }
 
-    /**
-     * @param class-string $targetClass
-     * @phpstan-return list<Parameters>
-     */
-    private function normalizeObjectParameters(TableNode $table, string $targetClass): array
-    {
-        return array_map(
-            function (array $parameters) use ($targetClass): array {
-                $normalized = [];
-                foreach ($parameters as $propertyName => $value) {
-                    if ($propertyName === '_ref') {
-                        $normalized['_ref'] = $value;
-
-                        continue;
-                    }
-
-                    if ('null' === $value) {
-                        $normalized[$propertyName] = null;
-
-                        continue;
-                    }
-
-                    if ('true' === $value) {
-                        $normalized[$propertyName] = true;
-
-                        continue;
-                    }
-
-                    if ('false' === $value) {
-                        $normalized[$propertyName] = false;
-
-                        continue;
-                    }
-
-                    if (preg_match('/^<ref\((?<factoryShortName>[^,]+), (?<objectName>[^)]+)\)>$/', $value, $matches)) {
-                        try {
-                            $normalized[$propertyName] = $this->objectRegistry->getByFactoryShortName($matches['factoryShortName'], $matches['objectName']);
-                        } catch (ObjectNotFoundException $e) {
-                            throw InvalidObjectParameter::objectReferencedInTableDoesNotExist($propertyName, $e);
-                        }
-
-                        continue;
-                    }
-
-                    $expectedTypeClass = $this->getPropertyTypeIfClass(new \ReflectionClass($targetClass), $propertyName);
-
-                    if (!$expectedTypeClass) {
-                        $normalized[$propertyName] = $value;
-
-                        continue;
-                    }
-
-                    if ($this->factoryResolver->hasFactoryForClass($expectedTypeClass)) {
-                        try {
-                            $normalized[$propertyName] = $this->objectRegistry->getByObjectClass($expectedTypeClass, $value);
-                        } catch (ObjectNotFoundException $e) {
-                            throw InvalidObjectParameter::objectReferencedInTableDoesNotExist($propertyName, $e);
-                        }
-
-                        continue;
-                    }
-
-                    if (is_a($expectedTypeClass, \DateTimeInterface::class, allow_string: true)) {
-                        try {
-                            $normalized[$propertyName] = new $expectedTypeClass($value);
-
-                            continue;
-                        } catch (\Throwable $e) { // @phpstan-ignore catch.neverThrown
-                            throw InvalidObjectParameter::invalidDate($propertyName, $value, $e);
-                        }
-                    }
-
-                    if (is_a($expectedTypeClass, \BackedEnum::class, allow_string: true)) {
-                        $value = is_numeric($value) ? (int) $value : $value;
-
-                        $normalized[$propertyName] = $expectedTypeClass::tryFrom($value) ?? throw InvalidObjectParameter::invalidEnumValue($propertyName, (string) $value);
-
-                        continue;
-                    }
-
-                    throw new \LogicException("Cannot normalize parameter \"$propertyName\" with value \"$value\".");
-                }
-
-                return $normalized;
-            },
-            $table->getColumnsHash()
-        );
-    }
-
     #[Given(':factoryShortName are created with properties')]
     public function createObjectsWithProperties(TableNode $table, string $factoryShortName): void
     {
-        $targetClass = $this->factoryResolver->targetObjectClassFor($factoryShortName);
-        $parametersList = $this->normalizeObjectParameters($table, $targetClass);
+        $parametersList = $table->getColumnsHash();
 
         foreach ($parametersList as $parameters) {
             $objectName = $parameters['_ref'] ?? null;
@@ -202,12 +112,9 @@ class FoundryContext implements Context
     }
 
     #[Then(':factoryShortName :objectName should have properties')]
-    public function assertObjectHasProperties(TableNode $table, string $factoryShortName, string $objectName): void
+    public function assertObjectHasProperties(FoundryTableNode $table, string $factoryShortName, string $objectName): void
     {
-        $parametersList = $this->normalizeObjectParameters(
-            $table,
-            $this->factoryResolver->targetObjectClassFor($factoryShortName)
-        );
+        $parametersList = $table->getColumnsHash();
 
         if (count($parametersList) !== 1) {
             throw new \InvalidArgumentException('Expected exactly one line of properties.');
@@ -267,32 +174,5 @@ class FoundryContext implements Context
     public function transformLastIdForSpecificObject(string $before, string $factoryShortName, string $after): string
     {
         return "{$before}{$this->objectRegistry->lastIdFor($factoryShortName)}{$after}";
-    }
-
-    /**
-     * @param \ReflectionClass<object> $class
-     *
-     * @return class-string|null
-     */
-    private function getPropertyTypeIfClass(\ReflectionClass $class, string $propertyName): ?string
-    {
-        try {
-            $property = $class->getProperty($propertyName);
-        } catch (\ReflectionException) {
-            if ($class = $class->getParentClass()) {
-                return $this->getPropertyTypeIfClass($class, $propertyName);
-            }
-        }
-
-        if (
-            !isset($property)
-            || !($type = $property->getType()) instanceof \ReflectionNamedType
-            || $type->isBuiltin()
-            || !class_exists($type->getName())
-        ) {
-            return null;
-        }
-
-        return $type->getName();
     }
 }

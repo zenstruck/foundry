@@ -30,8 +30,9 @@ use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @internal
+ * @final
  */
-final class PersistenceManager
+class PersistenceManager
 {
     private bool $flush = true;
     private bool $persist = true;
