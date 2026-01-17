@@ -43,6 +43,11 @@ class BehatTestKernel extends FoundryTestKernel
             ->setAutoconfigured(true)
             ->setArguments([new Reference('.zenstruck_foundry.behat.factory_resolver'), new Reference('.zenstruck_foundry.behat.object_registry')])
         ;
+//        $c->register(\Zenstruck\Foundry\Test\Behat\FoundryContext::class)
+//            ->setAutowired(true)
+//            ->setAutoconfigured(true)
+//            ->setArguments([new Reference('.zenstruck_foundry.behat.factory_resolver'), new Reference('.zenstruck_foundry.behat.object_registry')])
+//        ;
 
         $configurator->services()
             ->load('Zenstruck\\Foundry\\Tests\\Fixture\\Behat\\Factories\\', __DIR__.'/Factories')
