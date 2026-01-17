@@ -51,20 +51,23 @@ final class LoadFixturesListener implements EventSubscriberInterface
             return;
         }
 
-        $fixtureName = $this->parseFixtureName($tags);
+        $fixtureNames = $this->parseFixtureName($tags);
 
-        if (null === $fixtureName) {
+        if ([] === $fixtureNames) {
             return;
         }
 
-        $storyClass = $this->fixtureStoryResolver()->resolve($fixtureName);
-        $storyClass::load();
+        foreach ($fixtureNames as $fixtureName) {
+            $storyClass = $this->fixtureStoryResolver()->resolve($fixtureName);
+            $storyClass::load();
+        }
     }
 
     /**
      * @param list<string> $tags
+     * @return list<string>
      */
-    private function parseFixtureName(array $tags): ?string
+    private function parseFixtureName(array $tags): array
     {
         $fixtureNames = [];
 
@@ -74,15 +77,7 @@ final class LoadFixturesListener implements EventSubscriberInterface
             }
         }
 
-        if (0 === \count($fixtureNames)) {
-            return null;
-        }
-
-        if (\count($fixtureNames) > 1) {
-            throw new \RuntimeException('Multiple @withFixture tags found: you can only load one fixture per scenario.');
-        }
-
-        return $fixtureNames[0];
+        return $fixtureNames;
     }
 
     private function fixtureStoryResolver(): FixtureStoryResolver

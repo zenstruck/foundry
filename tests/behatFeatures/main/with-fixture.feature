@@ -35,3 +35,8 @@ Feature: Test @withFixture tag
     Then contact "jane-doe" should have properties
       | name     | category         |
       | Jane Doe | category fixture |
+
+  @withFixture(behat-category) @withFixture(behat-contacts)
+  Scenario: Can load multiple fixtures
+    Then 1 contact should exist
+    Then 2 categories should exist
