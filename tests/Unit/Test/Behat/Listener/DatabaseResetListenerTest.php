@@ -25,10 +25,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
-use Zenstruck\Foundry\Test\Behat\Config\DatabaseResetMode;
-use Zenstruck\Foundry\Test\Behat\DamaNativeExtensionIncompatibility;
+use Zenstruck\Foundry\Test\Behat\DatabaseResetMode;
+use Zenstruck\Foundry\Test\Behat\Exception\DamaNativeExtensionIncompatibility;
 use Zenstruck\Foundry\Test\Behat\FactoryShortNameResolver;
-use Zenstruck\Foundry\Test\Behat\InvalidResetDbTagException;
+use Zenstruck\Foundry\Test\Behat\Exception\InvalidResetDbTag;
 use Zenstruck\Foundry\Test\Behat\Listener\DatabaseResetListener;
 use Zenstruck\Foundry\Test\Behat\ObjectRegistry;
 use Zenstruck\Foundry\Test\UnitTestConfig;
@@ -61,7 +61,7 @@ final class DatabaseResetListenerTest extends TestCase
         yield 'resetDB tag on feature with feature mode' => [
             DatabaseResetMode::FEATURE,
             ['resetDB'],
-            InvalidResetDbTagException::class,
+            InvalidResetDbTag::class,
             'Cannot use "@resetDB" tag on a feature with database_reset_mode set as "feature".',
         ];
     }
@@ -92,14 +92,14 @@ final class DatabaseResetListenerTest extends TestCase
         yield 'resetDB tag on scenario with scenario mode' => [
             DatabaseResetMode::SCENARIO,
             ['resetDB'],
-            InvalidResetDbTagException::class,
+            InvalidResetDbTag::class,
             'Cannot use "@noResetDB" tag with database_reset_mode set as "manual".',
         ];
 
         yield 'both resetDB and noResetDB tags on scenario' => [
             DatabaseResetMode::MANUAL,
             ['resetDB', 'noResetDB'],
-            InvalidResetDbTagException::class,
+            InvalidResetDbTag::class,
             'Cannot use "@noResetDB" tag with database_reset_mode set as "manual".',
         ];
     }
@@ -232,14 +232,14 @@ final class DatabaseResetListenerTest extends TestCase
         yield 'noResetDB tag with manual mode' => [
             DatabaseResetMode::MANUAL,
             ['noResetDB'],
-            InvalidResetDbTagException::class,
+            InvalidResetDbTag::class,
             'Cannot use "@noResetDB" tag with database_reset_mode set as "manual".',
         ];
 
         yield 'noResetDB tag with feature mode' => [
             DatabaseResetMode::FEATURE,
             ['noResetDB'],
-            InvalidResetDbTagException::class,
+            InvalidResetDbTag::class,
             'Cannot use "@noResetDB" with database_reset_mode set as "feature".',
         ];
     }

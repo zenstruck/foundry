@@ -43,16 +43,14 @@ final class LoadFixturesCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument('name', InputArgument::OPTIONAL, 'The name of the story to load.')
+            ->addArgument('name', InputArgument::OPTIONAL, "Story's name or stories group's name to load.")
             ->addOption('append', 'a', InputOption::VALUE_NONE, 'Skip resetting database and append data to the existing database.')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $allFixtures = $this->fixtureStoryResolver->availableFixtureNames();
-
-        if (0 === \count($allFixtures)) {
+        if (!$this->fixtureStoryResolver->hasAnyFixtures()) {
             throw new LogicException('No story as fixture available: add attribute #[AsFixture] to your story classes before running this command.');
         }
 
@@ -68,37 +66,18 @@ final class LoadFixturesCommand extends Command
             $this->resetDatabase();
         }
 
-        $stories = [];
+        $fixtureNameOrGroup = $input->getArgument('name') ?? $this->getNameWhenNotProvided($io);
 
-        if (null === ($name = $input->getArgument('name'))) {
-            if (1 === \count($allFixtures)) {
-                $name = $this->fixtureStoryResolver->availableFixtureNames()[0];
-            } else {
-                $storyNames = $this->fixtureStoryResolver->availableFixtureNames();
-                if (\count($this->fixtureStoryResolver->availableGroupNames()) > 0) {
-                    $storyNames[] = '(choose a group of stories...)';
-                }
-                $name = $io->choice('Choose a story to load:', $storyNames);
-            }
-
-            if (!$this->fixtureStoryResolver->hasFixture($name)) {
-                $groupsNames = $this->fixtureStoryResolver->availableGroupNames();
-                $name = $io->choice('Choose a group of stories:', $groupsNames);
-            }
-        }
-
-        if ($this->fixtureStoryResolver->hasFixture($name)) {
-            $io->comment("Loading story with name \"{$name}\"...");
-            $stories = [$name => $this->fixtureStoryResolver->resolve($name)];
-        }
-
-        if ($this->fixtureStoryResolver->hasGroup($name)) {
-            $io->comment("Loading stories group \"{$name}\"...");
-            $stories = $this->fixtureStoryResolver->resolveGroup($name);
-        }
+        $stories = $this->fixtureStoryResolver->resolve($fixtureNameOrGroup);
 
         if (!$stories) {
-            throw new InvalidArgumentException("Story with name \"{$name}\" does not exist.");
+            throw new InvalidArgumentException("Story with name or group \"{$fixtureNameOrGroup}\" does not exist.");
+        }
+
+        if ($this->fixtureStoryResolver->hasFixture($fixtureNameOrGroup)) {
+            $io->comment("Loading story with name \"{$fixtureNameOrGroup}\"...");
+        } else {
+            $io->comment("Loading stories group \"{$fixtureNameOrGroup}\"...");
         }
 
         foreach ($stories as $name => $storyClass) {
@@ -124,5 +103,25 @@ final class LoadFixturesCommand extends Command
         foreach ($this->databaseResetters as $databaseResetter) {
             $databaseResetter->resetBeforeFirstTest($this->kernel);
         }
+    }
+
+    private function getNameWhenNotProvided(SymfonyStyle $io): string
+    {
+        if ($this->fixtureStoryResolver->hasOnlyOneFixture()) {
+            return $this->fixtureStoryResolver->availableFixtureNames()[0];
+        }
+
+        $storyNames = $this->fixtureStoryResolver->availableFixtureNames();
+        if (\count($this->fixtureStoryResolver->availableGroupNames()) > 0) {
+            $storyNames[] = '(choose a group of stories...)';
+        }
+        $name = $io->choice('Choose a story to load:', $storyNames);
+
+        if (!$this->fixtureStoryResolver->hasFixture($name)) {
+            $groupsNames = $this->fixtureStoryResolver->availableGroupNames();
+            $name = $io->choice('Choose a group of stories:', $groupsNames);
+        }
+
+        return $name;
     }
 }

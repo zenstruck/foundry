@@ -21,8 +21,8 @@ use Zenstruck\Foundry\Persistence\PersistenceManager;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Story\Event\StateAddedToStory;
 use Zenstruck\Foundry\Test\Behat\FactoryShortNameResolver;
-use Zenstruck\Foundry\Test\Behat\ObjectAlreadyRegisteredException;
-use Zenstruck\Foundry\Test\Behat\ObjectNotFoundException;
+use Zenstruck\Foundry\Test\Behat\Exception\ObjectAlreadyRegistered;
+use Zenstruck\Foundry\Test\Behat\Exception\ObjectNotFound;
 use Zenstruck\Foundry\Test\Behat\ObjectRegistry;
 
 final class ObjectRegistryTest extends TestCase
@@ -49,7 +49,7 @@ final class ObjectRegistryTest extends TestCase
 
         $this->registry->store($user1, 'john');
 
-        $this->expectException(ObjectAlreadyRegisteredException::class);
+        $this->expectException(ObjectAlreadyRegistered::class);
         $this->expectExceptionMessage('Object "john" is already registered for class "Zenstruck\Foundry\Tests\Unit\Test\Behat\User".');
 
         $this->registry->store($user2, 'john');
@@ -93,7 +93,7 @@ final class ObjectRegistryTest extends TestCase
     #[Test]
     public function it_throws_when_getting_non_existent_object(): void
     {
-        $this->expectException(ObjectNotFoundException::class);
+        $this->expectException(ObjectNotFound::class);
         $this->expectExceptionMessage('Object of class "Zenstruck\Foundry\Tests\Unit\Test\Behat\User" with name "john" was not found.');
 
         $this->registry->getByObjectClass(User::class, 'john');
@@ -178,6 +178,23 @@ final class ObjectRegistryTest extends TestCase
 
         self::assertTrue($this->registry->has(User::class, 'john'));
         self::assertSame($user, $this->registry->getByObjectClass(User::class, 'john'));
+    }
+
+    #[Test]
+    public function it_throws_when_storing_duplicate_from_story_event(): void
+    {
+        $user1 = new User(id: 1, name: 'John');
+        $user2 = new User(id: 2, name: 'Jane');
+
+        $event1 = new StateAddedToStory($user1, 'duplicate');
+        $event2 = new StateAddedToStory($user2, 'duplicate');
+
+        $this->registry->storeAfterStateAddedToStory($event1);
+
+        $this->expectException(ObjectAlreadyRegistered::class);
+        $this->expectExceptionMessage('Object "duplicate" is already registered for class "Zenstruck\Foundry\Tests\Unit\Test\Behat\User".');
+
+        $this->registry->storeAfterStateAddedToStory($event2);
     }
 
     #[Test]

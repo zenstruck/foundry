@@ -15,7 +15,7 @@ use Zenstruck\Foundry\Attribute\AsFixture;
 use Zenstruck\Foundry\Story;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
 
-#[AsFixture(name: 'behat-contacts')]
+#[AsFixture(name: 'behat-contacts', groups: ['behat-stories'])]
 final class ContactStory extends Story
 {
     public function build(): void

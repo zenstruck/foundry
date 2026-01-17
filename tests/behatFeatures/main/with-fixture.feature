@@ -40,3 +40,8 @@ Feature: Test @withFixture tag
   Scenario: Can load multiple fixtures
     Then 1 contact should exist
     Then 2 categories should exist
+
+  @withFixture(behat-stories)
+  Scenario: Can load grouped fixtures
+    Then 1 contact should exist
+    Then 2 categories should exist

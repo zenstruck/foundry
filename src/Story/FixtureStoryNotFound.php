@@ -16,14 +16,14 @@ namespace Zenstruck\Foundry\Story;
  *
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-final class FixtureStoryNotFoundException extends \RuntimeException
+final class FixtureStoryNotFound extends \RuntimeException
 {
     /**
      * @param list<string> $availableFixtures
      */
-    public static function forName(string $fixtureName, array $availableFixtures): self
+    public static function forNameOrGroup(string $fixtureName, array $availableFixtures): self
     {
-        $message = "Fixture story \"{$fixtureName}\" not found:";
+        $message = "Fixture story with name or group \"{$fixtureName}\" not found:";
 
         if ($availableFixtures) {
             $message .= ' Available fixtures: '.\implode(', ', $availableFixtures);

@@ -13,16 +13,16 @@ namespace Zenstruck\Foundry\Tests\Fixture\Behat\Stories;
 
 use Zenstruck\Foundry\Attribute\AsFixture;
 use Zenstruck\Foundry\Story;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
 
-#[AsFixture(name: 'behat-category', groups: ['behat-stories'])]
-final class CategoryStory extends Story
+#[AsFixture(name: 'conflict-story-1', groups: ['conflict-test'])]
+final class ConflictStory1 extends Story
 {
     public function build(): void
     {
         $this->addState(
-            'category fixture',
-            CategoryFactory::createOne()
+            'duplicate',
+            ContactFactory::createOne(['name' => 'From Story 1'])
         );
     }
 }

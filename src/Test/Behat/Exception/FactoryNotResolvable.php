@@ -11,13 +11,13 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\Test\Behat;
+namespace Zenstruck\Foundry\Test\Behat\Exception;
 
 /**
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-final class FactoryNotResolvableException extends \RuntimeException
+final class FactoryNotResolvable extends \RuntimeException
 {
     public static function forName(string $name): self
     {

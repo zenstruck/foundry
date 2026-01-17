@@ -29,31 +29,29 @@ final class FixtureStoryResolver
     }
 
     /**
-     * @return class-string<Story>
-     *
-     * @throws FixtureStoryNotFoundException
-     */
-    public function resolve(string $fixtureName): string
-    {
-        if (!isset($this->fixtureStories[$fixtureName])) {
-            throw FixtureStoryNotFoundException::forName($fixtureName, $this->availableFixtureNames());
-        }
-
-        return $this->fixtureStories[$fixtureName];
-    }
-
-    /**
      * @return array<string, class-string<Story>>
      *
-     * @throws FixtureStoryNotFoundException
+     * @throws FixtureStoryNotFound
      */
-    public function resolveGroup(string $groupName): array
+    public function resolve(string $fixtureOrGroupName): array
     {
-        if (!isset($this->groupedStories[$groupName])) {
-            throw FixtureStoryNotFoundException::forGroup($groupName, $this->availableGroupNames());
+        if ($this->hasFixture($fixtureOrGroupName)) {
+            return [$fixtureOrGroupName => $this->fixtureStories[$fixtureOrGroupName]];
         }
 
-        return $this->groupedStories[$groupName];
+        if ($this->hasGroup($fixtureOrGroupName)) {
+            return $this->resolveGroup($fixtureOrGroupName);
+        }
+
+        throw FixtureStoryNotFound::forNameOrGroup(
+            $fixtureOrGroupName,
+            [...$this->availableFixtureNames(), ...$this->availableGroupNames()]
+        );
+    }
+
+    public function hasAnyFixtures(): bool
+    {
+        return count($this->fixtureStories) > 0;
     }
 
     public function hasFixture(string $name): bool
@@ -61,9 +59,9 @@ final class FixtureStoryResolver
         return isset($this->fixtureStories[$name]);
     }
 
-    public function hasGroup(string $name): bool
+    public function hasOnlyOneFixture(): bool
     {
-        return isset($this->groupedStories[$name]);
+        return count($this->fixtureStories) === 1;
     }
 
     /**
@@ -80,5 +78,24 @@ final class FixtureStoryResolver
     public function availableGroupNames(): array
     {
         return \array_keys($this->groupedStories);
+    }
+
+    /**
+     * @return array<string, class-string<Story>>
+     *
+     * @throws FixtureStoryNotFound
+     */
+    private function resolveGroup(string $groupName): array
+    {
+        if (!isset($this->groupedStories[$groupName])) {
+            throw FixtureStoryNotFound::forGroup($groupName, $this->availableGroupNames());
+        }
+
+        return $this->groupedStories[$groupName];
+    }
+
+    private function hasGroup(string $name): bool
+    {
+        return isset($this->groupedStories[$name]);
     }
 }

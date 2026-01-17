@@ -11,17 +11,15 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\Test\Behat;
+namespace Zenstruck\Foundry\Test\Behat\Exception;
 
 /**
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- *
- * todo: rename les exceptions
  */
 final class InvalidObjectParameter extends \RuntimeException
 {
-    public static function objectReferencedInTableDoesNotExist(string $column, ObjectNotFoundException $previous): self
+    public static function objectReferencedInTableDoesNotExist(string $column, ObjectNotFound $previous): self
     {
         return new self("A reference to an object cannot be resolved in the table, at column \"$column\": {$previous->getMessage()}", previous: $previous);
     }

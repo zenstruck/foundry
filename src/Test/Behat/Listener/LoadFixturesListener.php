@@ -58,8 +58,11 @@ final class LoadFixturesListener implements EventSubscriberInterface
         }
 
         foreach ($fixtureNames as $fixtureName) {
-            $storyClass = $this->fixtureStoryResolver()->resolve($fixtureName);
-            $storyClass::load();
+            $stories = $this->fixtureStoryResolver()->resolve($fixtureName);
+
+            foreach ($stories as $storyClass) {
+                $storyClass::load();
+            }
         }
     }
 

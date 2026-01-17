@@ -11,13 +11,13 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\Test\Behat;
+namespace Zenstruck\Foundry\Test\Behat\Exception;
 
 /**
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-final class ObjectNotFoundException extends \RuntimeException
+final class ObjectNotFound extends \RuntimeException
 {
     public static function forFactoryAndName(string $factoryShortName, string $name): self
     {

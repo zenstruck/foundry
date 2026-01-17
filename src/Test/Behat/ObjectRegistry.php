@@ -16,6 +16,8 @@ namespace Zenstruck\Foundry\Test\Behat;
 use Zenstruck\Foundry\Persistence\Event\AfterPersist;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
 use Zenstruck\Foundry\Story\Event\StateAddedToStory;
+use Zenstruck\Foundry\Test\Behat\Exception\ObjectAlreadyRegistered;
+use Zenstruck\Foundry\Test\Behat\Exception\ObjectNotFound;
 
 /**
  * @internal
@@ -50,7 +52,7 @@ final class ObjectRegistry
     public function store(object $object, string $objectName): void
     {
         if ($this->has($object::class, $objectName)) {
-            throw ObjectAlreadyRegisteredException::forClassAndName($object::class, $objectName);
+            throw ObjectAlreadyRegistered::forClassAndName($object::class, $objectName);
         }
 
         self::$objects[$object::class][$objectName] = $object;
@@ -77,7 +79,7 @@ final class ObjectRegistry
         $objectClass = $this->factoryShortNameResolver->targetObjectClassFor($factoryShortName);
 
         if (!$this->has($objectClass, $objectName)) {
-            throw ObjectNotFoundException::forFactoryAndName($factoryShortName, $objectName);
+            throw ObjectNotFound::forFactoryAndName($factoryShortName, $objectName);
         }
 
         return self::$objects[$objectClass][$objectName];
@@ -86,12 +88,12 @@ final class ObjectRegistry
     /**
      * @param class-string $objectClass
      *
-     * @throws ObjectNotFoundException
+     * @throws ObjectNotFound
      */
     public function getByObjectClass(string $objectClass, string $objectName): object
     {
         if (!$this->has($objectClass, $objectName)) {
-            throw ObjectNotFoundException::forClassAndName($objectClass, $objectName);
+            throw ObjectNotFound::forClassAndName($objectClass, $objectName);
         }
 
         return self::$objects[$objectClass][$objectName];

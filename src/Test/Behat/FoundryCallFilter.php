@@ -8,6 +8,8 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Testwork\Call\Call;
 use Behat\Testwork\Call\Filter\CallFilter;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Zenstruck\Foundry\Test\Behat\Exception\InvalidObjectParameter;
+use Zenstruck\Foundry\Test\Behat\Exception\ObjectNotFound;
 
 /**
  * @internal
@@ -123,7 +125,7 @@ final class FoundryCallFilter implements CallFilter
                             if (preg_match('/^<ref\((?<factoryShortName>[^,]+), (?<objectName>[^)]+)\)>$/', $value, $matches)) {
                                 try {
                                     $normalized[$propertyName] = $this->objectRegistry->getByFactoryShortName($matches['factoryShortName'], $matches['objectName']);
-                                } catch (ObjectNotFoundException $e) {
+                                } catch (ObjectNotFound $e) {
                                     throw InvalidObjectParameter::objectReferencedInTableDoesNotExist($propertyName, $e);
                                 }
 
@@ -142,7 +144,7 @@ final class FoundryCallFilter implements CallFilter
                             if ($this->factoryResolver->hasFactoryForClass($expectedTypeClass)) {
                                 try {
                                     $normalized[$propertyName] = $this->objectRegistry->getByObjectClass($expectedTypeClass, $value);
-                                } catch (ObjectNotFoundException $e) {
+                                } catch (ObjectNotFound $e) {
                                     throw InvalidObjectParameter::objectReferencedInTableDoesNotExist($propertyName, $e);
                                 }
 

@@ -26,9 +26,9 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 use Zenstruck\Foundry\StoryRegistry;
-use Zenstruck\Foundry\Test\Behat\Config\DatabaseResetMode;
-use Zenstruck\Foundry\Test\Behat\DamaNativeExtensionIncompatibility;
-use Zenstruck\Foundry\Test\Behat\InvalidResetDbTagException;
+use Zenstruck\Foundry\Test\Behat\DatabaseResetMode;
+use Zenstruck\Foundry\Test\Behat\Exception\DamaNativeExtensionIncompatibility;
+use Zenstruck\Foundry\Test\Behat\Exception\InvalidResetDbTag;
 use Zenstruck\Foundry\Test\Behat\ObjectRegistry;
 
 /**
@@ -92,18 +92,18 @@ final class DatabaseResetListener implements EventSubscriberInterface
     public function validateFeature(BeforeFeatureTested $event): void
     {
         if ($this->hasResetDbTag($event) && $this->resetMode === DatabaseResetMode::FEATURE) {
-            throw InvalidResetDbTagException::resetDbOnFeatureWithFeatureMode();
+            throw InvalidResetDbTag::resetDbOnFeatureWithFeatureMode();
         }
     }
 
     public function validateScenario(BeforeScenarioTested $event): void
     {
         if ($this->hasResetDbTag($event) && $this->resetMode === DatabaseResetMode::SCENARIO) {
-            throw InvalidResetDbTagException::resetDbOnScenarioWithScenarioMode();
+            throw InvalidResetDbTag::resetDbOnScenarioWithScenarioMode();
         }
 
         if ($this->hasResetDbTag($event) && $this->hasNoResetDbTag($event)) {
-            throw InvalidResetDbTagException::bothTagsUsed();
+            throw InvalidResetDbTag::bothTagsUsed();
         }
     }
 
@@ -169,7 +169,7 @@ final class DatabaseResetListener implements EventSubscriberInterface
         if ($this->resetMode === DatabaseResetMode::SCENARIO) {
             // todo: il manque des tests unitaires de ces listeners ! et un peu ailleurs
             // todo: ajouter des infos concernant le fichier de features
-            throw InvalidResetDbTagException::resetDbWithScenarioMode();
+            throw InvalidResetDbTag::resetDbWithScenarioMode();
         }
 
         return true;
@@ -194,8 +194,8 @@ final class DatabaseResetListener implements EventSubscriberInterface
         }
 
         return match($this->resetMode) {
-            DatabaseResetMode::MANUAL => throw InvalidResetDbTagException::noResetDbWithManualMode(),
-            DatabaseResetMode::FEATURE => throw InvalidResetDbTagException::noResetDbWithFeatureMode(),
+            DatabaseResetMode::MANUAL => throw InvalidResetDbTag::noResetDbWithManualMode(),
+            DatabaseResetMode::FEATURE => throw InvalidResetDbTag::noResetDbWithFeatureMode(),
             default => true,
         };
     }

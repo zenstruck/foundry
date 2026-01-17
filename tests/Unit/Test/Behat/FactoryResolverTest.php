@@ -18,7 +18,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Attribute\FactoryShortName;
 use Zenstruck\Foundry\ObjectFactory;
-use Zenstruck\Foundry\Test\Behat\FactoryNotResolvableException;
+use Zenstruck\Foundry\Test\Behat\Exception\FactoryNotResolvable;
 use Zenstruck\Foundry\Test\Behat\FactoryShortNameResolver;
 
 final class FactoryResolverTest extends TestCase
@@ -81,7 +81,7 @@ final class FactoryResolverTest extends TestCase
     {
         $resolver = new FactoryShortNameResolver([new PostFactory()]);
 
-        $this->expectException(FactoryNotResolvableException::class);
+        $this->expectException(FactoryNotResolvable::class);
         $this->expectExceptionMessage('Cannot resolve factory for name "unknown"');
 
         $resolver->factoryFor('unknown');
@@ -93,7 +93,7 @@ final class FactoryResolverTest extends TestCase
     {
         $resolver = new FactoryShortNameResolver($factories);
 
-        $this->expectException(FactoryNotResolvableException::class);
+        $this->expectException(FactoryNotResolvable::class);
         $this->expectExceptionMessage('Multiple factories found for name "article"');
 
         $resolver->factoryFor('article');

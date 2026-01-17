@@ -18,18 +18,18 @@ Feature: Test objects creation
 
   Scenario: Can create entity with properties via PyTable (!)
     Given a "i don't exist" is created
-    Then an "FactoryNotResolvableException" exception should be thrown containing message "Cannot resolve factory for name \"i don't exist\""
+    Then an "FactoryNotResolvable" exception should be thrown containing message "Cannot resolve factory for name \"i don't exist\""
 
   Scenario: Multiple objects created with the same reference is handled (!)
     Given a contact A is created
     And a contact A is created
-    Then an "ObjectAlreadyRegisteredException" exception should be thrown containing message "Object \"A\" is already registered"
+    Then an "ObjectAlreadyRegistered" exception should be thrown containing message "Object \"A\" is already registered"
 
   Scenario: Reference to a non existent objet handled (!)
     Then contact "I don't exist" should have properties
       | foo |
       | bar |
-    Then an "ObjectNotFoundException" exception should be thrown containing message "Object \"contact I don't exist\" was not found"
+    Then an "ObjectNotFound" exception should be thrown containing message "Object \"contact I don't exist\" was not found"
 
   Scenario: Invalid property name handled (!)
     Given a contact A is created with properties
@@ -56,7 +56,7 @@ Feature: Test objects creation
       | _ref | name     |
       | A    | John Doe |
       | A    | Jane Doe |
-    Then an "ObjectAlreadyRegisteredException" exception should be thrown containing message "Object \"A\" is already registered"
+    Then an "ObjectAlreadyRegistered" exception should be thrown containing message "Object \"A\" is already registered"
 
   Scenario: Can reference another object
     Given a category MyCategory is created
@@ -186,4 +186,4 @@ Feature: Test objects creation
 
   Scenario: Cannot use a factory with ambiguous name (!)
     Given a "tag" is created
-    Then an "FactoryNotResolvableException" exception should be thrown containing message "Multiple factories found for name \"tag\""
+    Then an "FactoryNotResolvable" exception should be thrown containing message "Multiple factories found for name \"tag\""

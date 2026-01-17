@@ -1,8 +1,8 @@
 <?php
 
-namespace Zenstruck\Foundry\Test\Behat;
+namespace Zenstruck\Foundry\Test\Behat\Exception;
 
-final class InvalidResetDbTagException extends \LogicException
+final class InvalidResetDbTag extends \LogicException
 {
     public static function bothTagsUsed(): self
     {

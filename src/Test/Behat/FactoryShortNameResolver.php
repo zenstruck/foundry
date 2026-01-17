@@ -17,6 +17,7 @@ use Symfony\Component\String\Inflector\EnglishInflector;
 use Zenstruck\Foundry\Attribute\FactoryShortName;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\ObjectFactory;
+use Zenstruck\Foundry\Test\Behat\Exception\FactoryNotResolvable;
 use function Symfony\Component\String\u;
 
 /**
@@ -59,20 +60,20 @@ final class FactoryShortNameResolver
     /**
      * @return ObjectFactory<object>
      *
-     * @throws FactoryNotResolvableException
+     * @throws FactoryNotResolvable
      */
     public function factoryFor(string $shortName): ObjectFactory
     {
         $normalized = \strtolower($shortName);
 
         if (!isset($this->factoryMap[$normalized])) {
-            throw FactoryNotResolvableException::forName($shortName);
+            throw FactoryNotResolvable::forName($shortName);
         }
 
         $factories = $this->factoryMap[$normalized];
 
         if (\count($factories) > 1) {
-            throw FactoryNotResolvableException::conflict($shortName, array_map(static fn(ObjectFactory $f) => $f::class, $factories));
+            throw FactoryNotResolvable::conflict($shortName, array_map(static fn(ObjectFactory $f) => $f::class, $factories));
         }
 
         return $factories[0]::new();

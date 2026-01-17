@@ -21,12 +21,9 @@ use Behat\Gherkin\Node\StepNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Testwork\Call\Call;
 use Behat\Testwork\Environment\Environment;
-use DateTimeImmutable;
-use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use ReflectionMethod;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Attribute\FactoryShortName;
@@ -36,7 +33,7 @@ use Zenstruck\Foundry\Test\Behat\FactoryShortNameResolver;
 use Zenstruck\Foundry\Test\Behat\FoundryCallFilter;
 use Zenstruck\Foundry\Test\Behat\FoundryContext;
 use Zenstruck\Foundry\Test\Behat\FoundryTableNode;
-use Zenstruck\Foundry\Test\Behat\InvalidObjectParameter;
+use Zenstruck\Foundry\Test\Behat\Exception\InvalidObjectParameter;
 use Zenstruck\Foundry\Test\Behat\ObjectRegistry;
 
 final class FoundryCallFilterTest extends TestCase
@@ -212,7 +209,7 @@ final class FoundryCallFilterTest extends TestCase
         $normalizedTable = $result->getArguments()['table'];
         $rows = $normalizedTable->getColumnsHash();
 
-        self::assertInstanceOf(DateTimeImmutable::class, $rows[0]['createdAt']);
+        self::assertInstanceOf(\DateTimeImmutable::class, $rows[0]['createdAt']);
         self::assertSame('2024-01-15 10:30:00', $rows[0]['createdAt']->format('Y-m-d H:i:s'));
     }
 
@@ -344,7 +341,7 @@ final class FoundryCallFilterTest extends TestCase
         $container->method('get')->willReturnCallback(fn(string $id) => match ($id) {
             '.zenstruck_foundry.behat.factory_resolver' => $this->factoryResolver,
             '.zenstruck_foundry.behat.object_registry' => $this->objectRegistry,
-            default => throw new InvalidArgumentException("Unknown service: $id"),
+            default => throw new \InvalidArgumentException("Unknown service: $id"),
         });
 
         $kernel = $this->createStub(KernelInterface::class);
@@ -358,7 +355,7 @@ final class FoundryCallFilterTest extends TestCase
      */
     private function createDefinitionCallForFoundryContext(array $arguments): DefinitionCall
     {
-        $reflection = new ReflectionMethod(FoundryContext::class, 'createObjectWithProperties');
+        $reflection = new \ReflectionMethod(FoundryContext::class, 'createObjectWithProperties');
 
         $definition = $this->createStub(Definition::class);
         $definition->method('getReflection')->willReturn($reflection);
@@ -384,7 +381,7 @@ class TestEntity
 class DatedEntity
 {
     public function __construct(
-        public int $id, public DateTimeImmutable $createdAt,
+        public int $id, public \DateTimeImmutable $createdAt,
     ) {
     }
 }
@@ -457,7 +454,7 @@ final class DatedEntityFactory extends ObjectFactory
 
     protected function defaults(): array
     {
-        return ['id' => 1, 'createdAt' => new DateTimeImmutable()];
+        return ['id' => 1, 'createdAt' => new \DateTimeImmutable()];
     }
 }
 

@@ -11,17 +11,17 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\Test\Behat;
+namespace Zenstruck\Foundry\Test\Behat\Exception;
 
 /**
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-final class ObjectAlreadyRegisteredException extends \RuntimeException
+final class ObjectAlreadyRegistered extends \RuntimeException
 {
     /** @param class-string $objectClass */
     public static function forClassAndName(string $objectClass, string $name): self
     {
-        return new self("Object \"{$name}\" is already registered for class \"{$objectClass}\".");
+        return new self("Object \"{$name}\" is already registered for class \"{$objectClass}\". This may happen when loading multiple Stories in a group that define objects with the same name.");
     }
 }

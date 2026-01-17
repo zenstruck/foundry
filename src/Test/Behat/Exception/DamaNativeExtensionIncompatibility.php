@@ -1,6 +1,6 @@
 <?php
 
-namespace Zenstruck\Foundry\Test\Behat;
+namespace Zenstruck\Foundry\Test\Behat\Exception;
 
 final class DamaNativeExtensionIncompatibility extends \LogicException
 {

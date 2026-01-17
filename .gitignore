@@ -25,3 +25,6 @@
 /.grepai
 /.specify
 /specs
+.github/agents
+.github/prompts
+.vscode
