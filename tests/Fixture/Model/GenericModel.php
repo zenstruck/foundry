@@ -41,6 +41,18 @@ abstract class GenericModel
     #[MongoDB\Field(type: 'date_immutable', nullable: true)]
     private ?\DateTimeImmutable $date = null;
 
+    #[ORM\Column(nullable: true)]
+    #[MongoDB\Field(type: 'date', nullable: true)]
+    public ?\DateTime $dateMutable = null;
+
+    #[ORM\Column(nullable: true)]
+    #[MongoDB\Field(type: 'bool', nullable: true)]
+    public ?bool $bool = null;
+
+    #[ORM\Column(nullable: true)]
+    #[MongoDB\Field(type: 'float', nullable: true)]
+    public ?float $float = null;
+
     public function __construct(string $prop1)
     {
         $this->prop1 = $prop1;

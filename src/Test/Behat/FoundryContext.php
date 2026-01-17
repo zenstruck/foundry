@@ -3,7 +3,9 @@
 namespace Zenstruck\Foundry\Test\Behat;
 
 use Behat\Behat\Context\Context;
+use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Gherkin\Node\TableNode;
+use Behat\Hook\BeforeStep;
 use Behat\Step\Given;
 use Behat\Step\Then;
 use Behat\Transformation\Transform;
@@ -83,25 +85,58 @@ final class FoundryContext implements Context
                         continue;
                     }
 
+                    if ('null' === $value) {
+                        $normalized[$propertyName] = null;
+
+                        continue;
+                    }
+
+                    if ('true' === $value) {
+                        $normalized[$propertyName] = true;
+
+                        continue;
+                    }
+
+                    if ('false' === $value) {
+                        $normalized[$propertyName] = false;
+
+                        continue;
+                    }
+
+
                     if (preg_match('/^<ref\((?<factoryShortName>[^,]+), (?<objectName>[^)]+)\)>$/', $value, $matches)) {
                         $normalized[$propertyName] = $this->objectRegistry->getByFactoryShortName($matches['factoryShortName'], $matches['objectName']);
 
                         continue;
                     }
 
-                    $expectedType = $this->getPropertyType(new \ReflectionClass($targetClass), $propertyName);
+                    $expectedTypeClass = $this->getPropertyTypeIfClass(new \ReflectionClass($targetClass), $propertyName);
 
-                    if ($expectedType) {
+                    if (!$expectedTypeClass) {
+                        $normalized[$propertyName] = $value;
+
+                        continue;
+                    }
+
+                    if ($this->factoryResolver->hasFactoryForClass($expectedTypeClass)) {
                         try {
-                            $normalized[$propertyName] = $this->objectRegistry->getByObjectClass($expectedType, $value);
+                            $normalized[$propertyName] = $this->objectRegistry->getByObjectClass($expectedTypeClass, $value);
                         } catch (ObjectNotFoundException $e) {
-                            throw ObjectNotFoundException::objectReferencedInTableDoesNotExist($propertyName, $e);
+                            throw InvalidObjectParameter::objectReferencedInTableDoesNotExist($propertyName, $e);
                         }
 
                         continue;
                     }
 
-                    $normalized[$propertyName] = $value;
+                    if (is_a($expectedTypeClass, \DateTimeInterface::class, true)) {
+                        try {
+                            $normalized[$propertyName] = new $expectedTypeClass($value);
+
+                            continue;
+                        } catch (\Throwable $e) {
+                            throw InvalidObjectParameter::invalidDate($propertyName, $value, $e);
+                        }
+                    }
                 }
 
                 return $normalized;
@@ -168,8 +203,19 @@ final class FoundryContext implements Context
             refresh($object);
         }
 
-        foreach ($parametersList[0] as $key => $value) {
-            Assert::that(get($object, $key))->is($value);
+        foreach ($parametersList[0] as $key => $valueExpected) {
+            $actualValue = get($object, $key);
+
+            match(true) {
+                $valueExpected instanceof \DateTimeInterface => Assert::that($actualValue)
+                    ->isInstanceOf(\DateTimeInterface::class)
+                    ->and($actualValue->format('Y-m-d H:i:s'))
+                    ->is($valueExpected->format('Y-m-d H:i:s')),
+
+                is_object($valueExpected) => Assert::that($actualValue)->is($valueExpected),
+
+                default => Assert::that($actualValue)->equals($valueExpected)
+            };
         }
     }
 
@@ -212,13 +258,13 @@ final class FoundryContext implements Context
      *
      * @return class-string|null
      */
-    private function getPropertyType(\ReflectionClass $class, string $propertyName): ?string
+    private function getPropertyTypeIfClass(\ReflectionClass $class, string $propertyName): ?string
     {
         try {
             $property = $class->getProperty($propertyName);
         } catch (\ReflectionException) {
             if ($class = $class->getParentClass()) {
-                return $this->getPropertyType($class, $propertyName);
+                return $this->getPropertyTypeIfClass($class, $propertyName);
             }
         }
 
@@ -227,7 +273,6 @@ final class FoundryContext implements Context
             || !($type = $property->getType()) instanceof \ReflectionNamedType
             || $type->isBuiltin()
             || !class_exists($type->getName())
-            || !$this->factoryResolver->hasFactoryForClass($type->getName())
         ) {
             return null;
         }

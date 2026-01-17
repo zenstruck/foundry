@@ -31,9 +31,4 @@ final class ObjectNotFoundException extends \RuntimeException
     {
         return new self("Object of class \"$objectName\" with name \"$name\" was not found.");
     }
-
-    public static function objectReferencedInTableDoesNotExist(string $column, self $previous): self
-    {
-        return new self("A reference to an object cannot be resolved in the table, at \"$column\": {$previous->getMessage()}", previous: $previous);
-    }
 }

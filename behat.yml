@@ -2,6 +2,9 @@ default:
     testers:
         stop_on_failure: true
 
+    gherkin:
+        cache: var/cache/gherkin
+
     extensions:
         Zenstruck\Foundry\Test\Behat\FoundryExtension:
             database_reset_mode: scenario
