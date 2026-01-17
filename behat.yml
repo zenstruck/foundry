@@ -8,6 +8,7 @@ default:
     extensions:
         Zenstruck\Foundry\Test\Behat\FoundryExtension:
             database_reset_mode: scenario
+            enable_dama_support: true
         Behat\MinkExtension:
             sessions:
                 symfony:
@@ -24,15 +25,15 @@ default:
                 - Behat\MinkExtension\Context\MinkContext
                 - Zenstruck\Foundry\Test\Behat\FoundryContext
 
-main-dama:
+main-no-dama:
     extensions:
         Zenstruck\Foundry\Test\Behat\FoundryExtension:
             database_reset_mode: scenario
-            enable_dama_support: true
+            enable_dama_support: false
 
     suites:
         main: false
-        main-dama:
+        main-no-dama:
             paths: [tests/behatFeatures/main]
             contexts: *common_contexts
 
@@ -41,6 +42,7 @@ main-native-dama:
         DAMA\DoctrineTestBundle\Behat\ServiceContainer\DoctrineExtension: ~
         Zenstruck\Foundry\Test\Behat\FoundryExtension:
             database_reset_mode: scenario
+            enable_dama_support: false
 
     suites:
         main: false
@@ -52,6 +54,7 @@ reset-manual:
     extensions:
         Zenstruck\Foundry\Test\Behat\FoundryExtension:
             database_reset_mode: manual
+            enable_dama_support: false
 
     suites:
         main: false
@@ -78,6 +81,7 @@ reset-feature:
     extensions:
         Zenstruck\Foundry\Test\Behat\FoundryExtension:
             database_reset_mode: feature
+            enable_dama_support: false
 
     suites:
         main: false
@@ -102,6 +106,7 @@ reset-disabled:
     extensions:
         Zenstruck\Foundry\Test\Behat\FoundryExtension:
             database_reset_mode: disabled
+            enable_dama_support: false
 
     suites:
         main: false

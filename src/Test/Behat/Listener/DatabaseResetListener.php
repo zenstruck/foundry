@@ -50,7 +50,7 @@ final class DatabaseResetListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ExerciseCompleted::BEFORE => 'resetBeforeSuite',
+            ExerciseCompleted::BEFORE => ['resetBeforeSuite', -10], // -10 because it should occur after Dama
             ExerciseCompleted::AFTER => 'disableStaticConnection',
 
             FeatureTested::BEFORE => [

@@ -132,7 +132,7 @@ final class FoundryContext implements Context
                             $normalized[$propertyName] = new $expectedTypeClass($value);
 
                             continue;
-                        } catch (\Throwable $e) {
+                        } catch (\Throwable $e) { // @phpstan-ignore catch.neverThrown
                             throw InvalidObjectParameter::invalidDate($propertyName, $value, $e);
                         }
                     }
@@ -140,7 +140,7 @@ final class FoundryContext implements Context
                     if (is_a($expectedTypeClass, \BackedEnum::class, allow_string: true)) {
                         $value = is_numeric($value) ? (int) $value : $value;
 
-                        $normalized[$propertyName] = $expectedTypeClass::tryFrom($value) ?? throw InvalidObjectParameter::invalidEnumValue($propertyName, $value);
+                        $normalized[$propertyName] = $expectedTypeClass::tryFrom($value) ?? throw InvalidObjectParameter::invalidEnumValue($propertyName, (string) $value);
 
                         continue;
                     }

@@ -1,4 +1,4 @@
-Feature: Test object creation
+Feature: Test objects creation
 
   Scenario: Can create entity with properties via PyTable
     Given a contact A is created with properties
@@ -10,6 +10,7 @@ Feature: Test object creation
       | John Doe |
 
   Scenario: Can create multiple entities via PyTable
+    Then 0 contacts should exist
     Given contacts are created with properties
       | _ref | name     |
       | A    | John Doe |
