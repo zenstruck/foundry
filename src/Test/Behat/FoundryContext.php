@@ -103,7 +103,6 @@ final class FoundryContext implements Context
                         continue;
                     }
 
-
                     if (preg_match('/^<ref\((?<factoryShortName>[^,]+), (?<objectName>[^)]+)\)>$/', $value, $matches)) {
                         $normalized[$propertyName] = $this->objectRegistry->getByFactoryShortName($matches['factoryShortName'], $matches['objectName']);
 
@@ -128,7 +127,7 @@ final class FoundryContext implements Context
                         continue;
                     }
 
-                    if (is_a($expectedTypeClass, \DateTimeInterface::class, true)) {
+                    if (is_a($expectedTypeClass, \DateTimeInterface::class, allow_string: true)) {
                         try {
                             $normalized[$propertyName] = new $expectedTypeClass($value);
 
@@ -137,6 +136,16 @@ final class FoundryContext implements Context
                             throw InvalidObjectParameter::invalidDate($propertyName, $value, $e);
                         }
                     }
+
+                    if (is_a($expectedTypeClass, \BackedEnum::class, allow_string: true)) {
+                        $value = is_numeric($value) ? (int) $value : $value;
+
+                        $normalized[$propertyName] = $expectedTypeClass::tryFrom($value) ?? throw InvalidObjectParameter::invalidEnumValue($propertyName, $value);
+
+                        continue;
+                    }
+
+                    throw new \LogicException("Cannot normalize parameter \"$propertyName\" with value \"$value\".");
                 }
 
                 return $normalized;

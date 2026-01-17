@@ -11,10 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Fixture;
 
-final class ObjectWithEnum
+enum IntBackedEnum: int
 {
-    public function __construct(
-        public readonly StringBackedEnum $someEnum,
-    ) {
-    }
+    case SOME_VALUE = 0;
 }

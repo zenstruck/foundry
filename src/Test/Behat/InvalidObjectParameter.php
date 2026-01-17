@@ -30,4 +30,9 @@ final class InvalidObjectParameter extends \RuntimeException
     {
         return new self("Invalid date given \"$invalidDate\", at \"$column\"", previous: $previous);
     }
+
+    public static function invalidEnumValue(string $column, string $invalidEnumValue): self
+    {
+        return new self("Invalid enum value given \"$invalidEnumValue\", at \"$column\"");
+    }
 }

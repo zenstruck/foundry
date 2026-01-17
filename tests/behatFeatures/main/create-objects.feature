@@ -49,12 +49,12 @@ Feature: Test object creation
 
   Scenario: Can reference object with date
     Given a "generic entity" "GE" is created with properties
-      | prop1 | propInteger | date       | dateMutable | bool  | float |
-      | foo   | 1           | 2026-01-01 | 2026-01-02  | false | 3.14  |
+      | prop1 | propInteger | date       | dateMutable | bool  | float | stringEnum | intEnum |
+      | foo   | 1           | 2026-01-01 | 2026-01-02  | false | 3.14  | some_value | 0       |
     When I am on "/"
     Then "generic entity" "GE" should have properties
-      | prop1 | propInteger | date       | dateMutable | bool  | float |
-      | foo   | 1           | 2026-01-01 | 2026-01-02  | false | 3.14  |
+      | prop1 | propInteger | date       | dateMutable | bool  | float | stringEnum | intEnum |
+      | foo   | 1           | 2026-01-01 | 2026-01-02  | false | 3.14  | some_value | 0       |
 
   Scenario: Can compare null
     Given a "generic entity" "GE" is created with properties
