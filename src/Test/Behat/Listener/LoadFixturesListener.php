@@ -9,7 +9,6 @@ use Behat\Gherkin\Node\TaggedNodeInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Story\FixtureStoryResolver;
-use Zenstruck\Foundry\Test\Behat\FactoryShortNameResolver;
 
 /**
  * @internal

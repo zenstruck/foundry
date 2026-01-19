@@ -11,7 +11,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\Tests\Unit\Test\Behat\Listener;
+namespace Zenstruck\Foundry\Tests\Integration\Behat\Listener;
 
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeScenarioTested;
@@ -20,21 +20,32 @@ use Behat\Gherkin\Node\ScenarioNode;
 use Behat\Testwork\Environment\Environment;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Zenstruck\Foundry\Configuration;
-use Zenstruck\Foundry\Persistence\PersistenceManager;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Behat\DatabaseResetMode;
 use Zenstruck\Foundry\Test\Behat\Exception\DamaNativeExtensionIncompatibility;
-use Zenstruck\Foundry\Test\Behat\FactoryShortNameResolver;
 use Zenstruck\Foundry\Test\Behat\Exception\InvalidResetDbTag;
 use Zenstruck\Foundry\Test\Behat\Listener\DatabaseResetListener;
 use Zenstruck\Foundry\Test\Behat\ObjectRegistry;
-use Zenstruck\Foundry\Test\UnitTestConfig;
+use Zenstruck\Foundry\Test\Factories;
+use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Tests\Fixture\Behat\BehatTestKernel;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
+use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
-final class DatabaseResetListenerTest extends TestCase
+final class DatabaseResetListenerTest extends KernelTestCase
 {
+    use Factories, RequiresORM, ResetDatabase;
+
+    protected static function getKernelClass(): string
+    {
+        return BehatTestKernel::class;
+    }
+
+    protected function setUp(): void
+    {
+        $this->objectRegistry()->reset();
+    }
+
     /**
      * @param list<string> $tags
      * @param class-string<\Throwable> $exceptionClass
@@ -115,31 +126,25 @@ final class DatabaseResetListenerTest extends TestCase
         array $tags,
         bool $shouldReset,
     ): void {
+        $listener = $this->createListener($mode, damaSupportEnabled: true);
+        $objectRegistry = $this->objectRegistry();
+
+        $testObject = GenericEntityFactory::createOne();
+        GenericEntityFactory::assert()->count(1);
+
+        $objectRegistry->store($testObject, 'test-object');
+        self::assertTrue($objectRegistry->isStored($testObject));
+
+        $event = $eventType === 'feature' ? $this->createFeatureEvent($tags) : $this->createScenarioEvent($tags);
+
+        $listener->resetDatabaseIfNeeded($event);
+
         if ($shouldReset) {
-            Configuration::boot(UnitTestConfig::build());
-        }
-
-        try {
-            $listener = $this->createListener($mode);
-            $objectRegistry = $this->getObjectRegistry($listener);
-
-            $testObject = new \stdClass();
-            $objectRegistry->store($testObject, 'test-object');
+            self::assertFalse($objectRegistry->isStored($testObject));
+            GenericEntityFactory::assert()->count(0);
+        } else {
             self::assertTrue($objectRegistry->isStored($testObject));
-
-            $event = $eventType === 'feature' ? $this->createFeatureEvent($tags) : $this->createScenarioEvent($tags);
-
-            $listener->resetDatabaseIfNeeded($event);
-
-            if ($shouldReset) {
-                self::assertFalse($objectRegistry->isStored($testObject));
-            } else {
-                self::assertTrue($objectRegistry->isStored($testObject));
-            }
-        } finally {
-            if ($shouldReset && Configuration::isBooted()) {
-                Configuration::shutdown();
-            }
+            GenericEntityFactory::assert()->count(1);
         }
     }
 
@@ -301,28 +306,12 @@ final class DatabaseResetListenerTest extends TestCase
         bool $damaSupportEnabled = false,
         bool $damaNativeExtensionIsEnabled = false
     ): DatabaseResetListener {
-        $factoryResolver = new FactoryShortNameResolver([]);
-        $objectRegistry = new ObjectRegistry($factoryResolver, $this->createStub(PersistenceManager::class));
-        $objectRegistry->reset();
-
-        $container = $this->createStub(ContainerInterface::class);
-        $container->method('get')
-            ->willReturnCallback(static fn(string $id) => match ($id) {
-                '.zenstruck_foundry.behat.object_registry' => $objectRegistry,
-                default => throw new \InvalidArgumentException("Unknown service: $id"),
-            });
-
-        $kernel = $this->createStub(KernelInterface::class);
-        $kernel->method('getContainer')->willReturn($container);
-
-        return new DatabaseResetListener($kernel, $mode, $damaSupportEnabled, $damaNativeExtensionIsEnabled);
+        return new DatabaseResetListener(self::$kernel ?? self::bootKernel(), $mode, $damaSupportEnabled, $damaNativeExtensionIsEnabled);
     }
 
-    private function getObjectRegistry(DatabaseResetListener $listener): ObjectRegistry
+    private function objectRegistry(): ObjectRegistry
     {
-        $reflection = new \ReflectionMethod($listener, 'objectRegistry');
-
-        return $reflection->invoke($listener);
+        return self::getContainer()->get('.zenstruck_foundry.behat.object_registry'); // @phpstan-ignore return.type
     }
 
     /**

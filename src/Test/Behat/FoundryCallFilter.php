@@ -87,7 +87,7 @@ final class FoundryCallFilter implements CallFilter
                 TableNode::class
             )()),
             [ // @phpstan-ignore argument.type (TableNode has the same problem: array $table is not really lists)
-                $headKey => $thead,
+                $headKey => $thead, // @phpstan-ignore array.invalidKey
                 ...array_map(
                     function (array $parameters) use ($thead, $factoryShortName): array {
                         $normalized = [];

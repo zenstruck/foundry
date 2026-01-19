@@ -16,7 +16,6 @@ use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\FactoryRegistry;
 use Zenstruck\Foundry\FakerAdapter;
 use Zenstruck\Foundry\Object\Instantiator;
-use Zenstruck\Foundry\Story\FixtureStoryResolver;
 use Zenstruck\Foundry\StoryRegistry;
 
 return static function(ContainerConfigurator $container): void {
