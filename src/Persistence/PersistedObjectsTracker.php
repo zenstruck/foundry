@@ -101,7 +101,12 @@ final class PersistedObjectsTracker
 
         $clone = clone $object;
         $reflector->resetAsLazyGhost($object, function($object) use ($clone, $id) {
+            // prevent some weird recursion in some edge cases, caused by kernel.reset
+            unset(self::$trackedObjects[$object]);
+
             Configuration::instance()->persistence()->autorefresh($object, $id, $clone);
+
+            self::$trackedObjects[$object] = $id;
         });
     }
 }

@@ -444,6 +444,20 @@ abstract class AutoRefreshTestCase extends WebTestCase
         self::assertSame($object2, $newObject2);
     }
 
+    #[Test]
+    public function can_shutdown_kernel_and_still_access_the_object(): void
+    {
+        $client = self::createClient();
+
+        $object = $this->factory()->create(['prop1' => 'foo']);
+
+        self::ensureKernelShutdown();
+
+        $client->request('GET', "/hello-world");
+
+        self::assertSame('foo', $object->getProp1());
+    }
+
     /**
      * @return PersistentObjectFactory<GenericModel>
      */

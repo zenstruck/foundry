@@ -42,4 +42,10 @@ final class CreateContact
 
         return new Response();
     }
+
+    #[Route('/hello-world')]
+    public function index(): Response
+    {
+        return new Response('Hello World');
+    }
 }

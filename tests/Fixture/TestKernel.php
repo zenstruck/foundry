@@ -19,6 +19,7 @@ use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
 use Zenstruck\Foundry\Tests\Fixture\App\Command\UpdateGenericModelCommand;
 use Zenstruck\Foundry\Tests\Fixture\App\Controller\CreateContact;
 use Zenstruck\Foundry\Tests\Fixture\App\Controller\DeleteGenericModel;
+use Zenstruck\Foundry\Tests\Fixture\App\Controller\HelloWorld;
 use Zenstruck\Foundry\Tests\Fixture\App\Controller\UpdateGenericModel;
 use Zenstruck\Foundry\Tests\Fixture\Events\FoundryEventListener;
 use Zenstruck\Foundry\Tests\Fixture\Factories\ArrayFactory;
@@ -68,6 +69,7 @@ final class TestKernel extends FoundryTestKernel
         $c->register(DeleteGenericModel::class)->setAutowired(true)->setAutoconfigured(true)->addTag('controller.service_arguments');
         $c->register(UpdateGenericModel::class)->setAutowired(true)->setAutoconfigured(true)->addTag('controller.service_arguments');
         $c->register(CreateContact::class)->setAutowired(true)->setAutoconfigured(true)->addTag('controller.service_arguments');
+        $c->register(HelloWorld::class)->setAutowired(true)->setAutoconfigured(true)->addTag('controller.service_arguments');
         $c->register(UpdateGenericModelCommand::class)->setAutowired(true)->setAutoconfigured(true);
     }
 
