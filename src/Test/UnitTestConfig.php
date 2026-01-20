@@ -51,7 +51,7 @@ final class UnitTestConfig
             $faker,
             self::$instantiator ?? Instantiator::withConstructor(),
             new StoryRegistry([]),
-            forcedFakerSeed: $_SERVER['FOUNDRY_FAKER_SEED'] ?? $_ENV['FOUNDRY_FAKER_SEED'] ?? (\getenv('FOUNDRY_FAKER_SEED') ?: null)
+            forcedFakerSeedFromEnv: $_SERVER['FOUNDRY_FAKER_SEED'] ?? $_ENV['FOUNDRY_FAKER_SEED'] ?? (\getenv('FOUNDRY_FAKER_SEED') ?: null)
         );
     }
 }

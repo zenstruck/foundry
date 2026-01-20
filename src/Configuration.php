@@ -47,6 +47,8 @@ final class Configuration
     private static \Closure|self|null $instance = null;
 
     private static ?int $fakerSeed = null;
+    private ?int $forcedFakerSeed = null;
+    private static bool $fakerSeedHasBeenSet = false;
 
     private bool $inMemory = false;
 
@@ -55,32 +57,52 @@ final class Configuration
      */
     public function __construct(
         public readonly FactoryRegistryInterface $factories,
-        public readonly Faker\Generator $faker,
+        private readonly Faker\Generator $faker,
         callable $instantiator,
         public readonly StoryRegistry $stories,
         private readonly ?PersistenceManager $persistence = null,
         public readonly bool $flushOnce = false,
-        ?int $forcedFakerSeed = null,
+        ?int $forcedFakerSeedFromConfig = null,
+        ?int $forcedFakerSeedFromEnv = null,
         public readonly ?InMemoryRepositoryRegistry $inMemoryRepositoryRegistry = null,
         public readonly ?PersistedObjectsTracker $persistedObjectsTracker = null,
         private readonly bool $enableAutoRefreshWithLazyObjects = false,
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {
-        if (null === self::$instance) {
-            $this->faker->seed(self::fakerSeed($forcedFakerSeed));
-        }
+        $this->forcedFakerSeed = $forcedFakerSeedFromEnv ?? $forcedFakerSeedFromConfig;
 
         $this->instantiator = $instantiator;
     }
 
-    public static function fakerSeed(?int $forcedFakerSeed = null): int
+    public function faker(): Faker\Generator
     {
-        return self::$fakerSeed ??= ($forcedFakerSeed ?? \random_int(0, 1000000));
+        if (!self::$fakerSeedHasBeenSet) {
+            $this->seedFaker();
+        }
+
+        return $this->faker;
     }
 
-    public static function resetFakerSeed(): void
+    private function seedFaker(): void
     {
-        self::$fakerSeed = null;
+        self::$fakerSeed ??= ($this->forcedFakerSeed ?? \random_int(1, 1000000));
+
+        // prevent data providers to use the same seed as the test suite
+        $seed = $this->bootedForDataProvider ? self::$fakerSeed + 1 : self::$fakerSeed;
+
+        $this->faker->seed($seed);
+        self::$fakerSeedHasBeenSet = true;
+    }
+
+    public static function fakerSeed(): ?int
+    {
+        return self::$fakerSeed;
+    }
+
+    public static function resetFakerSeed(?int $forcedFakerSeed = null): void
+    {
+        self::$fakerSeed = $forcedFakerSeed;
+        self::$fakerSeedHasBeenSet = false;
     }
 
     /**
@@ -160,6 +182,7 @@ final class Configuration
     {
         PersistedObjectsTracker::reset();
         StoryRegistry::reset();
+        self::$fakerSeedHasBeenSet = false;
         self::$instance = null;
     }
 

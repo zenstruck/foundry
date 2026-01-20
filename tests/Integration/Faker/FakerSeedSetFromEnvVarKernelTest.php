@@ -17,9 +17,11 @@ use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
+use function Zenstruck\Foundry\faker;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
@@ -28,25 +30,25 @@ use Zenstruck\Foundry\Test\ResetDatabase;
 #[RequiresPhpunit('>=11.0')]
 final class FakerSeedSetFromEnvVarKernelTest extends KernelTestCase
 {
-    use Factories, FakerTestTrait, ResetDatabase;
+    use Factories, ResetFakerTestTrait, ResetDatabase;
 
     #[Test]
     public function faker_seed_can_be_set_by_environment_variable(): void
     {
-        // let's fake, we're starting from a fresh kernel
-        $this->tearDown();
-        Configuration::shutdown();
-        Configuration::resetFakerSeed();
-
-        self::bootKernel(['environment' => 'faker_seed_env_var']);
-
-        self::assertSame(1234, Configuration::fakerSeed());
+        self::assertSame('quia', faker()->word());
+        self::assertSame(4321, Configuration::fakerSeed());
     }
 
     #[Test]
     #[Depends('faker_seed_can_be_set_by_environment_variable')]
     public function faker_seed_is_already_set(): void
     {
-        self::assertSame(1234, Configuration::fakerSeed());
+        self::assertSame('quia', faker()->word());
+        self::assertSame(4321, Configuration::fakerSeed());
+    }
+
+    protected static function bootKernel(array $options = []): KernelInterface
+    {
+        return parent::bootKernel(['environment' => 'faker_seed_env_var']);
     }
 }

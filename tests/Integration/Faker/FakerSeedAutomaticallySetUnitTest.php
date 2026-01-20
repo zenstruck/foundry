@@ -19,6 +19,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Test\Factories;
+use function Zenstruck\Foundry\faker;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
@@ -27,11 +28,13 @@ use Zenstruck\Foundry\Test\Factories;
 #[RequiresPhpunit('>=11.0')]
 final class FakerSeedAutomaticallySetUnitTest extends TestCase
 {
-    use Factories, FakerTestTrait;
+    use Factories, ResetFakerTestTrait;
 
     #[Test]
     public function faker_seed_does_not_change(): void
     {
+        faker(); // triggers seeding
+
         self::$currentSeed = Configuration::fakerSeed();
 
         self::assertSame(self::$currentSeed, Configuration::fakerSeed());

@@ -21,6 +21,10 @@ final class DisplayFakerSeedOnTestSuiteFinished implements FinishedSubscriber
 {
     public function notify(Finished $event): void
     {
-        echo "\n\nFaker seed: ".Configuration::fakerSeed(); // @phpstan-ignore ekinoBannedCode.expression
+        $fakerSeed = Configuration::fakerSeed();
+
+        if ($fakerSeed !== null) {
+            echo "\n\nFaker seed: ".$fakerSeed; // @phpstan-ignore ekinoBannedCode.expression
+        }
     }
 }

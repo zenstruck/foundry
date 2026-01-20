@@ -16,7 +16,7 @@ use Zenstruck\Foundry\Object\Hydrator;
 
 function faker(): Faker\Generator
 {
-    return Configuration::instance()->faker;
+    return Configuration::instance()->faker();
 }
 
 /**

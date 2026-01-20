@@ -14,26 +14,27 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Integration\Faker;
 
 use PHPUnit\Framework\Attributes\Depends;
-use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Test\Factories;
+use function Zenstruck\Foundry\faker;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  * @requires PHPUnit >=12.0
  */
 #[RequiresPhpunit('>=12.0')]
-#[RequiresEnvironmentVariable('FOUNDRY_FAKER_SEED', '1234')]
 final class FakerSeedSetFromEnvVarUnitTest extends TestCase
 {
-    use Factories, FakerTestTrait;
+    use Factories;
 
     #[Test]
     public function faker_seed_is_set_from_env_var(): void
     {
+        self::assertSame('1234', $_SERVER['FOUNDRY_FAKER_SEED'], 'Default seed should be 1234');
+        self::assertSame('architecto', faker()->word());
         self::assertSame(1234, Configuration::fakerSeed());
     }
 
@@ -41,6 +42,8 @@ final class FakerSeedSetFromEnvVarUnitTest extends TestCase
     #[Depends('faker_seed_is_set_from_env_var')]
     public function faker_seed_does_not_change(): void
     {
+        self::assertSame('1234', $_SERVER['FOUNDRY_FAKER_SEED'], 'Default seed should be 1234');
+        self::assertSame('architecto', faker()->word());
         self::assertSame(1234, Configuration::fakerSeed());
     }
 }

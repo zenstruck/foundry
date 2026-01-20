@@ -162,7 +162,7 @@ abstract class Factory
 
     final protected static function faker(): Faker\Generator
     {
-        return Configuration::instance()->faker;
+        return Configuration::instance()->faker();
     }
 
     /**

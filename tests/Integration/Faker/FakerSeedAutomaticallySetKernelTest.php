@@ -20,6 +20,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
+use function Zenstruck\Foundry\faker;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
@@ -28,11 +29,13 @@ use Zenstruck\Foundry\Test\ResetDatabase;
 #[RequiresPhpunit('>=11.0')]
 final class FakerSeedAutomaticallySetKernelTest extends KernelTestCase
 {
-    use Factories, FakerTestTrait, ResetDatabase;
+    use Factories, ResetFakerTestTrait, ResetDatabase;
 
     #[Test]
     public function faker_seed_does_not_change(): void
     {
+        faker(); // triggers seeding
+
         self::$currentSeed = Configuration::fakerSeed();
 
         self::assertSame(self::$currentSeed, Configuration::fakerSeed());

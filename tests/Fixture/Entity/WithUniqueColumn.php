@@ -18,19 +18,19 @@ use Zenstruck\Foundry\Tests\Fixture\Model\Base;
 class WithUniqueColumn extends Base
 {
     #[ORM\Column(unique: true)]
-    private int $uniqueCol;
+    private string $uniqueCol;
 
-    public function __construct(int $uniqueCol)
+    public function __construct(string $uniqueCol)
     {
         $this->uniqueCol = $uniqueCol;
     }
 
-    public function getUniqueCol(): int
+    public function getUniqueCol(): string
     {
         return $this->uniqueCol;
     }
 
-    public function setUniqueCol(int $uniqueCol): static
+    public function setUniqueCol(string $uniqueCol): static
     {
         $this->uniqueCol = $uniqueCol;
 
