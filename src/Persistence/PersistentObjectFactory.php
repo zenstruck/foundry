@@ -547,31 +547,35 @@ abstract class PersistentObjectFactory extends ObjectFactory
                 },
                 self::PRIORITY_SCHEDULE_FOR_INSERT
             )
+
+            // Always register the callback that executes inverse relationship callbacks.
+            // This is needed even when Foundry is not booted (e.g., when factories are created in data providers
+            // without the PHPUnit extension), because the callbacks are populated later during create().
+            ->afterInstantiate(
+                static function(object $object, array $parameters, self $factoryUsed): void {
+                    $tempAfterInstantiateCallbacks = $factoryUsed->inverseRelationshipCallbacks;
+                    $factoryUsed->inverseRelationshipCallbacks = [];
+                    foreach ($tempAfterInstantiateCallbacks as $tempAfterInstantiateCallback) {
+                        $tempAfterInstantiateCallback($object);
+                    }
+                },
+                priority: 1000
+            )
         ;
 
         if (!Configuration::isBooted() || !Configuration::instance()->hasEventDispatcher()) {
             return $factory;
         }
 
-        return $factory->afterInstantiate(
-            static function(object $object, array $parameters, self $factoryUsed): void {
-                $tempAfterInstantiateCallbacks = $factoryUsed->inverseRelationshipCallbacks;
-                $factoryUsed->inverseRelationshipCallbacks = [];
-                foreach ($tempAfterInstantiateCallbacks as $tempAfterInstantiateCallback) {
-                    $tempAfterInstantiateCallback($object);
-                }
-            },
-            priority: 1000
-        )
-            ->afterPersist(
-                static function(object $object, array $parameters, self $factoryUsed): bool {
-                    Configuration::instance()->eventDispatcher()->dispatch(
-                        new AfterPersist($object, $parameters, $factoryUsed)
-                    );
+        return $factory->afterPersist(
+            static function(object $object, array $parameters, self $factoryUsed): bool {
+                Configuration::instance()->eventDispatcher()->dispatch(
+                    new AfterPersist($object, $parameters, $factoryUsed)
+                );
 
-                    return false; // don't perform a flush after the hook
-                }
-            );
+                return false; // don't perform a flush after the hook
+            }
+        );
     }
 
     private function throwIfCannotCreateObject(): void

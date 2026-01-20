@@ -839,6 +839,27 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         ];
     }
 
+    /**
+     * @test
+     * @dataProvider provideIsCreatesFactoryInDataProviderWithOneToManyCases
+     */
+    #[Test]
+    #[DataProvider('provideIsCreatesFactoryInDataProviderWithOneToManyCases')]
+    public function is_creates_factory_in_data_provider_with_one_to_many(CategoryFactory $categoryFactory): void
+    {
+        $category = $categoryFactory->create();
+        self::assertCount(2, $category->getContacts());
+    }
+
+    public static function provideIsCreatesFactoryInDataProviderWithOneToManyCases(): iterable
+    {
+        yield [
+            CategoryFactory::new([
+                'contacts' => ContactFactory::new()->sequence([['name' => 'foo'], ['name' => 'bar']]),
+            ])->withoutPersisting(),
+        ];
+    }
+
     /** @return PersistentObjectFactory<Contact> */
     protected static function contactFactoryWithoutCategory(): PersistentObjectFactory
     {
