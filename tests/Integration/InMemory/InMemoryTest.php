@@ -18,6 +18,7 @@ use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Attribute\WithStory;
 use Zenstruck\Foundry\InMemory\AsInMemoryTest;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Test\Factories;
@@ -25,11 +26,14 @@ use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Address;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
+use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\AddressFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\InMemory\InMemoryAddressRepository;
 use Zenstruck\Foundry\Tests\Fixture\InMemory\InMemoryContactRepository;
+use Zenstruck\Foundry\Tests\Fixture\Stories\EntityStory;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 /**
@@ -173,5 +177,14 @@ final class InMemoryTest extends KernelTestCase
 
         self::assertCount(1, ContactFactory::repository());
         self::assertCount(1, AddressFactory::repository());
+    }
+
+    #[Test]
+    #[WithStory(EntityStory::class)]
+    public function can_use_with_story_and_in_memory(): void
+    {
+        GenericEntityFactory::repository()->assert()->count(2);
+
+        self::assertSame(0, $this->entityManager->getRepository(GenericEntity::class)->count([]));
     }
 }

@@ -89,30 +89,28 @@ final class DataProviderWithInMemoryTest extends KernelTestCase
         }
     }
 
-    // todo: fixMe !
-    //    #[Test]
-    //    #[DataProvider('provideContact')]
-    //    #[AsInMemoryTest]
-    //    public function it_can_create_in_memory_objects_in_data_provider(?Contact $contact = null): void
-    //    {
-    //        self::assertInstanceOf(Contact::class, $contact);
-    //
-    //        if (TestKernel::canUseLegacyProxy()) {
-    //            self::assertSame([ProxyGenerator::unwrap($contact)], $this->contactRepository->_all());
-    //        } else {
-    //            self::assertSame([$contact], $this->contactRepository->_all());
-    //        }
-    //
-    //        self::assertSame(0, $this->entityManager->getRepository(Contact::class)->count());
-    //    }
-    //
-    //    public static function provideContact(): iterable
-    //    {
-    //        if (!TestKernel::canUseLegacyProxy()) {
-    //            yield [];
-    //            return;
-    //        }
-    //
-    //        yield [ProxyContactFactory::createOne()];
-    //    }
+    #[Test]
+    #[DataProvider('provideContact')]
+    #[AsInMemoryTest]
+    public function it_can_create_in_memory_objects_in_data_provider(?Contact $contact = null): void
+    {
+        self::assertInstanceOf(Contact::class, $contact);
+
+        if (TestKernel::canUseLegacyProxy()) {
+            self::assertSame([ProxyGenerator::unwrap($contact)], $this->contactRepository->_all());
+        } else {
+            self::assertSame([$contact], $this->contactRepository->_all());
+        }
+
+        self::assertSame(0, $this->entityManager->getRepository(Contact::class)->count());
+    }
+
+    public static function provideContact(): iterable
+    {
+        yield [ContactFactory::createOne()];
+
+        if (TestKernel::canUseLegacyProxy()) {
+            yield [ProxyContactFactory::createOne()];
+        }
+    }
 }
