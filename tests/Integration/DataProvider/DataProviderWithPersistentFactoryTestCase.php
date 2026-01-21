@@ -224,7 +224,7 @@ abstract class DataProviderWithPersistentFactoryTestCase extends KernelTestCase
         yield [
             static::factory()
                 ->afterPersist(fn(GenericModel $object) => $object->setProp1('after persist callback'))
-                ->create()
+                ->create(),
         ];
     }
 

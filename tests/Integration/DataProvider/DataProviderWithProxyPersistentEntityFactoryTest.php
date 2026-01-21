@@ -24,14 +24,13 @@ use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Persistence\ProxyGenerator;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
-use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithReadonly\EntityWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericProxyEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Model\Embeddable;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
-use function Zenstruck\Foundry\Persistence\persistent_factory;
+
 use function Zenstruck\Foundry\Persistence\proxy_factory;
 
 /**

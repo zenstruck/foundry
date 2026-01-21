@@ -81,7 +81,7 @@ final class ProxyGenerator
             $factory
                 // small hack to instantiate into the ghost object
                 ->instantiateWith(
-                    static function (array $parameters, string $class) use ($instantiator, $ghost): object {
+                    static function(array $parameters, string $class) use ($instantiator, $ghost): object {
                         $object = $instantiator($parameters, $class);
                         Hydrator::hydrateFromOtherObject($ghost, $object);
 

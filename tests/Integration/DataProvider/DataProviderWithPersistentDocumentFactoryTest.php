@@ -21,6 +21,7 @@ use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericDocumentFactory;
 use Zenstruck\Foundry\Tests\Fixture\Model\Embeddable;
 use Zenstruck\Foundry\Tests\Integration\RequiresMongo;
+
 use function Zenstruck\Foundry\Persistence\persistent_factory;
 
 /**
