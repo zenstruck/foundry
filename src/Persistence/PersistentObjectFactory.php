@@ -241,9 +241,8 @@ abstract class PersistentObjectFactory extends ObjectFactory
         if ($configuration->inADataProvider()
             && \PHP_VERSION_ID >= 80400
             && $this->isPersisting()
-            && !$this instanceof PersistentProxyObjectFactory
         ) {
-            return ProxyGenerator::wrapFactoryNativeProxy($this, $attributes);
+            return ProxyGenerator::wrapFactory($this->with($attributes));
         }
 
         $object = parent::create($attributes);
