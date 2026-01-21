@@ -76,13 +76,18 @@ final class ProxyGenerator
                 throw new \LogicException('Cannot access to a persisted object inside a data provider.');
             }
 
-            $createdObject = $factory->withoutPersisting()->create();
+            $instantiator = $factory->instantiator();
 
-            Hydrator::hydrateFromOtherObject($ghost, $createdObject);
+            $factory
+                // small hack to instantiate into the ghost object
+                ->instantiateWith(
+                    static function (array $parameters, string $class) use ($instantiator, $ghost): object {
+                        $object = $instantiator($parameters, $class);
+                        Hydrator::hydrateFromOtherObject($ghost, $object);
 
-            if ($factory->isPersisting()) {
-                Configuration::instance()->persistence()->save($ghost);
-            }
+                        return $ghost;
+                    }
+                )->create();
         });
     }
 

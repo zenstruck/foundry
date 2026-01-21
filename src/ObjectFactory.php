@@ -11,8 +11,10 @@
 
 namespace Zenstruck\Foundry;
 
+use Zenstruck\Assert;
 use Zenstruck\Foundry\Object\Event\AfterInstantiate;
 use Zenstruck\Foundry\Object\Event\BeforeInstantiate;
+use Zenstruck\Foundry\Object\Hydrator;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Persistence\ProxyGenerator;
 
@@ -83,6 +85,15 @@ abstract class ObjectFactory extends Factory
         $clone->instantiator = $instantiator;
 
         return $clone;
+    }
+
+    /**
+     * @internal
+     * @phpstan-return InstantiatorCallable
+     */
+    final public function instantiator(): callable
+    {
+        return $this->instantiator ?? Configuration::instance()->instantiator;
     }
 
     /**
