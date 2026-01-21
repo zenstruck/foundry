@@ -13,6 +13,7 @@ namespace Zenstruck\Foundry\Persistence;
 
 use Doctrine\Persistence\ObjectRepository;
 use Symfony\Component\VarExporter\Exception\LogicException as VarExportLogicException;
+use Zenstruck\Assert;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\FoundryNotBooted;
 use Zenstruck\Foundry\Exception\PersistenceDisabled;
@@ -240,7 +241,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
         if ($configuration->inADataProvider()
             && \PHP_VERSION_ID >= 80400
-            && $this->isPersisting()
+            && ($this->isPersisting() || $configuration->isInMemoryEnabled())
         ) {
             return ProxyGenerator::wrapFactory($this->with($attributes));
         }

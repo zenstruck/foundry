@@ -17,8 +17,11 @@ use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
+use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericDocumentFactory;
+use Zenstruck\Foundry\Tests\Fixture\Model\Embeddable;
 use Zenstruck\Foundry\Tests\Integration\RequiresMongo;
+use function Zenstruck\Foundry\Persistence\persistent_factory;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
@@ -35,5 +38,17 @@ final class DataProviderWithPersistentDocumentFactoryTest extends DataProviderWi
     protected static function factory(): PersistentObjectFactory
     {
         return GenericDocumentFactory::new();
+    }
+
+    /**
+     * @return PersistentObjectFactory<DocumentWithReadonly>
+     */
+    protected static function objectWithReadonlyFactory(): PersistentObjectFactory
+    {
+        return persistent_factory(DocumentWithReadonly::class, [
+            'prop' => 1,
+            'embedded' => new Embeddable('value1'),
+            'date' => new \DateTimeImmutable(),
+        ]);
     }
 }

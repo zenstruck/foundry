@@ -17,6 +17,8 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\ProxyGenerator;
 use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithReadonly;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithReadonly\EntityWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
 
@@ -208,28 +210,45 @@ abstract class DataProviderWithPersistentFactoryTestCase extends KernelTestCase
         ];
     }
 
-    // todo: FixMe! this is a known bug, currently the afterPersist callback is not called when creating objects in data provider
-    //
-    //    #[Test]
-    //    #[DataProvider('createOneObjectInDataProviderWithAfterPersistCallback')]
-    //    public function assert_after_persist_callbacks_are_triggered(?GenericModel $providedData): void
-    //    {
-    //        static::factory()::assert()->count(1);
-    //
-    //        self::assertSame('after persist callback', $providedData->getProp1());
-    //    }
-    //
-    //    public static function createOneObjectInDataProviderWithAfterPersistCallback(): iterable
-    //    {
-    //        yield [
-    //            static::factory()
-    //                ->afterPersist(fn(GenericModel $object) => $object->setProp1('after persist callback'))
-    //                ->create()
-    //        ];
-    //    }
+    #[Test]
+    #[DataProvider('createOneObjectInDataProviderWithAfterPersistCallback')]
+    public function assert_after_persist_callbacks_are_triggered(?GenericModel $providedData): void
+    {
+        static::factory()::assert()->count(1);
+
+        self::assertSame('after persist callback', $providedData?->getProp1());
+    }
+
+    public static function createOneObjectInDataProviderWithAfterPersistCallback(): iterable
+    {
+        yield [
+            static::factory()
+                ->afterPersist(fn(GenericModel $object) => $object->setProp1('after persist callback'))
+                ->create()
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('createObjectWithReadonlyProperties')]
+    public function assert_it_can_create_objects_with_readonly_properties(DocumentWithReadonly|EntityWithReadonly|null $providedData): void
+    {
+        static::objectWithReadonlyFactory()::assert()->count(1);
+
+        self::assertSame(1, $providedData?->prop);
+    }
+
+    public static function createObjectWithReadonlyProperties(): iterable
+    {
+        yield [static::objectWithReadonlyFactory()->create()];
+    }
 
     /**
      * @return PersistentObjectFactory<GenericModel>
      */
     abstract protected static function factory(): PersistentObjectFactory;
+
+    /**
+     * @return PersistentObjectFactory<DocumentWithReadonly|EntityWithReadonly>
+     */
+    abstract protected static function objectWithReadonlyFactory(): PersistentObjectFactory;
 }
