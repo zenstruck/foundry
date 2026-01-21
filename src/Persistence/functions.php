@@ -229,25 +229,3 @@ function assert_not_persisted(object $object, string $message = '{entity} is per
 
     return $object;
 }
-
-/**
- * @internal
- */
-function initialize_proxy_object(mixed $what): void
-{
-    if (
-        \PHP_VERSION_ID >= 80400
-        && \is_object($what)
-        && ($reflector = new \ReflectionClass($what))->isUninitializedLazyObject($what)
-    ) {
-        $reflector->initializeLazyObject($what);
-
-        return;
-    }
-
-    match (true) {
-        $what instanceof Proxy => $what->_initializeLazyObject(),
-        \is_array($what) => \array_map(initialize_proxy_object(...), $what),
-        default => true, // do nothing
-    };
-}

@@ -17,6 +17,7 @@ use Symfony\Component\VarExporter\LazyProxyTrait;
 use Symfony\Component\VarExporter\ProxyHelper;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\Object\Hydrator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -70,14 +71,18 @@ final class ProxyGenerator
             throw new \LogicException('Native proxy generation requires PHP 8.4 or higher.');
         }
 
-        $reflector = new \ReflectionClass($factory::class());
-
-        return $reflector->newLazyProxy(static function() use ($factory) {
+        return (new \ReflectionClass($factory::class()))->newLazyGhost(static function(object $ghost) use ($factory): void {
             if (Configuration::instance()->inADataProvider() && $factory->isPersisting()) {
                 throw new \LogicException('Cannot access to a persisted object inside a data provider.');
             }
 
-            return $factory->create();
+            $createdObject = $factory->withoutPersisting()->create();
+
+            Hydrator::hydrateFromOtherObject($ghost, $createdObject);
+
+            if ($factory->isPersisting()) {
+                Configuration::instance()->persistence()->save($ghost);
+            }
         });
     }
 

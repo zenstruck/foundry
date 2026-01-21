@@ -12,11 +12,12 @@
 namespace Zenstruck\Foundry\Tests\Integration\DataProvider;
 
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
-use Zenstruck\Foundry\Tests\Integration\RequiresORM;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericProxyDocumentFactory;
+use Zenstruck\Foundry\Tests\Integration\RequiresMongo;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
@@ -25,12 +26,13 @@ use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 #[RequiresPhpunit('>=11.4')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 #[IgnoreDeprecations]
-final class GenericEntityFactoryTest extends DataProviderWithPersistentFactoryAndPHP84InKernelTestCase
+#[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
+final class DataProviderWithProxyPersistentDocumentFactoryTest extends DataProviderWithPersistentFactoryTestCase
 {
-    use RequiresORM;
+    use RequiresMongo;
 
-    protected static function factory(): GenericEntityFactory
+    protected static function factory(): GenericProxyDocumentFactory
     {
-        return GenericEntityFactory::new();
+        return GenericProxyDocumentFactory::new();
     }
 }
