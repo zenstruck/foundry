@@ -12,12 +12,10 @@
 namespace Zenstruck\Foundry\PHPUnit;
 
 use PHPUnit\Event;
-use PHPUnit\Event\Code\NoTestCaseObjectOnCallStackException;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Util\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
-use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Test\UnitTestConfig;
 
 /**
