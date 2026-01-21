@@ -57,7 +57,7 @@ final class ProxyGenerator
     public static function wrapFactory(PersistentObjectFactory $factory): object
     {
         if ($factory instanceof PersistentProxyObjectFactory) {
-            return self::generateClassFor($factory)::createLazyProxy(static function () use ($factory) { // @phpstan-ignore staticMethod.notFound
+            return self::generateClassFor($factory)::createLazyProxy(static function() use ($factory) { // @phpstan-ignore staticMethod.notFound
                 if (Configuration::instance()->inADataProvider() && $factory->isPersisting()) {
                     throw new \LogicException('Cannot access to a persisted object inside a data provider.');
                 }
@@ -72,7 +72,7 @@ final class ProxyGenerator
 
         $reflector = new \ReflectionClass($factory::class());
 
-        return $reflector->newLazyProxy(static function () use ($factory) {
+        return $reflector->newLazyProxy(static function() use ($factory) {
             if (Configuration::instance()->inADataProvider() && $factory->isPersisting()) {
                 throw new \LogicException('Cannot access to a persisted object inside a data provider.');
             }
