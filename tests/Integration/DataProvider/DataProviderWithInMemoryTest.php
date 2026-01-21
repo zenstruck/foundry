@@ -94,7 +94,6 @@ final class DataProviderWithInMemoryTest extends KernelTestCase
     //    #[Test]
     //    #[DataProvider('provideContact')]
     //    #[AsInMemoryTest]
-    //    #[Group('legacy-proxy')]
     //    public function it_can_create_in_memory_objects_in_data_provider(?Contact $contact = null): void
     //    {
     //        self::assertInstanceOf(Contact::class, $contact);

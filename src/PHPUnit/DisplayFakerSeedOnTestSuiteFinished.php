@@ -17,6 +17,10 @@ use PHPUnit\Event\TestRunner\Finished;
 use PHPUnit\Event\TestRunner\FinishedSubscriber;
 use Zenstruck\Foundry\Configuration;
 
+/**
+ * @internal
+ * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ */
 final class DisplayFakerSeedOnTestSuiteFinished implements FinishedSubscriber
 {
     public function notify(Finished $event): void
