@@ -35,8 +35,8 @@ final class FoundryExtension implements Runner\Extension\Extension
         }
 
         $subscribers = [
+            new EnableInMemoryOnTestPrepared(),
             new BuildStoryOnTestPrepared(),
-            new EnableInMemoryBeforeTest(),
             new DisplayFakerSeedOnTestSuiteFinished(),
         ];
 

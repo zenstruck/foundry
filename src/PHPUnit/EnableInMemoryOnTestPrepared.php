@@ -19,7 +19,11 @@ use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\InMemory\AsInMemoryTest;
 use Zenstruck\Foundry\InMemory\CannotEnableInMemory;
 
-final class EnableInMemoryBeforeTest implements Event\Test\PreparedSubscriber
+/**
+ * @internal
+ * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ */
+final class EnableInMemoryOnTestPrepared implements Event\Test\PreparedSubscriber
 {
     public function notify(Event\Test\Prepared $event): void
     {

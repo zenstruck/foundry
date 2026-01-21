@@ -17,16 +17,6 @@ check_phpunit_version() {
     fi
 }
 
-can_use_legacy_proxies() {
-    INSTALLED_SYMFONY_VERSION=$(${COMPOSER_BIN} info symfony/var-exporter | grep versions |  cut -c 15-)
-
-    if [[ "${INSTALLED_SYMFONY_VERSION}" == "8"* ]]; then
-      echo 0;
-    else
-      echo 1;
-    fi
-}
-
 ### >> load env vars from .env files if not in CI and not from a composer script
 if [ -z "${CI:-}" ] ; then
   source .env
