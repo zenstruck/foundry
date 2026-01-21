@@ -16,7 +16,6 @@ namespace Zenstruck\Foundry\PHPUnit;
 use PHPUnit\Event;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Attribute\WithStory;
-use Zenstruck\Foundry\Exception\FactoriesTraitNotUsed;
 
 /**
  * @internal
@@ -46,8 +45,6 @@ final class BuildStoryOnTestPrepared implements Event\Test\PreparedSubscriber
         if (!\is_subclass_of($test->className(), KernelTestCase::class)) {
             throw new \InvalidArgumentException(\sprintf('The test class "%s" must extend "%s" to use the "%s" attribute.', $test->className(), KernelTestCase::class, WithStory::class));
         }
-
-        FactoriesTraitNotUsed::throwIfClassDoesNotHaveFactoriesTrait($test->className());
 
         foreach ($withStoryAttributes as $withStoryAttribute) {
             $withStoryAttribute->newInstance()->story::load();

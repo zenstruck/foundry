@@ -22,6 +22,8 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 #[RequiresPhpunit('>=11.0')]
 final class UnitTestCaseWithoutFactoriesTraitTest extends TestCase
 {
+    use SkipWithPHPUnitExtension;
+
     #[Test]
     public function should_throw(): void
     {
