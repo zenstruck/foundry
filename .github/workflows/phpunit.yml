@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   tests:
-    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}, PU:${{ matrix.phpunit }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.use-phpunit-extension == 1 && ' (phpunit extension)' || '' }}${{ (matrix.use-php-84-lazy-objects != 1 || matrix.php != '8.4') && ' (legacy proxy)' || '' }}
+    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}, PU:${{ matrix.phpunit }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.use-phpunit-extension == 0 && ' (no phpunit extension)' || '' }}${{ (matrix.use-php-84-lazy-objects != 1 || matrix.php != '8.4') && ' (legacy proxy)' || '' }}${{ matrix.use-dama == 0 && ' (no dama)' || '' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -30,11 +30,12 @@ jobs:
         symfony: [ 6.4.*, 7.4.*, 8.0.* ]
         database: [ mysql|mongo ]
         phpunit: [ 11, 12 ]
-        use-php-84-lazy-objects: [ 1 ]
+        use-dama: [ 1 ]
 
         # default values:
         # deps: [ highest ]
-        # use-phpunit-extension: [ 0 ]
+        # use-phpunit-extension: [ 1 ]
+        # use-php-84-lazy-objects: [ 1 ]
 
         exclude:
           - {php: 8.2, phpunit: 12}
@@ -46,16 +47,16 @@ jobs:
 
         include:
           # old php versions
-          - {php: 8.1, symfony: 6.4.*, phpunit: 9, database: mysql}
-          - {php: 8.2, symfony: 6.4.*, phpunit: 9, database: mysql}
+          - {php: 8.1, symfony: 6.4.*, phpunit: 9, database: mysql, use-phpunit-extension: 0}
+          - {php: 8.2, symfony: 6.4.*, phpunit: 9, database: mysql, use-phpunit-extension: 0}
 
           # old PHPUnit versions
-          - {php: 8.3, symfony: 7.4.*, phpunit: 9, database: mysql}
-          - {php: 8.4, symfony: 7.4.*, phpunit: 11, database: mysql}
+          - {php: 8.3, symfony: 7.4.*, phpunit: 9, database: mysql, use-phpunit-extension: 0}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 10, database: mysql, use-phpunit-extension: 0}
 
           # test with no database (PHPUnit 9 is used to prevent some problems with empty data providers)
-          - {php: 8.3, symfony: 7.4.*, phpunit: 9, database: none}
-          - {php: 8.3, symfony: 7.4.*, phpunit: 9, database: none, deps: lowest}
+          - {php: 8.3, symfony: 7.4.*, phpunit: 9, database: none, use-phpunit-extension: 0}
+          - {php: 8.3, symfony: 7.4.*, phpunit: 9, database: none, deps: lowest, use-phpunit-extension: 0}
 
           # One permutation per DBMS
           - {php: 8.4, symfony: 7.4.*, phpunit: 12, database: mongo}
@@ -64,24 +65,26 @@ jobs:
           - {php: 8.4, symfony: 7.4.*, phpunit: 12, database: mysql}
 
           # lowest deps (one per DBMS)
-          - {php: 8.3, symfony: 6.4.*, phpunit: 9, database: mysql|mongo, deps: lowest}
-          - {php: 8.3, symfony: 6.4.*, phpunit: 9, database: mongo, deps: lowest}
-          - {php: 8.3, symfony: 6.4.*, phpunit: 9, database: pgsql, deps: lowest}
-          - {php: 8.3, symfony: 6.4.*, phpunit: 9, database: sqlite, deps: lowest}
-          - {php: 8.3, symfony: 6.4.*, phpunit: 9, database: mysql, deps: lowest}
+          - {php: 8.3, symfony: 6.4.*, phpunit: 9, database: mysql|mongo, deps: lowest, use-phpunit-extension: 0}
+          - {php: 8.3, symfony: 6.4.*, phpunit: 9, database: mongo, deps: lowest, use-phpunit-extension: 0}
+          - {php: 8.3, symfony: 6.4.*, phpunit: 9, database: pgsql, deps: lowest, use-phpunit-extension: 0}
+          - {php: 8.3, symfony: 6.4.*, phpunit: 9, database: sqlite, deps: lowest, use-phpunit-extension: 0}
+          - {php: 8.3, symfony: 6.4.*, phpunit: 9, database: mysql, deps: lowest, use-phpunit-extension: 0}
 
           # Lowest deps with PHP 8.4 & lazy objects
           - {php: 8.4, symfony: 6.4.*, phpunit: 12, database: mysql|mongo, deps: lowest}
 
-          # using Foundry's PHPUnit extension
-          - {php: 8.4, symfony: 7.4.*, phpunit: 12, database: mysql|mongo, use-phpunit-extension: 1}
+          # Disable Foundry's PHPUnit extension and/or dama
+          - {php: 8.4, symfony: 7.4.*, phpunit: 12, database: mysql|mongo, use-phpunit-extension: 0}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 12, database: mysql, use-phpunit-extension: 0, use-dama: 0}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 12, database: mysql, use-dama: 0}
 
           # disable lazy objects in PHP 8.4
           - {php: 8.4, symfony: 7.4.*, phpunit: 12, database: mysql|mongo, use-php-84-lazy-objects: 0}
     env:
       DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || contains(matrix.database, 'sqlite') && 'sqlite:///%kernel.project_dir%/var/data.db' || '' }}
       MONGO_URL: ${{ contains(matrix.database, 'mongo') && 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb' || '' }}
-      USE_DAMA_DOCTRINE_TEST_BUNDLE: ${{ contains(matrix.database, 'sql') && 1 || 0 }}
+      USE_DAMA_DOCTRINE_TEST_BUNDLE: ${{ contains(matrix.database, 'sql') && matrix.use-dama != 0 && 1 || 0 }}
       USE_FOUNDRY_PHPUNIT_EXTENSION: ${{ matrix.use-phpunit-extension || 0 }}
       USE_PHP_84_LAZY_OBJECTS: ${{ matrix.use-php-84-lazy-objects }}
       PHPUNIT_VERSION: ${{ matrix.phpunit }}
@@ -249,7 +252,7 @@ jobs:
 
       - name: Test
         run: |
-          vendor/bin/phpunit tests/Unit --exclude-group legacy-proxy
+          vendor/bin/phpunit tests/Unit
 
   test-with-paratest:
     name: Test with paratest
