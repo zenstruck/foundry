@@ -3,7 +3,6 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          colors="true"
-         bootstrap="utils/rector/tests/bootstrap.php"
          failOnRisky="true"
          failOnWarning="true">
 
@@ -14,8 +13,12 @@
     </php>
 
     <testsuites>
-        <testsuite name="Rector">
+        <testsuite name="Rector" bootstrap="utils/rector/tests/bootstrap.php">
             <directory>./utils/rector/tests/</directory>
+        </testsuite>
+        <testsuite name="Phpstan" bootstrap="utils/phpstan/tests/bootstrap.php">
+            <directory>./utils/phpstan/tests/</directory>
         </testsuite>
     </testsuites>
 </phpunit>
+

@@ -1,0 +1,16 @@
+parameters:
+	foundry:
+		cannotCallStaticCreateMethodOnFactoryInstance: true
+
+parametersSchema:
+	foundry: structure([
+		cannotCallStaticCreateMethodOnFactoryInstance: anyOf(bool(), arrayOf(bool()))
+	])
+
+conditionalTags:
+	Zenstruck\Foundry\Utils\PHPStan\CannotCallStaticCreateMethodOnFactoryInstanceRule:
+		phpstan.rules.rule: %foundry.cannotCallStaticCreateMethodOnFactoryInstance%
+
+services:
+	-
+		class: Zenstruck\Foundry\Utils\PHPStan\CannotCallStaticCreateMethodOnFactoryInstanceRule
