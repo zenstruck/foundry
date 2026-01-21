@@ -62,7 +62,7 @@ if (\interface_exists(Runner\Extension\Extension::class)) {
 
         public static function shouldBeEnabled(): bool
         {
-            return defined('PHPUNIT_COMPOSER_INSTALL') && !self::isEnabled() && ConstraintRequirement::from('>=10')->isSatisfiedBy(Runner\Version::id());
+            return \defined('PHPUNIT_COMPOSER_INSTALL') && !self::isEnabled() && ConstraintRequirement::from('>=10')->isSatisfiedBy(Runner\Version::id());
         }
 
         public static function isEnabled(): bool

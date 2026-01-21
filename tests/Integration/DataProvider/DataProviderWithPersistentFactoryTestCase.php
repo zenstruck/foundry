@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Tests\Integration\DataProvider;
 
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -10,6 +19,7 @@ use Zenstruck\Foundry\Persistence\ProxyGenerator;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
+
 use function Zenstruck\Foundry\Persistence\assert_persisted;
 
 abstract class DataProviderWithPersistentFactoryTestCase extends KernelTestCase
@@ -102,11 +112,11 @@ abstract class DataProviderWithPersistentFactoryTestCase extends KernelTestCase
         ];
 
         yield 'createMany()' => [
-            static::factory()::createMany(2, static fn(int $i) => ['prop1' => "prop $i"]),
+            static::factory()::createMany(2, static fn(int $i) => ['prop1' => "prop {$i}"]),
         ];
 
         yield 'many()->create()' => [
-            static::factory()->many(2)->create(static fn(int $i) => ['prop1' => "prop $i"]),
+            static::factory()->many(2)->create(static fn(int $i) => ['prop1' => "prop {$i}"]),
         ];
     }
 
@@ -198,25 +208,25 @@ abstract class DataProviderWithPersistentFactoryTestCase extends KernelTestCase
         ];
     }
 
-// todo: FixMe! this is a known bug, currently the afterPersist callback is not called when creating objects in data provider
-//
-//    #[Test]
-//    #[DataProvider('createOneObjectInDataProviderWithAfterPersistCallback')]
-//    public function assert_after_persist_callbacks_are_triggered(?GenericModel $providedData): void
-//    {
-//        static::factory()::assert()->count(1);
-//
-//        self::assertSame('after persist callback', $providedData->getProp1());
-//    }
-//
-//    public static function createOneObjectInDataProviderWithAfterPersistCallback(): iterable
-//    {
-//        yield [
-//            static::factory()
-//                ->afterPersist(fn(GenericModel $object) => $object->setProp1('after persist callback'))
-//                ->create()
-//        ];
-//    }
+    // todo: FixMe! this is a known bug, currently the afterPersist callback is not called when creating objects in data provider
+    //
+    //    #[Test]
+    //    #[DataProvider('createOneObjectInDataProviderWithAfterPersistCallback')]
+    //    public function assert_after_persist_callbacks_are_triggered(?GenericModel $providedData): void
+    //    {
+    //        static::factory()::assert()->count(1);
+    //
+    //        self::assertSame('after persist callback', $providedData->getProp1());
+    //    }
+    //
+    //    public static function createOneObjectInDataProviderWithAfterPersistCallback(): iterable
+    //    {
+    //        yield [
+    //            static::factory()
+    //                ->afterPersist(fn(GenericModel $object) => $object->setProp1('after persist callback'))
+    //                ->create()
+    //        ];
+    //    }
 
     /**
      * @return PersistentObjectFactory<GenericModel>
