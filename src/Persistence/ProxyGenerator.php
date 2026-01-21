@@ -50,44 +50,34 @@ final class ProxyGenerator
     /**
      * @template T of object
      *
-     * @param PersistentProxyObjectFactory<T> $factory
-     * @phpstan-param Attributes $attributes
-     *
-     * @return T&Proxy<T>
-     */
-    public static function wrapFactory(PersistentProxyObjectFactory $factory, callable|array $attributes): Proxy
-    {
-        return self::generateClassFor($factory)::createLazyProxy(static function() use ($factory, $attributes) { // @phpstan-ignore staticMethod.notFound
-            if (Configuration::instance()->inADataProvider() && $factory->isPersisting()) {
-                throw new \LogicException('Cannot access to a persisted object from a data provider.');
-            }
-
-            return self::unwrap($factory->create($attributes));
-        });
-    }
-
-    /**
-     * @template T of object
-     *
      * @param PersistentObjectFactory<T> $factory
-     * @phpstan-param Attributes $attributes
      *
-     * @return T
+     * @return ($factory is PersistentProxyObjectFactory<T> ? T&Proxy<T> : T)
      */
-    public static function wrapFactoryNativeProxy(PersistentObjectFactory $factory, callable|array $attributes): object
+    public static function wrapFactory(PersistentObjectFactory $factory): object
     {
+        if ($factory instanceof PersistentProxyObjectFactory) {
+            return self::generateClassFor($factory)::createLazyProxy(static function () use ($factory) { // @phpstan-ignore staticMethod.notFound
+                if (Configuration::instance()->inADataProvider() && $factory->isPersisting()) {
+                    throw new \LogicException('Cannot access to a persisted object inside a data provider.');
+                }
+
+                return ProxyGenerator::unwrap($factory->create());
+            });
+        }
+
         if (\PHP_VERSION_ID < 80400) {
             throw new \LogicException('Native proxy generation requires PHP 8.4 or higher.');
         }
 
         $reflector = new \ReflectionClass($factory::class());
 
-        return $reflector->newLazyProxy(static function() use ($factory, $attributes) {
+        return $reflector->newLazyProxy(static function () use ($factory) {
             if (Configuration::instance()->inADataProvider() && $factory->isPersisting()) {
-                throw new \LogicException('Cannot access to a persisted object from a data provider.');
+                throw new \LogicException('Cannot access to a persisted object inside a data provider.');
             }
 
-            return $factory->create($attributes);
+            return $factory->create();
         });
     }
 
