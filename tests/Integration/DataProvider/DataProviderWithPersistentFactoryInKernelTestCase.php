@@ -101,7 +101,7 @@ abstract class DataProviderWithPersistentFactoryInKernelTestCase extends KernelT
     public function assert_using_getter_proxy_object_created_in_a_data_provider_throws(?\Throwable $e): void
     {
         self::assertInstanceOf(\LogicException::class, $e);
-        self::assertStringStartsWith('Cannot access to a persisted object from a data provider.', $e->getMessage());
+        self::assertStringStartsWith('Cannot access to a persisted object inside a data provider.', $e->getMessage());
     }
 
     public static function useGetterOnProxyObjectCreatedInDataProvider(): iterable
