@@ -15,9 +15,15 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
+use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithReadonly;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithReadonly\EntityWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericProxyDocumentFactory;
+use Zenstruck\Foundry\Tests\Fixture\Model\Embeddable;
 use Zenstruck\Foundry\Tests\Integration\RequiresMongo;
+use function Zenstruck\Foundry\Persistence\proxy_factory;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
@@ -34,5 +40,17 @@ final class DataProviderWithProxyPersistentDocumentFactoryTest extends DataProvi
     protected static function factory(): GenericProxyDocumentFactory
     {
         return GenericProxyDocumentFactory::new();
+    }
+
+    /**
+     * @return PersistentProxyObjectFactory<DocumentWithReadonly>
+     */
+    protected static function objectWithReadonlyFactory(): PersistentObjectFactory
+    {
+        return proxy_factory(DocumentWithReadonly::class, [
+            'prop' => 1,
+            'embedded' => new Embeddable('value1'),
+            'date' => new \DateTimeImmutable(),
+        ]);
     }
 }

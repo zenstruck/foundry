@@ -177,6 +177,24 @@ abstract class AutoRefreshTestCase extends WebTestCase
     }
 
     #[Test]
+    public function it_can_refresh_readonly_object(): void
+    {
+        $object = $this->objectWithReadonlyFactory()->create([
+            'prop' => 1,
+            'embedded' => new Embeddable('value1'),
+            'date' => new \DateTimeImmutable(),
+        ]);
+        $objectId = $object->id;
+
+        self::getContainer()->get('services_resetter')->reset(); // @phpstan-ignore method.notFound
+        self::assertTrue((new \ReflectionClass($object))->isUninitializedLazyObject($object));
+
+        $this->updateObject($objectId);
+
+        self::assertSame(1, $object->prop);
+    }
+
+    #[Test]
     #[TestWith(['deleteDirectlyInDb' => false, 'clearOM' => true])]
     #[TestWith(['deleteDirectlyInDb' => false, 'clearOM' => false])]
     #[TestWith(['deleteDirectlyInDb' => true, 'clearOM' => true])]

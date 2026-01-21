@@ -21,7 +21,7 @@ class EntityWithReadonly
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    public int $id;
+    public ?int $id = null;
 
     public function __construct(
         #[ORM\Column()]
