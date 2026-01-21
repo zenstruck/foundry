@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the zenstruck/foundry package.
  *
@@ -11,9 +9,11 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\PHPUnit;
+namespace Zenstruck\Foundry\PHPUnit\DataProvider;
 
 use PHPUnit\Event;
+use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\PHPUnit\KernelTestCaseHelper;
 
 /**
  * @internal
@@ -23,8 +23,8 @@ final class ShutdownFoundryOnDataProviderMethodFinished implements Event\Test\Da
 {
     public function notify(Event\Test\DataProviderMethodFinished $event): void
     {
-        if (\method_exists($event->testMethod()->className(), '_shutdownAfterDataProvider')) {
-            $event->testMethod()->className()::_shutdownAfterDataProvider();
-        }
+        KernelTestCaseHelper::tearDownClass($event->testMethod()->className());
+
+        Configuration::shutdown();
     }
 }

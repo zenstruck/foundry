@@ -13,6 +13,15 @@ namespace Zenstruck\Foundry\Utils\Rector;
 
 final class FoundrySetList
 {
+    /**
+     * @deprecated use FoundrySetList::FOUNDRY_2_7
+     * @var string
+     */
+    public const REMOVE_PROXIES = self::FOUNDRY_2_7;
+
     /** @var string */
-    public const REMOVE_PROXIES = __DIR__.'/../config/foundry-set.php';
+    public const FOUNDRY_2_7 = __DIR__.'/../config/foundry-2.7.php';
+
+    /** @var string */
+    public const FOUNDRY_2_9 = __DIR__.'/../config/foundry-2.9.php';
 }

@@ -52,7 +52,7 @@ return RectorConfig::configure()
         'src',
         'tests'
     ])
-    ->withSets([FoundrySetList::REMOVE_PROXIES])
+    ->withSets([FoundrySetList::FOUNDRY_2_7])
 ;
 ```
 

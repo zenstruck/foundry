@@ -18,6 +18,8 @@ use Zenstruck\Foundry\Persistence\Proxy;
 
 abstract class AnotherBaseTestCase extends KernelTestCase
 {
+    use SkipWithPHPUnitExtension;
+
     // @phpstan-ignore missingType.generics
     public function useProxyClass(Proxy $proxy): void
     {

@@ -27,7 +27,7 @@ use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 final class WebTestCaseWithBothTraitsInWrongOrderTest extends WebTestCase
 {
     // traits are in a different order than usual on purpose (ResetDatabase must be first)
-    use ResetDatabase, Factories, RequiresORM;
+    use ResetDatabase, Factories, RequiresORM, SkipWithPHPUnitExtension;
 
     #[Test]
     public function should_not_throw(): void

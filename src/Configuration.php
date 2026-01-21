@@ -21,6 +21,7 @@ use Zenstruck\Foundry\InMemory\CannotEnableInMemory;
 use Zenstruck\Foundry\InMemory\InMemoryRepositoryRegistry;
 use Zenstruck\Foundry\Persistence\PersistedObjectsTracker;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
+use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -117,7 +118,9 @@ final class Configuration
             throw new FoundryNotBooted();
         }
 
-        FactoriesTraitNotUsed::throwIfComingFromKernelTestCaseWithoutFactoriesTrait();
+        if (!FoundryExtension::isEnabled()) {
+            FactoriesTraitNotUsed::throwIfComingFromKernelTestCaseWithoutFactoriesTrait();
+        }
 
         return \is_callable(self::$instance) ? (self::$instance)() : self::$instance;
     }
