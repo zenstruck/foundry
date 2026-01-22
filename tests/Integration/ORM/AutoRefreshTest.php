@@ -35,7 +35,6 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Integration\Persistence\AutoRefreshTestCase;
-use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 use function Zenstruck\Foundry\Persistence\persistent_factory;
 use function Zenstruck\Foundry\Persistence\refresh_all;
@@ -43,12 +42,13 @@ use function Zenstruck\Foundry\Persistence\refresh_all;
 /**
  * @requires PHPUnit >=12
  */
+#[RequiresPhp('>= 8.4')]
 #[RequiresPhpunit('>=12')]
 #[RequiresEnvironmentVariable('USE_PHP_84_LAZY_OBJECTS', '1')]
-#[RequiresPhp('>= 8.4')]
+#[RequiresEnvironmentVariable('DATABASE_URL')]
 final class AutoRefreshTest extends AutoRefreshTestCase
 {
-    use ChangesEntityRelationshipCascadePersist, RequiresORM;
+    use ChangesEntityRelationshipCascadePersist;
 
     #[Test]
     public function tracker_keeps_reference_only_for_objects_in_current_scope(): void

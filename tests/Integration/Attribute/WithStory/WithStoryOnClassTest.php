@@ -19,7 +19,6 @@ use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Attribute\WithStory;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
-use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\EntityPoolStory;
@@ -35,7 +34,7 @@ use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 #[WithStory(EntityStory::class)]
 final class WithStoryOnClassTest extends KernelTestCase
 {
-    use Factories, RequiresORM, ResetDatabase;
+    use RequiresORM, ResetDatabase;
 
     #[Test]
     public function can_use_story_in_attribute(): void

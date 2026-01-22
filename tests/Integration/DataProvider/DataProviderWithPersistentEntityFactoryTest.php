@@ -20,7 +20,6 @@ use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithReadonly\EntityWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Model\Embeddable;
-use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 use function Zenstruck\Foundry\Persistence\persistent_factory;
 
@@ -28,14 +27,13 @@ use function Zenstruck\Foundry\Persistence\persistent_factory;
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  * @requires PHPUnit >=12
  */
-#[RequiresPhpunit('>=12')]
 #[RequiresPhp('>=8.4')]
+#[RequiresPhpunit('>=12')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 #[RequiresEnvironmentVariable('USE_PHP_84_LAZY_OBJECTS', '1')]
+#[RequiresEnvironmentVariable('DATABASE_URL')]
 final class DataProviderWithPersistentEntityFactoryTest extends DataProviderWithPersistentFactoryTestCase
 {
-    use RequiresORM;
-
     protected static function factory(): PersistentObjectFactory
     {
         return GenericEntityFactory::new();

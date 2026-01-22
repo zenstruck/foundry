@@ -21,7 +21,6 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Persistence\ProxyGenerator;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
-use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericProxyEntityFactory;
@@ -41,8 +40,6 @@ use function Zenstruck\Foundry\faker;
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 final class DataProviderInUnitTest extends TestCase
 {
-    use Factories;
-
     #[Test]
     #[DataProvider('createObjectWithObjectFactoryInDataProvider')]
     public function assert_it_can_create_object_with_object_factory_in_data_provider(mixed $providedData, mixed $expectedData): void
