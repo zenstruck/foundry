@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Integration\Faker;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use PHPUnit\Framework\Attributes\Test;
@@ -34,6 +35,7 @@ use function Zenstruck\Foundry\faker;
  */
 #[RequiresPhpunit('>=12.0')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
+#[RequiresPhp('^8.4')]
 final class FakerSeedDoNotConflictWithDataProviderTest extends KernelTestCase
 {
     use Factories, RequiresORM, ResetDatabase;

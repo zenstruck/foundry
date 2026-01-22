@@ -47,7 +47,10 @@ abstract class DataProviderWithPersistentFactoryTestCase extends KernelTestCase
         static::factory()::assert()->count(1);
 
         self::assertNotNull($providedData);
-        self::assertSame(static::factory()::repository()->firstOrFail(), $providedData);
+        self::assertSame(
+            ProxyGenerator::unwrap(static::factory()::repository()->firstOrFail()),
+            ProxyGenerator::unwrap($providedData),
+        );
     }
 
     public static function createOneObjectInDataProvider(): iterable
