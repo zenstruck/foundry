@@ -47,7 +47,7 @@ if (\interface_exists(Runner\Extension\Extension::class)) {
             }
 
             $autoResetEnabled = $parameters->has(self::PARAMETER_AUTO_RESET_DATABASE_CLASS)
-                && $parameters->get(self::PARAMETER_AUTO_RESET_DATABASE_CLASS) === 'true';
+                && 'true' === $parameters->get(self::PARAMETER_AUTO_RESET_DATABASE_CLASS);
 
             // ⚠️ order matters within each event
             $subscribers = [
