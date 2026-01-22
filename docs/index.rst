@@ -1739,33 +1739,50 @@ Add Foundry's `PHPUnit Extension`_ in your `phpunit.xml` file:
 Database Reset
 ~~~~~~~~~~~~~~
 
-This library requires that your database be reset before each test. The packaged ``ResetDatabase`` trait handles
+This library requires that your database be reset before each test. The packaged ``ResetDatabase`` attribute handles
 this for you.
 
 ::
 
     use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-    use Zenstruck\Foundry\Test\Factories;
-    use Zenstruck\Foundry\Test\ResetDatabase;
+    use Zenstruck\Foundry\Attribute\ResetDatabase;
 
+    #{ResetDatabase]
     class MyTest extends WebTestCase
     {
-        use ResetDatabase, Factories;
-
         // ...
     }
 
-Before the first test using the ``ResetDatabase`` trait, it drops (if exists) and creates the test database.
+Before the first test using the ``ResetDatabase`` attribute, it drops (if exists) and creates the test database.
 Then, by default, before each test, it resets the schema using ``doctrine:schema:drop``/``doctrine:schema:create``.
+
+.. versionadded::  2.9
+
+    ``#[ResetDatabase]`` attribute was added in Foundry 2.9 and requires at least PHPUnit 10.
+
+.. note::
+
+    If you're still using PHPUnit 9, the database can be reset by adding the trait ``Zenstruck\Foundry\Test\ResetDatabase``::
+
+        use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+        use Zenstruck\Foundry\Test\Factories;
+        use Zenstruck\Foundry\Test\ResetDatabase;
+
+        class MyTest extends WebTestCase
+        {
+            use ResetDatabase, Factories;
+
+            // ...
+        }
 
 .. tip::
 
-    Create a base TestCase for tests using factories to avoid adding the traits to every TestCase.
+    Create a base TestCase for tests using factories to avoid adding the attribute to every TestCase.
 
 .. tip::
 
     If your tests :ref:`are not persisting <without-persisting>` the objects they create, the ``ResetDatabase``
-    trait is not required.
+    attribute is not required.
 
 By default, ``ResetDatabase`` resets the default configured connection's database and default configured object manager's
 schema. To customize the connection's and object manager's to be reset (or reset multiple connections/managers), use the
@@ -2137,7 +2154,7 @@ Global State
 
 If you have an initial database state you want for all tests, you can set this in the config of the bundle. Accepted
 values are: stories as service, "global" stories and invokable services. Global state is loaded before each test using
-the ``ResetDatabase`` trait. If you are using `DamaDoctrineTestBundle`_, it is only loaded once for the entire
+the ``ResetDatabase`` attribute. If you are using `DamaDoctrineTestBundle`_, it is only loaded once for the entire
 test suite.
 
 .. configuration-block::
@@ -2160,7 +2177,7 @@ test suite.
 
 .. note::
 
-    The :ref:`ResetDatabase <enable-foundry-in-your-testcase>` trait is required when using global state.
+    The :ref:`ResetDatabase <enable-foundry-in-your-testcase>` attribute is required when using global state.
 
 .. warning::
 
@@ -2356,7 +2373,7 @@ This library integrates seamlessly with `DAMADoctrineTestBundle <https://github.
 wrap each test in a transaction which dramatically reduces test time. This library's test suite runs 5x faster with
 this bundle enabled.
 
-Follow its documentation to install. Foundry's ``ResetDatabase`` trait detects when using the bundle and adjusts
+Follow its documentation to install. Foundry's ``ResetDatabase`` attribute detects when using the bundle and adjusts
 accordingly. Your database is still reset before running your test suite but the schema isn't reset before each test
 (just the first).
 
@@ -2472,10 +2489,10 @@ Non-Kernel Tests
 ~~~~~~~~~~~~~~~~
 
 Foundry can be used in standard PHPUnit unit tests (TestCase's that just extend ``PHPUnit\Framework\TestCase`` and not
-``Symfony\Bundle\FrameworkBundle\Test\KernelTestCase``). These tests still require using the ``Factories`` trait to boot
-Foundry but will not have doctrine available. Factories created in these tests will not be persisted (calling
-``->withoutPersisting()`` is not necessary). Because the bundle is not available in these tests,
-any bundle configuration you have will not be picked up.
+``Symfony\Bundle\FrameworkBundle\Test\KernelTestCase``). These tests still require enabling Foundry with the PHPUnit extension
+(or using the ``Factories`` trait if you still use PHPUnit 9) to boot Foundry but will not have doctrine available.
+Factories created in these tests will not be persisted (calling ``->withoutPersisting()`` is not necessary). Because
+the bundle is not available in these tests, any bundle configuration you have will not be picked up.
 
 ::
 
@@ -2704,19 +2721,19 @@ Full Default Bundle Configuration
         orm:
             reset:
 
-                # DBAL connections to reset with ResetDatabase trait
+                # DBAL connections to reset with ResetDatabase attribute
                 connections:
 
                     # Default:
                     - default
 
-                # Entity Managers to reset with ResetDatabase trait
+                # Entity Managers to reset with ResetDatabase attribute
                 entity_managers:
 
                     # Default:
                     - default
 
-                # Reset mode to use with ResetDatabase trait
+                # Reset mode to use with ResetDatabase attribute
                 mode:                 schema # One of "schema"; "migrate"
                 migrations:
 
@@ -2726,7 +2743,7 @@ Full Default Bundle Configuration
         mongo:
             reset:
 
-                # Document Managers to reset with ResetDatabase trait
+                # Document Managers to reset with ResetDatabase attribute
                 document_managers:
 
                     # Default:

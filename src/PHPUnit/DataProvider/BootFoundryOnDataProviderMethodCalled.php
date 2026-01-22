@@ -23,7 +23,7 @@ use Zenstruck\Foundry\Test\UnitTestConfig;
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-final class BootFoundryOnDataProviderMethodCalled implements Event\Test\DataProviderMethodCalledSubscriber
+final class BootFoundryOnDataProviderMethodCalled implements Event\Test\DataProviderMethodCalledSubscriber, DataProviderSubscriberInterface
 {
     public function notify(Event\Test\DataProviderMethodCalled $event): void
     {
@@ -54,11 +54,11 @@ final class BootFoundryOnDataProviderMethodCalled implements Event\Test\DataProv
 
         // integration test
         Configuration::bootForDataProvider(static function() use ($className): Configuration {
-            if (!KernelTestCaseHelper::getContainerForTestClass($className)->has('.zenstruck_foundry.configuration')) {
+            if (!KernelTestCaseHelper::getContainer($className)->has('.zenstruck_foundry.configuration')) {
                 throw new \LogicException('ZenstruckFoundryBundle is not enabled. Ensure it is added to your config/bundles.php.');
             }
 
-            return KernelTestCaseHelper::getContainerForTestClass($className)->get('.zenstruck_foundry.configuration'); // @phpstan-ignore return.type
+            return KernelTestCaseHelper::getContainer($className)->get('.zenstruck_foundry.configuration'); // @phpstan-ignore return.type
         });
     }
 }

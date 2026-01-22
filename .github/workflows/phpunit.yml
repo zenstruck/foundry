@@ -139,7 +139,7 @@ jobs:
           SYMFONY_REQUIRE: ${{ matrix.symfony }}
 
   test-reset-database:
-    name: Reset DB - D:${{ matrix.database }} ${{ matrix.use-dama == 1 && ' (dama)' || '' }} ${{ matrix.reset-database-mode == 'migrate' && ' (migrate)' || '' }} ${{ contains(matrix.with-migration-configuration-file, 'transactional') && '(configuration file transactional)' || contains(matrix.with-migration-configuration-file, 'configuration') && '(configuration file)' || '' }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}
+    name: Reset DB - D:${{ matrix.database }} ${{ matrix.use-dama == 1 && ' (dama)' || '' }} ${{ matrix.reset-database-mode == 'migrate' && ' (migrate)' || '' }} ${{ contains(matrix.with-migration-configuration-file, 'transactional') && '(configuration file transactional)' || contains(matrix.with-migration-configuration-file, 'configuration') && '(configuration file)' || '' }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.use-phpunit-extension == 0 && ' (no phpunit extension)' || '' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -149,18 +149,22 @@ jobs:
         reset-database-mode: [ schema, migrate ]
         migration-configuration-file: ['no']
         deps: [ highest, lowest ]
+        use-phpunit-extension: [ 1 ]
         include:
-          - { database: mongo, migration-configuration-file: 'no', use-dama: 0, reset-database-mode: schema }
-          - { database: pgsql, migration-configuration-file: 'migration-configuration', use-dama: 0, reset-database-mode: migration }
-          - { database: pgsql, migration-configuration-file: 'migration-configuration-transactional', use-dama: 0, reset-database-mode: migration }
+          - { database: mongo, use-dama: 0, reset-database-mode: schema, use-phpunit-extension: 1 }
+          - { database: pgsql, use-dama: 1, reset-database-mode: schema, use-phpunit-extension: 0 }
+          - { database: pgsql, use-dama: 0, reset-database-mode: schema, use-phpunit-extension: 0 }
+          - { database: pgsql, migration-configuration-file: 'migration-configuration', use-dama: 0, reset-database-mode: migration, use-phpunit-extension: 1 }
+          - { database: pgsql, migration-configuration-file: 'migration-configuration-transactional', use-dama: 0, reset-database-mode: migration, use-phpunit-extension: 1 }
     env:
       DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || 'sqlite:///%kernel.project_dir%/var/data.db' }}
       MONGO_URL: ${{ contains(matrix.database, 'mongo') && 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb' || '' }}
       USE_DAMA_DOCTRINE_TEST_BUNDLE: ${{ matrix.use-dama == 1 && 1 || 0 }}
       DATABASE_RESET_MODE: ${{ matrix.reset-database-mode == 1 && 1 || 0 }}
       MIGRATION_CONFIGURATION_FILE: ${{ matrix.migration-configuration-file == 'no' && '' || format('tests/Fixture/MigrationTests/configs/{0}.php', matrix.migration-configuration-file) }}
-      PHPUNIT_VERSION: 11
+      PHPUNIT_VERSION: 12
       WITH_LOWEST_DEPENDENCIES: ${{ matrix.deps == 'lowest' && 1 || 0 }}
+      USE_FOUNDRY_PHPUNIT_EXTENSION: ${{ matrix.use-phpunit-extension }}
     services:
       postgres:
         image: ${{ contains(matrix.database, 'pgsql') && 'postgres:15' || '' }}

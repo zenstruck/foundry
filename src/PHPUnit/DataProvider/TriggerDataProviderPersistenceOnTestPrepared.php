@@ -20,7 +20,7 @@ use Zenstruck\Foundry\Persistence\ProxyGenerator;
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-final class TriggerDataProviderPersistenceOnTestPrepared implements Event\Test\PreparedSubscriber
+final class TriggerDataProviderPersistenceOnTestPrepared implements Event\Test\PreparedSubscriber, DataProviderSubscriberInterface
 {
     public function notify(Event\Test\Prepared $event): void
     {

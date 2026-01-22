@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\ResetDatabase;
 
-use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
-use Zenstruck\Foundry\Attribute\ResetDatabase;
-use Zenstruck\Foundry\PHPUnit\FoundryExtension;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use Zenstruck\Foundry\Test\Factories;
+use Zenstruck\Foundry\Test\ResetDatabase;
 
-#[ResetDatabase]
-#[RequiresPhpunitExtension(FoundryExtension::class)]
-final class GlobalStoryTest extends GlobalStoryTestCase
+#[IgnoreDeprecations('In order to use Foundry correctly, you must use the trait')]
+final class GlobalStoryWithTraitsTest extends GlobalStoryTestCase
 {
+    use Factories, ResetDatabase;
 }

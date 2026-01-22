@@ -13,38 +13,12 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\ResetDatabase;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Middleware;
-use PHPUnit\Framework\Attributes\BeforeClass;
-use PHPUnit\Framework\Attributes\RequiresPhpunit;
-use PHPUnit\Framework\Attributes\Test;
-use Zenstruck\Foundry\Test\ResetDatabase;
-use Zenstruck\Foundry\Tests\Fixture\ResetDatabase\DoctrineMiddleware;
+use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
+use Zenstruck\Foundry\Attribute\ResetDatabase;
+use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 
-/**
- * @requires PHPUnit >=11.3
- */
-#[RequiresPhpunit('>=11.3')]
-final class EarlyBootedKernelTest extends ResetDatabaseTestCase
+#[ResetDatabase]
+#[RequiresPhpunitExtension(FoundryExtension::class)]
+final class EarlyBootedKernelTest extends EarlyBootedKernelTestCase
 {
-    /**
-     * Needs to happen before {@see ResetDatabase::_resetDatabaseBeforeFirstTest()}.
-     */
-    #[BeforeClass(10)]
-    public static function before(): void
-    {
-        self::bootKernel();
-    }
-
-    #[Test]
-    public function connection_uses_doctrine_middleware(): void
-    {
-        /** @var Connection $connection */
-        $connection = self::getContainer()->get(Connection::class);
-
-        self::assertContains(
-            DoctrineMiddleware::class,
-            \array_map(static fn(Middleware $middleware) => $middleware::class, $connection->getConfiguration()->getMiddlewares())
-        );
-    }
 }

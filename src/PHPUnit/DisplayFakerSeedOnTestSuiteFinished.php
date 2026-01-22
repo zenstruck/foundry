@@ -13,17 +13,16 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\PHPUnit;
 
-use PHPUnit\Event\TestRunner\Finished;
-use PHPUnit\Event\TestRunner\FinishedSubscriber;
+use PHPUnit\Event;
 use Zenstruck\Foundry\FakerAdapter;
 
 /**
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-final class DisplayFakerSeedOnTestSuiteFinished implements FinishedSubscriber
+final class DisplayFakerSeedOnTestSuiteFinished implements Event\TestRunner\FinishedSubscriber
 {
-    public function notify(Finished $event): void
+    public function notify(Event\TestRunner\Finished $event): void
     {
         $fakerSeed = FakerAdapter::fakerSeed();
 
