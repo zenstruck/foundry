@@ -57,7 +57,7 @@ if (\interface_exists(Runner\Extension\Extension::class)) {
                     new TriggerDataProviderPersistenceOnTestPrepared(),
                 ],
                 Event\Test\Finished::class => [new ShutdownFoundryOnTestFinished()],
-                Event\TestRunner\Finished::class => [new DisplayFakerSeedOnTestSuiteFinished()],
+                Event\TestRunner\Finished::class => [new DisplayFakerSeedOnApplicationFinished()],
             ];
 
             $subscribers = \array_merge(...\array_values($subscribers));

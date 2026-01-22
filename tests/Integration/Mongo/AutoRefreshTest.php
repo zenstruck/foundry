@@ -22,20 +22,18 @@ use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Document\GenericDocument;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericDocumentFactory;
 use Zenstruck\Foundry\Tests\Integration\Persistence\AutoRefreshTestCase;
-use Zenstruck\Foundry\Tests\Integration\RequiresMongo;
 
 use function Zenstruck\Foundry\Persistence\persistent_factory;
 
 /**
  * @requires PHPUnit >=12
  */
+#[RequiresPhp('>= 8.4')]
 #[RequiresPhpunit('>=12')]
 #[RequiresEnvironmentVariable('USE_PHP_84_LAZY_OBJECTS', '1')]
-#[RequiresPhp('>= 8.4')]
+#[RequiresEnvironmentVariable('MONGO_URL')]
 final class AutoRefreshTest extends AutoRefreshTestCase
 {
-    use RequiresMongo;
-
     protected static function factory(): PersistentObjectFactory
     {
         return GenericDocumentFactory::new();

@@ -43,8 +43,6 @@ use function Zenstruck\Foundry\Persistence\proxy;
 #[AsInMemoryTest]
 final class DoctrineInMemoryDecoratorTest extends KernelTestCase
 {
-    use Factories;
-
     /**
      * @test
      */

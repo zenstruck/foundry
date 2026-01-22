@@ -20,14 +20,14 @@ use Zenstruck\Foundry\FakerAdapter;
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-final class DisplayFakerSeedOnTestSuiteFinished implements Event\TestRunner\FinishedSubscriber
+final class DisplayFakerSeedOnApplicationFinished implements Event\Application\FinishedSubscriber
 {
-    public function notify(Event\TestRunner\Finished $event): void
+    public function notify(Event\Application\Finished $event): void
     {
         $fakerSeed = FakerAdapter::fakerSeed();
 
         if (null !== $fakerSeed) {
-            echo "\n\nFaker seed: ".$fakerSeed; // @phpstan-ignore ekinoBannedCode.expression
+            echo "\nFaker seed used: {$fakerSeed}\n"; // @phpstan-ignore ekinoBannedCode.expression
         }
     }
 }
