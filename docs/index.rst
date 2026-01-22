@@ -1777,12 +1777,35 @@ Then, by default, before each test, it resets the schema using ``doctrine:schema
 
 .. tip::
 
-    Create a base TestCase for tests using factories to avoid adding the attribute to every TestCase.
+    Create a base TestCase for tests using factories to avoid adding the attributes to every TestCase.
 
 .. tip::
 
     If your tests :ref:`are not persisting <without-persisting>` the objects they create, the ``ResetDatabase``
     attribute is not required.
+
+Automatic Database Reset for Base Test Classes
+..............................................
+
+Instead of adding the ``#[ResetDatabase]`` attribute to every test class, you can configure Foundry to
+automatically reset the database for all tests extending ``Symfony\Bundle\FrameworkBundle\Test\KernelTestCase``.
+
+.. configuration-block::
+
+    .. code-block:: xml
+
+        <!-- phpunit.xml -->
+        <phpunit>
+            <extensions>
+                <bootstrap class="Zenstruck\Foundry\PHPUnit\FoundryExtension">
+                    <parameter name="enabled-auto-reset" value="true"/>
+                </bootstrap>
+            </extensions>
+        </phpunit>
+
+.. versionadded::  2.9
+
+    Automatic database reset for base test classes was added in Foundry 2.9 and requires at least PHPUnit 10.
 
 By default, ``ResetDatabase`` resets the default configured connection's database and default configured object manager's
 schema. To customize the connection's and object manager's to be reset (or reset multiple connections/managers), use the

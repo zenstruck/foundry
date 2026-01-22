@@ -13,7 +13,6 @@ namespace Zenstruck\Foundry\PHPUnit;
 
 use PHPUnit\Event;
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Util\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Test\UnitTestConfig;

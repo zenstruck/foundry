@@ -14,9 +14,9 @@ namespace Zenstruck\Foundry\Tests\Integration\DataProvider;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\ProxyGenerator;
-use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithReadonly\EntityWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
@@ -24,10 +24,9 @@ use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
 
 use function Zenstruck\Foundry\Persistence\assert_persisted;
 
+#[ResetDatabase]
 abstract class DataProviderWithPersistentFactoryTestCase extends KernelTestCase
 {
-    use ResetDatabase;
-
     #[Test]
     #[DataProvider('createOneObjectInDataProvider')]
     public function assert_it_can_create_one_object_in_data_provider(?GenericModel $providedData): void

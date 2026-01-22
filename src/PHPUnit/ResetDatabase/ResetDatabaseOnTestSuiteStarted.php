@@ -12,6 +12,7 @@
 namespace Zenstruck\Foundry\PHPUnit\ResetDatabase;
 
 use PHPUnit\Event;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 use Zenstruck\Foundry\PHPUnit\AttributeReader;
@@ -21,8 +22,13 @@ use Zenstruck\Foundry\PHPUnit\KernelTestCaseHelper;
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-final class ResetDatabaseOnTestSuiteStarted implements Event\TestSuite\StartedSubscriber
+final readonly class ResetDatabaseOnTestSuiteStarted implements Event\TestSuite\StartedSubscriber
 {
+    public function __construct(
+        private bool $autoResetEnabled = false,
+    ) {
+    }
+
     public function notify(Event\TestSuite\Started $event): void
     {
         if (!$event->testSuite()->isForTestClass()) {
@@ -31,21 +37,33 @@ final class ResetDatabaseOnTestSuiteStarted implements Event\TestSuite\StartedSu
 
         $testClassName = $event->testSuite()->name();
 
-        if (!\class_exists($testClassName)) {
-            return;
-        }
-
-        $resetDatabaseAttributes = AttributeReader::collectAttributesFromClassAndParents(
-            ResetDatabase::class,
-            new \ReflectionClass($testClassName)
-        );
-
-        if ([] === $resetDatabaseAttributes) {
+        if (
+            !\class_exists($testClassName)
+            || !$this->shouldReset($testClassName)
+        ) {
             return;
         }
 
         ResetDatabaseManager::resetBeforeFirstTest(
             KernelTestCaseHelper::bootKernel($testClassName),
         );
+
+        KernelTestCaseHelper::ensureKernelShutdown($testClassName);
+    }
+
+    /**
+     * @param class-string $testClassName
+     */
+    private function shouldReset(string $testClassName): bool
+    {
+        if (!is_subclass_of($testClassName, KernelTestCase::class)) {
+            return false;
+        }
+
+        if ($this->autoResetEnabled) {
+            return true;
+        }
+
+        return AttributeReader::classOrParentsHasAttribute($testClassName, ResetDatabase::class);
     }
 }

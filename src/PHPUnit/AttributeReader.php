@@ -39,4 +39,13 @@ final class AttributeReader
             ),
         ];
     }
+
+    /**
+     * @param class-string<object> $class
+     * @param class-string<object> $attributeClass
+     */
+    public static function classOrParentsHasAttribute(string $class, string $attributeClass): bool
+    {
+        return self::collectAttributesFromClassAndParents($attributeClass, new \ReflectionClass($class)) !== [];
+    }
 }
