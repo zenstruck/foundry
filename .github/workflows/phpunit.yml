@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   tests:
-    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}, PU:${{ matrix.phpunit }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.use-phpunit-extension == 0 && ' (no phpunit extension)' || '' }}${{ (matrix.use-php-84-lazy-objects != 1 || matrix.php != '8.4') && ' (legacy proxy)' || '' }}${{ matrix.use-dama == 0 && ' (no dama)' || '' }}
+    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}, PU:${{ matrix.phpunit }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.use-phpunit-extension != 1 && ' (no phpunit extension)' || '' }}${{ (matrix.use-php-84-lazy-objects != 1 || matrix.php != '8.4') && ' (legacy proxy)' || '' }}${{ matrix.use-dama != 1 && ' (no dama)' || '' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -31,11 +31,9 @@ jobs:
         database: [ mysql|mongo ]
         phpunit: [ 11, 12 ]
         use-dama: [ 1 ]
-
-        # default values:
-        # deps: [ highest ]
-        # use-phpunit-extension: [ 1 ]
-        # use-php-84-lazy-objects: [ 1 ]
+        use-phpunit-extension: [ 1 ]
+        use-php-84-lazy-objects: [ 1 ]
+        deps: [ highest ]
 
         exclude:
           - {php: 8.2, phpunit: 12}

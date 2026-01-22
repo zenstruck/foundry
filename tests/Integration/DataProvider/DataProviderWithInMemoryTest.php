@@ -16,6 +16,8 @@ namespace Zenstruck\Foundry\Tests\Integration\DataProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresMethod;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use PHPUnit\Framework\Attributes\Test;
@@ -92,15 +94,12 @@ final class DataProviderWithInMemoryTest extends KernelTestCase
     #[Test]
     #[DataProvider('provideContact')]
     #[AsInMemoryTest]
+    #[RequiresPhp('^8.4')]
     public function it_can_create_in_memory_objects_in_data_provider(?Contact $contact = null): void
     {
         self::assertInstanceOf(Contact::class, $contact);
 
-        if (TestKernel::canUseLegacyProxy()) {
-            self::assertSame([ProxyGenerator::unwrap($contact)], $this->contactRepository->_all());
-        } else {
-            self::assertSame([$contact], $this->contactRepository->_all());
-        }
+        self::assertSame([$contact], $this->contactRepository->_all());
 
         self::assertSame(0, $this->entityManager->getRepository(Contact::class)->count());
     }
@@ -108,9 +107,28 @@ final class DataProviderWithInMemoryTest extends KernelTestCase
     public static function provideContact(): iterable
     {
         yield [ContactFactory::createOne()];
+    }
 
+    #[Test]
+    #[DataProvider('provideContactWithLegacyProxy')]
+    #[AsInMemoryTest]
+    #[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
+    #[IgnoreDeprecations('(p|P)roxy')]
+    public function it_can_create_in_memory_objects_in_data_provider_with_legacy_proxy(?Contact $contact = null): void
+    {
+        self::assertInstanceOf(Contact::class, $contact);
+
+        self::assertSame([ProxyGenerator::unwrap($contact)], $this->contactRepository->_all());
         if (TestKernel::canUseLegacyProxy()) {
-            yield [ProxyContactFactory::createOne()];
+        } else {
+            self::assertSame([$contact], $this->contactRepository->_all());
         }
+
+        self::assertSame(0, $this->entityManager->getRepository(Contact::class)->count());
+    }
+
+    public static function provideContactWithLegacyProxy(): iterable
+    {
+        yield [ProxyContactFactory::createOne()];
     }
 }
