@@ -119,10 +119,6 @@ final class DataProviderWithInMemoryTest extends KernelTestCase
         self::assertInstanceOf(Contact::class, $contact);
 
         self::assertSame([ProxyGenerator::unwrap($contact)], $this->contactRepository->_all());
-        if (TestKernel::canUseLegacyProxy()) {
-        } else {
-            self::assertSame([$contact], $this->contactRepository->_all());
-        }
 
         self::assertSame(0, $this->entityManager->getRepository(Contact::class)->count());
     }
