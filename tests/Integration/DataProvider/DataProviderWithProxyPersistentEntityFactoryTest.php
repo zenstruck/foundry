@@ -29,7 +29,6 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericProxyEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Model\Embeddable;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
-use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 use function Zenstruck\Foundry\Persistence\proxy_factory;
 
