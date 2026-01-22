@@ -20,7 +20,6 @@ use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
-use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
 
@@ -34,8 +33,6 @@ use function Zenstruck\Foundry\faker;
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 final class DataProviderForServiceFactoryInKernelTestCaseTest extends KernelTestCase
 {
-    use Factories;
-
     #[Test]
     #[DataProvider('createObjectFromServiceFactoryInDataProvider')]
     public function it_can_create_one_object_in_data_provider(?Object1 $providedData, string $expected): void

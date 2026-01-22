@@ -37,15 +37,14 @@ use function Zenstruck\Foundry\Persistence\proxy_factory;
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  * @requires PHPUnit >=12
  */
+#[IgnoreDeprecations]
 #[RequiresPhpunit('>=12')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 #[RequiresEnvironmentVariable('USE_PHP_84_LAZY_OBJECTS', '0')]
-#[IgnoreDeprecations]
+#[RequiresEnvironmentVariable('DATABASE_URL')]
 #[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
 final class DataProviderWithProxyPersistentEntityFactoryTest extends DataProviderWithPersistentFactoryTestCase
 {
-    use RequiresORM;
-
     #[Test]
     #[DataProvider('createOneProxyObjectInDataProvider')]
     public function assert_provided_data_is_proxy(?GenericModel $providedData): void

@@ -26,7 +26,6 @@ use Zenstruck\Foundry\InMemory\AsInMemoryTest;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\ProxyGenerator;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
-use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
@@ -43,7 +42,6 @@ use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 final class DataProviderWithInMemoryTest extends KernelTestCase
 {
-    use Factories;
     use RequiresORM; // needed to use the entity manager
     use ResetDatabase;
 
