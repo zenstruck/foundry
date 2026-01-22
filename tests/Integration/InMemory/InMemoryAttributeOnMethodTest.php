@@ -18,9 +18,9 @@ use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\InMemory\AsInMemoryTest;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
-use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Address;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\AddressFactory;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
@@ -31,10 +31,10 @@ use Zenstruck\Foundry\Tests\Integration\RequiresORM;
  */
 #[RequiresPhpunit('>=11.4')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
+#[ResetDatabase]
 final class InMemoryAttributeOnMethodTest extends KernelTestCase
 {
     use RequiresORM;
-    use ResetDatabase;
 
     private EntityManagerInterface $entityManager;
 

@@ -12,6 +12,7 @@
 namespace Zenstruck\Foundry\PHPUnit\DataProvider;
 
 use PHPUnit\Event;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\PHPUnit\KernelTestCaseHelper;
 
@@ -23,7 +24,11 @@ final class ShutdownFoundryOnDataProviderMethodFinished implements Event\Test\Da
 {
     public function notify(Event\Test\DataProviderMethodFinished $event): void
     {
-        KernelTestCaseHelper::tearDownClass($event->testMethod()->className());
+        $class = $event->testMethod()->className();
+
+        if (\is_subclass_of($class, KernelTestCase::class)) {
+            KernelTestCaseHelper::ensureKernelShutdown($class);
+        }
 
         Configuration::shutdown();
     }

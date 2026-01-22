@@ -40,14 +40,19 @@ final class KernelTestCaseHelper
     /**
      * @param class-string $class
      */
-    public static function tearDownClass(string $class): void
+    public static function ensureKernelShutdown(string $class): void
     {
-        if (!\is_subclass_of($class, TestCase::class)) {
-            throw new \LogicException(\sprintf('Class "%s" must extend "%s".', $class, TestCase::class));
+        if (!\is_subclass_of($class, KernelTestCase::class)) {
+            throw new \LogicException(\sprintf('Class "%s" must extend "%s".', $class, KernelTestCase::class));
         }
 
         (\Closure::bind(
-            fn() => $class::tearDownAfterClass(),
+            static function () {
+                static::ensureKernelShutdown();
+                static::$class = null;
+                static::$kernel = null;
+                static::$booted = false;
+            },
             newThis: null,
             newScope: $class,
         ))();
@@ -64,22 +69,6 @@ final class KernelTestCaseHelper
 
         return (\Closure::bind(
             fn() => $class::bootKernel(),
-            newThis: null,
-            newScope: $class,
-        ))();
-    }
-
-    /**
-     * @param class-string $class
-     */
-    public static function ensureKernelShutdown(string $class): void
-    {
-        if (!\is_subclass_of($class, KernelTestCase::class)) {
-            throw new \LogicException(\sprintf('Class "%s" must extend "%s".', $class, KernelTestCase::class));
-        }
-
-        (\Closure::bind(
-            fn() => $class::ensureKernelShutdown(),
             newThis: null,
             newScope: $class,
         ))();

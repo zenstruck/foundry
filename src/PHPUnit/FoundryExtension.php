@@ -32,6 +32,8 @@ use Zenstruck\Foundry\PHPUnit\ResetDatabase\ResetDatabaseOnTestSuiteStarted;
 if (\interface_exists(Runner\Extension\Extension::class)) {
     final class FoundryExtension implements Runner\Extension\Extension
     {
+        public const PARAMETER_AUTO_RESET_DATABASE_CLASS = 'enabled-auto-reset';
+
         private static bool $enabled = false;
 
         public function bootstrap(
@@ -44,15 +46,18 @@ if (\interface_exists(Runner\Extension\Extension::class)) {
                 Configuration::shutdown();
             }
 
+            $autoResetEnabled = $parameters->has(self::PARAMETER_AUTO_RESET_DATABASE_CLASS)
+                && $parameters->get(self::PARAMETER_AUTO_RESET_DATABASE_CLASS) === 'true';
+
             // ⚠️ order matters within each event
             $subscribers = [
-                Event\TestSuite\Started::class => [new ResetDatabaseOnTestSuiteStarted()],
+                Event\TestSuite\Started::class => [new ResetDatabaseOnTestSuiteStarted($autoResetEnabled)],
                 Event\Test\DataProviderMethodCalled::class => [new BootFoundryOnDataProviderMethodCalled()],
                 Event\Test\DataProviderMethodFinished::class => [new ShutdownFoundryOnDataProviderMethodFinished()],
                 Event\Test\Prepared::class => [
                     new BootFoundryOnTestPrepared(),
                     new EnableInMemoryOnTestPrepared(),
-                    new ResetDatabaseOnTestPrepared(),
+                    new ResetDatabaseOnTestPrepared($autoResetEnabled),
                     new BuildStoryOnTestPrepared(),
                     new TriggerDataProviderPersistenceOnTestPrepared(),
                 ],
