@@ -11,7 +11,6 @@
 
 namespace Zenstruck\Foundry\PHPUnit;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -47,7 +46,7 @@ final class KernelTestCaseHelper
         }
 
         (\Closure::bind(
-            static function () {
+            static function() {
                 static::ensureKernelShutdown();
                 static::$class = null;
                 static::$kernel = null;

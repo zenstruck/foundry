@@ -46,6 +46,6 @@ final class AttributeReader
      */
     public static function classOrParentsHasAttribute(string $class, string $attributeClass): bool
     {
-        return self::collectAttributesFromClassAndParents($attributeClass, new \ReflectionClass($class)) !== [];
+        return [] !== self::collectAttributesFromClassAndParents($attributeClass, new \ReflectionClass($class));
     }
 }
