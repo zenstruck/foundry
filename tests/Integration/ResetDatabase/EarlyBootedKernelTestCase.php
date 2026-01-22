@@ -16,7 +16,6 @@ namespace Zenstruck\Foundry\Tests\Integration\ResetDatabase;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Middleware;
 use PHPUnit\Framework\Attributes\BeforeClass;
-use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\ResetDatabase;

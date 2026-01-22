@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Utils\Rector;
 
 use PhpParser\Node;
@@ -22,29 +31,29 @@ final class ResetDatabaseAttributeRector extends AbstractRector
     }
 
     /** @param Node\Stmt\Class_ $node */
-    public function refactor(Node $node): Node|null
+    public function refactor(Node $node): ?Node
     {
         /** @var ?Node\Stmt\TraitUse $traitUseWithResetDatabase */
-        $traitUseWithResetDatabase = $this->nodeFinder->findFirst($node->stmts, function (Node $node): bool {
+        $traitUseWithResetDatabase = $this->nodeFinder->findFirst($node->stmts, function(Node $node): bool {
             return $node instanceof Node\Stmt\TraitUse
-                && array_any($node->traits, fn(Node\Name $name) => $this->getName($name) === ResetDatabaseTrait::class);
+                && array_any($node->traits, fn(Node\Name $name) => ResetDatabaseTrait::class === $this->getName($name));
         });
 
         if (!$traitUseWithResetDatabase) {
             return null;
         }
 
-        $traitUseWithResetDatabase->traits = array_filter(
+        $traitUseWithResetDatabase->traits = \array_filter(
             $traitUseWithResetDatabase->traits,
-            fn(Node\Name $name) => $this->getName($name) !== ResetDatabaseTrait::class
+            fn(Node\Name $name) => ResetDatabaseTrait::class !== $this->getName($name)
         );
 
-        if ($traitUseWithResetDatabase->traits === []) {
-            $node->stmts = array_filter($node->stmts, fn(Node\Stmt $stmt) => $stmt !== $traitUseWithResetDatabase);
+        if ([] === $traitUseWithResetDatabase->traits) {
+            $node->stmts = \array_filter($node->stmts, fn(Node\Stmt $stmt) => $stmt !== $traitUseWithResetDatabase);
         }
 
-        $hasResetDatabaseTrait = (bool)$this->nodeFinder->findFirst($node->attrGroups, function (Node $node): bool {
-            return $this->getName($node) === ResetDatabaseAttribute::class;
+        $hasResetDatabaseTrait = (bool) $this->nodeFinder->findFirst($node->attrGroups, function(Node $node): bool {
+            return ResetDatabaseAttribute::class === $this->getName($node);
         });
 
         if ($hasResetDatabaseTrait) {
