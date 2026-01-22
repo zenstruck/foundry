@@ -12,16 +12,10 @@ declare(strict_types=1);
  */
 
 use Rector\Config\RectorConfig;
-use Rector\Removing\Rector\Class_\RemoveTraitUseRector;
-use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Utils\Rector\ResetDatabaseAttributeRector;
 
-return static function(RectorConfig $rectorConfig): void {
-    $rectorConfig->ruleWithConfiguration(
-        RemoveTraitUseRector::class,
-        [
-            Factories::class,
-        ]
+return static function (RectorConfig $rectorConfig): void {
+    $rectorConfig->rules(
+        [ResetDatabaseAttributeRector::class],
     );
-    $rectorConfig->rule(ResetDatabaseAttributeRector::class);
 };
