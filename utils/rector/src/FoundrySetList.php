@@ -24,5 +24,4 @@ final class FoundrySetList
 
     /** @var string */
     public const FOUNDRY_2_9 = __DIR__.'/../config/foundry-2.9.php';
-
 }

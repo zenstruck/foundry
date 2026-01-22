@@ -60,11 +60,11 @@ if (\interface_exists(Runner\Extension\Extension::class)) {
                 Event\TestRunner\Finished::class => [new DisplayFakerSeedOnTestSuiteFinished()],
             ];
 
-            $subscribers = array_merge(...array_values($subscribers));
+            $subscribers = \array_merge(...\array_values($subscribers));
 
             // Foundry can only handle data provider since PHPUnit 11.4
             if (!ConstraintRequirement::from('>=11.4')->isSatisfiedBy(Runner\Version::id())) {
-                $subscribers = array_filter(
+                $subscribers = \array_filter(
                     $subscribers,
                     static fn($subscriber) => !$subscriber instanceof DataProviderSubscriberInterface
                 );
