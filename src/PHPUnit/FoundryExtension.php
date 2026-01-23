@@ -22,7 +22,7 @@ use Zenstruck\Foundry\PHPUnit\DataProvider\BootFoundryOnDataProviderMethodCalled
 use Zenstruck\Foundry\PHPUnit\DataProvider\DataProviderSubscriberInterface;
 use Zenstruck\Foundry\PHPUnit\DataProvider\ShutdownFoundryOnDataProviderMethodFinished;
 use Zenstruck\Foundry\PHPUnit\DataProvider\TriggerDataProviderPersistenceOnTestPrepared;
-use Zenstruck\Foundry\PHPUnit\ResetDatabase\ResetDatabaseOnTestPrepared;
+use Zenstruck\Foundry\PHPUnit\ResetDatabase\ResetDatabaseOnPreparationStarted;
 use Zenstruck\Foundry\PHPUnit\ResetDatabase\ResetDatabaseOnTestSuiteStarted;
 
 /**
@@ -54,10 +54,12 @@ if (\interface_exists(Runner\Extension\Extension::class)) {
                 Event\TestSuite\Started::class => [new ResetDatabaseOnTestSuiteStarted($autoResetEnabled)],
                 Event\Test\DataProviderMethodCalled::class => [new BootFoundryOnDataProviderMethodCalled()],
                 Event\Test\DataProviderMethodFinished::class => [new ShutdownFoundryOnDataProviderMethodFinished()],
+                Event\Test\PreparationStarted::class => [
+                    new BootFoundryOnPreparationStarted(),
+                    new ResetDatabaseOnPreparationStarted($autoResetEnabled),
+                ],
                 Event\Test\Prepared::class => [
-                    new BootFoundryOnTestPrepared(),
                     new EnableInMemoryOnTestPrepared(),
-                    new ResetDatabaseOnTestPrepared($autoResetEnabled),
                     new BuildStoryOnTestPrepared(),
                     new TriggerDataProviderPersistenceOnTestPrepared(),
                 ],

@@ -22,10 +22,10 @@ use Zenstruck\Foundry\PHPUnit\KernelTestCaseHelper;
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-final readonly class ResetDatabaseOnTestSuiteStarted implements Event\TestSuite\StartedSubscriber
+final class ResetDatabaseOnTestSuiteStarted implements Event\TestSuite\StartedSubscriber
 {
     public function __construct(
-        private bool $autoResetEnabled = false,
+        private readonly bool $autoResetEnabled = false,
     ) {
     }
 
@@ -35,11 +35,17 @@ final readonly class ResetDatabaseOnTestSuiteStarted implements Event\TestSuite\
             return;
         }
 
+        if (ResetDatabaseManager::databaseHasBeenResetBeforeFirstTest()) {
+            return;
+        }
+
         $testClassName = $event->testSuite()->name();
 
-        if (
-            !\class_exists($testClassName)
-            || !$this->shouldReset($testClassName)
+        if (!\class_exists($testClassName)) {
+            return;
+        }
+
+        if (!$this->shouldReset($testClassName)
         ) {
             return;
         }
@@ -64,6 +70,9 @@ final readonly class ResetDatabaseOnTestSuiteStarted implements Event\TestSuite\
             return true;
         }
 
-        return AttributeReader::classOrParentsHasAttribute($testClassName, ResetDatabase::class);
+        return AttributeReader::classOrParentsHasAttribute($testClassName, ResetDatabase::class)
+
+            // let's use ResetDatabase trait as a marker, the same way we're using the attribute
+            || (new \ReflectionClass($testClassName))->hasMethod('_resetDatabaseBeforeFirstTest');
     }
 }

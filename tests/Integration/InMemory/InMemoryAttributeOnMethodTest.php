@@ -24,6 +24,7 @@ use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Address;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\AddressFactory;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
+use function Zenstruck\Foundry\Persistence\delete;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
@@ -71,5 +72,7 @@ final class InMemoryAttributeOnMethodTest extends KernelTestCase
         self::assertSame(1, $this->entityManager->getRepository(Address::class)->count([]));
 
         self::assertNotNull($address->id);
+
+        delete($address);
     }
 }

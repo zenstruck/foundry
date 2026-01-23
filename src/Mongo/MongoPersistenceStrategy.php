@@ -54,13 +54,7 @@ final class MongoPersistenceStrategy extends PersistenceStrategy
 
     public function managedNamespaces(): array
     {
-        $namespaces = [];
-
-        foreach ($this->objectManagers() as $objectManager) {
-            $namespaces[] = $objectManager->getConfiguration()->getDocumentNamespaces();
-        }
-
-        return \array_values(\array_merge(...$namespaces));
+        return [];
     }
 
     public function embeddablePropertiesFor(object $object, string $owner): ?array

@@ -21,9 +21,9 @@ use Zenstruck\Foundry\Test\UnitTestConfig;
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-final class BootFoundryOnTestPrepared implements Event\Test\PreparedSubscriber
+final class BootFoundryOnPreparationStarted implements Event\Test\PreparationStartedSubscriber
 {
-    public function notify(Event\Test\Prepared $event): void
+    public function notify(Event\Test\PreparationStarted $event): void
     {
         $test = $event->test();
 

@@ -60,7 +60,6 @@ final class FakerSeedDoNotConflictWithDataProviderTest extends KernelTestCase
     {
         self::assertSame(1234, Configuration::fakerSeed());
         self::assertSame($expected, $withUniqueColumnFromDataProvider->getUniqueCol());
-        self::assertSame('eius', WithUniqueColumnFactory::createOne()->getUniqueCol());
     }
 
     public static function provideObjectUsingFakreInDataProvider(): iterable

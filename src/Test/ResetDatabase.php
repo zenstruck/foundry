@@ -36,9 +36,7 @@ trait ResetDatabase
         if (FoundryExtension::isEnabled()) {
             trigger_deprecation('zenstruck/foundry', '2.9', \sprintf('Trait "%s" is deprecated and will be removed in Foundry 3. Use attribute "%s" instead. See https://github.com/zenstruck/foundry/blob/2.x/UPGRADE-2.9.md to upgrade.', ResetDatabase::class, ResetDatabaseAttribute::class));
 
-            if (self::_classHasResetDatabaseAttribute()) {
-                return;
-            }
+            return;
         }
 
         $kernel = static::_boot(); // @phpstan-ignore staticClassAccess.privateMethod
@@ -55,7 +53,7 @@ trait ResetDatabase
     #[Before(10)]
     public static function _resetDatabaseBeforeEachTest(): void
     {
-        if (FoundryExtension::isEnabled() && self::_classHasResetDatabaseAttribute()) {
+        if (FoundryExtension::isEnabled()) {
             return;
         }
 
@@ -102,18 +100,5 @@ trait ResetDatabase
 
         Configuration::shutdown();
         static::ensureKernelShutdown();
-    }
-
-    /**
-     * @internal
-     */
-    private static function _classHasResetDatabaseAttribute(): bool
-    {
-        $resetDatabaseAttributes = AttributeReader::collectAttributesFromClassAndParents(
-            ResetDatabaseAttribute::class,
-            new \ReflectionClass(static::class)
-        );
-
-        return [] !== $resetDatabaseAttributes;
     }
 }
