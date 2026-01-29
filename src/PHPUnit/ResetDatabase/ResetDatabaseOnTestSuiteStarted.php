@@ -62,7 +62,7 @@ final class ResetDatabaseOnTestSuiteStarted implements Event\TestSuite\StartedSu
      */
     private function shouldReset(string $testClassName): bool
     {
-        if (!is_subclass_of($testClassName, KernelTestCase::class)) {
+        if (!\is_subclass_of($testClassName, KernelTestCase::class)) {
             return false;
         }
 

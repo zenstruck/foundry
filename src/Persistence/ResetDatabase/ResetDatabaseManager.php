@@ -18,7 +18,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
-use Zenstruck\Foundry\PHPUnit\ResetDatabase\ResetDatabaseOnTestSuiteStarted;
 use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 
 /**
@@ -75,7 +74,6 @@ final class ResetDatabaseManager
             if (!\class_exists(TestKernel::class)) {
                 throw $e;
             }
-
 
             // allow this to fail if running foundry test suite
             return;

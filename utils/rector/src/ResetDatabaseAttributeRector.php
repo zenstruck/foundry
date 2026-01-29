@@ -49,7 +49,7 @@ final class ResetDatabaseAttributeRector extends AbstractRector
         );
 
         if ([] === $traitUseWithResetDatabase->traits) {
-            $node->stmts = \array_filter($node->stmts, fn(Node\Stmt $stmt) => $stmt !== $traitUseWithResetDatabase);
+            $node->stmts = \array_filter($node->stmts, static fn(Node\Stmt $stmt) => $stmt !== $traitUseWithResetDatabase);
         }
 
         $hasResetDatabaseTrait = (bool) $this->nodeFinder->findFirst($node->attrGroups, function(Node $node): bool {

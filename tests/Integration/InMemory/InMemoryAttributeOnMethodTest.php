@@ -24,6 +24,7 @@ use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Address;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\AddressFactory;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
+
 use function Zenstruck\Foundry\Persistence\delete;
 
 /**

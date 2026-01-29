@@ -30,7 +30,7 @@ final class KernelTestCaseHelper
         }
 
         return (\Closure::bind(
-            fn() => $class::getContainer(),
+            static fn() => $class::getContainer(),
             newThis: null,
             newScope: $class,
         ))();
@@ -67,7 +67,7 @@ final class KernelTestCaseHelper
         }
 
         return (\Closure::bind(
-            fn() => $class::bootKernel(),
+            static fn() => $class::bootKernel(),
             newThis: null,
             newScope: $class,
         ))();

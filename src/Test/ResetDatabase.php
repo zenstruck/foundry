@@ -18,7 +18,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Attribute\ResetDatabase as ResetDatabaseAttribute;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
-use Zenstruck\Foundry\PHPUnit\AttributeReader;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 
 /**

@@ -53,7 +53,7 @@ final class ResetDatabaseOnPreparationStarted implements Event\Test\PreparationS
     {
         $hasResetDatabaseAttribute = AttributeReader::classOrParentsHasAttribute($test->className(), ResetDatabase::class);
 
-        if (!is_subclass_of($test->className(), KernelTestCase::class)) {
+        if (!\is_subclass_of($test->className(), KernelTestCase::class)) {
             if ($hasResetDatabaseAttribute) {
                 throw new \LogicException(\sprintf('Class "%s" cannot use attribute #[ResetDatabase] if it does not extend "%s".', $test->className(), KernelTestCase::class));
             }
