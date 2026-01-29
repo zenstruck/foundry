@@ -36,11 +36,9 @@ jobs:
         deps: [ highest ]
 
         exclude:
-          - {php: 8.2, phpunit: 12}
           - {php: 8.3, phpunit: 11}
           - {php: 8.4, phpunit: 11}
 
-          - {php: 8.2, symfony: 8.0.*}
           - {php: 8.3, symfony: 8.0.*}
 
         include:
@@ -262,7 +260,6 @@ jobs:
     env:
       DATABASE_URL: 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42'
       MONGO_URL: 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb'
-      USE_DAMA_DOCTRINE_TEST_BUNDLE: 1
     services:
       mongo:
         image: 'mongo:4'
@@ -306,7 +303,9 @@ jobs:
       MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
       USE_DAMA_DOCTRINE_TEST_BUNDLE: 1
       USE_FOUNDRY_PHPUNIT_EXTENSION: 1
+      USE_PHP_84_LAZY_OBJECTS: 1
       PHPUNIT_VERSION: 12
+      FOUNDRY_FAKER_SEED: 1234
     services:
       mongo:
         image: mongo:4

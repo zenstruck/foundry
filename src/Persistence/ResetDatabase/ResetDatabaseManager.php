@@ -18,6 +18,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
+use Zenstruck\Foundry\PHPUnit\ResetDatabase\ResetDatabaseOnTestSuiteStarted;
 use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 
 /**
@@ -75,6 +76,7 @@ final class ResetDatabaseManager
                 throw $e;
             }
 
+
             // allow this to fail if running foundry test suite
             return;
         }
@@ -94,5 +96,10 @@ final class ResetDatabaseManager
     public static function canSkipSchemaReset(): bool
     {
         return self::isDAMADoctrineTestBundleEnabled() && PersistenceManager::isOrmOnly();
+    }
+
+    public static function databaseHasBeenResetBeforeFirstTest(): bool
+    {
+        return self::$hasDatabaseBeenReset;
     }
 }

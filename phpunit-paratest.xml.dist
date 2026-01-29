@@ -11,8 +11,16 @@
         <ini name="error_reporting" value="-1"/>
         <server name="KERNEL_CLASS" value="Zenstruck\Foundry\Tests\Fixture\TestKernel"/>
         <server name="SHELL_VERBOSITY" value="-1"/>
+
         <env name="PARATEST" value="1"/>
+
         <env name="APP_ENV" value="test"/>
+        <env name="USE_PHP_84_LAZY_OBJECTS" value="1"/>
+        <env name="USE_DAMA_DOCTRINE_TEST_BUNDLE" value="1"/>
+        <env name="USE_FOUNDRY_PHPUNIT_EXTENSION" value="1"/>
+        <env name="FOUNDRY_FAKER_SEED" value="1234"/>
+        <env name="DATABASE_URL" value="sqlite:///%kernel.project_dir%/var/data.db"/>
+        <env name="MONGO_URL" value="mongodb://127.0.0.1:27018/dbName?compressors=disabled&amp;gssapiServiceName=mongodb"/>
     </php>
     <testsuites>
         <testsuite name="main">
@@ -20,14 +28,14 @@
             <exclude>tests/Integration/ResetDatabase</exclude>
         </testsuite>
     </testsuites>
-    <source ignoreSuppressionOfDeprecations="true">
+    <source ignoreSuppressionOfDeprecations="true" baseline="phpunit-deprecation-baseline.xml">
         <include>
             <directory>src</directory>
         </include>
     </source>
     <extensions>
+        <bootstrap class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension" />
         <bootstrap class="Zenstruck\Foundry\PHPUnit\FoundryExtension" />
         <bootstrap class="Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\PhpUnitTestExtension" />
-        <bootstrap class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension" />
     </extensions>
 </phpunit>

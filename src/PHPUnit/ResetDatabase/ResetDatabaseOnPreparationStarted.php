@@ -12,8 +12,6 @@
 namespace Zenstruck\Foundry\PHPUnit\ResetDatabase;
 
 use PHPUnit\Event;
-use PHPUnit\Event\Code\TestMethod;
-use PHPUnit\Event\Test\Prepared;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\InMemory\AsInMemoryTest;
@@ -25,14 +23,14 @@ use Zenstruck\Foundry\PHPUnit\KernelTestCaseHelper;
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-final readonly class ResetDatabaseOnTestPrepared implements Event\Test\PreparedSubscriber
+final class ResetDatabaseOnPreparationStarted implements Event\Test\PreparationStartedSubscriber
 {
     public function __construct(
-        private bool $autoResetEnabled = false,
+        private readonly bool $autoResetEnabled = false,
     ) {
     }
 
-    public function notify(Prepared $event): void
+    public function notify(Event\Test\PreparationStarted $event): void
     {
         $test = $event->test();
 
@@ -51,7 +49,7 @@ final readonly class ResetDatabaseOnTestPrepared implements Event\Test\PreparedS
         KernelTestCaseHelper::ensureKernelShutdown($test->className());
     }
 
-    private function shouldReset(TestMethod $test): bool
+    private function shouldReset(Event\Code\TestMethod $test): bool
     {
         $hasResetDatabaseAttribute = AttributeReader::classOrParentsHasAttribute($test->className(), ResetDatabase::class);
 
@@ -74,6 +72,9 @@ final readonly class ResetDatabaseOnTestPrepared implements Event\Test\PreparedS
             return true;
         }
 
-        return $hasResetDatabaseAttribute;
+        return $hasResetDatabaseAttribute
+
+            // let's use ResetDatabase trait as a marker, the same way we're using the attribute
+            || (new \ReflectionClass($test->className()))->hasMethod('_resetDatabaseBeforeFirstTest');
     }
 }
