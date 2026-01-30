@@ -14,6 +14,7 @@ namespace Zenstruck\Foundry\Test;
 use Faker;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\FactoryRegistry;
+use Zenstruck\Foundry\FakerAdapter;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\StoryRegistry;
@@ -48,10 +49,9 @@ final class UnitTestConfig
 
         return new Configuration(
             new FactoryRegistry([]),
-            $faker,
+            new FakerAdapter($faker, forcedFakerSeedFromEnv: $_SERVER['FOUNDRY_FAKER_SEED'] ?? $_ENV['FOUNDRY_FAKER_SEED'] ?? (\getenv('FOUNDRY_FAKER_SEED') ?: null)),
             self::$instantiator ?? Instantiator::withConstructor(),
             new StoryRegistry([]),
-            forcedFakerSeedFromEnv: $_SERVER['FOUNDRY_FAKER_SEED'] ?? $_ENV['FOUNDRY_FAKER_SEED'] ?? (\getenv('FOUNDRY_FAKER_SEED') ?: null)
         );
     }
 }

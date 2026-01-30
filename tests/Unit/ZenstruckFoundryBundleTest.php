@@ -281,6 +281,7 @@ final class ZenstruckFoundryBundleTest extends TestCase
             'faker' => [
                 'locale' => null,
                 'seed' => null,
+                'manage_seed' => true,
                 'service' => null,
             ],
             'instantiator' => [

@@ -78,6 +78,10 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                             ->example('1234')
                             ->defaultNull()
                         ->end()
+                        ->booleanNode('manage_seed')
+                            ->info('Automatically manage faker seed to ensure consistent data between test runs.')
+                            ->defaultTrue()
+                        ->end()
                         ->scalarNode('service')
                             ->info('Service id for custom faker instance.')
                             ->example('my_faker')
@@ -349,6 +353,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
     private function configureFaker(array $config, ContainerBuilder $container): void
     {
         $container->setParameter('zenstruck_foundry.faker.seed', $config['seed']);
+        $container->setParameter('zenstruck_foundry.faker.manage_seed', $config['manage_seed']);
 
         if ($config['service']) {
             $container->setAlias('.zenstruck_foundry.faker', $config['service']);

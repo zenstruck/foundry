@@ -46,10 +46,6 @@ final class Configuration
     /** @var \Closure():self|self|null */
     private static \Closure|self|null $instance = null;
 
-    private static ?int $fakerSeed = null;
-    private ?int $forcedFakerSeed = null;
-    private static bool $fakerSeedHasBeenSet = false;
-
     private bool $inMemory = false;
 
     /**
@@ -57,41 +53,22 @@ final class Configuration
      */
     public function __construct(
         public readonly FactoryRegistryInterface $factories,
-        private readonly Faker\Generator $faker,
+        public readonly FakerAdapter $fakerAdapter,
         callable $instantiator,
         public readonly StoryRegistry $stories,
         private readonly ?PersistenceManager $persistence = null,
         public readonly bool $flushOnce = false,
-        ?int $forcedFakerSeedFromConfig = null,
-        ?int $forcedFakerSeedFromEnv = null,
         public readonly ?InMemoryRepositoryRegistry $inMemoryRepositoryRegistry = null,
         public readonly ?PersistedObjectsTracker $persistedObjectsTracker = null,
         private readonly bool $enableAutoRefreshWithLazyObjects = false,
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {
-        $this->forcedFakerSeed = $forcedFakerSeedFromEnv ?? $forcedFakerSeedFromConfig;
-
         $this->instantiator = $instantiator;
     }
 
     public function faker(): Faker\Generator
     {
-        if (!self::$fakerSeedHasBeenSet) {
-            $this->seedFaker();
-        }
-
-        return $this->faker;
-    }
-
-    public static function fakerSeed(): ?int
-    {
-        return self::$fakerSeed;
-    }
-
-    public static function resetFakerSeed(?int $forcedFakerSeed = null): void
-    {
-        self::$fakerSeed = $forcedFakerSeed;
-        self::$fakerSeedHasBeenSet = false;
+        return $this->fakerAdapter->faker();
     }
 
     /**
@@ -171,7 +148,7 @@ final class Configuration
     {
         PersistedObjectsTracker::reset();
         StoryRegistry::reset();
-        self::$fakerSeedHasBeenSet = false;
+        FakerAdapter::reset();
         self::$instance = null;
     }
 
@@ -222,16 +199,5 @@ final class Configuration
         }
 
         trigger_deprecation('zenstruck/foundry', '2.7', $message);
-    }
-
-    private function seedFaker(): void
-    {
-        self::$fakerSeed ??= ($this->forcedFakerSeed ?? \random_int(1, 1000000));
-
-        // prevent data providers to use the same seed as the test suite
-        $seed = $this->bootedForDataProvider ? self::$fakerSeed + 1 : self::$fakerSeed;
-
-        $this->faker->seed($seed);
-        self::$fakerSeedHasBeenSet = true;
     }
 }

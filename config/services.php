@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Faker;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\FactoryRegistry;
+use Zenstruck\Foundry\FakerAdapter;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\StoryRegistry;
 
@@ -34,16 +35,22 @@ return static function(ContainerConfigurator $container): void {
         ->set('.zenstruck_foundry.instantiator', Instantiator::class)
         ->factory([Instantiator::class, 'withConstructor'])
 
+        ->set('.zenstruck_foundry.faker.adapter', FakerAdapter::class)
+        ->args([
+            service('.zenstruck_foundry.faker'),
+            param('zenstruck_foundry.faker.seed'),
+            env('default::int:FOUNDRY_FAKER_SEED'),
+            param('zenstruck_foundry.faker.manage_seed'),
+        ])
+
         ->set('.zenstruck_foundry.configuration', Configuration::class)
         ->args([
             service('.zenstruck_foundry.factory_registry'),
-            service('.zenstruck_foundry.faker'),
+            service('.zenstruck_foundry.faker.adapter'),
             service('.zenstruck_foundry.instantiator'),
             service('.zenstruck_foundry.story_registry'),
             service('.zenstruck_foundry.persistence_manager')->nullOnInvalid(),
             param('zenstruck_foundry.persistence.flush_once'),
-            param('zenstruck_foundry.faker.seed'),
-            env('default::int:FOUNDRY_FAKER_SEED'),
             service('.zenstruck_foundry.in_memory.repository_registry'),
             service('.foundry.persistence.objects_tracker')->nullOnInvalid(),
             param('zenstruck_foundry.enable_auto_refresh_with_lazy_objects'),

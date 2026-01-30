@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\FakerAdapter;
@@ -26,31 +27,45 @@ use function Zenstruck\Foundry\faker;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11.0
+ * @requires PHPUnit >=12.0
  */
-#[RequiresPhpunit('>=11.0')]
-final class FakerSeedSetFromLegacyConfigKernelTest extends KernelTestCase
+#[RequiresPhpunit('>=12.0')]
+final class FakerSeedShouldNotChangeIfSeedIsNotManagedByFoundryTest extends KernelTestCase
 {
     use Factories, ResetDatabase, ResetFakerTestTrait;
 
     #[Test]
-    #[IgnoreDeprecations]
-    public function faker_seed_by_configuration_is_deprecated(): void
+    public function faker_seed_is_null_if_not_forced(): void
+    {
+        // usually triggers seeding
+        faker()->word();
+
+        self::assertNull(FakerAdapter::fakerSeed());
+    }
+
+    #[Test]
+    #[Depends('faker_seed_is_null_if_not_forced')]
+    public function faker_seed_still_null(): void
+    {
+        $this->faker_seed_is_null_if_not_forced();
+    }
+
+    #[Test]
+    #[WithEnvironmentVariable('FOUNDRY_FAKER_SEED', '4321')]
+    public function faker_seed_can_still_be_forced_by_env_var(): void
     {
         self::assertSame('quia', faker()->word());
         self::assertSame(4321, FakerAdapter::fakerSeed());
     }
 
     #[Test]
-    #[Depends('faker_seed_by_configuration_is_deprecated')]
-    public function faker_seed_is_already_set(): void
+    public function faker_seed_can_still_be_forced_by_env_var_2(): void
     {
-        self::assertSame('quia', faker()->word());
-        self::assertSame(4321, FakerAdapter::fakerSeed());
+        $this->faker_seed_can_still_be_forced_by_env_var();
     }
 
     protected static function bootKernel(array $options = []): KernelInterface
     {
-        return parent::bootKernel(['environment' => 'faker_seed_legacy_config']);
+        return parent::bootKernel(['environment' => 'faker_seed_not_managed']);
     }
 }

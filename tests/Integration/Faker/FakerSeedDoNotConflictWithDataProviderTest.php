@@ -18,14 +18,13 @@ use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\FakerAdapter;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithUniqueColumn;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\WithUniqueColumn\WithUniqueColumnFactory;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
-
 use function Zenstruck\Foundry\faker;
 
 /**
@@ -42,7 +41,7 @@ final class FakerSeedDoNotConflictWithDataProviderTest extends KernelTestCase
     #[DataProvider('provideObject')]
     public function no_conflict_with_data_providers(WithUniqueColumn $withUniqueColumnFromDataProvider): void
     {
-        self::assertSame(1234, Configuration::fakerSeed());
+        self::assertSame(1234, FakerAdapter::fakerSeed());
         self::assertSame('architecto', $withUniqueColumnFromDataProvider->getUniqueCol());
         self::assertSame('eius', WithUniqueColumnFactory::createOne()->getUniqueCol());
     }
@@ -57,7 +56,7 @@ final class FakerSeedDoNotConflictWithDataProviderTest extends KernelTestCase
     #[DataProvider('provideObjectUsingFakreInDataProvider')]
     public function no_conflict_with_data_providers_using_faker(WithUniqueColumn $withUniqueColumnFromDataProvider, string $expected): void
     {
-        self::assertSame(1234, Configuration::fakerSeed());
+        self::assertSame(1234, FakerAdapter::fakerSeed());
         self::assertSame($expected, $withUniqueColumnFromDataProvider->getUniqueCol());
         self::assertSame('eius', WithUniqueColumnFactory::createOne()->getUniqueCol());
     }
@@ -67,6 +66,6 @@ final class FakerSeedDoNotConflictWithDataProviderTest extends KernelTestCase
         yield [WithUniqueColumnFactory::createOne(['uniqueCol' => faker()->word()]), 'dolorum'];
         yield [WithUniqueColumnFactory::createOne(['uniqueCol' => faker()->word()]), 'soluta'];
 
-        self::assertSame(1234, Configuration::fakerSeed(), 'Faker seed should have been set even in data provider');
+        self::assertSame(1234, FakerAdapter::fakerSeed(), 'Faker seed should have been set even in data provider');
     }
 }

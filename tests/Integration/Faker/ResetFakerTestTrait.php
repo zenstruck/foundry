@@ -16,6 +16,7 @@ namespace Zenstruck\Foundry\Tests\Integration\Faker;
 use PHPUnit\Framework\Attributes\AfterClass;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\FakerAdapter;
 
 trait ResetFakerTestTrait
 {
@@ -36,7 +37,7 @@ trait ResetFakerTestTrait
         $_ENV['FOUNDRY_FAKER_SEED'] = null;
         \putenv('FOUNDRY_FAKER_SEED');
 
-        Configuration::resetFakerSeed();
+        FakerAdapter::resetFakerSeed();
     }
 
     #[AfterClass(-10)]
@@ -51,6 +52,6 @@ trait ResetFakerTestTrait
         }
 
         $savedValue = self::$savedServerSeed ?? self::$savedEnvSeed ?? self::$savedGetEnvSeed;
-        Configuration::resetFakerSeed($savedValue ? (int) $savedValue : null);
+        FakerAdapter::resetFakerSeed($savedValue ? (int) $savedValue : null);
     }
 }

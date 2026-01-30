@@ -607,6 +607,18 @@ You can also freeze the seed, by using the environment variable ``FOUNDRY_FAKER_
 
     Support for ``FOUNDRY_FAKER_SEED`` was added in 2.4.
 
+.. note::
+
+    By default, Foundry generates a seed for Faker and automatically resets it before each test.
+    You can disable this with the configuration ``manage_seed: false``. You can still use ``FOUNDRY_FAKER_SEED``
+    to set an explicit seed.
+
+    .. code-block:: yaml
+
+        # config/packages/zenstruck_foundry.yaml
+        zenstruck_foundry:
+            faker:
+                manage_seed: false
 
 Hooks
 ~~~~~
@@ -2652,6 +2664,9 @@ Full Default Bundle Configuration
 
             # Change the default faker locale.
             locale:               null # Example: fr_FR
+
+            # Automatically manage faker seed to ensure consistent data between test runs.
+            manage_seed:          true
 
             # Customize the faker service.
             service:              null # Example: my_faker

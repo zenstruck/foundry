@@ -18,10 +18,9 @@ use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\FakerAdapter;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
-
 use function Zenstruck\Foundry\faker;
 
 /**
@@ -37,7 +36,7 @@ final class FakerSeedSetFromEnvVarKernelTest extends KernelTestCase
     public function faker_seed_can_be_set_by_environment_variable(): void
     {
         self::assertSame('quia', faker()->word());
-        self::assertSame(4321, Configuration::fakerSeed());
+        self::assertSame(4321, FakerAdapter::fakerSeed());
     }
 
     #[Test]
@@ -45,7 +44,7 @@ final class FakerSeedSetFromEnvVarKernelTest extends KernelTestCase
     public function faker_seed_is_already_set(): void
     {
         self::assertSame('quia', faker()->word());
-        self::assertSame(4321, Configuration::fakerSeed());
+        self::assertSame(4321, FakerAdapter::fakerSeed());
     }
 
     protected static function bootKernel(array $options = []): KernelInterface

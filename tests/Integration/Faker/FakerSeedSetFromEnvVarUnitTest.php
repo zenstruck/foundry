@@ -17,9 +17,8 @@ use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\FakerAdapter;
 use Zenstruck\Foundry\Test\Factories;
-
 use function Zenstruck\Foundry\faker;
 
 /**
@@ -36,7 +35,7 @@ final class FakerSeedSetFromEnvVarUnitTest extends TestCase
     {
         self::assertSame('1234', $_SERVER['FOUNDRY_FAKER_SEED'], 'Default seed should be 1234');
         self::assertSame('architecto', faker()->word());
-        self::assertSame(1234, Configuration::fakerSeed());
+        self::assertSame(1234, FakerAdapter::fakerSeed());
     }
 
     #[Test]
@@ -45,6 +44,6 @@ final class FakerSeedSetFromEnvVarUnitTest extends TestCase
     {
         self::assertSame('1234', $_SERVER['FOUNDRY_FAKER_SEED'], 'Default seed should be 1234');
         self::assertSame('architecto', faker()->word());
-        self::assertSame(1234, Configuration::fakerSeed());
+        self::assertSame(1234, FakerAdapter::fakerSeed());
     }
 }

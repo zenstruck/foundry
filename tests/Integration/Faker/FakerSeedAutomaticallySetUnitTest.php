@@ -17,9 +17,8 @@ use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\FakerAdapter;
 use Zenstruck\Foundry\Test\Factories;
-
 use function Zenstruck\Foundry\faker;
 
 /**
@@ -36,15 +35,15 @@ final class FakerSeedAutomaticallySetUnitTest extends TestCase
     {
         faker(); // triggers seeding
 
-        self::$currentSeed = Configuration::fakerSeed();
+        self::$currentSeed = FakerAdapter::fakerSeed();
 
-        self::assertSame(self::$currentSeed, Configuration::fakerSeed());
+        self::assertSame(self::$currentSeed, FakerAdapter::fakerSeed());
     }
 
     #[Test]
     #[Depends('faker_seed_does_not_change')]
     public function faker_seed_does_not_change_between_tests(): void
     {
-        self::assertSame(self::$currentSeed, Configuration::fakerSeed());
+        self::assertSame(self::$currentSeed, FakerAdapter::fakerSeed());
     }
 }

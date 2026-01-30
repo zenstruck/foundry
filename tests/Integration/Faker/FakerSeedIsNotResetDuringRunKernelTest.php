@@ -16,7 +16,7 @@ namespace Zenstruck\Foundry\Tests\Integration\Faker;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\FakerAdapter;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\WithUniqueColumn\WithUniqueColumnFactory;
@@ -34,13 +34,13 @@ final class FakerSeedIsNotResetDuringRunKernelTest extends WebTestCase
     public function faker_seed_is_not_reset_with_kernel_shutdown(): void
     {
         $e1 = WithUniqueColumnFactory::createOne();
-        self::assertSame(1234, Configuration::fakerSeed());
+        self::assertSame(1234, FakerAdapter::fakerSeed());
 
         self::ensureKernelShutdown();
 
         $e2 = WithUniqueColumnFactory::createOne();
 
-        self::assertSame(1234, Configuration::fakerSeed());
+        self::assertSame(1234, FakerAdapter::fakerSeed());
         self::assertNotSame($e1->getUniqueCol(), $e2->getUniqueCol());
     }
 
@@ -50,18 +50,18 @@ final class FakerSeedIsNotResetDuringRunKernelTest extends WebTestCase
         $client = $this->createClient();
 
         $e1 = WithUniqueColumnFactory::createOne();
-        self::assertSame(1234, Configuration::fakerSeed());
+        self::assertSame(1234, FakerAdapter::fakerSeed());
 
         $client->request('GET', '/hello-world');
 
         $e2 = WithUniqueColumnFactory::createOne();
-        self::assertSame(1234, Configuration::fakerSeed());
+        self::assertSame(1234, FakerAdapter::fakerSeed());
         self::assertNotSame($e1->getUniqueCol(), $e2->getUniqueCol());
 
         $client->request('GET', '/hello-world');
 
         $e2 = WithUniqueColumnFactory::createOne();
-        self::assertSame(1234, Configuration::fakerSeed());
+        self::assertSame(1234, FakerAdapter::fakerSeed());
         self::assertNotSame($e1->getUniqueCol(), $e2->getUniqueCol());
     }
 }

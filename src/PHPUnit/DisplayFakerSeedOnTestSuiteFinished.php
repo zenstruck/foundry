@@ -15,13 +15,13 @@ namespace Zenstruck\Foundry\PHPUnit;
 
 use PHPUnit\Event\TestRunner\Finished;
 use PHPUnit\Event\TestRunner\FinishedSubscriber;
-use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\FakerAdapter;
 
 final class DisplayFakerSeedOnTestSuiteFinished implements FinishedSubscriber
 {
     public function notify(Finished $event): void
     {
-        $fakerSeed = Configuration::fakerSeed();
+        $fakerSeed = FakerAdapter::fakerSeed();
 
         if (null !== $fakerSeed) {
             echo "\n\nFaker seed: ".$fakerSeed; // @phpstan-ignore ekinoBannedCode.expression
