@@ -99,15 +99,13 @@ abstract class KernelBench
     }
 
     /**
-     * @param array{environment?: string, debug?: bool} $options
-     *
      * @see KernelTestCase::bootKernel()
      */
-    protected static function bootKernel(array $options = []): KernelInterface
+    protected static function bootKernel(): KernelInterface
     {
         static::ensureKernelShutdown();
 
-        $kernel = static::createKernel($options);
+        $kernel = static::createKernel();
         $kernel->boot();
         static::$kernel = $kernel;
         static::$booted = true;
@@ -140,17 +138,12 @@ abstract class KernelBench
 
     /**
      * @see KernelTestCase::createKernel()
-     *
-     * @param array{environment?: string, debug?: bool} $options
      */
-    protected static function createKernel(array $options = []): KernelInterface
+    protected static function createKernel(): KernelInterface
     {
         static::$class ??= static::getKernelClass();
 
-        $env = $options['environment'] ?? $_ENV['APP_ENV'] ?? $_SERVER['APP_ENV'] ?? 'test';
-        $debug = $options['debug'] ?? $_ENV['APP_DEBUG'] ?? $_SERVER['APP_DEBUG'] ?? true;
-
-        return new static::$class($env, false);
+        return new static::$class('test', false);
     }
 
     /**
