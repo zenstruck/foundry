@@ -11,6 +11,7 @@ $file = __DIR__.'/.php-cs-fixer.temp.php';
 $csFixerConfig = require $file;
 $csFixerConfig->setFinder(
     $csFixerConfig->getFinder()
+        ->notName('WebTestCaseWithBothTraitsInWrongOrderTest.php')
         ->in(__DIR__.'/utils')
         ->in(__DIR__.'/config')
 );

@@ -41,7 +41,7 @@ trait ResetDatabase
      * @internal
      * @before
      */
-    #[Before]
+    #[Before(10)]
     public static function _resetDatabaseBeforeEachTest(): void
     {
         if (ResetDatabaseManager::canSkipSchemaReset()) {

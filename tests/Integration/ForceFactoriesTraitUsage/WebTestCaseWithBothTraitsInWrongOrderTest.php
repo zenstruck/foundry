@@ -13,17 +13,21 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\ForceFactoriesTraitUsage;
 
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
+use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 #[RequiresPhpunit('>=11.0')]
-final class KernelTestCaseWithBothTraitsInWrongOrderTest extends KernelTestCase
+final class WebTestCaseWithBothTraitsInWrongOrderTest extends WebTestCase
 {
-    use Factories, ResetDatabase;
+    // traits are in a different order than usual on purpose (ResetDatabase must be first)
+    use ResetDatabase, Factories, RequiresORM;
 
     #[Test]
     public function should_not_throw(): void
@@ -41,5 +45,23 @@ final class KernelTestCaseWithBothTraitsInWrongOrderTest extends KernelTestCase
         Object1Factory::createOne();
 
         $this->expectNotToPerformAssertions();
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function ensure_entity_manager_instance_is_shared(): void
+    {
+        static::createClient();
+
+        $object = GenericEntityFactory::createOne();
+
+        /** @var EntityManagerInterface $em */
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+
+        self::assertTrue(
+            $em->contains($object)
+        );
     }
 }

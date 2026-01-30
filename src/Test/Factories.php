@@ -27,7 +27,7 @@ trait Factories
      * @internal
      * @before
      */
-    #[Before]
+    #[Before(5)]
     public function _beforeHook(): void
     {
         $this->_bootFoundry();
@@ -38,7 +38,7 @@ trait Factories
      * @internal
      * @after
      */
-    #[After]
+    #[After(5)]
     public static function _shutdownFoundry(): void
     {
         Configuration::shutdown();
