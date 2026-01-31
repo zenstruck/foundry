@@ -297,6 +297,14 @@ final class PersistenceManager
             return $object->_delete();
         }
 
+        if (
+            \PHP_VERSION_ID >= 80400
+            && ($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)
+        ) {
+            /** @var T $object */
+            $object = $reflector->initializeLazyObject($object);
+        }
+
         $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
         $om->remove($object);
         $this->flush($om);

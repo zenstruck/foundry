@@ -30,6 +30,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\DerivedIdentity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithCloneMethod;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithReadonly\EntityWithReadonly;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\ManyToOneWithCascade\OwningSide;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\AddressFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
@@ -37,6 +38,9 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Integration\Persistence\AutoRefreshTestCase;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
+use function Zenstruck\Foundry\Persistence\assert_not_persisted;
+use function Zenstruck\Foundry\Persistence\assert_persisted;
+use function Zenstruck\Foundry\Persistence\delete;
 use function Zenstruck\Foundry\Persistence\persistent_factory;
 use function Zenstruck\Foundry\Persistence\refresh_all;
 
@@ -209,6 +213,20 @@ final class AutoRefreshTest extends AutoRefreshTestCase
         self::assertTrue((new \ReflectionClass($inverseSide))->isUninitializedLazyObject($inverseSide));
 
         $inverseSide->getStatus();
+    }
+
+    #[Test]
+    public function it_can_delete_uninitialized_entity_with_cascade_persist(): void
+    {
+        $entity = persistent_factory(OwningSide::class)->create();
+
+        assert_persisted($entity);
+
+        refresh_all();
+
+        delete($entity);
+
+        assert_not_persisted($entity);
     }
 
     protected static function factory(): PersistentObjectFactory
