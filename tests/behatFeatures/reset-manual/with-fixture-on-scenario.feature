@@ -18,4 +18,6 @@ Feature: "@withFixture" on scenario
   @resetDB
   Scenario: Reset DB should clear DB
     Then 0 contacts should exist
+    Given a contact is created
+    Then 1 contact should exist
 

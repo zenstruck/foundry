@@ -79,6 +79,10 @@ final class DatabaseResetListener implements EventSubscriberInterface
             StaticDriver::setKeepStaticConnections(true);
         }
 
+        if (DatabaseResetMode::MANUAL === $this->resetMode) {
+            return;
+        }
+
         ResetDatabaseManager::resetBeforeFirstTest($this->symfonyKernel);
     }
 
@@ -117,6 +121,10 @@ final class DatabaseResetListener implements EventSubscriberInterface
 
         // when the DB is reset, any stories should be able to reload
         StoryRegistry::reset();
+
+        if (!ResetDatabaseManager::databaseHasBeenResetBeforeFirstTest()) {
+            ResetDatabaseManager::resetBeforeFirstTest($this->symfonyKernel);
+        }
 
         if ($this->damaSupportEnabled) {
             StaticDriver::rollBack();
@@ -167,7 +175,6 @@ final class DatabaseResetListener implements EventSubscriberInterface
         }
 
         if ($this->resetMode === DatabaseResetMode::SCENARIO) {
-            // todo: il manque des tests unitaires de ces listeners ! et un peu ailleurs
             // todo: ajouter des infos concernant le fichier de features
             throw InvalidResetDbTag::resetDbWithScenarioMode();
         }

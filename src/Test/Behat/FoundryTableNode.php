@@ -2,7 +2,6 @@
 
 namespace Zenstruck\Foundry\Test\Behat;
 
-use Behat\Gherkin\Exception\NodeException;
 use Behat\Gherkin\Node\TableNode;
 use function Zenstruck\Foundry\set;
 

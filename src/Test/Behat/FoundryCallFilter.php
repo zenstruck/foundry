@@ -13,6 +13,8 @@ use Zenstruck\Foundry\Test\Behat\Exception\ObjectNotFound;
 
 /**
  * @internal
+ *
+ * Transforms TableNodes into FoundryTableNodes where all types are resolved.
  */
 final class FoundryCallFilter implements CallFilter
 {

@@ -61,10 +61,7 @@ reset-manual:
         main: false
         reset-manual:
             paths: [tests/behatFeatures/reset-manual]
-            contexts: &common_contexts_with_reset_manual
-                - Behat\MinkExtension\Context\MinkContext
-                - Zenstruck\Foundry\Test\Behat\FoundryContext
-                - Zenstruck\Foundry\Tests\Fixture\Behat\ResetDisabledTestContext
+            contexts: *common_contexts
 
 reset-manual-dama:
     extensions:
@@ -76,7 +73,7 @@ reset-manual-dama:
         main: false
         reset-manual-dama:
             paths: [tests/behatFeatures/reset-manual]
-            contexts: *common_contexts_with_reset_manual
+            contexts: *common_contexts
 
 reset-feature:
     extensions:
@@ -113,4 +110,7 @@ reset-disabled:
         main: false
         reset-disabled:
             paths: [tests/behatFeatures/reset-disabled]
-            contexts: *common_contexts_with_reset_manual
+            contexts:
+                - Behat\MinkExtension\Context\MinkContext
+                - Zenstruck\Foundry\Tests\Fixture\Behat\TestFoundryContext
+                - Zenstruck\Foundry\Tests\Fixture\Behat\ResetDisabledTestContext

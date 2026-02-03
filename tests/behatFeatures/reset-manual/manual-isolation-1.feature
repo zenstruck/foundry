@@ -1,3 +1,4 @@
+@resetDB
 Feature: Manual database isolation (disabled mode) - Part 1
 
   Scenario: First scenario creates data
