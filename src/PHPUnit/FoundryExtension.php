@@ -57,9 +57,9 @@ if (\interface_exists(Runner\Extension\Extension::class)) {
                 Event\Test\PreparationStarted::class => [
                     new BootFoundryOnPreparationStarted(),
                     new ResetDatabaseOnPreparationStarted($autoResetEnabled),
+                    new EnableInMemoryOnPreparationStarted(),
                 ],
                 Event\Test\Prepared::class => [
-                    new EnableInMemoryOnTestPrepared(),
                     new BuildStoryOnTestPrepared(),
                     new TriggerDataProviderPersistenceOnTestPrepared(),
                 ],

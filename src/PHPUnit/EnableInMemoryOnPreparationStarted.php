@@ -23,9 +23,9 @@ use Zenstruck\Foundry\InMemory\CannotEnableInMemory;
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-final class EnableInMemoryOnTestPrepared implements Event\Test\PreparedSubscriber
+final class EnableInMemoryOnPreparationStarted implements Event\Test\PreparationStartedSubscriber
 {
-    public function notify(Event\Test\Prepared $event): void
+    public function notify(Event\Test\PreparationStarted $event): void
     {
         $test = $event->test();
 
