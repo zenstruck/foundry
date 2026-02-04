@@ -4,15 +4,16 @@ on:
   push:
     paths: &paths
       - .github/workflows/behat.yml
-      - bin/tools/behat
-      - src/Behat/**
-      - tests/Behat/**
-      - behat.yml
-      - composer.json
+      - src/Test/Behat/**
   pull_request:
     paths: *paths
   schedule:
     - cron: '0 0 1,16 * *'
+
+defaults:
+  run:
+    shell: bash
+    working-directory: ./src/Test/Behat
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -51,13 +52,9 @@ jobs:
       - name: Install dependencies
         uses: ramsey/composer-install@v2
         with:
+          working-directory: "src/Test/Behat"
           dependency-versions: ${{ matrix.deps }}
           composer-options: --prefer-dist
-        env:
-          SYMFONY_REQUIRE: ${{ matrix.symfony }}
-
-      - name: Install Behat
-        run: composer bin behat update ${{ matrix.deps == 'lowest' && '--prefer-lowest' || '' }} --prefer-dist
         env:
           SYMFONY_REQUIRE: ${{ matrix.symfony }}
 

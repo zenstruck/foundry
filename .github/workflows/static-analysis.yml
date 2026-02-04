@@ -48,9 +48,7 @@ jobs:
         run: composer bin phpstan install
 
       - name: Install PHPBench & Behat
-        run: |
-          composer bin phpbench install
-          composer bin behat install
+        run: composer bin phpbench install
 
       - name: Run PHPStan
         run: bin/tools/phpstan/vendor/phpstan/phpstan/phpstan analyse

@@ -11,7 +11,7 @@
          defaultTestSuite="main">
     <php>
         <ini name="error_reporting" value="-1"/>
-        <server name="KERNEL_CLASS" value="Zenstruck\Foundry\Tests\Fixture\TestKernel"/>
+        <server name="KERNEL_CLASS" value="Zenstruck\Foundry\Test\Behat\Tests\Fixture\BehatTestKernel"/>
         <server name="SHELL_VERBOSITY" value="-1"/>
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>
         <env name="APP_ENV" value="test"/>

@@ -115,14 +115,14 @@ abstract class FoundryTestKernel extends Kernel
                         'Entity' => [
                             'is_bundle' => false,
                             'type' => 'attribute',
-                            'dir' => '%kernel.project_dir%/tests/Fixture/Entity',
+                            'dir' => "{$this->baseFixturePath()}/Entity",
                             'prefix' => 'Zenstruck\Foundry\Tests\Fixture\Entity',
                             'alias' => 'Entity',
                         ],
                         'Model' => [
                             'is_bundle' => false,
                             'type' => 'attribute',
-                            'dir' => '%kernel.project_dir%/tests/Fixture/Model',
+                            'dir' => "{$this->baseFixturePath()}/Model",
                             'prefix' => 'Zenstruck\Foundry\Tests\Fixture\Model',
                             'alias' => 'Model',
                         ],
@@ -134,7 +134,7 @@ abstract class FoundryTestKernel extends Kernel
                                 'EntityInAnotherSchema' => [
                                     'is_bundle' => false,
                                     'type' => 'attribute',
-                                    'dir' => '%kernel.project_dir%/tests/Fixture/EntityInAnotherSchema',
+                                    'dir' => "{$this->baseFixturePath()}/EntityInAnotherSchema",
                                     'prefix' => 'Zenstruck\Foundry\Tests\Fixture\EntityInAnotherSchema',
                                     'alias' => 'Migrate',
                                 ],
@@ -177,14 +177,14 @@ abstract class FoundryTestKernel extends Kernel
                             'Document' => [
                                 'is_bundle' => false,
                                 'type' => 'attribute',
-                                'dir' => '%kernel.project_dir%/tests/Fixture/Document',
+                                'dir' => "{$this->baseFixturePath()}/Document",
                                 'prefix' => 'Zenstruck\Foundry\Tests\Fixture\Document',
                                 'alias' => 'Document',
                             ],
                             'Model' => [
                                 'is_bundle' => false,
                                 'type' => 'attribute',
-                                'dir' => '%kernel.project_dir%/tests/Fixture/Model',
+                                'dir' => "{$this->baseFixturePath()}/Model",
                                 'prefix' => 'Zenstruck\Foundry\Tests\Fixture\Model',
                                 'alias' => 'Model',
                             ],
@@ -200,5 +200,10 @@ abstract class FoundryTestKernel extends Kernel
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
         $routes->import(__DIR__.'/App/Controller/*.php', 'attribute');
+    }
+
+    protected function baseFixturePath(): string
+    {
+        return '%kernel.project_dir%/tests/Fixture';
     }
 }

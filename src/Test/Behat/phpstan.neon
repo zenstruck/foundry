@@ -10,10 +10,9 @@ parameters:
     checkMissingCallableSignature: true
 
     paths:
-        - config
+        - config?
         - src
         - tests
-        - stubs/phpstan
 
     banned_code:
         non_ignorable: false
