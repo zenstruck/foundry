@@ -21,7 +21,7 @@ final class FactoryNotResolvable extends \RuntimeException
 {
     public static function forName(string $name): self
     {
-        return new self("Cannot resolve factory for name \"$name\": short name does not exist");
+        return new self("Cannot resolve factory for name \"{$name}\": short name does not exist");
     }
 
     /**

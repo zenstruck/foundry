@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Test\Behat;
 
 use Behat\Behat\Definition\Call\DefinitionCall;
@@ -14,7 +23,7 @@ use Zenstruck\Foundry\Test\Behat\Exception\ObjectNotFound;
 /**
  * @internal
  *
- * Transforms TableNodes into FoundryTableNodes where all types are resolved.
+ * Transforms TableNodes into FoundryTableNodes where all types are resolved
  */
 final class FoundryCallFilter implements CallFilter
 {
@@ -41,7 +50,7 @@ final class FoundryCallFilter implements CallFilter
         if (
             !$call instanceof DefinitionCall
             || !$call->getCallee()->getReflection() instanceof \ReflectionMethod
-            || $call->getCallee()->getReflection()->class !== FoundryContext::class
+            || FoundryContext::class !== $call->getCallee()->getReflection()->class
         ) {
             return $call;
         }
@@ -49,20 +58,18 @@ final class FoundryCallFilter implements CallFilter
         $arguments = $call->getArguments();
 
         if (!isset($arguments['factoryShortName'])) {
-            throw new \InvalidArgumentException(
-                <<<ERROR
+            throw new \InvalidArgumentException(<<<ERROR
                 Cannot filter call without a "\$factoryShortName" argument. 
                 This must be the name of the argument in the #[Given], #[When], #[Then] definitions."
-                ERROR
-            );
+                ERROR);
         }
-        
+
         return new DefinitionCall(
             $call->getEnvironment(),
             $call->getFeature(),
             $call->getStep(),
             $call->getCallee(),
-            array_map(
+            \array_map(
                 fn(mixed $argument) => match ($argument instanceof TableNode) {
                     true => $this->normalizeObjectParameters($argument, $arguments['factoryShortName']),
                     false => $argument,
@@ -77,30 +84,30 @@ final class FoundryCallFilter implements CallFilter
     {
         $table = $tableNode->getTable();
 
-        $headKey = array_key_first($table);
-        $thead = array_shift($table);
+        $headKey = \array_key_first($table);
+        $thead = \array_shift($table);
 
         return FoundryTableNode::create(
             $this->factoryResolver,
             $this->objectRegistry,
-            (\Closure::bind(
-                fn () => $this->maxLineLength,
+            \Closure::bind(
+                fn() => $this->maxLineLength,
                 $tableNode,
                 TableNode::class
-            )()),
+            )(),
             [ // @phpstan-ignore argument.type (TableNode has the same problem: array $table is not really lists)
                 $headKey => $thead, // @phpstan-ignore array.invalidKey
-                ...array_map(
-                    function (array $parameters) use ($thead, $factoryShortName): array {
+                ...\array_map(
+                    function(array $parameters) use ($thead, $factoryShortName): array {
                         $normalized = [];
                         foreach ($parameters as $key => $value) {
                             if (!isset($thead[$key])) {
-                                throw new \LogicException("Table has no column for parameter \"$key\". This should never happen, table integrity is checked in TableNode.");
+                                throw new \LogicException("Table has no column for parameter \"{$key}\". This should never happen, table integrity is checked in TableNode.");
                             }
 
                             $propertyName = $thead[$key];
 
-                            if ($propertyName === '_ref') {
+                            if ('_ref' === $propertyName) {
                                 $normalized['_ref'] = $value;
 
                                 continue;
@@ -124,7 +131,7 @@ final class FoundryCallFilter implements CallFilter
                                 continue;
                             }
 
-                            if (preg_match('/^<ref\((?<factoryShortName>[^,]+), (?<objectName>[^)]+)\)>$/', $value, $matches)) {
+                            if (\preg_match('/^<ref\((?<factoryShortName>[^,]+), (?<objectName>[^)]+)\)>$/', $value, $matches)) {
                                 try {
                                     $normalized[$propertyName] = $this->objectRegistry->getByFactoryShortName($matches['factoryShortName'], $matches['objectName']);
                                 } catch (ObjectNotFound $e) {
@@ -153,7 +160,7 @@ final class FoundryCallFilter implements CallFilter
                                 continue;
                             }
 
-                            if (is_a($expectedTypeClass, \DateTimeInterface::class, allow_string: true)) {
+                            if (\is_a($expectedTypeClass, \DateTimeInterface::class, allow_string: true)) {
                                 try {
                                     $normalized[$propertyName] = new $expectedTypeClass($value);
 
@@ -163,15 +170,15 @@ final class FoundryCallFilter implements CallFilter
                                 }
                             }
 
-                            if (is_a($expectedTypeClass, \BackedEnum::class, allow_string: true)) {
-                                $value = is_numeric($value) ? (int)$value : $value;
+                            if (\is_a($expectedTypeClass, \BackedEnum::class, allow_string: true)) {
+                                $value = \is_numeric($value) ? (int) $value : $value;
 
-                                $normalized[$propertyName] = $expectedTypeClass::tryFrom($value) ?? throw InvalidObjectParameter::invalidEnumValue($propertyName, (string)$value);
+                                $normalized[$propertyName] = $expectedTypeClass::tryFrom($value) ?? throw InvalidObjectParameter::invalidEnumValue($propertyName, (string) $value);
 
                                 continue;
                             }
 
-                            throw new \LogicException("Cannot normalize parameter \"$propertyName\" with value \"$value\".");
+                            throw new \LogicException("Cannot normalize parameter \"{$propertyName}\" with value \"{$value}\".");
                         }
 
                         return $normalized;
@@ -201,7 +208,7 @@ final class FoundryCallFilter implements CallFilter
             !isset($property)
             || !($type = $property->getType()) instanceof \ReflectionNamedType
             || $type->isBuiltin()
-            || !class_exists($type->getName())
+            || !\class_exists($type->getName())
         ) {
             return null;
         }

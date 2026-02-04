@@ -43,15 +43,12 @@ final class FixtureStoryResolver
             return $this->resolveGroup($fixtureOrGroupName);
         }
 
-        throw FixtureStoryNotFound::forNameOrGroup(
-            $fixtureOrGroupName,
-            [...$this->availableFixtureNames(), ...$this->availableGroupNames()]
-        );
+        throw FixtureStoryNotFound::forNameOrGroup($fixtureOrGroupName, [...$this->availableFixtureNames(), ...$this->availableGroupNames()]);
     }
 
     public function hasAnyFixtures(): bool
     {
-        return count($this->fixtureStories) > 0;
+        return \count($this->fixtureStories) > 0;
     }
 
     public function hasFixture(string $name): bool
@@ -61,7 +58,7 @@ final class FixtureStoryResolver
 
     public function hasOnlyOneFixture(): bool
     {
-        return count($this->fixtureStories) === 1;
+        return 1 === \count($this->fixtureStories);
     }
 
     /**

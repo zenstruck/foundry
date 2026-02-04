@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Zenstruck\Foundry\Test\Behat\Exception;
 
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
@@ -24,19 +33,19 @@ final class InvalidResetDbTag extends \LogicException
                     continue;
                 }
 
-                if (str_contains($file, $path)) {
-                    $file = substr($file, strpos($file, $path)); // @phpstan-ignore argument.type (strpos cannot be false if $path is contained in $file)
+                if (\str_contains($file, $path)) {
+                    $file = \mb_substr($file, \mb_strpos($file, $path)); // @phpstan-ignore argument.type (strpos cannot be false if $path is contained in $file)
                     break;
                 }
             }
         }
 
-        $errorFileAndLine = match($event::class){
+        $errorFileAndLine = match ($event::class) {
             BeforeFeatureTested::class => "{$file}:{$event->getFeature()->getLine()}",
             BeforeScenarioTested::class => "{$file}:{$event->getScenario()->getLine()}",
         };
 
-        parent::__construct("$message\nAt $errorFileAndLine");
+        parent::__construct("{$message}\nAt {$errorFileAndLine}");
     }
 
     public static function bothTagsUsed(BeforeScenarioTested $event): self

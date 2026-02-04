@@ -56,15 +56,15 @@ final class DatabaseResetListener implements EventSubscriberInterface
 
             FeatureTested::BEFORE => [
                 ['validateFeature', 10],
-                ['resetDatabaseIfNeeded']
+                ['resetDatabaseIfNeeded'],
             ],
             ScenarioTested::BEFORE => [
                 ['validateScenario', 10],
-                ['resetDatabaseIfNeeded']
+                ['resetDatabaseIfNeeded'],
             ],
             ExampleTested::BEFORE => [
                 ['validateScenario', 10],
-                ['resetDatabaseIfNeeded']
+                ['resetDatabaseIfNeeded'],
             ],
 
             // a shutdown is needed after each scenario to ensure StoriesRegistry is reset
@@ -95,14 +95,14 @@ final class DatabaseResetListener implements EventSubscriberInterface
 
     public function validateFeature(BeforeFeatureTested $event): void
     {
-        if ($this->hasResetDbTag($event) && $this->resetMode === DatabaseResetMode::FEATURE) {
+        if ($this->hasResetDbTag($event) && DatabaseResetMode::FEATURE === $this->resetMode) {
             throw InvalidResetDbTag::resetDbOnFeatureWithFeatureMode($event);
         }
     }
 
     public function validateScenario(BeforeScenarioTested $event): void
     {
-        if ($this->hasResetDbTag($event) && $this->resetMode === DatabaseResetMode::SCENARIO) {
+        if ($this->hasResetDbTag($event) && DatabaseResetMode::SCENARIO === $this->resetMode) {
             throw InvalidResetDbTag::resetDbOnScenarioWithScenarioMode($event);
         }
 
@@ -136,6 +136,16 @@ final class DatabaseResetListener implements EventSubscriberInterface
         ResetDatabaseManager::resetBeforeEachTest($this->symfonyKernel);
     }
 
+    public function shutdownFoundryAfterScenario(): void
+    {
+        if (DatabaseResetMode::SCENARIO !== $this->resetMode) {
+            return;
+        }
+
+        $this->resetObjectRegistry();
+        Configuration::shutdown();
+    }
+
     private function shouldResetDB(BeforeFeatureTested|BeforeScenarioTested $event): bool
     {
         if ($this->hasNoResetDbTag($event)) {
@@ -146,18 +156,8 @@ final class DatabaseResetListener implements EventSubscriberInterface
             return true;
         }
 
-        return $event instanceof BeforeScenarioTested && $this->resetMode === DatabaseResetMode::SCENARIO
-            || $event instanceof BeforeFeatureTested && $this->resetMode === DatabaseResetMode::FEATURE;
-    }
-
-    public function shutdownFoundryAfterScenario(): void
-    {
-        if (DatabaseResetMode::SCENARIO !== $this->resetMode) {
-            return;
-        }
-
-        $this->resetObjectRegistry();
-        Configuration::shutdown();
+        return $event instanceof BeforeScenarioTested && DatabaseResetMode::SCENARIO === $this->resetMode
+            || $event instanceof BeforeFeatureTested && DatabaseResetMode::FEATURE === $this->resetMode;
     }
 
     private function hasResetDbTag(BeforeFeatureTested|BeforeScenarioTested $event): bool
@@ -174,7 +174,7 @@ final class DatabaseResetListener implements EventSubscriberInterface
             return false;
         }
 
-        if ($this->resetMode === DatabaseResetMode::SCENARIO) {
+        if (DatabaseResetMode::SCENARIO === $this->resetMode) {
             throw InvalidResetDbTag::resetDbWithScenarioMode($event);
         }
 
@@ -199,7 +199,7 @@ final class DatabaseResetListener implements EventSubscriberInterface
             throw DamaNativeExtensionIncompatibility::withNoResetDbTag();
         }
 
-        return match($this->resetMode) {
+        return match ($this->resetMode) {
             DatabaseResetMode::MANUAL => throw InvalidResetDbTag::noResetDbWithManualMode($event),
             DatabaseResetMode::FEATURE => throw InvalidResetDbTag::noResetDbWithFeatureMode($event),
             default => true,

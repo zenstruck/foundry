@@ -40,18 +40,13 @@ final class DatabaseResetListenerTest extends KernelTestCase
 {
     use Factories, RequiresORM, ResetDatabase;
 
-    protected static function getKernelClass(): string
-    {
-        return BehatTestKernel::class;
-    }
-
     protected function setUp(): void
     {
         $this->objectRegistry()->reset();
     }
 
     /**
-     * @param list<string> $tags
+     * @param list<string>             $tags
      * @param class-string<\Throwable> $exceptionClass
      */
     #[Test]
@@ -60,7 +55,7 @@ final class DatabaseResetListenerTest extends KernelTestCase
         DatabaseResetMode $mode,
         array $tags,
         string $exceptionClass,
-        string $exceptionMessage
+        string $exceptionMessage,
     ): void {
         $listener = $this->createListener($mode);
         $event = $this->createFeatureEvent($tags);
@@ -82,7 +77,7 @@ final class DatabaseResetListenerTest extends KernelTestCase
     }
 
     /**
-     * @param list<string> $tags
+     * @param list<string>             $tags
      * @param class-string<\Throwable> $exceptionClass
      */
     #[Test]
@@ -91,7 +86,7 @@ final class DatabaseResetListenerTest extends KernelTestCase
         DatabaseResetMode $mode,
         array $tags,
         string $exceptionClass,
-        string $exceptionMessage
+        string $exceptionMessage,
     ): void {
         $listener = $this->createListener($mode);
         $event = $this->createScenarioEvent($tags);
@@ -139,7 +134,7 @@ final class DatabaseResetListenerTest extends KernelTestCase
         $objectRegistry->store($testObject, 'test-object');
         self::assertTrue($objectRegistry->isStored($testObject));
 
-        $event = $eventType === 'feature' ? $this->createFeatureEvent($tags) : $this->createScenarioEvent($tags);
+        $event = 'feature' === $eventType ? $this->createFeatureEvent($tags) : $this->createScenarioEvent($tags);
 
         $listener->resetDatabaseIfNeeded($event);
 
@@ -205,7 +200,7 @@ final class DatabaseResetListenerTest extends KernelTestCase
     }
 
     /**
-     * @param list<string> $tags
+     * @param list<string>             $tags
      * @param class-string<\Throwable> $exceptionClass
      */
     #[Test]
@@ -216,7 +211,7 @@ final class DatabaseResetListenerTest extends KernelTestCase
         string $exceptionClass,
         string $exceptionMessage,
         bool $damaSupportEnabled = false,
-        bool $damaNativeExtensionIsEnabled = false
+        bool $damaNativeExtensionIsEnabled = false,
     ): void {
         $listener = $this->createListener($mode, $damaSupportEnabled, $damaNativeExtensionIsEnabled);
         $event = $this->createScenarioEvent($tags);
@@ -284,7 +279,7 @@ final class DatabaseResetListenerTest extends KernelTestCase
     }
 
     #[Test]
-    public function it_does_not_throw_for_noResetDB_tag_with_scenario_mode(): void
+    public function it_does_not_throw_for_no_reset_d_b_tag_with_scenario_mode(): void
     {
         $this->expectNotToPerformAssertions();
 
@@ -295,7 +290,7 @@ final class DatabaseResetListenerTest extends KernelTestCase
     }
 
     #[Test]
-    public function it_validates_feature_without_resetDB_tag_in_feature_mode(): void
+    public function it_validates_feature_without_reset_d_b_tag_in_feature_mode(): void
     {
         $this->expectNotToPerformAssertions();
 
@@ -305,10 +300,15 @@ final class DatabaseResetListenerTest extends KernelTestCase
         $listener->validateFeature($event);
     }
 
+    protected static function getKernelClass(): string
+    {
+        return BehatTestKernel::class;
+    }
+
     private function createListener(
         DatabaseResetMode $mode,
         bool $damaSupportEnabled = false,
-        bool $damaNativeExtensionIsEnabled = false
+        bool $damaNativeExtensionIsEnabled = false,
     ): DatabaseResetListener {
         return new DatabaseResetListener(self::$kernel ?? self::bootKernel(), $mode, $damaSupportEnabled, $damaNativeExtensionIsEnabled);
     }

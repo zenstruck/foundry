@@ -214,4 +214,3 @@ final class Article2Factory extends ObjectFactory
         return [];
     }
 }
-

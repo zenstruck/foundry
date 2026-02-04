@@ -241,7 +241,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
 
         // we load all services for Behat by default, and we remove them if we detect that Behat is not installed
         // that's the only way that worked so far...
-        if (interface_exists(\Behat\Behat\Context\Context::class)) {
+        if (\interface_exists(\Behat\Behat\Context\Context::class)) {
             $configurator->import('../config/behat.php');
         }
 

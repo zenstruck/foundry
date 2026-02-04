@@ -31,18 +31,6 @@ abstract class GenericModel
     #[MongoDB\Id(type: 'int', strategy: 'INCREMENT')]
     public ?int $id = null;
 
-    #[ORM\Column]
-    #[MongoDB\Field(type: 'string')]
-    private ?string $prop1 = null; // @phpstan-ignore doctrine.columnType (made on purpose, Doctrine does not handle nullable properties the same way)
-
-    #[ORM\Column]
-    #[MongoDB\Field(type: 'int')]
-    private int $propInteger = 0;
-
-    #[ORM\Column(nullable: true)]
-    #[MongoDB\Field(type: 'date_immutable', nullable: true)]
-    private ?\DateTimeImmutable $date = null;
-
     #[ORM\Column(nullable: true)]
     #[MongoDB\Field(type: 'date', nullable: true)]
     public ?\DateTime $dateMutable = null;
@@ -62,6 +50,18 @@ abstract class GenericModel
     #[ORM\Column(nullable: true)]
     #[MongoDB\Field(type: 'int', nullable: true, enumType: IntBackedEnum::class)]
     public ?IntBackedEnum $intEnum = null;
+
+    #[ORM\Column]
+    #[MongoDB\Field(type: 'string')]
+    private ?string $prop1 = null; // @phpstan-ignore doctrine.columnType (made on purpose, Doctrine does not handle nullable properties the same way)
+
+    #[ORM\Column]
+    #[MongoDB\Field(type: 'int')]
+    private int $propInteger = 0;
+
+    #[ORM\Column(nullable: true)]
+    #[MongoDB\Field(type: 'date_immutable', nullable: true)]
+    private ?\DateTimeImmutable $date = null;
 
     public function __construct(string $prop1)
     {

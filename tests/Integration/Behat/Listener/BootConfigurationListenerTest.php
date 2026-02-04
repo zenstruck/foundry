@@ -31,11 +31,6 @@ final class BootConfigurationListenerTest extends KernelTestCase
 {
     use Factories, RequiresORM, ResetDatabase;
 
-    protected static function getKernelClass(): string
-    {
-        return BehatTestKernel::class;
-    }
-
     #[Test]
     public function it_boots_foundry_when_not_already_booted(): void
     {
@@ -74,6 +69,11 @@ final class BootConfigurationListenerTest extends KernelTestCase
 
         self::assertFalse($registry->isStored($testObj));
         self::assertFalse(Configuration::isBooted());
+    }
+
+    protected static function getKernelClass(): string
+    {
+        return BehatTestKernel::class;
     }
 
     private function createListener(): BootConfigurationListener

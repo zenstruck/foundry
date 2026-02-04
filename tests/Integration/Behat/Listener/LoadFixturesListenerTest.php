@@ -40,11 +40,6 @@ final class LoadFixturesListenerTest extends KernelTestCase
 {
     use Factories, RequiresORM, ResetDatabase;
 
-    protected static function getKernelClass(): string
-    {
-        return BehatTestKernel::class;
-    }
-
     protected function setUp(): void
     {
         $this->objectRegistry()->reset();
@@ -120,12 +115,17 @@ final class LoadFixturesListenerTest extends KernelTestCase
     public function it_throws_if_states_name_conflict_in_stories(): void
     {
         $this->expectException(ObjectAlreadyRegistered::class);
-        $this->expectExceptionMessage('Object "duplicate" is already registered for class "'.Contact::class);;
+        $this->expectExceptionMessage('Object "duplicate" is already registered for class "'.Contact::class);
 
         $listener = $this->createListener();
         $event = $this->createAfterScenarioSetupEvent([], ['withFixture(conflict-test)']);
 
         $listener->loadFixtureIfTagged($event);
+    }
+
+    protected static function getKernelClass(): string
+    {
+        return BehatTestKernel::class;
     }
 
     private function createListener(): LoadFixturesListener

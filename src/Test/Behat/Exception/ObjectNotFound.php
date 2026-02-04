@@ -21,7 +21,7 @@ final class ObjectNotFound extends \RuntimeException
 {
     public static function forFactoryAndName(string $factoryShortName, string $name): self
     {
-        return new self("Object \"$factoryShortName $name\" was not found.");
+        return new self("Object \"{$factoryShortName} {$name}\" was not found.");
     }
 
     /**
@@ -29,6 +29,6 @@ final class ObjectNotFound extends \RuntimeException
      */
     public static function forClassAndName(string $objectName, string $name): self
     {
-        return new self("Object of class \"$objectName\" with name \"$name\" was not found.");
+        return new self("Object of class \"{$objectName}\" with name \"{$name}\" was not found.");
     }
 }

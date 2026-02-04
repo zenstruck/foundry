@@ -17,7 +17,7 @@ use Zenstruck\Foundry\Test\Behat\FactoryShortNameResolver;
 use Zenstruck\Foundry\Test\Behat\FoundryContext;
 use Zenstruck\Foundry\Test\Behat\ObjectRegistry;
 
-return static function (ContainerConfigurator $container): void {
+return static function(ContainerConfigurator $container): void {
     $container->services()
         ->set('.zenstruck_foundry.behat.factory_resolver', FactoryShortNameResolver::class)
         ->args([

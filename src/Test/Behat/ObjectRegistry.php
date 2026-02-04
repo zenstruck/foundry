@@ -26,7 +26,7 @@ use Zenstruck\Foundry\Test\Behat\Exception\ObjectNotFound;
 final class ObjectRegistry
 {
     /**
-     * We need to use static properties in order that this is kept between kernel resets
+     * We need to use static properties in order that this is kept between kernel resets.
      */
 
     /** @var array<class-string, array<string, object>> */
@@ -114,29 +114,12 @@ final class ObjectRegistry
         return $this->coerceIdToScalar(self::$lastId);
     }
 
-    /**
-     * @param array<string, mixed> $ids
-     */
-    private function coerceIdToScalar(array $ids): int|string
-    {
-        if (count($ids) !== 1) {
-            throw new \InvalidArgumentException('Cannot get last id: generic entity must have exactly one identifier.');
-        }
-
-        $id = array_first($ids);
-        if (!is_int($id) && !is_string($id)) {
-            throw new \InvalidArgumentException(sprintf('Wrong type for the id: expected int or string, got "%s".', get_debug_type($id)));
-        }
-
-        return $id;
-    }
-
     public function lastIdFor(string $factoryShortName): int|string
     {
         $objects = self::$objects[$this->factoryShortNameResolver->targetObjectClassFor($factoryShortName)] ?? [];
 
-        if (count($objects) === 0) {
-            throw new \InvalidArgumentException("No object of type \"$factoryShortName\" found.");
+        if (0 === \count($objects)) {
+            throw new \InvalidArgumentException("No object of type \"{$factoryShortName}\" found.");
         }
 
         return $this->coerceIdToScalar(
@@ -160,5 +143,22 @@ final class ObjectRegistry
             self::$objects[$object::class] ?? [],
             static fn(object $o) => $o === $object
         ) ?? throw new \LogicException('Object is not stored in the registry.');
+    }
+
+    /**
+     * @param array<string, mixed> $ids
+     */
+    private function coerceIdToScalar(array $ids): int|string
+    {
+        if (1 !== \count($ids)) {
+            throw new \InvalidArgumentException('Cannot get last id: generic entity must have exactly one identifier.');
+        }
+
+        $id = array_first($ids);
+        if (!\is_int($id) && !\is_string($id)) {
+            throw new \InvalidArgumentException(\sprintf('Wrong type for the id: expected int or string, got "%s".', \get_debug_type($id)));
+        }
+
+        return $id;
     }
 }

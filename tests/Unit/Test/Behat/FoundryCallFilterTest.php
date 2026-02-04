@@ -30,11 +30,11 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Attribute\FactoryShortName;
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
+use Zenstruck\Foundry\Test\Behat\Exception\InvalidObjectParameter;
 use Zenstruck\Foundry\Test\Behat\FactoryShortNameResolver;
 use Zenstruck\Foundry\Test\Behat\FoundryCallFilter;
 use Zenstruck\Foundry\Test\Behat\FoundryContext;
 use Zenstruck\Foundry\Test\Behat\FoundryTableNode;
-use Zenstruck\Foundry\Test\Behat\Exception\InvalidObjectParameter;
 use Zenstruck\Foundry\Test\Behat\ObjectRegistry;
 
 /** @requires PHP 9 */
@@ -44,6 +44,23 @@ final class FoundryCallFilterTest extends TestCase
     private FoundryCallFilter $filter;
     private FactoryShortNameResolver $factoryResolver;
     private ObjectRegistry $objectRegistry;
+
+    protected function setUp(): void
+    {
+        $this->factoryResolver = new FactoryShortNameResolver([
+            new TestEntityFactory(),
+            new DatedEntityFactory(),
+            new EnumEntityFactory(),
+            new RelationEntityFactory(),
+            new ChildEntityFactory(),
+        ]);
+        $this->objectRegistry = new ObjectRegistry(
+            $this->factoryResolver, $this->createStub(PersistenceManager::class)
+        );
+        $this->objectRegistry->reset();
+
+        $this->filter = $this->createFilterWithMockedKernel();
+    }
 
     #[Test]
     public function it_supports_call_with_table_node_argument(): void
@@ -148,17 +165,6 @@ final class FoundryCallFilterTest extends TestCase
             ['_ref' => 'my-ref'],
             ['_ref' => 'my-ref'],
         ];
-    }
-
-    /**
-     * @param array<string, mixed> $row
-     */
-    private function createTableNodeFromRow(array $row): TableNode
-    {
-        return new TableNode([
-            array_keys($row),
-            array_values($row),
-        ]);
     }
 
     #[Test]
@@ -321,21 +327,15 @@ final class FoundryCallFilterTest extends TestCase
         self::assertSame('value', $rows[0]['inheritedProperty']);
     }
 
-    protected function setUp(): void
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function createTableNodeFromRow(array $row): TableNode
     {
-        $this->factoryResolver = new FactoryShortNameResolver([
-            new TestEntityFactory(),
-            new DatedEntityFactory(),
-            new EnumEntityFactory(),
-            new RelationEntityFactory(),
-            new ChildEntityFactory(),
+        return new TableNode([
+            \array_keys($row),
+            \array_values($row),
         ]);
-        $this->objectRegistry = new ObjectRegistry(
-            $this->factoryResolver, $this->createStub(PersistenceManager::class)
-        );
-        $this->objectRegistry->reset();
-
-        $this->filter = $this->createFilterWithMockedKernel();
     }
 
     private function createFilterWithMockedKernel(): FoundryCallFilter
@@ -344,7 +344,7 @@ final class FoundryCallFilterTest extends TestCase
         $container->method('get')->willReturnCallback(fn(string $id) => match ($id) {
             '.zenstruck_foundry.behat.factory_resolver' => $this->factoryResolver,
             '.zenstruck_foundry.behat.object_registry' => $this->objectRegistry,
-            default => throw new \InvalidArgumentException("Unknown service: $id"),
+            default => throw new \InvalidArgumentException("Unknown service: {$id}"),
         });
 
         $kernel = $this->createStub(KernelInterface::class);

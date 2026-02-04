@@ -18,6 +18,7 @@ use Zenstruck\Foundry\Attribute\FactoryShortName;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Test\Behat\Exception\FactoryNotResolvable;
+
 use function Symfony\Component\String\u;
 
 /**
@@ -51,7 +52,7 @@ final class FactoryShortNameResolver
             $this->factoryMap[$shortName] ??= [];
             $this->factoryMap[$shortName][] = $factory;
 
-            $plural = \strtolower($this->factoryShortNameAttribute($factory::class)->pluralName ?? $inflector->pluralize($shortName)[0]);
+            $plural = \mb_strtolower($this->factoryShortNameAttribute($factory::class)->pluralName ?? $inflector->pluralize($shortName)[0]);
             $this->factoryMap[$plural] ??= [];
             $this->factoryMap[$plural][] = $factory;
         }
@@ -64,7 +65,7 @@ final class FactoryShortNameResolver
      */
     public function factoryFor(string $shortName): ObjectFactory
     {
-        $normalized = \strtolower($shortName);
+        $normalized = \mb_strtolower($shortName);
 
         if (!isset($this->factoryMap[$normalized])) {
             throw FactoryNotResolvable::forName($shortName);
@@ -73,7 +74,7 @@ final class FactoryShortNameResolver
         $factories = $this->factoryMap[$normalized];
 
         if (\count($factories) > 1) {
-            throw FactoryNotResolvable::conflict($shortName, array_map(static fn(ObjectFactory $f) => $f::class, $factories));
+            throw FactoryNotResolvable::conflict($shortName, \array_map(static fn(ObjectFactory $f) => $f::class, $factories));
         }
 
         return $factories[0]::new();
@@ -123,7 +124,7 @@ final class FactoryShortNameResolver
         $attribute = $this->factoryShortNameAttribute($factoryClass);
 
         if ($attribute) {
-            return \strtolower($attribute->shortName);
+            return \mb_strtolower($attribute->shortName);
         }
 
         $shortClass = u((new \ReflectionClass($factoryClass))->getShortName());

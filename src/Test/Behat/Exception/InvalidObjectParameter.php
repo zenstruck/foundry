@@ -21,16 +21,16 @@ final class InvalidObjectParameter extends \RuntimeException
 {
     public static function objectReferencedInTableDoesNotExist(string $column, ObjectNotFound $previous): self
     {
-        return new self("A reference to an object cannot be resolved in the table, at column \"$column\": {$previous->getMessage()}", previous: $previous);
+        return new self("A reference to an object cannot be resolved in the table, at column \"{$column}\": {$previous->getMessage()}", previous: $previous);
     }
 
     public static function invalidDate(string $column, string $invalidDate, \Throwable $previous): self
     {
-        return new self("Invalid date given \"$invalidDate\", at column \"$column\"", previous: $previous);
+        return new self("Invalid date given \"{$invalidDate}\", at column \"{$column}\"", previous: $previous);
     }
 
     public static function invalidEnumValue(string $column, string $invalidEnumValue): self
     {
-        return new self("Invalid enum value given \"$invalidEnumValue\", at column \"$column\"");
+        return new self("Invalid enum value given \"{$invalidEnumValue}\", at column \"{$column}\"");
     }
 }

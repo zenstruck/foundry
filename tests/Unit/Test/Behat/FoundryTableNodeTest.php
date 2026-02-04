@@ -31,6 +31,19 @@ final class FoundryTableNodeTest extends TestCase
     private FactoryShortNameResolver $factoryResolver;
     private ObjectRegistry $objectRegistry;
 
+    protected function setUp(): void
+    {
+        $this->factoryResolver = new FactoryShortNameResolver([new TableTestEntityFactory()]);
+
+        $persistenceManager = $this->createStub(PersistenceManager::class);
+        $persistenceManager->method('getIdentifierValues')->willReturnCallback(
+            static fn(object $object): array => ['id' => $object->id ?? 0]
+        );
+
+        $this->objectRegistry = new ObjectRegistry($this->factoryResolver, $persistenceManager);
+        $this->objectRegistry->reset();
+    }
+
     #[Test]
     public function it_creates_table_node_with_factory_method(): void
     {
@@ -193,19 +206,6 @@ final class FoundryTableNodeTest extends TestCase
 
         self::assertStringContainsString('[0:', $row);
         self::assertStringContainsString('[1:', $row);
-    }
-
-    protected function setUp(): void
-    {
-        $this->factoryResolver = new FactoryShortNameResolver([new TableTestEntityFactory()]);
-        
-        $persistenceManager = $this->createStub(PersistenceManager::class);
-        $persistenceManager->method('getIdentifierValues')->willReturnCallback(
-            static fn(object $object): array => ['id' => $object->id ?? 0]
-        );
-        
-        $this->objectRegistry = new ObjectRegistry($this->factoryResolver, $persistenceManager);
-        $this->objectRegistry->reset();
     }
 }
 

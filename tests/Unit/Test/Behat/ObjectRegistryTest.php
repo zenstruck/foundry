@@ -21,9 +21,9 @@ use Zenstruck\Foundry\Persistence\Event\AfterPersist;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Story\Event\StateAddedToStory;
-use Zenstruck\Foundry\Test\Behat\FactoryShortNameResolver;
 use Zenstruck\Foundry\Test\Behat\Exception\ObjectAlreadyRegistered;
 use Zenstruck\Foundry\Test\Behat\Exception\ObjectNotFound;
+use Zenstruck\Foundry\Test\Behat\FactoryShortNameResolver;
 use Zenstruck\Foundry\Test\Behat\ObjectRegistry;
 
 /** @requires PHP 9 */
@@ -33,6 +33,21 @@ final class ObjectRegistryTest extends TestCase
     private ObjectRegistry $registry;
     private FactoryShortNameResolver $resolver;
     private PersistenceManager $persistenceManager;
+
+    protected function setUp(): void
+    {
+        $this->resolver = new FactoryShortNameResolver([new UserFactory()]);
+        $this->persistenceManager = $this->createStub(PersistenceManager::class);
+        $this->persistenceManager->method('getIdentifierValues')->willReturnCallback(
+            static function(object $object): array {
+                \assert($object instanceof User);
+
+                return ['id' => $object->id];
+            }
+        );
+        $this->registry = new ObjectRegistry($this->resolver, $this->persistenceManager);
+        $this->registry->reset();
+    }
 
     #[Test]
     public function it_stores_an_object(): void
@@ -277,21 +292,6 @@ final class ObjectRegistryTest extends TestCase
         $this->expectExceptionMessage('Object is not stored in the registry.');
 
         $this->registry->getNameFor($user);
-    }
-
-    protected function setUp(): void
-    {
-        $this->resolver = new FactoryShortNameResolver([new UserFactory()]);
-        $this->persistenceManager = $this->createStub(PersistenceManager::class);
-        $this->persistenceManager->method('getIdentifierValues')->willReturnCallback(
-            static function (object $object): array {
-                assert($object instanceof User);
-
-                return ['id' => $object->id];
-            }
-        );
-        $this->registry = new ObjectRegistry($this->resolver, $this->persistenceManager);
-        $this->registry->reset();
     }
 }
 

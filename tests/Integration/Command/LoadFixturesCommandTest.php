@@ -27,6 +27,7 @@ use Zenstruck\Foundry\Tests\Fixture\Stories\Fixtures\FixtureStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\Fixtures\FixtureStoryWithNameCollision;
 use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
+
 use function Zenstruck\Foundry\Persistence\repository;
 
 final class LoadFixturesCommandTest extends KernelTestCase

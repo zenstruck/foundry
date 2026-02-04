@@ -46,7 +46,7 @@ final class FoundryExtension implements Extension
         $builder
             ->children()
                 ->enumNode('database_reset_mode')
-                    ->values(array_map(static fn(DatabaseResetMode $mode) => $mode->value, DatabaseResetMode::cases()))
+                    ->values(\array_map(static fn(DatabaseResetMode $mode) => $mode->value, DatabaseResetMode::cases()))
                     ->defaultValue(DatabaseResetMode::MANUAL->value)
                 ->end()
                 ->booleanNode('enable_dama_support')
@@ -75,7 +75,7 @@ final class FoundryExtension implements Extension
 
         $databaseResetMode = DatabaseResetMode::from($config['database_reset_mode']);
 
-        if ($databaseResetMode === DatabaseResetMode::DISABLED) {
+        if (DatabaseResetMode::DISABLED === $databaseResetMode) {
             return;
         }
 
@@ -84,11 +84,11 @@ final class FoundryExtension implements Extension
                 throw DamaNativeExtensionIncompatibility::withFoundryDamaSupport();
             }
 
-            if ($databaseResetMode === DatabaseResetMode::FEATURE) {
+            if (DatabaseResetMode::FEATURE === $databaseResetMode) {
                 throw DamaNativeExtensionIncompatibility::withFeatureResetDbMode();
             }
 
-            if ($databaseResetMode === DatabaseResetMode::MANUAL) {
+            if (DatabaseResetMode::MANUAL === $databaseResetMode) {
                 throw DamaNativeExtensionIncompatibility::withManualResetDbMode();
             }
         }
@@ -103,6 +103,6 @@ final class FoundryExtension implements Extension
 
     private function damaNativeExtensionIsEnabled(ContainerBuilder $container): bool
     {
-        return in_array(DoctrineExtension::class, (array) $container->getParameter('extensions'), true);
+        return \in_array(DoctrineExtension::class, (array) $container->getParameter('extensions'), true);
     }
 }
