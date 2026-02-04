@@ -20,6 +20,7 @@ use Behat\Gherkin\Node\ScenarioNode;
 use Behat\Testwork\Environment\Environment;
 use Behat\Testwork\Tester\Setup\Setup;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Behat\Exception\ObjectAlreadyRegistered;
@@ -33,6 +34,8 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
+/** @requires PHP 9 */
+#[RequiresPhp('9')]
 final class LoadFixturesListenerTest extends KernelTestCase
 {
     use Factories, RequiresORM, ResetDatabase;

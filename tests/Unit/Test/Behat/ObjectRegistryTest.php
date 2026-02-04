@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Unit\Test\Behat;
 
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\ObjectFactory;
@@ -25,6 +26,8 @@ use Zenstruck\Foundry\Test\Behat\Exception\ObjectAlreadyRegistered;
 use Zenstruck\Foundry\Test\Behat\Exception\ObjectNotFound;
 use Zenstruck\Foundry\Test\Behat\ObjectRegistry;
 
+/** @requires PHP 9 */
+#[RequiresPhp('9')]
 final class ObjectRegistryTest extends TestCase
 {
     private ObjectRegistry $registry;

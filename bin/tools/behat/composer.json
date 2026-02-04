@@ -5,7 +5,9 @@
         "friends-of-behat/mink-extension": "^2.0",
         "friends-of-behat/symfony-extension": "^2.0",
         "symfony/flex": "^2.10",
-        "yceruto/behat-extension": "^1.0"
+        "yceruto/behat-extension": "^1.0.2",
+        "symfony/polyfill-php84": "^1.33",
+        "symfony/polyfill-php85": "^1.33"
     },
     "config": {
         "allow-plugins": {

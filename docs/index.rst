@@ -2702,7 +2702,7 @@ Installation
 
     $ composer require --dev behat/behat friends-of-behat/symfony-extension
 
-2. Enable the Foundry extension in your ``behat.yml``:
+2. Enable the Foundry extension in your ``behat.yaml``:
 
 .. code-block:: yaml
 

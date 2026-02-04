@@ -47,6 +47,7 @@
         "symfony/framework-bundle": "^6.4|^7.0|^8.0",
         "symfony/maker-bundle": "^1.55",
         "symfony/phpunit-bridge": "^6.4.26|^7.0|^8.0",
+        "symfony/polyfill-php80": "^1.16",
         "symfony/routing": "^6.4|^7.0|^8.0",
         "symfony/runtime": "^6.4|^7.0|^8.0",
         "symfony/translation-contracts": "^3.4",

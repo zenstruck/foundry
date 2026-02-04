@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Unit\Test\Behat;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Attribute\FactoryShortName;
@@ -23,6 +24,8 @@ use Zenstruck\Foundry\Test\Behat\FactoryShortNameResolver;
 use Zenstruck\Foundry\Test\Behat\FoundryTableNode;
 use Zenstruck\Foundry\Test\Behat\ObjectRegistry;
 
+/** @requires PHP 9 */
+#[RequiresPhp('9')]
 final class FoundryTableNodeTest extends TestCase
 {
     private FactoryShortNameResolver $factoryResolver;

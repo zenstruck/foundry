@@ -20,6 +20,7 @@ use Behat\Gherkin\Node\ScenarioNode;
 use Behat\Testwork\Environment\StaticEnvironment;
 use Behat\Testwork\Suite\GenericSuite;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Behat\DatabaseResetMode;
@@ -33,6 +34,8 @@ use Zenstruck\Foundry\Tests\Fixture\Behat\BehatTestKernel;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
+/** @requires PHP 9 */
+#[RequiresPhp('9')]
 final class DatabaseResetListenerTest extends KernelTestCase
 {
     use Factories, RequiresORM, ResetDatabase;

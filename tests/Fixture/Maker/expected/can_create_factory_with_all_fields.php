@@ -16,7 +16,6 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 use Zenstruck\Foundry\Tests\Fixture\IntBackedEnum;
 use Zenstruck\Foundry\Tests\Fixture\StringBackedEnum;
 
-
 /**
  * @extends PersistentObjectFactory<GenericEntity>
  */

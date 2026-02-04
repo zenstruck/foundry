@@ -51,7 +51,7 @@ abstract class GenericModel
     #[MongoDB\Field(type: 'bool', nullable: true)]
     public ?bool $bool = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(name: '`float`', nullable: true)]
     #[MongoDB\Field(type: 'float', nullable: true)]
     public ?float $float = null;
 

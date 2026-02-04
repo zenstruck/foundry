@@ -30,6 +30,9 @@ jobs:
         deps: [ highest, lowest ]
     env:
       DATABASE_URL: 'sqlite:///%kernel.project_dir%/var/data.db'
+      USE_DAMA_DOCTRINE_TEST_BUNDLE: 1
+      USE_PHP_84_LAZY_OBJECTS: 1
+      MONGO_URL: ''
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -59,25 +62,25 @@ jobs:
           SYMFONY_REQUIRE: ${{ matrix.symfony }}
 
       - name: "Main test suite: reset DB at scenario level, with Dama support"
-        run: vendor/bin/behat
+        run: vendor/bin/behat --colors -vvv
 
       - name: "Main test suite: reset DB at scenario level, without Dama support"
-        run: vendor/bin/behat --profile=main-no-dama
+        run: vendor/bin/behat --colors -vvv --profile=main-no-dama
 
       - name: "Main test suite: reset DB at scenario level, with native Dama extension"
-        run: vendor/bin/behat --profile=main-native-dama --tags='~@skip-with-native-dama'
+        run: vendor/bin/behat --colors -vvv --profile=main-native-dama --tags='~@skip-with-native-dama'
 
       - name: Manual reset DB
-        run: vendor/bin/behat --profile=reset-manual
+        run: vendor/bin/behat --colors -vvv --profile=reset-manual
 
       - name: Manual reset DB and Dama support
-        run: vendor/bin/behat --profile=reset-manual-dama
+        run: vendor/bin/behat --colors -vvv --profile=reset-manual-dama
 
       - name: Reset DB at feature level
-        run: vendor/bin/behat --profile=reset-feature
+        run: vendor/bin/behat --colors -vvv --profile=reset-feature
 
       - name: Reset DB at feature level with Dama support
-        run: vendor/bin/behat --profile=reset-feature-dama
+        run: vendor/bin/behat --colors -vvv --profile=reset-feature-dama
 
       - name: Reset DB disabled
-        run: vendor/bin/behat --profile=reset-disabled
+        run: vendor/bin/behat --colors -vvv --profile=reset-disabled

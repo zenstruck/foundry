@@ -53,7 +53,7 @@ final class FoundryTableNode extends TableNode
         return $tableNode;
     }
 
-    public function getRowAsString(int $rowNum): string
+    public function getRowAsString($rowNum): string
     {
         $values = [];
         foreach ($this->getRow($rowNum) as $column => $value) {
@@ -63,7 +63,7 @@ final class FoundryTableNode extends TableNode
         return sprintf('|%s|', implode('|', $values));
     }
 
-    public function getRowAsStringWithWrappedValues(int $rowNum, callable $wrapper): string
+    public function getRowAsStringWithWrappedValues($rowNum, $wrapper): string
     {
         $values = [];
         foreach ($this->getRow($rowNum) as $column => $value) {
