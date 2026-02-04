@@ -262,7 +262,7 @@ component will be used to call the ``setTitle()`` method or directly set the pub
 
 .. note::
 
-    ``defaults()`` is called everytime a factory is instantiated (even if you don't end up
+    ``defaults()`` is called every time a factory is instantiated (even if you don't end up
     creating it). `Lazy Values`_ allows you to ensure the value is only calculated when/if it's needed.
 
 Using your Factory
@@ -1045,7 +1045,7 @@ all ``ManyToOne`` and ``OneToOne`` relationships using the class of this object:
 Lazy Values
 ~~~~~~~~~~~
 
-The ``defaults()`` method is called everytime a factory is instantiated (even if you don't end up
+The ``defaults()`` method is called every time a factory is instantiated (even if you don't end up
 creating it). Sometimes, you might not want your value calculated every time. For example, if you have a value for one
 of your attributes that:
 
@@ -1747,7 +1747,7 @@ this for you.
     use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
     use Zenstruck\Foundry\Attribute\ResetDatabase;
 
-    #{ResetDatabase]
+    #[ResetDatabase]
     class MyTest extends WebTestCase
     {
         // ...
@@ -2010,7 +2010,7 @@ Auto-Refresh
 
 Object proxies have the option to enable *auto refreshing* that removes the need to call ``->_refresh()`` before calling
 methods on the underlying object. When auto-refresh is enabled, most calls to proxy objects first refresh the wrapped
-object from the database. This is mainly useful with "integration" test which interacts with your database and Symfony's
+object from the database. This is mainly useful with "integration" tests that interact with your database and Symfony's
 kernel.
 
 ::
@@ -2032,9 +2032,7 @@ Without auto-refreshing enabled, the above call to ``$post->getTitle()`` would r
 
     A situation you need to be aware of when using auto-refresh is that all methods refresh the object first. If
     changing the object's state via multiple methods (or multiple force-sets), an "unsaved changes" exception will be
-    thrown:
-
-::
+    thrown::
 
         use App\Factory\PostFactory;
 
@@ -2078,7 +2076,7 @@ To overcome this, you need to first disable auto-refreshing, then re-enable afte
 Proxy objects pitfalls
 ......................
 
-Proxified objects may have some pitfalls when dealing with Doctrine's entity manager. You may encounter this error:
+Proxied objects may have some pitfalls when dealing with Doctrine's entity manager. You may encounter this error:
 
 .. code-block:: text
 
@@ -2100,7 +2098,7 @@ the "real" object, which won't be wrapped by ``Proxy`` class.
 
 .. warning::
 
-    Be aware that your object won't refresh automatically if they are not wrapped with a proxy.
+    Be aware that your objects won't refresh automatically if they are not wrapped with a proxy.
 
 Repository Decorator
 ~~~~~~~~~~~~~~~~~~~~
@@ -2211,7 +2209,7 @@ PHPUnit Data Providers
 
 It is possible to use factories in
 `PHPUnit data providers <https://docs.phpunit.de/en/11.5/writing-tests-for-phpunit.html#data-providers>`_.
-Their usage depends on whether you're using Foundry's `PHPUnit Extension`_ or not.:
+Their usage depends on whether you're using Foundry's `PHPUnit Extension`_ or not:
 
 With PHPUnit Extension
 ......................
@@ -2247,7 +2245,7 @@ you're using them in tests. Thanks to it, you can:
     {
         yield [PostFactory::createOne()];
         yield [PostWithServiceFactory::createOne()];
-        yield [PostFactory::createOne(['body' => faker()->sentence()];
+        yield [PostFactory::createOne(['body' => faker()->sentence()])];
     }
 
 .. warning::
@@ -2454,7 +2452,7 @@ Disable Debug Mode
 ..................
 
 In your ``.env.test`` file, you can set ``APP_DEBUG=0`` to have your tests run without debug mode. This can speed up
-your tests considerably. You will need to ensure you cache is cleared before running the test suite. The best place to
+your tests considerably. You will need to ensure your cache is cleared before running the test suite. The best place to
 do this is in your ``tests/bootstrap.php``:
 
 ::
@@ -2560,7 +2558,7 @@ In-memory Behavior
 ~~~~~~~~~~~~~~~~~~
 
 Foundry allows to use "in-memory" repositories in your factories. This is mainly useful for `DDD <https://en.wikipedia.org/wiki/Domain-driven_design>`_
-applications or with `hexagonal architecture <https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)>_`, where
+applications or with `hexagonal architecture <https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)>`_, where
 repositories in the domain are usually interfaces for which main implementations are Doctrine ones. You can tell Foundry to
 use the "in-memory" version of these repositories.
 
@@ -2677,8 +2675,8 @@ Foundry is shipped with an extension for PHPUnit. You can install it by modifyin
 
 This extension provides the following features:
 
-* :ref:`globally boot Foundry <_enable-foundry-in-your-testcase>` (and remove the needs of `Factories` trait)
-* possibility to :ref:`automate the reset database mechanism <_automatic-database-reset>`
+* :ref:`globally boot Foundry <enable-foundry-in-your-testcase>` (and remove the needs of `Factories` trait)
+* possibility to :ref:`automate the reset database mechanism <automatic-database-reset>`
 * support for the `#[WithStory] Attribute`_
 * ability to use ``Factory::create()`` in `PHPUnit Data Providers`_ (along with PHPUnit ^11.4)
 
