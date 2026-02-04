@@ -1641,7 +1641,7 @@ You can also load stories by group, by using the ``groups`` option:
 
 .. tip::
 
-    It is possible to call a story inside another story, by using `OtherStory::load();`. Because the stories are only
+    It is possible to call a story inside another story, by using ``OtherStory::load();``. Because the stories are only
     loaded once, it will work regardless of the order of the stories.
 
 Using in your Tests
@@ -1777,15 +1777,17 @@ Then, by default, before each test, it resets the schema using ``doctrine:schema
 
 .. tip::
 
-    Create a base TestCase for tests using factories to avoid adding the attributes to every TestCase.
+    Create a base ``TestCase`` for tests using factories to avoid adding the attributes to every ``TestCase``.
 
 .. tip::
 
     If your tests :ref:`are not persisting <without-persisting>` the objects they create, the ``ResetDatabase``
     attribute is not required.
 
-Automatic Database Reset for Base Test Classes
-..............................................
+.. _automatic-database-reset:
+
+Automatic Database Reset
+........................
 
 Instead of adding the ``#[ResetDatabase]`` attribute to every test class, you can configure Foundry to
 automatically reset the database for all tests extending ``Symfony\Bundle\FrameworkBundle\Test\KernelTestCase``.
@@ -2675,6 +2677,8 @@ Foundry is shipped with an extension for PHPUnit. You can install it by modifyin
 
 This extension provides the following features:
 
+* :ref:`globally boot Foundry <_enable-foundry-in-your-testcase>` (and remove the needs of `Factories` trait)
+* possibility to :ref:`automate the reset database mechanism <_automatic-database-reset>`
 * support for the `#[WithStory] Attribute`_
 * ability to use ``Factory::create()`` in `PHPUnit Data Providers`_ (along with PHPUnit ^11.4)
 

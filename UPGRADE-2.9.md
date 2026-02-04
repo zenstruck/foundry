@@ -16,10 +16,10 @@ The trait will be removed in Foundry 3.0, and the extension will be mandatory.
 > [!IMPORTANT]
 > If you're still not using PHPUnit 10 or grater, there is nothing to do (yet!)
 
-Enable Foundry's [PHPUnit extension](https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#phpunit-extension)
-in your `phpunit.xml` file:
+Enable Foundry's [PHPUnit extension](https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#phpunit-extension):
 
 ```xml
+<!-- phpunit.xml -->
 <phpunit>
     <extensions>
         <bootstrap class="Zenstruck\Foundry\PHPUnit\FoundryExtension"/>
@@ -31,6 +31,22 @@ And then:
 - remove all the `use Factories;` statements from your factories.
 - replace all the `use ResetDatabase;` statements by a `#[\Zenstruck\Foundry\Attribute\ResetDatabase]` attribute
   on your test classes. Note that you can put the attribute on a parent class, it will be inherited by all its children.
+
+### Automatic Database Reset for Base Test Classes
+
+Instead of adding the `#[ResetDatabase]` attribute to every test class, you can configure Foundry to
+automatically reset the database for all tests extending `Symfony\Bundle\FrameworkBundle\Test\KernelTestCase`:
+
+```xml
+<!-- phpunit.xml -->
+<phpunit>
+    <extensions>
+        <bootstrap class="Zenstruck\Foundry\PHPUnit\FoundryExtension">
+            <parameter name="enabled-auto-reset" value="true"/>
+        </bootstrap>
+    </extensions>
+</phpunit>
+```
 
 ## Rector rules
 
