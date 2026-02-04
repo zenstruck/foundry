@@ -30,8 +30,9 @@ use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @internal
+ * @final
  */
-final class PersistenceManager
+class PersistenceManager
 {
     private bool $flush = true;
     private bool $persist = true;
@@ -417,7 +418,10 @@ final class PersistenceManager
         return $this->resetDatabaseManager;
     }
 
-    public function getIdentifierValues(object $object): mixed
+    /**
+     * @return array<string, mixed>
+     */
+    public function getIdentifierValues(object $object): array
     {
         return $this->strategyFor($object::class)->getIdentifierValues($object);
     }

@@ -19,6 +19,7 @@ use Zenstruck\Foundry\Persistence\Event\AfterPersist;
 use Zenstruck\Foundry\Persistence\PersistedObjectsTracker;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
+use Zenstruck\Foundry\Story\FixtureStoryResolver;
 
 return static function(ContainerConfigurator $container): void {
     $container->services()
@@ -34,12 +35,20 @@ return static function(ContainerConfigurator $container): void {
             ])
 
         ->set('.zenstruck_foundry.command.load_fixtures', LoadFixturesCommand::class)
+            ->arg('$fixtureStoryResolver', service('.zenstruck_foundry.story.fixture_resolver'))
             ->arg('$databaseResetters', tagged_iterator('.foundry.persistence.database_resetter'))
             ->arg('$kernel', service('kernel'))
             ->tag('console.command', [
                 'command' => 'foundry:load-fixtures|foundry:load-stories|foundry:load-story',
                 'description' => 'Load stories which are marked with #[AsFixture] attribute.',
             ])
+
+        ->set('.zenstruck_foundry.story.fixture_resolver', FixtureStoryResolver::class)
+        ->args([
+            abstract_arg('fixtureStories'),
+            abstract_arg('groupedStories'),
+        ])
+        ->public()
     ;
 
     if (\PHP_VERSION_ID >= 80400) {
@@ -48,7 +57,7 @@ return static function(ContainerConfigurator $container): void {
             ->tag('kernel.event_listener', ['event' => TerminateEvent::class, 'method' => 'refresh'])
             ->tag('kernel.event_listener', ['event' => ConsoleTerminateEvent::class, 'method' => 'refresh'])
             ->tag('kernel.event_listener', ['event' => WorkerMessageHandledEvent::class, 'method' => 'refresh']) // @phpstan-ignore class.notFound
-            ->tag('foundry.hook', ['class' => null, 'method' => 'afterPersistHook', 'event' => AfterPersist::class])
+            ->tag('kernel.event_listener', ['method' => 'afterPersistHook', 'event' => AfterPersist::class])
         ;
     }
 };

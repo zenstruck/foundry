@@ -14,7 +14,7 @@ namespace Zenstruck\Foundry\Tests\Fixture;
 use Symfony\Bundle\MakerBundle\MakerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
 use Zenstruck\Foundry\Tests\Fixture\App\Command\UpdateGenericModelCommand;
 use Zenstruck\Foundry\Tests\Fixture\App\Controller\CreateContact;
@@ -40,9 +40,9 @@ final class TestKernel extends FoundryTestKernel
         yield new MakerBundle();
     }
 
-    protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
+    protected function configureContainer(ContainerConfigurator $configurator, LoaderInterface $loader, ContainerBuilder $c): void
     {
-        parent::configureContainer($c, $loader);
+        parent::configureContainer($configurator, $loader, $c);
 
         $c->loadFromExtension('zenstruck_foundry', [
             'persistence' => ['flush_once' => true],
@@ -71,10 +71,5 @@ final class TestKernel extends FoundryTestKernel
         $c->register(CreateContact::class)->setAutowired(true)->setAutoconfigured(true)->addTag('controller.service_arguments');
         $c->register(HelloWorld::class)->setAutowired(true)->setAutoconfigured(true)->addTag('controller.service_arguments');
         $c->register(UpdateGenericModelCommand::class)->setAutowired(true)->setAutoconfigured(true);
-    }
-
-    protected function configureRoutes(RoutingConfigurator $routes): void
-    {
-        $routes->import(__DIR__.'/App/Controller/*.php', 'attribute');
     }
 }

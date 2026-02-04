@@ -23,6 +23,7 @@
         "symfony/polyfill-php85": "^1.33",
         "symfony/property-access": "^6.4|^7.0|^8.0",
         "symfony/property-info": "^6.4|^7.0|^8.0",
+        "symfony/string": "^6.4|^7.0|^8.0",
         "symfony/var-exporter": "^6.4.9|~7.0.9|^7.1.2|^8.0",
         "zenstruck/assert": "^1.4"
     },
@@ -46,6 +47,7 @@
         "symfony/framework-bundle": "^6.4|^7.0|^8.0",
         "symfony/maker-bundle": "^1.55",
         "symfony/phpunit-bridge": "^6.4.26|^7.0|^8.0",
+        "symfony/polyfill-php80": "^1.16",
         "symfony/routing": "^6.4|^7.0|^8.0",
         "symfony/runtime": "^6.4|^7.0|^8.0",
         "symfony/translation-contracts": "^3.4",
@@ -102,7 +104,7 @@
         }
     },
     "scripts": {
-        "post-install-cmd": ["@composer bin phpstan install", "@composer bin phpbench install"]
+        "post-install-cmd": ["@composer bin phpstan install", "@composer bin phpbench install", "@composer bin behat install"]
     },
     "minimum-stability": "dev",
     "prefer-stable": true

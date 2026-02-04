@@ -13,6 +13,8 @@ namespace Zenstruck\Foundry\Tests\Fixture\Model;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Doctrine\ORM\Mapping as ORM;
+use Zenstruck\Foundry\Tests\Fixture\IntBackedEnum;
+use Zenstruck\Foundry\Tests\Fixture\StringBackedEnum;
 
 /**
  * Used for ORM/Mongo tests.
@@ -40,6 +42,26 @@ abstract class GenericModel
     #[ORM\Column(nullable: true)]
     #[MongoDB\Field(type: 'date_immutable', nullable: true)]
     private ?\DateTimeImmutable $date = null;
+
+    #[ORM\Column(nullable: true)]
+    #[MongoDB\Field(type: 'date', nullable: true)]
+    public ?\DateTime $dateMutable = null;
+
+    #[ORM\Column(nullable: true)]
+    #[MongoDB\Field(type: 'bool', nullable: true)]
+    public ?bool $bool = null;
+
+    #[ORM\Column(name: '`float`', nullable: true)]
+    #[MongoDB\Field(type: 'float', nullable: true)]
+    public ?float $float = null;
+
+    #[ORM\Column(nullable: true)]
+    #[MongoDB\Field(type: 'string', nullable: true, enumType: StringBackedEnum::class)]
+    public ?StringBackedEnum $stringEnum = null;
+
+    #[ORM\Column(nullable: true)]
+    #[MongoDB\Field(type: 'int', nullable: true, enumType: IntBackedEnum::class)]
+    public ?IntBackedEnum $intEnum = null;
 
     public function __construct(string $prop1)
     {

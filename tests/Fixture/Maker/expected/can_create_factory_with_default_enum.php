@@ -13,7 +13,7 @@ namespace App\Factory;
 
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\ObjectWithEnum;
-use Zenstruck\Foundry\Tests\Fixture\SomeEnum;
+use Zenstruck\Foundry\Tests\Fixture\StringBackedEnum;
 
 /**
  * @extends ObjectFactory<ObjectWithEnum>
@@ -44,7 +44,7 @@ final class ObjectWithEnumFactory extends ObjectFactory
     protected function defaults(): array|callable
     {
         return [
-            'someEnum' => self::faker()->randomElement(SomeEnum::cases()),
+            'someEnum' => self::faker()->randomElement(StringBackedEnum::cases()),
         ];
     }
 

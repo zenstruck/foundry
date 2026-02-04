@@ -1,0 +1,86 @@
+name: Behat
+
+on:
+  push:
+    paths: &paths
+      - .github/workflows/behat.yml
+      - bin/tools/behat
+      - src/Behat/**
+      - tests/Behat/**
+      - behat.yml
+      - composer.json
+  pull_request:
+    paths: *paths
+  schedule:
+    - cron: '0 0 1,16 * *'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  behat:
+    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ 8.3, 8.5 ]
+        symfony: [ 6.4.*, 7.4.* ]
+        deps: [ highest, lowest ]
+    env:
+      DATABASE_URL: 'sqlite:///%kernel.project_dir%/var/data.db'
+      USE_DAMA_DOCTRINE_TEST_BUNDLE: 1
+      USE_PHP_84_LAZY_OBJECTS: 1
+      MONGO_URL: ''
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: flex
+
+      - name: Add the polyfill compatible with Doctrine ^2.16
+        if: ${{ matrix.deps == 'lowest' }}
+        run: composer require --dev symfony/polyfill-php80:^1.16 --no-update
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v2
+        with:
+          dependency-versions: ${{ matrix.deps }}
+          composer-options: --prefer-dist
+        env:
+          SYMFONY_REQUIRE: ${{ matrix.symfony }}
+
+      - name: Install Behat
+        run: composer bin behat update ${{ matrix.deps == 'lowest' && '--prefer-lowest' || '' }} --prefer-dist
+        env:
+          SYMFONY_REQUIRE: ${{ matrix.symfony }}
+
+      - name: "Main test suite: reset DB at scenario level, with Dama support"
+        run: vendor/bin/behat --colors -vvv
+
+      - name: "Main test suite: reset DB at scenario level, without Dama support"
+        run: vendor/bin/behat --colors -vvv --profile=main-no-dama
+
+      - name: "Main test suite: reset DB at scenario level, with native Dama extension"
+        run: vendor/bin/behat --colors -vvv --profile=main-native-dama --tags='~@skip-with-native-dama'
+
+      - name: Manual reset DB
+        run: vendor/bin/behat --colors -vvv --profile=reset-manual
+
+      - name: Manual reset DB and Dama support
+        run: vendor/bin/behat --colors -vvv --profile=reset-manual-dama
+
+      - name: Reset DB at feature level
+        run: vendor/bin/behat --colors -vvv --profile=reset-feature
+
+      - name: Reset DB at feature level with Dama support
+        run: vendor/bin/behat --colors -vvv --profile=reset-feature-dama
+
+      - name: Reset DB disabled
+        run: vendor/bin/behat --colors -vvv --profile=reset-disabled

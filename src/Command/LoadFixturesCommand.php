@@ -22,7 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Persistence\ResetDatabase\BeforeFirstTestResetter;
-use Zenstruck\Foundry\Story;
+use Zenstruck\Foundry\Story\FixtureStoryResolver;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
@@ -32,10 +32,7 @@ use Zenstruck\Foundry\Story;
 final class LoadFixturesCommand extends Command
 {
     public function __construct(
-        /** @var array<string, class-string<Story>> */
-        private readonly array $stories,
-        /** @var array<string, array<string, class-string<Story>>> */
-        private readonly array $groupedStories,
+        private readonly FixtureStoryResolver $fixtureStoryResolver,
         /** @var iterable<BeforeFirstTestResetter> */
         private iterable $databaseResetters,
         private KernelInterface $kernel,
@@ -46,14 +43,14 @@ final class LoadFixturesCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument('name', InputArgument::OPTIONAL, 'The name of the story to load.')
+            ->addArgument('name', InputArgument::OPTIONAL, "Story's name or stories group's name to load.")
             ->addOption('append', 'a', InputOption::VALUE_NONE, 'Skip resetting database and append data to the existing database.')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if (0 === \count($this->stories)) {
+        if (!$this->fixtureStoryResolver->hasAnyFixtures()) {
             throw new LogicException('No story as fixture available: add attribute #[AsFixture] to your story classes before running this command.');
         }
 
@@ -69,37 +66,18 @@ final class LoadFixturesCommand extends Command
             $this->resetDatabase();
         }
 
-        $stories = [];
+        $fixtureNameOrGroup = $input->getArgument('name') ?? $this->getNameWhenNotProvided($io);
 
-        if (null === ($name = $input->getArgument('name'))) {
-            if (1 === \count($this->stories)) {
-                $name = \array_keys($this->stories)[0];
-            } else {
-                $storyNames = \array_keys($this->stories);
-                if (\count($this->groupedStories) > 0) {
-                    $storyNames[] = '(choose a group of stories...)';
-                }
-                $name = $io->choice('Choose a story to load:', $storyNames);
-            }
-
-            if (!isset($this->stories[$name])) {
-                $groupsNames = \array_keys($this->groupedStories);
-                $name = $io->choice('Choose a group of stories:', $groupsNames);
-            }
-        }
-
-        if (isset($this->stories[$name])) {
-            $io->comment("Loading story with name \"{$name}\"...");
-            $stories = [$name => $this->stories[$name]];
-        }
-
-        if (isset($this->groupedStories[$name])) {
-            $io->comment("Loading stories group \"{$name}\"...");
-            $stories = $this->groupedStories[$name];
-        }
+        $stories = $this->fixtureStoryResolver->resolve($fixtureNameOrGroup);
 
         if (!$stories) {
-            throw new InvalidArgumentException("Story with name \"{$name}\" does not exist.");
+            throw new InvalidArgumentException("Story with name or group \"{$fixtureNameOrGroup}\" does not exist.");
+        }
+
+        if ($this->fixtureStoryResolver->hasFixture($fixtureNameOrGroup)) {
+            $io->comment("Loading story with name \"{$fixtureNameOrGroup}\"...");
+        } else {
+            $io->comment("Loading stories group \"{$fixtureNameOrGroup}\"...");
         }
 
         foreach ($stories as $name => $storyClass) {
@@ -125,5 +103,25 @@ final class LoadFixturesCommand extends Command
         foreach ($this->databaseResetters as $databaseResetter) {
             $databaseResetter->resetBeforeFirstTest($this->kernel);
         }
+    }
+
+    private function getNameWhenNotProvided(SymfonyStyle $io): string
+    {
+        if ($this->fixtureStoryResolver->hasOnlyOneFixture()) {
+            return $this->fixtureStoryResolver->availableFixtureNames()[0];
+        }
+
+        $storyNames = $this->fixtureStoryResolver->availableFixtureNames();
+        if (\count($this->fixtureStoryResolver->availableGroupNames()) > 0) {
+            $storyNames[] = '(choose a group of stories...)';
+        }
+        $name = $io->choice('Choose a story to load:', $storyNames);
+
+        if (!$this->fixtureStoryResolver->hasFixture($name)) {
+            $groupsNames = $this->fixtureStoryResolver->availableGroupNames();
+            $name = $io->choice('Choose a group of stories:', $groupsNames);
+        }
+
+        return $name;
     }
 }

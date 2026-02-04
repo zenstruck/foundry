@@ -23,7 +23,7 @@ final class PersistedObjectsTracker
     /**
      * This buffer of objects needs to be static to be kept between two kernel.reset events.
      *
-     * @var \WeakMap<object, mixed> keys: objects, values: value ids
+     * @var \WeakMap<object, array<string, mixed>> keys: objects, values: value ids
      */
     private static \WeakMap $trackedObjects;
 

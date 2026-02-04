@@ -252,7 +252,7 @@ jobs:
 
       - name: Test
         run: |
-          vendor/bin/phpunit tests/Unit
+          vendor/bin/phpunit -c phpunit-10.xml.dist tests/Unit
 
   test-with-paratest:
     name: Test with paratest

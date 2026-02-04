@@ -16,6 +16,7 @@ use Zenstruck\Foundry\Persistence\Exception\NoPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
 use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Persistence\ProxyGenerator;
+use Zenstruck\Foundry\Story\Event\StateAddedToStory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -119,6 +120,10 @@ abstract class Story
         $value = self::normalizeFactory($value);
 
         $this->state[$name] = $value;
+
+        if (\is_object($value) && Configuration::instance()->hasEventDispatcher()) {
+            Configuration::instance()->eventDispatcher()->dispatch(new StateAddedToStory($value, $name));
+        }
 
         if ($pool) {
             $this->addToPool($pool, $value);

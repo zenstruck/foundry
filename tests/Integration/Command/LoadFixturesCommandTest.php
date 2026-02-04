@@ -15,10 +15,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Tester\CommandTester;
+use Zenstruck\Foundry\Story\FixtureStoryNotFound;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GlobalEntity;
@@ -27,7 +27,6 @@ use Zenstruck\Foundry\Tests\Fixture\Stories\Fixtures\FixtureStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\Fixtures\FixtureStoryWithNameCollision;
 use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
-
 use function Zenstruck\Foundry\Persistence\repository;
 
 final class LoadFixturesCommandTest extends KernelTestCase
@@ -52,8 +51,8 @@ final class LoadFixturesCommandTest extends KernelTestCase
     #[Test]
     public function it_throws_if_story_does_not_exist(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Story with name "invalid-name" does not exist');
+        $this->expectException(FixtureStoryNotFound::class);
+        $this->expectExceptionMessage('Fixture story with name or group "invalid-name" not found');
 
         $this->commandTester(['environment' => 'stories_as_fixtures'])->execute(['name' => 'invalid-name', '--append' => true]);
     }
@@ -286,8 +285,10 @@ final class LoadFixturesCommandTest extends KernelTestCase
             'foundry:load-story',
         ];
 
-        return new CommandTester((new Application(self::bootKernel($options)))->find(
-            $commands[\array_rand($commands)]
-        ));
+        return new CommandTester(
+            (new Application(self::bootKernel($options)))->find(
+                $commands[\array_rand($commands)]
+            )
+        );
     }
 }

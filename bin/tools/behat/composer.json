@@ -1,0 +1,17 @@
+{
+    "require": {
+        "behat/behat": "^3.22",
+        "behat/mink-browserkit-driver": "^2.0",
+        "friends-of-behat/mink-extension": "^2.0",
+        "friends-of-behat/symfony-extension": "^2.0",
+        "symfony/flex": "^2.10",
+        "yceruto/behat-extension": "^1.0.2",
+        "symfony/polyfill-php84": "^1.33",
+        "symfony/polyfill-php85": "^1.33"
+    },
+    "config": {
+        "allow-plugins": {
+            "symfony/flex": true
+        }
+    }
+}

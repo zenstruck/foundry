@@ -13,6 +13,8 @@ namespace App\Factory;
 
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
+use Zenstruck\Foundry\Tests\Fixture\IntBackedEnum;
+use Zenstruck\Foundry\Tests\Fixture\StringBackedEnum;
 
 /**
  * @extends PersistentObjectFactory<GenericEntity>
@@ -43,9 +45,14 @@ final class GenericEntityFactory extends PersistentObjectFactory
     protected function defaults(): array|callable
     {
         return [
+            'bool' => self::faker()->boolean(),
             'date' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
+            'dateMutable' => self::faker()->dateTime(),
+            'float' => self::faker()->randomFloat(),
+            'intEnum' => self::faker()->randomElement(IntBackedEnum::cases()),
             'prop1' => self::faker()->text(),
             'propInteger' => self::faker()->randomNumber(),
+            'stringEnum' => self::faker()->randomElement(StringBackedEnum::cases()),
         ];
     }
 

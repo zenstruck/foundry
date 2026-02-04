@@ -11,7 +11,8 @@
 
 namespace Zenstruck\Foundry\Tests\Fixture;
 
-enum SomeEnum
+enum StringBackedEnum: string
 {
-    case SOME_VALUE;
+    case SOME_VALUE = 'some_value';
+    case OTHER_VALUE = 'other_value';
 }
