@@ -17,7 +17,8 @@ use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeScenarioTested;
 use Behat\Gherkin\Node\FeatureNode;
 use Behat\Gherkin\Node\ScenarioNode;
-use Behat\Testwork\Environment\Environment;
+use Behat\Testwork\Environment\StaticEnvironment;
+use Behat\Testwork\Suite\GenericSuite;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -314,6 +315,11 @@ final class DatabaseResetListenerTest extends KernelTestCase
         return self::getContainer()->get('.zenstruck_foundry.behat.object_registry'); // @phpstan-ignore return.type
     }
 
+    private function createEnvironment(): StaticEnvironment
+    {
+        return new StaticEnvironment(new GenericSuite('default', ['paths' => ['/path/to']]));
+    }
+
     /**
      * @param list<string> $tags
      */
@@ -331,9 +337,7 @@ final class DatabaseResetListenerTest extends KernelTestCase
             1
         );
 
-        $environment = $this->createStub(Environment::class);
-
-        return new BeforeFeatureTested($environment, $feature);
+        return new BeforeFeatureTested($this->createEnvironment(), $feature);
     }
 
     /**
@@ -355,8 +359,6 @@ final class DatabaseResetListenerTest extends KernelTestCase
             1
         );
 
-        $environment = $this->createStub(Environment::class);
-
-        return new BeforeScenarioTested($environment, $feature, $scenario);
+        return new BeforeScenarioTested($this->createEnvironment(), $feature, $scenario);
     }
 }

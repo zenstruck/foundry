@@ -96,18 +96,18 @@ final class DatabaseResetListener implements EventSubscriberInterface
     public function validateFeature(BeforeFeatureTested $event): void
     {
         if ($this->hasResetDbTag($event) && $this->resetMode === DatabaseResetMode::FEATURE) {
-            throw InvalidResetDbTag::resetDbOnFeatureWithFeatureMode();
+            throw InvalidResetDbTag::resetDbOnFeatureWithFeatureMode($event);
         }
     }
 
     public function validateScenario(BeforeScenarioTested $event): void
     {
         if ($this->hasResetDbTag($event) && $this->resetMode === DatabaseResetMode::SCENARIO) {
-            throw InvalidResetDbTag::resetDbOnScenarioWithScenarioMode();
+            throw InvalidResetDbTag::resetDbOnScenarioWithScenarioMode($event);
         }
 
         if ($this->hasResetDbTag($event) && $this->hasNoResetDbTag($event)) {
-            throw InvalidResetDbTag::bothTagsUsed();
+            throw InvalidResetDbTag::bothTagsUsed($event);
         }
     }
 
@@ -175,8 +175,7 @@ final class DatabaseResetListener implements EventSubscriberInterface
         }
 
         if ($this->resetMode === DatabaseResetMode::SCENARIO) {
-            // todo: ajouter des infos concernant le fichier de features
-            throw InvalidResetDbTag::resetDbWithScenarioMode();
+            throw InvalidResetDbTag::resetDbWithScenarioMode($event);
         }
 
         return true;
@@ -201,8 +200,8 @@ final class DatabaseResetListener implements EventSubscriberInterface
         }
 
         return match($this->resetMode) {
-            DatabaseResetMode::MANUAL => throw InvalidResetDbTag::noResetDbWithManualMode(),
-            DatabaseResetMode::FEATURE => throw InvalidResetDbTag::noResetDbWithFeatureMode(),
+            DatabaseResetMode::MANUAL => throw InvalidResetDbTag::noResetDbWithManualMode($event),
+            DatabaseResetMode::FEATURE => throw InvalidResetDbTag::noResetDbWithFeatureMode($event),
             default => true,
         };
     }
