@@ -11,7 +11,6 @@
 
 namespace Zenstruck\Foundry\Test\Behat\Tests\Unit\Test\Behat;
 
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\ObjectFactory;
@@ -24,8 +23,6 @@ use Zenstruck\Foundry\Test\Behat\Exception\ObjectNotFound;
 use Zenstruck\Foundry\Test\Behat\FactoryShortNameResolver;
 use Zenstruck\Foundry\Test\Behat\ObjectRegistry;
 
-/** @requires PHP 9 */
-#[RequiresPhp('9')]
 final class ObjectRegistryTest extends TestCase
 {
     private ObjectRegistry $registry;
@@ -66,7 +63,7 @@ final class ObjectRegistryTest extends TestCase
         $this->registry->store($user1, 'john');
 
         $this->expectException(ObjectAlreadyRegistered::class);
-        $this->expectExceptionMessage('Object "john" is already registered for class "Zenstruck\Foundry\Tests\Unit\Test\Behat\User".');
+        $this->expectExceptionMessage('Object "john" is already registered for class "Zenstruck\Foundry\Test\Behat\Tests\Unit\Test\Behat\User".');
 
         $this->registry->store($user2, 'john');
     }
@@ -110,7 +107,7 @@ final class ObjectRegistryTest extends TestCase
     public function it_throws_when_getting_non_existent_object(): void
     {
         $this->expectException(ObjectNotFound::class);
-        $this->expectExceptionMessage('Object of class "Zenstruck\Foundry\Tests\Unit\Test\Behat\User" with name "john" was not found.');
+        $this->expectExceptionMessage('Object of class "Zenstruck\Foundry\Test\Behat\Tests\Unit\Test\Behat\User" with name "john" was not found.');
 
         $this->registry->getByObjectClass(User::class, 'john');
     }
@@ -208,7 +205,7 @@ final class ObjectRegistryTest extends TestCase
         $this->registry->storeAfterStateAddedToStory($event1);
 
         $this->expectException(ObjectAlreadyRegistered::class);
-        $this->expectExceptionMessage('Object "duplicate" is already registered for class "Zenstruck\Foundry\Tests\Unit\Test\Behat\User".');
+        $this->expectExceptionMessage('Object "duplicate" is already registered for class "Zenstruck\Foundry\Test\Behat\Tests\Unit\Test\Behat\User".');
 
         $this->registry->storeAfterStateAddedToStory($event2);
     }

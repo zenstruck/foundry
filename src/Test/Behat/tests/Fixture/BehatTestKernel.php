@@ -48,10 +48,12 @@ class BehatTestKernel extends FoundryTestKernel
         $c->register(UpdateGenericModel::class)->setAutowired(true)->setAutoconfigured(true)->addTag('controller.service_arguments');
         $c->register(ResetDisabledTestContext::class)->setAutowired(true)->setAutoconfigured(true);
         $c->register(TestFoundryContext::class)
+            ->setArguments([
+                new Reference('.zenstruck_foundry.behat.factory_resolver'),
+                new Reference('.zenstruck_foundry.behat.object_registry'),
+            ])
             ->setAutowired(true)
-            ->setAutoconfigured(true)
-            ->setArguments([new Reference('.zenstruck_foundry.behat.factory_resolver'), new Reference('.zenstruck_foundry.behat.object_registry')])
-        ;
+            ->setAutoconfigured(true);
 
         $configurator->services()
             ->load('Zenstruck\\Foundry\\Test\\Behat\\Tests\\Fixture\\Factories\\', __DIR__.'/Factories')
@@ -67,15 +69,6 @@ class BehatTestKernel extends FoundryTestKernel
             ->load('Zenstruck\\Foundry\\Test\\Behat\\Tests\\Fixture\\Stories\\', __DIR__.'/Stories')
             ->autowire()
             ->autoconfigure();
-
-        if (!self::runsWithBehat()) {
-            $c->register('behat.service_container', \stdClass::class);
-        }
-    }
-
-    private static function runsWithBehat(): bool
-    {
-        return \str_contains($_SERVER['SCRIPT_NAME'], 'behat');
     }
 
     protected function baseFixturePath(): string

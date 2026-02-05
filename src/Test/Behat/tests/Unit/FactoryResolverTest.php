@@ -12,7 +12,6 @@
 namespace Zenstruck\Foundry\Test\Behat\Tests\Unit\Test\Behat;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Attribute\FactoryShortName;
@@ -20,8 +19,6 @@ use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Test\Behat\Exception\FactoryNotResolvable;
 use Zenstruck\Foundry\Test\Behat\FactoryShortNameResolver;
 
-/** @requires PHP 9 */
-#[RequiresPhp('9')]
 final class FactoryResolverTest extends TestCase
 {
     public static function factoriesWithConflictingShortNames(): iterable

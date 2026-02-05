@@ -82,6 +82,10 @@ final class DatabaseResetListener implements EventSubscriberInterface
         }
 
         ResetDatabaseManager::resetBeforeFirstTest($this->symfonyKernel);
+
+//        if ($this->damaSupportEnabled) {
+//            StaticDriver::beginTransaction();
+//        }
     }
 
     public function disableStaticConnection(): void

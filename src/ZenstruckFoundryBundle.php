@@ -33,7 +33,7 @@ use Zenstruck\Foundry\ORM\ResetDatabase\MigrateDatabaseResetter;
 use Zenstruck\Foundry\ORM\ResetDatabase\OrmResetter;
 use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
 use Zenstruck\Foundry\ORM\ResetDatabase\SchemaDatabaseResetter;
-use Zenstruck\Foundry\Test\Behat\FoundryContext;
+use Zenstruck\Foundry\Test\Behat\DependencyInjection\BehatServicesCompilerPass;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -239,12 +239,6 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
 
         $configurator->import('../config/services.php');
 
-        // we load all services for Behat by default, and we remove them if we detect that Behat is not installed
-        // that's the only way that worked so far...
-        if (\interface_exists(\Behat\Behat\Context\Context::class)) {
-            $configurator->import('../config/behat.php');
-        }
-
         $this->configureInstantiator($config['instantiator'], $container);
         $this->configureFaker($config['faker'], $container);
         $this->configureGlobalState($config['global_state'], $container);
@@ -281,12 +275,14 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
         $container->addCompilerPass($this);
         $container->addCompilerPass(new InMemoryCompilerPass());
         $container->addCompilerPass(new AsFixtureStoryCompilerPass());
+
+        if (class_exists(BehatServicesCompilerPass::class)) {
+            $container->addCompilerPass(new BehatServicesCompilerPass());
+        }
     }
 
     public function process(ContainerBuilder $container): void
     {
-        $this->removeBehatConfigIfNeeded($container);
-
         // faker providers
         foreach ($container->findTaggedServiceIds('foundry.faker_provider') as $id => $tags) {
             $container
@@ -309,17 +305,6 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                 ++$i;
             }
         }
-    }
-
-    private function removeBehatConfigIfNeeded(ContainerBuilder $container): void
-    {
-        if ($container->has('behat.service_container')) {
-            return;
-        }
-
-        $container->removeDefinition(FoundryContext::class);
-        $container->removeDefinition('.zenstruck_foundry.behat.object_registry');
-        $container->removeDefinition('zenstruck_foundry.behat.context.foundry');
     }
 
     /**

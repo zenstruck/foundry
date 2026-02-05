@@ -21,10 +21,10 @@ default:
 
     suites:
         main:
-            paths: [tests/behatFeatures/main]
+            paths: [features/main]
             contexts: &common_contexts
                 - Behat\MinkExtension\Context\MinkContext
-                - Zenstruck\Foundry\Tests\Fixture\Behat\TestFoundryContext
+                - Zenstruck\Foundry\Test\Behat\Tests\Fixture\TestFoundryContext
 
 main-no-dama:
     extensions:
@@ -35,7 +35,7 @@ main-no-dama:
     suites:
         main: false
         main-no-dama:
-            paths: [tests/behatFeatures/main]
+            paths: [features/main]
             contexts: *common_contexts
 
 main-native-dama:
@@ -48,7 +48,7 @@ main-native-dama:
     suites:
         main: false
         main-native-dama:
-            paths: [tests/behatFeatures/main]
+            paths: [features/main]
             contexts: *common_contexts
 
 reset-manual:
@@ -60,7 +60,7 @@ reset-manual:
     suites:
         main: false
         reset-manual:
-            paths: [tests/behatFeatures/reset-manual]
+            paths: [features/reset-manual]
             contexts: *common_contexts
 
 reset-manual-dama:
@@ -72,7 +72,7 @@ reset-manual-dama:
     suites:
         main: false
         reset-manual-dama:
-            paths: [tests/behatFeatures/reset-manual]
+            paths: [features/reset-manual]
             contexts: *common_contexts
 
 reset-feature:
@@ -84,7 +84,7 @@ reset-feature:
     suites:
         main: false
         reset-feature:
-            paths: [tests/behatFeatures/reset-feature]
+            paths: [features/reset-feature]
             contexts: *common_contexts
 
 
@@ -97,7 +97,7 @@ reset-feature-dama:
     suites:
         main: false
         reset-feature-dama:
-            paths: [tests/behatFeatures/reset-feature]
+            paths: [features/reset-feature]
             contexts: *common_contexts
 
 reset-disabled:
@@ -109,8 +109,8 @@ reset-disabled:
     suites:
         main: false
         reset-disabled:
-            paths: [tests/behatFeatures/reset-disabled]
+            paths: [features/reset-disabled]
             contexts:
                 - Behat\MinkExtension\Context\MinkContext
-                - Zenstruck\Foundry\Tests\Fixture\Behat\TestFoundryContext
-                - Zenstruck\Foundry\Tests\Fixture\Behat\ResetDisabledTestContext
+                - Zenstruck\Foundry\Test\Behat\Tests\Fixture\TestFoundryContext
+                - Zenstruck\Foundry\Test\Behat\Tests\Fixture\ResetDisabledTestContext

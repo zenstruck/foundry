@@ -9,6 +9,7 @@
  * file that was distributed with this source code.
  */
 
+use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Filesystem\Filesystem;
 
 $command = \implode(' ', $_SERVER['argv']);
@@ -18,3 +19,5 @@ require \dirname(__DIR__).'/vendor/autoload.php';
 $fs = new Filesystem();
 
 $fs->remove(__DIR__.'/../var/cache');
+
+(new Dotenv())->usePutenv()->loadEnv(__DIR__.'/../.env', testEnvs: []);

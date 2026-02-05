@@ -16,10 +16,6 @@
         <server name="APP_ENV" value="test" force="true" />
         <server name="SHELL_VERBOSITY" value="-1" />
         <server name="KERNEL_CLASS" value="Zenstruck\Foundry\Test\Behat\Tests\Fixture\BehatTestKernel"/>
-        <env name="DATABASE_URL" value="sqlite:///%kernel.project_dir%/var/data.db"/>
-        <env name="USE_DAMA_DOCTRINE_TEST_BUNDLE" value="1"/>
-        <env name="USE_PHP_84_LAZY_OBJECTS" value="1"/>
-        <env name="MONGO_URL" value=""/>
     </php>
 
     <testsuites>
@@ -45,6 +41,7 @@
     </source>
 
     <extensions>
+        <bootstrap class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension"/>
         <bootstrap class="Zenstruck\Foundry\PHPUnit\FoundryExtension">
             <parameter name="enabled-auto-reset" value="true"/>
         </bootstrap>

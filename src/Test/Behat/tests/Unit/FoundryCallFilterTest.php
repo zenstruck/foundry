@@ -20,7 +20,6 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Testwork\Call\Call;
 use Behat\Testwork\Environment\Environment;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -35,8 +34,6 @@ use Zenstruck\Foundry\Test\Behat\FoundryContext;
 use Zenstruck\Foundry\Test\Behat\FoundryTableNode;
 use Zenstruck\Foundry\Test\Behat\ObjectRegistry;
 
-/** @requires PHP 9 */
-#[RequiresPhp('9')]
 final class FoundryCallFilterTest extends TestCase
 {
     private FoundryCallFilter $filter;
