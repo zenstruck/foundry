@@ -1,0 +1,18 @@
+#!/usr/bin/env php
+<?php
+
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Zenstruck\Foundry\Test\Behat\Tests\Fixture\BehatTestKernel;
+
+require_once __DIR__ . '/../tests/bootstrap.php';
+
+foreach ($argv ?? [] as $i => $arg) {
+    if (($arg === '--env' || $arg === '-e') && isset($argv[$i + 1])) {
+        $_ENV['APP_ENV'] = $argv[$i + 1];
+        break;
+    }
+}
+
+$application = new Application(new BehatTestKernel($_ENV['APP_ENV'], true));
+
+$application->run();

@@ -45,7 +45,7 @@ final class FoundryExtension implements Extension
             ->children()
                 ->enumNode('database_reset_mode')
                     ->values(\array_map(static fn(DatabaseResetMode $mode) => $mode->value, DatabaseResetMode::cases()))
-                    ->defaultValue(DatabaseResetMode::MANUAL->value)
+                    ->defaultValue(DatabaseResetMode::DISABLED->value)
                 ->end()
                 ->booleanNode('enable_dama_support')
                     ->defaultFalse()

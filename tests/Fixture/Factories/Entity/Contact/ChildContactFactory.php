@@ -11,10 +11,10 @@
 
 namespace Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact;
 
-use Zenstruck\Foundry\Attribute\FactoryShortName;
+use Zenstruck\Foundry\Test\Behat\Attribute\FactoryShortName;
 use Zenstruck\Foundry\Tests\Fixture\Entity\ChildContact;
 
-#[FactoryShortName('child of contact', 'children of contact')]
+#[FactoryShortName('child of contact', 'children of contact')] // @phpstan-ignore attribute.notFound
 final class ChildContactFactory extends ContactFactory
 {
     public static function class(): string

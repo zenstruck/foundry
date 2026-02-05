@@ -28,7 +28,7 @@ Feature: Test @withFixture tag
 
   @withFixture(behat-category)
   Scenario: Can use entities from fixture in another entity
-    Given a contact "jane-doe" is created with properties
+    Given there is a contact "jane-doe" with
       | name     | category         |
       | Jane Doe | category fixture |
     Then 1 contact should exist

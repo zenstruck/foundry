@@ -2,13 +2,13 @@
 Feature: Skip database reset with @noResetDB tag
 
   Scenario: First scenario creates data
-    Given a contact is created
+    Given there is a contact
     Then 1 contact should exist
 
   @noResetDB
   Scenario: Data persists with @noResetDB tag
     Then 1 contact should exist
-    Given a contact is created
+    Given there is a contact
     Then 2 contacts should exist
 
   Scenario: Normal reset resumes after @noResetDB

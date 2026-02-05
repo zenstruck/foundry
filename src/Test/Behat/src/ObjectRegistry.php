@@ -127,6 +127,15 @@ final class ObjectRegistry
         );
     }
 
+    public function idFor(string $factoryShortName, string $objectName): int|string
+    {
+        $object = $this->getByFactoryShortName($factoryShortName, $objectName);
+
+        return $this->coerceIdToScalar(
+            $this->persistenceManager->getIdentifierValues($object)
+        );
+    }
+
     public function isStored(object $object): bool
     {
         return array_any(

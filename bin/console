@@ -6,13 +6,6 @@ use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 
 require_once __DIR__ . '/../tests/bootstrap.php';
 
-foreach ($argv ?? [] as $i => $arg) {
-    if (($arg === '--env' || $arg === '-e') && isset($argv[$i + 1])) {
-        $_ENV['APP_ENV'] = $argv[$i + 1];
-        break;
-    }
-}
-
-$application = new Application(new TestKernel($_ENV['APP_ENV'], true));
+$application = new Application(new TestKernel('test', true));
 
 $application->run();

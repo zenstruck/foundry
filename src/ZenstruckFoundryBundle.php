@@ -277,7 +277,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
         $container->addCompilerPass(new AsFixtureStoryCompilerPass());
 
         if (class_exists(BehatServicesCompilerPass::class)) {
-            $container->addCompilerPass(new BehatServicesCompilerPass());
+            $container->addCompilerPass(new BehatServicesCompilerPass()); // @phpstan-ignore argument.type
         }
     }
 

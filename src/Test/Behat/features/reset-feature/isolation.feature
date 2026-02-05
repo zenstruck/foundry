@@ -1,7 +1,7 @@
 Feature: Database isolation per feature - Part 1
 
   Scenario: First scenario creates data
-    Given a contact A is created with properties
+    Given there is a contact A with
       | name     |
       | John Doe |
     Then 1 contact should exist
@@ -10,7 +10,7 @@ Feature: Database isolation per feature - Part 1
     Then 1 contact should exist
 
   Scenario: Third scenario also sees accumulated data
-    Given a contact B is created with properties
+    Given there is a contact B with
       | name     |
       | Jane Doe |
     Then 2 contacts should exist

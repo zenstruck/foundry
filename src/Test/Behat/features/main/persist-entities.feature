@@ -7,16 +7,16 @@ Feature: Test persisting entities
 
   Scenario: Can persist entities
     # Can name entities
-    Given a contact A is created
+    Given there is a contact A
     # Can create unnamed entities
-    And a contact is created
+    And there is a contact
     When I am on "/"
     Then the response status code should be 200
     Then I should see "Hello World"
     Then 2 contacts should exist
 
   Scenario: Can visit pages twice and still access to EM
-    Given a contact is created
+    Given there is a contact
     When I am on "/"
     Then I should see "Hello World"
     When I am on "/"
@@ -24,7 +24,7 @@ Feature: Test persisting entities
     Then 1 contact should exist
 
   Scenario Outline: Persist entity
-    Given a contact is created
+    Given there is a contact
     When I am on "/"
     Then the response status code should be 200
     Then I should see "<data>"
@@ -36,7 +36,7 @@ Feature: Test persisting entities
       | World |
 
   Scenario: Can access last created entity ID
-    Given a "generic entity" "the object" is created with properties
+    Given there is a "generic entity" "the object" with
       | prop1 |
       | foo   |
     When I am on "/orm/update/<lastId>/bar"
@@ -50,10 +50,10 @@ Feature: Test persisting entities
     Then an "RuntimeException" exception should be thrown containing message "No last id found"
 
   Scenario: Can access last created entity ID
-    Given a "generic entity" "the object" is created with properties
+    Given there is a "generic entity" "the object" with
       | prop1 |
       | foo   |
-    And a contact is created
+    And there is a contact
     When I am on "/orm/update/<lastId(generic entity)>/bar"
     Then the response status code should be 200
     Then "generic entity" "the object" should have properties
@@ -63,3 +63,17 @@ Feature: Test persisting entities
   Scenario: Throws if last id is not found (!)
     When I am on "/orm/update/<lastId(generic entity)>/bar"
     Then an "InvalidArgumentException" exception should be thrown containing message "No object of type \"generic entity\" found"
+
+  Scenario: Can access an ID from reference
+    Given there is a "generic entity" "the object" with
+      | prop1 |
+      | foo   |
+    When I am on "/orm/update/<id(generic entity, the object)>/bar"
+    Then the response status code should be 200
+    Then "generic entity" "the object" should have properties
+      | prop1 |
+      | bar   |
+
+  Scenario: Throws if the reference is not found (!)
+    When I am on "/orm/update/<id(generic entity, the object)>/bar"
+    Then an "ObjectNotFound" exception should be thrown containing message "Object \"generic entity the object\" was not found"

@@ -12,11 +12,10 @@
 namespace Zenstruck\Foundry\Test\Behat;
 
 use Symfony\Component\String\Inflector\EnglishInflector;
-use Zenstruck\Foundry\Attribute\FactoryShortName;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\ObjectFactory;
+use Zenstruck\Foundry\Test\Behat\Attribute\FactoryShortName;
 use Zenstruck\Foundry\Test\Behat\Exception\FactoryNotResolvable;
-
 use function Symfony\Component\String\u;
 
 /**

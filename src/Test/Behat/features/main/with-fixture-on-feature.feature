@@ -2,7 +2,7 @@
 Feature: Test @withFixture tag
 
   Scenario: Load behat-contacts fixture with @withFixture tag
-    Given a contact "jane-doe" is created
+    Given there is a contact "jane-doe"
     Then 2 contacts should exist
 
   Scenario: Ensure DB is fresh

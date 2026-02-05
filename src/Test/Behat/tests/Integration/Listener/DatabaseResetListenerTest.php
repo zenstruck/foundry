@@ -92,7 +92,7 @@ final class DatabaseResetListenerTest extends KernelTestCase
             DatabaseResetMode::SCENARIO,
             ['resetDB'],
             InvalidResetDbTag::class,
-            'Cannot use "@noResetDB" tag with database_reset_mode set as "manual".',
+            'Cannot use "@resetDB" tag with database_reset_mode set as "scenario".',
         ];
 
         yield 'both resetDB and noResetDB tags on scenario' => [

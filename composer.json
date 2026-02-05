@@ -102,9 +102,6 @@
             "allow-contrib": false
         }
     },
-    "scripts": {
-        "post-install-cmd": ["@composer bin phpstan install", "@composer bin phpbench install", "@composer bin behat install"]
-    },
     "minimum-stability": "dev",
     "prefer-stable": true
 }

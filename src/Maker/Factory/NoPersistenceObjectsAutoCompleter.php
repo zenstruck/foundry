@@ -13,6 +13,8 @@ namespace Zenstruck\Foundry\Maker\Factory;
 
 /**
  * @internal
+ *
+ * todo: ⚠️ this class is problematic and should be at least refactored or removed
  */
 final class NoPersistenceObjectsAutoCompleter
 {
@@ -35,6 +37,11 @@ final class NoPersistenceObjectsAutoCompleter
             /** @var \SplFileInfo $phpFile */
             foreach (new \RegexIterator($allFiles, '/\.php$/') as $phpFile) {
                 if (\in_array($phpFile->getRealPath(), $excludedFiles, true)) {
+                    continue;
+                }
+
+                if (str_contains($phpFile->getRealPath(), 'var/cache')
+                    || str_contains($phpFile->getRealPath(), 'src/Test/Behat')) {
                     continue;
                 }
 

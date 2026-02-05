@@ -26,14 +26,15 @@
         <testsuite name="main">
             <directory>tests</directory>
             <exclude>tests/Integration/ResetDatabase</exclude>
-            <exclude>tests/Unit/Test/Behat</exclude>
-            <exclude>tests/Unit/Integration/Behat</exclude>
         </testsuite>
     </testsuites>
     <source ignoreSuppressionOfDeprecations="true" baseline="phpunit-deprecation-baseline.xml">
         <include>
             <directory>src</directory>
         </include>
+        <exclude>
+            <directory>src/Test/Behat</directory>
+        </exclude>
     </source>
     <extensions>
         <bootstrap class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension" />

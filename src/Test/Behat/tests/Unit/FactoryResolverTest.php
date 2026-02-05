@@ -14,8 +14,8 @@ namespace Zenstruck\Foundry\Test\Behat\Tests\Unit\Test\Behat;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Zenstruck\Foundry\Attribute\FactoryShortName;
 use Zenstruck\Foundry\ObjectFactory;
+use Zenstruck\Foundry\Test\Behat\Attribute\FactoryShortName;
 use Zenstruck\Foundry\Test\Behat\Exception\FactoryNotResolvable;
 use Zenstruck\Foundry\Test\Behat\FactoryShortNameResolver;
 

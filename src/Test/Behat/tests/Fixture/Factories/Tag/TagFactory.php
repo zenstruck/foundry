@@ -11,8 +11,8 @@
 
 namespace Zenstruck\Foundry\Test\Behat\Tests\Fixture\Factories\Tag;
 
-use Zenstruck\Foundry\Attribute\FactoryShortName;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+use Zenstruck\Foundry\Test\Behat\Attribute\FactoryShortName;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Tag;
 
 /**

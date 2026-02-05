@@ -8,7 +8,7 @@ Feature: "@withFixture" on feature
     Then 1 contact should exist
 
   Scenario: Can add new data
-    Given a contact is created
+    Given there is a contact
     Then 2 contacts should exist
 
   @resetDB

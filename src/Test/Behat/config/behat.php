@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Zenstruck\Foundry\Persistence\Event\AfterPersist;
 use Zenstruck\Foundry\Story\Event\StateAddedToStory;
+use Zenstruck\Foundry\Test\Behat\AbstractFoundryContext;
 use Zenstruck\Foundry\Test\Behat\FactoryShortNameResolver;
 use Zenstruck\Foundry\Test\Behat\FoundryContext;
 use Zenstruck\Foundry\Test\Behat\ObjectRegistry;
@@ -34,11 +35,18 @@ return static function(ContainerConfigurator $container): void {
         ->tag('kernel.event_listener', ['method' => 'storeAfterStateAddedToStory', 'event' => StateAddedToStory::class])
         ->public()
 
-        ->set(FoundryContext::class, FoundryContext::class)
-        ->autowire()
-        ->autoconfigure()
+        ->set('zenstruck_foundry.behat.context.parent', AbstractFoundryContext::class)
         ->args([
             service('.zenstruck_foundry.behat.factory_resolver'),
             service('.zenstruck_foundry.behat.object_registry'),
-        ]);
+        ])
+        ->abstract()
+        ->public()
+        ->autowire()
+        ->autoconfigure()
+
+        // service name is not hidden on purpose
+        ->set(FoundryContext::class, FoundryContext::class)
+            ->parent('zenstruck_foundry.behat.context.parent')
+    ;
 };

@@ -55,12 +55,7 @@ final class InvalidResetDbTag extends \LogicException
 
     public static function resetDbWithScenarioMode(BeforeFeatureTested|BeforeScenarioTested $event): self
     {
-        return new self('Cannot use "@noResetDB" tag with database_reset_mode set as "manual".', $event);
-    }
-
-    public static function noResetDbWithManualMode(BeforeFeatureTested|BeforeScenarioTested $event): self
-    {
-        return new self('Cannot use "@noResetDB" tag with database_reset_mode set as "manual".', $event);
+        return new self('Cannot use "@resetDB" tag with database_reset_mode set as "scenario".', $event);
     }
 
     public static function resetDbOnFeatureWithFeatureMode(BeforeFeatureTested $event): self
@@ -71,6 +66,11 @@ final class InvalidResetDbTag extends \LogicException
     public static function resetDbOnScenarioWithScenarioMode(BeforeScenarioTested $event): self
     {
         return new self('Cannot use "@resetDB" tag on a scenario with database_reset_mode set as "scenario".', $event);
+    }
+
+    public static function noResetDbWithManualMode(BeforeFeatureTested|BeforeScenarioTested $event): self
+    {
+        return new self('Cannot use "@noResetDB" tag with database_reset_mode set as "manual".', $event);
     }
 
     public static function noResetDbWithFeatureMode(BeforeFeatureTested|BeforeScenarioTested $event): self

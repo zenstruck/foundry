@@ -1597,6 +1597,8 @@ You can use the ``#[WithStory]`` attribute to load stories in your tests:
 
 If used on the class, the story will be loaded before each test method.
 
+.. _as-fixture-attribute:
+
 Local Development Fixtures
 --------------------------
 
@@ -2691,16 +2693,16 @@ This extension provides the following features:
 Behat Integration
 -----------------
 
-Foundry provides a Behat extension that allows you to use factories and fixtures in your BDD tests.
+Foundry provides a Behat extension that correctly boots the Foundry for you.
 
 Installation
 ~~~~~~~~~~~~
 
-1. Install Behat and the Symfony extension:
+1. The Behat extension is shipped as an independent packagist package, so you need to install in addition to the main Foundry package:
 
 .. code-block:: terminal
 
-    $ composer require --dev behat/behat friends-of-behat/symfony-extension
+    $ composer require --dev zenstruck/foundry-behat
 
 2. Enable the Foundry extension in your ``behat.yaml``:
 
@@ -2708,34 +2710,59 @@ Installation
 
     default:
         extensions:
-            Zenstruck\Foundry\Test\Behat\FoundryExtension:
-                database_reset_mode: scenario  # or: feature, manual, disabled
-            FriendsOfBehat\SymfonyExtension: ~
-            Behat\MinkExtension:
-                sessions:
-                    symfony:
-                        symfony: ~
+            Zenstruck\Foundry\Test\Behat\FoundryExtension: ~
 
-        suites:
-            default:
-                contexts:
-                    - Behat\MinkExtension\Context\MinkContext
-                    - Zenstruck\Foundry\Test\Behat\FoundryContext
+            # SymfonyExtension is required for the Foundry Behat extension to work, so make sure to enable it as well
+            FriendsOfBehat\SymfonyExtension: ~
 
 Database Reset Modes
 ~~~~~~~~~~~~~~~~~~~~
 
+Like in PHPUnit, and using the ``ResetDatabase`` attribute, Foundry can be configured to automatically reset the database
+in your Behat tests. This is useful to ensure a clean state for your tests. You can configure this in your ``behat.yaml``:
+
+.. code-block:: yaml
+
+    default:
+        extensions:
+            Zenstruck\Foundry\Test\Behat\FoundryExtension:
+                database_reset_mode: scenario # or "feature" or "manual"
+
 The ``database_reset_mode`` option controls when the database is reset:
 
-- ``scenario``: Reset before each scenario (default)
+- ``disabled``: Never reset automatically (default)
+- ``scenario``: Reset before each scenario
 - ``feature``: Reset before each feature file
 - ``manual``: Only reset when using the ``@resetDB`` tag
-- ``disabled``: Never reset automatically
+
+.. tip::
+
+    With ``scenario`` mode, you can skip the reset for a specific scenario with the ``@noResetDB`` tag.
+
+    .. code-block:: gherkin
+
+        @noResetDB
+        Scenario: Keep data from previous scenario
+          Then 1 contact should exist
+
+.. tip::
+
+    When using ``database_reset_mode: manual`` or ``database_reset_mode: feature``,
+    you can force a reset using the ``@resetDB`` tag:
+
+    .. code-block:: gherkin
+
+        @resetDB
+        Scenario: Start with fresh database
+          Then 0 contacts should exist
 
 DAMA DoctrineTestBundle Support
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+...............................
 
-For faster tests using database transactions:
+This Behat extension supports `DAMADoctrineTestBundle`_ out of the box. But some features are not compatible with its
+native extension, such as the ``@noResetDB`` tag or the ``feature`` and ``manual`` database reset modes.
+
+To use these features, enable Foundry's own DAMA support:
 
 .. code-block:: yaml
 
@@ -2750,77 +2777,209 @@ For faster tests using database transactions:
     When using Foundry's DAMA support, do not enable the native DAMA Behat extension
     (``DAMA\DoctrineTestBundle\Behat\ServiceContainer\DoctrineExtension``).
 
-Available Steps
-~~~~~~~~~~~~~~~
+Built-in Behat Context
+~~~~~~~~~~~~~~~~~~~~~~
 
-**Creating objects:**
+Foundry ships a built-in context with steps definitions, which helps to create objects, access them and make assertions on them.
+To use it, add the following to your ``behat.yaml``:
+
+.. code-block:: yaml
+
+    default:
+        suites:
+            main:
+                contexts:
+                    - Zenstruck\Foundry\Test\Behat\FoundryContext
+
+Create objects
+..............
 
 .. code-block:: gherkin
 
     # Create a single object
-    Given a contact is created
-    Given a contact "john" is created
+    # "contact" is a short name resolved from the factory class name (ContactFactory → contact)
+    Given there is a contact
 
-    # Create with properties
-    Given a contact "john" is created with properties
+    # Create a named object: this name will be useful for later reference
+    Given there is a contact "john"
+
+    # You can also use "called" or "named" keywords
+    Given there is a contact called "john"
+    Given there is a contact named "john"
+
+    # Create an object with properties
+    Given there is a contact called "john" with
       | name     | email          |
       | John Doe | john@email.com |
 
     # Create multiple objects
-    Given contacts are created with properties
+    # Notice that you can use the plural form of the factory name
+    Given there are contacts with
       | _ref | name     |
       | A    | John Doe |
       | B    | Jane Doe |
 
 The ``_ref`` column is a special column that allows you to name the created objects for later reference.
 
-**Referencing objects:**
+.. tip::
 
-Objects are automatically resolved based on property types. If a property expects an object
-and you provide a string that matches a previously created object name, it will be resolved automatically:
+    Factory short names and object names can be either quoted or unquoted. Quoting is required when the name
+    contains spaces (e.g. ``"blog post"``):
+
+    .. code-block:: gherkin
+
+        # both are equivalent
+        Given there is a contact "john"
+        Given there is a contact john
+
+        # quoting is required for multi-word factory names
+        Given there is a "blog post" "Foundry rocks" with
+          | name | Foo |
+
+.. note::
+
+    You can use custom names or disambiguate factory names by using the attribute ``#[FactoryShortName]``:
+
+    ::
+
+        use Zenstruck\Foundry\Attribute\FactoryShortName;
+
+        #[FactoryShortName(shortName: 'person', pluralName: 'people')]
+        final class PersonFactory extends PersistentObjectFactory
+        {}
+
+Type handling in table values
+.............................
+
+When using properties in Gherkin tables, Foundry automatically converts string values based on the target property type:
 
 .. code-block:: gherkin
 
-    Given a category "tech" is created
-    Given a post "my-post" is created with properties
-      | title        | category |
-      | My Post      | tech     |
+    Given there is a post "my-post" with
+      | title   | category | publishedAt | status       | body |
+      | My Post | tech     | 2026-01-15  | published    | null |
 
-The ``category`` property expects a ``Category`` object. Foundry detects this and looks up
-the object named "tech" in the registry.
+- **Object references**: If the property type has a registered factory, Foundry looks up the object by name in the registry
+  (e.g. ``tech`` resolves to the ``Category`` object named "tech")
+- **null**: The literal string ``null`` is converted to PHP ``null``
+- **Booleans**: ``true`` and ``false`` are converted to PHP booleans
+- **Dates**: If the property type implements ``DateTimeInterface``, the value is parsed using PHP's native date parsing
+  (e.g. ``2026-01-15``, ``yesterday``, ``+1 week``)
+- **Enums**: If the property type is a ``BackedEnum``, the value is resolved using ``::tryFrom()``
 
-**Assertions:**
+Referencing objects in another object
+.....................................
 
 .. code-block:: gherkin
 
+    Given there is a category "tech"
+    Given there is a post "my-post" with
+      | title   | category |
+      | My Post | tech     |
+
+The property ``Post::$category`` expects a ``Category`` object. Foundry detects this and looks up
+the category named "tech" in the registry.
+
+.. tip::
+
+    If for any reason the property type cannot be resolved, you can use the special syntax ``<ref(type, name)>``:
+
+    .. code-block:: gherkin
+
+        Given there is a category "tech"
+        Given there is a post "my-post" with
+          | title   | category                  |
+          | My Post | <ref(category, tech)>     |
+
+.. note::
+
+    Objects can be referenced by name until the next database reset occurs. How long they persist depends on your
+    ``database_reset_mode``. In any case, the object registry is always cleared between features, even when using
+    ``database_reset_mode: disabled`` (the data may still exist in the database, but the named references are lost).
+    This is also true for the assertions and id access described below.
+
+Assertions
+..........
+
+.. code-block:: gherkin
+
+    # count objects of a type
     Then 2 contacts should exist
+
+    # assert a specific object has properties
     Then contact "john" should have properties
       | name     |
       | John Doe |
-    Then contact object named "john" should exist
-    Then contact object named "jane" should not exist
 
-**Using last created ID:**
+    # You can also use various natural language forms:
+    Then the contact "john" should exist and have properties
+      | name     |
+      | John Doe |
+
+    # assert if objects are persisted or not
+    Then contact "john" should exist
+    Then contact "jane" should not exist
+
+Accessing ids of created objects
+................................
 
 .. code-block:: gherkin
 
-    Given a contact "john" is created
+    Given there is a contact "john"
+
+    # Access the last id created
     When I am on "/contacts/<lastId>"
-    # Or for a specific type:
+
+    # Or the last id for specific type:
     When I am on "/contacts/<lastId(contact)>"
+
+    # Be even more specific with the name:
+    When I am on "/contacts/<id(contact, john)>"
+
+.. warning::
+
+    The ``<lastId>`` and ``<id>`` syntax only work for object which have "simple" ids (integer, string or Uuid).
+    This means it won't work for objects with `composite keys <https://www.doctrine-project.org/projects/doctrine-orm/en/3.6/tutorials/composite-primary-keys.html>`_
+    nor for `derived entities <https://www.doctrine-project.org/projects/doctrine-orm/en/3.6/tutorials/composite-primary-keys.html#use-case-2-simple-derived-identity>`_.
+
+.. note::
+
+    As for object references, the ids can also be accessed until the next database reset occurs. And they are also cleared after each feature.
+
+Overriding built-in step definitions
+....................................
+
+If the built-in step definitions don't fit your need or conflict with your own contexts and step definitions, you can
+define you own "Foundry context" with the definitions' name of your choice:
+- Create your own context class which overrides ``Zenstruck\Foundry\Test\Behat\AbstractFoundryContext``
+- Declare a service for your own context:
+
+.. code-block:: yaml
+
+    # config/services.yaml
+    when@test:
+        services:
+            App\Tests\Behat\Context\CustomFoundryContext:
+                parent: zenstruck_foundry.behat.context.parent
+
+You can use ``Zenstruck\Foundry\Test\Behat\FoundryContext`` as an example of how to implement the step definitions, and
+define your own language to create objects with Foundry.
+
+.. warning::
+
+    You must keep the name of the methods' parameters, although some of the definition won't work.
+
+.. warning::
+
+    By doing this, you won't automatically benefit from the potentially new definition that we will add to the built-in
+    context in the future. You will need to manually add them to your own context.
 
 Loading Fixtures with Tags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Use the ``@withFixture`` tag to load a Story before a scenario:
+Foundry's Behat extension leverages :ref:`the #[AsFixture] attribute <_as-fixture-attribute>` in order to load stories.
 
-.. code-block:: gherkin
-
-    @withFixture(my-contacts)
-    Scenario: View contacts
-      Then 3 contacts should exist
-
-First, mark your Story with the ``#[AsFixture]`` attribute:
+First, mark a Story with the ``#[AsFixture]`` attribute:
 
 ::
 
@@ -2838,54 +2997,53 @@ First, mark your Story with the ``#[AsFixture]`` attribute:
         }
     }
 
-Objects added via ``addState()`` are automatically available in the object registry and can be
-referenced in your scenarios.
-
-Manual Database Reset
-~~~~~~~~~~~~~~~~~~~~~
-
-When using ``database_reset_mode: manual`` or ``database_reset_mode: feature``,
-you can force a reset using the ``@resetDB`` tag:
+Then use the ``@withFixture`` tag to load a Story before a scenario:
 
 .. code-block:: gherkin
 
-    @resetDB
-    Scenario: Start with fresh database
-      Then 0 contacts should exist
+    @withFixture(my-contacts)
+    Scenario: View contacts
+      Then 3 contacts should exist
 
-In ``database_reset_mode: scenario``, you can skip the reset with ``@noresetDB``:
+    Scenario: Assert john exists
+      # Objects added with "addState()" are automatically available in the objects registry and can be
+      #  referenced in your scenarios.
+      Then contact "john" should have properties
+        | name     |
+        | John     |
 
-.. code-block:: gherkin
-
-    @noresetDB
-    Scenario: Keep data from previous scenario
-      Then 1 contact should exist
-
-Customizing Factory Short Names
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-By default, factories are resolved by their class name (``ContactFactory`` → ``contact``).
-You can customize this with the ``#[FactoryShortName]`` attribute:
-
-::
-
-    use Zenstruck\Foundry\Attribute\FactoryShortName;
-
-    #[FactoryShortName('person', 'people')]
-    final class ContactFactory extends PersistentObjectFactory
-    {
-        // ...
-    }
-
-Now you can use:
+The ``@withFixture`` tag can also be used on a **feature** to load fixtures once for all scenarios in that feature:
 
 .. code-block:: gherkin
 
-    Given a person is created
-    Given people are created with properties
-      | name |
-      | John |
-      | Jane |
+    @withFixture(my-contacts)
+    Feature: Contacts management
+      Scenario: List contacts
+        Then 3 contacts should exist
+
+      Scenario: Find john
+        Then contact "john" should exist
+
+.. tip::
+
+    When combining ``@withFixture`` with ``@resetDB`` (either on a scenario or inherited from the feature), the fixtures
+    are automatically reloaded after the database is reset.
+
+    .. code-block:: gherkin
+
+        @withFixture(my-contacts)
+        Feature: Contacts management
+          Scenario: List all contacts
+            Then 3 contacts should exist
+
+          @resetDB
+          Scenario: Start fresh but still have fixtures
+            # Database was reset, but fixtures were reloaded
+            Then 3 contacts should exist
+
+.. note::
+
+    ``@withFixture`` also works with Scenario Outlines (``Examples`` tables).
 
 Bundle Configuration
 --------------------

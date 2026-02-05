@@ -1,6 +1,10 @@
 {
   "name": "zenstruck/foundry-behat",
   "type": "behat-extension",
+  "description": "Behat extension for zenstruck/foundry.",
+  "homepage": "https://github.com/zenstruck/foundry",
+  "license": "MIT",
+  "keywords": ["fixture", "factory", "test", "symfony", "dev", "behat"],
   "authors": [
     {
       "name": "Kevin Bond",
@@ -32,29 +36,35 @@
     "zenstruck/foundry": "dev-behat-extension"
   },
   "require-dev": {
+    "bamarni/composer-bin-plugin": "^1.9",
     "behat/mink-browserkit-driver": "^2.0",
-    "doctrine/orm": "^2.16|^3.0",
+    "dama/doctrine-test-bundle": "^8.6",
     "doctrine/common": "^3.2.2",
     "doctrine/doctrine-bundle": "^2.10|^3.0",
+    "doctrine/orm": "^2.16|^3.0",
     "friends-of-behat/mink-extension": "^2.0",
+    "phpunit/phpunit": "^12.5",
     "symfony/dotenv": "^6.4|^7.0",
     "symfony/flex": "^2.10",
     "symfony/framework-bundle": "^6.4|^7.0",
     "symfony/uid": "^6.4|^7.0",
-    "phpunit/phpunit": "^12.5",
-    "yceruto/behat-extension": "^1.0.2",
-    "dama/doctrine-test-bundle": "^8.6"
+    "yceruto/behat-extension": "^1.0.2"
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
   "config": {
     "allow-plugins": {
-      "symfony/flex": true
+      "symfony/flex": true,
+      "bamarni/composer-bin-plugin": true
     }
   },
   "extra": {
     "symfony": {
       "allow-contrib": false
+    },
+    "bamarni-bin": {
+      "target-directory": "../../../bin/tools",
+      "forward-command": false
     }
   },
   "scripts": {
