@@ -28,8 +28,8 @@ fi
 ### <<
 
 ### >> update PHPUnit if needed
-if [[ " 9 10 11 12 " != *" ${PHPUNIT_VERSION-9} "* ]]; then
-  echo "❌ PHPUNIT_VERSION should be one of 9, 10, 11, 12";
+if [[ " 9 10 11 12 13 " != *" ${PHPUNIT_VERSION-9} "* ]]; then
+  echo "❌ PHPUNIT_VERSION should be one of 9, 10, 11, 12, 13";
   exit 1;
 fi
 
@@ -53,7 +53,7 @@ fi
 PHPUNIT_EXEC="vendor/bin/phpunit"
 case ${PHPUNIT_VERSION} in
   "9")
-    PHPUNIT_EXEC="${PHPUNIT_EXEC} -c phpunit.xml.dist"
+    PHPUNIT_EXEC="${PHPUNIT_EXEC} -c phpunit-9.xml.dist"
     if [ "${USE_DAMA_DOCTRINE_TEST_BUNDLE:-0}" = "1" ]; then
       PHPUNIT_EXEC="${PHPUNIT_EXEC} --extensions ${DAMA_EXTENSION}"
     fi
@@ -61,11 +61,11 @@ case ${PHPUNIT_VERSION} in
 
   "10")
     # PHPUnit 10 does not have a --extension option
-    PHPUNIT_EXEC="${PHPUNIT_EXEC} -c phpunit-10.xml.dist"
+    PHPUNIT_EXEC="${PHPUNIT_EXEC} -c phpunit.xml.dist"
     ;;
 
-  "11"|"12")
-    PHPUNIT_EXEC="${PHPUNIT_EXEC} -c phpunit-10.xml.dist --extension Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\PhpUnitTestExtension"
+  "11"|"12"|"13")
+    PHPUNIT_EXEC="${PHPUNIT_EXEC} -c phpunit.xml.dist --extension Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\PhpUnitTestExtension"
 
     if [ "${USE_DAMA_DOCTRINE_TEST_BUNDLE:-0}" = "1" ]; then
       PHPUNIT_EXEC="${PHPUNIT_EXEC} --extension "${DAMA_EXTENSION}""

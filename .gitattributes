@@ -16,7 +16,7 @@
 /phpstan.neon                   export-ignore
 /phpunit                        export-ignore
 /phpunit.xml.dist               export-ignore
-/phpunit-10.xml.dist            export-ignore
+/phpunit-9.xml.dist             export-ignore
 /phpunit-paratest.xml.dist      export-ignore
 /psalm.xml                      export-ignore
 /stubs                          export-ignore

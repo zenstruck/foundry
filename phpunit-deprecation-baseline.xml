@@ -30,6 +30,7 @@ See https://github.com/zenstruck/foundry/blob/2.x/UPGRADE-2.7.md to upgrade.]]><
     </file>
     <file path="vendor/doctrine/deprecations/src/Deprecation.php">
         <line number="208" hash="815824609bbd80ce3a5cc8a6a19c2e6dd0c6985c">
+            <issue><![CDATA[Support for MySQL < 8 is deprecated and will be removed in DBAL 5 (AbstractMySQLDriver.php:70 called by AbstractDriverMiddleware.php:32, https://github.com/doctrine/dbal/pull/6343, package doctrine/dbal)]]></issue>
             <issue><![CDATA[Support for MySQL < 8 is deprecated and will be removed in DBAL 5 (AbstractMySQLDriver.php:75 called by AbstractDriverMiddleware.php:32, https://github.com/doctrine/dbal/pull/6343, package doctrine/dbal)]]></issue>
         </line>
     </file>

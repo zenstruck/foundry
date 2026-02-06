@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- https://phpunit.de/manual/current/en/appendixes.configuration.html -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
+         colors="true"
+         failOnRisky="true"
+         failOnWarning="true"
+         defaultTestSuite="main"
+>
+    <php>
+        <ini name="error_reporting" value="-1" />
+        <server name="KERNEL_CLASS" value="Zenstruck\Foundry\Tests\Fixture\TestKernel" />
+        <server name="SHELL_VERBOSITY" value="-1" />
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0&amp;max[direct]=0&amp;quiet[]=indirect&amp;quiet[]=other&amp;ignoreFile=./tests/baseline-ignore"/>
+        <env name="APP_ENV" value="test"/>
+    </php>
+
+    <testsuites>
+        <testsuite name="main">
+            <directory>tests</directory>
+            <exclude>tests/Integration/ResetDatabase</exclude>
+            <exclude>tests/Integration/ForceFactoriesTraitUsage</exclude>
+        </testsuite>
+        <testsuite name="reset-database">
+            <directory>tests/Integration/ResetDatabase</directory>
+        </testsuite>
+        <testsuite name="unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+    </testsuites>
+
+    <coverage>
+        <include>
+            <directory>src</directory>
+        </include>
+    </coverage>
+
+    <listeners>
+        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
+    </listeners>
+</phpunit>
