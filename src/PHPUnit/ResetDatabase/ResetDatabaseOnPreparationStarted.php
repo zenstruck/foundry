@@ -38,15 +38,19 @@ final class ResetDatabaseOnPreparationStarted implements Event\Test\PreparationS
             return;
         }
 
-        if (!$this->shouldReset($test)) {
-            return;
+        try {
+            if (!$this->shouldReset($test)) {
+                return;
+            }
+
+            ResetDatabaseManager::resetBeforeEachTest(
+                KernelTestCaseHelper::bootKernel($test->className()),
+            );
+        } finally {
+            if (\is_subclass_of($test->className(), KernelTestCase::class)) {
+                KernelTestCaseHelper::ensureKernelShutdown($test->className());
+            }
         }
-
-        ResetDatabaseManager::resetBeforeEachTest(
-            KernelTestCaseHelper::bootKernel($test->className()),
-        );
-
-        KernelTestCaseHelper::ensureKernelShutdown($test->className());
     }
 
     private function shouldReset(Event\Code\TestMethod $test): bool

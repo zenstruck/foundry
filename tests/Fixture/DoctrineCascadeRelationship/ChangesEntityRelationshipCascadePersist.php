@@ -33,6 +33,8 @@ use Zenstruck\Foundry\Tests\Integration\RequiresORM;
  *   before each test, thanks to "onLoadMetadata" doctrine event.
  *
  * This way, we can test all possible combinations of "cascade persist" on doctrine relationships.
+ *
+ * @phpstan-require-extends KernelTestCase
  */
 trait ChangesEntityRelationshipCascadePersist
 {
@@ -134,6 +136,7 @@ trait ChangesEntityRelationshipCascadePersist
         yield from DoctrineCascadeRelationshipMetadata::allCombinations($relationshipFields);
 
         Configuration::shutdown();
+        static::ensureKernelShutdown();
     }
 
     public static function setCurrentProvidedMethodName(string $methodName): void

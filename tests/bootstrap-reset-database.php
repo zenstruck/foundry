@@ -9,39 +9,34 @@
  * file that was distributed with this source code.
  */
 
-use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Filesystem\Filesystem;
 use Zenstruck\Foundry\Tests\Fixture\FoundryTestKernel;
 use Zenstruck\Foundry\Tests\Fixture\ResetDatabase\ResetDatabaseTestKernel;
-
 use function Zenstruck\Foundry\application;
 use function Zenstruck\Foundry\runCommand;
 
-require \dirname(__DIR__).'/vendor/autoload.php';
+if (!FoundryTestKernel::usesMigrations()) {
+    return;
+}
 
 $fs = new Filesystem();
 
-$fs->remove(__DIR__.'/../var/cache');
+$fs->mkdir(__DIR__ . '/../var/cache/Migrations');
 
-(new Dotenv())->usePutenv()->loadEnv(__DIR__.'/../.env', testEnvs: []);
+$kernel = new ResetDatabaseTestKernel('test', true);
+$kernel->boot();
 
-if (FoundryTestKernel::usesMigrations()) {
-    $fs->mkdir(__DIR__.'/../var/cache/Migrations');
+$application = application($kernel);
 
-    $kernel = new ResetDatabaseTestKernel('test', true);
-    $kernel->boot();
+runCommand($application, 'doctrine:database:drop --if-exists --force', canFail: true);
+runCommand($application, 'doctrine:database:create', canFail: true);
 
-    $application = application($kernel);
-
-    runCommand($application, 'doctrine:database:drop --if-exists --force', canFail: true);
-    runCommand($application, 'doctrine:database:create', canFail: true);
-
-    $configuration = '';
-    if (\getenv('MIGRATION_CONFIGURATION_FILE')) {
-        $configuration = '--configuration '.\getcwd().'/'.\getenv('MIGRATION_CONFIGURATION_FILE');
-    }
-    runCommand($application, "doctrine:migrations:diff {$configuration}");
-    runCommand($application, 'doctrine:database:drop --force', canFail: true);
-
-    $kernel->shutdown();
+$configuration = '';
+if (\getenv('MIGRATION_CONFIGURATION_FILE')) {
+    $configuration = '--configuration ' . \getcwd() . '/' . \getenv('MIGRATION_CONFIGURATION_FILE');
 }
+runCommand($application, "doctrine:migrations:diff {$configuration}");
+runCommand($application, 'doctrine:database:drop --force', canFail: true);
+
+$kernel->shutdown();
+

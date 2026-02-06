@@ -18,7 +18,14 @@
     </php>
     <testsuites>
         <testsuite name="main">
-            <directory>tests</directory>
+            <!--
+                Let's run "WebTestCase" tests in the first place, to ensure the error
+                "Booting the kernel before calling "WebTestCase::createClient()" is not supported"
+                is not hidden by the other test.
+            -->
+            <directory>tests/WebTestCase/</directory>
+            <directory>tests/Integration</directory>
+            <directory>tests/Unit</directory>
             <exclude>tests/Integration/ResetDatabase</exclude>
         </testsuite>
         <testsuite name="reset-database">

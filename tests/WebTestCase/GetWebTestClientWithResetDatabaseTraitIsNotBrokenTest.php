@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\Tests\Integration;
+namespace Zenstruck\Foundry\Tests\WebTestCase;
 
 use Zenstruck\Foundry\Test\ResetDatabase;
 
-final class GetWebTestClientWithResetDatabaseIsNotBrokenTest extends GetWebTestClientIsNotBrokenTest
+final class GetWebTestClientWithResetDatabaseTraitIsNotBrokenTest extends GetWebTestClientIsNotBrokenTestCase
 {
     use ResetDatabase;
 }

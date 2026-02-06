@@ -9,22 +9,26 @@
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\Tests\Integration;
+namespace Zenstruck\Foundry\Tests\WebTestCase;
 
 use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\DependsOnClass;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
+use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
-class GetWebTestClientIsNotBrokenTest extends WebTestCase
+abstract class GetWebTestClientIsNotBrokenTestCase extends WebTestCase
 {
     use Factories, RequiresORM;
 
     /**
      * @test
+     * @depends \Zenstruck\Foundry\Tests\WebTestCase\NoResetGetWebTestClientIsNotBrokenTest::class
      */
     #[Test]
+    #[DependsOnClass(NoResetGetWebTestClientIsNotBrokenTest::class)]
     public function boots_kernel_and_get_client(): void
     {
         $client = self::createClient();
