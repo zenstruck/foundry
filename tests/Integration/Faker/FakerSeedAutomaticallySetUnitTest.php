@@ -14,22 +14,18 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Integration\Faker;
 
 use PHPUnit\Framework\Attributes\Depends;
-use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\FakerAdapter;
-use Zenstruck\Foundry\Test\Factories;
 
 use function Zenstruck\Foundry\faker;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11.0
  */
-#[RequiresPhpunit('>=11.0')]
 final class FakerSeedAutomaticallySetUnitTest extends TestCase
 {
-    use Factories, ResetFakerTestTrait;
+    use ResetFakerTestTrait;
 
     #[Test]
     public function faker_seed_does_not_change(): void

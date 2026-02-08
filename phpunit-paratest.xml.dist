@@ -15,7 +15,6 @@
         <env name="PARATEST" value="1"/>
 
         <env name="APP_ENV" value="test"/>
-        <env name="USE_PHP_84_LAZY_OBJECTS" value="1"/>
         <env name="USE_DAMA_DOCTRINE_TEST_BUNDLE" value="1"/>
         <env name="USE_FOUNDRY_PHPUNIT_EXTENSION" value="1"/>
         <env name="FOUNDRY_FAKER_SEED" value="1234"/>

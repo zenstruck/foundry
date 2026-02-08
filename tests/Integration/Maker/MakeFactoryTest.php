@@ -13,13 +13,10 @@ namespace Zenstruck\Foundry\Tests\Integration\Maker;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 use Symfony\Component\Console\Tester\CommandTester;
-use Zenstruck\Foundry\Maker\Factory\FactoryGenerator;
 use Zenstruck\Foundry\Tests\Fixture\Document\GenericDocument;
 use Zenstruck\Foundry\Tests\Fixture\Document\WithEmbeddableDocument;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
@@ -33,16 +30,10 @@ use Zenstruck\Foundry\Tests\Fixture\ObjectWithNonWriteable;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- * @group maker
- * @requires PHP >=8.4
  */
 #[Group('maker')]
-#[RequiresPhp('>=8.4')]
 final class MakeFactoryTest extends MakerTestCase
 {
-    private const PHPSTAN_PATH = __DIR__.'/../../..'.FactoryGenerator::PHPSTAN_PATH;
-    private const PSALM_PATH = __DIR__.'/../../..'.FactoryGenerator::PSALM_PATH;
-
     protected function setUp(): void
     {
         self::assertDirectoryDoesNotExist(self::tempDir());
@@ -50,24 +41,6 @@ final class MakeFactoryTest extends MakerTestCase
         parent::setUp();
     }
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        $removeSCAMock = function(string $file): void {
-            if (\file_exists($file)) {
-                \unlink($file);
-                $this->rrmdir(\dirname($file));
-                $this->rrmdir(\dirname($file, 2));
-            }
-        };
-        $removeSCAMock(self::PHPSTAN_PATH);
-        $removeSCAMock(self::PSALM_PATH);
-    }
-
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_factory(): void
     {
@@ -86,9 +59,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/CategoryFactory.php'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_factory_with_uid(): void
     {
@@ -107,9 +77,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/WithUidColumnFactory.php'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_factory_interactively(): void
     {
@@ -135,9 +102,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/ContactFactory.php'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_factory_in_test_dir(): void
     {
@@ -152,58 +116,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileExists(self::tempFile('tests/Factory/CategoryFactory.php'));
     }
 
-    /**
-     * @test
-     * @dataProvider scaToolProvider
-     */
-    #[Test]
-    #[DataProvider('scaToolProvider')]
-    #[IgnoreDeprecations]
-    public function can_create_factory_with_static_analysis_annotations(string $scaTool): void
-    {
-        if (!\getenv('DATABASE_URL')) {
-            self::markTestSkipped('doctrine/orm not enabled.');
-        }
-
-        $this->emulateSCAToolEnabled($scaTool);
-
-        $tester = $this->makeFactoryCommandTester();
-
-        $tester->execute(['class' => Category::class, '--test' => true, '--with-phpdoc' => true]);
-
-        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('tests/Factory/CategoryFactory.php'));
-    }
-
-    /**
-     * @return iterable<string, array{0: string}>
-     */
-    public static function scaToolProvider(): iterable
-    {
-        yield 'phpstan' => [self::PHPSTAN_PATH];
-        yield 'psalm' => [self::PSALM_PATH];
-    }
-
-    /**
-     * @test
-     */
-    #[Test]
-    #[IgnoreDeprecations]
-    public function can_create_factory_for_entity_with_repository(): void
-    {
-        if (!\getenv('DATABASE_URL')) {
-            self::markTestSkipped('doctrine/orm not enabled.');
-        }
-
-        $tester = $this->makeFactoryCommandTester();
-
-        $tester->execute(['class' => GenericEntity::class, '--with-phpdoc' => true]);
-
-        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/GenericEntityFactory.php'));
-    }
-
-    /**
-     * @test
-     */
     #[Test]
     public function invalid_entity_throws_exception(): void
     {
@@ -221,9 +133,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->fail('Exception not thrown.');
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_factory_for_not_persisted_class(): void
     {
@@ -234,9 +143,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/Object1Factory.php'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_factory_without_hints(): void
     {
@@ -247,9 +153,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/Object1Factory.php'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_factory_for_not_persisted_class_interactively(): void
     {
@@ -266,9 +169,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileExists(self::tempFile('src/Factory/Object1Factory.php'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_customize_namespace(): void
     {
@@ -286,9 +186,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertStringContainsString('namespace App\\My\\Namespace;', \file_get_contents($expectedFile) ?: '');
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_customize_namespace_with_test_flag(): void
     {
@@ -306,9 +203,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertStringContainsString('namespace App\\Tests\\My\\Namespace;', \file_get_contents($expectedFile) ?: '');
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_customize_namespace_with_root_namespace_prefix(): void
     {
@@ -326,9 +220,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertStringContainsString('namespace App\\My\\Namespace;', \file_get_contents($expectedFile) ?: '');
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_customize_namespace_with_test_flag_with_root_namespace_prefix(): void
     {
@@ -346,10 +237,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertStringContainsString('namespace App\\Tests\\My\\Namespace;', \file_get_contents($expectedFile) ?: '');
     }
 
-    /**
-     * @test
-     * @dataProvider documentProvider
-     */
     #[Test]
     #[DataProvider('documentProvider')]
     public function can_create_factory_for_odm(string $class, string $file): void
@@ -375,9 +262,6 @@ final class MakeFactoryTest extends MakerTestCase
         yield 'embedded document' => [WithEmbeddableDocument::class, 'WithEmbeddableDocumentFactory'];
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_all_factories_for_doctrine_objects(): void
     {
@@ -408,9 +292,6 @@ final class MakeFactoryTest extends MakerTestCase
         }
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_factory_with_auto_activated_not_persisted_option(): void
     {
@@ -428,9 +309,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/GenericEntityFactory.php'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_factory_with_all_fields(): void
     {
@@ -445,10 +323,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/GenericEntityFactory.php'));
     }
 
-    /**
-     * @test
-     * @dataProvider objectsWithEmbeddableProvider
-     */
     #[Test]
     #[DataProvider('objectsWithEmbeddableProvider')]
     public function can_create_factory_with_embeddable(string $objectClass, string $objectFactoryName): void
@@ -475,9 +349,6 @@ final class MakeFactoryTest extends MakerTestCase
         }
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_factory_with_default_enum(): void
     {
@@ -488,9 +359,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/ObjectWithEnumFactory.php'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function does_not_initialize_non_settable(): void
     {
@@ -501,9 +369,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/ObjectWithNonWriteableFactory.php'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function does_force_initialization_of_non_settable_with_always_force(): void
     {
@@ -514,42 +379,9 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/ObjectWithNonWriteableFactory.php'));
     }
 
-    private function emulateSCAToolEnabled(string $scaToolFilePath): void
-    {
-        \mkdir(\dirname($scaToolFilePath), 0777, true);
-        \touch($scaToolFilePath);
-    }
-
     private function makeFactoryCommandTester(array $options = []): CommandTester
     {
         return new CommandTester((new Application(self::bootKernel($options)))->find('make:factory'));
     }
 
-    /**
-     * Recursively remove a directory.
-     * @see https://stackoverflow.com/questions/1653771/how-do-i-remove-a-directory-that-is-not-empty
-     */
-    private function rrmdir(string $dir): void
-    {
-        if (\is_dir($dir)) {
-            $objects = \scandir($dir);
-
-            if (false === $objects) {
-                return;
-            }
-
-            foreach ($objects as $object) {
-                if ('.' !== $object && '..' !== $object) {
-                    if ('dir' === \filetype($dir.'/'.$object)) {
-                        $this->rrmdir($dir.'/'.$object);
-                    } else {
-                        \unlink($dir.'/'.$object);
-                    }
-                }
-            }
-
-            \reset($objects);
-            \rmdir($dir);
-        }
-    }
 }

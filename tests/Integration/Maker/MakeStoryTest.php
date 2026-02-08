@@ -19,15 +19,10 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- * @group maker
  */
 #[Group('maker')]
 final class MakeStoryTest extends MakerTestCase
 {
-    /**
-     * @test
-     * @dataProvider storyNameProvider
-     */
     #[Test]
     #[DataProvider('storyNameProvider')]
     public function can_create_story(string $name): void
@@ -68,10 +63,6 @@ final class MakeStoryTest extends MakerTestCase
         );
     }
 
-    /**
-     * @test
-     * @dataProvider storyNameProvider
-     */
     #[Test]
     #[DataProvider('storyNameProvider')]
     public function can_create_story_interactively(string $name): void
@@ -116,10 +107,6 @@ final class MakeStoryTest extends MakerTestCase
         );
     }
 
-    /**
-     * @test
-     * @dataProvider storyNameProvider
-     */
     #[Test]
     #[DataProvider('storyNameProvider')]
     public function can_create_story_in_test_dir(string $name): void
@@ -160,10 +147,6 @@ final class MakeStoryTest extends MakerTestCase
         );
     }
 
-    /**
-     * @test
-     * @dataProvider storyNameProvider
-     */
     #[Test]
     #[DataProvider('storyNameProvider')]
     public function can_create_story_in_test_dir_interactively(string $name): void
@@ -218,8 +201,6 @@ final class MakeStoryTest extends MakerTestCase
     }
 
     /**
-     * @test
-     * @dataProvider namespaceProvider
      * @param array<string, mixed> $commandOptions
      */
     #[Test]

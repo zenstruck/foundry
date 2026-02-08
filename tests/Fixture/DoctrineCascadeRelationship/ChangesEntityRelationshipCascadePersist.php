@@ -21,7 +21,6 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
-use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
@@ -38,8 +37,6 @@ use Zenstruck\Foundry\Tests\Integration\RequiresORM;
  */
 trait ChangesEntityRelationshipCascadePersist
 {
-    use RequiresORM;
-
     private static string $methodName = '';
 
     #[Before]
@@ -84,9 +81,8 @@ trait ChangesEntityRelationshipCascadePersist
         }
 
         if (!\getenv('DATABASE_URL') || !self::$methodName) {
-            // this test requires the ORM, but trait RequiresORM is analysed after data provider are called
+            // data providers are called before #[RequiresEnvironmentVariable] is evaluated
             // then we need to return at least one empty array to avoid an error
-            // in PHPUnit 12, we will be able to use #[RequiresEnvironmentVariable('DATABASE_URL')] to prevent this
             yield []; // @phpstan-ignore generator.valueType
 
             return;

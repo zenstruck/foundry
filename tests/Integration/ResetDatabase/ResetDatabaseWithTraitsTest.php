@@ -16,8 +16,6 @@ namespace Zenstruck\Foundry\Tests\Integration\ResetDatabase;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
@@ -25,8 +23,6 @@ use Zenstruck\Foundry\Test\ResetDatabase;
 #[IgnoreDeprecations('In order to use Foundry correctly, you must use the trait')]
 final class ResetDatabaseWithTraitsTest extends ResetDatabaseTestCase
 {
-    use Factories, ResetDatabase;
-
     #[BeforeClass(10)]
     public static function skipIfExtensionEnabled(): void
     {

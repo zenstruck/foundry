@@ -13,7 +13,6 @@ namespace Zenstruck\Foundry;
 
 use Faker;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Zenstruck\Foundry\Exception\FactoriesTraitNotUsed;
 use Zenstruck\Foundry\Exception\FoundryNotBooted;
 use Zenstruck\Foundry\Exception\PersistenceDisabled;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
@@ -21,7 +20,6 @@ use Zenstruck\Foundry\InMemory\CannotEnableInMemory;
 use Zenstruck\Foundry\InMemory\InMemoryRepositoryRegistry;
 use Zenstruck\Foundry\Persistence\PersistedObjectsTracker;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
-use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -61,7 +59,7 @@ final class Configuration
         public readonly bool $flushOnce = false,
         public readonly ?InMemoryRepositoryRegistry $inMemoryRepositoryRegistry = null,
         public readonly ?PersistedObjectsTracker $persistedObjectsTracker = null,
-        private readonly bool $enableAutoRefreshWithLazyObjects = false,
+        private readonly bool $enableAutoRefreshWithLazyObjects = true,
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {
         $this->instantiator = $instantiator;
@@ -116,10 +114,6 @@ final class Configuration
     {
         if (!self::$instance) {
             throw new FoundryNotBooted();
-        }
-
-        if (!FoundryExtension::isEnabled()) {
-            FactoriesTraitNotUsed::throwIfComingFromKernelTestCaseWithoutFactoriesTrait();
         }
 
         return \is_callable(self::$instance) ? (self::$instance)() : self::$instance;
@@ -178,29 +172,5 @@ final class Configuration
     public static function autoRefreshWithLazyObjectsIsEnabled(): bool
     {
         return self::isBooted() && self::instance()->enableAutoRefreshWithLazyObjects;
-    }
-
-    public static function triggerProxyDeprecation(?string $additionalMessage = null): void
-    {
-        if (\PHP_VERSION_ID < 80400) {
-            return;
-        }
-
-        if (!\trait_exists(\Symfony\Component\VarExporter\LazyProxyTrait::class)) {
-            // Deprecation is not needed: PersistentProxyObjectFactory will actually throw when create() is called.
-            return;
-        }
-
-        $message = <<<DEPRECATION
-            Proxy usage is deprecated in PHP 8.4. You should extend directly PersistentObjectFactory in your factories.
-            Foundry now leverages the native PHP lazy system to auto-refresh objects (it can be enabled with "zenstruck_foundry.enable_auto_refresh_with_lazy_objects" configuration).
-            See https://github.com/zenstruck/foundry/blob/2.x/UPGRADE-2.7.md to upgrade.
-            DEPRECATION;
-
-        if ($additionalMessage) {
-            $message = "{$additionalMessage}\n{$message}";
-        }
-
-        trigger_deprecation('zenstruck/foundry', '2.7', $message);
     }
 }

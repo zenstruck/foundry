@@ -24,7 +24,6 @@ final class MakeFactoryQuery
         private bool $test,
         private bool $persisted,
         private bool $allFields,
-        private bool $withPhpDoc,
         private string $class,
         private bool $generateAllFactories,
         private bool $addHints,
@@ -39,7 +38,6 @@ final class MakeFactoryQuery
             test: (bool) $input->getOption('test'),
             persisted: !$input->getOption('no-persistence'),
             allFields: (bool) $input->getOption('all-fields'),
-            withPhpDoc: (bool) $input->getOption('with-phpdoc'),
             class: $class,
             generateAllFactories: $generateAllFactories,
             addHints: $addHints,
@@ -65,11 +63,6 @@ final class MakeFactoryQuery
     public function isAllFields(): bool
     {
         return $this->allFields;
-    }
-
-    public function addPhpDoc(): bool
-    {
-        return $this->withPhpDoc;
     }
 
     public function getClass(): string

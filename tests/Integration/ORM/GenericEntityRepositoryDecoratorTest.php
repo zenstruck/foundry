@@ -13,22 +13,18 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Persistence\ProxyGenerator;
+use Zenstruck\Foundry\Persistence\LazyObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Integration\Persistence\GenericRepositoryDecoratorTestCase;
-use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 use function Zenstruck\Foundry\Persistence\repository;
 
+#[RequiresEnvironmentVariable('DATABASE_URL')]
 class GenericEntityRepositoryDecoratorTest extends GenericRepositoryDecoratorTestCase
 {
-    use RequiresORM;
-
-    /**
-     * @test
-     */
     #[Test]
     public function can_call_find_by_with_multiple_values(): void
     {
@@ -36,11 +32,11 @@ class GenericEntityRepositoryDecoratorTest extends GenericRepositoryDecoratorTes
 
         $repository = repository($this->modelClass());
 
-        $this->assertSame(ProxyGenerator::unwrap($object1), ProxyGenerator::unwrap($repository->find(['prop1' => 'foo'])));
-        $this->assertSame(ProxyGenerator::unwrap($object2), ProxyGenerator::unwrap($repository->find(['prop1' => 'bar'])));
+        $this->assertSame(LazyObjectFactory::unwrap($object1), LazyObjectFactory::unwrap($repository->find(['prop1' => 'foo'])));
+        $this->assertSame(LazyObjectFactory::unwrap($object2), LazyObjectFactory::unwrap($repository->find(['prop1' => 'bar'])));
 
         $by = $repository->findBy(['prop1' => ['foo', 'bar']]);
-        $this->assertSame(ProxyGenerator::unwrap([$object1, $object2]), ProxyGenerator::unwrap($by));
+        $this->assertSame(LazyObjectFactory::unwrap([$object1, $object2]), LazyObjectFactory::unwrap($by));
     }
 
     protected function factory(): PersistentObjectFactory

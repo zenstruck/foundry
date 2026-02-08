@@ -19,7 +19,6 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- * @group maker
  */
 #[Group('maker')]
 abstract class MakerTestCase extends KernelTestCase

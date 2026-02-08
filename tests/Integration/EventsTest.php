@@ -13,19 +13,14 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration;
 
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Events\FactoryWithEventListeners;
 
+#[RequiresEnvironmentVariable('DATABASE_URL')]
 final class EventsTest extends KernelTestCase
 {
-    use Factories, RequiresORM, ResetDatabase;
-
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_call_hooks(): void
     {

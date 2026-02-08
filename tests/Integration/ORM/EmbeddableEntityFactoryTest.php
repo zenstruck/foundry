@@ -11,20 +11,19 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithEmbeddableEntity;
 use Zenstruck\Foundry\Tests\Integration\Persistence\EmbeddableFactoryTestCase;
-use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 use function Zenstruck\Foundry\Persistence\persistent_factory;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
+#[RequiresEnvironmentVariable('DATABASE_URL')]
 final class EmbeddableEntityFactoryTest extends EmbeddableFactoryTestCase
 {
-    use RequiresORM;
-
     protected function withEmbeddableFactory(): PersistentObjectFactory
     {
         return persistent_factory(WithEmbeddableEntity::class); // @phpstan-ignore return.type

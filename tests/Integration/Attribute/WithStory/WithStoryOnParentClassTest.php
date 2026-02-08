@@ -13,20 +13,14 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\Attribute\WithStory;
 
-use PHPUnit\Framework\Attributes\RequiresPhpunit;
-use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use PHPUnit\Framework\Attributes\Test;
 use Zenstruck\Foundry\Attribute\WithStory;
-use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\EntityPoolStory;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11.0
  */
-#[RequiresPhpunit('>=11.0')]
-#[RequiresPhpunitExtension(FoundryExtension::class)]
 #[WithStory(EntityPoolStory::class)]
 final class WithStoryOnParentClassTest extends ParentClassWithStoryAttributeTestCase
 {

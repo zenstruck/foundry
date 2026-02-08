@@ -11,13 +11,9 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
-
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
 final class GenericFactoryUsingBeforeHooksAndResetDatabaseTraitTest extends GenericFactoryUsingBeforeHooksTestCase
 {
-    use Factories, ResetDatabase;
 }

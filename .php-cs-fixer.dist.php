@@ -11,10 +11,13 @@ $file = __DIR__.'/.php-cs-fixer.temp.php';
 $csFixerConfig = require $file;
 $csFixerConfig->setFinder(
     $csFixerConfig->getFinder()
-        ->notName('WebTestCaseWithBothTraitsInWrongOrderTest.php')
         ->in(__DIR__.'/utils')
         ->in(__DIR__.'/config')
 );
+
+$csFixerConfig->setRules(\array_merge($csFixerConfig->getRules(), [
+    'php_unit_test_annotation' => false,
+]));
 
 try {
     return $csFixerConfig;

@@ -14,14 +14,9 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Integration\InMemory;
 
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
-use PHPUnit\Framework\Attributes\RequiresMethod;
-use PHPUnit\Framework\Attributes\RequiresPhpunit;
-use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\InMemory\AsInMemoryTest;
-use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithEmbeddableEntity;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
@@ -31,20 +26,13 @@ use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
 
 use function Zenstruck\Foundry\faker;
 use function Zenstruck\Foundry\Persistence\persistent_factory;
-use function Zenstruck\Foundry\Persistence\proxy;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11.4
  */
-#[RequiresPhpunit('>=11.4')]
-#[RequiresPhpunitExtension(FoundryExtension::class)]
 #[AsInMemoryTest]
 final class DoctrineInMemoryDecoratorTest extends KernelTestCase
 {
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_find_by_one_param(): void
     {
@@ -55,9 +43,6 @@ final class DoctrineInMemoryDecoratorTest extends KernelTestCase
         self::assertSame($expected, $found);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_find_by_two_params(): void
     {
@@ -68,9 +53,6 @@ final class DoctrineInMemoryDecoratorTest extends KernelTestCase
         self::assertSame($expected, $found);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_limit_find_by_results(): void
     {
@@ -84,9 +66,6 @@ final class DoctrineInMemoryDecoratorTest extends KernelTestCase
         }
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_order_find_by_results(): void
     {
@@ -101,9 +80,6 @@ final class DoctrineInMemoryDecoratorTest extends KernelTestCase
         self::assertSame($sorted, $integers);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_order_desc_find_by_results(): void
     {
@@ -117,9 +93,6 @@ final class DoctrineInMemoryDecoratorTest extends KernelTestCase
         self::assertSame($sorted, $integers);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_use_offset(): void
     {
@@ -132,9 +105,6 @@ final class DoctrineInMemoryDecoratorTest extends KernelTestCase
         self::assertSame([2, 3, 4], $integers);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_use_limit_and_offset(): void
     {
@@ -147,9 +117,6 @@ final class DoctrineInMemoryDecoratorTest extends KernelTestCase
         self::assertSame([2, 3], $integers);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_find_one_by(): void
     {
@@ -160,9 +127,6 @@ final class DoctrineInMemoryDecoratorTest extends KernelTestCase
         self::assertSame($expected, $found);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_find_by_entity(): void
     {
@@ -175,27 +139,6 @@ final class DoctrineInMemoryDecoratorTest extends KernelTestCase
         self::assertSame($contacts, $contactsFound);
     }
 
-    /**
-     * @test
-     * @group legacy
-     */
-    #[Test]
-    #[IgnoreDeprecations]
-    #[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
-    public function it_can_find_by_entity_proxified(): void
-    {
-        ContactFactory::createMany(2, static fn() => ['category' => CategoryFactory::createOne()]);
-
-        $category = CategoryFactory::createOne();
-        $contacts = ContactFactory::createMany(2, ['category' => $category]);
-
-        $contactsFound = ContactFactory::repository()->findBy(['category' => proxy($category)]);
-        self::assertSame($contacts, $contactsFound);
-    }
-
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_find_by_embeddable(): void
     {

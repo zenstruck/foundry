@@ -14,30 +14,23 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Integration\InMemory;
 
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\RequiresPhpunit;
-use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\InMemory\AsInMemoryTest;
-use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Address;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\AddressFactory;
-use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 use function Zenstruck\Foundry\Persistence\delete;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11.4
  */
-#[RequiresPhpunit('>=11.4')]
-#[RequiresPhpunitExtension(FoundryExtension::class)]
 #[ResetDatabase]
+#[RequiresEnvironmentVariable('DATABASE_URL')]
 final class InMemoryAttributeOnMethodTest extends KernelTestCase
 {
-    use RequiresORM;
-
     private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
@@ -45,9 +38,6 @@ final class InMemoryAttributeOnMethodTest extends KernelTestCase
         $this->entityManager = self::getContainer()->get(EntityManagerInterface::class); // @phpstan-ignore assign.propertyType
     }
 
-    /**
-     * @test
-     */
     #[Test]
     #[AsInMemoryTest]
     public function create_one_does_not_persist_in_database(): void
@@ -61,9 +51,6 @@ final class InMemoryAttributeOnMethodTest extends KernelTestCase
         self::assertNull($address->id);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function not_in_memory_test(): void
     {

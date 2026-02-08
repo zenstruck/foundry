@@ -14,7 +14,6 @@ namespace Zenstruck\Foundry\Tests\Unit;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\LazyValue;
-use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixture\Factories\ArrayFactory;
 
 /**
@@ -22,11 +21,6 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\ArrayFactory;
  */
 final class ArrayFactoryTest extends TestCase
 {
-    use Factories;
-
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_with_defaults(): void
     {
@@ -41,9 +35,6 @@ final class ArrayFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_with_overrides(): void
     {
@@ -61,9 +52,6 @@ final class ArrayFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_many(): void
     {
@@ -79,9 +67,6 @@ final class ArrayFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_range(): void
     {
@@ -91,9 +76,6 @@ final class ArrayFactoryTest extends TestCase
         $this->assertLessThanOrEqual(4, \count($range));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_sequence(): void
     {

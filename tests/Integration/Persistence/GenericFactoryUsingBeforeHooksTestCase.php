@@ -12,20 +12,17 @@
 namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
 use PHPUnit\Framework\Attributes\Before;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
-use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
+#[RequiresEnvironmentVariable('DATABASE_URL')]
 abstract class GenericFactoryUsingBeforeHooksTestCase extends KernelTestCase
 {
-    use Factories, RequiresORM, ResetDatabase;
-
     protected function setUp(): void
     {
         GenericEntityFactory::createOne();
@@ -45,18 +42,12 @@ abstract class GenericFactoryUsingBeforeHooksTestCase extends KernelTestCase
         $this->setUp();
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function assert_objects_created(): void
     {
         GenericEntityFactory::assert()->count(3);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function assert_objects_created_2(): void
     {

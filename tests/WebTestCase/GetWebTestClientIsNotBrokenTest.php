@@ -13,20 +13,19 @@ namespace Zenstruck\Foundry\Tests\WebTestCase;
 
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\DependsOnClass;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Zenstruck\Foundry\Test\Factories;
+use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
-use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
-abstract class GetWebTestClientIsNotBrokenTestCase extends WebTestCase
+/**
+ * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ */
+#[ResetDatabase]
+#[RequiresEnvironmentVariable('DATABASE_URL')]
+final class GetWebTestClientIsNotBrokenTest extends WebTestCase
 {
-    use Factories, RequiresORM;
-
-    /**
-     * @test
-     * @depends \Zenstruck\Foundry\Tests\WebTestCase\NoResetGetWebTestClientIsNotBrokenTest::class
-     */
     #[Test]
     #[DependsOnClass(NoResetGetWebTestClientIsNotBrokenTest::class)]
     public function boots_kernel_and_get_client(): void
@@ -38,10 +37,6 @@ abstract class GetWebTestClientIsNotBrokenTestCase extends WebTestCase
         self::assertResponseIsSuccessful();
     }
 
-    /**
-     * @test
-     * @depends boots_kernel_and_get_client
-     */
     #[Test]
     #[Depends('boots_kernel_and_get_client')]
     public function assert_test_starts_with_a_non_booted_kernel(): void

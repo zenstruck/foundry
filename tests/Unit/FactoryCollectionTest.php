@@ -17,15 +17,9 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\ObjectFactory;
-use Zenstruck\Foundry\Test\Factories;
 
 final class FactoryCollectionTest extends TestCase
 {
-    use Factories;
-
-    /**
-     * @test
-     */
     #[Test]
     public function throws_when_method_does_not_exist(): void
     {
@@ -37,9 +31,6 @@ final class FactoryCollectionTest extends TestCase
             ->applyStateMethod('nonExistentMethod', static fn() => []);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function throws_when_method_is_static(): void
     {
@@ -51,11 +42,6 @@ final class FactoryCollectionTest extends TestCase
             ->applyStateMethod('class', static fn() => []);
     }
 
-    /**
-     * @test
-     * @testWith [[]]
-     *           [["a", "b"]]
-     */
     #[Test]
     #[TestWith([[]])]
     #[TestWith([['a', 'b']])]
@@ -71,9 +57,6 @@ final class FactoryCollectionTest extends TestCase
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function throws_when_does_not_return_static(): void
     {
@@ -87,9 +70,6 @@ final class FactoryCollectionTest extends TestCase
         ;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_call_state_method_without_parameter(): void
     {
@@ -103,9 +83,6 @@ final class FactoryCollectionTest extends TestCase
         self::assertSame(42, $objects[1]->param);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_call_state_method_with_parameter(): void
     {
@@ -119,9 +96,6 @@ final class FactoryCollectionTest extends TestCase
         self::assertSame(2, $objects[1]->param);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_call_state_method_with_named_parameter(): void
     {
@@ -135,9 +109,6 @@ final class FactoryCollectionTest extends TestCase
         self::assertSame(40, $objects[1]->param);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function throws_when_called_with_not_existing_named_parameter(): void
     {

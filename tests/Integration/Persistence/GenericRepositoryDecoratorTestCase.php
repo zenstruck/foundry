@@ -16,20 +16,13 @@ namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Persistence\ProxyGenerator;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Persistence\LazyObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
 
 use function Zenstruck\Foundry\Persistence\repository;
 
 abstract class GenericRepositoryDecoratorTestCase extends KernelTestCase
 {
-    use Factories, ResetDatabase;
-
-    /**
-     * @test
-     */
     #[Test]
     public function repository_proxy_is_countable_and_iterable(): void
     {
@@ -41,9 +34,6 @@ abstract class GenericRepositoryDecoratorTestCase extends KernelTestCase
         $this->assertCount(4, \iterator_to_array($repository));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_fetch_objects(): void
     {
@@ -60,9 +50,6 @@ abstract class GenericRepositoryDecoratorTestCase extends KernelTestCase
         $this->assertInstanceOf($this->modelClass(), $objects[0]);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_call_find_with_empty_array(): void
     {
@@ -70,7 +57,7 @@ abstract class GenericRepositoryDecoratorTestCase extends KernelTestCase
 
         $repository = repository($this->modelClass());
 
-        $this->assertSame(ProxyGenerator::unwrap($object), ProxyGenerator::unwrap($repository->find([])));
+        $this->assertSame(LazyObjectFactory::unwrap($object), LazyObjectFactory::unwrap($repository->find([])));
     }
 
     /**

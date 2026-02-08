@@ -16,8 +16,6 @@ use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Story;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericDocumentFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
@@ -35,8 +33,6 @@ use Zenstruck\Foundry\Tests\Fixture\Stories\PersistenceDisabledStory;
  */
 final class StoryTest extends KernelTestCase
 {
-    use Factories, ResetDatabase;
-
     /**
      * @return iterable<array{class-string<Story>, class-string<PersistentObjectFactory<GenericModel>>}>
      */
@@ -55,8 +51,6 @@ final class StoryTest extends KernelTestCase
      * @param class-string<Story>                                 $story
      * @param class-string<PersistentObjectFactory<GenericModel>> $factory
      *
-     * @test
-     * @dataProvider storiesProvider
      */
     #[Test]
     #[DataProvider('storiesProvider')]
@@ -74,8 +68,6 @@ final class StoryTest extends KernelTestCase
     /**
      * @param class-string<EntityStory|DocumentStory> $story
      *
-     * @test
-     * @dataProvider storiesProvider
      */
     #[Test]
     #[DataProvider('storiesProvider')]
@@ -94,8 +86,6 @@ final class StoryTest extends KernelTestCase
     /**
      * @param class-string<EntityStory|DocumentStory> $story
      *
-     * @test
-     * @dataProvider storiesProvider
      */
     #[Test]
     #[DataProvider('storiesProvider')]
@@ -114,8 +104,6 @@ final class StoryTest extends KernelTestCase
     /**
      * @param class-string<EntityStory|DocumentStory> $story
      *
-     * @test
-     * @dataProvider storiesProvider
      */
     #[Test]
     #[DataProvider('storiesProvider')]
@@ -134,8 +122,6 @@ final class StoryTest extends KernelTestCase
     /**
      * @param class-string<EntityStory|DocumentStory> $story
      *
-     * @test
-     * @dataProvider storiesProvider
      */
     #[Test]
     #[DataProvider('storiesProvider')]
@@ -163,8 +149,6 @@ final class StoryTest extends KernelTestCase
     /**
      * @param class-string<Story> $story
      *
-     * @test
-     * @dataProvider poolStoriesProvider
      */
     #[Test]
     #[DataProvider('poolStoriesProvider')]
@@ -178,8 +162,6 @@ final class StoryTest extends KernelTestCase
     /**
      * @param class-string<Story> $story
      *
-     * @test
-     * @dataProvider poolStoriesProvider
      */
     #[Test]
     #[DataProvider('poolStoriesProvider')]
@@ -197,8 +179,6 @@ final class StoryTest extends KernelTestCase
     /**
      * @param class-string<Story> $story
      *
-     * @test
-     * @dataProvider poolStoriesProvider
      */
     #[Test]
     #[DataProvider('poolStoriesProvider')]
@@ -221,8 +201,6 @@ final class StoryTest extends KernelTestCase
     /**
      * @param class-string<Story> $story
      *
-     * @test
-     * @dataProvider poolStoriesProvider
      */
     #[Test]
     #[DataProvider('poolStoriesProvider')]
@@ -235,9 +213,6 @@ final class StoryTest extends KernelTestCase
         self::assertContains($item->getProp1(), ['foo', 'default1']);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_story_with_simple_object(): void
     {
@@ -245,9 +220,6 @@ final class StoryTest extends KernelTestCase
         self::assertInstanceOf(Object1::class, ObjectStory::foo());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_story_with_persistence_disabled(): void
     {

@@ -18,8 +18,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\IgnorePhpunitWarnings;
 use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
-use PHPUnit\Framework\Attributes\RequiresPhp;
-use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Persistence\PersistedObjectsTracker;
@@ -43,12 +41,6 @@ use function Zenstruck\Foundry\Persistence\delete;
 use function Zenstruck\Foundry\Persistence\persistent_factory;
 use function Zenstruck\Foundry\Persistence\refresh_all;
 
-/**
- * @requires PHPUnit >=12
- */
-#[RequiresPhp('>= 8.4')]
-#[RequiresPhpunit('>=12')]
-#[RequiresEnvironmentVariable('USE_PHP_84_LAZY_OBJECTS', '1')]
 #[RequiresEnvironmentVariable('DATABASE_URL')]
 final class AutoRefreshTest extends AutoRefreshTestCase
 {

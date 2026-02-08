@@ -16,7 +16,10 @@ namespace Zenstruck\Foundry\Maker\Factory;
  */
 final class NoPersistenceObjectsAutoCompleter
 {
-    public function __construct(private string $kernelRootDir)
+    /** @var array<string, mixed>|null */
+    private ?array $composerConfig = null;
+
+    public function __construct(private string $projectDir)
     {
     }
 
@@ -25,41 +28,33 @@ final class NoPersistenceObjectsAutoCompleter
      */
     public function getAutocompleteValues(): array
     {
-        $classes = [];
-
         $excludedFiles = $this->excludedFiles();
 
-        foreach ($this->getDefinedNamespaces() as $namespacePrefix => $rootFragment) {
-            $allFiles = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($rootPath = "{$this->kernelRootDir}/{$rootFragment}"));
+        $classes = [];
 
-            /** @var \SplFileInfo $phpFile */
-            foreach (new \RegexIterator($allFiles, '/\.php$/') as $phpFile) {
+        foreach ($this->psr4Namespaces() as $namespacePrefix => $rootFragment) {
+            $rootPath = "{$this->projectDir}/{$rootFragment}";
+
+            if (!\is_dir($rootPath)) {
+                continue;
+            }
+
+            foreach ($this->phpFilesIn($rootPath) as $phpFile) {
                 if (\in_array($phpFile->getRealPath(), $excludedFiles, true)) {
                     continue;
                 }
 
-                $class = $this->toPSR4($rootPath, $phpFile, $namespacePrefix);
-
-                if (\in_array($class, ['Zenstruck\Foundry\Proxy', 'Zenstruck\Foundry\RepositoryProxy', 'Zenstruck\Foundry\RepositoryAssertions'])) {
-                    // do not load legacy Proxy: prevents deprecations in tests.
-                    continue;
-                }
+                $class = $this->toClassName($rootPath, $phpFile, $namespacePrefix);
 
                 try {
-                    // @phpstan-ignore-next-line $class is not always a class-string
-                    $reflection = new \ReflectionClass($class);
+                    $reflection = new \ReflectionClass($class); // @phpstan-ignore argument.type
                 } catch (\Throwable) {
-                    // remove all files which are not class / interface / traits
                     continue;
                 }
 
-                /** @var class-string $class */
-                if (!$reflection->isInstantiable()) {
-                    // remove abstract classes / interfaces / traits
-                    continue;
+                if ($reflection->isInstantiable()) {
+                    $classes[] = $reflection->getName();
                 }
-
-                $classes[] = $class;
             }
         }
 
@@ -68,59 +63,68 @@ final class NoPersistenceObjectsAutoCompleter
         return $classes;
     }
 
-    private function toPSR4(string $rootPath, \SplFileInfo $fileInfo, string $namespacePrefix): string
+    /**
+     * @return \RegexIterator<int, \SplFileInfo, \RecursiveIteratorIterator<\RecursiveCallbackFilterIterator>>
+     */
+    private function phpFilesIn(string $directory): \RegexIterator
     {
-        // /app/src/Bundle/Maker/Factory/NoPersistenceObjectsAutoCompleter.php => /Bundle/Maker/Factory/NoPersistenceObjectsAutoCompleter
-        $relativeFileNameWithoutExtension = \str_replace([$rootPath, '.php'], ['', ''], $fileInfo->getRealPath());
+        $iterator = new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS);
 
-        return $namespacePrefix.\str_replace('/', '\\', $relativeFileNameWithoutExtension);
+        $filtered = new \RecursiveCallbackFilterIterator(
+            $iterator,
+            static fn(\SplFileInfo $file): bool => !$file->isDir() || !\str_contains($file->getPathname(), '/vendor/'),
+        );
+
+        return new \RegexIterator(new \RecursiveIteratorIterator($filtered), '/\.php$/'); // @phpstan-ignore return.type
+    }
+
+    private static function toClassName(string $rootPath, \SplFileInfo $fileInfo, string $namespacePrefix): string
+    {
+        $relativePath = \str_replace([$rootPath, '.php'], ['', ''], $fileInfo->getRealPath());
+
+        return $namespacePrefix.\str_replace('/', '\\', $relativePath);
     }
 
     /**
      * @return array<string, string>
      */
-    private function getDefinedNamespaces(): array
+    private function psr4Namespaces(): array
     {
-        $composerConfig = $this->getComposerConfiguration();
-
-        /** @var array<string, string> $definedNamespaces */
-        $definedNamespaces = $composerConfig['autoload']['psr-4'] ?? [];
+        /** @var array<string, string> $namespaces */
+        $namespaces = $this->composerConfig()['autoload']['psr-4'] ?? [];
 
         return \array_combine(
-            \array_map(
-                static fn(string $namespacePrefix): string => \trim($namespacePrefix, '\\'),
-                \array_keys($definedNamespaces),
-            ),
-            \array_map(
-                static fn(string $rootFragment): string => \trim($rootFragment, '/'),
-                \array_values($definedNamespaces),
-            ),
+            \array_map(static fn(string $prefix): string => \trim($prefix, '\\'), \array_keys($namespaces)),
+            \array_map(static fn(string $path): string => \trim($path, '/'), \array_values($namespaces)),
         );
     }
 
     /**
-     * @return array<string, string>
+     * @return list<string>
      */
     private function excludedFiles(): array
     {
-        $composerConfig = $this->getComposerConfiguration();
-
-        return \array_map(
-            fn(string $file): string => "{$this->kernelRootDir}/{$file}",
-            $composerConfig['autoload']['files'] ?? [],
-        );
+        return \array_values(\array_map(
+            fn(string $file): string => "{$this->projectDir}/{$file}",
+            $this->composerConfig()['autoload']['files'] ?? [],
+        ));
     }
 
     /**
      * @return array<string, mixed>
      */
-    private function getComposerConfiguration(): array
+    private function composerConfig(): array
     {
-        $composerConfigFilePath = "{$this->kernelRootDir}/composer.json";
-        if (!\is_file($composerConfigFilePath)) {
-            return [];
+        if (null !== $this->composerConfig) {
+            return $this->composerConfig;
         }
 
-        return \json_decode((string) \file_get_contents($composerConfigFilePath), true, 512, \JSON_THROW_ON_ERROR);
+        $path = "{$this->projectDir}/composer.json";
+
+        if (!\is_file($path)) {
+            return $this->composerConfig = [];
+        }
+
+        return $this->composerConfig = \json_decode(\file_get_contents($path) ?: '{}', true, 512, \JSON_THROW_ON_ERROR);
     }
 }

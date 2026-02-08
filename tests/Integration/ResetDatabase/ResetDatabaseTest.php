@@ -13,15 +13,12 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\ResetDatabase;
 
-use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
-use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
 #[ResetDatabase]
-#[RequiresPhpunitExtension(FoundryExtension::class)]
 final class ResetDatabaseTest extends ResetDatabaseTestCase
 {
 }

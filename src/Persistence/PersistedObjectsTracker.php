@@ -12,7 +12,6 @@
 namespace Zenstruck\Foundry\Persistence;
 
 use Zenstruck\Foundry\Configuration;
-use Zenstruck\Foundry\ORM\DoctrineOrmVersionGuesser;
 use Zenstruck\Foundry\Persistence\Event\AfterPersist;
 
 /**
@@ -42,7 +41,7 @@ final class PersistedObjectsTracker
      */
     public function afterPersistHook(AfterPersist $event): void
     {
-        if ($event->factory instanceof PersistentProxyObjectFactory || !$event->factory->isAutorefreshEnabled()) {
+        if (!$event->factory->isAutorefreshEnabled()) {
             return;
         }
 
@@ -53,11 +52,7 @@ final class PersistedObjectsTracker
     {
         foreach ($objects as $object) {
             if (self::$trackedObjects->offsetExists($object) && self::$trackedObjects[$object]) {
-                if (DoctrineOrmVersionGuesser::isOrmV3()) {
-                    self::resetObjectAsLazyGhost($object, self::$trackedObjects[$object]);
-                } else {
-                    Configuration::instance()->persistence()->refresh($object, canThrow: false);
-                }
+                self::resetObjectAsLazyGhost($object, self::$trackedObjects[$object]);
 
                 continue;
             }

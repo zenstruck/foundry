@@ -16,16 +16,14 @@ namespace Zenstruck\Foundry\Tests\Integration\ORM\EntityRelationship;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnorePhpunitWarnings;
-use PHPUnit\Framework\Attributes\RequiresPhpunit;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Persistence\ProxyGenerator;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Persistence\LazyObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\ChangesEntityRelationshipCascadePersist;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\UsingRelationships;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Address;
@@ -34,6 +32,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Tag;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
+use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Tests\Integration\ORM\EdgeCasesRelationshipTest;
 
 use function Zenstruck\Foundry\lazy;
@@ -43,14 +42,12 @@ use function Zenstruck\Foundry\Persistence\refresh;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11.4
  */
-#[RequiresPhpunit('>=11.4')]
+#[RequiresEnvironmentVariable('DATABASE_URL')]
+#[ResetDatabase]
 abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
 {
-    use ChangesEntityRelationshipCascadePersist, Factories, ResetDatabase;
-
-    /** @test */
+    use ChangesEntityRelationshipCascadePersist;
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -67,8 +64,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         $this->assertNotNull($contact->id);
         $this->assertNotNull($contact->getCategory()?->id);
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -77,8 +72,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
     {
         $this->one_to_many(static::contactFactory()->many(2));
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -92,8 +85,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         ContactFactory::assert()->count(5);
         CategoryFactory::assert()->count(1);
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -102,8 +93,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
     {
         $this->one_to_many([static::contactFactory(), static::contactFactory()]);
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -112,8 +101,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
     {
         $this->one_to_many([static::contactFactoryWithoutCategory()->create(), static::contactFactoryWithoutCategory()->create()]);
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -135,8 +122,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
             $this->assertSame($category->id, $contact->getCategory()?->id);
         }
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -145,8 +130,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
     {
         $this->many_to_many(static::contactFactory()->many(3));
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -155,8 +138,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
     {
         $this->many_to_many([static::contactFactory(), static::contactFactory(), static::contactFactory()]);
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -177,8 +158,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
             $this->assertNotNull($tag->id);
         }
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -193,8 +172,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         $this->assertNotNull($contact->id);
         $this->assertNotNull($contact->getAddress()->id);
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -209,15 +186,13 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         static::addressFactory()::assert()->count(1);
         static::contactFactory()::assert()->count(1);
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
     #[UsingRelationships(Contact::class, ['address'])]
     public function many_to_one_unmanaged_raw_entity(): void
     {
-        $address = ProxyGenerator::unwrap(static::addressFactory()->create(['city' => 'Some city']));
+        $address = LazyObjectFactory::unwrap(static::addressFactory()->create(['city' => 'Some city']));
 
         /** @var EntityManagerInterface $em */
         $em = self::getContainer()->get(EntityManagerInterface::class);
@@ -227,8 +202,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
 
         $this->assertSame('Some city', $contact->getAddress()->getCity());
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -249,15 +222,13 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         static::categoryFactory()::assert()->count(1);
 
         foreach ($category->getContacts() as $contact) {
-            self::assertSame(ProxyGenerator::unwrap($category), $contact->getCategory());
+            self::assertSame(LazyObjectFactory::unwrap($category), $contact->getCategory());
         }
 
         foreach ($category->getSecondaryContacts() as $contact) {
-            self::assertSame(ProxyGenerator::unwrap($category), $contact->getSecondaryCategory());
+            self::assertSame(LazyObjectFactory::unwrap($category), $contact->getSecondaryCategory());
         }
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -275,8 +246,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         static::contactFactory()::assert()->count(2);
         static::categoryFactory()::assert()->count(1);
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -296,8 +265,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         static::contactFactory()::assert()->count(5);
         static::tagFactory()::assert()->count(1);
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -311,8 +278,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         self::assertCount(1, $category->getContacts());
         self::assertSame('foo', $category->getContacts()[0]?->getName());
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -328,13 +293,11 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
 
         self::assertCount(2, $category->getContacts());
         foreach ($category->getContacts() as $contact) {
-            self::assertSame(ProxyGenerator::unwrap($category), $contact->getCategory());
+            self::assertSame(LazyObjectFactory::unwrap($category), $contact->getCategory());
         }
         static::contactFactory()::assert()->count(2);
         static::categoryFactory()::assert()->count(1);
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -363,8 +326,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
             $this->assertNull($tag->id);
         }
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -388,8 +349,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
             $this->assertSame($category->getName(), $contact->getCategory()?->getName());
         }
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -410,8 +369,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         $this->assertInstanceOf(Contact::class, $address->getContact());
         $this->assertNull($address->getContact()->id);
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -436,8 +393,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
             $this->assertNotNull($contact->id);
         }
     }
-
-    /** @test */
     #[Test]
     public function assert_updates_are_implicitly_persisted(): void
     {
@@ -451,8 +406,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         refresh($category);
         self::assertSame('new name', $category->getName());
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -463,8 +416,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
             static::categoryFactory()->create()
         );
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -475,8 +426,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
             static::categoryFactory()->withoutPersisting()->create()
         );
     }
-
-    /** @test */
     #[Test]
     public function it_uses_after_persist_with_many_to_many(): void
     {
@@ -492,8 +441,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
 
         self::assertEquals('foobar', $contact->getTags()[0]?->getName());
     }
-
-    /** @test */
     #[Test]
     public function it_uses_after_persist_with_one_to_many(): void
     {
@@ -508,8 +455,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
 
         self::assertEquals('foobar', $category->getContacts()[0]?->getName());
     }
-
-    /** @test */
     #[Test]
     public function it_uses_after_persist_with_many_to_one(): void
     {
@@ -523,8 +468,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
 
         self::assertEquals('foobar', $contact->getCategory()?->getName());
     }
-
-    /** @test */
     #[Test]
     public function it_uses_after_persist_with_one_to_one(): void
     {
@@ -536,8 +479,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
 
         self::assertEquals('foobar', $contact->getAddress()->getCity());
     }
-
-    /** @test */
     #[Test]
     public function it_uses_after_persist_with_inversed_one_to_one(): void
     {
@@ -549,8 +490,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
 
         self::assertEquals('foobar', $address->getContact()?->getName());
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -566,10 +505,8 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         static::categoryFactory()::assert()->count(1);
         static::contactFactory()::assert()->count(1);
         self::assertCount(1, $category->getContacts());
-        self::assertSame(ProxyGenerator::unwrap($category), $category->getContacts()[0]?->getCategory());
+        self::assertSame(LazyObjectFactory::unwrap($category), $category->getContacts()[0]?->getCategory());
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -587,8 +524,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
 
         self::assertSame('city from after persist', $contact->getAddress()->getCity());
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -600,7 +535,7 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
                 'category' => static::categoryFactory()
                     ->afterPersist(static function(Category $category) {
                         $category->addSecondaryContact(
-                            ProxyGenerator::unwrap(static::contactFactory()::createOne())
+                            LazyObjectFactory::unwrap(static::contactFactory()::createOne())
                         );
                     }),
             ]
@@ -608,8 +543,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
 
         self::assertCount(1, $contact->getCategory()?->getSecondaryContacts() ?? []);
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -637,8 +570,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         self::assertNotNull($address->getContact());
         self::assertNotNull($address->getContact()->getCategory());
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -661,8 +592,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         self::assertNotNull($address->getContact());
         self::assertNotNull($address->getContact()->getCategory());
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -683,8 +612,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         self::assertCount(1, $category->getContacts());
         self::assertNotNull($category->getContacts()[0] ?? null);
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -707,8 +634,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         self::assertNotNull($category->getContacts()[0] ?? null);
         self::assertNotNull($category->getContacts()[1] ?? null);
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -729,8 +654,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         self::assertNotNull($contact->getCategory());
         self::assertCount(1, $contact->getCategory()->getContacts());
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -746,8 +669,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
 
         self::assertNotNull($address->getContact());
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -761,8 +682,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         static::contactFactory()::assert()->count(2);
         static::categoryFactory()::assert()->count(1);
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -786,8 +705,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         static::contactFactory()::assert()->count(4);
         static::categoryFactory()::assert()->count(2);
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -802,8 +719,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
     }
 
     /**
-     * @test
-     * @dataProvider provideCanUseFactoryInDataProviderWithRelationshipCases
      * @param PersistentObjectFactory<Contact> $factory
      */
     #[Test]
@@ -814,8 +729,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
 
         self::assertCount(2, $objects);
     }
-
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
@@ -838,11 +751,6 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
             static::contactFactory(),
         ];
     }
-
-    /**
-     * @test
-     * @dataProvider provideIsCreatesFactoryInDataProviderWithOneToManyCases
-     */
     #[Test]
     #[DataProvider('provideIsCreatesFactoryInDataProviderWithOneToManyCases')]
     public function is_creates_factory_in_data_provider_with_one_to_many(CategoryFactory $categoryFactory): void
@@ -889,8 +797,8 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
 
         self::assertCount(2, $category->getContacts());
 
-        self::assertSame(ProxyGenerator::unwrap($category), $contact1->getCategory());
-        self::assertSame(ProxyGenerator::unwrap($category), $contact2->getCategory());
+        self::assertSame(LazyObjectFactory::unwrap($category), $contact1->getCategory());
+        self::assertSame(LazyObjectFactory::unwrap($category), $contact2->getCategory());
     }
 
     /**

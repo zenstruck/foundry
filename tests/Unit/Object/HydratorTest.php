@@ -25,9 +25,6 @@ use Zenstruck\Foundry\Tests\Fixture\Object1;
  */
 class HydratorTest extends TestCase
 {
-    /**
-     * @test
-     */
     #[Test]
     public function can_hydrate_scalar(): void
     {
@@ -42,9 +39,6 @@ class HydratorTest extends TestCase
         $this->assertSame($value, $object->foo);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_hydrate_scalar_array(): void
     {
@@ -59,9 +53,6 @@ class HydratorTest extends TestCase
         $this->assertSame($value, $object->foo);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_hydrate_object(): void
     {
@@ -81,9 +72,6 @@ class HydratorTest extends TestCase
         $this->assertSame($value, $object->foo);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_hydrate_object_array(): void
     {
@@ -101,10 +89,6 @@ class HydratorTest extends TestCase
 
         $this->assertSame($value, $object->foo);
     }
-
-    /**
-     * @test
-     */
     #[Test]
     public function can_hydrate_doctrine_collection(): void
     {
@@ -128,10 +112,6 @@ class HydratorTest extends TestCase
         $this->assertInstanceOf(ArrayCollection::class, $object->foo);
         $this->assertSame($value, $object->foo->toArray());
     }
-
-    /**
-     * @test
-     */
     #[Test]
     public function can_hydrate_doctrine_collection_union(): void
     {
@@ -155,10 +135,6 @@ class HydratorTest extends TestCase
         $this->assertInstanceOf(ArrayCollection::class, $object->foo);
         $this->assertSame($value, $object->foo->toArray());
     }
-
-    /**
-     * @test
-     */
     #[Test]
     public function can_hydrate_doctrine_collection_intersection(): void
     {
@@ -182,10 +158,6 @@ class HydratorTest extends TestCase
         $this->assertInstanceOf(ArrayCollection::class, $object->foo);
         $this->assertSame($value, $object->foo->toArray());
     }
-
-    /**
-     * @test
-     */
     #[Test]
     public function can_hydrate_with_force_value(): void
     {
@@ -203,9 +175,6 @@ class HydratorTest extends TestCase
         $this->assertSame('foo', $object->getFoo());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_force_set_with_force_value(): void
     {

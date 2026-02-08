@@ -30,20 +30,6 @@ function repository(string $class): RepositoryDecorator
 }
 
 /**
- * @template T of object
- *
- * @param class-string<T> $class
- *
- * @return ProxyRepositoryDecorator<T,ObjectRepository<T>>
- */
-function proxy_repository(string $class): ProxyRepositoryDecorator
-{
-    Configuration::triggerProxyDeprecation('Function proxy_repository() is deprecated and will be removed in Foundry 3.');
-
-    return new ProxyRepositoryDecorator($class, Configuration::instance()->isInMemoryEnabled()); // @phpstan-ignore return.type
-}
-
-/**
  * Create an anonymous "persistent" factory for the given class.
  *
  * @template T of object
@@ -59,23 +45,6 @@ function persistent_factory(string $class, array|callable $attributes = []): Per
 }
 
 /**
- * Create an anonymous "persistent with proxy" factory for the given class.
- *
- * @template T of object
- *
- * @param class-string<T>                                       $class
- * @param array<string,mixed>|callable(int):array<string,mixed> $attributes
- *
- * @return PersistentProxyObjectFactory<T>
- */
-function proxy_factory(string $class, array|callable $attributes = []): PersistentProxyObjectFactory
-{
-    Configuration::triggerProxyDeprecation('Function proxy_factory() is deprecated and will be removed in Foundry 3.');
-
-    return AnonymousFactoryGenerator::create($class, PersistentProxyObjectFactory::class)::new($attributes);
-}
-
-/**
  * Instantiate and "persist" the given class.
  *
  * @template T of object
@@ -88,38 +57,6 @@ function proxy_factory(string $class, array|callable $attributes = []): Persiste
 function persist(string $class, array|callable $attributes = []): object
 {
     return persistent_factory($class, $attributes)->andPersist()->create();
-}
-
-/**
- * Create an auto-refreshable proxy for the object.
- *
- * @template T of object
- *
- * @param T $object
- *
- * @return T&Proxy<T>
- */
-function proxy(object $object): object
-{
-    Configuration::triggerProxyDeprecation('Function proxy() is deprecated and will be removed in Foundry 3.');
-
-    return ProxyGenerator::wrap($object);
-}
-
-/**
- * Recursively unwrap all proxies.
- *
- * @template T
- *
- * @param T $what
- *
- * @return T
- */
-function unproxy(mixed $what, bool $withAutoRefresh = true): mixed
-{
-    Configuration::triggerProxyDeprecation('Function unproxy() is deprecated and will be removed in Foundry 3.');
-
-    return ProxyGenerator::unwrap($what, $withAutoRefresh);
 }
 
 /**
@@ -150,15 +87,9 @@ function refresh(object &$object): object
 
 /**
  * For refreshing all persistent objects created by Foundry, that are currently in use.
- *
- * @throws \BadMethodCallException if called with PHP <8.4
  */
 function refresh_all(): void
 {
-    if (\PHP_VERSION_ID < 80400) {
-        throw new \BadMethodCallException('Cannot use refresh_all() before PHP 8.4.');
-    }
-
     $objectsTracker = Configuration::instance()->persistedObjectsTracker;
 
     if (null === $objectsTracker) {

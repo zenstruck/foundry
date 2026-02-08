@@ -13,12 +13,9 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\ResetDatabase;
 
-use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
-use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 
 #[ResetDatabase]
-#[RequiresPhpunitExtension(FoundryExtension::class)]
 final class GlobalStoryTest extends GlobalStoryTestCase
 {
 }

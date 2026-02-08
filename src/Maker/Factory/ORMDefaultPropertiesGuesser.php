@@ -14,7 +14,6 @@ namespace Zenstruck\Foundry\Maker\Factory;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Doctrine\ORM\Mapping\ToOneAssociationMapping;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Zenstruck\Foundry\ORM\DoctrineOrmVersionGuesser;
 use Zenstruck\Foundry\Persistence\Exception\NoPersistenceStrategy;
 
 /**
@@ -24,10 +23,6 @@ final class ORMDefaultPropertiesGuesser extends AbstractDoctrineDefaultPropertie
 {
     public function __invoke(SymfonyStyle $io, MakeFactoryData $makeFactoryData, MakeFactoryQuery $makeFactoryQuery): void
     {
-        if (!DoctrineOrmVersionGuesser::isOrmV3()) {
-            return;
-        }
-
         $metadata = $this->getClassMetadata($makeFactoryData);
 
         if (!$metadata instanceof ORMClassMetadata) {

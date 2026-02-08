@@ -18,16 +18,12 @@ use Doctrine\DBAL\Driver\Middleware;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\ResetDatabase\DoctrineMiddleware;
 use Zenstruck\Foundry\Tests\Fixture\ResetDatabase\ResetDatabaseTestKernel;
 
 abstract class EarlyBootedKernelTestCase extends KernelTestCase
 {
-    /**
-     * Needs to happen before {@see ResetDatabase::_resetDatabaseBeforeFirstTest()}.
-     */
-    #[BeforeClass(10)]
+    #[BeforeClass]
     public static function before(): void
     {
         self::bootKernel();

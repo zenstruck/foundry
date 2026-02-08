@@ -14,24 +14,19 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Integration\Faker;
 
 use PHPUnit\Framework\Attributes\Depends;
-use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\FakerAdapter;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
 
 use function Zenstruck\Foundry\faker;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11.0
  */
-#[RequiresPhpunit('>=11.0')]
 final class FakerSeedSetFromEnvVarKernelTest extends KernelTestCase
 {
-    use Factories, ResetDatabase, ResetFakerTestTrait;
+    use ResetFakerTestTrait;
 
     #[Test]
     public function faker_seed_can_be_set_by_environment_variable(): void

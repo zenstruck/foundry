@@ -18,9 +18,6 @@ use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 
 /**
  * @internal
@@ -37,8 +34,6 @@ final class MakeFactoryData
     private array $uses;
     /** @var array<string, string> */
     private array $defaultProperties = [];
-    /** @var list<MakeFactoryPHPDocMethod> */
-    private array $methodsInPHPDoc;
 
     public function __construct(
         private \ReflectionClass $object,
@@ -46,7 +41,6 @@ final class MakeFactoryData
         private ?\ReflectionClass $repository,
         private string $staticAnalysisTool,
         private bool $persisted,
-        bool $withPhpDoc,
         private bool $forceProperties,
         private bool $addHints,
     ) {
@@ -55,19 +49,13 @@ final class MakeFactoryData
             $object->getName(),
         ];
 
-        if ($this->persisted) {
-            $this->uses[] = Proxy::class;
-        }
-
+        // todo: check if @method still needed
         if ($repository) {
             $this->uses[] = $repository->getName();
-            $this->uses[] = ProxyRepositoryDecorator::class;
             if (!\str_starts_with($repository->getName(), 'Doctrine')) {
                 $this->uses[] = \is_a($repository->getName(), DocumentRepository::class, allow_string: true) ? DocumentRepository::class : EntityRepository::class;
             }
         }
-
-        $this->methodsInPHPDoc = $withPhpDoc ? MakeFactoryPHPDocMethod::createAll($this) : [];
     }
 
     // @phpstan-ignore-next-line
@@ -87,7 +75,7 @@ final class MakeFactoryData
     public function getFactoryClass(): string
     {
         return $this->isPersisted()
-            ? (\PHP_VERSION_ID >= 80400 ? PersistentObjectFactory::class : PersistentProxyObjectFactory::class)
+            ? PersistentObjectFactory::class
             : ObjectFactory::class;
     }
 
@@ -183,24 +171,8 @@ final class MakeFactoryData
         return $defaultProperties;
     }
 
-    /** @return list<MakeFactoryPHPDocMethod> */
-    public function getMethodsPHPDoc(): array
-    {
-        $methodsInPHPDoc = $this->methodsInPHPDoc;
-        \usort(
-            $methodsInPHPDoc,
-            static fn(MakeFactoryPHPDocMethod $m1, MakeFactoryPHPDocMethod $m2) => $m1->sortValue() <=> $m2->sortValue(),
-        );
-
-        return $methodsInPHPDoc;
-    }
-
     public function addEnumDefaultProperty(string $propertyName, string $enumClass): void
     {
-        if (\PHP_VERSION_ID < 80100) {
-            throw new \LogicException('Cannot add enum for php version inferior than 8.1');
-        }
-
         if (!\enum_exists($enumClass)) {
             throw new \InvalidArgumentException("Enum of class \"{$enumClass}\" does not exist.");
         }
@@ -217,11 +189,6 @@ final class MakeFactoryData
     public function shouldAddHints(): bool
     {
         return $this->addHints;
-    }
-
-    public function shouldAddOverrideAttributes(): bool
-    {
-        return \PHP_VERSION_ID >= 80300;
     }
 
     private static function propertyInfo(): ReflectionExtractor

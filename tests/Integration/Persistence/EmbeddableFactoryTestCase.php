@@ -14,8 +14,6 @@ namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Model\Embeddable;
 use Zenstruck\Foundry\Tests\Fixture\Model\WithEmbeddable;
 
@@ -26,9 +24,6 @@ use function Zenstruck\Foundry\factory;
  */
 abstract class EmbeddableFactoryTestCase extends KernelTestCase
 {
-    use Factories, ResetDatabase;
-
-    /** @test */
     #[Test]
     public function embed_one(): void
     {
@@ -44,10 +39,6 @@ abstract class EmbeddableFactoryTestCase extends KernelTestCase
 
         $this->assertSame('value1', $object->getEmbeddable()->getProp1());
     }
-
-    /**
-     * @test
-     */
     #[Test]
     public function can_find_using_embeddable_object(): void
     {
@@ -62,9 +53,6 @@ abstract class EmbeddableFactoryTestCase extends KernelTestCase
         $this->assertSame(0, $factory::count(['embeddable' => factory(Embeddable::class, ['prop1' => 'value2'])]));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_embeddable_as_factory_parameter(): void
     {
