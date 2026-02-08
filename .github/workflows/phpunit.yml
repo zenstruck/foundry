@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   tests:
-    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}, PU:${{ matrix.phpunit }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.use-phpunit-extension != 1 && ' (no phpunit extension)' || '' }}${{ (matrix.use-php-84-lazy-objects != 1 || matrix.php != '8.4') && ' (legacy proxy)' || '' }}${{ matrix.use-dama != 1 && ' (no dama)' || '' }}
+    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}, PU:${{ matrix.phpunit }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.use-phpunit-extension != 1 && ' (no phpunit extension)' || '' }}${{ (matrix.use-php-84-lazy-objects != 1 || matrix.php != '8.4') && ' (legacy proxy)' || '' }}${{ matrix.no-dama == 1 && ' (no dama)' || '' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -30,7 +30,6 @@ jobs:
         symfony: [ 6.4.*, 7.4.*, 8.0.* ]
         database: [ mysql|mongo ]
         phpunit: [ 13 ]
-        use-dama: [ 1 ]
         use-phpunit-extension: [ 1 ]
         use-php-84-lazy-objects: [ 1 ]
         deps: [ highest ]
@@ -70,15 +69,15 @@ jobs:
 
           # Disable Foundry's PHPUnit extension and/or dama
           - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mysql|mongo, use-phpunit-extension: 0}
-          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mysql, use-phpunit-extension: 0, use-dama: 0}
-          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mysql, use-dama: 0}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mysql, use-phpunit-extension: 0, no-dama: 1}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mysql, no-dama: 1}
 
           # disable lazy objects in PHP 8.4
           - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mysql|mongo, use-php-84-lazy-objects: 0}
     env:
       DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || contains(matrix.database, 'sqlite') && 'sqlite:///%kernel.project_dir%/var/data.db' || '' }}
       MONGO_URL: ${{ contains(matrix.database, 'mongo') && 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb' || '' }}
-      USE_DAMA_DOCTRINE_TEST_BUNDLE: ${{ contains(matrix.database, 'sql') && matrix.use-dama != 0 && 1 || 0 }}
+      USE_DAMA_DOCTRINE_TEST_BUNDLE: ${{ contains(matrix.database, 'sql') && matrix.no-dama != 1 && 1 || 0 }}
       USE_FOUNDRY_PHPUNIT_EXTENSION: ${{ matrix.use-phpunit-extension || 0 }}
       USE_PHP_84_LAZY_OBJECTS: ${{ matrix.use-php-84-lazy-objects }}
       PHPUNIT_VERSION: ${{ matrix.phpunit }}
