@@ -455,7 +455,7 @@ final class MakeFactoryTest extends MakerTestCase
         $tester->execute(['class' => WithEmbeddableEntity::class, '--all-fields' => true]);
 
         $this->assertFileExists(self::tempFile('src/Factory/EmbeddableFactory.php'));
-        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile("src/Factory/WithEmbeddableEntityFactory.php"));
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/WithEmbeddableEntityFactory.php'));
     }
 
     #[Test]
@@ -467,7 +467,7 @@ final class MakeFactoryTest extends MakerTestCase
         $tester->execute(['class' => WithEmbeddableDocument::class, '--all-fields' => true]);
 
         $this->assertFileExists(self::tempFile('src/Factory/EmbeddableFactory.php'));
-        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile("src/Factory/WithEmbeddableDocumentFactory.php"));
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/WithEmbeddableDocumentFactory.php'));
     }
 
     /**
