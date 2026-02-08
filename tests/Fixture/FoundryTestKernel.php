@@ -11,7 +11,6 @@
 
 namespace Zenstruck\Foundry\Tests\Fixture;
 
-use Composer\InstalledVersions;
 use DAMA\DoctrineTestBundle\DAMADoctrineTestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
@@ -73,42 +72,22 @@ abstract class FoundryTestKernel extends Kernel
 
     public static function usePHP84LazyObjects(): bool
     {
-        return \PHP_VERSION_ID >= 80400 && \getenv('USE_PHP_84_LAZY_OBJECTS');
-    }
-
-    public static function canUseLegacyProxy(): bool
-    {
-        return \trait_exists(\Symfony\Component\VarExporter\LazyProxyTrait::class);
+        return (bool) \getenv('USE_PHP_84_LAZY_OBJECTS');
     }
 
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
     {
-        $frameworkConfiguration = [
-            'http_method_override' => false,
+        $c->loadFromExtension('framework', [
             'secret' => 'S3CRET',
             'router' => ['utf8' => true],
             'test' => true,
             'uid' => ['default_uuid_version' => 7, 'time_based_uuid_version' => 7],
-        ];
-
-        if (\str_starts_with(self::VERSION, '6.4')) {
-            // prevent a deprecation notice in Symfony 6.4
-            $frameworkConfiguration['handle_all_throwables'] = true;
-        }
-
-        if (\str_starts_with(self::VERSION, '7.3') || \str_starts_with(self::VERSION, '7.4')) {
-            // prevent a deprecation notice in Symfony 7.3 - 7.4
-            $frameworkConfiguration['property_info']['with_constructor_extractor'] = true;
-        }
-
-        $c->loadFromExtension('framework', $frameworkConfiguration);
+        ]);
 
         if (self::hasORM()) {
-            $doctrineConfig = [
-                'dbal' => ['url' => '%env(resolve:DATABASE_URL)%', 'use_savepoints' => true],
+            $c->loadFromExtension('doctrine', [
+                'dbal' => ['url' => '%env(resolve:DATABASE_URL)%'],
                 'orm' => [
-                    'auto_generate_proxy_classes' => true,
-                    'auto_mapping' => true,
                     'mappings' => [
                         'Entity' => [
                             'is_bundle' => false,
@@ -140,20 +119,8 @@ abstract class FoundryTestKernel extends Kernel
                             : []
                         ),
                     ],
-                    'controller_resolver' => ['auto_mapping' => false],
                 ],
-            ];
-
-            if (\version_compare(InstalledVersions::getVersion('doctrine/doctrine-bundle') ?? '', '3.0', '>=')) {
-                unset($doctrineConfig['dbal']['use_savepoints']);
-                unset($doctrineConfig['orm']['auto_generate_proxy_classes']);
-                unset($doctrineConfig['orm']['auto_mapping']);
-                unset($doctrineConfig['orm']['controller_resolver']['auto_mapping']);
-            } elseif (\PHP_VERSION_ID >= 80400 && \version_compare(InstalledVersions::getVersion('doctrine/orm') ?? '', '3.4', '>=')) {
-                $doctrineConfig['orm']['enable_native_lazy_objects'] = true;
-            }
-
-            $c->loadFromExtension('doctrine', $doctrineConfig);
+            ]);
 
             $c->register(ChangeCascadePersistOnLoadClassMetadataListener::class)
                 ->setAutowired(true)

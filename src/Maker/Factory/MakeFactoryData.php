@@ -219,6 +219,9 @@ final class MakeFactoryData
         return $this->addHints;
     }
 
+    /**
+     * @phpstan-ignore return.tooWideBool
+     */
     public function shouldAddOverrideAttributes(): bool
     {
         return \PHP_VERSION_ID >= 80300;

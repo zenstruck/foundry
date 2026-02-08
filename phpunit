@@ -3,20 +3,6 @@
 set -o errexit
 set -o nounset
 
-COMPOSER_BIN="php -d xdebug.mode=off $(which composer)"
-
-check_phpunit_version() {
-    INSTALLED_PHPUNIT_VERSION=$(${COMPOSER_BIN} info phpunit/phpunit | grep versions |  cut -c 14-)
-
-    REQUIRED_PHPUNIT_VERSION="${1?}"
-
-    if [[ "${INSTALLED_PHPUNIT_VERSION}" == "${REQUIRED_PHPUNIT_VERSION}"* ]]; then
-      echo 1;
-    else
-      echo 0;
-    fi
-}
-
 ### >> load env vars from .env files if not in CI and not from a composer script
 if [ -z "${CI:-}" ] ; then
   source .env
@@ -27,59 +13,22 @@ if [ -z "${CI:-}" ] ; then
 fi
 ### <<
 
-### >> update PHPUnit if needed
-if [[ " 9 10 11 12 13 " != *" ${PHPUNIT_VERSION-9} "* ]]; then
-  echo "❌ PHPUNIT_VERSION should be one of 9, 10, 11, 12, 13";
-  exit 1;
-fi
-
-SHOULD_UPDATE_PHPUNIT=$(check_phpunit_version "${PHPUNIT_VERSION}")
-
-if [ "${SHOULD_UPDATE_PHPUNIT}" = "0" ]; then
-  echo "ℹ️  Upgrading PHPUnit to ${PHPUNIT_VERSION}"
-  ${COMPOSER_BIN} update dama/doctrine-test-bundle "phpunit/phpunit:^${PHPUNIT_VERSION}" -W
-fi
-### <<
-
 ### >> actually execute PHPUnit with the right options
 DAMA_EXTENSION="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension"
 FOUNDRY_EXTENSION="Zenstruck\Foundry\PHPUnit\FoundryExtension"
 
-if [ "${USE_FOUNDRY_PHPUNIT_EXTENSION:-0}" = "1" ] && [ "${PHPUNIT_VERSION}" = "9" ]; then
-  echo "❌ USE_FOUNDRY_PHPUNIT_EXTENSION cannot be used with PHPUNIT_VERSION=10";
-  exit 1;
+PHPUNIT_EXEC="vendor/bin/phpunit -c phpunit.xml.dist"
+PHPUNIT_EXEC="${PHPUNIT_EXEC} --extension Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\PhpUnitTestExtension"
+
+if [ "${USE_DAMA_DOCTRINE_TEST_BUNDLE:-0}" = "1" ]; then
+  PHPUNIT_EXEC="${PHPUNIT_EXEC} --extension ${DAMA_EXTENSION}"
 fi
 
-PHPUNIT_EXEC="vendor/bin/phpunit"
-case ${PHPUNIT_VERSION} in
-  "9")
-    PHPUNIT_EXEC="${PHPUNIT_EXEC} -c phpunit-9.xml.dist"
-    if [ "${USE_DAMA_DOCTRINE_TEST_BUNDLE:-0}" = "1" ]; then
-      PHPUNIT_EXEC="${PHPUNIT_EXEC} --extensions ${DAMA_EXTENSION}"
-    fi
-    ;;
+PHPUNIT_EXEC="${PHPUNIT_EXEC} --extension ${FOUNDRY_EXTENSION}"
 
-  "10")
-    # PHPUnit 10 does not have a --extension option
-    PHPUNIT_EXEC="${PHPUNIT_EXEC} -c phpunit.xml.dist"
-    ;;
-
-  "11"|"12"|"13")
-    PHPUNIT_EXEC="${PHPUNIT_EXEC} -c phpunit.xml.dist --extension Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\PhpUnitTestExtension"
-
-    if [ "${USE_DAMA_DOCTRINE_TEST_BUNDLE:-0}" = "1" ]; then
-      PHPUNIT_EXEC="${PHPUNIT_EXEC} --extension "${DAMA_EXTENSION}""
-    fi
-
-    if [ "${USE_FOUNDRY_PHPUNIT_EXTENSION:-0}" = "1" ]; then
-      PHPUNIT_EXEC="${PHPUNIT_EXEC} --extension "${FOUNDRY_EXTENSION}""
-    fi
-
-    if [ "${WITH_LOWEST_DEPENDENCIES:-0}" = "1" ]; then
-      PHPUNIT_EXEC="${PHPUNIT_EXEC} --do-not-fail-on-deprecation --do-not-fail-on-phpunit-deprecation"
-    fi
-    ;;
-esac
+if [ "${WITH_LOWEST_DEPENDENCIES:-0}" = "1" ]; then
+  PHPUNIT_EXEC="${PHPUNIT_EXEC} --do-not-fail-on-deprecation --do-not-fail-on-phpunit-deprecation"
+fi
 
 PHPUNIT_EXEC="${PHPUNIT_EXEC} $*"
 

@@ -16,7 +16,6 @@ use PHPUnit\Framework\Attributes\Test;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\EmptyConstructorFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericProxyEntityFactory;
-use Zenstruck\Foundry\Tests\Fixture\FoundryTestKernel;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
 use Zenstruck\Foundry\Tests\Integration\Persistence\GenericFactoryTestCase;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
@@ -65,10 +64,6 @@ final class GenericEntityFactoryTest extends GenericFactoryTestCase
     #[Test]
     public function it_throws_when_proxy_is_used_with_symfony_8(): void
     {
-        if (FoundryTestKernel::canUseLegacyProxy()) {
-            self::markTestSkipped('Symfony 8+ required.');
-        }
-
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('PersistentProxyObjectFactory can no longer be used with Symfony 8');
 

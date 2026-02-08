@@ -21,67 +21,45 @@ concurrency:
 
 jobs:
   tests:
-    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}, PU:${{ matrix.phpunit }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.use-phpunit-extension != 1 && ' (no phpunit extension)' || '' }}${{ (matrix.use-php-84-lazy-objects != 1 || matrix.php != '8.4') && ' (legacy proxy)' || '' }}${{ matrix.no-dama == 1 && ' (no dama)' || '' }}
+    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.no-dama == 1 && ' (no dama)' || '' }}${{ matrix.disable-php-84-lazy-objects == 1 && ' (no lazy objects)' || '' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         php: [ 8.4, 8.5 ]
-        symfony: [ 6.4.*, 7.4.*, 8.0.* ]
+        symfony: [ 8.0.* ]
         database: [ mysql|mongo ]
-        phpunit: [ 13 ]
-        use-phpunit-extension: [ 1 ]
-        use-php-84-lazy-objects: [ 1 ]
         deps: [ highest ]
 
         include:
-          # old php versions
-          - {php: 8.1, symfony: 6.4.*, phpunit: 9, database: mysql, use-phpunit-extension: 0}
-          - {php: 8.2, symfony: 6.4.*, phpunit: 9, database: mysql, use-phpunit-extension: 0}
-
-          # old PHPUnit versions
-          - {php: 8.3, symfony: 7.4.*, phpunit: 9, database: mysql, use-phpunit-extension: 0}
-          - {php: 8.4, symfony: 7.4.*, phpunit: 10, database: mysql, use-phpunit-extension: 0}
-          - {php: 8.4, symfony: 7.4.*, phpunit: 11, database: mysql, use-phpunit-extension: 0}
-          - {php: 8.4, symfony: 7.4.*, phpunit: 11, database: mysql}
-          - {php: 8.4, symfony: 7.4.*, phpunit: 12, database: mysql, use-phpunit-extension: 0}
-          - {php: 8.4, symfony: 7.4.*, phpunit: 12, database: mysql}
-
-          # test with no database (PHPUnit 9 is used to prevent some problems with empty data providers)
-          - {php: 8.3, symfony: 7.4.*, phpunit: 9, database: none, use-phpunit-extension: 0}
-          - {php: 8.3, symfony: 7.4.*, phpunit: 9, database: none, deps: lowest, use-phpunit-extension: 0}
-
           # One permutation per DBMS
-          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mongo}
-          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: pgsql}
-          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: sqlite}
-          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mysql}
+          - {php: 8.5, symfony: 8.0.*, database: mongo}
+          - {php: 8.5, symfony: 8.0.*, database: pgsql}
+          - {php: 8.5, symfony: 8.0.*, database: sqlite}
+          - {php: 8.5, symfony: 8.0.*, database: mysql}
+
+          # test with no database
+          - {php: 8.5, symfony: 8.0.*, database: none}
+          - {php: 8.5, symfony: 8.0.*, database: none, deps: lowest}
 
           # lowest deps (one per DBMS)
-          - {php: 8.3, symfony: 6.4.*, phpunit: 9, database: mysql|mongo, deps: lowest, use-phpunit-extension: 0}
-          - {php: 8.3, symfony: 6.4.*, phpunit: 9, database: mongo, deps: lowest, use-phpunit-extension: 0}
-          - {php: 8.3, symfony: 6.4.*, phpunit: 9, database: pgsql, deps: lowest, use-phpunit-extension: 0}
-          - {php: 8.3, symfony: 6.4.*, phpunit: 9, database: sqlite, deps: lowest, use-phpunit-extension: 0}
-          - {php: 8.3, symfony: 6.4.*, phpunit: 9, database: mysql, deps: lowest, use-phpunit-extension: 0}
+          - {php: 8.4, symfony: 8.0.*, database: mysql|mongo, deps: lowest}
+          - {php: 8.4, symfony: 8.0.*, database: mongo, deps: lowest}
+          - {php: 8.4, symfony: 8.0.*, database: pgsql, deps: lowest}
+          - {php: 8.4, symfony: 8.0.*, database: sqlite, deps: lowest}
+          - {php: 8.4, symfony: 8.0.*, database: mysql, deps: lowest}
 
-          # Lowest deps with PHP 8.4 & lazy objects
-          - {php: 8.4, symfony: 6.4.*, phpunit: 13, database: mysql|mongo, deps: lowest}
-
-          # Disable Foundry's PHPUnit extension and/or dama
-          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mysql|mongo, use-phpunit-extension: 0}
-          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mysql, use-phpunit-extension: 0, no-dama: 1}
-          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mysql, no-dama: 1}
+          # Disable dama
+          - {php: 8.5, symfony: 8.0.*, database: mysql, no-dama: 1}
 
           # disable lazy objects in PHP 8.4
-          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mysql|mongo, use-php-84-lazy-objects: 0}
+          - { php: 8.4, symfony: 8.0.*, database: mysql|mongo, disable-php-84-lazy-objects: 1 }
     env:
       DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || contains(matrix.database, 'sqlite') && 'sqlite:///%kernel.project_dir%/var/data.db' || '' }}
       MONGO_URL: ${{ contains(matrix.database, 'mongo') && 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb' || '' }}
       USE_DAMA_DOCTRINE_TEST_BUNDLE: ${{ contains(matrix.database, 'sql') && matrix.no-dama != 1 && 1 || 0 }}
-      USE_FOUNDRY_PHPUNIT_EXTENSION: ${{ matrix.use-phpunit-extension || 0 }}
-      USE_PHP_84_LAZY_OBJECTS: ${{ matrix.use-php-84-lazy-objects }}
-      PHPUNIT_VERSION: ${{ matrix.phpunit }}
       WITH_LOWEST_DEPENDENCIES: ${{ matrix.deps == 'lowest' && 1 || 0 }}
+      USE_PHP_84_LAZY_OBJECTS: ${{ matrix.disable-php-84-lazy-objects != 1 && 1 || 0}}
     services:
       postgres:
         image: ${{ contains(matrix.database, 'pgsql') && 'postgres:15' || '' }}
@@ -111,11 +89,6 @@ jobs:
           coverage: none
           tools: flex
 
-      - name: Add the polyfill compatible with Doctrine ^2.16
-        if: ${{ matrix.deps == 'lowest' }}
-        shell: bash
-        run: composer require --dev symfony/polyfill-php80:^1.16 --no-update
-
       - name: Install dependencies
         uses: ramsey/composer-install@v2
         with:
@@ -123,6 +96,7 @@ jobs:
           composer-options: --prefer-dist
         env:
           SYMFONY_REQUIRE: ${{ matrix.symfony }}
+
       - name: Set up MySQL
         if: contains(matrix.database, 'mysql')
         run: sudo /etc/init.d/mysql start
@@ -134,7 +108,7 @@ jobs:
           SYMFONY_REQUIRE: ${{ matrix.symfony }}
 
   test-reset-database:
-    name: Reset DB - D:${{ matrix.database }} ${{ matrix.use-dama == 1 && ' (dama)' || '' }} ${{ matrix.reset-database-mode == 'migrate' && ' (migrate)' || '' }} ${{ contains(matrix.with-migration-configuration-file, 'transactional') && '(configuration file transactional)' || contains(matrix.with-migration-configuration-file, 'configuration') && '(configuration file)' || '' }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.use-phpunit-extension == 0 && ' (no phpunit extension)' || '' }}
+    name: Reset DB - D:${{ matrix.database }}${{ matrix.use-dama == 1 && ' (dama)' || '' }}${{ matrix.reset-database-mode == 'migrate' && ' (migrate)' || '' }}${{ contains(matrix.with-migration-configuration-file, 'transactional') && '(configuration file transactional)' || contains(matrix.with-migration-configuration-file, 'configuration') && '(configuration file)' || '' }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -144,22 +118,18 @@ jobs:
         reset-database-mode: [ schema, migrate ]
         migration-configuration-file: ['no']
         deps: [ highest, lowest ]
-        use-phpunit-extension: [ 1 ]
         include:
-          - { database: mongo, use-dama: 0, reset-database-mode: schema, use-phpunit-extension: 1 }
-          - { database: pgsql, use-dama: 1, reset-database-mode: schema, use-phpunit-extension: 0 }
-          - { database: pgsql, use-dama: 0, reset-database-mode: schema, use-phpunit-extension: 0 }
-          - { database: pgsql, migration-configuration-file: 'migration-configuration', use-dama: 0, reset-database-mode: migration, use-phpunit-extension: 1 }
-          - { database: pgsql, migration-configuration-file: 'migration-configuration-transactional', use-dama: 0, reset-database-mode: migration, use-phpunit-extension: 1 }
+          - { database: mongo, use-dama: 0, reset-database-mode: schema }
+          - { database: pgsql, migration-configuration-file: 'migration-configuration', use-dama: 0, reset-database-mode: migration }
+          - { database: pgsql, migration-configuration-file: 'migration-configuration-transactional', use-dama: 0, reset-database-mode: migration }
     env:
       DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || 'sqlite:///%kernel.project_dir%/var/data.db' }}
       MONGO_URL: ${{ contains(matrix.database, 'mongo') && 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb' || '' }}
       USE_DAMA_DOCTRINE_TEST_BUNDLE: ${{ matrix.use-dama == 1 && 1 || 0 }}
       DATABASE_RESET_MODE: ${{ matrix.reset-database-mode == 1 && 1 || 0 }}
       MIGRATION_CONFIGURATION_FILE: ${{ matrix.migration-configuration-file == 'no' && '' || format('tests/Fixture/MigrationTests/configs/{0}.php', matrix.migration-configuration-file) }}
-      PHPUNIT_VERSION: 13
       WITH_LOWEST_DEPENDENCIES: ${{ matrix.deps == 'lowest' && 1 || 0 }}
-      USE_FOUNDRY_PHPUNIT_EXTENSION: ${{ matrix.use-phpunit-extension }}
+      USE_PHP_84_LAZY_OBJECTS: 1
     services:
       postgres:
         image: ${{ contains(matrix.database, 'pgsql') && 'postgres:15' || '' }}
@@ -195,7 +165,7 @@ jobs:
           dependency-versions: ${{ matrix.deps }}
           composer-options: --prefer-dist
         env:
-          SYMFONY_REQUIRE: 7.4.*
+          SYMFONY_REQUIRE: 8.0.*
 
       - name: Set up MySQL
         if: contains(matrix.database, 'mysql')
@@ -210,7 +180,7 @@ jobs:
           ./phpunit --testsuite reset-database --bootstrap tests/bootstrap-reset-database.php
         shell: bash
         env:
-          SYMFONY_REQUIRE: 7.4.*
+          SYMFONY_REQUIRE: 8.0.*
 
   test-no-framework:
     name: No framework - PHP${{ matrix.php }}
@@ -218,7 +188,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [ 8.3, 8.4, 8.5 ]
+        php: [ 8.4, 8.5 ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -299,9 +269,6 @@ jobs:
       DATABASE_URL: postgresql://root:root@localhost:5432/foundry?serverVersion=15
       MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
       USE_DAMA_DOCTRINE_TEST_BUNDLE: 1
-      USE_FOUNDRY_PHPUNIT_EXTENSION: 1
-      USE_PHP_84_LAZY_OBJECTS: 1
-      PHPUNIT_VERSION: 13
       FOUNDRY_FAKER_SEED: 1234
     services:
       mongo:
@@ -350,4 +317,3 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           file: ./coverage.xml
-

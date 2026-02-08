@@ -11,14 +11,9 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
-use Composer\InstalledVersions;
-use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
-use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
-use PHPUnit\Framework\Attributes\RequiresPhp;
-use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -45,11 +40,7 @@ use function Zenstruck\Foundry\Persistence\refresh_all;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=12
  */
-#[RequiresPhpunit('>=12')]
-#[RequiresEnvironmentVariable('USE_PHP_84_LAZY_OBJECTS', '1')]
-#[RequiresPhp('>= 8.4')]
 abstract class AutoRefreshTestCase extends WebTestCase
 {
     use Factories, ResetDatabase;
@@ -66,10 +57,6 @@ abstract class AutoRefreshTestCase extends WebTestCase
         $this->updateObject($objectId);
 
         self::assertSame('foo', $object->getProp1());
-
-        if ($this->objectManager() instanceof DocumentManager && \version_compare(InstalledVersions::getVersion('doctrine/mongodb-odm-bundle') ?? '', '5.4.3', '<')) {
-            return;
-        }
 
         // service reset did clear the EM, thus the object is not managed anymore
         self::assertFalse($this->objectManager()->contains($object));

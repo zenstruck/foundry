@@ -208,7 +208,9 @@ abstract class PersistentObjectFactory extends ObjectFactory
      */
     public static function repository(): ObjectRepository
     {
-        Configuration::instance()->assertPersistenceEnabled();
+        if (!Configuration::instance()->isInMemoryEnabled()) {
+            Configuration::instance()->assertPersistenceEnabled();
+        }
 
         return new RepositoryDecorator(static::class(), Configuration::instance()->isInMemoryEnabled()); // @phpstan-ignore return.type
     }
@@ -239,7 +241,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
         $configuration = Configuration::instance();
 
         if ($configuration->inADataProvider()
-            && (\PHP_VERSION_ID >= 80400 || $this instanceof PersistentProxyObjectFactory)
+            && (\PHP_VERSION_ID >= 80400 || $this instanceof PersistentProxyObjectFactory) // @phpstan-ignore booleanOr.alwaysTrue
             && ($this->isPersisting() || $configuration->isInMemoryEnabled())
         ) {
             return ProxyGenerator::wrapFactory($this->with($attributes));
