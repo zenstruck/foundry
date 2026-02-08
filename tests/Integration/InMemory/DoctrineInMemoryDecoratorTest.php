@@ -13,6 +13,7 @@ namespace Zenstruck\Foundry\Tests\Integration\InMemory;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
@@ -37,6 +38,7 @@ use function Zenstruck\Foundry\Persistence\proxy;
  */
 #[RequiresPhpunit('>=11.4.0')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
+#[RequiresEnvironmentVariable('DATABASE_URL')]
 #[AsInMemoryTest]
 final class DoctrineInMemoryDecoratorTest extends KernelTestCase
 {
@@ -197,6 +199,10 @@ final class DoctrineInMemoryDecoratorTest extends KernelTestCase
     #[Test]
     public function it_can_find_by_embeddable(): void
     {
+        if (!\getenv('DATABASE_URL') && !\getenv('MONGO_URL')) {
+            self::markTestSkipped('Need at least one persistence to test embeddables.');
+        }
+
         $factory = persistent_factory(WithEmbeddableEntity::class);
         $factory->create(['embeddable' => new Embeddable('foo')]);
         $o = $factory->create(['embeddable' => $e = new Embeddable('bar')]);
