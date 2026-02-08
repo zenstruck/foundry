@@ -14,7 +14,6 @@ namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Story;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
@@ -31,15 +30,6 @@ use Zenstruck\Foundry\Tests\Fixture\Stories\ObjectStory;
 abstract class StoryTestCase extends KernelTestCase
 {
     use Factories, ResetDatabase;
-
-    /** @return class-string<DocumentStory|EntityStory> */
-    abstract protected static function storyClass(): string;
-
-    /** @return class-string<PersistentObjectFactory<GenericModel>> */
-    abstract protected static function factoryClass(): string;
-
-    /** @return class-string<DocumentPoolStory|EntityPoolStory> */
-    abstract protected static function poolStoryClass(): string;
 
     /**
      * @test
@@ -197,4 +187,13 @@ abstract class StoryTestCase extends KernelTestCase
         ObjectStory::load();
         self::assertInstanceOf(Object1::class, ObjectStory::foo());
     }
+
+    /** @return class-string<DocumentStory|EntityStory> */
+    abstract protected static function storyClass(): string;
+
+    /** @return class-string<PersistentObjectFactory<GenericModel>> */
+    abstract protected static function factoryClass(): string;
+
+    /** @return class-string<DocumentPoolStory|EntityPoolStory> */
+    abstract protected static function poolStoryClass(): string;
 }
