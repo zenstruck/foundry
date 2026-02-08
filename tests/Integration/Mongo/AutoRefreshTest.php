@@ -13,8 +13,6 @@ namespace Zenstruck\Foundry\Tests\Integration\Mongo;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
-use PHPUnit\Framework\Attributes\RequiresPhp;
-use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithOnlyPrivateProperties;
 use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithReadonly;
@@ -24,13 +22,8 @@ use Zenstruck\Foundry\Tests\Integration\Persistence\AutoRefreshTestCase;
 
 use function Zenstruck\Foundry\Persistence\persistent_factory;
 
-/**
- * @requires PHPUnit >=12.0.0
- */
-#[RequiresPhp('>= 8.4.0')]
-#[RequiresPhpunit('>=12.0.0')]
-#[RequiresEnvironmentVariable('USE_PHP_84_LAZY_OBJECTS', '1')]
 #[RequiresEnvironmentVariable('MONGO_URL')]
+#[RequiresEnvironmentVariable('USE_PHP_84_LAZY_OBJECTS', '1')]
 final class AutoRefreshTest extends AutoRefreshTestCase
 {
     protected static function factory(): PersistentObjectFactory
