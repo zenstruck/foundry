@@ -14,6 +14,7 @@ namespace Zenstruck\Foundry\Tests\Integration\Maker;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -445,34 +446,28 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/GenericEntityFactory.php'));
     }
 
-    /**
-     * @test
-     * @dataProvider objectsWithEmbeddableProvider
-     */
     #[Test]
-    #[DataProvider('objectsWithEmbeddableProvider')]
-    public function can_create_factory_with_embeddable(string $objectClass, string $objectFactoryName): void
+    #[RequiresEnvironmentVariable('DATABASE_URL')]
+    public function can_create_factory_with_embeddable_orm(): void
     {
         $tester = $this->makeFactoryCommandTester();
 
-        $tester->execute(['class' => $objectClass, '--all-fields' => true]);
+        $tester->execute(['class' => WithEmbeddableEntity::class, '--all-fields' => true]);
 
         $this->assertFileExists(self::tempFile('src/Factory/EmbeddableFactory.php'));
-        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile("src/Factory/{$objectFactoryName}.php"));
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile("src/Factory/WithEmbeddableEntityFactory.php"));
     }
 
-    /**
-     * @return iterable<string, array{0: string, 1: string}>
-     */
-    public static function objectsWithEmbeddableProvider(): iterable
+    #[Test]
+    #[RequiresEnvironmentVariable('MONGO_URL')]
+    public function can_create_factory_with_embeddable_odm(): void
     {
-        if (\getenv('DATABASE_URL')) {
-            yield 'orm' => [WithEmbeddableEntity::class, 'WithEmbeddableEntityFactory'];
-        }
+        $tester = $this->makeFactoryCommandTester();
 
-        if (\getenv('MONGO_URL')) {
-            yield 'odm' => [WithEmbeddableDocument::class, 'WithEmbeddableDocumentFactory'];
-        }
+        $tester->execute(['class' => WithEmbeddableDocument::class, '--all-fields' => true]);
+
+        $this->assertFileExists(self::tempFile('src/Factory/EmbeddableFactory.php'));
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile("src/Factory/WithEmbeddableDocumentFactory.php"));
     }
 
     /**
