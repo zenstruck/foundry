@@ -72,11 +72,6 @@ abstract class FoundryTestKernel extends Kernel
         return (bool) \getenv('USE_DAMA_DOCTRINE_TEST_BUNDLE');
     }
 
-    public static function usePHP84LazyObjects(): bool
-    {
-        return (bool) \getenv('USE_PHP_84_LAZY_OBJECTS');
-    }
-
     protected function configureContainer(ContainerConfigurator $configurator, LoaderInterface $loader, ContainerBuilder $c): void
     {
         $c->loadFromExtension('framework', [

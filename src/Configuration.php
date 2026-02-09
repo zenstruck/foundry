@@ -56,7 +56,6 @@ final class Configuration
         callable $instantiator,
         public readonly StoryRegistry $stories,
         private readonly ?PersistenceManager $persistence = null,
-        public readonly bool $flushOnce = false,
         public readonly ?InMemoryRepositoryRegistry $inMemoryRepositoryRegistry = null,
         public readonly ?PersistedObjectsTracker $persistedObjectsTracker = null,
         private readonly bool $enableAutoRefreshWithLazyObjects = false,
