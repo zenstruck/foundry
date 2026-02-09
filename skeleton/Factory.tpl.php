@@ -22,7 +22,7 @@ final class <?php echo $class_name; ?> extends <?php echo $makeFactoryData->getF
     {
     }
 
-<?php endif ?><?php if ($makeFactoryData->shouldAddOverrideAttributes()): ?>    #[\Override]<?= "\n" ?><?php endif ?>
+<?php endif ?>    #[\Override]
     public static function class(): string
     {
         return <?php echo $makeFactoryData->getObjectShortName(); ?>::class;
@@ -33,8 +33,8 @@ final class <?php echo $class_name; ?> extends <?php echo $makeFactoryData->getF
      *
      * @todo add your default values here
      */
-<?php endif ?><?php if ($makeFactoryData->shouldAddOverrideAttributes()): ?>    #[\Override]<?= "\n" ?><?php endif ?>
-    protected function defaults(): array<?php if ($makeFactoryData->shouldAddHints()): ?>|callable<?php endif ?><?= "\n" ?>
+<?php endif ?>    #[\Override]
+    protected function defaults(): array<?php if ($makeFactoryData->shouldAddHints()): ?>|callable<?php endif ?>
     {
         return [
 <?php
@@ -49,7 +49,7 @@ foreach ($makeFactoryData->getDefaultProperties() as $propertyName => $value) {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
      */
-<?php if ($makeFactoryData->shouldAddOverrideAttributes()): ?>    #[\Override]<?= "\n" ?><?php endif ?>
+    #[\Override]
     protected function initialize(): static
     {
         return $this

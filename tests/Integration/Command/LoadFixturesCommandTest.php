@@ -13,6 +13,7 @@ namespace Zenstruck\Foundry\Tests\Integration\Command;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -26,18 +27,13 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\Fixtures\FixtureStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\Fixtures\FixtureStoryWithNameCollision;
 use Zenstruck\Foundry\Tests\Fixture\TestKernel;
-use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 use function Zenstruck\Foundry\Persistence\repository;
 
 #[ResetDatabase]
+#[RequiresEnvironmentVariable('DATABASE_URL')]
 final class LoadFixturesCommandTest extends KernelTestCase
 {
-    use RequiresORM;
-
-    /**
-     * @test
-     */
     #[Test]
     public function it_throws_if_no_story_marked_as_fixture(): void
     {
@@ -47,9 +43,6 @@ final class LoadFixturesCommandTest extends KernelTestCase
         $this->commandTester()->execute(['name' => ['foo']]);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_throws_if_story_does_not_exist(): void
     {
@@ -59,9 +52,6 @@ final class LoadFixturesCommandTest extends KernelTestCase
         $this->commandTester(['environment' => 'stories_as_fixtures'])->execute(['name' => ['invalid-name'], '--append' => true]);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_load_a_story(): void
     {
@@ -71,9 +61,6 @@ final class LoadFixturesCommandTest extends KernelTestCase
         GenericEntityFactory::assert()->count(1, ['prop1' => 'fixture-story']);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_load_a_story_with_verbose_mode(): void
     {
@@ -100,9 +87,6 @@ final class LoadFixturesCommandTest extends KernelTestCase
         GenericEntityFactory::assert()->count(1);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_load_multiple_stories(): void
     {
@@ -221,9 +205,6 @@ final class LoadFixturesCommandTest extends KernelTestCase
         $this->commandTester(['environment' => 'story_fixture_with_name_collision'])->execute(['name' => ['fixture-story'], '--append' => true]);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_throws_if_name_collision_between_story_name_and_group_name(): void
     {
@@ -233,9 +214,6 @@ final class LoadFixturesCommandTest extends KernelTestCase
         $this->commandTester(['environment' => 'story_fixture_with_group_name_collision'])->execute(['name' => ['fixture-story'], '--append' => true]);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_load_one_single_story_based_on_its_group_name(): void
     {
@@ -245,9 +223,6 @@ final class LoadFixturesCommandTest extends KernelTestCase
         GenericEntityFactory::assert()->count(1, ['prop1' => 'fixture-story']);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_load_multiple_stories_based_on_their_group_name(): void
     {
@@ -258,10 +233,6 @@ final class LoadFixturesCommandTest extends KernelTestCase
         GenericEntityFactory::assert()->count(1, ['prop1' => 'fixture-story-for-group']);
     }
 
-    /**
-     * @test
-     * @dataProvider provideFixturesWhichLoadAnotherFixtureCases
-     */
     #[Test]
     #[DataProvider('provideFixturesWhichLoadAnotherFixtureCases')]
     public function it_can_load_fixture_which_loads_another_fixture(string $name): void
@@ -279,9 +250,6 @@ final class LoadFixturesCommandTest extends KernelTestCase
         yield 'by group name' => ['fixture-using-another-fixture-group'];
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_load_a_story_and_reset_database(): void
     {
@@ -297,9 +265,6 @@ final class LoadFixturesCommandTest extends KernelTestCase
         GenericEntityFactory::assert()->count(1, ['prop1' => 'fixture-story']);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function user_can_refuse_to_reset_database(): void
     {
@@ -312,9 +277,6 @@ final class LoadFixturesCommandTest extends KernelTestCase
         GenericEntityFactory::assert()->count(0);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_does_not_reset_database_if_append_option_is_used(): void
     {
@@ -329,9 +291,6 @@ final class LoadFixturesCommandTest extends KernelTestCase
         GenericEntityFactory::assert()->count(6);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function if_no_name_provided_it_asks_for_story_to_load(): void
     {
@@ -346,9 +305,6 @@ final class LoadFixturesCommandTest extends KernelTestCase
         self::assertStringContainsString('Loading story with name "fixture-story"', $commandTester->getDisplay());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function if_no_name_provided_it_asks_for_group_to_load(): void
     {
@@ -364,9 +320,6 @@ final class LoadFixturesCommandTest extends KernelTestCase
         self::assertStringContainsString('Loading stories group "multiple-fixtures-in-group"', $commandTester->getDisplay());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function if_no_name_provided_and_on_one_story_fixture_it_loads_it_automatically(): void
     {
@@ -379,9 +332,6 @@ final class LoadFixturesCommandTest extends KernelTestCase
         self::assertStringContainsString('Loading story with name "fixture-story"', $commandTester->getDisplay());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_does_not_load_global_state(): void
     {

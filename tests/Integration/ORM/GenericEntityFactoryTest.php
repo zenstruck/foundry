@@ -14,12 +14,12 @@ namespace Zenstruck\Foundry\Tests\Integration\ORM;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\EmptyConstructorFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
 use Zenstruck\Foundry\Tests\Integration\Persistence\GenericFactoryTestCase;
-use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 use function Zenstruck\Foundry\Persistence\disable_persisting;
 use function Zenstruck\Foundry\Persistence\enable_persisting;
@@ -27,13 +27,9 @@ use function Zenstruck\Foundry\Persistence\enable_persisting;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
+#[RequiresEnvironmentVariable('DATABASE_URL')]
 final class GenericEntityFactoryTest extends GenericFactoryTestCase
 {
-    use RequiresORM;
-
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_factory_with_empty_constructor(): void
     {
@@ -44,9 +40,6 @@ final class GenericEntityFactoryTest extends GenericFactoryTestCase
         EmptyConstructorFactory::assert()->count(1);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_factory_with_empty_constructor_without_persistence(): void
     {
@@ -60,9 +53,6 @@ final class GenericEntityFactoryTest extends GenericFactoryTestCase
     }
 
     /**
-     * @test
-     * @dataProvider afterPersistDecideFlushProvider
-     *
      * @phpstan-ignore missingType.callable
      */
     #[Test]
