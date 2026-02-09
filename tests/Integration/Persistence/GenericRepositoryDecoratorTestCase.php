@@ -13,8 +13,8 @@ namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
 
 use function Zenstruck\Foundry\Persistence\repository;
@@ -22,7 +22,6 @@ use function Zenstruck\Foundry\Persistence\repository;
 #[ResetDatabase]
 abstract class GenericRepositoryDecoratorTestCase extends KernelTestCase
 {
-
     /**
      * @test
      */
