@@ -28,7 +28,6 @@ use function Zenstruck\Foundry\faker;
 #[ResetDatabase]
 final class FakerCustomServiceKernelTest extends KernelTestCase
 {
-
     #[Test]
     public function faker_service_can_be_set(): void
     {

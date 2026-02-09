@@ -14,8 +14,8 @@ namespace Zenstruck\Foundry\Tests\Integration\Faker;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Zenstruck\Foundry\FakerAdapter;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
+use Zenstruck\Foundry\FakerAdapter;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\WithUniqueColumn\WithUniqueColumnFactory;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
