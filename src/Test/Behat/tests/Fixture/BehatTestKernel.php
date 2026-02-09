@@ -36,8 +36,6 @@ class BehatTestKernel extends FoundryTestKernel
         parent::configureContainer($configurator, $loader, $c);
 
         $c->loadFromExtension('zenstruck_foundry', [
-            'persistence' => ['flush_once' => true],
-            'enable_auto_refresh_with_lazy_objects' => self::usePHP84LazyObjects(),
             'global_state' => [Stories\GlobalStory::class],
             'orm' => [
                 'reset' => [

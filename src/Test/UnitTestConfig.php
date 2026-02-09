@@ -53,7 +53,7 @@ final class UnitTestConfig
             new FactoryRegistry([]),
             new FakerAdapter(
                 $faker,
-                forcedFakerSeedFromEnv: $_SERVER['FOUNDRY_FAKER_SEED'] ?? $_ENV['FOUNDRY_FAKER_SEED'] ?? (\getenv('FOUNDRY_FAKER_SEED') ?: null),
+                forcedFakerSeed: $_SERVER['FOUNDRY_FAKER_SEED'] ?? $_ENV['FOUNDRY_FAKER_SEED'] ?? (\getenv('FOUNDRY_FAKER_SEED') ?: null),
                 manageFakerSeed: self::$manageFakerSeed,
             ),
             self::$instantiator ?? Instantiator::withConstructor(),
