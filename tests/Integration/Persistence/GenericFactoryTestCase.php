@@ -19,7 +19,6 @@ use Zenstruck\Foundry\Exception\PersistenceDisabled;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Persistence\ProxyGenerator;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
@@ -644,16 +643,6 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     {
         $object = static::factory()->create(['date' => $date = new \DateTimeImmutable()]);
         self::assertSame($date->format(\DateTimeInterface::ATOM), $object->getDate()?->format(\DateTimeInterface::ATOM));
-    }
-
-    /**
-     * @test
-     */
-    #[Test]
-    public function it_should_not_create_proxy_for_not_persistable_objects(): void
-    {
-        $this->factory()->create(['date' => new \DateTimeImmutable()]);
-        self::assertFalse(\class_exists(ProxyGenerator::proxyClassNameFor(\DateTimeImmutable::class)));
     }
 
     /**

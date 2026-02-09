@@ -13,47 +13,46 @@ namespace App\Factory;
 
 use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
+use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Repository\GenericEntityRepository;
 
 /**
  * @extends PersistentObjectFactory<GenericEntity>
  *
- * @method        GenericEntity|Proxy                              create(array|callable $attributes = [])
- * @method static GenericEntity|Proxy                              createOne(array $attributes = [])
- * @method static GenericEntity|Proxy                              find(object|array|mixed $criteria)
- * @method static GenericEntity|Proxy                              findOrCreate(array $attributes)
- * @method static GenericEntity|Proxy                              first(string $sortBy = 'id')
- * @method static GenericEntity|Proxy                              last(string $sortBy = 'id')
- * @method static GenericEntity|Proxy                              random(array $attributes = [])
- * @method static GenericEntity|Proxy                              randomOrCreate(array $attributes = [])
- * @method static GenericEntityRepository|ProxyRepositoryDecorator repository()
- * @method static GenericEntity[]|Proxy[]                          all()
- * @method static GenericEntity[]|Proxy[]                          createMany(int $number, array|callable $attributes = [])
- * @method static GenericEntity[]|Proxy[]                          createSequence(iterable|callable $sequence)
- * @method static GenericEntity[]|Proxy[]                          findBy(array $attributes)
- * @method static GenericEntity[]|Proxy[]                          randomRange(int $min, int $max, array $attributes = [])
- * @method static GenericEntity[]|Proxy[]                          randomRangeOrCreate(int $min, int $max, array $attributes = [])
- * @method static GenericEntity[]|Proxy[]                          randomSet(int $number, array $attributes = [])
+ * @method        GenericEntity                               create(array|callable $attributes = [])
+ * @method static GenericEntity                               createOne(array $attributes = [])
+ * @method static GenericEntity                               find(object|array|mixed $criteria)
+ * @method static GenericEntity                               findOrCreate(array $attributes)
+ * @method static GenericEntity                               first(string $sortBy = 'id')
+ * @method static GenericEntity                               last(string $sortBy = 'id')
+ * @method static GenericEntity                               random(array $attributes = [])
+ * @method static GenericEntity                               randomOrCreate(array $attributes = [])
+ * @method static GenericEntityRepository|RepositoryDecorator repository()
+ * @method static GenericEntity[]                             all()
+ * @method static GenericEntity[]                             createMany(int $number, array|callable $attributes = [])
+ * @method static GenericEntity[]                             createSequence(iterable|callable $sequence)
+ * @method static GenericEntity[]                             findBy(array $attributes)
+ * @method static GenericEntity[]                             randomRange(int $min, int $max, array $attributes = [])
+ * @method static GenericEntity[]                             randomRangeOrCreate(int $min, int $max, array $attributes = [])
+ * @method static GenericEntity[]                             randomSet(int $number, array $attributes = [])
  *
- * @phpstan-method        GenericEntity&Proxy<GenericEntity> create(array|callable $attributes = [])
- * @phpstan-method static GenericEntity&Proxy<GenericEntity> createOne(array $attributes = [])
- * @phpstan-method static GenericEntity&Proxy<GenericEntity> find(object|array|mixed $criteria)
- * @phpstan-method static GenericEntity&Proxy<GenericEntity> findOrCreate(array $attributes)
- * @phpstan-method static GenericEntity&Proxy<GenericEntity> first(string $sortBy = 'id')
- * @phpstan-method static GenericEntity&Proxy<GenericEntity> last(string $sortBy = 'id')
- * @phpstan-method static GenericEntity&Proxy<GenericEntity> random(array $attributes = [])
- * @phpstan-method static GenericEntity&Proxy<GenericEntity> randomOrCreate(array $attributes = [])
- * @phpstan-method static ProxyRepositoryDecorator<GenericEntity, EntityRepository<GenericEntity>> repository()
- * @phpstan-method static list<GenericEntity&Proxy<GenericEntity>> all()
- * @phpstan-method static list<GenericEntity&Proxy<GenericEntity>> createMany(int $number, array|callable $attributes = [])
- * @phpstan-method static list<GenericEntity&Proxy<GenericEntity>> createSequence(iterable|callable $sequence)
- * @phpstan-method static list<GenericEntity&Proxy<GenericEntity>> findBy(array $attributes)
- * @phpstan-method static list<GenericEntity&Proxy<GenericEntity>> randomRange(int $min, int $max, array $attributes = [])
- * @phpstan-method static list<GenericEntity&Proxy<GenericEntity>> randomRangeOrCreate(int $min, int $max, array $attributes = [])
- * @phpstan-method static list<GenericEntity&Proxy<GenericEntity>> randomSet(int $number, array $attributes = [])
+ * @phpstan-method        GenericEntity create(array|callable $attributes = [])
+ * @phpstan-method static GenericEntity createOne(array $attributes = [])
+ * @phpstan-method static GenericEntity find(object|array|mixed $criteria)
+ * @phpstan-method static GenericEntity findOrCreate(array $attributes)
+ * @phpstan-method static GenericEntity first(string $sortBy = 'id')
+ * @phpstan-method static GenericEntity last(string $sortBy = 'id')
+ * @phpstan-method static GenericEntity random(array $attributes = [])
+ * @phpstan-method static GenericEntity randomOrCreate(array $attributes = [])
+ * @phpstan-method static RepositoryDecorator<GenericEntity, EntityRepository<GenericEntity>> repository()
+ * @phpstan-method static list<GenericEntity> all()
+ * @phpstan-method static list<GenericEntity> createMany(int $number, array|callable $attributes = [])
+ * @phpstan-method static list<GenericEntity> createSequence(iterable|callable $sequence)
+ * @phpstan-method static list<GenericEntity> findBy(array $attributes)
+ * @phpstan-method static list<GenericEntity> randomRange(int $min, int $max, array $attributes = [])
+ * @phpstan-method static list<GenericEntity> randomRangeOrCreate(int $min, int $max, array $attributes = [])
+ * @phpstan-method static list<GenericEntity> randomSet(int $number, array $attributes = [])
  */
 final class GenericEntityFactory extends PersistentObjectFactory
 {

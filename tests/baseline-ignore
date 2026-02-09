@@ -1,4 +1,3 @@
 %Subscribing to postConnect events is deprecated.%
 %The "Zenstruck\\Foundry.*\(\)" method is considered final.%
 %The "Zenstruck\\Foundry.*\(\)" method is considered final.%
-%Proxy usage is deprecated in PHP 8.4%

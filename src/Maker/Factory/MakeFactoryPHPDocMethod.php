@@ -63,9 +63,9 @@ final class MakeFactoryPHPDocMethod
 
         if ($this->repository) {
             $returnType = match ((bool) $staticAnalysisTool) {
-                false => "{$this->repository->getShortName()}|ProxyRepositoryDecorator",
+                false => "{$this->repository->getShortName()}|RepositoryDecorator",
                 true => \sprintf(
-                    "ProxyRepositoryDecorator<{$this->objectName}, %s>",
+                    "RepositoryDecorator<{$this->objectName}, %s>",
                     \is_a($this->repository->getName(), DocumentRepository::class, allow_string: true)
                         ? "DocumentRepository<{$this->objectName}>"
                         : "EntityRepository<{$this->objectName}>"
@@ -73,10 +73,10 @@ final class MakeFactoryPHPDocMethod
             };
         } else {
             $returnType = match ([$this->returnsCollection, (bool) $staticAnalysisTool]) {
-                [true, true] => "list<{$this->objectName}&Proxy<{$this->objectName}>>",
-                [true, false] => "{$this->objectName}[]|Proxy[]",
-                [false, true] => "{$this->objectName}&Proxy<{$this->objectName}>",
-                [false, false] => "{$this->objectName}|Proxy",
+                [true, true] => "list<{$this->objectName}>",
+                [true, false] => "{$this->objectName}[]",
+                [false, true] => "{$this->objectName}",
+                [false, false] => "{$this->objectName}",
             };
         }
 

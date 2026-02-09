@@ -22,7 +22,6 @@
         "symfony/polyfill-php85": "^1.33",
         "symfony/property-access": "^8.0",
         "symfony/property-info": "^8.0",
-        "symfony/var-exporter": "^8.0",
         "zenstruck/assert": "^1.4"
     },
     "require-dev": {

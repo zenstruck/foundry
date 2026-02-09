@@ -72,10 +72,6 @@ final class PersistenceManager
      */
     public function save(object $object): object
     {
-        if ($object instanceof Proxy) {
-            return $object->_save();
-        }
-
         $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
         $om->persist($object);
         $this->flush($om);
@@ -99,10 +95,6 @@ final class PersistenceManager
      */
     public function scheduleForInsert(object $object, array $afterPersistCallbacks = []): object
     {
-        if ($object instanceof Proxy) {
-            $object = ProxyGenerator::unwrap($object);
-        }
-
         $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
         $om->persist($object);
 
@@ -198,14 +190,7 @@ final class PersistenceManager
             return $object;
         }
 
-        if ($object instanceof Proxy) {
-            return $object->_refresh();
-        }
-
-        if (
-            \PHP_VERSION_ID >= 80400
-            && ($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)
-        ) {
+        if (($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)) {
             /** @var T $object */
             $object = $reflector->initializeLazyObject($object);
         }
@@ -255,14 +240,7 @@ final class PersistenceManager
 
     public function isPersisted(object $object): bool
     {
-        if ($object instanceof Proxy) {
-            $object = $object->_real(withAutoRefresh: false);
-        }
-
-        if (
-            \PHP_VERSION_ID >= 80400
-            && ($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)
-        ) {
+        if (($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)) {
             /** @var object $object */
             $object = $reflector->initializeLazyObject($object);
         }
@@ -272,10 +250,6 @@ final class PersistenceManager
         // prevents doctrine to use its cache and think the object is persisted
         if ($persistenceStrategy->isScheduledForInsert($object)) {
             return false;
-        }
-
-        if ($object instanceof Proxy) {
-            $object = ProxyGenerator::unwrap($object);
         }
 
         $om = $persistenceStrategy->objectManagerFor($object::class);
@@ -293,14 +267,7 @@ final class PersistenceManager
      */
     public function delete(object $object): object
     {
-        if ($object instanceof Proxy) {
-            return $object->_delete();
-        }
-
-        if (
-            \PHP_VERSION_ID >= 80400
-            && ($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)
-        ) {
+        if (($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)) {
             /** @var T $object */
             $object = $reflector->initializeLazyObject($object);
         }
@@ -317,8 +284,6 @@ final class PersistenceManager
      */
     public function truncate(string $class): void
     {
-        $class = ProxyGenerator::unwrap($class);
-
         $this->strategyFor($class)->truncate($class);
     }
 
@@ -331,8 +296,6 @@ final class PersistenceManager
      */
     public function repositoryFor(string $class): ObjectRepository
     {
-        $class = ProxyGenerator::unwrap($class);
-
         return $this->strategyFor($class)->objectManagerFor($class)->getRepository($class);
     }
 
@@ -342,9 +305,6 @@ final class PersistenceManager
      */
     public function bidirectionalRelationshipMetadata(string $parent, string $child, string $field): ?RelationshipMetadata
     {
-        $parent = ProxyGenerator::unwrap($parent);
-        $child = ProxyGenerator::unwrap($child);
-
         return $this->strategyFor($parent)->bidirectionalRelationshipMetadata($parent, $child, $field);
     }
 
@@ -392,8 +352,6 @@ final class PersistenceManager
      */
     public function embeddablePropertiesFor(object $object, string $owner): ?array
     {
-        $owner = ProxyGenerator::unwrap($owner);
-
         try {
             return $this->strategyFor($owner)->embeddablePropertiesFor(ProxyGenerator::unwrap($object), $owner);
         } catch (NoPersistenceStrategy) {

@@ -11,8 +11,6 @@
 
 namespace Zenstruck\Foundry\Tests\Unit;
 
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
-use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Test\Factories;
@@ -23,7 +21,6 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
 
 use function Zenstruck\Foundry\factory;
 use function Zenstruck\Foundry\object;
-use function Zenstruck\Foundry\Persistence\proxy;
 
 final class ReuseEntityTest extends TestCase
 {
@@ -39,23 +36,6 @@ final class ReuseEntityTest extends TestCase
 
         $contact = ContactFactory::new()
             ->reuse($address)
-            ->create();
-
-        self::assertSame($address, $contact->getAddress());
-    }
-
-    /**
-     * @test
-     */
-    #[Test]
-    #[IgnoreDeprecations]
-    #[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
-    public function it_can_reuse_a_proxy_object(): void
-    {
-        $address = AddressFactory::createOne();
-
-        $contact = ContactFactory::new()
-            ->reuse(proxy($address))
             ->create();
 
         self::assertSame($address, $contact->getAddress());

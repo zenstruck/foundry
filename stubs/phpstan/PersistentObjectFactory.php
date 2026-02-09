@@ -6,7 +6,6 @@ use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 use function PHPStan\Testing\assertType;
-use function Zenstruck\Foundry\Persistence\proxy;
 
 class UserForPersistentFactory
 {
@@ -93,9 +92,6 @@ assertType('string', UserFactory::find(1)->name);
 assertType('string', UserFactory::random()->name);
 assertType('string', UserFactory::findOrCreate([])->name);
 assertType('string', UserFactory::randomOrCreate()->name);
-
-assertType('string', proxy(UserFactory::createOne())->name);
-assertType('string', proxy(UserFactory::new()->create())->name);
 
 assertType('string', UserFactory::all()[0]->name);
 assertType("string", UserFactory::createMany(1)[0]->name);

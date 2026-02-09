@@ -18,9 +18,7 @@ use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
+use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 
 /**
  * @internal
@@ -55,13 +53,9 @@ final class MakeFactoryData
             $object->getName(),
         ];
 
-        if ($this->persisted) {
-            $this->uses[] = Proxy::class;
-        }
-
         if ($repository) {
             $this->uses[] = $repository->getName();
-            $this->uses[] = ProxyRepositoryDecorator::class;
+            $this->uses[] = RepositoryDecorator::class;
             if (!\str_starts_with($repository->getName(), 'Doctrine')) {
                 $this->uses[] = \is_a($repository->getName(), DocumentRepository::class, allow_string: true) ? DocumentRepository::class : EntityRepository::class;
             }
@@ -86,9 +80,7 @@ final class MakeFactoryData
      */
     public function getFactoryClass(): string
     {
-        return $this->isPersisted()
-            ? (\PHP_VERSION_ID >= 80400 ? PersistentObjectFactory::class : PersistentProxyObjectFactory::class)
-            : ObjectFactory::class;
+        return $this->isPersisted() ? PersistentObjectFactory::class : ObjectFactory::class;
     }
 
     public function getFactoryClassShortName(): string

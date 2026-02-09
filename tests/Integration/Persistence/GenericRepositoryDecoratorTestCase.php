@@ -29,7 +29,7 @@ abstract class GenericRepositoryDecoratorTestCase extends KernelTestCase
      * @test
      */
     #[Test]
-    public function repository_proxy_is_countable_and_iterable(): void
+    public function repository_is_countable_and_iterable(): void
     {
         $this->factory()->many(4)->create();
 

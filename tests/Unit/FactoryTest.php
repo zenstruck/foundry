@@ -12,30 +12,20 @@
 namespace Zenstruck\Foundry\Tests\Unit;
 
 use Faker;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
-use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Configuration;
-use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\UnitTestConfig;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
-use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\ProxyAddressFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ProxyContactFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\EmptyConstructorFactory;
-use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericProxyEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
 
 use function Zenstruck\Foundry\factory;
 use function Zenstruck\Foundry\faker;
-use function Zenstruck\Foundry\Persistence\proxy;
-use function Zenstruck\Foundry\Persistence\proxy_factory;
 
 final class FactoryTest extends TestCase
 {
@@ -79,36 +69,6 @@ final class FactoryTest extends TestCase
 
     /**
      * @test
-     * @group legacy
-     */
-    #[Test]
-    #[IgnoreDeprecations]
-    #[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
-    public function can_use_user_defined_proxy_persistent_factory_in_unit_test(): void
-    {
-        $object = GenericProxyEntityFactory::createOne();
-
-        $this->assertInstanceOf(GenericEntity::class, $object);
-        $this->assertInstanceOf(Proxy::class, $object);
-    }
-
-    /**
-     * @test
-     * @group legacy
-     */
-    #[Test]
-    #[IgnoreDeprecations]
-    #[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
-    public function can_use_user_anonymous_proxy_persistent_factory_in_unit_test(): void
-    {
-        $object = proxy_factory(GenericEntity::class, ['prop1' => 'prop1'])->create();
-
-        $this->assertInstanceOf(GenericEntity::class, $object);
-        $this->assertInstanceOf(Proxy::class, $object);
-    }
-
-    /**
-     * @test
      */
     #[Test]
     public function can_register_default_instantiator(): void
@@ -128,42 +88,10 @@ final class FactoryTest extends TestCase
      * @test
      */
     #[Test]
-    #[IgnoreDeprecations]
-    #[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
-    public function proxy_attributes_can_be_used_in_unit_test(): void
-    {
-        $object = ProxyContactFactory::createOne([
-            'category' => proxy(new Category('name')), // @phpstan-ignore function.unresolvableReturnType
-            'address' => ProxyAddressFactory::new(),
-        ]);
-
-        $this->assertInstanceOf(Contact::class, $object);
-    }
-
-    /**
-     * @test
-     */
-    #[Test]
     public function instantiating_with_factory_attribute_instantiates_the_factory(): void
     {
         $object = ContactFactory::createOne([
             'category' => CategoryFactory::new(),
-        ]);
-
-        $this->assertInstanceOf(Category::class, $object->getCategory());
-    }
-
-    /**
-     * @test
-     * @group legacy
-     */
-    #[Test]
-    #[IgnoreDeprecations]
-    #[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
-    public function instantiating_with_proxy_attribute_normalizes_to_underlying_object(): void
-    {
-        $object = ProxyContactFactory::createOne([
-            'category' => proxy(new Category('name')), // @phpstan-ignore function.unresolvableReturnType
         ]);
 
         $this->assertInstanceOf(Category::class, $object->getCategory());
