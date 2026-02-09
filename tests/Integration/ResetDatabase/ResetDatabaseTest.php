@@ -11,7 +11,6 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\ResetDatabase;
 
-use Composer\InstalledVersions;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use PHPUnit\Framework\Attributes\Test;
@@ -46,14 +45,10 @@ final class ResetDatabaseTest extends KernelTestCase
         $application = new Application(self::bootKernel());
         $application->setAutoExit(false);
 
-        $parameters = ['command' => 'doctrine:schema:validate', '-v' => true];
-
-        // enums in GenericModel are not well handled with --prefer-lowest
-        if (\version_compare(InstalledVersions::getVersion('doctrine/orm') ?? '', '3.0', '<')) {
-            $parameters['--skip-mapping'] = true;
-        }
-
-        $exit = $application->run(new ArrayInput($parameters), $output = new BufferedOutput());
+        $exit = $application->run(
+            new ArrayInput(['command' => 'doctrine:schema:validate', '-v' => true]),
+            $output = new BufferedOutput()
+        );
 
         if (FoundryTestKernel::usesMigrations()) {
             // The command actually fails, because of a bug in doctrine ORM 3!

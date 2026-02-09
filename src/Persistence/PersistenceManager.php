@@ -17,8 +17,7 @@ use Doctrine\Persistence\ObjectRepository;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\Object\Hydrator;
-use Zenstruck\Foundry\ORM\AbstractORMPersistenceStrategy;
-use Zenstruck\Foundry\ORM\DoctrineOrmVersionGuesser;
+use Zenstruck\Foundry\ORM\ORMPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\NoPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Exception\ObjectHasUnsavedChanges;
 use Zenstruck\Foundry\Persistence\Exception\ObjectNoLongerExist;
@@ -189,10 +188,6 @@ class PersistenceManager implements IdentifierResolver
             // let's detach the object, in order to prevent Doctrine cache
             $om->detach($object);
             if ($refreshedObject = $om->find($object::class, $id)) {
-                if (!DoctrineOrmVersionGuesser::isOrmV3()) {
-                    $this->refresh($refreshedObject, canThrow: false);
-                }
-
                 Hydrator::hydrateFromOtherObject($object, $refreshedObject);
 
                 return;
@@ -478,7 +473,7 @@ class PersistenceManager implements IdentifierResolver
                 $strategies = [];
             }
 
-            return 1 === \count($strategies) && $strategies[0] instanceof AbstractORMPersistenceStrategy;
+            return 1 === \count($strategies) && $strategies[0] instanceof ORMPersistenceStrategy;
         })();
     }
 
