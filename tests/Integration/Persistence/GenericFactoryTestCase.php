@@ -15,12 +15,12 @@ use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\PersistenceDisabled;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
 
 use function Zenstruck\Foundry\Persistence\delete;
@@ -39,7 +39,6 @@ use function Zenstruck\Foundry\Persistence\save;
 #[ResetDatabase]
 abstract class GenericFactoryTestCase extends KernelTestCase
 {
-
     /**
      * @test
      */

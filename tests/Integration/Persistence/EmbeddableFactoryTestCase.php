@@ -13,8 +13,8 @@ namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Model\Embeddable;
 use Zenstruck\Foundry\Tests\Fixture\Model\WithEmbeddable;
 
@@ -26,7 +26,6 @@ use function Zenstruck\Foundry\factory;
 #[ResetDatabase]
 abstract class EmbeddableFactoryTestCase extends KernelTestCase
 {
-
     /** @test */
     #[Test]
     public function embed_one(): void

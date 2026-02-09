@@ -46,7 +46,6 @@ use function Zenstruck\Foundry\Persistence\refresh_all;
 #[ResetDatabase]
 abstract class AutoRefreshTestCase extends WebTestCase
 {
-
     #[Test]
     public function it_can_refresh_after_services_reset(): void
     {

@@ -13,8 +13,8 @@ namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
 use Zenstruck\Foundry\Tests\Fixture\Stories\DocumentPoolStory;
@@ -29,7 +29,6 @@ use Zenstruck\Foundry\Tests\Fixture\Stories\ObjectStory;
 #[ResetDatabase]
 abstract class StoryTestCase extends KernelTestCase
 {
-
     /**
      * @test
      */

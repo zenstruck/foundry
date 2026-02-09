@@ -47,34 +47,34 @@ final class FoundryExtension implements Runner\Extension\Extension
             && 'true' === $parameters->get(self::PARAMETER_AUTO_RESET_DATABASE_CLASS);
 
         // ⚠️ order matters within each event
-            $subscribers = [
-                Event\TestSuite\Started::class => [new ResetDatabaseOnTestSuiteStarted($autoResetEnabled)],
-                Event\Test\DataProviderMethodCalled::class => [new BootFoundryOnDataProviderMethodCalled()],
-                Event\Test\DataProviderMethodFinished::class => [new ShutdownFoundryOnDataProviderMethodFinished()],
-                Event\Test\PreparationStarted::class => [
-            new BootFoundryOnPreparationStarted(),
-            new ResetDatabaseOnPreparationStarted($autoResetEnabled),
-            new EnableInMemoryOnPreparationStarted(),
-                ],
-                Event\Test\Prepared::class => [
-            new BuildStoryOnTestPrepared(),
-            new TriggerDataProviderPersistenceOnTestPrepared(),
-                ],
-                Event\Test\Finished::class => [new ShutdownFoundryOnTestFinished()],
-                Event\TestRunner\Finished::class => [new DisplayFakerSeedOnApplicationFinished()],
-            ];
+        $subscribers = [
+            Event\TestSuite\Started::class => [new ResetDatabaseOnTestSuiteStarted($autoResetEnabled)],
+            Event\Test\DataProviderMethodCalled::class => [new BootFoundryOnDataProviderMethodCalled()],
+            Event\Test\DataProviderMethodFinished::class => [new ShutdownFoundryOnDataProviderMethodFinished()],
+            Event\Test\PreparationStarted::class => [
+                new BootFoundryOnPreparationStarted(),
+                new ResetDatabaseOnPreparationStarted($autoResetEnabled),
+                new EnableInMemoryOnPreparationStarted(),
+            ],
+            Event\Test\Prepared::class => [
+                new BuildStoryOnTestPrepared(),
+                new TriggerDataProviderPersistenceOnTestPrepared(),
+            ],
+            Event\Test\Finished::class => [new ShutdownFoundryOnTestFinished()],
+            Event\TestRunner\Finished::class => [new DisplayFakerSeedOnApplicationFinished()],
+        ];
 
-            $subscribers = \array_merge(...\array_values($subscribers));
+        $subscribers = \array_merge(...\array_values($subscribers));
 
-            // Foundry can only handle data provider since PHPUnit 11.4
-            if (!ConstraintRequirement::from('>=11.4')->isSatisfiedBy(Runner\Version::id())) {
-                $subscribers = \array_filter(
-                    $subscribers,
-                    static fn($subscriber) => !$subscriber instanceof DataProviderSubscriberInterface
-        );
-            }
+        // Foundry can only handle data provider since PHPUnit 11.4
+        if (!ConstraintRequirement::from('>=11.4')->isSatisfiedBy(Runner\Version::id())) {
+            $subscribers = \array_filter(
+                $subscribers,
+                static fn($subscriber) => !$subscriber instanceof DataProviderSubscriberInterface
+            );
+        }
 
-            $facade->registerSubscribers(...$subscribers);
+        $facade->registerSubscribers(...$subscribers);
 
         self::$enabled = true;
     }
