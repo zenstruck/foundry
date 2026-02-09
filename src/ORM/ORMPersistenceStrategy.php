@@ -13,10 +13,18 @@ namespace Zenstruck\Foundry\ORM;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
+use Doctrine\ORM\Mapping\AssociationMapping;
+use Doctrine\ORM\Mapping\ManyToOneAssociationMapping;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
+use Doctrine\ORM\Mapping\OneToManyAssociationMapping;
+use Doctrine\ORM\Mapping\OneToOneAssociationMapping;
 use Doctrine\Persistence\Mapping\MappingException;
 use Zenstruck\Foundry\Persistence\InitializeTrackedGhostsBeforeFlushListener;
 use Zenstruck\Foundry\Persistence\PersistenceStrategy;
+use Zenstruck\Foundry\Persistence\Relationship\ManyToOneRelationship;
+use Zenstruck\Foundry\Persistence\Relationship\OneToManyRelationship;
+use Zenstruck\Foundry\Persistence\Relationship\OneToOneRelationship;
+use Zenstruck\Foundry\Persistence\Relationship\RelationshipMetadata;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -26,9 +34,9 @@ use Zenstruck\Foundry\Persistence\PersistenceStrategy;
  * @method EntityManagerInterface       objectManagerFor(string $class)
  * @method list<EntityManagerInterface> objectManagers()
  */
-abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
+final class ORMPersistenceStrategy extends PersistenceStrategy
 {
-    final public function transactional(callable $callback): mixed
+    public function transactional(callable $callback): mixed
     {
         $connections = [];
         foreach ($this->objectManagers() as $om) {
@@ -62,14 +70,14 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
         }
     }
 
-    final public function contains(object $object): bool
+    public function contains(object $object): bool
     {
         $em = $this->objectManagerFor($object::class);
 
         return $em->contains($object) && !$em->getUnitOfWork()->isScheduledForInsert($object);
     }
 
-    final public function registerPreFlushGhostInitializer(string $class): void
+    public function registerPreFlushGhostInitializer(string $class): void
     {
         $em = $this->objectManagerFor($class);
 
@@ -82,7 +90,7 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
         InitializeTrackedGhostsBeforeFlushListener::registerTo($em->getEventManager(), Events::preFlush);
     }
 
-    final public function hasChanges(object $object): bool
+    public function hasChanges(object $object): bool
     {
         $em = $this->objectManagerFor($object::class);
 
@@ -99,12 +107,12 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
         return (bool) $unitOfWork->getEntityChangeSet($object);
     }
 
-    final public function truncate(string $class): void
+    public function truncate(string $class): void
     {
         $this->objectManagerFor($class)->createQuery("DELETE {$class} e")->execute();
     }
 
-    final public function embeddablePropertiesFor(object $object, string $owner): ?array
+    public function embeddablePropertiesFor(object $object, string $owner): ?array
     {
         try {
             $metadata = $this->objectManagerFor($owner)->getClassMetadata($object::class);
@@ -125,17 +133,17 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
         return $properties;
     }
 
-    final public function isEmbeddable(object $object): bool
+    public function isEmbeddable(object $object): bool
     {
         return $this->objectManagerFor($object::class)->getClassMetadata($object::class)->isEmbeddedClass;
     }
 
-    final public function isScheduledForInsert(object $object): bool
+    public function isScheduledForInsert(object $object): bool
     {
         return $this->objectManagerFor($object::class)->getUnitOfWork()->isScheduledForInsert($object);
     }
 
-    final public function managedNamespaces(): array
+    public function managedNamespaces(): array
     {
         $namespaces = [];
 
@@ -146,7 +154,7 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
         return \array_values(\array_merge(...$namespaces));
     }
 
-    final public function getIdentifierValues(object $object): array
+    public function getIdentifierValues(object $object): array
     {
         $identifiers = $this->classMetadata($object::class)->getIdentifierValues($object);
 
@@ -300,5 +308,71 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
         if ([] !== $original) {
             $om->getClassMetadata($entityClass)->entityListeners = $original;
         }
+    }
+
+    public function bidirectionalRelationshipMetadata(string $parent, string $child, string $field): ?RelationshipMetadata
+    {
+        $associationMapping = $this->getAssociationMapping($parent, $child, $field);
+
+        if (null === $associationMapping) {
+            return null;
+        }
+
+        if (!\is_a(
+            $child,
+            $associationMapping->targetEntity,
+            allow_string: true
+        )) { // is_a() handles inheritance as well
+            throw new \LogicException("Cannot find correct association named \"{$field}\" between classes [parent: \"{$parent}\", child: \"{$child}\"]");
+        }
+
+        $inverseField = $associationMapping->isOwningSide() ? $associationMapping->inversedBy : $associationMapping->mappedBy;
+
+        if (null === $inverseField) {
+            return null;
+        }
+
+        return match (true) {
+            $associationMapping instanceof OneToManyAssociationMapping => new OneToManyRelationship(
+                inverseField: $inverseField,
+                collectionIndexByPath: $associationMapping->isIndexed() ? $this->indexByPropertyPath($associationMapping->targetEntity, $associationMapping->indexBy()) : null
+            ),
+            $associationMapping instanceof OneToOneAssociationMapping => new OneToOneRelationship(
+                inverseField: $inverseField,
+                isOwning: $associationMapping->isOwningSide()
+            ),
+            $associationMapping instanceof ManyToOneAssociationMapping => new ManyToOneRelationship(
+                inverseField: $inverseField,
+                collectionIndexByPath: $this->inverseCollectionIndexByPath($associationMapping->targetEntity, $parent, $inverseField),
+            ),
+            default => null,
+        };
+    }
+
+    /**
+     * @param class-string $entityClass
+     */
+    private function inverseCollectionIndexByPath(string $entityClass, string $elementClass, string $field): ?array
+    {
+        $associationMapping = $this->objectManagerFor($entityClass)->getClassMetadata($entityClass)->getAssociationMapping($field);
+
+        return $associationMapping instanceof OneToManyAssociationMapping && $associationMapping->isIndexed()
+            ? $this->indexByPropertyPath($elementClass, $associationMapping->indexBy())
+            : null;
+    }
+
+    private function getAssociationMapping(string $entityClass, string $targetEntity, string $field): ?AssociationMapping
+    {
+        try {
+            $associationMapping = $this->objectManagerFor($entityClass)->getClassMetadata($entityClass)->getAssociationMapping($field);
+        } catch (MappingException|ORMMappingException) {
+            return null;
+        }
+
+        if (!\is_a($targetEntity, $associationMapping->targetEntity, allow_string: true)) {
+            return null;
+        }
+
+        return $associationMapping;
     }
 }

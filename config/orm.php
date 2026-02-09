@@ -12,16 +12,14 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver;
-use Zenstruck\Foundry\ORM\DoctrineOrmVersionGuesser;
-use Zenstruck\Foundry\ORM\OrmV2PersistenceStrategy;
-use Zenstruck\Foundry\ORM\OrmV3PersistenceStrategy;
+use Zenstruck\Foundry\ORM\ORMPersistenceStrategy;
 use Zenstruck\Foundry\ORM\ResetDatabase\BaseOrmResetter;
 use Zenstruck\Foundry\ORM\ResetDatabase\DamaDatabaseResetter;
 use Zenstruck\Foundry\ORM\ResetDatabase\OrmResetter;
 
 return static function(ContainerConfigurator $container): void {
     $container->services()
-        ->set('.zenstruck_foundry.persistence_strategy.orm', DoctrineOrmVersionGuesser::isOrmV3() ? OrmV3PersistenceStrategy::class : OrmV2PersistenceStrategy::class)
+        ->set('.zenstruck_foundry.persistence_strategy.orm', ORMPersistenceStrategy::class)
             ->args([
                 service('doctrine'),
             ])
