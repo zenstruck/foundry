@@ -13,7 +13,6 @@ namespace Zenstruck\Foundry\Tests\Integration;
 
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object2Factory;
 
@@ -22,8 +21,6 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Object2Factory;
  */
 final class ObjectFactoryTest extends KernelTestCase
 {
-    use Factories;
-
     /**
      * @test
      */

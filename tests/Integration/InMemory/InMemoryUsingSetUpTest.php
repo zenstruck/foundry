@@ -18,7 +18,6 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\InMemory\AsInMemoryTest;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
-use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
 use Zenstruck\Foundry\Tests\Fixture\InMemory\InMemoryContactRepository;
@@ -34,7 +33,6 @@ use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 #[ResetDatabase]
 final class InMemoryUsingSetUpTest extends KernelTestCase
 {
-    use Factories;
     use RequiresORM;
 
     private InMemoryContactRepository $contactRepository;

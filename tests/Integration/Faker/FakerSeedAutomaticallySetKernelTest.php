@@ -16,8 +16,7 @@ use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\FakerAdapter;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Attribute\ResetDatabase;
 
 use function Zenstruck\Foundry\faker;
 
@@ -26,9 +25,10 @@ use function Zenstruck\Foundry\faker;
  * @requires PHPUnit >=11.0
  */
 #[RequiresPhpunit('>=11.0')]
+#[ResetDatabase]
 final class FakerSeedAutomaticallySetKernelTest extends KernelTestCase
 {
-    use Factories, ResetDatabase, ResetFakerTestTrait;
+    use ResetFakerTestTrait;
 
     #[Test]
     public function faker_seed_does_not_change(): void

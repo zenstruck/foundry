@@ -15,7 +15,6 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\LazyValue;
-use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixture\Factories\ArrayFactory;
 
 /**
@@ -23,8 +22,6 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\ArrayFactory;
  */
 final class ArrayFactoryTest extends KernelTestCase
 {
-    use Factories;
-
     /**
      * @test
      */

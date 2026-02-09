@@ -15,8 +15,7 @@ use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\FakerAdapter;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\WithUniqueColumn\WithUniqueColumnFactory;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
@@ -24,9 +23,10 @@ use Zenstruck\Foundry\Tests\Integration\RequiresORM;
  * @requires PHPUnit >=11.0
  */
 #[RequiresPhpunit('>=11.0')]
+#[ResetDatabase]
 final class FakerSeedIsNotResetDuringRunKernelTest extends WebTestCase
 {
-    use Factories, RequiresORM, ResetDatabase;
+    use RequiresORM;
 
     #[Test]
     public function faker_seed_is_not_reset_with_kernel_shutdown(): void

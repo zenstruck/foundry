@@ -18,8 +18,7 @@ use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\ChangesEntityRelationshipCascadePersist;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\UsingRelationships;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithLifecycleCallback;
@@ -43,9 +42,10 @@ use function Zenstruck\Foundry\Persistence\refresh;
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
+#[ResetDatabase]
 final class EdgeCasesRelationshipTest extends KernelTestCase
 {
-    use ChangesEntityRelationshipCascadePersist, Factories, RequiresORM, ResetDatabase;
+    use ChangesEntityRelationshipCascadePersist, RequiresORM;
 
     // Because we're handling the provided data manually in a #[Before] method,
     // PHPUnit triggers a warning, which we ignore with #[IgnorePhpunitWarnings]

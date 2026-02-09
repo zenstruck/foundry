@@ -223,22 +223,6 @@ final class ZenstruckFoundryBundleTest extends TestCase
 
     /**
      * @test
-     * @requires PHP < 8.4
-     */
-    #[Test]
-    #[RequiresPhp('<8.4')]
-    public function cannot_enable_auto_refresh_with_lazy_objects_if_not_php84(): void
-    {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Cannot enable auto-refresh with lazy objects if not using at least PHP 8.4');
-
-        $config = self::buildConfiguration([['enable_auto_refresh_with_lazy_objects' => true]]);
-
-        $this->bundle->loadExtension($config, $this->configurator, $this->container);
-    }
-
-    /**
-     * @test
      * @requires PHP >= 8.4
      */
     #[Test]

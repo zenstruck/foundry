@@ -16,7 +16,6 @@ use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\FakerAdapter;
-use Zenstruck\Foundry\Test\Factories;
 
 use function Zenstruck\Foundry\faker;
 
@@ -27,8 +26,6 @@ use function Zenstruck\Foundry\faker;
 #[RequiresPhpunit('>=12.0')]
 final class FakerSeedSetFromEnvVarUnitTest extends TestCase
 {
-    use Factories;
-
     #[Test]
     public function faker_seed_is_set_from_env_var(): void
     {

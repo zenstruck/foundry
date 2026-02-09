@@ -21,8 +21,7 @@ use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\ChangesEntityRelationshipCascadePersist;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\UsingRelationships;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Address;
@@ -43,9 +42,10 @@ use function Zenstruck\Foundry\Persistence\refresh;
  * @requires PHPUnit >=11.4
  */
 #[RequiresPhpunit('>=11.4')]
+#[ResetDatabase]
 abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
 {
-    use ChangesEntityRelationshipCascadePersist, Factories, ResetDatabase;
+    use ChangesEntityRelationshipCascadePersist;
 
     /** @test */
     #[Test]

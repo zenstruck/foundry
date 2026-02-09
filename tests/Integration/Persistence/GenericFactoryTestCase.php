@@ -19,8 +19,7 @@ use Zenstruck\Foundry\Exception\PersistenceDisabled;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
 
 use function Zenstruck\Foundry\Persistence\delete;
@@ -36,9 +35,9 @@ use function Zenstruck\Foundry\Persistence\save;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
+#[ResetDatabase]
 abstract class GenericFactoryTestCase extends KernelTestCase
 {
-    use Factories, ResetDatabase;
 
     /**
      * @test

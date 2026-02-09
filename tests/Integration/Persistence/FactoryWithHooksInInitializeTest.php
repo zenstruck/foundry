@@ -13,7 +13,6 @@ namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixture\Factories\WithHooksInInitializeFactory;
 
 /**
@@ -21,8 +20,6 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\WithHooksInInitializeFactory;
  */
 final class FactoryWithHooksInInitializeTest extends KernelTestCase
 {
-    use Factories;
-
     /**
      * @test
      */
