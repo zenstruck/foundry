@@ -13,14 +13,17 @@ namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-abstract class GenericFactoryUsingBeforeHooksTestCase extends KernelTestCase
+#[ResetDatabase]
+final class GenericFactoryUsingBeforeHooksTest extends KernelTestCase
 {
+    use GenericFactoryUsingBeforeHooksTrait;
     use RequiresORM;
 
     protected function setUp(): void

@@ -13,7 +13,6 @@ namespace Zenstruck\Foundry\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\RelationshipOnInterface;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\AddressFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
@@ -24,8 +23,6 @@ use function Zenstruck\Foundry\object;
 
 final class ReuseEntityTest extends TestCase
 {
-    use Factories;
-
     /**
      * @test
      */
