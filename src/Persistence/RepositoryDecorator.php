@@ -98,9 +98,9 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
         }
 
         /** @var T|null $object */
-        $object = $this->inner()->find(ProxyGenerator::unwrap($id));
+        $object = $this->inner()->find($id);
 
-        if ($object && !$this instanceof ProxyRepositoryDecorator) {
+        if ($object) {
             Configuration::instance()->persistedObjectsTracker?->add($object);
         }
 
@@ -135,9 +135,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
     {
         $objects = \array_values($this->inner()->findBy($this->normalize($criteria), $orderBy, $limit, $offset));
 
-        if (!$this instanceof ProxyRepositoryDecorator) {
-            Configuration::instance()->persistedObjectsTracker?->add(...$objects);
-        }
+        Configuration::instance()->persistedObjectsTracker?->add(...$objects);
 
         return $objects;
     }
@@ -280,11 +278,6 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
             if ($value instanceof Factory) {
                 // create factories
                 $value = $value instanceof PersistentObjectFactory ? $value->withoutPersisting()->create() : $value->create();
-            }
-
-            if ($value instanceof Proxy) {
-                // unwrap proxies
-                $value = $value->_real();
             }
 
             if (!\is_object($value) || null === $embeddableProps = Configuration::instance()->persistence()->embeddablePropertiesFor($value, $this->getClassName())) {

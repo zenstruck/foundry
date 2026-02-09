@@ -14,7 +14,6 @@ namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Persistence\ProxyGenerator;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
@@ -29,7 +28,7 @@ abstract class GenericRepositoryDecoratorTestCase extends KernelTestCase
      * @test
      */
     #[Test]
-    public function repository_proxy_is_countable_and_iterable(): void
+    public function repository_is_countable_and_iterable(): void
     {
         $this->factory()->many(4)->create();
 
@@ -68,7 +67,7 @@ abstract class GenericRepositoryDecoratorTestCase extends KernelTestCase
 
         $repository = repository($this->modelClass());
 
-        $this->assertSame(ProxyGenerator::unwrap($object), ProxyGenerator::unwrap($repository->find([])));
+        $this->assertSame($object, $repository->find([]));
     }
 
     /**

@@ -4,7 +4,6 @@ use function Zenstruck\Foundry\factory;
 use function Zenstruck\Foundry\object;
 use function Zenstruck\Foundry\Persistence\persist;
 use function Zenstruck\Foundry\Persistence\persistent_factory;
-use function Zenstruck\Foundry\Persistence\proxy;
 use function Zenstruck\Foundry\Persistence\repository;
 
 final class User
@@ -28,12 +27,3 @@ $user = persist(User::class);
 
 /** @psalm-check-type-exact $user = User|null */
 $user = repository(User::class)->find(1);
-
-/** @psalm-check-type-exact $user = User&Zenstruck\Foundry\Persistence\Proxy<User> */
-$user = proxy(object(User::class));
-
-/** @psalm-check-type-exact $name = string */
-$name = proxy(object(User::class))->name;
-
-/** @psalm-check-type-exact $user = User&Zenstruck\Foundry\Persistence\Proxy<User> */
-$user = proxy(object(User::class))->_refresh();

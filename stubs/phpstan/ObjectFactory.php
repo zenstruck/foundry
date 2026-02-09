@@ -6,7 +6,6 @@ use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\ObjectFactory;
 
 use function PHPStan\Testing\assertType;
-use function Zenstruck\Foundry\Persistence\proxy;
 
 class UserForObjectFactory
 {
