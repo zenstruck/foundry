@@ -77,10 +77,6 @@ class PersistenceManager implements IdentifierResolver
      */
     public function save(object $object): object
     {
-        if ($object instanceof Proxy) {
-            return $object->_save();
-        }
-
         $this->persistScheduled();
 
         $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
@@ -106,10 +102,6 @@ class PersistenceManager implements IdentifierResolver
      */
     public function scheduleForInsert(object $object, array $afterPersistCallbacks = []): object
     {
-        if ($object instanceof Proxy) {
-            $object = ProxyGenerator::unwrap($object);
-        }
-
         $this->pendingForInsert[\spl_object_id($object)] ??= $object;
 
         $this->afterPersistCallbacks = [...$this->afterPersistCallbacks, ...$afterPersistCallbacks];
@@ -269,14 +261,7 @@ class PersistenceManager implements IdentifierResolver
             return $object;
         }
 
-        if ($object instanceof Proxy) {
-            return $object->_refresh();
-        }
-
-        if (
-            \PHP_VERSION_ID >= 80400
-            && ($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)
-        ) {
+        if (($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)) {
             /** @var T $object */
             $object = $reflector->initializeLazyObject($object);
         }
@@ -325,14 +310,7 @@ class PersistenceManager implements IdentifierResolver
 
     public function isPersisted(object $object): bool
     {
-        if ($object instanceof Proxy) {
-            $object = $object->_real(withAutoRefresh: false);
-        }
-
-        if (
-            \PHP_VERSION_ID >= 80400
-            && ($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)
-        ) {
+        if (($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)) {
             /** @var object $object */
             $object = $reflector->initializeLazyObject($object);
         }
@@ -342,10 +320,6 @@ class PersistenceManager implements IdentifierResolver
         // prevents doctrine to use its cache and think the object is persisted
         if ($persistenceStrategy->isScheduledForInsert($object)) {
             return false;
-        }
-
-        if ($object instanceof Proxy) {
-            $object = ProxyGenerator::unwrap($object);
         }
 
         $om = $persistenceStrategy->objectManagerFor($object::class);
@@ -363,14 +337,7 @@ class PersistenceManager implements IdentifierResolver
      */
     public function delete(object $object): object
     {
-        if ($object instanceof Proxy) {
-            return $object->_delete();
-        }
-
-        if (
-            \PHP_VERSION_ID >= 80400
-            && ($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)
-        ) {
+        if (($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)) {
             /** @var T $object */
             $object = $reflector->initializeLazyObject($object);
         }
@@ -390,8 +357,6 @@ class PersistenceManager implements IdentifierResolver
      */
     public function truncate(string $class): void
     {
-        $class = ProxyGenerator::unwrap($class);
-
         $this->strategyFor($class)->truncate($class);
     }
 
@@ -404,8 +369,6 @@ class PersistenceManager implements IdentifierResolver
      */
     public function repositoryFor(string $class): ObjectRepository
     {
-        $class = ProxyGenerator::unwrap($class);
-
         return $this->strategyFor($class)->objectManagerFor($class)->getRepository($class);
     }
 
@@ -415,9 +378,6 @@ class PersistenceManager implements IdentifierResolver
      */
     public function bidirectionalRelationshipMetadata(string $parent, string $child, string $field): ?RelationshipMetadata
     {
-        $parent = ProxyGenerator::unwrap($parent);
-        $child = ProxyGenerator::unwrap($child);
-
         try {
             return $this->strategyFor($parent)->bidirectionalRelationshipMetadata($parent, $child, $field);
         } catch (NoPersistenceStrategy) {
@@ -470,10 +430,8 @@ class PersistenceManager implements IdentifierResolver
      */
     public function embeddablePropertiesFor(object $object, string $owner): ?array
     {
-        $owner = ProxyGenerator::unwrap($owner);
-
         try {
-            return $this->strategyFor($owner)->embeddablePropertiesFor(ProxyGenerator::unwrap($object), $owner);
+            return $this->strategyFor($owner)->embeddablePropertiesFor($object, $owner);
         } catch (NoPersistenceStrategy) {
             return null;
         }
