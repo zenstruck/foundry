@@ -23,9 +23,6 @@ use function Zenstruck\Foundry\object;
 
 final class ReuseEntityTest extends TestCase
 {
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_reuse_an_object(): void
     {
@@ -38,9 +35,6 @@ final class ReuseEntityTest extends TestCase
         self::assertSame($address, $contact->getAddress());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function last_reused_object_is_used_if_recycling_two_objects_of_same_type(): void
     {
@@ -52,9 +46,6 @@ final class ReuseEntityTest extends TestCase
         self::assertSame($address, $contact->getAddress());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_throws_if_recycling_two_objects_of_same_type_with_spread_parameters(): void
     {
@@ -65,9 +56,6 @@ final class ReuseEntityTest extends TestCase
         self::assertSame($address, $contact->getAddress());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_throws_if_recycling_a_factory(): void
     {
@@ -78,9 +66,6 @@ final class ReuseEntityTest extends TestCase
             ->create();
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_does_nothing_if_reused_object_is_not_used(): void
     {
@@ -91,9 +76,6 @@ final class ReuseEntityTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_call_reuse_multiple_times(): void
     {
@@ -109,9 +91,6 @@ final class ReuseEntityTest extends TestCase
         self::assertSame($category, $contact->getCategory());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_call_reuse_multiple_times_with_spread_parameters(): void
     {
@@ -126,9 +105,6 @@ final class ReuseEntityTest extends TestCase
         self::assertSame($category, $contact->getCategory());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_reuse_the_same_object_multiple_times(): void
     {
@@ -142,9 +118,6 @@ final class ReuseEntityTest extends TestCase
         self::assertSame($category, $contact->getSecondaryCategory());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_propagate_reused_objects(): void
     {
@@ -158,9 +131,6 @@ final class ReuseEntityTest extends TestCase
         self::assertSame($category, $address->getContact()->getSecondaryCategory());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function reused_object_in_sub_factory_has_priority(): void
     {
@@ -176,9 +146,6 @@ final class ReuseEntityTest extends TestCase
         self::assertSame($category2, $address->getContact()->getSecondaryCategory());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function reused_object_dont_have_priority_over_states(): void
     {
@@ -191,9 +158,6 @@ final class ReuseEntityTest extends TestCase
         self::assertNotSame($address, $contact->getAddress());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function reused_object_on_interface_property(): void
     {
@@ -205,9 +169,6 @@ final class ReuseEntityTest extends TestCase
         self::assertSame($entity, $otherEntity->entity);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_reuse_objects_in_collection(): void
     {
@@ -222,9 +183,6 @@ final class ReuseEntityTest extends TestCase
         self::assertSame($address, $contacts[1]->getAddress());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_propagates_reused_objects_to_collection(): void
     {

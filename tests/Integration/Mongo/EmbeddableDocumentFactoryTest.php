@@ -11,12 +11,12 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\Mongo;
 
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Document\WithEmbeddableDocument;
 use Zenstruck\Foundry\Tests\Fixture\Model\Embeddable;
 use Zenstruck\Foundry\Tests\Integration\Persistence\EmbeddableFactoryTestCase;
-use Zenstruck\Foundry\Tests\Integration\RequiresMongo;
 
 use function Zenstruck\Foundry\factory;
 use function Zenstruck\Foundry\Persistence\persist;
@@ -26,13 +26,9 @@ use function Zenstruck\Foundry\Persistence\repository;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
+#[RequiresEnvironmentVariable('MONGO_URL')]
 final class EmbeddableDocumentFactoryTest extends EmbeddableFactoryTestCase
 {
-    use RequiresMongo;
-
-    /**
-     * @test
-     */
     #[Test]
     public function embed_many(): void
     {

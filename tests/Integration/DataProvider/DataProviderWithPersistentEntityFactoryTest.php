@@ -12,9 +12,7 @@
 namespace Zenstruck\Foundry\Tests\Integration\DataProvider;
 
 use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
-use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithReadonly\EntityWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Model\Embeddable;
@@ -24,7 +22,6 @@ use function Zenstruck\Foundry\Persistence\persistent_factory;
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-#[RequiresPhpunitExtension(FoundryExtension::class)]
 #[RequiresEnvironmentVariable('DATABASE_URL')]
 final class DataProviderWithPersistentEntityFactoryTest extends DataProviderWithPersistentFactoryTestCase
 {

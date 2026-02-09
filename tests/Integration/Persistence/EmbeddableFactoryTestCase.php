@@ -26,7 +26,6 @@ use function Zenstruck\Foundry\factory;
 #[ResetDatabase]
 abstract class EmbeddableFactoryTestCase extends KernelTestCase
 {
-    /** @test */
     #[Test]
     public function embed_one(): void
     {
@@ -43,9 +42,6 @@ abstract class EmbeddableFactoryTestCase extends KernelTestCase
         $this->assertSame('value1', $object->getEmbeddable()->getProp1());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_find_using_embeddable_object(): void
     {
@@ -60,9 +56,6 @@ abstract class EmbeddableFactoryTestCase extends KernelTestCase
         $this->assertSame(0, $factory::count(['embeddable' => factory(Embeddable::class, ['prop1' => 'value2'])]));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_embeddable_as_factory_parameter(): void
     {

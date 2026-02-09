@@ -23,9 +23,6 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
  */
 final class PersistentObjectFactoryTest extends TestCase
 {
-    /**
-     * @test
-     */
     #[Test]
     public function can_create(): void
     {
@@ -40,9 +37,6 @@ final class PersistentObjectFactoryTest extends TestCase
         $this->assertSame('value', $entity2->getProp1());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function find_or_create(): void
     {
@@ -51,9 +45,6 @@ final class PersistentObjectFactoryTest extends TestCase
         $this->assertSame('foo', $entity->getProp1());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function random_or_create(): void
     {
@@ -63,8 +54,6 @@ final class PersistentObjectFactoryTest extends TestCase
     }
 
     /**
-     * @test
-     * @dataProvider factoryCollectionDataProvider
      * @param FactoryCollection<GenericEntity, GenericEntityFactory> $collection
      */
     #[Test] // @phpstan-ignore generics.notSubtype

@@ -12,7 +12,6 @@
 namespace Zenstruck\Foundry\Tests\Integration\ResetDatabase;
 
 use PHPUnit\Framework\Attributes\Depends;
-use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -20,7 +19,6 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
-use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Tests\Fixture\EntityInAnotherSchema\Article;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericDocumentFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
@@ -36,7 +34,6 @@ use function Zenstruck\Foundry\Persistence\repository;
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
 #[ResetDatabase]
-#[RequiresPhpunitExtension(FoundryExtension::class)]
 final class ResetDatabaseTest extends KernelTestCase
 {
     #[Test]

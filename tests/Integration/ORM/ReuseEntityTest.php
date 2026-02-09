@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
@@ -18,16 +19,11 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\AddressFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Tag\TagFactory;
-use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 #[ResetDatabase]
+#[RequiresEnvironmentVariable('DATABASE_URL')]
 final class ReuseEntityTest extends KernelTestCase
 {
-    use RequiresORM;
-
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_reuse_an_object_in_one_to_one(): void
     {
@@ -40,9 +36,6 @@ final class ReuseEntityTest extends KernelTestCase
         self::assertSame($address, $contact->getAddress());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_reuse_an_object_in_inverse_one_to_one(): void
     {
@@ -55,9 +48,6 @@ final class ReuseEntityTest extends KernelTestCase
         self::assertSame($contact, $address->getContact());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_propagate_reused_objects_through_inversed_one_to_one(): void
     {
@@ -71,9 +61,6 @@ final class ReuseEntityTest extends KernelTestCase
         self::assertSame($category, $address->getContact()->getSecondaryCategory());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function reused_object_in_sub_factory_has_priority(): void
     {
@@ -89,9 +76,6 @@ final class ReuseEntityTest extends KernelTestCase
         self::assertSame($category2, $address->getContact()->getSecondaryCategory());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function reuse_has_no_effect_on_collections(): void
     {
@@ -105,9 +89,6 @@ final class ReuseEntityTest extends KernelTestCase
         self::assertNotSame($contact, $category->getContacts()[1]);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_propagate_reused_objects_through_inversed_one_to_many(): void
     {
@@ -123,9 +104,6 @@ final class ReuseEntityTest extends KernelTestCase
         }
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_propagate_reused_objects_through_inversed_many_to_many(): void
     {

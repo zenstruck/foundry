@@ -18,9 +18,6 @@ use Zenstruck\Foundry\Configuration;
 
 abstract class PersistenceManagerTestCase extends KernelTestCase
 {
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_test_if_object_with_uuid_is_persisted(): void
     {
