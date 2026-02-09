@@ -41,7 +41,7 @@ final class PersistedObjectsTracker
      */
     public function afterPersistHook(AfterPersist $event): void
     {
-        if ($event->factory instanceof PersistentProxyObjectFactory || !$event->factory->isAutorefreshEnabled()) {
+        if (!$event->factory->isAutorefreshEnabled()) {
             return;
         }
 

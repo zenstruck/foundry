@@ -22,10 +22,6 @@ parameters:
         - bin/tools/phpbench/vendor/autoload.php
 
     ignoreErrors:
-        # suppress strange behavior of PHPStan where it considers proxy() return type as *NEVER*
-        - message: '#Return type of call to function Zenstruck\\Foundry\\Persistence\\proxy contains unresolvable type#'
-          path: src/Persistence/ProxyRepositoryDecorator.php
-
         # prevent PHPStan to force to type data providers
         - identifier: missingType.iterableValue
           path: tests/

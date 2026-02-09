@@ -30,7 +30,6 @@ use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
 
 use function Zenstruck\Foundry\faker;
 use function Zenstruck\Foundry\Persistence\persistent_factory;
-use function Zenstruck\Foundry\Persistence\proxy;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
@@ -177,32 +176,10 @@ final class DoctrineInMemoryDecoratorTest extends KernelTestCase
 
     /**
      * @test
-     * @group legacy
-     */
-    #[Test]
-    #[IgnoreDeprecations]
-    #[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
-    public function it_can_find_by_entity_proxified(): void
-    {
-        ContactFactory::createMany(2, static fn() => ['category' => CategoryFactory::createOne()]);
-
-        $category = CategoryFactory::createOne();
-        $contacts = ContactFactory::createMany(2, ['category' => $category]);
-
-        $contactsFound = ContactFactory::repository()->findBy(['category' => proxy($category)]);
-        self::assertSame($contacts, $contactsFound);
-    }
-
-    /**
-     * @test
      */
     #[Test]
     public function it_can_find_by_embeddable(): void
     {
-        if (!\getenv('DATABASE_URL') && !\getenv('MONGO_URL')) {
-            self::markTestSkipped('Need at least one persistence to test embeddables.');
-        }
-
         $factory = persistent_factory(WithEmbeddableEntity::class);
         $factory->create(['embeddable' => new Embeddable('foo')]);
         $o = $factory->create(['embeddable' => $e = new Embeddable('bar')]);

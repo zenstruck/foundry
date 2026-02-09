@@ -16,7 +16,6 @@ use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Persistence\ProxyGenerator;
 use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithReadonly\EntityWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
@@ -47,8 +46,8 @@ abstract class DataProviderWithPersistentFactoryTestCase extends KernelTestCase
 
         self::assertNotNull($providedData);
         self::assertSame(
-            ProxyGenerator::unwrap(static::factory()::repository()->firstOrFail()),
-            ProxyGenerator::unwrap($providedData),
+            static::factory()::repository()->firstOrFail(),
+            $providedData,
         );
     }
 
@@ -199,7 +198,7 @@ abstract class DataProviderWithPersistentFactoryTestCase extends KernelTestCase
         string $providedData,
         mixed $expectedData,
     ): void {
-        self::assertEquals($expectedData, ProxyGenerator::unwrap($providedData));
+        self::assertEquals($expectedData, $providedData);
     }
 
     public static function useGetterOnObjectCreatedInDataProvider(): iterable
