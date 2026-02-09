@@ -461,5 +461,4 @@ final class MakeFactoryTest extends MakerTestCase
     {
         return new CommandTester((new Application(self::bootKernel($options)))->find('make:factory'));
     }
-
 }
