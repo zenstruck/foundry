@@ -19,8 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\FakerAdapter;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Attribute\ResetDatabase;
 
 use function Zenstruck\Foundry\faker;
 
@@ -29,9 +28,10 @@ use function Zenstruck\Foundry\faker;
  * @requires PHPUnit >=12.0.0
  */
 #[RequiresPhpunit('>=12.0.0')]
+#[ResetDatabase]
 final class FakerSeedShouldNotChangeIfSeedIsNotManagedByFoundryTest extends KernelTestCase
 {
-    use Factories, ResetDatabase, ResetFakerTestTrait;
+    use ResetFakerTestTrait;
 
     #[Test]
     public function faker_seed_is_null_if_not_forced(): void

@@ -20,7 +20,6 @@ use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Attribute\WithStory;
 use Zenstruck\Foundry\InMemory\AsInMemoryTest;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
-use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Address;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
@@ -44,7 +43,6 @@ use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 #[ResetDatabase]
 final class InMemoryTest extends KernelTestCase
 {
-    use Factories;
     use RequiresORM;
 
     private InMemoryAddressRepository $addressRepository;

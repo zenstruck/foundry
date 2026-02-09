@@ -76,9 +76,6 @@ final class ResetDatabaseOnPreparationStarted implements Event\Test\PreparationS
             return true;
         }
 
-        return $hasResetDatabaseAttribute
-
-            // let's use ResetDatabase trait as a marker, the same way we're using the attribute
-            || (new \ReflectionClass($test->className()))->hasMethod('_resetDatabaseBeforeFirstTest');
+        return $hasResetDatabaseAttribute;
     }
 }

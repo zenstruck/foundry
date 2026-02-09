@@ -15,12 +15,9 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\ObjectFactory;
-use Zenstruck\Foundry\Test\Factories;
 
 final class FactoryCollectionTest extends TestCase
 {
-    use Factories;
-
     /**
      * @test
      */

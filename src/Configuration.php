@@ -13,7 +13,6 @@ namespace Zenstruck\Foundry;
 
 use Faker;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Zenstruck\Foundry\Exception\FactoriesTraitNotUsed;
 use Zenstruck\Foundry\Exception\FoundryNotBooted;
 use Zenstruck\Foundry\Exception\PersistenceDisabled;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
@@ -21,8 +20,6 @@ use Zenstruck\Foundry\InMemory\CannotEnableInMemory;
 use Zenstruck\Foundry\InMemory\InMemoryRepositoryRegistry;
 use Zenstruck\Foundry\Persistence\PersistedObjectsTracker;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
-use Zenstruck\Foundry\PHPUnit\FoundryExtension;
-
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
@@ -118,10 +115,6 @@ final class Configuration
             throw new FoundryNotBooted();
         }
 
-        if (!FoundryExtension::isEnabled()) {
-            FactoriesTraitNotUsed::throwIfComingFromKernelTestCaseWithoutFactoriesTrait();
-        }
-
         return \is_callable(self::$instance) ? (self::$instance)() : self::$instance;
     }
 
@@ -143,10 +136,6 @@ final class Configuration
         self::$instance->bootedForDataProvider = true;
     }
 
-    /**
-     * /!\ Until PHPUnit 9 support is not dropped, this method MUST NOT call Configuration::instance()
-     * Otherwise, it will reboot the kernel, leading to complex bugs.
-     */
     public static function shutdown(): void
     {
         PersistedObjectsTracker::reset();

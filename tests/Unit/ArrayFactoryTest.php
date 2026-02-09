@@ -14,7 +14,6 @@ namespace Zenstruck\Foundry\Tests\Unit;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\LazyValue;
-use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixture\Factories\ArrayFactory;
 
 /**
@@ -22,8 +21,6 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\ArrayFactory;
  */
 final class ArrayFactoryTest extends TestCase
 {
-    use Factories;
-
     /**
      * @test
      */
