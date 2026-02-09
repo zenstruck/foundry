@@ -11,8 +11,6 @@
 
 namespace Zenstruck\Foundry\Tests\Unit;
 
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -27,7 +25,6 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
 use Zenstruck\Foundry\Tests\Fixture\ExtendedGenerator;
@@ -35,9 +32,7 @@ use Zenstruck\Foundry\ZenstruckFoundryBundle;
 
 /**
  * @author Silas Joisten <silasjoisten@proton.me>
- * @group legacy
  */
-#[IgnoreDeprecations] // default configuration uses flush_once: false, which is deprecated
 final class ZenstruckFoundryBundleTest extends TestCase
 {
     private ZenstruckFoundryBundle $bundle;
@@ -73,37 +68,6 @@ final class ZenstruckFoundryBundleTest extends TestCase
      * @test
      */
     #[Test]
-    public function faker_seed_default_value(): void
-    {
-        $config = self::buildConfiguration();
-
-        $this->bundle->loadExtension($config, $this->configurator, $this->container);
-
-        self::assertTrue($this->container->hasParameter('zenstruck_foundry.faker.seed'));
-        self::assertNull($this->container->getParameter('zenstruck_foundry.faker.seed'));
-    }
-
-    /**
-     * @test
-     *
-     * @group legacy
-     */
-    #[Test]
-    #[IgnoreDeprecations]
-    public function faker_seed_value_overridden(): void
-    {
-        $config = self::buildConfiguration([['faker' => ['seed' => $expected = 1234]]]);
-
-        $this->bundle->loadExtension($config, $this->configurator, $this->container);
-
-        self::assertTrue($this->container->hasParameter('zenstruck_foundry.faker.seed'));
-        self::assertSame($expected, $this->container->getParameter('zenstruck_foundry.faker.seed'));
-    }
-
-    /**
-     * @test
-     */
-    #[Test]
     public function container_has_default_faker_service_definition(): void
     {
         $this->bundle->loadExtension(self::buildConfiguration(), $this->configurator, $this->container);
@@ -121,7 +85,6 @@ final class ZenstruckFoundryBundleTest extends TestCase
 
         $this->bundle->loadExtension($config, $this->configurator, $this->container);
 
-        self::assertTrue($this->container->hasParameter('zenstruck_foundry.faker.seed'));
         self::assertTrue($this->container->hasDefinition('.zenstruck_foundry.faker'));
 
         $definition = $this->container->getDefinition('.zenstruck_foundry.faker');
@@ -141,7 +104,6 @@ final class ZenstruckFoundryBundleTest extends TestCase
 
         self::assertTrue($this->container->hasAlias('.zenstruck_foundry.faker'));
         self::assertSame($expected, $this->container->get('.zenstruck_foundry.faker')::class);
-        self::assertTrue($this->container->hasParameter('zenstruck_foundry.faker.seed'));
     }
 
     /**
@@ -222,11 +184,9 @@ final class ZenstruckFoundryBundleTest extends TestCase
 
     /**
      * @test
-     * @requires PHP >= 8.4
      */
     #[Test]
-    #[RequiresPhp('>=8.4')]
-    public function can_enable_auto_refresh_with_lazy_objects_if_at_leat_php84(): void
+    public function can_enable_auto_refresh_with_lazy_objects(): void
     {
         $config = self::buildConfiguration([['enable_auto_refresh_with_lazy_objects' => true]]);
 
@@ -237,11 +197,9 @@ final class ZenstruckFoundryBundleTest extends TestCase
 
     /**
      * @test
-     * @requires PHP >= 8.4
      */
     #[Test]
-    #[RequiresPhp('>=8.4')]
-    public function can_disable_auto_refresh_with_lazy_objects_if_at_leat_php84(): void
+    public function can_disable_auto_refresh_with_lazy_objects(): void
     {
         $config = self::buildConfiguration([['enable_auto_refresh_with_lazy_objects' => false]]);
 
@@ -257,11 +215,9 @@ final class ZenstruckFoundryBundleTest extends TestCase
     public function configuration_default_values(): void
     {
         self::assertSame([
-            'auto_refresh_proxies' => null,
-            'enable_auto_refresh_with_lazy_objects' => null,
+            'enable_auto_refresh_with_lazy_objects' => true,
             'faker' => [
                 'locale' => null,
-                'seed' => null,
                 'manage_seed' => true,
                 'service' => null,
             ],
@@ -272,9 +228,8 @@ final class ZenstruckFoundryBundleTest extends TestCase
                 'service' => null,
             ],
             'global_state' => [],
-            'persistence' => ['flush_once' => false],
+            'persistence' => ['flush_once' => true],
             'orm' => [
-                'auto_persist' => true,
                 'reset' => [
                     'connections' => ['default'],
                     'entity_managers' => ['default'],
@@ -285,7 +240,6 @@ final class ZenstruckFoundryBundleTest extends TestCase
                 ],
             ],
             'mongo' => [
-                'auto_persist' => true,
                 'reset' => [
                     'document_managers' => ['default'],
                 ],

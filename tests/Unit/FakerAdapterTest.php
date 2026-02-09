@@ -64,23 +64,9 @@ final class FakerAdapterTest extends TestCase
     }
 
     #[Test]
-    public function forced_seed_from_config_is_used(): void
+    public function forced_seed_from_env_is_used(): void
     {
-        $adapter = new FakerAdapter(Faker\Factory::create(), forcedFakerSeedFromConfig: 12345);
-
-        $adapter->faker();
-
-        $this->assertSame(12345, FakerAdapter::fakerSeed());
-    }
-
-    #[Test]
-    public function forced_seed_from_env_takes_precedence_over_config(): void
-    {
-        $adapter = new FakerAdapter(
-            Faker\Factory::create(),
-            forcedFakerSeedFromConfig: 12345,
-            forcedFakerSeedFromEnv: 99999,
-        );
+        $adapter = new FakerAdapter(Faker\Factory::create(), forcedFakerSeed: 99999);
 
         $adapter->faker();
 

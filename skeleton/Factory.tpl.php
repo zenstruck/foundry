@@ -10,20 +10,6 @@ foreach ($makeFactoryData->getUses() as $use) {
 
 /**
  * @extends <?php echo $makeFactoryData->getFactoryClassShortName(); ?><<?php echo $makeFactoryData->getObjectShortName(); ?>>
-<?php
-if (count($makeFactoryData->getMethodsPHPDoc())) {
-    echo " *\n";
-    foreach ($makeFactoryData->getMethodsPHPDoc() as $methodPHPDoc) {
-        echo "{$methodPHPDoc->toString()}\n";
-    }
-
-    echo " *\n";
-
-    foreach ($makeFactoryData->getMethodsPHPDoc() as $methodPHPDoc) {
-        echo "{$methodPHPDoc->toString($makeFactoryData->staticAnalysisTool())}\n";
-    }
-}
-?>
  */
 final class <?php echo $class_name; ?> extends <?php echo $makeFactoryData->getFactoryClassShortName(); ?>
 {

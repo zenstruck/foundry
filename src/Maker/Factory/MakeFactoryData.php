@@ -25,26 +25,18 @@ use Zenstruck\Foundry\Persistence\RepositoryDecorator;
  */
 final class MakeFactoryData
 {
-    public const STATIC_ANALYSIS_TOOL_NONE = 'none';
-    public const STATIC_ANALYSIS_TOOL_PHPSTAN = 'phpstan';
-    public const STATIC_ANALYSIS_TOOL_PSALM = 'psalm';
-
     private static ?ReflectionExtractor $propertyInfo = null;
 
     /** @var list<string> */
     private array $uses;
     /** @var array<string, string> */
     private array $defaultProperties = [];
-    /** @var list<MakeFactoryPHPDocMethod> */
-    private array $methodsInPHPDoc;
 
     public function __construct(
         private \ReflectionClass $object,
         private ClassNameDetails $factoryClassNameDetails,
         private ?\ReflectionClass $repository,
-        private string $staticAnalysisTool,
         private bool $persisted,
-        bool $withPhpDoc,
         private bool $forceProperties,
         private bool $addHints,
     ) {
@@ -60,8 +52,6 @@ final class MakeFactoryData
                 $this->uses[] = \is_a($repository->getName(), DocumentRepository::class, allow_string: true) ? DocumentRepository::class : EntityRepository::class;
             }
         }
-
-        $this->methodsInPHPDoc = $withPhpDoc ? MakeFactoryPHPDocMethod::createAll($this) : [];
     }
 
     // @phpstan-ignore-next-line
@@ -107,16 +97,6 @@ final class MakeFactoryData
     public function isPersisted(): bool
     {
         return $this->persisted;
-    }
-
-    public function staticAnalysisTool(): string
-    {
-        // if none was detected, let's fallback on phpstan: both psalm and phpstan can read `@phpstan` annotations
-        if (self::STATIC_ANALYSIS_TOOL_NONE === $this->staticAnalysisTool) {
-            return self::STATIC_ANALYSIS_TOOL_PHPSTAN;
-        }
-
-        return $this->staticAnalysisTool;
     }
 
     /** @param class-string $use */
@@ -173,18 +153,6 @@ final class MakeFactoryData
         \ksort($defaultProperties);
 
         return $defaultProperties;
-    }
-
-    /** @return list<MakeFactoryPHPDocMethod> */
-    public function getMethodsPHPDoc(): array
-    {
-        $methodsInPHPDoc = $this->methodsInPHPDoc;
-        \usort(
-            $methodsInPHPDoc,
-            static fn(MakeFactoryPHPDocMethod $m1, MakeFactoryPHPDocMethod $m2) => $m1->sortValue() <=> $m2->sortValue(),
-        );
-
-        return $methodsInPHPDoc;
     }
 
     public function addEnumDefaultProperty(string $propertyName, string $enumClass): void

@@ -21,17 +21,14 @@ use Faker;
 final class FakerAdapter
 {
     private static ?int $fakerSeed = null;
-    private ?int $forcedFakerSeed;
 
     private static bool $fakerSeedHasBeenSet = false;
 
     public function __construct(
         private readonly Faker\Generator $faker,
-        ?int $forcedFakerSeedFromConfig = null,
-        ?int $forcedFakerSeedFromEnv = null,
+        private ?int $forcedFakerSeed = null,
         private bool $manageFakerSeed = true,
     ) {
-        $this->forcedFakerSeed = $forcedFakerSeedFromEnv ?? $forcedFakerSeedFromConfig;
     }
 
     public static function fakerSeed(): ?int

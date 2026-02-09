@@ -52,7 +52,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: 2.x
+          ref: 3.x
           fetch-depth: 1
 
       - name: Install dependencies
@@ -71,7 +71,7 @@ jobs:
           bin/tools/phpbench/vendor/phpbench/phpbench/bin/phpbench run \
             tests/Benchmark \
             --report=aggregate \
-            --tag=2.x \
+            --tag=3.x \
             --iterations=5 \
             --progress=plain \
             --retry-threshold=10
@@ -99,7 +99,7 @@ jobs:
           bin/tools/phpbench/vendor/phpbench/phpbench/bin/phpbench run \
             tests/Benchmark \
             --report=aggregate \
-            --ref=2.x \
+            --ref=3.x \
             --iterations=5 \
             --progress=plain \
             --retry-threshold=10 \

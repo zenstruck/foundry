@@ -50,14 +50,9 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
     {
         $definition->rootNode()
             ->children()
-                ->booleanNode('auto_refresh_proxies')
-                    ->info('Whether to auto-refresh proxies by default (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#auto-refresh)')
-                    ->defaultNull()
-                    ->setDeprecated('zenstruck/foundry', '2.0', 'Since 2.0 auto_refresh_proxies defaults to true and this configuration has no effect.')
-                ->end()
                 ->booleanNode('enable_auto_refresh_with_lazy_objects')
                     ->info('Enable auto-refresh using PHP 8.4 lazy objects.')
-                    ->defaultNull()
+                    ->defaultTrue()
                 ->end()
                 ->arrayNode('faker')
                     ->addDefaultsIfNotSet()
@@ -66,12 +61,6 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                         ->scalarNode('locale')
                             ->info('The default locale to use for faker.')
                             ->example('fr_FR')
-                            ->defaultNull()
-                        ->end()
-                        ->scalarNode('seed')
-                            ->setDeprecated('zenstruck/foundry', '2.4', 'The "faker.seed" configuration is deprecated and will be removed in 3.0. Use environment variable "FOUNDRY_FAKER_SEED" instead.')
-                            ->info('Random number generator seed to produce the same fake values every run.')
-                            ->example('1234')
                             ->defaultNull()
                         ->end()
                         ->booleanNode('manage_seed')
@@ -116,19 +105,15 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->booleanNode('flush_once')
-                            ->info('Flush only once per call of `PersistentObjectFactory::create()` in userland.')
-                            ->defaultFalse()
+                            ->info('This option is deprecated and has no effect. Flush once is always enabled.')
+                            ->defaultTrue()
+                            ->setDeprecated('zenstruck/foundry', '3.0', 'The "flush_once" option is deprecated and has no effect. It is always enabled.')
                         ->end()
                     ->end()
                 ->end()
                 ->arrayNode('orm')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->booleanNode('auto_persist')
-                            ->info('Automatically persist entities when created.')
-                            ->defaultTrue()
-                            ->setDeprecated('zenstruck/foundry', '2.4', 'Since 2.4 auto_persist defaults to true and this configuration has no effect.')
-                        ->end()
                         ->arrayNode('reset')
                             ->addDefaultsIfNotSet()
                             ->children()
@@ -180,11 +165,6 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                 ->arrayNode('mongo')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->booleanNode('auto_persist')
-                            ->info('Automatically persist documents when created.')
-                            ->defaultTrue()
-                            ->setDeprecated('zenstruck/foundry', '2.4', 'Since 2.4 auto_persist defaults to true and this configuration has no effect.')
-                        ->end()
                         ->arrayNode('reset')
                             ->addDefaultsIfNotSet()
                             ->children()
@@ -241,7 +221,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
         $this->configurePersistence($container, $configurator, $config);
         $this->configureInMemory($configurator, $container);
         $this->configureFixturesStory($container);
-        $this->configureAutoRefreshWithLazyObjects($container, $config['enable_auto_refresh_with_lazy_objects'] ?? null);
+        $this->configureAutoRefreshWithLazyObjects($container, $config['enable_auto_refresh_with_lazy_objects']);
 
         $container->registerAttributeForAutoconfiguration(
             AsFoundryHook::class,
@@ -348,7 +328,6 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
      */
     private function configureFaker(array $config, ContainerBuilder $container): void
     {
-        $container->setParameter('zenstruck_foundry.faker.seed', $config['seed']);
         $container->setParameter('zenstruck_foundry.faker.manage_seed', $config['manage_seed']);
 
         if ($config['service']) {
@@ -410,12 +389,6 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
      */
     private function configurePersistence(ContainerBuilder $container, ContainerConfigurator $configurator, array $config): void
     {
-        if (false === $config['persistence']['flush_once']) {
-            trigger_deprecation('zenstruck/foundry', '2.5', 'Not setting "zenstruck_foundry.persistence.flush_once" to true is deprecated. This option will be forced to true in 3.0');
-        }
-
-        $container->setParameter('zenstruck_foundry.persistence.flush_once', $config['persistence']['flush_once']);
-
         /** @var array<string, string> $bundles */
         $bundles = $container->getParameter('kernel.bundles');
 
@@ -493,9 +466,9 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
         );
     }
 
-    private function configureAutoRefreshWithLazyObjects(ContainerBuilder $container, ?bool $enableAutoRefreshWithLazyObjects): void
+    private function configureAutoRefreshWithLazyObjects(ContainerBuilder $container, bool $enableAutoRefreshWithLazyObjects): void
     {
-        $container->setParameter('zenstruck_foundry.enable_auto_refresh_with_lazy_objects', $enableAutoRefreshWithLazyObjects ?? false);
+        $container->setParameter('zenstruck_foundry.enable_auto_refresh_with_lazy_objects', $enableAutoRefreshWithLazyObjects);
 
         if ($container->has('.foundry.persistence.objects_tracker') && !$enableAutoRefreshWithLazyObjects) {
             $container->removeDefinition('.foundry.persistence.objects_tracker');

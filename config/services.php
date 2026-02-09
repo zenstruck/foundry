@@ -38,7 +38,6 @@ return static function(ContainerConfigurator $container): void {
         ->set('.zenstruck_foundry.faker.adapter', FakerAdapter::class)
         ->args([
             service('.zenstruck_foundry.faker'),
-            param('zenstruck_foundry.faker.seed'),
             env('default::int:FOUNDRY_FAKER_SEED'),
             param('zenstruck_foundry.faker.manage_seed'),
         ])
@@ -50,7 +49,6 @@ return static function(ContainerConfigurator $container): void {
             service('.zenstruck_foundry.instantiator'),
             service('.zenstruck_foundry.story_registry'),
             service('.zenstruck_foundry.persistence_manager')->nullOnInvalid(),
-            param('zenstruck_foundry.persistence.flush_once'),
             service('.zenstruck_foundry.in_memory.repository_registry'),
             service('.foundry.persistence.objects_tracker')->nullOnInvalid(),
             param('zenstruck_foundry.enable_auto_refresh_with_lazy_objects'),

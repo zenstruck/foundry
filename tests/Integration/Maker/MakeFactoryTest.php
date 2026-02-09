@@ -13,14 +13,12 @@ namespace Zenstruck\Foundry\Tests\Integration\Maker;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 use Symfony\Component\Console\Tester\CommandTester;
-use Zenstruck\Foundry\Maker\Factory\FactoryGenerator;
 use Zenstruck\Foundry\Tests\Fixture\Document\GenericDocument;
 use Zenstruck\Foundry\Tests\Fixture\Document\WithEmbeddableDocument;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
@@ -41,29 +39,11 @@ use Zenstruck\Foundry\Tests\Fixture\ObjectWithNonWriteable;
 #[RequiresPhp('>=8.4')]
 final class MakeFactoryTest extends MakerTestCase
 {
-    private const PHPSTAN_PATH = __DIR__.'/../../..'.FactoryGenerator::PHPSTAN_PATH;
-    private const PSALM_PATH = __DIR__.'/../../..'.FactoryGenerator::PSALM_PATH;
-
     protected function setUp(): void
     {
         self::assertDirectoryDoesNotExist(self::tempDir());
 
         parent::setUp();
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        $removeSCAMock = function(string $file): void {
-            if (\file_exists($file)) {
-                \unlink($file);
-                $this->rrmdir(\dirname($file));
-                $this->rrmdir(\dirname($file, 2));
-            }
-        };
-        $removeSCAMock(self::PHPSTAN_PATH);
-        $removeSCAMock(self::PSALM_PATH);
     }
 
     /**
@@ -155,40 +135,8 @@ final class MakeFactoryTest extends MakerTestCase
 
     /**
      * @test
-     * @dataProvider scaToolProvider
      */
     #[Test]
-    #[DataProvider('scaToolProvider')]
-    #[IgnoreDeprecations]
-    public function can_create_factory_with_static_analysis_annotations(string $scaTool): void
-    {
-        if (!\getenv('DATABASE_URL')) {
-            self::markTestSkipped('doctrine/orm not enabled.');
-        }
-
-        $this->emulateSCAToolEnabled($scaTool);
-
-        $tester = $this->makeFactoryCommandTester();
-
-        $tester->execute(['class' => Category::class, '--test' => true, '--with-phpdoc' => true]);
-
-        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('tests/Factory/CategoryFactory.php'));
-    }
-
-    /**
-     * @return iterable<string, array{0: string}>
-     */
-    public static function scaToolProvider(): iterable
-    {
-        yield 'phpstan' => [self::PHPSTAN_PATH];
-        yield 'psalm' => [self::PSALM_PATH];
-    }
-
-    /**
-     * @test
-     */
-    #[Test]
-    #[IgnoreDeprecations]
     public function can_create_factory_for_entity_with_repository(): void
     {
         if (!\getenv('DATABASE_URL')) {
@@ -197,7 +145,7 @@ final class MakeFactoryTest extends MakerTestCase
 
         $tester = $this->makeFactoryCommandTester();
 
-        $tester->execute(['class' => GenericEntity::class, '--with-phpdoc' => true]);
+        $tester->execute(['class' => GenericEntity::class]);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/GenericEntityFactory.php'));
     }
@@ -509,42 +457,9 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/ObjectWithNonWriteableFactory.php'));
     }
 
-    private function emulateSCAToolEnabled(string $scaToolFilePath): void
-    {
-        \mkdir(\dirname($scaToolFilePath), 0777, true);
-        \touch($scaToolFilePath);
-    }
-
     private function makeFactoryCommandTester(array $options = []): CommandTester
     {
         return new CommandTester((new Application(self::bootKernel($options)))->find('make:factory'));
     }
 
-    /**
-     * Recursively remove a directory.
-     * @see https://stackoverflow.com/questions/1653771/how-do-i-remove-a-directory-that-is-not-empty
-     */
-    private function rrmdir(string $dir): void
-    {
-        if (\is_dir($dir)) {
-            $objects = \scandir($dir);
-
-            if (false === $objects) {
-                return;
-            }
-
-            foreach ($objects as $object) {
-                if ('.' !== $object && '..' !== $object) {
-                    if ('dir' === \filetype($dir.'/'.$object)) {
-                        $this->rrmdir($dir.'/'.$object);
-                    } else {
-                        \unlink($dir.'/'.$object);
-                    }
-                }
-            }
-
-            \reset($objects);
-            \rmdir($dir);
-        }
-    }
 }

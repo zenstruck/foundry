@@ -147,7 +147,7 @@ final class FactoryCollection implements \IteratorAggregate
     {
         $factories = $this->all();
 
-        if (Configuration::instance()->flushOnce && $this->isRootFactory && $this->factory instanceof PersistentObjectFactory && $this->factory->isPersisting()) {
+        if ($this->isRootFactory && $this->factory instanceof PersistentObjectFactory && $this->factory->isPersisting()) {
             $lastFactory = \array_pop($factories);
             // @phpstan-ignore method.notFound (phpstan does not understand that we only have persistent factories here)
             $factories = \array_map(static fn(Factory $f) => $f->notRootFactory(), $factories);

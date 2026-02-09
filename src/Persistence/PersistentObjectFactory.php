@@ -253,7 +253,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
             return $object;
         }
 
-        if ($configuration->flushOnce && !$this->isRootFactory) {
+        if (!$this->isRootFactory) {
             return $object;
         }
 

@@ -29,13 +29,9 @@ use Zenstruck\Foundry\Persistence\PersistenceManager;
  */
 final class FactoryGenerator
 {
-    public const PHPSTAN_PATH = '/vendor/phpstan/phpstan/phpstan';
-    public const PSALM_PATH = '/vendor/vimeo/psalm/psalm';
-
     /** @param \Traversable<int, DefaultPropertiesGuesser> $defaultPropertiesGuessers */
     public function __construct(
         private ?PersistenceManager $persistenceManager,
-        private KernelInterface $kernel,
         private \Traversable $defaultPropertiesGuessers,
         private FactoryClassMap $factoryClassMap,
         private NamespaceGuesser $namespaceGuesser,
@@ -148,20 +144,9 @@ final class FactoryGenerator
             $object,
             $factory,
             $repository ?? null,
-            $this->staticAnalysisTool(),
             $persisted ?? false,
-            $makeFactoryQuery->addPhpDoc(),
             $this->forceProperties,
             $makeFactoryQuery->shouldAddHints(),
         );
-    }
-
-    private function staticAnalysisTool(): string
-    {
-        return match (true) {
-            \file_exists($this->kernel->getProjectDir().self::PHPSTAN_PATH) => MakeFactoryData::STATIC_ANALYSIS_TOOL_PHPSTAN,
-            \file_exists($this->kernel->getProjectDir().self::PSALM_PATH) => MakeFactoryData::STATIC_ANALYSIS_TOOL_PSALM,
-            default => MakeFactoryData::STATIC_ANALYSIS_TOOL_NONE,
-        };
     }
 }
