@@ -14,7 +14,6 @@ namespace Zenstruck\Foundry\PHPUnit\DataProvider;
 use PHPUnit\Event;
 use PHPUnit\Event\Code\NoTestCaseObjectOnCallStackException;
 use PHPUnit\Util\Test;
-use Zenstruck\Foundry\Persistence\ProxyGenerator;
 
 /**
  * @internal
@@ -38,7 +37,20 @@ final class TriggerDataProviderPersistenceOnTestPrepared implements Event\Test\P
 
         $providedData = $testCase->providedData(); // @phpstan-ignore method.internal
         if ($providedData) {
-            ProxyGenerator::unwrap($providedData);
+            self::initializeLazyObjects($providedData);
+        }
+    }
+
+    private static function initializeLazyObjects(mixed $what): void
+    {
+        if (\is_array($what)) {
+            \array_map(self::initializeLazyObjects(...), $what);
+
+            return;
+        }
+
+        if (\is_object($what) && (new \ReflectionClass($what))->isUninitializedLazyObject($what)) {
+            (new \ReflectionClass($what))->initializeLazyObject($what);
         }
     }
 }

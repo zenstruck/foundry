@@ -13,7 +13,6 @@ namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
 use PHPUnit\Framework\Attributes\Test;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Persistence\ProxyGenerator;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Integration\Persistence\GenericRepositoryDecoratorTestCase;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
@@ -34,11 +33,11 @@ class GenericEntityRepositoryDecoratorTest extends GenericRepositoryDecoratorTes
 
         $repository = repository($this->modelClass());
 
-        $this->assertSame(ProxyGenerator::unwrap($object1), ProxyGenerator::unwrap($repository->find(['prop1' => 'foo'])));
-        $this->assertSame(ProxyGenerator::unwrap($object2), ProxyGenerator::unwrap($repository->find(['prop1' => 'bar'])));
+        $this->assertSame($object1, $repository->find(['prop1' => 'foo']));
+        $this->assertSame($object2, $repository->find(['prop1' => 'bar']));
 
         $by = $repository->findBy(['prop1' => ['foo', 'bar']]);
-        $this->assertSame(ProxyGenerator::unwrap([$object1, $object2]), ProxyGenerator::unwrap($by));
+        $this->assertSame([$object1, $object2], $by);
     }
 
     protected function factory(): PersistentObjectFactory

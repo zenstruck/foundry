@@ -14,7 +14,6 @@ namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Persistence\ProxyGenerator;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
@@ -68,7 +67,7 @@ abstract class GenericRepositoryDecoratorTestCase extends KernelTestCase
 
         $repository = repository($this->modelClass());
 
-        $this->assertSame(ProxyGenerator::unwrap($object), ProxyGenerator::unwrap($repository->find([])));
+        $this->assertSame($object, $repository->find([]));
     }
 
     /**

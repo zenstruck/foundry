@@ -362,7 +362,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     protected function normalizeParameter(string $field, mixed $value): mixed
     {
         if (!Configuration::instance()->isPersistenceAvailable()) {
-            return ProxyGenerator::unwrap(parent::normalizeParameter($field, $value));
+            return parent::normalizeParameter($field, $value);
         }
 
         if ($value instanceof self) {
@@ -387,18 +387,14 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
                 if (($fieldType = (new \ReflectionClass(static::class()))->getProperty($field)->getType())?->allowsNull()) {
                     $this->inverseRelationshipCallbacks[] = static function(object $object) use ($value, $inverseField, $field) {
-                        $inverseObject = $value->create([$inverseField => $object]);
-
-                        set($object, $field, ProxyGenerator::unwrap($inverseObject));
+                        set($object, $field, $value->create([$inverseField => $object]));
                     };
 
                     // we're using "force" here to avoid a potential type check in a setter
                     return force(null);
                 } elseif (($inverseFieldType = (new \ReflectionClass($value::class()))->getProperty($inverseField)->getType())?->allowsNull()) {
-                    $inverseObject = ProxyGenerator::unwrap(
-                        // we're using "force" here to avoid a potential type check in a setter
-                        $value->create([$inverseField => force(null)])
-                    );
+                    // we're using "force" here to avoid a potential type check in a setter
+                    $inverseObject = $value->create([$inverseField => force(null)]);
 
                     $this->inverseRelationshipCallbacks[] = static function(object $object) use ($inverseObject, $inverseField) {
                         set($inverseObject, $inverseField, $object);
@@ -412,7 +408,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
             }
         }
 
-        return ProxyGenerator::unwrap(parent::normalizeParameter($field, $value));
+        return parent::normalizeParameter($field, $value);
     }
 
     protected function normalizeCollection(string $field, FactoryCollection $collection): array
@@ -435,8 +431,6 @@ abstract class PersistentObjectFactory extends ObjectFactory
                     ->reuse(...$this->reusedObjects())
                     ->withPersistMode($this->isPersisting() ? PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT : PersistMode::WITHOUT_PERSISTING)
                     ->create([$inverseField => $object]);
-
-                $inverseObjects = ProxyGenerator::unwrap($inverseObjects);
 
                 // if the collection is indexed by a field, index the array
                 if ($inverseRelationshipMetadata->collectionIndexedBy) {
@@ -464,8 +458,6 @@ abstract class PersistentObjectFactory extends ObjectFactory
     protected function normalizeObject(string $field, object $object): object
     {
         $configuration = Configuration::instance();
-
-        $object = ProxyGenerator::unwrap($object);
 
         if (!$configuration->isPersistenceAvailable()) {
             return $object;

@@ -353,7 +353,7 @@ final class PersistenceManager
     public function embeddablePropertiesFor(object $object, string $owner): ?array
     {
         try {
-            return $this->strategyFor($owner)->embeddablePropertiesFor(ProxyGenerator::unwrap($object), $owner);
+            return $this->strategyFor($owner)->embeddablePropertiesFor($object, $owner);
         } catch (NoPersistenceStrategy) {
             return null;
         }

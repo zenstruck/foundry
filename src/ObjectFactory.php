@@ -14,7 +14,6 @@ namespace Zenstruck\Foundry;
 use Zenstruck\Foundry\Object\Event\AfterInstantiate;
 use Zenstruck\Foundry\Object\Event\BeforeInstantiate;
 use Zenstruck\Foundry\Object\Instantiator;
-use Zenstruck\Foundry\Persistence\ProxyGenerator;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -144,8 +143,6 @@ abstract class ObjectFactory extends Factory
         $clone = clone $this;
 
         foreach ($objects as $object) {
-            $object = ProxyGenerator::unwrap($object);
-
             if ($object instanceof Factory) {
                 throw new \InvalidArgumentException('Cannot reuse a factory.');
             }
