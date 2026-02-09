@@ -68,7 +68,7 @@ final class FakerAdapterTest extends TestCase
     #[Test]
     public function forced_seed_is_used_even_when_seed_is_not_managed(): void
     {
-        $adapter = new FakerAdapter(Faker\Factory::create(), forcedFakerSeedFromEnv: 4321, manageFakerSeed: false);
+        $adapter = new FakerAdapter(Faker\Factory::create(), forcedFakerSeed: 4321, manageFakerSeed: false);
 
         $adapter->faker();
 
@@ -97,7 +97,7 @@ final class FakerAdapterTest extends TestCase
     #[Test]
     public function forced_seed_stays_in_effect_for_the_whole_run_when_seed_is_not_managed(): void
     {
-        (new FakerAdapter(Faker\Factory::create(), forcedFakerSeedFromEnv: 4321, manageFakerSeed: false))->faker();
+        (new FakerAdapter(Faker\Factory::create(), forcedFakerSeed: 4321, manageFakerSeed: false))->faker();
         FakerAdapter::reset();
 
         $faker = Faker\Factory::create();
@@ -120,7 +120,7 @@ final class FakerAdapterTest extends TestCase
         $wordFor = static function(string $testId) use ($faker): string {
             FakerAdapter::reset();
             FakerAdapter::setCurrentTestId($testId);
-            (new FakerAdapter($faker, forcedFakerSeedFromEnv: 1234))->faker();
+            (new FakerAdapter($faker, forcedFakerSeed: 1234))->faker();
 
             return $faker->word();
         };
@@ -134,23 +134,9 @@ final class FakerAdapterTest extends TestCase
     }
 
     #[Test]
-    public function forced_seed_from_config_is_used(): void
+    public function forced_seed_from_env_is_used(): void
     {
-        $adapter = new FakerAdapter(Faker\Factory::create(), forcedFakerSeedFromConfig: 12345);
-
-        $adapter->faker();
-
-        $this->assertSame(12345, FakerAdapter::fakerSeed());
-    }
-
-    #[Test]
-    public function forced_seed_from_env_takes_precedence_over_config(): void
-    {
-        $adapter = new FakerAdapter(
-            Faker\Factory::create(),
-            forcedFakerSeedFromConfig: 12345,
-            forcedFakerSeedFromEnv: 99999,
-        );
+        $adapter = new FakerAdapter(Faker\Factory::create(), forcedFakerSeed: 99999);
 
         $adapter->faker();
 

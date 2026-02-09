@@ -81,7 +81,6 @@ return static function(ContainerConfigurator $container): void {
         ->set('.zenstruck_foundry.maker.factory.generator', FactoryGenerator::class)
             ->args([
                 service('.zenstruck_foundry.persistence_manager')->nullOnInvalid(),
-                service('kernel'),
                 tagged_iterator('foundry.make_factory.default_properties_guesser'),
                 service('.zenstruck_foundry.maker.factory.factory_class_map'),
                 service('.zenstruck_foundry.maker.namespace_guesser'),
