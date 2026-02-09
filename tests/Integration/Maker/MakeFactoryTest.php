@@ -14,7 +14,6 @@ namespace Zenstruck\Foundry\Tests\Integration\Maker;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
@@ -32,11 +31,8 @@ use Zenstruck\Foundry\Tests\Fixture\ObjectWithNonWriteable;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- * @group maker
- * @requires PHP >=8.4
  */
 #[Group('maker')]
-#[RequiresPhp('>=8.4')]
 final class MakeFactoryTest extends MakerTestCase
 {
     protected function setUp(): void
@@ -46,9 +42,6 @@ final class MakeFactoryTest extends MakerTestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_factory(): void
     {
@@ -67,9 +60,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/CategoryFactory.php'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_factory_with_uid(): void
     {
@@ -88,9 +78,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/WithUidColumnFactory.php'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_factory_interactively(): void
     {
@@ -116,9 +103,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/ContactFactory.php'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_factory_in_test_dir(): void
     {
@@ -133,9 +117,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileExists(self::tempFile('tests/Factory/CategoryFactory.php'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_factory_for_entity_with_repository(): void
     {
@@ -150,9 +131,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/GenericEntityFactory.php'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function invalid_entity_throws_exception(): void
     {
@@ -170,9 +148,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->fail('Exception not thrown.');
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_factory_for_not_persisted_class(): void
     {
@@ -183,9 +158,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/Object1Factory.php'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_factory_without_hints(): void
     {
@@ -196,9 +168,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/Object1Factory.php'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_factory_for_not_persisted_class_interactively(): void
     {
@@ -215,9 +184,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileExists(self::tempFile('src/Factory/Object1Factory.php'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_customize_namespace(): void
     {
@@ -235,9 +201,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertStringContainsString('namespace App\\My\\Namespace;', \file_get_contents($expectedFile) ?: '');
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_customize_namespace_with_test_flag(): void
     {
@@ -255,9 +218,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertStringContainsString('namespace App\\Tests\\My\\Namespace;', \file_get_contents($expectedFile) ?: '');
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_customize_namespace_with_root_namespace_prefix(): void
     {
@@ -275,9 +235,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertStringContainsString('namespace App\\My\\Namespace;', \file_get_contents($expectedFile) ?: '');
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_customize_namespace_with_test_flag_with_root_namespace_prefix(): void
     {
@@ -295,10 +252,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertStringContainsString('namespace App\\Tests\\My\\Namespace;', \file_get_contents($expectedFile) ?: '');
     }
 
-    /**
-     * @test
-     * @dataProvider documentProvider
-     */
     #[Test]
     #[DataProvider('documentProvider')]
     public function can_create_factory_for_odm(string $class, string $file): void
@@ -324,9 +277,6 @@ final class MakeFactoryTest extends MakerTestCase
         yield 'embedded document' => [WithEmbeddableDocument::class, 'WithEmbeddableDocumentFactory'];
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_all_factories_for_doctrine_objects(): void
     {
@@ -357,9 +307,6 @@ final class MakeFactoryTest extends MakerTestCase
         }
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_factory_with_auto_activated_not_persisted_option(): void
     {
@@ -377,9 +324,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/GenericEntityFactory.php'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_factory_with_all_fields(): void
     {
@@ -418,9 +362,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/WithEmbeddableDocumentFactory.php'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_factory_with_default_enum(): void
     {
@@ -431,9 +372,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/ObjectWithEnumFactory.php'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function does_not_initialize_non_settable(): void
     {
@@ -444,9 +382,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/ObjectWithNonWriteableFactory.php'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function does_force_initialization_of_non_settable_with_always_force(): void
     {

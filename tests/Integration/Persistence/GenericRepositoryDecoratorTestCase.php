@@ -22,9 +22,6 @@ use function Zenstruck\Foundry\Persistence\repository;
 #[ResetDatabase]
 abstract class GenericRepositoryDecoratorTestCase extends KernelTestCase
 {
-    /**
-     * @test
-     */
     #[Test]
     public function repository_is_countable_and_iterable(): void
     {
@@ -36,9 +33,6 @@ abstract class GenericRepositoryDecoratorTestCase extends KernelTestCase
         $this->assertCount(4, \iterator_to_array($repository));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_fetch_objects(): void
     {
@@ -55,9 +49,6 @@ abstract class GenericRepositoryDecoratorTestCase extends KernelTestCase
         $this->assertInstanceOf($this->modelClass(), $objects[0]);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_call_find_with_empty_array(): void
     {

@@ -13,30 +13,19 @@ namespace Zenstruck\Foundry\Tests\WebTestCase;
 
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\DependsOnClass;
-use PHPUnit\Framework\Attributes\RequiresPhpunit;
-use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
-use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
-use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11
  */
 #[ResetDatabase]
-#[RequiresPhpunit('>=11')]
-#[RequiresPhpunitExtension(FoundryExtension::class)]
+#[RequiresEnvironmentVariable('DATABASE_URL')]
 final class GetWebTestClientWithResetDatabaseAttributeIsNotBrokenTest extends WebTestCase
 {
-    use RequiresORM;
-
-    /**
-     * @test
-     * @depends \Zenstruck\Foundry\Tests\WebTestCase\NoResetGetWebTestClientIsNotBrokenTest::class
-     */
     #[Test]
     #[DependsOnClass(NoResetGetWebTestClientIsNotBrokenTest::class)]
     public function boots_kernel_and_get_client(): void
@@ -48,10 +37,6 @@ final class GetWebTestClientWithResetDatabaseAttributeIsNotBrokenTest extends We
         self::assertResponseIsSuccessful();
     }
 
-    /**
-     * @test
-     * @depends boots_kernel_and_get_client
-     */
     #[Test]
     #[Depends('boots_kernel_and_get_client')]
     public function assert_test_starts_with_a_non_booted_kernel(): void

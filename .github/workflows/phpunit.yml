@@ -173,11 +173,11 @@ jobs:
 
       - name: Test
         run: |
-          ./phpunit --testsuite reset-database --bootstrap tests/bootstrap-reset-database.php
+          ./phpunit --testsuite reset-database
 
           # We should be able to run the tests twice in order to check if the second run also starts from a fresh db
           # some bugs could be detected this way
-          ./phpunit --testsuite reset-database --bootstrap tests/bootstrap-reset-database.php
+          ./phpunit --testsuite reset-database
         shell: bash
         env:
           SYMFONY_REQUIRE: 8.0.*

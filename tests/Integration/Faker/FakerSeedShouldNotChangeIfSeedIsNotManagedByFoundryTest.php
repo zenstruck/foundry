@@ -12,7 +12,6 @@
 namespace Zenstruck\Foundry\Tests\Integration\Faker;
 
 use PHPUnit\Framework\Attributes\Depends;
-use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -24,9 +23,7 @@ use function Zenstruck\Foundry\faker;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=12.0
  */
-#[RequiresPhpunit('>=12.0')]
 #[ResetDatabase]
 final class FakerSeedShouldNotChangeIfSeedIsNotManagedByFoundryTest extends KernelTestCase
 {

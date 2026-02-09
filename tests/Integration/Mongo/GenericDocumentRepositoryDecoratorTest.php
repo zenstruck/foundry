@@ -11,15 +11,14 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\Mongo;
 
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericDocumentFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\GenericModelFactory;
 use Zenstruck\Foundry\Tests\Integration\Persistence\GenericRepositoryDecoratorTestCase;
-use Zenstruck\Foundry\Tests\Integration\RequiresMongo;
 
+#[RequiresEnvironmentVariable('MONGO_URL')]
 final class GenericDocumentRepositoryDecoratorTest extends GenericRepositoryDecoratorTestCase
 {
-    use RequiresMongo;
-
     protected function factory(): GenericModelFactory
     {
         return GenericDocumentFactory::new();

@@ -11,19 +11,18 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\Mongo;
 
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericDocumentFactory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\DocumentPoolStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\DocumentStory;
 use Zenstruck\Foundry\Tests\Integration\Persistence\StoryTestCase;
-use Zenstruck\Foundry\Tests\Integration\RequiresMongo;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
+#[RequiresEnvironmentVariable('MONGO_URL')]
 final class MongoStoryTest extends StoryTestCase
 {
-    use RequiresMongo;
-
     protected static function storyClass(): string
     {
         return DocumentStory::class;

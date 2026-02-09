@@ -17,9 +17,6 @@ use Zenstruck\Foundry\Object\Instantiator;
 
 final class InstantiatorTest extends TestCase
 {
-    /**
-     * @test
-     */
     #[Test]
     public function can_set_variadic_constructor_attributes(): void
     {

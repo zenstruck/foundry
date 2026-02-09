@@ -11,30 +11,23 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\InMemory;
 
-use PHPUnit\Framework\Attributes\RequiresPhpunit;
-use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\InMemory\AsInMemoryTest;
-use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
 use Zenstruck\Foundry\Tests\Fixture\InMemory\InMemoryContactRepository;
-use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11.4
  */
-#[RequiresPhpunit('>=11.4')]
-#[RequiresPhpunitExtension(FoundryExtension::class)]
 #[AsInMemoryTest]
 #[ResetDatabase]
+#[RequiresEnvironmentVariable('DATABASE_URL')]
 final class InMemoryUsingSetUpTest extends KernelTestCase
 {
-    use RequiresORM;
-
     private InMemoryContactRepository $contactRepository;
 
     private Contact $contact;
@@ -48,9 +41,6 @@ final class InMemoryUsingSetUpTest extends KernelTestCase
         self::assertCount(1, ContactFactory::repository());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_access_objects_created_in_set_up_method(): void
     {

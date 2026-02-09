@@ -34,9 +34,6 @@ use function Zenstruck\Foundry\set;
  */
 final class ObjectFactoryTest extends TestCase
 {
-    /**
-     * @test
-     */
     #[Test]
     public function defaults(): void
     {
@@ -47,9 +44,6 @@ final class ObjectFactoryTest extends TestCase
         $this->assertNull($object->getProp3());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function named_constructor_defaults(): void
     {
@@ -60,9 +54,6 @@ final class ObjectFactoryTest extends TestCase
         $this->assertNull($object->getProp3());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function default_instantiator_and_hydrator(): void
     {
@@ -77,9 +68,6 @@ final class ObjectFactoryTest extends TestCase
         $this->assertSame('override3-setter', $object->getProp3());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function without_constructor_instantiator(): void
     {
@@ -94,9 +82,6 @@ final class ObjectFactoryTest extends TestCase
         $this->assertSame('override3-setter', $object->getProp3());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function with_closure_factory_constructor(): void
     {
@@ -114,9 +99,6 @@ final class ObjectFactoryTest extends TestCase
         $this->assertSame('override3-setter', $object->getProp3());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function with_method_factory_constructor(): void
     {
@@ -134,9 +116,6 @@ final class ObjectFactoryTest extends TestCase
         $this->assertSame('override3-setter', $object->getProp3());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function with_named_constructor_instantiator(): void
     {
@@ -151,9 +130,6 @@ final class ObjectFactoryTest extends TestCase
         $this->assertSame('override3-setter', $object->getProp3());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function with_extra_and_force_mode_without_constructor(): void
     {
@@ -172,9 +148,6 @@ final class ObjectFactoryTest extends TestCase
         $this->assertSame('override3', $object->getProp3());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_force_helper_to_force_a_single_property(): void
     {
@@ -188,9 +161,6 @@ final class ObjectFactoryTest extends TestCase
         $this->assertSame('override1', $object->getProp1());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function force_helper_used_in_constructor_does_not_throw(): void
     {
@@ -203,9 +173,6 @@ final class ObjectFactoryTest extends TestCase
         $this->assertSame('override1-constructor', $object->getProp1());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function force_helper_used_in_named_constructor_does_not_throw(): void
     {
@@ -216,9 +183,6 @@ final class ObjectFactoryTest extends TestCase
         $this->assertSame('override1-named-constructor', $object->getProp1());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function with_configured_hydrator(): void
     {
@@ -237,9 +201,6 @@ final class ObjectFactoryTest extends TestCase
         $this->assertSame('override3-setter', $object->getProp3());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function with_hydration_disabled(): void
     {
@@ -258,9 +219,6 @@ final class ObjectFactoryTest extends TestCase
         $this->assertNull($object->getProp3());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function with_custom_instantiator_callable(): void
     {
@@ -279,9 +237,6 @@ final class ObjectFactoryTest extends TestCase
         $this->assertNull($object->getProp3());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function before_instantiate_hook(): void
     {
@@ -304,9 +259,6 @@ final class ObjectFactoryTest extends TestCase
         $this->assertSame('custom3-setter', $object->getProp3());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function after_instantiate_hook(): void
     {
@@ -324,9 +276,6 @@ final class ObjectFactoryTest extends TestCase
         $this->assertSame('custom3-setter', $object->getProp3());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function create_anonymous_factory(): void
     {
@@ -349,9 +298,6 @@ final class ObjectFactoryTest extends TestCase
         $this->assertNull($object->getProp3());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function object_factories_are_converted(): void
     {
@@ -360,9 +306,6 @@ final class ObjectFactoryTest extends TestCase
         $this->assertSame('value1-constructor', $object->object->getProp1());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_many(): void
     {
@@ -381,9 +324,6 @@ final class ObjectFactoryTest extends TestCase
         $this->assertSame('value3-constructor', $objects[2]->getProp1());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function set_and_get_functions(): void
     {
@@ -397,11 +337,7 @@ final class ObjectFactoryTest extends TestCase
     }
 
     /**
-     * @dataProvider sequenceDataProvider
-     *
      * @param Sequence $sequence
-     *
-     * @test
      */
     #[Test]
     #[DataProvider('sequenceDataProvider')]
@@ -453,9 +389,6 @@ final class ObjectFactoryTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_sequence_with_associative_array(): void
     {
@@ -477,9 +410,6 @@ final class ObjectFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function distribute(): void
     {
@@ -490,9 +420,6 @@ final class ObjectFactoryTest extends TestCase
         self::assertSame('bar', $objects[1]->prop1);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function distribute_on_factory_collection(): void
     {
@@ -503,9 +430,6 @@ final class ObjectFactoryTest extends TestCase
         self::assertSame('bar', $objects[1]->prop1);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function providing_invalid_values_number_to_distribute_throws(): void
     {
@@ -514,9 +438,6 @@ final class ObjectFactoryTest extends TestCase
         SimpleObjectFactory::new()->many(2)->distribute('prop1', ['foo']);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function as_data_provider(): void
     {

@@ -21,9 +21,6 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Object2Factory;
  */
 final class ObjectFactoryTest extends KernelTestCase
 {
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_service_factory(): void
     {
@@ -34,9 +31,6 @@ final class ObjectFactoryTest extends KernelTestCase
         $this->assertNull($object->getProp3());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_non_service_factories(): void
     {
@@ -45,9 +39,6 @@ final class ObjectFactoryTest extends KernelTestCase
         $this->assertSame('router-constructor', $object->object->getProp1());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_different_objects_based_on_same_factory(): void
     {

@@ -14,16 +14,13 @@ namespace Zenstruck\Foundry\Tests\Integration\ResetDatabase;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Middleware;
 use PHPUnit\Framework\Attributes\BeforeClass;
-use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
-use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Tests\Fixture\ResetDatabase\DoctrineMiddleware;
 use Zenstruck\Foundry\Tests\Fixture\ResetDatabase\ResetDatabaseTestKernel;
 
 #[ResetDatabase]
-#[RequiresPhpunitExtension(FoundryExtension::class)]
 final class EarlyBootedKernelTest extends KernelTestCase
 {
     /**

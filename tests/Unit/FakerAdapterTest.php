@@ -12,16 +12,13 @@
 namespace Zenstruck\Foundry\Tests\Unit;
 
 use Faker;
-use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\FakerAdapter;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11.0
  */
-#[RequiresPhpunit('>=11.0')]
 final class FakerAdapterTest extends TestCase
 {
     private ?int $backupSeed;

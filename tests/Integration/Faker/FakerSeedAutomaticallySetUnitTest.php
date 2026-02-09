@@ -12,7 +12,6 @@
 namespace Zenstruck\Foundry\Tests\Integration\Faker;
 
 use PHPUnit\Framework\Attributes\Depends;
-use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\FakerAdapter;
@@ -21,9 +20,7 @@ use function Zenstruck\Foundry\faker;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11.0
  */
-#[RequiresPhpunit('>=11.0')]
 final class FakerSeedAutomaticallySetUnitTest extends TestCase
 {
     use ResetFakerTestTrait;

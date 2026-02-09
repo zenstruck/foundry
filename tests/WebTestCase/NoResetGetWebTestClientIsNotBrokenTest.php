@@ -17,9 +17,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 final class NoResetGetWebTestClientIsNotBrokenTest extends WebTestCase
 {
-    /**
-     * @test
-     */
     #[Test]
     public function boots_kernel_and_get_client(): void
     {
@@ -29,10 +26,6 @@ final class NoResetGetWebTestClientIsNotBrokenTest extends WebTestCase
         self::assertResponseIsSuccessful();
     }
 
-    /**
-     * @test
-     * @depends boots_kernel_and_get_client
-     */
     #[Test]
     #[Depends('boots_kernel_and_get_client')]
     public function assert_test_starts_with_a_non_booted_kernel(): void

@@ -21,9 +21,6 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\ArrayFactory;
  */
 final class ArrayFactoryTest extends KernelTestCase
 {
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_with_defaults(): void
     {
@@ -38,9 +35,6 @@ final class ArrayFactoryTest extends KernelTestCase
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_with_overrides(): void
     {

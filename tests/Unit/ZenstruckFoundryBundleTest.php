@@ -64,9 +64,6 @@ final class ZenstruckFoundryBundleTest extends TestCase
         $this->configurator = new ContainerConfigurator($this->container, $fileLoader, $instanceof, __DIR__, '');
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function container_has_default_faker_service_definition(): void
     {
@@ -75,9 +72,6 @@ final class ZenstruckFoundryBundleTest extends TestCase
         self::assertTrue($this->container->hasDefinition('.zenstruck_foundry.faker'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function default_faker_service_can_receive_a_locale_via_configuration(): void
     {
@@ -91,9 +85,6 @@ final class ZenstruckFoundryBundleTest extends TestCase
         self::assertSame($expected, $definition->getArgument(0));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function faker_service_can_be_overridden_with_configuration(): void
     {
@@ -106,9 +97,6 @@ final class ZenstruckFoundryBundleTest extends TestCase
         self::assertSame($expected, $this->container->get('.zenstruck_foundry.faker')::class);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function container_has_default_instanciator(): void
     {
@@ -119,9 +107,6 @@ final class ZenstruckFoundryBundleTest extends TestCase
         self::assertEmpty($this->container->getDefinition('.zenstruck_foundry.instantiator')->getMethodCalls());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function service_can_be_overridden_with_configuration(): void
     {
@@ -134,9 +119,6 @@ final class ZenstruckFoundryBundleTest extends TestCase
         self::assertSame($expected, $this->container->get('.zenstruck_foundry.instantiator')::class);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function create_instantiator_without_constructor_configuration(): void
     {
@@ -150,9 +132,6 @@ final class ZenstruckFoundryBundleTest extends TestCase
         self::assertSame([], $this->container->getDefinition('.zenstruck_foundry.instantiator')->getMethodCalls());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function create_instantiator_without_constructor_and_with_extra_configuration(): void
     {
@@ -166,9 +145,6 @@ final class ZenstruckFoundryBundleTest extends TestCase
         self::assertSame([['allowExtra', [], true]], $this->container->getDefinition('.zenstruck_foundry.instantiator')->getMethodCalls());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function create_instantiator_without_constructor_and_with_extra_and_with_forced_properties_configuration(): void
     {
@@ -182,9 +158,6 @@ final class ZenstruckFoundryBundleTest extends TestCase
         self::assertSame([['allowExtra', [], true], ['alwaysForce', [], true]], $this->container->getDefinition('.zenstruck_foundry.instantiator')->getMethodCalls());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_enable_auto_refresh_with_lazy_objects(): void
     {
@@ -195,9 +168,6 @@ final class ZenstruckFoundryBundleTest extends TestCase
         self::assertTrue($config['enable_auto_refresh_with_lazy_objects']);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_disable_auto_refresh_with_lazy_objects(): void
     {
@@ -208,9 +178,6 @@ final class ZenstruckFoundryBundleTest extends TestCase
         self::assertFalse($config['enable_auto_refresh_with_lazy_objects']);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function configuration_default_values(): void
     {

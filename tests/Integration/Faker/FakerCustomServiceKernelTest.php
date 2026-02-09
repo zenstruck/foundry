@@ -11,7 +11,6 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\Faker;
 
-use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -22,9 +21,7 @@ use function Zenstruck\Foundry\faker;
 
 /**
  * @author Silas Joisten <silasjoisten@proton.me>
- * @requires PHPUnit >=11.0
  */
-#[RequiresPhpunit('>=11.0')]
 #[ResetDatabase]
 final class FakerCustomServiceKernelTest extends KernelTestCase
 {

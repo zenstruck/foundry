@@ -11,21 +11,17 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Integration\Persistence\GenericRepositoryDecoratorTestCase;
-use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 use function Zenstruck\Foundry\Persistence\repository;
 
+#[RequiresEnvironmentVariable('DATABASE_URL')]
 class GenericEntityRepositoryDecoratorTest extends GenericRepositoryDecoratorTestCase
 {
-    use RequiresORM;
-
-    /**
-     * @test
-     */
     #[Test]
     public function can_call_find_by_with_multiple_values(): void
     {

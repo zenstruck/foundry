@@ -12,14 +12,12 @@
 namespace Zenstruck\Foundry\Tests\Integration\InMemory;
 
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\RequiresPhpunit;
-use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Attribute\WithStory;
 use Zenstruck\Foundry\InMemory\AsInMemoryTest;
-use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Address;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
@@ -31,20 +29,15 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\InMemory\InMemoryAddressRepository;
 use Zenstruck\Foundry\Tests\Fixture\InMemory\InMemoryContactRepository;
 use Zenstruck\Foundry\Tests\Fixture\Stories\EntityStory;
-use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11.4
  */
-#[RequiresPhpunit('>=11.4')]
-#[RequiresPhpunitExtension(FoundryExtension::class)]
 #[AsInMemoryTest]
 #[ResetDatabase]
+#[RequiresEnvironmentVariable('DATABASE_URL')]
 final class InMemoryTest extends KernelTestCase
 {
-    use RequiresORM;
-
     private InMemoryAddressRepository $addressRepository;
     private InMemoryContactRepository $contactRepository;
 
@@ -58,9 +51,6 @@ final class InMemoryTest extends KernelTestCase
         $this->entityManager = self::getContainer()->get(EntityManagerInterface::class); // @phpstan-ignore assign.propertyType
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function create_one_does_not_persist_in_database(): void
     {
@@ -75,9 +65,6 @@ final class InMemoryTest extends KernelTestCase
         self::assertCount(1, AddressFactory::repository());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function create_many_does_not_persist_in_database(): void
     {
@@ -94,9 +81,6 @@ final class InMemoryTest extends KernelTestCase
         self::assertCount(2, AddressFactory::repository());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function object_should_be_accessible_from_in_memory_repository(): void
     {
@@ -107,9 +91,6 @@ final class InMemoryTest extends KernelTestCase
         self::assertCount(1, AddressFactory::repository());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function nested_objects_should_be_accessible_from_their_respective_repository(): void
     {
@@ -125,9 +106,6 @@ final class InMemoryTest extends KernelTestCase
         self::assertCount(1, AddressFactory::repository());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_generic_repository(): void
     {
@@ -143,9 +121,6 @@ final class InMemoryTest extends KernelTestCase
         self::assertCount(1, CategoryFactory::repository());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function one_to_many(): void
     {
@@ -160,9 +135,6 @@ final class InMemoryTest extends KernelTestCase
         }
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function inversed_one_to_one(): void
     {
