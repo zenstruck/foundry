@@ -179,5 +179,4 @@ final class Configuration
     {
         return self::isBooted() && self::instance()->enableAutoRefreshWithLazyObjects;
     }
-
 }
