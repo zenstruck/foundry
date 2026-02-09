@@ -40,15 +40,11 @@ return static function(ContainerConfigurator $container): void {
                 'command' => 'foundry:load-fixtures|foundry:load-stories|foundry:load-story',
                 'description' => 'Load stories which are marked with #[AsFixture] attribute.',
             ])
-    ;
-
-    if (\PHP_VERSION_ID >= 80400) {
-        $container->services()->set('.foundry.persistence.objects_tracker', PersistedObjectsTracker::class)
+        ->set('.foundry.persistence.objects_tracker', PersistedObjectsTracker::class)
             ->tag('kernel.reset', ['method' => 'refresh'])
             ->tag('kernel.event_listener', ['event' => TerminateEvent::class, 'method' => 'refresh'])
             ->tag('kernel.event_listener', ['event' => ConsoleTerminateEvent::class, 'method' => 'refresh'])
             ->tag('kernel.event_listener', ['event' => WorkerMessageHandledEvent::class, 'method' => 'refresh']) // @phpstan-ignore class.notFound
             ->tag('foundry.hook', ['class' => null, 'method' => 'afterPersistHook', 'event' => AfterPersist::class])
-        ;
-    }
+    ;
 };

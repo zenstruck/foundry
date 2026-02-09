@@ -26,9 +26,6 @@ parameters:
         - identifier: missingType.iterableValue
           path: tests/
 
-        # PHPStan does not understand PHP version checks
-        - message: '#Comparison operation "(<|>|<=|>=)" between int<80\d+, 80\d+> and 80\d+ is always (false|true).#'
-
         # Hydrator and Factory are annotated @immutable
         - identifier: property.readOnlyByPhpDocDefaultValue
           paths:

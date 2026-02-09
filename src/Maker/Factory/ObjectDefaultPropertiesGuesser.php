@@ -39,7 +39,7 @@ class ObjectDefaultPropertiesGuesser extends AbstractDefaultPropertyGuesser
 
             $value = \sprintf('null, // TODO add %svalue manually', $type ? "{$type} " : '');
 
-            if (\PHP_VERSION_ID >= 80100 && \enum_exists($type)) {
+            if (\enum_exists($type)) {
                 $makeFactoryData->addEnumDefaultProperty($property->getName(), $type);
 
                 continue;
