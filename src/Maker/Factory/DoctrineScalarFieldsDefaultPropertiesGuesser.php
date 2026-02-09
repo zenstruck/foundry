@@ -104,7 +104,6 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
         return $makeFactoryData->isPersisted();
     }
 
-    // handles both ORM 3 & 4
     private function extractFieldMappingData(FieldMapping|array $fieldMapping, string $field, mixed $default = null): mixed
     {
         if ($fieldMapping instanceof FieldMapping) {

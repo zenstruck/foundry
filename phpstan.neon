@@ -63,7 +63,5 @@ parameters:
         - tests/Fixture/Maker/expected/can_create_factory_with_embeddable_odm.php
         - tests/Fixture/Maker/expected/can_create_factory_with_embeddable_orm.php
 
-        # phpstan runs with orm 3 - there are too many failures in these files which are compatible with orm 2
-        - ./src/Maker/Factory/LegacyORMDefaultPropertiesGuesser.php
+        # dual ORM/ODM FieldMapping type in this file requires exclusion
         - ./src/Maker/Factory/DoctrineScalarFieldsDefaultPropertiesGuesser.php
-        - ./src/ORM/OrmV2PersistenceStrategy.php
