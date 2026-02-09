@@ -20,9 +20,6 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\WithHooksInInitializeFactory;
  */
 final class FactoryWithHooksInInitializeTest extends KernelTestCase
 {
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_access_current_factory_in_hooks(): void
     {

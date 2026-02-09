@@ -29,9 +29,6 @@ use Zenstruck\Foundry\Tests\Fixture\Stories\ObjectStory;
 #[ResetDatabase]
 abstract class StoryTestCase extends KernelTestCase
 {
-    /**
-     * @test
-     */
     #[Test]
     public function stories_only_loaded_once(): void
     {
@@ -44,9 +41,6 @@ abstract class StoryTestCase extends KernelTestCase
         static::factoryClass()::repository()->assert()->count(2);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_access_story_state(): void
     {
@@ -62,9 +56,6 @@ abstract class StoryTestCase extends KernelTestCase
         $this->assertNull($story::get('null'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_access_story_state_with_magic_call(): void
     {
@@ -80,9 +71,6 @@ abstract class StoryTestCase extends KernelTestCase
         $this->assertNull($story::null());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_access_story_state_with_magic_call_on_instance(): void
     {
@@ -98,9 +86,6 @@ abstract class StoryTestCase extends KernelTestCase
         $this->assertNull($story::load()->null());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function cannot_access_invalid_object(): void
     {
@@ -109,9 +94,6 @@ abstract class StoryTestCase extends KernelTestCase
         static::storyClass()::get('invalid');
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_get_random_object_set_from_pool(): void
     {
@@ -122,9 +104,6 @@ abstract class StoryTestCase extends KernelTestCase
         $this->assertCount(2, $objects);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_get_random_object_from_pool(): void
     {
@@ -139,9 +118,6 @@ abstract class StoryTestCase extends KernelTestCase
         $this->assertCount(3, \array_unique($ids));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_get_random_object_range_from_pool(): void
     {
@@ -161,9 +137,6 @@ abstract class StoryTestCase extends KernelTestCase
         $this->assertNotContains(4, $counts);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function story_can_access_its_own_pool(): void
     {
@@ -176,9 +149,6 @@ abstract class StoryTestCase extends KernelTestCase
         self::assertContains($item->getProp1(), ['foo', 'default1']);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_story_with_simple_object(): void
     {

@@ -13,11 +13,9 @@ namespace Zenstruck\Foundry\Tests\Integration\ResetDatabase;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
-use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Tests\Fixture\Document\GlobalDocument;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GlobalEntity;
 use Zenstruck\Foundry\Tests\Fixture\FoundryTestKernel;
@@ -27,7 +25,6 @@ use Zenstruck\Foundry\Tests\Fixture\Stories\GlobalStory;
 use function Zenstruck\Foundry\Persistence\repository;
 
 #[ResetDatabase]
-#[RequiresPhpunitExtension(FoundryExtension::class)]
 final class GlobalStoryTest extends KernelTestCase
 {
     #[Test]

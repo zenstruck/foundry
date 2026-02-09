@@ -48,15 +48,11 @@ return static function(ContainerConfigurator $container): void {
             abstract_arg('fixtureStories'),
             abstract_arg('groupedStories'),
         ])
-    ;
-
-    if (\PHP_VERSION_ID >= 80400) {
-        $container->services()->set('.foundry.persistence.objects_tracker', PersistedObjectsTracker::class)
+        ->set('.foundry.persistence.objects_tracker', PersistedObjectsTracker::class)
             ->tag('kernel.reset', ['method' => 'refresh'])
             ->tag('kernel.event_listener', ['event' => TerminateEvent::class, 'method' => 'refresh'])
             ->tag('kernel.event_listener', ['event' => ConsoleTerminateEvent::class, 'method' => 'refresh'])
             ->tag('kernel.event_listener', ['event' => WorkerMessageHandledEvent::class, 'method' => 'refresh']) // @phpstan-ignore class.notFound
             ->tag('kernel.event_listener', ['method' => 'afterPersistHook', 'event' => AfterPersist::class])
-        ;
-    }
+    ;
 };

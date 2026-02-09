@@ -35,9 +35,6 @@ final class FactoryTest extends TestCase
         Configuration::boot(UnitTestConfig::build());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_register_custom_faker(): void
     {
@@ -49,9 +46,6 @@ final class FactoryTest extends TestCase
         $this->assertNotSame(faker(), $defaultFaker);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_arrays_for_attribute_values(): void
     {
@@ -64,9 +58,6 @@ final class FactoryTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $factory->value);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_register_default_instantiator(): void
     {
@@ -81,9 +72,6 @@ final class FactoryTest extends TestCase
         $this->assertSame('different prop2-constructor', $object->getProp2());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function instantiating_with_factory_attribute_instantiates_the_factory(): void
     {
@@ -94,9 +82,6 @@ final class FactoryTest extends TestCase
         $this->assertInstanceOf(Category::class, $object->getCategory());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_factory_with_empty_constructor(): void
     {

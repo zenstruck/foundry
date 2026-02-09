@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
@@ -18,18 +19,13 @@ use Zenstruck\Foundry\Tests\Fixture\Stories\EntityPoolStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\EntityStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\PersistenceDisabledStory;
 use Zenstruck\Foundry\Tests\Integration\Persistence\StoryTestCase;
-use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
+#[RequiresEnvironmentVariable('DATABASE_URL')]
 final class OrmStoryTest extends StoryTestCase
 {
-    use RequiresORM;
-
-    /**
-     * @test
-     */
     #[Test]
     public function can_use_story_with_persistence_disabled(): void
     {

@@ -12,10 +12,8 @@
 namespace Zenstruck\Foundry\Tests\Integration\DataProvider;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
@@ -28,7 +26,6 @@ use function Zenstruck\Foundry\faker;
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-#[RequiresPhpunitExtension(FoundryExtension::class)]
 final class DataProviderInUnitTest extends TestCase
 {
     #[Test]

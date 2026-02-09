@@ -21,9 +21,6 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\ArrayFactory;
  */
 final class ArrayFactoryTest extends TestCase
 {
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_with_defaults(): void
     {
@@ -38,9 +35,6 @@ final class ArrayFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_with_overrides(): void
     {
@@ -58,9 +52,6 @@ final class ArrayFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_many(): void
     {
@@ -76,9 +67,6 @@ final class ArrayFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_range(): void
     {
@@ -88,9 +76,6 @@ final class ArrayFactoryTest extends TestCase
         $this->assertLessThanOrEqual(4, \count($range));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_sequence(): void
     {

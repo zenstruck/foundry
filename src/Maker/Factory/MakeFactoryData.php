@@ -157,10 +157,6 @@ final class MakeFactoryData
 
     public function addEnumDefaultProperty(string $propertyName, string $enumClass): void
     {
-        if (\PHP_VERSION_ID < 80100) {
-            throw new \LogicException('Cannot add enum for php version inferior than 8.1');
-        }
-
         if (!\enum_exists($enumClass)) {
             throw new \InvalidArgumentException("Enum of class \"{$enumClass}\" does not exist.");
         }
@@ -177,14 +173,6 @@ final class MakeFactoryData
     public function shouldAddHints(): bool
     {
         return $this->addHints;
-    }
-
-    /**
-     * @phpstan-ignore return.tooWideBool
-     */
-    public function shouldAddOverrideAttributes(): bool
-    {
-        return \PHP_VERSION_ID >= 80300;
     }
 
     private static function propertyInfo(): ReflectionExtractor

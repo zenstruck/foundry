@@ -30,9 +30,6 @@ final class LazyValueTest extends TestCase
 {
     use Factories;
 
-    /**
-     * @test
-     */
     #[Test]
     public function lazy(): void
     {
@@ -41,9 +38,6 @@ final class LazyValueTest extends TestCase
         $this->assertNotSame($value(), $value());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function memoize(): void
     {
@@ -52,9 +46,6 @@ final class LazyValueTest extends TestCase
         $this->assertSame($value(), $value());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_handle_nested_lazy_values(): void
     {
@@ -63,9 +54,6 @@ final class LazyValueTest extends TestCase
         $this->assertSame('foo', $value());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_handle_array_with_lazy_values(): void
     {

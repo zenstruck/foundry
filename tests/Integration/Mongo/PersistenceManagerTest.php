@@ -13,14 +13,13 @@ namespace Zenstruck\Foundry\Tests\Integration\Mongo;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\Persistence\ObjectManager;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithUid;
 use Zenstruck\Foundry\Tests\Integration\Persistence\PersistenceManagerTestCase;
-use Zenstruck\Foundry\Tests\Integration\RequiresMongo;
 
+#[RequiresEnvironmentVariable('MONGO_URL')]
 final class PersistenceManagerTest extends PersistenceManagerTestCase
 {
-    use RequiresMongo;
-
     protected static function createObject(): object
     {
         return new DocumentWithUid();

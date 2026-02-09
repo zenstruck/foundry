@@ -13,27 +13,23 @@ namespace Zenstruck\Foundry\Tests\Integration\DataProvider;
 
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\InMemory\AsInMemoryTest;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
 use Zenstruck\Foundry\Tests\Fixture\InMemory\InMemoryContactRepository;
-use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-#[RequiresPhpunitExtension(FoundryExtension::class)]
+#[RequiresEnvironmentVariable('DATABASE_URL')] // needed to use the entity manager
 #[ResetDatabase]
 final class DataProviderWithInMemoryTest extends KernelTestCase
 {
-    use RequiresORM; // needed to use the entity manager
-
     private InMemoryContactRepository $contactRepository;
 
     private EntityManagerInterface $entityManager;
