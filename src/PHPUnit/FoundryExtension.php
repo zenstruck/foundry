@@ -27,39 +27,38 @@ use Zenstruck\Foundry\PHPUnit\ResetDatabase\ResetDatabaseOnTestSuiteStarted;
  * @internal
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-if (\interface_exists(Runner\Extension\Extension::class)) {
-    final class FoundryExtension implements Runner\Extension\Extension
-    {
-        public const PARAMETER_AUTO_RESET_DATABASE_CLASS = 'enabled-auto-reset';
+final class FoundryExtension implements Runner\Extension\Extension
+{
+    public const PARAMETER_AUTO_RESET_DATABASE_CLASS = 'enabled-auto-reset';
 
-        private static bool $enabled = false;
+    private static bool $enabled = false;
 
-        public function bootstrap(
-            TextUI\Configuration\Configuration $configuration,
-            Runner\Extension\Facade $facade,
-            Runner\Extension\ParameterCollection $parameters,
-        ): void {
-            // shutdown Foundry if for some reason it has been booted before
-            if (Configuration::isBooted()) {
-                Configuration::shutdown();
-            }
+    public function bootstrap(
+        TextUI\Configuration\Configuration $configuration,
+        Runner\Extension\Facade $facade,
+        Runner\Extension\ParameterCollection $parameters,
+    ): void {
+        // shutdown Foundry if for some reason it has been booted before
+        if (Configuration::isBooted()) {
+            Configuration::shutdown();
+        }
 
-            $autoResetEnabled = $parameters->has(self::PARAMETER_AUTO_RESET_DATABASE_CLASS)
-                && 'true' === $parameters->get(self::PARAMETER_AUTO_RESET_DATABASE_CLASS);
+        $autoResetEnabled = $parameters->has(self::PARAMETER_AUTO_RESET_DATABASE_CLASS)
+            && 'true' === $parameters->get(self::PARAMETER_AUTO_RESET_DATABASE_CLASS);
 
-            // ⚠️ order matters within each event
+        // ⚠️ order matters within each event
             $subscribers = [
                 Event\TestSuite\Started::class => [new ResetDatabaseOnTestSuiteStarted($autoResetEnabled)],
                 Event\Test\DataProviderMethodCalled::class => [new BootFoundryOnDataProviderMethodCalled()],
                 Event\Test\DataProviderMethodFinished::class => [new ShutdownFoundryOnDataProviderMethodFinished()],
                 Event\Test\PreparationStarted::class => [
-                    new BootFoundryOnPreparationStarted(),
-                    new ResetDatabaseOnPreparationStarted($autoResetEnabled),
-                    new EnableInMemoryOnPreparationStarted(),
+            new BootFoundryOnPreparationStarted(),
+            new ResetDatabaseOnPreparationStarted($autoResetEnabled),
+            new EnableInMemoryOnPreparationStarted(),
                 ],
                 Event\Test\Prepared::class => [
-                    new BuildStoryOnTestPrepared(),
-                    new TriggerDataProviderPersistenceOnTestPrepared(),
+            new BuildStoryOnTestPrepared(),
+            new TriggerDataProviderPersistenceOnTestPrepared(),
                 ],
                 Event\Test\Finished::class => [new ShutdownFoundryOnTestFinished()],
                 Event\TestRunner\Finished::class => [new DisplayFakerSeedOnApplicationFinished()],
@@ -72,35 +71,21 @@ if (\interface_exists(Runner\Extension\Extension::class)) {
                 $subscribers = \array_filter(
                     $subscribers,
                     static fn($subscriber) => !$subscriber instanceof DataProviderSubscriberInterface
-                );
+        );
             }
 
             $facade->registerSubscribers(...$subscribers);
 
-            self::$enabled = true;
-        }
-
-        public static function shouldBeEnabled(): bool
-        {
-            return \defined('PHPUNIT_COMPOSER_INSTALL') && !self::isEnabled() && ConstraintRequirement::from('>=10')->isSatisfiedBy(Runner\Version::id());
-        }
-
-        public static function isEnabled(): bool
-        {
-            return self::$enabled;
-        }
+        self::$enabled = true;
     }
-} else {
-    final class FoundryExtension
-    {
-        public static function shouldBeEnabled(): bool
-        {
-            return false;
-        }
 
-        public static function isEnabled(): bool
-        {
-            return false;
-        }
+    public static function shouldBeEnabled(): bool
+    {
+        return \defined('PHPUNIT_COMPOSER_INSTALL') && !self::isEnabled() && ConstraintRequirement::from('>=10')->isSatisfiedBy(Runner\Version::id());
+    }
+
+    public static function isEnabled(): bool
+    {
+        return self::$enabled;
     }
 }

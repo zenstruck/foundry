@@ -11,12 +11,44 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\ResetDatabase;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\Middleware;
+use PHPUnit\Framework\Attributes\BeforeClass;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
+use PHPUnit\Framework\Attributes\Test;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
+use Zenstruck\Foundry\Tests\Fixture\ResetDatabase\DoctrineMiddleware;
+use Zenstruck\Foundry\Tests\Fixture\ResetDatabase\ResetDatabaseTestKernel;
 
 #[ResetDatabase]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
-final class EarlyBootedKernelTest extends EarlyBootedKernelTestCase
+final class EarlyBootedKernelTest extends KernelTestCase
 {
+    /**
+     * Needs to happen before the database reset.
+     */
+    #[BeforeClass(10)]
+    public static function before(): void
+    {
+        self::bootKernel();
+    }
+
+    #[Test]
+    public function connection_uses_doctrine_middleware(): void
+    {
+        /** @var Connection $connection */
+        $connection = self::getContainer()->get(Connection::class);
+
+        self::assertContains(
+            DoctrineMiddleware::class,
+            \array_map(static fn(Middleware $middleware) => $middleware::class, $connection->getConfiguration()->getMiddlewares())
+        );
+    }
+
+    protected static function getKernelClass(): string
+    {
+        return ResetDatabaseTestKernel::class;
+    }
 }

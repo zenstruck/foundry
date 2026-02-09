@@ -13,13 +13,13 @@ namespace Zenstruck\Foundry\Tests\Integration;
 
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Events\FactoryWithEventListeners;
 
+#[ResetDatabase]
 final class EventsTest extends KernelTestCase
 {
-    use Factories, RequiresORM, ResetDatabase;
+    use RequiresORM;
 
     /**
      * @test

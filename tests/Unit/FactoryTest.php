@@ -15,7 +15,6 @@ use Faker;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Configuration;
-use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\UnitTestConfig;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
@@ -29,8 +28,6 @@ use function Zenstruck\Foundry\faker;
 
 final class FactoryTest extends TestCase
 {
-    use Factories;
-
     protected function tearDown(): void
     {
         // neutralize custom configuration added in some tests

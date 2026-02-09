@@ -4,9 +4,6 @@
         <line number="25" hash="c6af5d66288d0667e424978000f29571e4954b81">
             <issue><![CDATA[Since symfony/framework-bundle 6.4: Not setting the "framework.php_errors.log" config option is deprecated. It will default to "true" in 7.0.]]></issue>
 
-            <issue><![CDATA[Since zenstruck/foundry 2.9: Trait Zenstruck\Foundry\Test\Factories is deprecated and will be removed in Foundry 3. See https://github.com/zenstruck/foundry/blob/2.x/UPGRADE-2.9.md to upgrade.]]></issue>
-            <issue><![CDATA[Since zenstruck/foundry 2.9: Not using Foundry's PHPUnit extension is deprecated and will throw an error in Foundry 3. See https://github.com/zenstruck/foundry/blob/2.x/UPGRADE-2.9.md to upgrade.]]></issue>
-
             <issue><![CDATA[Since doctrine/mongodb-odm 2.14: Not using native lazy objects is deprecated and will be impossible in Doctrine MongoDB ODM 3.0.]]></issue>
             <issue><![CDATA[Since symfony/framework-bundle 7.3: Not setting the "property_info.with_constructor_extractor" option explicitly is deprecated because its default value will change in version 8.0.]]></issue>
             <issue><![CDATA[Since symfony/console 7.4: The "Symfony\Component\Console\Application::add()" method is deprecated and will be removed in Symfony 8.0, use "Symfony\Component\Console\Application::addCommand()" instead.]]></issue>

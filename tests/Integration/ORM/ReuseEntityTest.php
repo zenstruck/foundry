@@ -13,17 +13,17 @@ namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\AddressFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Tag\TagFactory;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
+#[ResetDatabase]
 final class ReuseEntityTest extends KernelTestCase
 {
-    use Factories, RequiresORM, ResetDatabase;
+    use RequiresORM;
 
     /**
      * @test

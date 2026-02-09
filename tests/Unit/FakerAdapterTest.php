@@ -16,7 +16,6 @@ use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\FakerAdapter;
-use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Integration\Faker\ResetFakerTestTrait;
 
 /**
@@ -28,7 +27,7 @@ final class FakerAdapterTest extends TestCase
 {
     // ResetFakerTestTrait restores the run's seed from the environment, which this test cannot infer
     // from FakerAdapter::fakerSeed(): a generated seed would be restored as an explicitly forced one
-    use Factories, ResetFakerTestTrait;
+    use ResetFakerTestTrait;
 
     protected function setUp(): void
     {

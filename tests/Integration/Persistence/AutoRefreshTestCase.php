@@ -20,11 +20,10 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Persistence\PersistedObjectsTracker;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithOnlyPrivateProperties;
 use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithReadonly\EntityWithReadonly;
@@ -44,9 +43,9 @@ use function Zenstruck\Foundry\Persistence\refresh_all;
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
+#[ResetDatabase]
 abstract class AutoRefreshTestCase extends WebTestCase
 {
-    use Factories, ResetDatabase;
 
     #[Test]
     public function it_can_refresh_after_services_reset(): void

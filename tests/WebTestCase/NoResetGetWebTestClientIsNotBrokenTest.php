@@ -14,12 +14,9 @@ namespace Zenstruck\Foundry\Tests\WebTestCase;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Zenstruck\Foundry\Test\Factories;
 
 final class NoResetGetWebTestClientIsNotBrokenTest extends WebTestCase
 {
-    use Factories;
-
     /**
      * @test
      */

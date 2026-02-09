@@ -69,9 +69,6 @@ final class ResetDatabaseOnTestSuiteStarted implements Event\TestSuite\StartedSu
             return true;
         }
 
-        return AttributeReader::classOrParentsHasAttribute($testClassName, ResetDatabase::class)
-
-            // let's use ResetDatabase trait as a marker, the same way we're using the attribute
-            || (new \ReflectionClass($testClassName))->hasMethod('_resetDatabaseBeforeFirstTest');
+        return AttributeReader::classOrParentsHasAttribute($testClassName, ResetDatabase::class);
     }
 }

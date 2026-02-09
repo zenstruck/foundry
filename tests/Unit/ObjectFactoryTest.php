@@ -18,7 +18,6 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\Object\Instantiator;
-use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object2Factory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\SimpleObjectFactory;
@@ -37,8 +36,6 @@ use function Zenstruck\Foundry\set;
  */
 final class ObjectFactoryTest extends TestCase
 {
-    use Factories;
-
     /**
      * @test
      */

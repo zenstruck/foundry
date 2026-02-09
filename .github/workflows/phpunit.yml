@@ -189,6 +189,8 @@ jobs:
       fail-fast: false
       matrix:
         php: [ 8.4, 8.5 ]
+    env:
+      USE_DAMA_DOCTRINE_TEST_BUNDLE: 0
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -219,7 +221,7 @@ jobs:
 
       - name: Test
         run: |
-          vendor/bin/phpunit tests/Unit
+          ./phpunit tests/Unit
 
   test-with-paratest:
     name: Test with paratest
