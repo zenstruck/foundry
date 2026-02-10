@@ -19,9 +19,6 @@ use Rector\Testing\PHPUnit\AbstractRectorTestCase;
 
 final class RemoveWithoutAutorefreshCallRectorTest extends AbstractRectorTestCase
 {
-    /**
-     * @test
-     */
     #[Test]
     #[DataProvider('provideData')]
     public function test(string $filePath): void
