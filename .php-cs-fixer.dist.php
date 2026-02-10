@@ -9,6 +9,7 @@ $file = __DIR__.'/.php-cs-fixer.temp.php';
 
 /** @var PhpCsFixer\Config $csFixerConfig */
 $csFixerConfig = require $file;
+$csFixerConfig->setRules(['php_unit_attributes' => true, ...$csFixerConfig->getRules()]);
 $csFixerConfig->setFinder(
     $csFixerConfig->getFinder()
         ->notName('WebTestCaseWithBothTraitsInWrongOrderTest.php')
