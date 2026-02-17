@@ -11,13 +11,16 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ * @group legacy
  */
+#[IgnoreDeprecations]
 final class GenericFactoryUsingBeforeHooksAndResetDatabaseTraitTest extends GenericFactoryUsingBeforeHooksTestCase
 {
-    use Factories, ResetDatabase;
+    use GenericFactoryUsingBeforeHooksTrait, Factories, ResetDatabase;
 }

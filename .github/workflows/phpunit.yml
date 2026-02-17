@@ -41,7 +41,7 @@ jobs:
 
           # old PHPUnit versions
           - {php: 8.3, symfony: 7.4.*, phpunit: 9, database: mysql, use-phpunit-extension: 0}
-          - {php: 8.4, symfony: 7.4.*, phpunit: 10, database: mysql, use-phpunit-extension: 0}
+          - {php: 8.2, symfony: 7.4.*, phpunit: 10, database: mysql, use-phpunit-extension: 0}
           - {php: 8.4, symfony: 7.4.*, phpunit: 11, database: mysql, use-phpunit-extension: 0}
           - {php: 8.4, symfony: 7.4.*, phpunit: 11, database: mysql}
           - {php: 8.4, symfony: 7.4.*, phpunit: 12, database: mysql, use-phpunit-extension: 0}

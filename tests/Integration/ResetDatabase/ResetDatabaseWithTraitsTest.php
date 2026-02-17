@@ -22,7 +22,7 @@ use Zenstruck\Foundry\Test\ResetDatabase;
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-#[IgnoreDeprecations('In order to use Foundry correctly, you must use the trait')]
+#[IgnoreDeprecations()]
 final class ResetDatabaseWithTraitsTest extends ResetDatabaseTestCase
 {
     use Factories, ResetDatabase;

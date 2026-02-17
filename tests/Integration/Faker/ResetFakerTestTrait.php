@@ -14,43 +14,50 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Integration\Faker;
 
 use PHPUnit\Framework\Attributes\AfterClass;
+use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use Zenstruck\Foundry\FakerAdapter;
 
-trait ResetFakerTestTrait
-{
-    private static ?string $savedServerSeed = null;
-    private static ?string $savedEnvSeed = null;
-    private static ?string $savedGetEnvSeed = null;
-
-    private static ?int $currentSeed = null;
-
-    #[BeforeClass(10)]
-    public static function __saveAndResetFakerSeed(): void
+if (\method_exists(Before::class, '__construct')) { // @phpstan-ignore function.alreadyNarrowedType
+    trait ResetFakerTestTrait
     {
-        self::$savedServerSeed = $_SERVER['FOUNDRY_FAKER_SEED'] ?? null;
-        self::$savedEnvSeed = $_ENV['FOUNDRY_FAKER_SEED'] ?? null;
-        self::$savedGetEnvSeed = \getenv('FOUNDRY_FAKER_SEED') ?: null;
+        private static ?string $savedServerSeed = null;
+        private static ?string $savedEnvSeed = null;
+        private static ?string $savedGetEnvSeed = null;
 
-        $_SERVER['FOUNDRY_FAKER_SEED'] = null;
-        $_ENV['FOUNDRY_FAKER_SEED'] = null;
-        \putenv('FOUNDRY_FAKER_SEED');
+        private static ?int $currentSeed = null;
 
-        FakerAdapter::resetFakerSeed();
-    }
+        #[BeforeClass(10)]
+        public static function __saveAndResetFakerSeed(): void
+        {
+            self::$savedServerSeed = $_SERVER['FOUNDRY_FAKER_SEED'] ?? null;
+            self::$savedEnvSeed = $_ENV['FOUNDRY_FAKER_SEED'] ?? null;
+            self::$savedGetEnvSeed = \getenv('FOUNDRY_FAKER_SEED') ?: null;
 
-    #[AfterClass(-10)]
-    public static function __restoreFakerSeed(): void
-    {
-        $_SERVER['FOUNDRY_FAKER_SEED'] = self::$savedServerSeed;
-        $_ENV['FOUNDRY_FAKER_SEED'] = self::$savedEnvSeed;
-        if (null === self::$savedGetEnvSeed) {
+            $_SERVER['FOUNDRY_FAKER_SEED'] = null;
+            $_ENV['FOUNDRY_FAKER_SEED'] = null;
             \putenv('FOUNDRY_FAKER_SEED');
-        } else {
-            \putenv('FOUNDRY_FAKER_SEED='.self::$savedGetEnvSeed);
+
+            FakerAdapter::resetFakerSeed();
         }
 
-        $savedValue = self::$savedServerSeed ?? self::$savedEnvSeed ?? self::$savedGetEnvSeed;
-        FakerAdapter::resetFakerSeed($savedValue ? (int) $savedValue : null);
+        #[AfterClass(-10)]
+        public static function __restoreFakerSeed(): void
+        {
+            $_SERVER['FOUNDRY_FAKER_SEED'] = self::$savedServerSeed;
+            $_ENV['FOUNDRY_FAKER_SEED'] = self::$savedEnvSeed;
+            if (null === self::$savedGetEnvSeed) {
+                \putenv('FOUNDRY_FAKER_SEED');
+            } else {
+                \putenv('FOUNDRY_FAKER_SEED='.self::$savedGetEnvSeed);
+            }
+
+            $savedValue = self::$savedServerSeed ?? self::$savedEnvSeed ?? self::$savedGetEnvSeed;
+            FakerAdapter::resetFakerSeed($savedValue ? (int) $savedValue : null);
+        }
+    }
+} else {
+    trait ResetFakerTestTrait
+    {
     }
 }

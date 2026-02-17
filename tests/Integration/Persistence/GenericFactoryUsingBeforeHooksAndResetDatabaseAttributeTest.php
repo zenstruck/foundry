@@ -9,13 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Integration\Persistence;
+namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
-use Zenstruck\Foundry\Tests\Integration\Persistence\GenericFactoryUsingBeforeHooksTestCase;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
@@ -26,4 +25,5 @@ use Zenstruck\Foundry\Tests\Integration\Persistence\GenericFactoryUsingBeforeHoo
 #[ResetDatabase]
 final class GenericFactoryUsingBeforeHooksAndResetDatabaseAttributeTest extends GenericFactoryUsingBeforeHooksTestCase
 {
+    use GenericFactoryUsingBeforeHooksTrait;
 }

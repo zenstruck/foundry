@@ -12,6 +12,7 @@ $csFixerConfig = require $file;
 $csFixerConfig->setFinder(
     $csFixerConfig->getFinder()
         ->notName('WebTestCaseWithBothTraitsInWrongOrderTest.php')
+        ->notName('GenericFactoryUsingBeforeHooksAndResetDatabaseTraitTest.php')
         ->in(__DIR__.'/utils')
         ->in(__DIR__.'/config')
 );

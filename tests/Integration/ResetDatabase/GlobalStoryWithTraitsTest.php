@@ -17,7 +17,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
-#[IgnoreDeprecations('In order to use Foundry correctly, you must use the trait')]
+#[IgnoreDeprecations()]
 final class GlobalStoryWithTraitsTest extends GlobalStoryTestCase
 {
     use Factories, ResetDatabase;

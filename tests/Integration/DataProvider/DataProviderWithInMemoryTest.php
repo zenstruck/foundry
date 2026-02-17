@@ -111,7 +111,7 @@ final class DataProviderWithInMemoryTest extends KernelTestCase
     #[DataProvider('provideContactWithLegacyProxy')]
     #[AsInMemoryTest]
     #[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
-    #[IgnoreDeprecations('(p|P)roxy')]
+    #[IgnoreDeprecations]
     public function it_can_create_in_memory_objects_in_data_provider_with_legacy_proxy(?Contact $contact = null): void
     {
         self::assertInstanceOf(Contact::class, $contact);

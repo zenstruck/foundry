@@ -23,7 +23,37 @@ use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-trait ResetDatabase
+if (!\method_exists(Before::class, '__construct')) { // @phpstan-ignore function.alreadyNarrowedType
+    trait ResetDatabase
+    {
+        use CommonResetDatabase;
+
+        /**
+         * @internal
+         * @before
+         */
+        #[Before]
+        public static function _resetDatabaseBeforeEachTest(): void
+        {
+            self::_commonResetDatabaseBeforeEachTest();
+        }
+    }
+} else {
+    trait ResetDatabase
+    {
+        use CommonResetDatabase;
+
+        /** @internal */
+        #[Before(10)]
+        public static function _resetDatabaseBeforeEachTest(): void
+        {
+            self::_commonResetDatabaseBeforeEachTest();
+        }
+    }
+}
+
+/** @internal */
+trait CommonResetDatabase
 {
     /**
      * @internal
@@ -45,32 +75,7 @@ trait ResetDatabase
         static::_shutdown(); // @phpstan-ignore staticClassAccess.privateMethod
     }
 
-    /**
-     * @internal
-     * @before
-     */
-    #[Before(10)]
-    public static function _resetDatabaseBeforeEachTest(): void
-    {
-        if (FoundryExtension::isEnabled()) {
-            return;
-        }
-
-        if (ResetDatabaseManager::canSkipSchemaReset()) {
-            // can fully skip booting the kernel
-            return;
-        }
-
-        $kernel = static::_boot(); // @phpstan-ignore staticClassAccess.privateMethod
-
-        ResetDatabaseManager::resetBeforeEachTest($kernel);
-
-        static::_shutdown(); // @phpstan-ignore staticClassAccess.privateMethod
-    }
-
-    /**
-     * @internal
-     */
+    /** @internal */
     private static function _boot(): KernelInterface
     {
         if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.alreadyNarrowedType
@@ -88,9 +93,7 @@ trait ResetDatabase
         return $kernel;
     }
 
-    /**
-     * @internal
-     */
+    /** @internal */
     private static function _shutdown(): void
     {
         if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.alreadyNarrowedType
@@ -99,5 +102,24 @@ trait ResetDatabase
 
         Configuration::shutdown();
         static::ensureKernelShutdown();
+    }
+
+    /** @internal */
+    private static function _commonResetDatabaseBeforeEachTest(): void
+    {
+        if (FoundryExtension::isEnabled()) {
+            return;
+        }
+
+        if (ResetDatabaseManager::canSkipSchemaReset()) {
+            // can fully skip booting the kernel
+            return;
+        }
+
+        $kernel = static::_boot(); // @phpstan-ignore staticClassAccess.privateMethod
+
+        ResetDatabaseManager::resetBeforeEachTest($kernel);
+
+        static::_shutdown(); // @phpstan-ignore staticClassAccess.privateMethod
     }
 }
