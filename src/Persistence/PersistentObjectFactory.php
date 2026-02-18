@@ -180,6 +180,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
      */
     public static function findBy(array $attributes): array
     {
+        
         return static::repository()->findBy($attributes);
     }
 
