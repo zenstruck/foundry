@@ -51,13 +51,13 @@ final class Hydrator
                 continue;
             }
 
-            if (true === $this->forceProperties || \in_array($parameter, $this->forceProperties, true) || $value instanceof ForceValue) {
+            if ($this->shouldForceProperty($parameter, $value)) {
                 if ($value instanceof ForceValue) {
                     $value = $value->value;
                 }
 
                 try {
-                    self::set($object, $parameter, $value);
+                    self::forceSet($object, $parameter, $value);
                 } catch (\InvalidArgumentException $e) {
                     if (true !== $this->extraAttributes) {
                         throw $e;
@@ -67,10 +67,8 @@ final class Hydrator
                 continue;
             }
 
-            self::$accessor ??= new PropertyAccessor();
-
             try {
-                self::$accessor->setValue($object, $parameter, $value);
+                $this->propertyAccessor()->setValue($object, $parameter, $value);
             } catch (NoSuchPropertyException $e) {
                 if (true !== $this->extraAttributes) {
                     throw new \InvalidArgumentException(\sprintf('Cannot set attribute "%s" for object "%s" (not public and no setter).', $parameter, $object::class), previous: $e);
@@ -97,7 +95,22 @@ final class Hydrator
         return $clone;
     }
 
-    public static function set(object $object, string $property, mixed $value, bool $catchErrors = false): void
+    public function setProperty(object $object, string $property, mixed $value, bool $catchErrors = false): void
+    {
+        if (!$this->shouldForceProperty($property, $value)) {
+            try {
+                $this->propertyAccessor()->setValue($object, $property, $value);
+
+                return;
+            } catch (\Throwable) {
+            }
+        }
+
+        self::forceSet($object, $property, $value, $catchErrors);
+    }
+
+    // todo: rename
+    public static function forceSet(object $object, string $property, mixed $value, bool $catchErrors = false): void
     {
         $value = ForceValue::unwrap($value);
 
@@ -117,7 +130,7 @@ final class Hydrator
         }
     }
 
-    public static function add(object $object, string $property, mixed $value): void
+    public function add(object $object, string $property, mixed $value): void
     {
         $inverseValue = self::get($object, $property);
 
@@ -132,8 +145,12 @@ final class Hydrator
             return;
         }
 
+        if ($inverseValue instanceof \Traversable) {
+            $inverseValue = \iterator_to_array($inverseValue);
+        }
+
         $inverseValue[] = $value;
-        self::set($object, $property, $inverseValue, catchErrors: true);
+        $this->setProperty($object, $property, $inverseValue);
     }
 
     public static function get(object $object, string $property): mixed
@@ -160,7 +177,7 @@ final class Hydrator
         }
 
         foreach ($properties as $property) {
-            self::set($object, $property, self::get($other, $property), catchErrors: true);
+            self::forceSet($object, $property, self::get($other, $property), catchErrors: true);
         }
     }
 
@@ -212,5 +229,15 @@ final class Hydrator
         }
 
         return false;
+    }
+
+    private function shouldForceProperty(int|string $parameter, mixed $value): bool
+    {
+        return true === $this->forceProperties || \in_array($parameter, $this->forceProperties, true) || $value instanceof ForceValue;
+    }
+
+    private function propertyAccessor(): PropertyAccessor
+    {
+        return self::$accessor ??= new PropertyAccessor();
     }
 }

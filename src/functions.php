@@ -59,7 +59,7 @@ function object(string $class, array|callable $attributes = []): object
  */
 function set(object $object, string $property, mixed $value): object
 {
-    Hydrator::set($object, $property, $value);
+    Hydrator::forceSet($object, $property, $value);
 
     return $object;
 }

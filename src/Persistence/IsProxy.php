@@ -93,7 +93,7 @@ trait IsProxy // @phpstan-ignore trait.unused
     {
         $this->_autoRefresh();
 
-        Hydrator::set($this->initializeLazyObject(), $property, $value);
+        Hydrator::forceSet($this->initializeLazyObject(), $property, $value);
 
         return $this;
     }

@@ -453,12 +453,16 @@ abstract class PersistentObjectFactory extends ObjectFactory
                         \array_map(static fn($o) => get($o, $inverseRelationshipMetadata->collectionIndexedBy), $inverseObjects),
                         \array_values($inverseObjects)
                     );
-                }
 
-                set($object, $field, $inverseObjects);
+                    // using forceSet to prevent usage of PropertyAccessor,
+                    // which will potentially call adders and lose index information
+                    Hydrator::forceSet($object, $field, $inverseObjects);
+                } else {
+                    $this->hydrator()->setProperty($object, $field, $inverseObjects);
+                }
             };
 
-            // creation delegated to tempAfterInstantiate hook - return empty array here
+            // creation delegated to tempAfterInstantiate hook - return an empty array here
             return [];
         }
 
@@ -466,7 +470,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
-     * This method will try to find entities in database if they are detached.
+     * This method will try to find entities in the database if they are detached.
      *
      * @internal
      */
@@ -489,14 +493,14 @@ abstract class PersistentObjectFactory extends ObjectFactory
         $inverseRelationship = $persistenceManager->bidirectionalRelationshipMetadata(static::class(), $object::class, $field);
 
         if ($inverseRelationship instanceof OneToOneRelationship) {
-            $this->inverseRelationshipCallbacks[] = static function(object $newObject) use ($object, $inverseRelationship) {
-                Hydrator::set($object, $inverseRelationship->inverseField(), $newObject, catchErrors: true);
+            $this->inverseRelationshipCallbacks[] = function(object $newObject) use ($object, $inverseRelationship) {
+                $this->hydrator()->setProperty($object, $inverseRelationship->inverseField(), $newObject, catchErrors: true);
             };
         }
 
         if ($inverseRelationship instanceof ManyToOneRelationship) {
-            $this->inverseRelationshipCallbacks[] = static function(object $newObject) use ($object, $inverseRelationship) {
-                Hydrator::add($object, $inverseRelationship->inverseField(), $newObject);
+            $this->inverseRelationshipCallbacks[] = function (object $newObject) use ($object, $inverseRelationship) {
+                $this->hydrator()->add($object, $inverseRelationship->inverseField(), $newObject);
             };
         }
 

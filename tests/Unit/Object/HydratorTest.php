@@ -37,7 +37,7 @@ class HydratorTest extends TestCase
             public string $foo = '';
         };
 
-        Hydrator::set($object, 'foo', $value);
+        Hydrator::forceSet($object, 'foo', $value);
 
         $this->assertSame($value, $object->foo);
     }
@@ -54,7 +54,7 @@ class HydratorTest extends TestCase
             public array $foo = [];
         };
 
-        Hydrator::set($object, 'foo', $value);
+        Hydrator::forceSet($object, 'foo', $value);
 
         $this->assertSame($value, $object->foo);
     }
@@ -76,7 +76,7 @@ class HydratorTest extends TestCase
 
         $value = new Object1('foo');
 
-        Hydrator::set($object, 'foo', $value);
+        Hydrator::forceSet($object, 'foo', $value);
 
         $this->assertSame($value, $object->foo);
     }
@@ -97,7 +97,7 @@ class HydratorTest extends TestCase
             new Object1('bar'),
         ];
 
-        Hydrator::set($object, 'foo', $value);
+        Hydrator::forceSet($object, 'foo', $value);
 
         $this->assertSame($value, $object->foo);
     }
@@ -123,7 +123,7 @@ class HydratorTest extends TestCase
             new Object1('bar'),
         ];
 
-        Hydrator::set($object, 'foo', $value);
+        Hydrator::forceSet($object, 'foo', $value);
 
         $this->assertInstanceOf(ArrayCollection::class, $object->foo);
         $this->assertSame($value, $object->foo->toArray());
@@ -150,7 +150,7 @@ class HydratorTest extends TestCase
             new Object1('bar'),
         ];
 
-        Hydrator::set($object, 'foo', $value);
+        Hydrator::forceSet($object, 'foo', $value);
 
         $this->assertInstanceOf(ArrayCollection::class, $object->foo);
         $this->assertSame($value, $object->foo->toArray());
@@ -177,7 +177,7 @@ class HydratorTest extends TestCase
             new Object1('bar'),
         ];
 
-        Hydrator::set($object, 'foo', $value);
+        Hydrator::forceSet($object, 'foo', $value);
 
         $this->assertInstanceOf(ArrayCollection::class, $object->foo);
         $this->assertSame($value, $object->foo->toArray());
@@ -218,7 +218,7 @@ class HydratorTest extends TestCase
             }
         };
 
-        Hydrator::set($object, 'foo', new ForceValue('foo'));
+        Hydrator::forceSet($object, 'foo', new ForceValue('foo'));
 
         $this->assertSame('foo', $object->getFoo());
     }

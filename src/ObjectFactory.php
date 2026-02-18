@@ -13,6 +13,7 @@ namespace Zenstruck\Foundry;
 
 use Zenstruck\Foundry\Object\Event\AfterInstantiate;
 use Zenstruck\Foundry\Object\Event\BeforeInstantiate;
+use Zenstruck\Foundry\Object\Hydrator;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Persistence\ProxyGenerator;
 
@@ -90,7 +91,21 @@ abstract class ObjectFactory extends Factory
      */
     final public function instantiator(): callable
     {
-        return $this->instantiator ?? Configuration::instance()->instantiator;
+        return $this->instantiator ??= Configuration::instance()->instantiator;
+    }
+
+    /**
+     * @internal
+     */
+    final protected function hydrator(): Hydrator
+    {
+        $instantiator = $this->instantiator();
+
+        if (!$instantiator instanceof Instantiator) {
+            return new Hydrator();
+        }
+
+        return $instantiator->hydrator();
     }
 
     /**

@@ -112,6 +112,14 @@ final class Instantiator
     }
 
     /**
+     * @internal
+     */
+    public function hydrator(): Hydrator
+    {
+        return $this->hydrator;
+    }
+
+    /**
      * @template T of object
      *
      * @param class-string<T> $class
