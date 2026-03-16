@@ -1,7 +1,9 @@
 Foundry
 =======
 
-Foundry makes creating fixtures data fun again, via an expressive, auto-completable, on-demand fixtures system with
+"Fixtures you'll actually enjoy writing!"
+
+Foundry turns fixture creation into a joy, via an expressive, auto-completable, on-demand fixtures system with
 Symfony and Doctrine:
 
 Foundry supports ``doctrine/orm`` (with `doctrine/doctrine-bundle <https://github.com/doctrine/doctrinebundle>`_),
