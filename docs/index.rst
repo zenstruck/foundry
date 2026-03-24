@@ -1309,6 +1309,39 @@ If you'd like your factory to not persist by default, override its ``initialize(
 Now, after creating objects using this factory, you'd have to call ``\Zenstruck\Foundry\Persistence\save()`` to actually
 persist them to the database.
 
+.. _without-doctrine-events:
+
+Without Doctrine Events
+~~~~~~~~~~~~~~~~~~~~~~~
+
+When loading fixtures, Doctrine event listeners fire as usual and can cause unwanted side effects. You can disable
+them during object creation to avoid this.
+
+::
+
+    use App\Entity\Post;
+    use App\Factory\PostFactory;
+    use function Zenstruck\Foundry\Persistence\persistent_factory;
+
+    // disable ALL Doctrine event listeners during creation
+    $post = PostFactory::new()->withoutDoctrineEvents()->create(); // returns Post
+
+    // disable only a specific listener/subscriber
+    $post = PostFactory::new()->withoutDoctrineEvents(PostListener::class)->create(); // returns Post
+
+    $posts = PostFactory::new()->withoutDoctrineEvents()->many(5)->create(); // returns Post[]
+
+If you'd like your factory to always disable Doctrine events, override its ``initialize()`` method:
+
+::
+
+    protected function initialize(): static
+    {
+        return $this
+            ->withoutDoctrineEvents()
+        ;
+    }
+
 Array factories
 ~~~~~~~~~~~~~~~
 

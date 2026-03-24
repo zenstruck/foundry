@@ -21,6 +21,12 @@ use Zenstruck\Foundry\Tests\Fixture\App\Controller\CreateContact;
 use Zenstruck\Foundry\Tests\Fixture\App\Controller\DeleteGenericModel;
 use Zenstruck\Foundry\Tests\Fixture\App\Controller\HelloWorld;
 use Zenstruck\Foundry\Tests\Fixture\App\Controller\UpdateGenericModel;
+use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\AsEntityListenerListener;
+use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\DoctrineEventsSubscriber;
+use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\EntityForDoctrineEventsFactory;
+use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\EntityWithAsEntityListenerFactory;
+use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\EntityWithOrmEntityListenerFactory;
+use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\OrmEntityListener;
 use Zenstruck\Foundry\Tests\Fixture\Events\FoundryEventListener;
 use Zenstruck\Foundry\Tests\Fixture\Factories\ArrayFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
@@ -65,6 +71,12 @@ final class TestKernel extends FoundryTestKernel
         $c->register(InMemoryContactRepository::class)->setAutowired(true)->setAutoconfigured(true);
 
         $c->register(FoundryEventListener::class)->setAutowired(true)->setAutoconfigured(true);
+        $c->register(DoctrineEventsSubscriber::class)->setAutowired(true)->setAutoconfigured(true);
+        $c->register(EntityForDoctrineEventsFactory::class)->setAutowired(true)->setAutoconfigured(true);
+        $c->register(OrmEntityListener::class)->setAutowired(true)->setAutoconfigured(true);
+        $c->register(EntityWithOrmEntityListenerFactory::class)->setAutowired(true)->setAutoconfigured(true);
+        $c->register(AsEntityListenerListener::class)->setAutowired(true)->setAutoconfigured(true);
+        $c->register(EntityWithAsEntityListenerFactory::class)->setAutowired(true)->setAutoconfigured(true);
 
         $c->register(DeleteGenericModel::class)->setAutowired(true)->setAutoconfigured(true)->addTag('controller.service_arguments');
         $c->register(UpdateGenericModel::class)->setAutowired(true)->setAutoconfigured(true)->addTag('controller.service_arguments');

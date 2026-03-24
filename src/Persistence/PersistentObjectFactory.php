@@ -46,6 +46,9 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
     private PersistMode $persist = PersistMode::PERSIST;
 
+    /** @var list<class-string>|null null = disabled not requested, [] = disable all, [Foo::class] = disable specific */
+    private ?array $disabledDoctrineEventClasses = null;
+
     /** @phpstan-var array<int, list<callable(T, Parameters, static):void|callable(T, Parameters, static):bool>> */
     private array $afterPersist = [];
 
@@ -261,7 +264,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
             throw new \LogicException('Persistence cannot be used in unit tests.');
         }
 
-        $configuration->persistence()->save($object);
+        $configuration->persistence()->save($object, $this->disabledDoctrineEventClasses);
 
         return $object;
     }
@@ -278,6 +281,20 @@ abstract class PersistentObjectFactory extends ObjectFactory
     {
         $clone = clone $this;
         $clone->persist = PersistMode::WITHOUT_PERSISTING;
+
+        return $clone;
+    }
+
+    /**
+     * Disable Doctrine event listeners/subscribers during object creation.
+     * Call with no arguments to disable all listeners, or pass specific class names to disable selectively.
+     *
+     * @param class-string ...$classes
+     */
+    final public function withoutDoctrineEvents(string ...$classes): static
+    {
+        $clone = clone $this;
+        $clone->disabledDoctrineEventClasses = \array_values($classes);
 
         return $clone;
     }
@@ -377,6 +394,10 @@ abstract class PersistentObjectFactory extends ObjectFactory
             $value = $value
                 ->withPersistMode($this->persist)
                 ->notRootFactory();
+
+            if (null !== $this->disabledDoctrineEventClasses) {
+                $value = $value->withoutDoctrineEvents(...$this->disabledDoctrineEventClasses);
+            }
 
             $pm = Configuration::instance()->persistence();
 
@@ -541,7 +562,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
                         };
                     }
 
-                    Configuration::instance()->persistence()->scheduleForInsert($object, $afterPersistCallbacks);
+                    Configuration::instance()->persistence()->scheduleForInsert($object, $afterPersistCallbacks, $factoryUsed->disabledDoctrineEventClasses);
                 },
                 self::PRIORITY_SCHEDULE_FOR_INSERT
             )
