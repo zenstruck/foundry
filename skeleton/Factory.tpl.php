@@ -25,7 +25,7 @@ if (count($makeFactoryData->getMethodsPHPDoc())) {
 }
 ?>
  */
-final class <?php echo $class_name; ?> extends <?php echo $makeFactoryData->getFactoryClassShortName(); ?>
+final class <?php echo $class_name; ?> extends <?php echo $makeFactoryData->getFactoryClassShortName(); ?><?= "\n" ?>
 {
 <?php if ($makeFactoryData->shouldAddHints()): ?>    /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -34,21 +34,22 @@ final class <?php echo $class_name; ?> extends <?php echo $makeFactoryData->getF
      */
     public function __construct()
     {
+        parent::__construct();
     }
 
-<?php endif ?><?php if ($makeFactoryData->shouldAddOverrideAttributes()): ?>    #[\Override]<?php endif ?>
+<?php endif ?><?php if ($makeFactoryData->shouldAddOverrideAttributes()): ?>    #[\Override]<?= "\n" ?><?php endif ?>
     public static function class(): string
     {
         return <?php echo $makeFactoryData->getObjectShortName(); ?>::class;
     }
 
-<?php if ($makeFactoryData->shouldAddHints()): ?>        /**
+<?php if ($makeFactoryData->shouldAddHints()): ?>    /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      *
      * @todo add your default values here
      */
-<?php endif ?><?php if ($makeFactoryData->shouldAddOverrideAttributes()): ?>    #[\Override]<?php endif ?>
-    protected function defaults(): array<?php if ($makeFactoryData->shouldAddHints()): ?>|callable<?php endif ?>
+<?php endif ?><?php if ($makeFactoryData->shouldAddOverrideAttributes()): ?>    #[\Override]<?= "\n" ?><?php endif ?>
+    protected function defaults(): array<?php if ($makeFactoryData->shouldAddHints()): ?>|callable<?= "\n" ?><?php endif ?>
     {
         return [
 <?php
@@ -59,10 +60,10 @@ foreach ($makeFactoryData->getDefaultProperties() as $propertyName => $value) {
         ];
     }
 
-<?php if ($makeFactoryData->shouldAddHints()): ?>        /**
+<?php if ($makeFactoryData->shouldAddHints()): ?>    /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
      */
-<?php if ($makeFactoryData->shouldAddOverrideAttributes()): ?>    #[\Override]<?php endif ?>
+<?php if ($makeFactoryData->shouldAddOverrideAttributes()): ?>    #[\Override]<?= "\n" ?><?php endif ?>
     protected function initialize(): static
     {
         return $this
