@@ -34,7 +34,6 @@ final class <?php echo $class_name; ?> extends <?php echo $makeFactoryData->getF
      */
     public function __construct()
     {
-        parent::__construct();
     }
 
 <?php endif ?><?php if ($makeFactoryData->shouldAddOverrideAttributes()): ?>    #[\Override]<?= "\n" ?><?php endif ?>
