@@ -17,7 +17,9 @@ use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
+use Zenstruck\Foundry\Tests\Fixture\Entity\ChildEntityForDoctrineEvents;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EntityForDoctrineEvents;
+use Zenstruck\Foundry\Tests\Fixture\Entity\ParentEntityForDoctrineEvents;
 
 #[AsDoctrineListener(event: Events::prePersist)]
 #[AsDoctrineListener(event: Events::preUpdate)]
@@ -27,11 +29,12 @@ final class DoctrineEventsSubscriber
     {
         $object = $eventArgs->getObject();
 
-        if (!$object instanceof EntityForDoctrineEvents) {
-            return;
+        if ($object instanceof EntityForDoctrineEvents
+            || $object instanceof ParentEntityForDoctrineEvents
+            || $object instanceof ChildEntityForDoctrineEvents
+        ) {
+            $object->name .= ' (from Doctrine event)';
         }
-
-        $object->name .= ' (from Doctrine event)';
     }
 
     public function preUpdate(PreUpdateEventArgs $eventArgs): void

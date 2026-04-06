@@ -99,4 +99,17 @@ abstract class PersistenceStrategy
     abstract public function isEmbeddable(object $object): bool;
 
     abstract public function isScheduledForInsert(object $object): bool;
+
+    /**
+     * Execute a callback with Doctrine event listeners temporarily disabled.
+     *
+     * @template T
+     *
+     * @param class-string          $entityClass
+     * @param list<class-string>    $disabledClasses [] = disable all, [Foo::class] = disable specific
+     * @param callable():T  $callback
+     *
+     * @return T
+     */
+    abstract public function withoutDoctrineEvents(string $entityClass, array $disabledClasses, callable $callback): mixed;
 }

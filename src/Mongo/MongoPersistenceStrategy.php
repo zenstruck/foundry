@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Mongo;
 
+use Doctrine\Common\EventManager;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\MappingException as MongoMappingException;
 use Doctrine\Persistence\Mapping\MappingException;
@@ -93,5 +94,30 @@ final class MongoPersistenceStrategy extends PersistenceStrategy
     public function getIdentifierValues(object $object): array
     {
         return $this->classMetadata($object::class)->getIdentifierValues($object);
+    }
+
+    public function withoutDoctrineEvents(string $entityClass, array $disabledClasses, callable $callback): mixed
+    {
+        $eventManager = $this->objectManagerFor($entityClass)->getEventManager();
+        $removed = [];
+
+        foreach ($eventManager->getAllListeners() as $eventName => $listeners) {
+            foreach ($listeners as $listener) {
+                if ([] === $disabledClasses || \in_array($listener::class, $disabledClasses, true)) {
+                    $eventManager->removeEventListener([$eventName], $listener);
+                    $removed[$eventName][] = $listener;
+                }
+            }
+        }
+
+        try {
+            return $callback();
+        } finally {
+            foreach ($removed as $eventName => $listeners) {
+                foreach ($listeners as $listener) {
+                    $eventManager->addEventListener([$eventName], $listener);
+                }
+            }
+        }
     }
 }

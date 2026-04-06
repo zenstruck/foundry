@@ -11,18 +11,21 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Zenstruck\Foundry\Tests\Integration;
+namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\AsEntityListenerListener;
+use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\ChildEntityForDoctrineEventsFactory;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\DoctrineEventsSubscriber;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\EntityForDoctrineEventsFactory;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\EntityWithAsEntityListenerFactory;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\EntityWithOrmEntityListenerFactory;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\OrmEntityListener;
+use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\ParentEntityForDoctrineEventsFactory;
+use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 use function Zenstruck\Foundry\Persistence\flush_after;
 
@@ -74,42 +77,16 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
     // --- flush_after() ---
 
     #[Test]
-    public function testItCanDisableAllDoctrineEventsInsideFlushAfter(): void
+    public function testItThrowsWhenUsedInsideFlushAfter(): void
     {
-        $entity = flush_after(static function(): mixed {
-            return EntityForDoctrineEventsFactory::new()
-                ->withoutDoctrineEvents()
-                ->create(['name' => 'test']);
-        });
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('withoutDoctrineEvents() cannot be used inside flush_after().');
 
-        self::assertSame('test', $entity->name);
-    }
-
-    #[Test]
-    public function testItCanDisableSpecificListenerInsideFlushAfter(): void
-    {
-        $entity = flush_after(static function(): mixed {
-            return EntityForDoctrineEventsFactory::new()
-                ->withoutDoctrineEvents(DoctrineEventsSubscriber::class)
-                ->create(['name' => 'test']);
-        });
-
-        self::assertSame('test', $entity->name);
-    }
-
-    #[Test]
-    public function testDoctrineEventsAreRestoredAfterFlushAfter(): void
-    {
         flush_after(static function(): void {
             EntityForDoctrineEventsFactory::new()
                 ->withoutDoctrineEvents()
-                ->create(['name' => 'first']);
+                ->create(['name' => 'test']);
         });
-
-        // Events must be restored for subsequent factories
-        $entity = EntityForDoctrineEventsFactory::createOne(['name' => 'second']);
-
-        self::assertSame('second (from Doctrine event)', $entity->name);
     }
 
     // --- #[ORM\EntityListeners] ---
@@ -194,5 +171,64 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         $entity = EntityWithAsEntityListenerFactory::createOne(['name' => 'second']);
 
         self::assertSame('second (from AsEntityListener)', $entity->name);
+    }
+
+    // --- Relations: ManyToOne (child → parent) ---
+
+    #[Test]
+    public function testEventsAreCalledByDefaultOnChildAndParent(): void
+    {
+        $child = ChildEntityForDoctrineEventsFactory::createOne(['name' => 'child']);
+
+        self::assertSame('child (from Doctrine event)', $child->name);
+        self::assertNotNull($child->parent);
+        self::assertStringEndsWith('(from Doctrine event)', $child->parent->name);
+    }
+
+    #[Test]
+    public function testWithoutDoctrineEventsPropagatesFromChildToParent(): void
+    {
+        $child = ChildEntityForDoctrineEventsFactory::new()
+            ->withoutDoctrineEvents()
+            ->create(['name' => 'child']);
+
+        self::assertSame('child', $child->name);
+        self::assertNotNull($child->parent);
+        self::assertStringNotContainsString('(from Doctrine event)', $child->parent->name);
+    }
+
+    // --- Relations: OneToMany (parent → children) ---
+
+    #[Test]
+    public function testEventsAreCalledByDefaultOnParentAndChildren(): void
+    {
+        $parent = ParentEntityForDoctrineEventsFactory::createOne([
+            'name' => 'parent',
+            'children' => ChildEntityForDoctrineEventsFactory::new()->many(2),
+        ]);
+
+        self::assertSame('parent (from Doctrine event)', $parent->name);
+        self::assertCount(2, $parent->getChildren());
+
+        foreach ($parent->getChildren() as $child) {
+            self::assertStringEndsWith('(from Doctrine event)', $child->name);
+        }
+    }
+
+    #[Test]
+    public function testWithoutDoctrineEventsPropagatesFromParentToChildren(): void
+    {
+        $parent = ParentEntityForDoctrineEventsFactory::new()
+            ->withoutDoctrineEvents()
+            ->create([
+                'name' => 'parent',
+                'children' => ChildEntityForDoctrineEventsFactory::new()->many(2),
+            ]);
+
+        self::assertSame('parent', $parent->name);
+
+        foreach ($parent->getChildren() as $child) {
+            self::assertStringNotContainsString('(from Doctrine event)', $child->name);
+        }
     }
 }

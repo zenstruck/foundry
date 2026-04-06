@@ -1319,9 +1319,7 @@ them during object creation to avoid this.
 
 ::
 
-    use App\Entity\Post;
     use App\Factory\PostFactory;
-    use function Zenstruck\Foundry\Persistence\persistent_factory;
 
     // disable ALL Doctrine event listeners during creation
     $post = PostFactory::new()->withoutDoctrineEvents()->create(); // returns Post
@@ -1341,6 +1339,10 @@ If you'd like your factory to always disable Doctrine events, override its ``ini
             ->withoutDoctrineEvents()
         ;
     }
+
+.. note::
+
+    ``withoutDoctrineEvents()`` cannot be used inside ``flush_after()``.
 
 Array factories
 ~~~~~~~~~~~~~~~

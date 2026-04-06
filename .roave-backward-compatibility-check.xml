@@ -9,5 +9,6 @@
         <ignored-regex>#(.*)Zenstruck\\Foundry\\Utils\\Rector(.*)#</ignored-regex>
         <ignored-regex>#(.*)initializeInternal(.*)#</ignored-regex>
         <ignored-regex>#\[BC\] CHANGED: Method getIdentifierValues\(\) of class Zenstruck\\Foundry\\Persistence\\PersistenceStrategy became final#</ignored-regex>
+        <ignored-regex>#"Zenstruck\\Foundry\\Test\\(CommonResetDatabase|CommonFactories)" could not be found in the located source(.*)#</ignored-regex>
     </baseline>
 </roave-bc-check>

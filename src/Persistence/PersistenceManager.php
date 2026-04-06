@@ -11,8 +11,6 @@
 
 namespace Zenstruck\Foundry\Persistence;
 
-use Doctrine\Common\EventManager;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
@@ -42,24 +40,6 @@ final class PersistenceManager
     private array $afterPersistCallbacks = [];
 
     /**
-     * Event listener classes to keep disabled until the next real flush, accumulated across
-     * multiple scheduleForInsert() calls inside a flush_after() context.
-     * Keyed by spl_object_id of the ObjectManager.
-     *
-     * @var array<int, list<class-string>|null>
-     */
-    private array $pendingEventClassesToDisable = [];
-
-    /**
-     * Entity-listener overrides to apply during the next real flush, accumulated across
-     * multiple scheduleForInsert() calls inside a flush_after() context.
-     * Keyed by spl_object_id of the ObjectManager.
-     *
-     * @var array<int, list<array{entityClass: class-string, disabledClasses: list<class-string>|null}>>
-     */
-    private array $pendingEntityListenerOverrides = [];
-
-    /**
      * @param iterable<PersistenceStrategy> $strategies
      */
     public function __construct(
@@ -86,34 +66,19 @@ final class PersistenceManager
     /**
      * @template T of object
      *
-     * @param T                       $object
-     * @param list<class-string>|null $disabledDoctrineEventClasses null = no events disabled, [] = all disabled, [Foo::class] = specific classes disabled
+     * @param T $object
      *
      * @return T
      */
-    public function save(object $object, ?array $disabledDoctrineEventClasses = null): object
+    public function save(object $object): object
     {
         if ($object instanceof Proxy) {
             return $object->_save();
         }
 
         $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
-
-        // Disable for prePersist (fires during persist())
-        // Note: disableEntityListeners must be called first, as it calls getClassMetadata() which
-        // triggers the loadClassMetadata event to register #[AsEntityListener] listeners. If we
-        // disabled global events first, that event would fire without the EntityListenerRegistry
-        // handler, leaving entityListeners permanently empty in the metadata cache.
-        $entityListenerBackup = $this->disableEntityListeners($om, $object::class, $disabledDoctrineEventClasses);
-        $removedListeners = $this->disableDoctrineEvents($om, $disabledDoctrineEventClasses);
-
         $om->persist($object);
-
-        $this->restoreDoctrineEvents($om, $removedListeners);
-        $this->restoreEntityListeners($om, $object::class, $entityListenerBackup);
-
-        // Disable for postPersist / preUpdate (fire during flush())
-        $this->flush($om, $disabledDoctrineEventClasses);
+        $this->flush($om);
 
         $shouldFlush = $this->callPostPersistCallbacks();
 
@@ -129,40 +94,17 @@ final class PersistenceManager
      *
      * @param T                     $object
      * @param list<callable():bool> $afterPersistCallbacks
-     * @param list<class-string>|null $disabledDoctrineEventClasses null = no events disabled, [] = all disabled, [Foo::class] = specific classes disabled
      *
      * @return T
      */
-    public function scheduleForInsert(object $object, array $afterPersistCallbacks = [], ?array $disabledDoctrineEventClasses = null): object
+    public function scheduleForInsert(object $object, array $afterPersistCallbacks = []): object
     {
         if ($object instanceof Proxy) {
             $object = ProxyGenerator::unwrap($object);
         }
 
         $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
-
-        // Disable for prePersist (fires during persist())
-        // Note: disableEntityListeners must be called first — same reason as in save().
-        $entityListenerBackup = $this->disableEntityListeners($om, $object::class, $disabledDoctrineEventClasses);
-        $removedListeners = $this->disableDoctrineEvents($om, $disabledDoctrineEventClasses);
-
         $om->persist($object);
-
-        $this->restoreDoctrineEvents($om, $removedListeners);
-        $this->restoreEntityListeners($om, $object::class, $entityListenerBackup);
-
-        // Accumulate for postPersist / preUpdate (fire during the deferred flush())
-        if (null !== $disabledDoctrineEventClasses) {
-            $omId = spl_object_id($om);
-            $this->pendingEventClassesToDisable[$omId] = $this->mergeEventClasses(
-                $this->pendingEventClassesToDisable[$omId] ?? null,
-                $disabledDoctrineEventClasses,
-            );
-            $this->pendingEntityListenerOverrides[$omId][] = [
-                'entityClass' => $object::class,
-                'disabledClasses' => $disabledDoctrineEventClasses,
-            ];
-        }
 
         $this->afterPersistCallbacks = [...$this->afterPersistCallbacks, ...$afterPersistCallbacks];
 
@@ -195,40 +137,10 @@ final class PersistenceManager
         return $result;
     }
 
-    /**
-     * @param list<class-string>|null $eventClassesToDisable
-     */
-    public function flush(ObjectManager $om, ?array $eventClassesToDisable = null): void
+    public function flush(ObjectManager $om): void
     {
-        if (!$this->flush) {
-            return;
-        }
-
-        $omId = spl_object_id($om);
-
-        // Merge caller-supplied classes with anything accumulated from scheduleForInsert()
-        /** @var list<class-string>|null $pendingClasses */
-        $pendingClasses = $this->pendingEventClassesToDisable[$omId] ?? null;
-        $eventClassesToDisable = $this->mergeEventClasses($eventClassesToDisable, $pendingClasses);
-        unset($this->pendingEventClassesToDisable[$omId]);
-
-        $removedListeners = $this->disableDoctrineEvents($om, $eventClassesToDisable);
-
-        // Apply entity-listener overrides accumulated from scheduleForInsert()
-        $entityListenerBackups = [];
-        foreach ($this->pendingEntityListenerOverrides[$omId] ?? [] as $override) {
-            $entityListenerBackups[] = [
-                'entityClass' => $override['entityClass'],
-                'backup' => $this->disableEntityListeners($om, $override['entityClass'], $override['disabledClasses']),
-            ];
-        }
-        unset($this->pendingEntityListenerOverrides[$omId]);
-
-        $om->flush();
-
-        $this->restoreDoctrineEvents($om, $removedListeners);
-        foreach ($entityListenerBackups as ['entityClass' => $entityClass, 'backup' => $backup]) {
-            $this->restoreEntityListeners($om, $entityClass, $backup);
+        if ($this->flush) {
+            $om->flush();
         }
     }
 
@@ -558,134 +470,21 @@ final class PersistenceManager
     }
 
     /**
-     * Temporarily removes Doctrine event listeners from the EventManager.
+     * @template TCallback
      *
-     * @param list<class-string>|null $eventClassesToDisable null = nothing removed, [] = all removed, [Foo::class] = specific classes removed
+     * @param class-string          $entityClass
+     * @param list<class-string>    $disabledClasses [] = all, [Foo::class] = specific
+     * @param callable():TCallback  $callback
      *
-     * @return array<string, list<object>> map of eventName => removed listeners, for later restoration
+     * @return TCallback
      */
-    private function disableDoctrineEvents(ObjectManager $om, ?array $eventClassesToDisable): array
+    public function withoutDoctrineEvents(string $entityClass, array $disabledClasses, callable $callback): mixed
     {
-        if (null === $eventClassesToDisable || !method_exists($om, 'getEventManager')) {
-            return [];
+        if (!$this->flush) {
+            throw new \LogicException('withoutDoctrineEvents() cannot be used inside flush_after().');
         }
 
-        /** @var EventManager $eventManager */
-        $eventManager = $om->getEventManager();
-        $removed = [];
-
-        foreach ($eventManager->getAllListeners() as $eventName => $listeners) {
-            foreach ($listeners as $listener) {
-                if ([] === $eventClassesToDisable || \in_array($listener::class, $eventClassesToDisable, true)) {
-                    $eventManager->removeEventListener([$eventName], $listener);
-                    $removed[$eventName][] = $listener;
-                }
-            }
-        }
-
-        return $removed;
-    }
-
-    /**
-     * Re-adds Doctrine event listeners previously removed by disableDoctrineEvents().
-     *
-     * @param array<string, list<object>> $removedListeners
-     */
-    private function restoreDoctrineEvents(ObjectManager $om, array $removedListeners): void
-    {
-        if ([] === $removedListeners || !method_exists($om, 'getEventManager')) {
-            return;
-        }
-
-        /** @var EventManager $eventManager */
-        $eventManager = $om->getEventManager();
-
-        foreach ($removedListeners as $eventName => $listeners) {
-            foreach ($listeners as $listener) {
-                $eventManager->addEventListener([$eventName], $listener);
-            }
-        }
-    }
-
-    /**
-     * Temporarily removes Doctrine entity listeners by modifying the entity's ClassMetadata.
-     *
-     * @param class-string            $entityClass
-     * @param list<class-string>|null $eventClassesToDisable null = nothing removed, [] = all removed, [Foo::class] = specific classes removed
-     *
-     * @return array<string, list<array{class: class-string, method: string}>> original entityListeners for later restoration
-     */
-    private function disableEntityListeners(ObjectManager $om, string $entityClass, ?array $eventClassesToDisable): array
-    {
-        if (null === $eventClassesToDisable || !$om instanceof EntityManagerInterface) {
-            return [];
-        }
-
-        $metadata = $om->getClassMetadata($entityClass);
-        $original = $metadata->entityListeners;
-
-        if ([] === $original) {
-            return [];
-        }
-
-        if ([] === $eventClassesToDisable) {
-            $metadata->entityListeners = [];
-        } else {
-            $filtered = [];
-            foreach ($original as $event => $listeners) {
-                foreach ($listeners as $listener) {
-                    if (!\in_array($listener['class'], $eventClassesToDisable, true)) {
-                        $filtered[$event][] = $listener;
-                    }
-                }
-            }
-            $metadata->entityListeners = $filtered;
-        }
-
-        return $original;
-    }
-
-    /**
-     * Restores entity listeners previously removed by disableEntityListeners().
-     *
-     * @param class-string                                                        $entityClass
-     * @param array<string, list<array{class: class-string, method: string}>>     $original
-     */
-    private function restoreEntityListeners(ObjectManager $om, string $entityClass, array $original): void
-    {
-        if ([] === $original || !$om instanceof EntityManagerInterface) {
-            return;
-        }
-
-        $om->getClassMetadata($entityClass)->entityListeners = $original;
-    }
-
-    /**
-     * Merges two sets of event classes to disable, following these rules:
-     *   - null + anything  = anything  (null means "no disabling requested")
-     *   - []   + anything  = []        ([] means "disable all", takes precedence)
-     *   - [A]  + [B]       = [A, B]    (union of specific classes)
-     *
-     * @param list<class-string>|null $a
-     * @param list<class-string>|null $b
-     *
-     * @return list<class-string>|null
-     */
-    private function mergeEventClasses(?array $a, ?array $b): ?array
-    {
-        if (null === $a) {
-            return $b;
-        }
-
-        if (null === $b) {
-            return $a;
-        }
-
-        if ([] === $a || [] === $b) {
-            return [];
-        }
-
-        return \array_values(\array_unique([...$a, ...$b]));
+        return $this->strategyFor($entityClass)->withoutDoctrineEvents($entityClass, $disabledClasses, $callback);
     }
 
     /**

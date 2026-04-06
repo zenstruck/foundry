@@ -239,6 +239,24 @@ abstract class PersistentObjectFactory extends ObjectFactory
      */
     public function create(callable|array $attributes = []): object
     {
+        if (null !== $this->disabledDoctrineEventClasses) {
+            return Configuration::instance()->persistence()->withoutDoctrineEvents(
+                static::class(),
+                $this->disabledDoctrineEventClasses,
+                fn() => $this->doCreate($attributes),
+            );
+        }
+
+        return $this->doCreate($attributes);
+    }
+
+    /**
+     * @phpstan-param callable(int):Parameters|Parameters $attributes
+     *
+     * @return T
+     */
+    private function doCreate(callable|array $attributes): object
+    {
         $configuration = Configuration::instance();
 
         if ($configuration->inADataProvider()
@@ -264,7 +282,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
             throw new \LogicException('Persistence cannot be used in unit tests.');
         }
 
-        $configuration->persistence()->save($object, $this->disabledDoctrineEventClasses);
+        $configuration->persistence()->save($object);
 
         return $object;
     }
@@ -562,7 +580,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
                         };
                     }
 
-                    Configuration::instance()->persistence()->scheduleForInsert($object, $afterPersistCallbacks, $factoryUsed->disabledDoctrineEventClasses);
+                    Configuration::instance()->persistence()->scheduleForInsert($object, $afterPersistCallbacks);
                 },
                 self::PRIORITY_SCHEDULE_FOR_INSERT
             )
