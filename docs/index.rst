@@ -17,7 +17,7 @@ or a combination of these.
 
 .. warning::
 
-    You're reading the documentation for Foundry v2 which is brand new.
+    You're reading the documentation for Foundry v2.
     You might want to look at `Foundry v1 documentation <https://symfony.com/bundles/ZenstruckFoundryBundle/1.x/index.html>`_
     or `the upgrade guide to v2 <https://github.com/zenstruck/foundry/blob/1.x/UPGRADE-2.0.md>`_
 
