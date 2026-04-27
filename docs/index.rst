@@ -1952,7 +1952,7 @@ Auto-Refresh
     Auto-refresh mechanism leverages `PHP 8.4 lazy objects <https://www.php.net/manual/en/language.oop5.lazy-objects.php>`_,
     so this feature is only available when using PHP 8.4 or later.
 
-.. info::
+.. note::
 
     For PHP versions older than PHP 8.4, auto-refresh is made using :ref:`Proxy mechanism <object-proxy>`.
 
