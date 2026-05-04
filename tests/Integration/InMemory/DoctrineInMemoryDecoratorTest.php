@@ -35,9 +35,9 @@ use function Zenstruck\Foundry\Persistence\proxy;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11.4
+ * @requires PHPUnit >=11.4.0
  */
-#[RequiresPhpunit('>=11.4')]
+#[RequiresPhpunit('>=11.4.0')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 #[AsInMemoryTest]
 final class DoctrineInMemoryDecoratorTest extends KernelTestCase

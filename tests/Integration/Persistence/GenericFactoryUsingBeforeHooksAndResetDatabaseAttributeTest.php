@@ -18,9 +18,9 @@ use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11.4
+ * @requires PHPUnit >=11.4.0
  */
-#[RequiresPhpunit('>=11.4')]
+#[RequiresPhpunit('>=11.4.0')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 #[ResetDatabase]
 final class GenericFactoryUsingBeforeHooksAndResetDatabaseAttributeTest extends GenericFactoryUsingBeforeHooksTestCase

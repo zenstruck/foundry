@@ -23,7 +23,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Tag\TagFactory;
  * @author Kevin Bond <kevinbond@gmail.com>
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-#[RequiresPhpunit('>=11.4')]
+#[RequiresPhpunit('>=11.4.0')]
 final class PolymorphicEntityFactoryRelationshipTest extends EntityFactoryRelationshipTestCase
 {
     protected static function contactFactory(): ChildContactFactory

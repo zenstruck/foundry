@@ -16,7 +16,7 @@ namespace Zenstruck\Foundry\Tests\Integration\ForceFactoriesTraitUsage;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-#[RequiresPhpunit('>=11.0')]
+#[RequiresPhpunit('>=11.0.0')]
 final class KernelTestWithoutFactoriesTest extends KernelTestCase
 {
     use KernelTestCaseWithoutFactoriesTrait, SkipWithPHPUnitExtension;

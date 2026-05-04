@@ -20,7 +20,7 @@ use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 
-#[RequiresPhpunit('>=11.0')]
+#[RequiresPhpunit('>=11.0.0')]
 final class KernelTestCaseWithBothTraitsTest extends KernelTestCase
 {
     use Factories, ResetDatabase, SkipWithPHPUnitExtension;

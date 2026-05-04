@@ -19,9 +19,9 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11.4
+ * @requires PHPUnit >=11.4.0
  */
-#[RequiresPhpunit('>=11.4')]
+#[RequiresPhpunit('>=11.4.0')]
 #[IgnoreDeprecations]
 final class StandardEntityFlushOnceDisabledFactoryRelationshipTest extends StandardEntityFactoryRelationshipTest
 {

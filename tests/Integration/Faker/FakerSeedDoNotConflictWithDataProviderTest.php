@@ -30,10 +30,10 @@ use function Zenstruck\Foundry\faker;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=12.0
+ * @requires PHPUnit >=12.0.0
  */
-#[RequiresPhp('^8.4')]
-#[RequiresPhpunit('>=12.0')]
+#[RequiresPhp('^8.4.0')]
+#[RequiresPhpunit('>=12.0.0')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 #[RequiresEnvironmentVariable('DATABASE_URL')]
 #[ResetDatabase]

@@ -34,10 +34,10 @@ use Zenstruck\Foundry\Tests\Fixture\ObjectWithNonWriteable;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  * @group maker
- * @requires PHP >=8.4
+ * @requires PHP >=8.4.0
  */
 #[Group('maker')]
-#[RequiresPhp('>=8.4')]
+#[RequiresPhp('>=8.4.0')]
 final class MakeFactoryTest extends MakerTestCase
 {
     private const PHPSTAN_PATH = __DIR__.'/../../..'.FactoryGenerator::PHPSTAN_PATH;

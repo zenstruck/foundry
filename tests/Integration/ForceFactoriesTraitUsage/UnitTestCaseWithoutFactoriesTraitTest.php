@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Exception\FoundryNotBooted;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 
-#[RequiresPhpunit('>=11.0')]
+#[RequiresPhpunit('>=11.0.0')]
 final class UnitTestCaseWithoutFactoriesTraitTest extends TestCase
 {
     use SkipWithPHPUnitExtension;

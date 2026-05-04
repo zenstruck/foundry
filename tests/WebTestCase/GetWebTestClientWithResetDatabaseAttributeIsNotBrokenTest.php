@@ -18,10 +18,10 @@ use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11
+ * @requires PHPUnit >=11.0.0
  */
 #[ResetDatabase]
-#[RequiresPhpunit('>=11')]
+#[RequiresPhpunit('>=11.0.0')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 final class GetWebTestClientWithResetDatabaseAttributeIsNotBrokenTest extends GetWebTestClientIsNotBrokenTestCase
 {

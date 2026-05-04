@@ -34,10 +34,10 @@ use function Zenstruck\Foundry\Persistence\proxy_factory;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=12
+ * @requires PHPUnit >=12.0.0
  */
 #[IgnoreDeprecations]
-#[RequiresPhpunit('>=12')]
+#[RequiresPhpunit('>=12.0.0')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 #[RequiresEnvironmentVariable('USE_PHP_84_LAZY_OBJECTS', '0')]
 #[RequiresEnvironmentVariable('DATABASE_URL')]
@@ -66,7 +66,7 @@ final class DataProviderWithProxyPersistentEntityFactoryTest extends DataProvide
 
     #[Test]
     #[DataProvider('throwsExceptionWhenCreatingObjectInDataProvider')]
-    #[RequiresPhp('<8.4')]
+    #[RequiresPhp('<8.4.0')]
     public function it_throws_when_creating_persisted_object_with_non_proxy_factory_in_data_provider_without_php_84(?\Throwable $e): void
     {
         self::assertInstanceOf(\LogicException::class, $e);

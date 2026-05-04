@@ -27,9 +27,9 @@ use function Zenstruck\Foundry\faker;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=12.0
+ * @requires PHPUnit >=12.0.0
  */
-#[RequiresPhpunit('>=12.0')]
+#[RequiresPhpunit('>=12.0.0')]
 final class FakerSeedShouldNotChangeIfSeedIsNotManagedByFoundryTest extends KernelTestCase
 {
     use Factories, ResetDatabase, ResetFakerTestTrait;

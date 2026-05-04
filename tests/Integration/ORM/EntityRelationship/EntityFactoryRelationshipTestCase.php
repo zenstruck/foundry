@@ -43,9 +43,9 @@ use function Zenstruck\Foundry\Persistence\refresh;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11.4
+ * @requires PHPUnit >=11.4.0
  */
-#[RequiresPhpunit('>=11.4')]
+#[RequiresPhpunit('>=11.4.0')]
 abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
 {
     use ChangesEntityRelationshipCascadePersist, Factories, ResetDatabase;

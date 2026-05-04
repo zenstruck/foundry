@@ -225,10 +225,10 @@ final class ZenstruckFoundryBundleTest extends TestCase
 
     /**
      * @test
-     * @requires PHP < 8.4
+     * @requires PHP < 8.4.0
      */
     #[Test]
-    #[RequiresPhp('<8.4')]
+    #[RequiresPhp('<8.4.0')]
     public function cannot_enable_auto_refresh_with_lazy_objects_if_not_php84(): void
     {
         $this->expectException(InvalidConfigurationException::class);
@@ -241,10 +241,10 @@ final class ZenstruckFoundryBundleTest extends TestCase
 
     /**
      * @test
-     * @requires PHP >= 8.4
+     * @requires PHP >= 8.4.0
      */
     #[Test]
-    #[RequiresPhp('>=8.4')]
+    #[RequiresPhp('>=8.4.0')]
     public function can_enable_auto_refresh_with_lazy_objects_if_at_leat_php84(): void
     {
         $config = self::buildConfiguration([['enable_auto_refresh_with_lazy_objects' => true]]);
@@ -256,10 +256,10 @@ final class ZenstruckFoundryBundleTest extends TestCase
 
     /**
      * @test
-     * @requires PHP >= 8.4
+     * @requires PHP >= 8.4.0
      */
     #[Test]
-    #[RequiresPhp('>=8.4')]
+    #[RequiresPhp('>=8.4.0')]
     public function can_disable_auto_refresh_with_lazy_objects_if_at_leat_php84(): void
     {
         $config = self::buildConfiguration([['enable_auto_refresh_with_lazy_objects' => false]]);

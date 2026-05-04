@@ -17,7 +17,7 @@ use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
-#[RequiresPhpunit('>=11.0')]
+#[RequiresPhpunit('>=11.0.0')]
 final class KernelTestCaseWithOnlyResetDatabaseTraitTestWithoutFactoriesTest extends KernelTestCase
 {
     use KernelTestCaseWithoutFactoriesTrait;

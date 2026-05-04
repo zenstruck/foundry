@@ -23,7 +23,7 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
-#[RequiresPhpunit('>=11.0')]
+#[RequiresPhpunit('>=11.0.0')]
 final class WebTestCaseWithBothTraitsInWrongOrderTest extends WebTestCase
 {
     // traits are in a different order than usual on purpose (ResetDatabase must be first)

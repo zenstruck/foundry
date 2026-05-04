@@ -36,7 +36,7 @@ abstract class OrmEdgeCaseTestCase extends KernelTestCase
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(RelationshipWithGlobalEntity\RelationshipWithGlobalEntity::class, ['globalEntity'])]
-    #[RequiresPhpunit('>=11.4')]
+    #[RequiresPhpunit('>=11.4.0')]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
     public function it_can_use_flush_after_and_entity_from_global_state(): void
     {

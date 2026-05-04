@@ -21,7 +21,7 @@ use PHPUnit\Framework\Attributes\Test;
 use function Zenstruck\Foundry\factory;
 use function Zenstruck\Foundry\Persistence\proxy;
 
-#[RequiresPhpunit('>=11.0')]
+#[RequiresPhpunit('>=11.0.0')]
 final class ClassExtendingBaseTestCaseNotUsingFactoriesTest extends AnotherBaseTestCase
 {
     use KernelTestCaseWithoutFactoriesTrait;

@@ -27,9 +27,9 @@ use function Zenstruck\Foundry\Persistence\proxy_factory;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11.4
+ * @requires PHPUnit >=11.4.0
  */
-#[RequiresPhpunit('>=11.4')]
+#[RequiresPhpunit('>=11.4.0')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 #[IgnoreDeprecations]
 #[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]

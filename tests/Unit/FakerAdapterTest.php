@@ -20,9 +20,9 @@ use Zenstruck\Foundry\Test\Factories;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11.0
+ * @requires PHPUnit >=11.0.0
  */
-#[RequiresPhpunit('>=11.0')]
+#[RequiresPhpunit('>=11.0.0')]
 final class FakerAdapterTest extends TestCase
 {
     use Factories;

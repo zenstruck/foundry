@@ -25,9 +25,9 @@ use function Zenstruck\Foundry\faker;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11.0
+ * @requires PHPUnit >=11.0.0
  */
-#[RequiresPhpunit('>=11.0')]
+#[RequiresPhpunit('>=11.0.0')]
 final class FakerSeedAutomaticallySetKernelTest extends KernelTestCase
 {
     use Factories, ResetDatabase, ResetFakerTestTrait;

@@ -45,11 +45,10 @@ use function Zenstruck\Foundry\Persistence\refresh_all;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=12
  */
-#[RequiresPhpunit('>=12')]
+#[RequiresPhpunit('>=12.0.0')]
 #[RequiresEnvironmentVariable('USE_PHP_84_LAZY_OBJECTS', '1')]
-#[RequiresPhp('>= 8.4')]
+#[RequiresPhp('>=8.4.0')]
 abstract class AutoRefreshTestCase extends WebTestCase
 {
     use Factories, ResetDatabase;

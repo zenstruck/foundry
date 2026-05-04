@@ -23,9 +23,9 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\WithUniqueColumn\WithUnique
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 /**
- * @requires PHPUnit >=11.0
+ * @requires PHPUnit >=11.0.0
  */
-#[RequiresPhpunit('>=11.0')]
+#[RequiresPhpunit('>=11.0.0')]
 final class FakerSeedIsNotResetDuringRunKernelTest extends WebTestCase
 {
     use Factories, RequiresORM, ResetDatabase;

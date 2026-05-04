@@ -37,7 +37,7 @@ use Zenstruck\Foundry\Tests\Integration\ORM\EdgeCasesRelationshipTest;
  * @author Kevin Bond <kevinbond@gmail.com>
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
-#[RequiresPhpunit('>=11.4')]
+#[RequiresPhpunit('>=11.4.0')]
 #[IgnoreDeprecations]
 #[RequiresMethod(\Symfony\Component\VarExporter\LazyProxyTrait::class, 'createLazyProxy')]
 final class ProxyEntityFactoryRelationshipTest extends EntityFactoryRelationshipTestCase
@@ -47,7 +47,7 @@ final class ProxyEntityFactoryRelationshipTest extends EntityFactoryRelationship
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(Contact::class, ['category'])]
     #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
-    #[RequiresPhp('<8.4')]
+    #[RequiresPhp('<8.4.0')]
     public function doctrine_proxies_are_converted_to_foundry_proxies(): void
     {
         static::contactFactory()->create(['category' => static::categoryFactory()]);

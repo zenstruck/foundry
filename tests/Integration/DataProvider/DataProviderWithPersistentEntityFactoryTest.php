@@ -25,10 +25,10 @@ use function Zenstruck\Foundry\Persistence\persistent_factory;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=12
+ * @requires PHPUnit >=12.0.0
  */
-#[RequiresPhp('>=8.4')]
-#[RequiresPhpunit('>=12')]
+#[RequiresPhp('>=8.4.0')]
+#[RequiresPhpunit('>=12.0.0')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 #[RequiresEnvironmentVariable('USE_PHP_84_LAZY_OBJECTS', '1')]
 #[RequiresEnvironmentVariable('DATABASE_URL')]

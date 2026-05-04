@@ -18,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 
-#[RequiresPhpunit('>=11.0')]
+#[RequiresPhpunit('>=11.0.0')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 final class KernelTestCaseWithoutFactoriesTraitTest extends KernelTestCase
 {

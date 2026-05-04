@@ -36,9 +36,9 @@ use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
- * @requires PHPUnit >=11.4
+ * @requires PHPUnit >=11.4.0
  */
-#[RequiresPhpunit('>=11.4')]
+#[RequiresPhpunit('>=11.4.0')]
 #[RequiresPhpunitExtension(FoundryExtension::class)]
 #[ResetDatabase]
 final class DataProviderWithInMemoryTest extends KernelTestCase
@@ -92,7 +92,7 @@ final class DataProviderWithInMemoryTest extends KernelTestCase
     #[Test]
     #[DataProvider('provideContact')]
     #[AsInMemoryTest]
-    #[RequiresPhp('^8.4')]
+    #[RequiresPhp('^8.4.0')]
     public function it_can_create_in_memory_objects_in_data_provider(?Contact $contact = null): void
     {
         self::assertInstanceOf(Contact::class, $contact);
