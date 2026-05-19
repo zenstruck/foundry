@@ -240,11 +240,14 @@ abstract class PersistentObjectFactory extends ObjectFactory
     public function create(callable|array $attributes = []): object
     {
         if (null !== $this->disabledDoctrineEventClasses) {
-            return Configuration::instance()->persistence()->withoutDoctrineEvents(
-                static::class(),
-                $this->disabledDoctrineEventClasses,
-                fn() => $this->doCreate($attributes),
-            );
+            $configuration = Configuration::instance();
+            if ($configuration->isPersistenceAvailable()) {
+                return $configuration->persistence()->withoutDoctrineEvents(
+                    static::class(),
+                    $this->disabledDoctrineEventClasses,
+                    fn() => $this->doCreate($attributes),
+                );
+            }
         }
 
         return $this->doCreate($attributes);
