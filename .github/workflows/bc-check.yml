@@ -4,7 +4,7 @@ on:
   pull_request:
     paths: &paths
       - .github/workflows/bc-check.yml
-      - bin/tools/bc-check
+      - bin/tools/bc-check/**
       - src/**
   push:
     paths: *paths
