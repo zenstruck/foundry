@@ -1,5 +1,6 @@
 {
     "require": {
-        "roave/backward-compatibility-check": "^8.17"
+        "roave/backward-compatibility-check": "^8.17",
+        "composer/composer": "^2.9.8"
     }
 }
