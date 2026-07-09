@@ -22,7 +22,7 @@ class ChildEntityWithCascadeToEntityListener extends Base
     public function __construct(
         #[ORM\Column]
         public string $name,
-        #[ORM\ManyToOne(cascade: ['persist'])]
+        #[ORM\ManyToOne]
         public ?EntityWithAsEntityListener $parent = null,
     ) {
     }

@@ -221,11 +221,12 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
     #[Test]
     public function without_doctrine_events_disables_orm_entity_listener_on_cascade_persisted_related_entity(): void
     {
+        AsEntityListenerListener::$postPersistExecuted = false;
         $child = ChildEntityWithoutAsEntityListenerFactory::createOne(['name' => 'child']);
 
-        self::assertSame('child', $child->name);
         self::assertNotNull($child->parent);
         self::assertStringNotContainsString('(from Doctrine event)', $child->parent->name);
+        self::assertFalse(AsEntityListenerListener::$postPersistExecuted);
     }
 
     // --- Relations: ManyToOne (child → parent) ---
