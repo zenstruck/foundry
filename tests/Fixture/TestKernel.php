@@ -23,10 +23,12 @@ use Zenstruck\Foundry\Tests\Fixture\App\Controller\HelloWorld;
 use Zenstruck\Foundry\Tests\Fixture\App\Controller\UpdateGenericModel;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\AsEntityListenerListener;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\ChildEntityForDoctrineEventsFactory;
+use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\ChildEntityWithoutAsEntityListenerFactory;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\DoctrineEventsSubscriber;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\DocumentForDoctrineEventsFactory;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\EntityForDoctrineEventsFactory;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\EntityWithAsEntityListenerFactory;
+use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\EntityWithoutAsEntityListenerFactory;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\EntityWithOrmEntityListenerFactory;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\MongoDoctrineEventsListener;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\OrmEntityListener;
@@ -83,8 +85,10 @@ final class TestKernel extends FoundryTestKernel
             $c->register(EntityWithOrmEntityListenerFactory::class)->setAutowired(true)->setAutoconfigured(true);
             $c->register(AsEntityListenerListener::class)->setAutowired(true)->setAutoconfigured(true);
             $c->register(EntityWithAsEntityListenerFactory::class)->setAutowired(true)->setAutoconfigured(true);
+            $c->register(EntityWithoutAsEntityListenerFactory::class)->setAutowired(true)->setAutoconfigured(true);
             $c->register(ParentEntityForDoctrineEventsFactory::class)->setAutowired(true)->setAutoconfigured(true);
             $c->register(ChildEntityForDoctrineEventsFactory::class)->setAutowired(true)->setAutoconfigured(true);
+            $c->register(ChildEntityWithoutAsEntityListenerFactory::class)->setAutowired(true)->setAutoconfigured(true);
         }
 
         if (self::hasMongo()) {

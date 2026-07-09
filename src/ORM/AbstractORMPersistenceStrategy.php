@@ -26,6 +26,14 @@ use Zenstruck\Foundry\Persistence\PersistenceStrategy;
  */
 abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
 {
+    private int $withoutDoctrineEventsDepth = 0;
+
+    /** @var array<string, list<object>> */
+    private array $pendingGlobalListenerRestoration = [];
+
+    /** @var array<class-string, array<string, list<array{class: class-string, method: string}>>> */
+    private array $pendingEntityListenerRestoration = [];
+
     final public function contains(object $object): bool
     {
         $em = $this->objectManagerFor($object::class);
@@ -122,75 +130,75 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
     public function withoutDoctrineEvents(string $entityClass, array $disabledClasses, callable $callback): mixed
     {
         $om = $this->objectManagerFor($entityClass);
+        $isOutermost = 0 === $this->withoutDoctrineEventsDepth;
+        ++$this->withoutDoctrineEventsDepth;
 
         // Entity listeners first: getClassMetadata() triggers loadClassMetadata which registers
         // #[AsEntityListener] listeners. Global listeners must still be active at that point.
-        $entityListenersBackup = $this->removeEntityListeners($om, $entityClass, $disabledClasses);
-        $globalListenersBackup = $this->removeGlobalListeners($om, $disabledClasses);
+        $this->removeEntityListeners($om, $entityClass, $disabledClasses);
+        $this->removeGlobalListeners($om, $disabledClasses);
 
         try {
             return $callback();
         } finally {
-            $this->restoreGlobalListeners($om, $globalListenersBackup);
-            $this->restoreEntityListeners($om, $entityClass, $entityListenersBackup);
+            --$this->withoutDoctrineEventsDepth;
+
+            // Both global and entity listeners are accumulated across nested calls and restored only once
+            // when the outermost withoutDoctrineEvents callback completes.
+            if ($isOutermost) {
+                $this->restoreGlobalListeners($om);
+                $this->restoreEntityListeners($om);
+            }
         }
     }
 
     /**
      * @param list<class-string> $disabledClasses
-     *
-     * @return array<string, list<object>>
      */
-    private function removeGlobalListeners(EntityManagerInterface $om, array $disabledClasses): array
+    private function removeGlobalListeners(EntityManagerInterface $om, array $disabledClasses): void
     {
         $eventManager = $om->getEventManager();
-        $removed = [];
 
         foreach ($eventManager->getAllListeners() as $eventName => $listeners) {
             foreach ($listeners as $listener) {
                 if ([] === $disabledClasses || \in_array($listener::class, $disabledClasses, true)) {
                     $eventManager->removeEventListener([$eventName], $listener);
-                    $removed[$eventName][] = $listener;
+                    $this->pendingGlobalListenerRestoration[$eventName][] = $listener;
                 }
             }
         }
-
-        return $removed;
     }
 
-    /**
-     * @param array<string, list<object>> $removedListeners
-     */
-    private function restoreGlobalListeners(EntityManagerInterface $om, array $removedListeners): void
+    private function restoreGlobalListeners(EntityManagerInterface $om,): void
     {
         $eventManager = $om->getEventManager();
 
-        foreach ($removedListeners as $eventName => $listeners) {
+        foreach ($this->pendingGlobalListenerRestoration as $eventName => $listeners) {
             foreach ($listeners as $listener) {
                 $eventManager->addEventListener([$eventName], $listener);
             }
         }
+        $this->pendingGlobalListenerRestoration = [];
     }
 
     /**
      * @param class-string       $entityClass
      * @param list<class-string> $disabledClasses
-     *
-     * @return array<string, list<array{class: class-string, method: string}>>
      */
-    private function removeEntityListeners(EntityManagerInterface $om, string $entityClass, array $disabledClasses): array
+    private function removeEntityListeners(EntityManagerInterface $om, string $entityClass, array $disabledClasses): void
     {
         $metadata = $om->getClassMetadata($entityClass);
         $original = $metadata->entityListeners;
 
         if ([] === $original) {
-            return [];
+            return;
         }
 
+        $this->pendingEntityListenerRestoration[$entityClass] ??= $original;
         if ([] === $disabledClasses) {
             $metadata->entityListeners = [];
 
-            return $original;
+            return;
         }
 
         $metadata->entityListeners = \array_filter(
@@ -203,18 +211,13 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
             ),
             static fn(array $listeners) => [] !== $listeners,
         );
-
-        return $original;
     }
 
-    /**
-     * @param class-string                                                    $entityClass
-     * @param array<string, list<array{class: class-string, method: string}>> $original
-     */
-    private function restoreEntityListeners(EntityManagerInterface $om, string $entityClass, array $original): void
+    private function restoreEntityListeners(EntityManagerInterface $om): void
     {
-        if ([] !== $original) {
-            $om->getClassMetadata($entityClass)->entityListeners = $original;
+        foreach ($this->pendingEntityListenerRestoration as $entityClass => $listeners) {
+            $om->getClassMetadata($entityClass)->entityListeners = $listeners;
         }
+        $this->pendingEntityListenerRestoration = [];
     }
 }

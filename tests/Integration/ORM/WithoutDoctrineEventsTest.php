@@ -19,6 +19,7 @@ use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\AsEntityListenerListener;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\ChildEntityForDoctrineEventsFactory;
+use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\ChildEntityWithoutAsEntityListenerFactory;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\DoctrineEventsSubscriber;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\EntityForDoctrineEventsFactory;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\EntityWithAsEntityListenerFactory;
@@ -210,6 +211,21 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         $entity = EntityWithAsEntityListenerFactory::createOne(['name' => 'second']);
 
         self::assertSame('second (from AsEntityListener)', $entity->name);
+    }
+
+    // --- Relations: ORM entity listeners on cascade-persisted related entity ---
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function without_doctrine_events_disables_orm_entity_listener_on_cascade_persisted_related_entity(): void
+    {
+        $child = ChildEntityWithoutAsEntityListenerFactory::createOne(['name' => 'child']);
+
+        self::assertSame('child', $child->name);
+        self::assertNotNull($child->parent);
+        self::assertStringNotContainsString('(from Doctrine event)', $child->parent->name);
     }
 
     // --- Relations: ManyToOne (child → parent) ---
