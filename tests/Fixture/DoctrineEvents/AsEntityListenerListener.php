@@ -16,12 +16,14 @@ namespace Zenstruck\Foundry\Tests\Fixture\DoctrineEvents;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Events;
+use Zenstruck\Foundry\Tests\Fixture\Entity\ChildEntityWithCascadeToEntityListener;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EntityWithAsEntityListener;
 
 #[AsEntityListener(event: Events::prePersist, entity: EntityWithAsEntityListener::class)]
+#[AsEntityListener(event: Events::prePersist, entity: ChildEntityWithCascadeToEntityListener::class)]
 final class AsEntityListenerListener
 {
-    public function prePersist(EntityWithAsEntityListener $entity, PrePersistEventArgs $eventArgs): void
+    public function prePersist(EntityWithAsEntityListener|ChildEntityWithCascadeToEntityListener $entity, PrePersistEventArgs $eventArgs): void
     {
         $entity->name .= ' (from AsEntityListener)';
     }
