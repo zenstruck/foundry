@@ -19,8 +19,11 @@ use Doctrine\ODM\MongoDB\Events;
 use Zenstruck\Foundry\Tests\Fixture\Document\DocumentForDoctrineEvents;
 
 #[AsDocumentListener(event: Events::prePersist)]
+#[AsDocumentListener(event: Events::postPersist)]
 final class MongoDoctrineEventsListener
 {
+    public static int $postPersistCount = 0;
+
     public function prePersist(LifecycleEventArgs $eventArgs): void
     {
         $object = $eventArgs->getDocument();
@@ -30,5 +33,12 @@ final class MongoDoctrineEventsListener
         }
 
         $object->name .= ' (from Mongo event)';
+    }
+
+    public function postPersist(LifecycleEventArgs $eventArgs): void
+    {
+        if ($eventArgs->getDocument() instanceof DocumentForDoctrineEvents) {
+            ++self::$postPersistCount;
+        }
     }
 }

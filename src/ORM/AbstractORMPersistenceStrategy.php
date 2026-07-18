@@ -119,7 +119,7 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
         );
     }
 
-    public function withoutDoctrineEvents(string $entityClass, array $disabledClasses, callable $callback): mixed
+    public function disableDoctrineEvents(string $entityClass, array $disabledClasses): callable
     {
         $om = $this->objectManagerFor($entityClass);
 
@@ -128,12 +128,10 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
         $entityListenersBackup = $this->removeEntityListeners($om, $entityClass, $disabledClasses);
         $globalListenersBackup = $this->removeGlobalListeners($om, $disabledClasses);
 
-        try {
-            return $callback();
-        } finally {
+        return function() use ($om, $entityClass, $entityListenersBackup, $globalListenersBackup): void {
             $this->restoreGlobalListeners($om, $globalListenersBackup);
             $this->restoreEntityListeners($om, $entityClass, $entityListenersBackup);
-        }
+        };
     }
 
     /**

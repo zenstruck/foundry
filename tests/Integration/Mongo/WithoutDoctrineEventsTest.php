@@ -18,6 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\DocumentForDoctrineEventsFactory;
+use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\DocumentWithListenedRelationFactory;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\MongoDoctrineEventsListener;
 use Zenstruck\Foundry\Tests\Integration\RequiresMongo;
 
@@ -77,6 +78,28 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         $document = DocumentForDoctrineEventsFactory::createOne(['name' => 'second']);
 
         self::assertSame('second (from Mongo event)', $document->name);
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function without_doctrine_events_on_nested_factory_only_covers_the_root_flush(): void
+    {
+        MongoDoctrineEventsListener::$postPersistCount = 0;
+
+        $document = DocumentWithListenedRelationFactory::createOne([
+            'name' => 'root',
+            'listened' => DocumentForDoctrineEventsFactory::new()->withoutDoctrineEvents(MongoDoctrineEventsListener::class),
+        ]);
+
+        self::assertNotNull($document->listened);
+        self::assertStringNotContainsString('(from Mongo event)', $document->listened->name);
+        self::assertSame(0, MongoDoctrineEventsListener::$postPersistCount);
+
+        DocumentForDoctrineEventsFactory::createOne(['name' => 'after']);
+
+        self::assertSame(1, MongoDoctrineEventsListener::$postPersistCount);
     }
 
     /**

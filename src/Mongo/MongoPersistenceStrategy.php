@@ -95,7 +95,7 @@ final class MongoPersistenceStrategy extends PersistenceStrategy
         return $this->classMetadata($object::class)->getIdentifierValues($object);
     }
 
-    public function withoutDoctrineEvents(string $entityClass, array $disabledClasses, callable $callback): mixed
+    public function disableDoctrineEvents(string $entityClass, array $disabledClasses): callable
     {
         $eventManager = $this->objectManagerFor($entityClass)->getEventManager();
         $removed = [];
@@ -109,14 +109,12 @@ final class MongoPersistenceStrategy extends PersistenceStrategy
             }
         }
 
-        try {
-            return $callback();
-        } finally {
+        return static function() use ($eventManager, $removed): void {
             foreach ($removed as $eventName => $listeners) {
                 foreach ($listeners as $listener) {
                     $eventManager->addEventListener([$eventName], $listener);
                 }
             }
-        }
+        };
     }
 }

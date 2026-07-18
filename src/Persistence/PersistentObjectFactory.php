@@ -49,6 +49,8 @@ abstract class PersistentObjectFactory extends ObjectFactory
     /** @var list<class-string>|null null = disabled not requested, [] = disable all, [Foo::class] = disable specific */
     private ?array $disabledDoctrineEventClasses = null;
 
+    private ?DoctrineEventsScope $doctrineEventsScope = null;
+
     /** @phpstan-var array<int, list<callable(T, Parameters, static):void|callable(T, Parameters, static):bool>> */
     private array $afterPersist = [];
 
@@ -240,15 +242,22 @@ abstract class PersistentObjectFactory extends ObjectFactory
     public function create(callable|array $attributes = []): object
     {
         $configuration = Configuration::instance();
-        if (null !== $this->disabledDoctrineEventClasses && $configuration->isPersistenceAvailable()) {
-            return $configuration->persistence()->withoutDoctrineEvents(
-                static::class(),
-                $this->disabledDoctrineEventClasses,
-                fn() => $this->doCreate($attributes),
-            );
+
+        if (!$configuration->isPersistenceAvailable()) {
+            return $this->doCreate($attributes);
         }
 
-        return $this->doCreate($attributes);
+        // a scope opened here must be closed here, once the root flush is done
+        $ownedScope = $this->doctrineEventsScope?->isOpen() ? null : new DoctrineEventsScope($configuration->persistence());
+        $factory = $this->withDoctrineEventsScope($ownedScope);
+
+        $factory->doctrineEventsScope?->disable(static::class(), $this->disabledDoctrineEventClasses);
+
+        try {
+            return $factory->doCreate($attributes);
+        } finally {
+            $ownedScope?->close();
+        }
     }
 
     final public function andPersist(): static
@@ -277,6 +286,21 @@ abstract class PersistentObjectFactory extends ObjectFactory
     {
         $clone = clone $this;
         $clone->disabledDoctrineEventClasses = \array_values($classes);
+
+        return $clone;
+    }
+
+    /**
+     * @internal
+     */
+    public function withDoctrineEventsScope(?DoctrineEventsScope $scope): static
+    {
+        if (null === $scope || $this->doctrineEventsScope?->isOpen()) {
+            return $this; // an outer open scope always wins
+        }
+
+        $clone = clone $this;
+        $clone->doctrineEventsScope = $scope;
 
         return $clone;
     }
@@ -375,11 +399,8 @@ abstract class PersistentObjectFactory extends ObjectFactory
         if ($value instanceof self) {
             $value = $value
                 ->withPersistMode($this->persist)
-                ->notRootFactory();
-
-            if (null !== $this->disabledDoctrineEventClasses) {
-                $value = $value->withoutDoctrineEvents(...$this->disabledDoctrineEventClasses);
-            }
+                ->notRootFactory()
+                ->withDoctrineEventsScope($this->doctrineEventsScope);
 
             $pm = Configuration::instance()->persistence();
 
@@ -436,6 +457,19 @@ abstract class PersistentObjectFactory extends ObjectFactory
         $pm = Configuration::instance()->persistence();
 
         $inverseRelationshipMetadata = $pm->bidirectionalRelationshipMetadata(static::class(), $collection->factory::class(), $field);
+
+        // scope rides on the item factories themselves, so it survives any collection
+        // reconstruction (reuse(), distribute()) without FactoryCollection knowing about it
+        if (null !== $scope = $this->doctrineEventsScope) {
+            $factories = \array_map(
+                static fn(Factory $f) => $f instanceof self ? $f->withDoctrineEventsScope($scope) : $f,
+                $collection->all(),
+            );
+
+            if ([] !== $factories) {
+                $collection = FactoryCollection::fromFactoriesList($factories);
+            }
+        }
 
         $collection = $collection->notRootFactory();
 

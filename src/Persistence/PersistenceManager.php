@@ -30,8 +30,10 @@ use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @internal
+ *
+ * @final not final only to be mockable in tests
  */
-final class PersistenceManager
+class PersistenceManager
 {
     private bool $flush = true;
     private bool $persist = true;
@@ -438,21 +440,20 @@ final class PersistenceManager
     }
 
     /**
-     * @template TCallback
+     * Removes the given Doctrine listeners immediately and returns a restorer closure.
      *
-     * @param class-string         $entityClass
-     * @param list<class-string>   $disabledClasses [] = all, [Foo::class] = specific
-     * @param callable():TCallback $callback
+     * @param class-string       $entityClass
+     * @param list<class-string> $disabledClasses [] = all, [Foo::class] = specific
      *
-     * @return TCallback
+     * @return callable():void
      */
-    public function withoutDoctrineEvents(string $entityClass, array $disabledClasses, callable $callback): mixed
+    public function disableDoctrineEvents(string $entityClass, array $disabledClasses): callable
     {
         if (!$this->flush) {
             throw new \LogicException('withoutDoctrineEvents() cannot be used inside flush_after().');
         }
 
-        return $this->strategyFor($entityClass)->withoutDoctrineEvents($entityClass, $disabledClasses, $callback);
+        return $this->strategyFor($entityClass)->disableDoctrineEvents($entityClass, $disabledClasses);
     }
 
     private function flushAllStrategies(): void
