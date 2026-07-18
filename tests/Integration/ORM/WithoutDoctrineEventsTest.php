@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
@@ -37,6 +39,7 @@ use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\ListenedEntityListener;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\OrmEntityListener;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\ParentEntityForDoctrineEventsFactory;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\ParentOfListenedEntitiesFactory;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EntityWithAsEntityListener;
 use Zenstruck\Foundry\Tests\Fixture\Entity\ListenedEntity;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
@@ -261,6 +264,34 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
 
         self::assertSame('third (from AsEntityListener)', $third->name);
         self::assertTrue(AsEntityListenerListener::$postPersistExecuted);
+    }
+
+    // --- Metadata loaded lazily during the disabling window ---
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function it_keeps_as_entity_listeners_of_classes_whose_metadata_loads_during_the_window(): void
+    {
+        /** @var EntityManagerInterface $em */
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+
+        // ensure the metadata of EntityWithAsEntityListener is built for the very first time inside the window
+        $em->getConfiguration()->getMetadataCache()?->clear();
+
+        EntityForDoctrineEventsFactory::new()
+            ->withoutDoctrineEvents()
+            // triggers the loadClassMetadata event for this class inside the window
+            ->afterInstantiate(static function() use ($em): void {
+                $em->getClassMetadata(EntityWithAsEntityListener::class);
+            })
+            ->create(['name' => 'test']);
+
+        // outside the window, the #[AsEntityListener] must still be registered
+        $entity = EntityWithAsEntityListenerFactory::createOne(['name' => 'second']);
+
+        self::assertSame('second (from AsEntityListener)', $entity->name);
     }
 
     // --- Relations: ManyToOne (child → parent) ---

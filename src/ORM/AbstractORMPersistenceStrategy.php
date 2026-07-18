@@ -12,6 +12,7 @@
 namespace Zenstruck\Foundry\ORM;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Zenstruck\Foundry\Persistence\PersistenceStrategy;
@@ -145,6 +146,13 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
         $removed = [];
 
         foreach ($eventManager->getAllListeners() as $eventName => $listeners) {
+            // Removing mapping infrastructure listeners (e.g. DoctrineBundle's AttachEntityListenersListener)
+            // would permanently corrupt the metadata of any class loaded for the first time during the
+            // disabling window: its #[AsEntityListener] listeners would be cached away forever.
+            if ([] === $disabledClasses && \in_array($eventName, [Events::loadClassMetadata, Events::onClassMetadataNotFound], true)) {
+                continue;
+            }
+
             foreach ($listeners as $listener) {
                 if ([] === $disabledClasses || \in_array($listener::class, $disabledClasses, true)) {
                     $eventManager->removeEventListener([$eventName], $listener);
