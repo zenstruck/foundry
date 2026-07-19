@@ -57,6 +57,9 @@ abstract class PersistentObjectFactory extends ObjectFactory
     /** @var list<callable(T):void> */
     private array $inverseRelationshipCallbacks = [];
 
+    /** @var list<string> */
+    private array $skipInverseWiringFields = [];
+
     private bool $isRootFactory = true;
 
     private ?bool $autorefreshEnabled = null;
@@ -255,6 +258,12 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
         try {
             return $factory->doCreate($attributes);
+        } catch (\Throwable $e) {
+            if (null !== $ownedScope) {
+                $configuration->persistence()->discardScheduled();
+            }
+
+            throw $e;
         } finally {
             $ownedScope?->close();
         }
@@ -372,6 +381,20 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
+     * The inverse side of the given field will not be silently wired when this
+     * factory's object is created: the owner of the relation does the wiring itself.
+     *
+     * @internal
+     */
+    public function skipInverseWiringFor(string $field): static
+    {
+        $clone = clone $this;
+        $clone->skipInverseWiringFields[] = $field;
+
+        return $clone;
+    }
+
+    /**
      * @internal
      */
     public function notRootFactory(): static
@@ -461,22 +484,19 @@ abstract class PersistentObjectFactory extends ObjectFactory
         // scope rides on the item factories themselves, so it survives any collection
         // reconstruction (reuse(), distribute()) without FactoryCollection knowing about it
         if (null !== $scope = $this->doctrineEventsScope) {
-            $factories = \array_map(
-                static fn(Factory $f) => $f instanceof self ? $f->withDoctrineEventsScope($scope) : $f,
-                $collection->all(),
-            );
-
-            if ([] !== $factories) {
-                $collection = FactoryCollection::fromFactoriesList($factories);
-            }
+            $collection = $collection->map(static fn(Factory $f) => $f instanceof self ? $f->withDoctrineEventsScope($scope) : $f);
         }
 
         $collection = $collection->notRootFactory();
 
         if ($inverseRelationshipMetadata instanceof OneToManyRelationship) {
-            $this->inverseRelationshipCallbacks[] = function(object $object) use ($collection, $inverseRelationshipMetadata, $field) {
-                $inverseField = $inverseRelationshipMetadata->inverseField();
+            $inverseField = $inverseRelationshipMetadata->inverseField();
 
+            // this factory's accessor (see the callback below) is the single wiring agent
+            // for its own collection: children must not silently touch it from their side
+            $collection = $collection->map(static fn(Factory $f) => $f instanceof self ? $f->skipInverseWiringFor($inverseField) : $f);
+
+            $this->inverseRelationshipCallbacks[] = function(object $object) use ($collection, $inverseRelationshipMetadata, $field, $inverseField) {
                 $inverseObjects = $collection
                     ->reuse(...$this->reusedObjects())
                     ->withPersistMode($this->isPersisting() ? PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT : PersistMode::WITHOUT_PERSISTING)
@@ -484,15 +504,18 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
                 $inverseObjects = ProxyGenerator::unwrap($inverseObjects, withAutoRefresh: false);
 
-                // if the collection is indexed by a field, index the array
+                // if the collection is indexed by a field, index the array and keep a raw
+                // assignment: going through an adder would lose the keys
                 if ($inverseRelationshipMetadata->collectionIndexedBy) {
                     $inverseObjects = \array_combine(
                         \array_map(static fn($o) => get($o, $inverseRelationshipMetadata->collectionIndexedBy), $inverseObjects),
                         \array_values($inverseObjects)
                     );
-                }
 
-                set($object, $field, $inverseObjects);
+                    Hydrator::forceSet($object, $field, $inverseObjects);
+                } else {
+                    $this->hydrator()->addAll($object, $field, $inverseObjects);
+                }
             };
 
             // creation delegated to tempAfterInstantiate hook - return empty array here
@@ -527,11 +550,11 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
         if ($inverseRelationship instanceof OneToOneRelationship) {
             $this->inverseRelationshipCallbacks[] = static function(object $newObject) use ($object, $inverseRelationship) {
-                Hydrator::set($object, $inverseRelationship->inverseField(), $newObject, catchErrors: true);
+                Hydrator::forceSet($object, $inverseRelationship->inverseField(), $newObject, catchErrors: true);
             };
         }
 
-        if ($inverseRelationship instanceof ManyToOneRelationship) {
+        if ($inverseRelationship instanceof ManyToOneRelationship && !\in_array($field, $this->skipInverseWiringFields, true)) {
             $this->inverseRelationshipCallbacks[] = static function(object $newObject) use ($object, $inverseRelationship) {
                 Hydrator::add($object, $inverseRelationship->inverseField(), $newObject);
             };
@@ -578,7 +601,14 @@ abstract class PersistentObjectFactory extends ObjectFactory
                         };
                     }
 
-                    Configuration::instance()->persistence()->scheduleForInsert($object, $afterPersistCallbacks);
+                    $persistenceManager = Configuration::instance()->persistence();
+                    $persistenceManager->scheduleForInsert($object, $afterPersistCallbacks);
+
+                    // the root factory's hook is the single point where the whole object graph
+                    // is guaranteed instantiated and wired: persist everything now
+                    if ($factoryUsed->isRootFactory && PersistMode::PERSIST === $factoryUsed->persistMode()) {
+                        $persistenceManager->persistScheduled();
+                    }
                 },
                 self::PRIORITY_SCHEDULE_FOR_INSERT
             )

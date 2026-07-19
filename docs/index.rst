@@ -665,6 +665,24 @@ they were added, or by priority (higher priority hooks are executed first).
 
     Hook priority were added in Foundry 2.8.
 
+``beforeInstantiate`` and ``afterInstantiate`` hooks run **before** the object graph is handed over to the
+object manager: state set by Doctrine lifecycle listeners (e.g. a field computed in a ``PrePersist``
+listener) is not yet available, even for objects created by a nested factory. To observe such state,
+register an ``afterInstantiate`` hook with a priority lower than
+``PersistentObjectFactory::PRIORITY_SCHEDULE_FOR_INSERT``: it runs once the whole object graph has been
+persisted (but not flushed yet):
+
+::
+
+    use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+
+    PostFactory::new()
+        ->afterInstantiate(function(Post $post): void {
+            // the "pre persist" events of the whole object graph have been triggered:
+            // any state they computed is visible here
+        }, priority: PersistentObjectFactory::PRIORITY_SCHEDULE_FOR_INSERT - 1)
+    ;
+
 You can also add hooks directly in your factory class:
 
 ::

@@ -103,6 +103,14 @@ final class Instantiator
         return $clone;
     }
 
+    /**
+     * @internal
+     */
+    public function hydrator(): Hydrator
+    {
+        return $this->hydrator;
+    }
+
     public function disableHydration(): self
     {
         $clone = clone $this;

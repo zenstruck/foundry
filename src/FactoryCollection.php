@@ -218,6 +218,24 @@ final class FactoryCollection implements \IteratorAggregate
     }
 
     /**
+     * @param callable(TFactory):TFactory $callback
+     *
+     * @return self<T, TFactory>
+     *
+     * @internal
+     */
+    public function map(callable $callback): self
+    {
+        $factories = $this->all();
+
+        if ([] === $factories) {
+            return $this;
+        }
+
+        return new self($this->factory, static fn() => \array_map($callback, $factories));
+    }
+
+    /**
      * @internal
      */
     public function reuse(object ...$objects): static
@@ -226,15 +244,7 @@ final class FactoryCollection implements \IteratorAggregate
             return $this;
         }
 
-        $factories = $this->all();
-
-        return new self(
-            $this->factory,
-            static fn() => \array_map(
-                static fn(Factory $f) => $f instanceof ObjectFactory ? $f->reuse(...$objects) : $f,
-                $factories,
-            )
-        );
+        return $this->map(static fn(Factory $f) => $f instanceof ObjectFactory ? $f->reuse(...$objects) : $f);
     }
 
     /**

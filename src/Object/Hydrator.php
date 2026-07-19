@@ -51,13 +51,13 @@ final class Hydrator
                 continue;
             }
 
-            if (true === $this->forceProperties || \in_array($parameter, $this->forceProperties, true) || $value instanceof ForceValue) {
+            if ($this->shouldForceProperty($parameter) || $value instanceof ForceValue) {
                 if ($value instanceof ForceValue) {
                     $value = $value->value;
                 }
 
                 try {
-                    self::set($object, $parameter, $value);
+                    self::forceSet($object, $parameter, $value);
                 } catch (\InvalidArgumentException $e) {
                     if (true !== $this->extraAttributes) {
                         throw $e;
@@ -67,10 +67,8 @@ final class Hydrator
                 continue;
             }
 
-            self::$accessor ??= new PropertyAccessor();
-
             try {
-                self::$accessor->setValue($object, $parameter, $value);
+                self::propertyAccessor()->setValue($object, $parameter, $value);
             } catch (NoSuchPropertyException $e) {
                 if (true !== $this->extraAttributes) {
                     throw new \InvalidArgumentException(\sprintf('Cannot set attribute "%s" for object "%s" (not public and no setter).', $parameter, $object::class), previous: $e);
@@ -97,7 +95,7 @@ final class Hydrator
         return $clone;
     }
 
-    public static function set(object $object, string $property, mixed $value, bool $catchErrors = false): void
+    public static function forceSet(object $object, string $property, mixed $value, bool $catchErrors = false): void
     {
         $value = ForceValue::unwrap($value);
 
@@ -132,8 +130,50 @@ final class Hydrator
             return;
         }
 
+        if (!$inverseValue instanceof Collection && $inverseValue instanceof \Traversable) {
+            $inverseValue = \iterator_to_array($inverseValue);
+        }
+
         $inverseValue[] = $value;
-        self::set($object, $property, $inverseValue, catchErrors: true);
+        self::forceSet($object, $property, $inverseValue, catchErrors: true);
+    }
+
+    /**
+     * Adds the given values to a collection property through its adder when one exists
+     * (so domain logic in adders runs), without ever removing already present items.
+     * Forced properties and objects without accessors fall back to raw reflection.
+     *
+     * @param list<object> $values
+     */
+    public function addAll(object $object, string $property, array $values): void
+    {
+        if ($this->shouldForceProperty($property)) {
+            self::forceSet($object, $property, $values, catchErrors: true);
+
+            return;
+        }
+
+        $currentValue = self::get($object, $property);
+        $currentItems = match (true) {
+            $currentValue instanceof Collection => $currentValue->toArray(),
+            \is_array($currentValue) => $currentValue,
+            $currentValue instanceof \Traversable => \iterator_to_array($currentValue),
+            default => [],
+        };
+
+        $newItems = \array_filter($values, static fn(object $value) => !\in_array($value, $currentItems, true));
+
+        if ([] === $newItems) {
+            return;
+        }
+
+        try {
+            self::propertyAccessor()->setValue($object, $property, [...\array_values($currentItems), ...\array_values($newItems)]);
+        } catch (NoSuchPropertyException|\TypeError) {
+            foreach ($newItems as $newItem) {
+                self::add($object, $property, $newItem);
+            }
+        }
     }
 
     public static function get(object $object, string $property): mixed
@@ -160,7 +200,7 @@ final class Hydrator
         }
 
         foreach ($properties as $property) {
-            self::set($object, $property, self::get($other, $property), catchErrors: true);
+            self::forceSet($object, $property, self::get($other, $property), catchErrors: true);
         }
     }
 
@@ -189,6 +229,16 @@ final class Hydrator
         }
 
         return null;
+    }
+
+    private function shouldForceProperty(int|string $property): bool
+    {
+        return true === $this->forceProperties || \in_array($property, $this->forceProperties, true);
+    }
+
+    private static function propertyAccessor(): PropertyAccessor
+    {
+        return self::$accessor ??= new PropertyAccessor();
     }
 
     private static function isDoctrineCollection(object $object, string $property): bool

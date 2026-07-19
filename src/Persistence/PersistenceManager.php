@@ -41,6 +41,9 @@ class PersistenceManager
     /** @var list<callable():bool> */
     private array $afterPersistCallbacks = [];
 
+    /** @var array<int, object> objects awaiting an object manager persist, in creation order */
+    private array $pendingForInsert = [];
+
     /**
      * @param iterable<PersistenceStrategy> $strategies
      */
@@ -78,6 +81,8 @@ class PersistenceManager
             return $object->_save();
         }
 
+        $this->persistScheduled();
+
         $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
         $om->persist($object);
         $this->flush($om);
@@ -105,12 +110,30 @@ class PersistenceManager
             $object = ProxyGenerator::unwrap($object);
         }
 
-        $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
-        $om->persist($object);
+        $this->pendingForInsert[\spl_object_id($object)] ??= $object;
 
         $this->afterPersistCallbacks = [...$this->afterPersistCallbacks, ...$afterPersistCallbacks];
 
         return $object;
+    }
+
+    /**
+     * Persists all scheduled objects, in creation order. Doing this only once the whole
+     * object graph is instantiated and wired guarantees lifecycle events (eg: "pre persist")
+     * never observe half-built objects.
+     */
+    public function persistScheduled(): void
+    {
+        // a "pre persist" listener may schedule new objects: keep draining until empty
+        while ($this->pendingForInsert) {
+            $object = \array_shift($this->pendingForInsert);
+            $this->strategyFor($object::class)->objectManagerFor($object::class)->persist($object);
+        }
+    }
+
+    public function discardScheduled(): void
+    {
+        $this->pendingForInsert = [];
     }
 
     /**
@@ -128,6 +151,7 @@ class PersistenceManager
 
         $this->flush = true;
 
+        $this->persistScheduled();
         $this->flushAllStrategies();
 
         $callbacksCalled = $this->callPostPersistCallbacks();
