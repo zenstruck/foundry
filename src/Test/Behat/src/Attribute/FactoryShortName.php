@@ -15,6 +15,7 @@ namespace Zenstruck\Foundry\Test\Behat\Attribute;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ * @experimental
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 final class FactoryShortName

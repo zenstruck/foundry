@@ -2748,6 +2748,15 @@ This extension provides the following features:
 Behat Integration
 -----------------
 
+.. warning::
+
+    The Behat integration is experimental. It is not covered by the backward compatibility promise and may
+    change in any minor version.
+
+.. versionadded:: 2.11
+
+    The Behat integration was added in Foundry 2.11.
+
 Foundry provides a Behat extension that correctly boots the Foundry for you.
 
 Installation

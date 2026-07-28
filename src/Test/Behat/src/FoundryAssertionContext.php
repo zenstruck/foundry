@@ -16,6 +16,7 @@ namespace Zenstruck\Foundry\Test\Behat;
  * and on the database.
  *
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ * @experimental
  */
 final class FoundryAssertionContext implements FoundryContextInterface
 {

@@ -22,6 +22,7 @@ use Zenstruck\Foundry\ObjectFactory;
  * injected by the HasFactoryShortNameResolver and HasObjectRegistry traits (see FoundryCreationContext).
  *
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ * @experimental
  */
 trait CreationSteps
 {

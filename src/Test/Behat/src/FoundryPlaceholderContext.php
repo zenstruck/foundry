@@ -16,6 +16,7 @@ namespace Zenstruck\Foundry\Test\Behat;
  * (<foundry:lastId(...)> and <foundry:id(...)>) in step arguments.
  *
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ * @experimental
  */
 final class FoundryPlaceholderContext implements FoundryContextInterface
 {

@@ -19,6 +19,7 @@ namespace Zenstruck\Foundry\Test\Behat;
  * compose your own context from the step traits (see the documentation).
  *
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ * @experimental
  */
 final class FoundryContext implements FoundryContextInterface
 {

@@ -25,6 +25,10 @@ use Zenstruck\Foundry\Test\Behat\Listener\BootConfigurationListener;
 use Zenstruck\Foundry\Test\Behat\Listener\DatabaseResetListener;
 use Zenstruck\Foundry\Test\Behat\Listener\LoadFixturesListener;
 
+/**
+ * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ * @experimental
+ */
 final class FoundryExtension implements Extension
 {
     public function process(ContainerBuilder $container): void

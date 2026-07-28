@@ -21,6 +21,7 @@ use Behat\Transformation\Transform;
  * injected by the HasObjectRegistry trait (see FoundryPlaceholderContext).
  *
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ * @experimental
  */
 trait PlaceholderTransforms
 {

@@ -32,6 +32,7 @@ use function Zenstruck\Foundry\Persistence\repository;
  * injected by the HasFactoryShortNameResolver and HasObjectRegistry traits (see FoundryAssertionContext).
  *
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ * @experimental
  */
 trait AssertionSteps
 {

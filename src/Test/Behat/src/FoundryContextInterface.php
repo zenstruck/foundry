@@ -22,6 +22,7 @@ use Behat\Behat\Context\Context;
  * some built-in steps.
  *
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ * @experimental
  */
 interface FoundryContextInterface extends Context
 {
