@@ -43,7 +43,7 @@ final class LoadFixturesCommandTest extends KernelTestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('No story as fixture available');
 
-        $this->commandTester()->execute(['name' => 'foo']);
+        $this->commandTester()->execute(['name' => ['foo']]);
     }
 
     /**
@@ -55,7 +55,7 @@ final class LoadFixturesCommandTest extends KernelTestCase
         $this->expectException(FixtureStoryNotFound::class);
         $this->expectExceptionMessage('Fixture story with name or group "invalid-name" not found');
 
-        $this->commandTester(['environment' => 'stories_as_fixtures'])->execute(['name' => 'invalid-name', '--append' => true]);
+        $this->commandTester(['environment' => 'stories_as_fixtures'])->execute(['name' => ['invalid-name'], '--append' => true]);
     }
 
     /**
@@ -64,7 +64,7 @@ final class LoadFixturesCommandTest extends KernelTestCase
     #[Test]
     public function it_can_load_a_story(): void
     {
-        $this->commandTester(['environment' => 'stories_as_fixtures'])->execute(['name' => 'fixture-story', '--append' => true]);
+        $this->commandTester(['environment' => 'stories_as_fixtures'])->execute(['name' => ['fixture-story'], '--append' => true]);
 
         GenericEntityFactory::assert()->count(1);
         GenericEntityFactory::assert()->count(1, ['prop1' => 'fixture-story']);
@@ -77,12 +77,72 @@ final class LoadFixturesCommandTest extends KernelTestCase
     public function it_can_load_a_story_with_verbose_mode(): void
     {
         $commandTester = $this->commandTester(['environment' => 'stories_as_fixtures']);
-        $commandTester->execute(['name' => 'fixture-story', '--append' => true], ['verbosity' => ConsoleOutput::VERBOSITY_VERBOSE]);
+        $commandTester->execute(['name' => ['fixture-story'], '--append' => true], ['verbosity' => ConsoleOutput::VERBOSITY_VERBOSE]);
 
         GenericEntityFactory::assert()->count(1);
         GenericEntityFactory::assert()->count(1, ['prop1' => 'fixture-story']);
 
         self::assertStringContainsString('loaded (name: fixture-story)', $commandTester->getDisplay());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function it_can_load_multiple_stories(): void
+    {
+        $this->commandTester(['environment' => 'stories_as_fixtures'])
+            ->execute(['name' => ['fixture-story', 'fixture-story-for-group'], '--append' => true]);
+
+        GenericEntityFactory::assert()->count(2);
+        GenericEntityFactory::assert()->count(1, ['prop1' => 'fixture-story']);
+        GenericEntityFactory::assert()->count(1, ['prop1' => 'fixture-story-for-group']);
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function it_can_load_multiple_groups(): void
+    {
+        $this->commandTester(['environment' => 'stories_as_fixtures'])
+            ->execute(['name' => ['single-fixture-in-group', 'multiple-fixtures-in-group'], '--append' => true]);
+
+        // "fixture-story" belongs to both groups, but is only loaded once
+        GenericEntityFactory::assert()->count(2);
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function it_can_load_a_mix_of_stories_and_groups(): void
+    {
+        $commandTester = $this->commandTester(['environment' => 'stories_as_fixtures']);
+        $commandTester->execute(['name' => ['fixture-story', 'multiple-fixtures-in-group'], '--append' => true]);
+
+        GenericEntityFactory::assert()->count(2);
+
+        self::assertStringContainsString('Loading story with name "fixture-story"', $commandTester->getDisplay());
+        self::assertStringContainsString('Loading stories group "multiple-fixtures-in-group"', $commandTester->getDisplay());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function it_does_not_load_anything_if_one_of_the_names_is_invalid(): void
+    {
+        $this->expectException(FixtureStoryNotFound::class);
+        $this->expectExceptionMessage('Fixture story with name or group "invalid-name" not found');
+
+        try {
+            $this->commandTester(['environment' => 'stories_as_fixtures'])
+                ->execute(['name' => ['fixture-story', 'invalid-name'], '--append' => true]);
+        } finally {
+            // "fixture-story" is valid, but must not have been loaded
+            GenericEntityFactory::assert()->count(0);
+        }
     }
 
     /**
@@ -100,7 +160,7 @@ final class LoadFixturesCommandTest extends KernelTestCase
             )
         );
 
-        $this->commandTester(['environment' => 'story_fixture_with_name_collision'])->execute(['name' => 'fixture-story', '--append' => true]);
+        $this->commandTester(['environment' => 'story_fixture_with_name_collision'])->execute(['name' => ['fixture-story'], '--append' => true]);
     }
 
     /**
@@ -112,7 +172,7 @@ final class LoadFixturesCommandTest extends KernelTestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot use #[AsFixture] group(s) "fixture-story", they collide with fixture names.');
 
-        $this->commandTester(['environment' => 'story_fixture_with_group_name_collision'])->execute(['name' => 'fixture-story', '--append' => true]);
+        $this->commandTester(['environment' => 'story_fixture_with_group_name_collision'])->execute(['name' => ['fixture-story'], '--append' => true]);
     }
 
     /**
@@ -121,7 +181,7 @@ final class LoadFixturesCommandTest extends KernelTestCase
     #[Test]
     public function it_can_load_one_single_story_based_on_its_group_name(): void
     {
-        $this->commandTester(['environment' => 'stories_as_fixtures'])->execute(['name' => 'single-fixture-in-group', '--append' => true]);
+        $this->commandTester(['environment' => 'stories_as_fixtures'])->execute(['name' => ['single-fixture-in-group'], '--append' => true]);
 
         GenericEntityFactory::assert()->count(1);
         GenericEntityFactory::assert()->count(1, ['prop1' => 'fixture-story']);
@@ -133,7 +193,7 @@ final class LoadFixturesCommandTest extends KernelTestCase
     #[Test]
     public function it_can_load_multiple_stories_based_on_their_group_name(): void
     {
-        $this->commandTester(['environment' => 'stories_as_fixtures'])->execute(['name' => 'multiple-fixtures-in-group', '--append' => true]);
+        $this->commandTester(['environment' => 'stories_as_fixtures'])->execute(['name' => ['multiple-fixtures-in-group'], '--append' => true]);
 
         GenericEntityFactory::assert()->count(2);
         GenericEntityFactory::assert()->count(1, ['prop1' => 'fixture-story']);
@@ -148,7 +208,7 @@ final class LoadFixturesCommandTest extends KernelTestCase
     #[DataProvider('provideFixturesWhichLoadAnotherFixtureCases')]
     public function it_can_load_fixture_which_loads_another_fixture(string $name): void
     {
-        $this->commandTester(['environment' => 'stories_as_fixtures'])->execute(['name' => $name, '--append' => true]);
+        $this->commandTester(['environment' => 'stories_as_fixtures'])->execute(['name' => [$name], '--append' => true]);
 
         GenericEntityFactory::assert()->count(2);
         GenericEntityFactory::assert()->count(1, ['prop1' => 'fixture-using-another-fixture']);
@@ -173,7 +233,7 @@ final class LoadFixturesCommandTest extends KernelTestCase
 
         GenericEntityFactory::createMany(5);
 
-        $this->commandTester(['environment' => 'stories_as_fixtures'])->execute(['name' => 'fixture-story']);
+        $this->commandTester(['environment' => 'stories_as_fixtures'])->execute(['name' => ['fixture-story']]);
 
         GenericEntityFactory::assert()->count(1);
         GenericEntityFactory::assert()->count(1, ['prop1' => 'fixture-story']);
@@ -187,7 +247,7 @@ final class LoadFixturesCommandTest extends KernelTestCase
     {
         $commandTester = $this->commandTester(['environment' => 'stories_as_fixtures']);
         $commandTester->setInputs(['no']);
-        $commandTester->execute(['name' => 'fixture-story']);
+        $commandTester->execute(['name' => ['fixture-story']]);
 
         self::assertStringContainsString('[WARNING] Aborting command execution', $commandTester->getDisplay());
 
@@ -206,7 +266,7 @@ final class LoadFixturesCommandTest extends KernelTestCase
 
         GenericEntityFactory::createMany(5);
 
-        $this->commandTester(['environment' => 'stories_as_fixtures'])->execute(['name' => 'fixture-story', '--append' => true]);
+        $this->commandTester(['environment' => 'stories_as_fixtures'])->execute(['name' => ['fixture-story'], '--append' => true]);
 
         GenericEntityFactory::assert()->count(6);
     }

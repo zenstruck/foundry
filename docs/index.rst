@@ -1696,6 +1696,19 @@ You can also load stories by group, by using the ``groups`` option:
 
 ``bin/console foundry:load-fixtures all`` will load both stories ``CategoryStory`` and ``PostStory``.
 
+.. versionadded:: 2.12
+
+    The ability to load several stories or groups at once was added in 2.12.
+
+Several names can be passed at once, and story names and group names can be mixed:
+
+.. code-block:: terminal
+
+    $ php bin/console foundry:load-fixtures category post
+    $ php bin/console foundry:load-fixtures all other-group category
+
+The database is only reset once, and a story belonging to several of the given groups is only loaded once.
+
 .. tip::
 
     It is possible to call a story inside another story, by using ``OtherStory::load();``. Because the stories are only

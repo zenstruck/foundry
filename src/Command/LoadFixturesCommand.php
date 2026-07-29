@@ -42,7 +42,7 @@ final class LoadFixturesCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument('name', InputArgument::OPTIONAL, "Story's name or stories group's name to load.")
+            ->addArgument('name', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, "Stories' names or stories groups' names to load.")
             ->addOption('append', 'a', InputOption::VALUE_NONE, 'Skip resetting database and append data to the existing database.')
         ;
     }
@@ -65,21 +65,31 @@ final class LoadFixturesCommand extends Command
             $this->resetDatabase();
         }
 
-        $fixtureNameOrGroup = $input->getArgument('name') ?? $this->getNameWhenNotProvided($io);
+        /** @var array<string> $fixtureNamesOrGroups */
+        $fixtureNamesOrGroups = $input->getArgument('name');
 
-        $stories = $this->fixtureStoryResolver->resolve($fixtureNameOrGroup);
-
-        if ($this->fixtureStoryResolver->hasFixture($fixtureNameOrGroup)) {
-            $io->comment("Loading story with name \"{$fixtureNameOrGroup}\"...");
-        } else {
-            $io->comment("Loading stories group \"{$fixtureNameOrGroup}\"...");
+        if ([] === $fixtureNamesOrGroups) {
+            $fixtureNamesOrGroups = [$this->getNameWhenNotProvided($io)];
         }
 
-        foreach ($stories as $name => $storyClass) {
-            $storyClass::load();
+        $resolvedStories = [];
+        foreach (\array_unique($fixtureNamesOrGroups) as $fixtureNameOrGroup) {
+            $resolvedStories[] = [$fixtureNameOrGroup, $this->fixtureStoryResolver->resolve($fixtureNameOrGroup)];
+        }
 
-            if ($io->isVerbose()) {
-                $io->info("Story \"{$storyClass}\" loaded (name: {$name}).");
+        foreach ($resolvedStories as [$fixtureNameOrGroup, $stories]) {
+            if ($this->fixtureStoryResolver->hasFixture($fixtureNameOrGroup)) {
+                $io->comment("Loading story with name \"{$fixtureNameOrGroup}\"...");
+            } else {
+                $io->comment("Loading stories group \"{$fixtureNameOrGroup}\"...");
+            }
+
+            foreach ($stories as $name => $storyClass) {
+                $storyClass::load();
+
+                if ($io->isVerbose()) {
+                    $io->info("Story \"{$storyClass}\" loaded (name: {$name}).");
+                }
             }
         }
 
