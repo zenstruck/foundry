@@ -65,10 +65,16 @@ final class LoadFixturesCommand extends Command
             $this->resetDatabase();
         }
 
-        /** @var array<string> $fixtureNamesOrGroups */
+        /** @var array<string>|string|null $fixtureNamesOrGroups */
         $fixtureNamesOrGroups = $input->getArgument('name');
 
-        if ([] === $fixtureNamesOrGroups) {
+        if (\is_string($fixtureNamesOrGroups)) {
+            trigger_deprecation('zenstruck/foundry', '2.12', 'Passing a string as the "name" argument of the "foundry:load-fixtures" command is deprecated and will throw an error in Foundry 3: pass an array of names instead.');
+
+            $fixtureNamesOrGroups = [$fixtureNamesOrGroups];
+        }
+
+        if (!$fixtureNamesOrGroups) {
             $fixtureNamesOrGroups = [$this->getNameWhenNotProvided($io)];
         }
 

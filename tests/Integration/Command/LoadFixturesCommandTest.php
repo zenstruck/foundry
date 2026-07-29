@@ -12,6 +12,7 @@
 namespace Zenstruck\Foundry\Tests\Integration\Command;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -83,6 +84,20 @@ final class LoadFixturesCommandTest extends KernelTestCase
         GenericEntityFactory::assert()->count(1, ['prop1' => 'fixture-story']);
 
         self::assertStringContainsString('loaded (name: fixture-story)', $commandTester->getDisplay());
+    }
+
+    /**
+     * @test
+     *
+     * @group legacy
+     */
+    #[Test]
+    #[IgnoreDeprecations]
+    public function it_can_still_load_a_story_when_the_name_argument_is_a_string(): void
+    {
+        $this->commandTester(['environment' => 'stories_as_fixtures'])->execute(['name' => 'fixture-story', '--append' => true]);
+
+        GenericEntityFactory::assert()->count(1);
     }
 
     /**
