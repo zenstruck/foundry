@@ -80,10 +80,13 @@ final class LoadFixturesCommand extends Command
 
         $resolvedStories = [];
         foreach (\array_unique($fixtureNamesOrGroups) as $fixtureNameOrGroup) {
-            $resolvedStories[] = [$fixtureNameOrGroup, $this->fixtureStoryResolver->resolve($fixtureNameOrGroup)];
+            $resolvedStories[$fixtureNameOrGroup] = $this->fixtureStoryResolver->resolve($fixtureNameOrGroup);
         }
 
-        foreach ($resolvedStories as [$fixtureNameOrGroup, $stories]) {
+        $loadedStoryClasses = [];
+        foreach ($resolvedStories as $fixtureNameOrGroup => $stories) {
+            $fixtureNameOrGroup = (string) $fixtureNameOrGroup;
+
             if ($this->fixtureStoryResolver->hasFixture($fixtureNameOrGroup)) {
                 $io->comment("Loading story with name \"{$fixtureNameOrGroup}\"...");
             } else {
@@ -91,7 +94,14 @@ final class LoadFixturesCommand extends Command
             }
 
             foreach ($stories as $name => $storyClass) {
+                if (isset($loadedStoryClasses[$storyClass])) {
+                    $io->warning("Story \"{$storyClass}\" (name: {$name}) already loaded. Skipping...");
+
+                    continue;
+                }
+
                 $storyClass::load();
+                $loadedStoryClasses[$storyClass] = true;
 
                 if ($io->isVerbose()) {
                     $io->info("Story \"{$storyClass}\" loaded (name: {$name}).");

@@ -120,11 +120,19 @@ final class LoadFixturesCommandTest extends KernelTestCase
     #[Test]
     public function it_can_load_multiple_groups(): void
     {
-        $this->commandTester(['environment' => 'stories_as_fixtures'])
-            ->execute(['name' => ['single-fixture-in-group', 'multiple-fixtures-in-group'], '--append' => true]);
+        $commandTester = $this->commandTester(['environment' => 'stories_as_fixtures']);
+        $commandTester->execute(
+            ['name' => ['single-fixture-in-group', 'multiple-fixtures-in-group'], '--append' => true],
+            ['verbosity' => ConsoleOutput::VERBOSITY_VERBOSE]
+        );
 
         // "fixture-story" belongs to both groups, but is only loaded once
         GenericEntityFactory::assert()->count(2);
+
+        // SymfonyStyle wraps long lines, so words may be split by whitespace across lines
+        $display = \preg_replace('/\s+/', ' ', $commandTester->getDisplay()) ?? $commandTester->getDisplay();
+        self::assertStringContainsString('loaded (name: fixture-story)', $display);
+        self::assertStringContainsString('Story "'.FixtureStory::class.'" (name: fixture-story) already loaded. Skipping...', $display);
     }
 
     /**
