@@ -52,6 +52,11 @@ final class PersistedObjectsTracker
     public function add(object ...$objects): void
     {
         foreach ($objects as $object) {
+            // ie: in-memory objects in a kernel without their persistence strategy
+            if (!Configuration::instance()->persistence()->hasPersistenceFor($object)) {
+                continue;
+            }
+
             if (self::$trackedObjects->offsetExists($object) && self::$trackedObjects[$object]) {
                 if (DoctrineOrmVersionGuesser::isOrmV3()) {
                     self::resetObjectAsLazyGhost($object, self::$trackedObjects[$object]);

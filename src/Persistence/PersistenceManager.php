@@ -393,7 +393,12 @@ class PersistenceManager implements IdentifierResolver
         $parent = ProxyGenerator::unwrap($parent);
         $child = ProxyGenerator::unwrap($child);
 
-        return $this->strategyFor($parent)->bidirectionalRelationshipMetadata($parent, $child, $field);
+        try {
+            return $this->strategyFor($parent)->bidirectionalRelationshipMetadata($parent, $child, $field);
+        } catch (NoPersistenceStrategy) {
+            // ie: in-memory objects in a kernel without their persistence strategy
+            return null;
+        }
     }
 
     /**

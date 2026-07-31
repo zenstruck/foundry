@@ -99,7 +99,7 @@ final class DataProviderWithInMemoryTest extends KernelTestCase
 
         self::assertSame([$contact], $this->contactRepository->_all());
 
-        self::assertSame(0, $this->entityManager->getRepository(Contact::class)->count());
+        self::assertSame(0, $this->entityManager->getRepository(Contact::class)->count([]));
     }
 
     public static function provideContact(): iterable
@@ -118,7 +118,7 @@ final class DataProviderWithInMemoryTest extends KernelTestCase
 
         self::assertSame([ProxyGenerator::unwrap($contact)], $this->contactRepository->_all());
 
-        self::assertSame(0, $this->entityManager->getRepository(Contact::class)->count());
+        self::assertSame(0, $this->entityManager->getRepository(Contact::class)->count([]));
     }
 
     public static function provideContactWithLegacyProxy(): iterable

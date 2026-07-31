@@ -15,6 +15,7 @@ namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use PHPUnit\Framework\Attributes\Test;
@@ -513,6 +514,7 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
     #[Test]
     #[RequiresPhpunit('>=11.4.0')]
     #[RequiresPhpunitExtension(FoundryExtension::class)]
+    #[RequiresEnvironmentVariable('DATABASE_URL')]
     #[DataProvider('provideEntityWithDisabledListener')]
     public function deferred_factory_from_data_provider_does_not_leak_disabled_listeners(?ListenedEntity $entity): void
     {
