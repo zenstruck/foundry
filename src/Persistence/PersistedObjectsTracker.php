@@ -61,7 +61,9 @@ final class PersistedObjectsTracker
                 if (DoctrineOrmVersionGuesser::isOrmV3()) {
                     self::resetObjectAsLazyGhost($object, self::$trackedObjects[$object]);
                 } else {
-                    Configuration::instance()->persistence()->refresh($object, canThrow: false);
+                    // refresh() would only swap a detached object for its managed instance,
+                    // leaving the tracked one stale: rehydrate it in place instead
+                    Configuration::instance()->persistence()->autorefresh($object, self::$trackedObjects[$object], clone $object);
                 }
 
                 continue;

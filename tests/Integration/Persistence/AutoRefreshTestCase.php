@@ -247,6 +247,23 @@ abstract class AutoRefreshTestCase extends WebTestCase
     }
 
     #[Test]
+    public function it_refreshes_a_detached_object_when_tracked_again(): void
+    {
+        $object = $this->factory()->create();
+
+        $this->updateObject($object->id);
+        $this->objectManager()->clear(); // $object is now detached and stale
+
+        $objectTracker = Configuration::instance()->persistedObjectsTracker;
+        self::assertNotNull($objectTracker);
+
+        // ie: what RepositoryDecorator does with the objects it returns
+        $objectTracker->add($object);
+
+        self::assertSame('foo', $object->getProp1());
+    }
+
+    #[Test]
     public function it_can_refresh_after_command_terminated(): void
     {
         $object = $this->factory()->create();
