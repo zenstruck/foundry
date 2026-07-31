@@ -42,20 +42,20 @@ jobs:
           # old PHPUnit versions
           - {php: 8.3, symfony: 7.4.*, phpunit: 9, database: mysql, use-phpunit-extension: 0}
           - {php: 8.2, symfony: 7.4.*, phpunit: 10, database: mysql, use-phpunit-extension: 0}
-          - {php: 8.4, symfony: 7.4.*, phpunit: 11, database: mysql, use-phpunit-extension: 0}
-          - {php: 8.4, symfony: 7.4.*, phpunit: 11, database: mysql}
-          - {php: 8.4, symfony: 7.4.*, phpunit: 12, database: mysql, use-phpunit-extension: 0}
-          - {php: 8.4, symfony: 7.4.*, phpunit: 12, database: mysql}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 11, database: mysql, use-phpunit-extension: 0, use-php-84-lazy-objects: 1}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 11, database: mysql, use-phpunit-extension: 1, use-php-84-lazy-objects: 1}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 12, database: mysql, use-phpunit-extension: 0, use-php-84-lazy-objects: 1}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 12, database: mysql, use-phpunit-extension: 1, use-php-84-lazy-objects: 1}
 
           # test with no database (PHPUnit 9 is used to prevent some problems with empty data providers)
           - {php: 8.3, symfony: 7.4.*, phpunit: 9, database: none, use-phpunit-extension: 0}
           - {php: 8.3, symfony: 7.4.*, phpunit: 9, database: none, deps: lowest, use-phpunit-extension: 0}
 
           # One permutation per DBMS
-          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mongo}
-          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: pgsql}
-          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: sqlite}
-          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mysql}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mongo, use-phpunit-extension: 1, use-php-84-lazy-objects: 1}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: pgsql, use-phpunit-extension: 1, use-php-84-lazy-objects: 1}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: sqlite, use-phpunit-extension: 1, use-php-84-lazy-objects: 1}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mysql, use-phpunit-extension: 1, use-php-84-lazy-objects: 1}
 
           # lowest deps (one per DBMS)
           - {php: 8.3, symfony: 6.4.*, phpunit: 9, database: mysql|mongo, deps: lowest, use-phpunit-extension: 0}
@@ -65,15 +65,15 @@ jobs:
           - {php: 8.3, symfony: 6.4.*, phpunit: 9, database: mysql, deps: lowest, use-phpunit-extension: 0}
 
           # Lowest deps with PHP 8.4 & lazy objects
-          - {php: 8.4, symfony: 6.4.*, phpunit: 13, database: mysql|mongo, deps: lowest}
+          - {php: 8.4, symfony: 6.4.*, phpunit: 13, database: mysql|mongo, deps: lowest, use-phpunit-extension: 1, use-php-84-lazy-objects: 1}
 
           # Disable Foundry's PHPUnit extension and/or dama
-          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mysql|mongo, use-phpunit-extension: 0}
-          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mysql, use-phpunit-extension: 0, no-dama: 1}
-          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mysql, no-dama: 1}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mysql|mongo, use-phpunit-extension: 0, use-php-84-lazy-objects: 1}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mysql, use-phpunit-extension: 0, use-php-84-lazy-objects: 1, no-dama: 1}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mysql, use-phpunit-extension: 1, use-php-84-lazy-objects: 1, no-dama: 1}
 
           # disable lazy objects in PHP 8.4
-          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mysql|mongo, use-php-84-lazy-objects: 0}
+          - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mysql|mongo, use-phpunit-extension: 1, use-php-84-lazy-objects: 0}
     env:
       DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || contains(matrix.database, 'sqlite') && 'sqlite:///%kernel.project_dir%/var/data.db' || '' }}
       MONGO_URL: ${{ contains(matrix.database, 'mongo') && 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb' || '' }}
