@@ -173,9 +173,10 @@ class PersistenceManager implements IdentifierResolver
     /**
      * @template T of object
      *
-     * @param T $object
+     * @param T                    $object
+     * @param array<string, mixed> $id
      */
-    public function autorefresh(object $object, mixed $id, object $clone): void
+    public function autorefresh(object $object, array $id, object $clone): void
     {
         $strategy = $this->strategyFor($object::class);
         $om = $strategy->objectManagerFor($object::class);
@@ -188,7 +189,7 @@ class PersistenceManager implements IdentifierResolver
                     // no identifier values means the object no longer exists
                     return;
                 }
-            } catch (\Throwable $e) {
+            } catch (\Throwable) {
             }
 
             // let's detach the object, in order to prevent Doctrine cache
@@ -240,9 +241,9 @@ class PersistenceManager implements IdentifierResolver
      *
      * @throws RefreshObjectFailed
      */
-    public function refresh(object &$object, bool $force = false, bool $canThrow = true): object
+    public function refresh(object &$object, bool $canThrow = true): object
     {
-        if (!$this->flush && !$force) {
+        if (!$this->flush) {
             return $object;
         }
 
@@ -286,9 +287,10 @@ class PersistenceManager implements IdentifierResolver
             return $object;
         }
 
-        $id = $strategy->getIdentifierValues($object);
+        $objectFromDB = $this->reattach($object);
 
-        if (!$id || !($objectFromDB = $om->find($object::class, $id))) {
+        if ($objectFromDB === $object) {
+            // reattach() could not find a managed instance: the object no longer exists
             if (!$canThrow) {
                 return $object;
             }
@@ -296,9 +298,7 @@ class PersistenceManager implements IdentifierResolver
             throw new ObjectNoLongerExist($object);
         }
 
-        $object = $objectFromDB;
-
-        return $object;
+        return $object = $objectFromDB;
     }
 
     public function isPersisted(object $object): bool
@@ -352,6 +352,9 @@ class PersistenceManager implements IdentifierResolver
             /** @var T $object */
             $object = $reflector->initializeLazyObject($object);
         }
+
+        // Doctrine cannot remove a detached object
+        $object = $this->reattach($object);
 
         $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
         $om->remove($object);

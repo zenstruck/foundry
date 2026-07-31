@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
+use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -152,6 +153,21 @@ abstract class GenericFactoryTestCase extends KernelTestCase
         $object = static::factory()->create();
 
         static::factory()->repository()->assert()->exists(['prop1' => 'default1']);
+
+        delete($object);
+
+        static::factory()->repository()->assert()->empty();
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_delete_a_detached_object(): void
+    {
+        $object = static::factory()->create();
+
+        self::objectManagerFor(ProxyGenerator::unwrap($object))->clear();
 
         delete($object);
 
@@ -762,4 +778,15 @@ abstract class GenericFactoryTestCase extends KernelTestCase
      * @return PersistentObjectFactory<GenericModel>
      */
     abstract protected static function factory(): PersistentObjectFactory;
+
+    private static function objectManagerFor(object $object): ObjectManager
+    {
+        foreach (['doctrine', 'doctrine_mongodb'] as $registry) {
+            if (self::getContainer()->has($registry) && ($om = self::getContainer()->get($registry)->getManagerForClass($object::class))) { // @phpstan-ignore method.notFound
+                return $om;
+            }
+        }
+
+        self::fail(\sprintf('No object manager found for "%s".', $object::class));
+    }
 }

@@ -91,7 +91,10 @@ final class PersistedObjectsTracker
         }
     }
 
-    private static function resetObjectAsLazyGhost(object $object, mixed $id): void
+    /**
+     * @param array<string, mixed> $id
+     */
+    private static function resetObjectAsLazyGhost(object $object, array $id): void
     {
         $reflector = new \ReflectionClass($object);
 
