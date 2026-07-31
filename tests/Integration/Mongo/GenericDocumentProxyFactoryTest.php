@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\Mongo;
 
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresMethod;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
@@ -41,5 +43,10 @@ final class GenericDocumentProxyFactoryTest extends GenericProxyFactoryTestCase
     protected function objectWithReadonlyFactory(): PersistentProxyObjectFactory // @phpstan-ignore method.childReturnType
     {
         return proxy_factory(DocumentWithReadonly::class);
+    }
+
+    protected function objectManager(): ObjectManager
+    {
+        return self::getContainer()->get(DocumentManager::class); // @phpstan-ignore return.type
     }
 }

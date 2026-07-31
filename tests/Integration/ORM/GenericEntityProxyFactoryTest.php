@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresMethod;
@@ -43,5 +45,10 @@ final class GenericEntityProxyFactoryTest extends GenericProxyFactoryTestCase
     protected function objectWithReadonlyFactory(): PersistentProxyObjectFactory // @phpstan-ignore method.childReturnType
     {
         return proxy_factory(EntityWithReadonly::class);
+    }
+
+    protected function objectManager(): ObjectManager
+    {
+        return self::getContainer()->get(EntityManagerInterface::class); // @phpstan-ignore return.type
     }
 }

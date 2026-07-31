@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\EmptyConstructorFactory;
@@ -132,5 +134,10 @@ final class GenericEntityFactoryTest extends GenericFactoryTestCase
     protected static function factory(): GenericEntityFactory
     {
         return GenericEntityFactory::new();
+    }
+
+    protected function objectManager(): ObjectManager
+    {
+        return self::getContainer()->get(EntityManagerInterface::class); // @phpstan-ignore return.type
     }
 }

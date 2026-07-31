@@ -167,7 +167,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     {
         $object = static::factory()->create();
 
-        self::objectManagerFor(ProxyGenerator::unwrap($object))->clear();
+        $this->objectManager()->clear();
 
         delete($object);
 
@@ -779,14 +779,5 @@ abstract class GenericFactoryTestCase extends KernelTestCase
      */
     abstract protected static function factory(): PersistentObjectFactory;
 
-    private static function objectManagerFor(object $object): ObjectManager
-    {
-        foreach (['doctrine', 'doctrine_mongodb'] as $registry) {
-            if (self::getContainer()->has($registry) && ($om = self::getContainer()->get($registry)->getManagerForClass($object::class))) { // @phpstan-ignore method.notFound
-                return $om;
-            }
-        }
-
-        self::fail(\sprintf('No object manager found for "%s".', $object::class));
-    }
+    abstract protected function objectManager(): ObjectManager;
 }
