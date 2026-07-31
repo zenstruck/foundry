@@ -17,6 +17,6 @@ final class ObjectNoLongerExist extends RefreshObjectFailed
 {
     public function __construct(public readonly object $originalObject)
     {
-        parent::__construct('object no longer exists...');
+        parent::__construct(\sprintf('Object "%s" no longer exists in the database: it was deleted or rolled back.', $originalObject::class));
     }
 }

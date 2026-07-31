@@ -61,7 +61,9 @@ final class PersistedObjectsTracker
                 if (DoctrineOrmVersionGuesser::isOrmV3()) {
                     self::resetObjectAsLazyGhost($object, self::$trackedObjects[$object]);
                 } else {
-                    Configuration::instance()->persistence()->refresh($object, canThrow: false);
+                    // refresh() would only swap a detached object for its managed instance,
+                    // leaving the tracked one stale: rehydrate it in place instead
+                    Configuration::instance()->persistence()->autorefresh($object, self::$trackedObjects[$object]);
                 }
 
                 continue;
@@ -107,12 +109,14 @@ final class PersistedObjectsTracker
             return;
         }
 
-        $clone = clone $object;
-        $reflector->resetAsLazyGhost($object, static function($object) use ($clone, $id) {
+        // resetAsLazyGhost() destroys the object's state: capture it so it can be
+        // restored if the database row no longer exists when the ghost initializes
+        $snapshot = (array) $object;
+        $reflector->resetAsLazyGhost($object, static function($object) use ($snapshot, $id) {
             // prevent some weird recursion in some edge cases, caused by kernel.reset
             unset(self::$trackedObjects[$object]);
 
-            Configuration::instance()->persistence()->autorefresh($object, $id, $clone);
+            Configuration::instance()->persistence()->autorefresh($object, $id, $snapshot);
 
             self::$trackedObjects[$object] = $id;
         });

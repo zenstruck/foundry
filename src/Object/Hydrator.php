@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\VarExporter\Hydrator as VarExporterHydrator;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\ForceValue;
 
@@ -201,6 +202,22 @@ final class Hydrator
 
         foreach ($properties as $property) {
             self::forceSet($object, $property, self::get($other, $property), catchErrors: true);
+        }
+    }
+
+    /**
+     * Restores properties captured with an `(array) $object` cast (mangled keys),
+     * without invoking __clone() nor the constructor.
+     *
+     * @param array<string, mixed> $snapshot
+     */
+    public static function hydrateFromSnapshot(object $object, array $snapshot): void
+    {
+        if (\function_exists('deepclone_hydrate')) {
+            // VarExporter's Hydrator is deprecated since symfony/var-exporter 8.1
+            deepclone_hydrate($object, $snapshot, \DEEPCLONE_HYDRATE_PRESERVE_REFS);
+        } else {
+            VarExporterHydrator::hydrate($object, $snapshot);
         }
     }
 

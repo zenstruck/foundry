@@ -173,10 +173,12 @@ class PersistenceManager implements IdentifierResolver
     /**
      * @template T of object
      *
-     * @param T                    $object
-     * @param array<string, mixed> $id
+     * @param T                         $object
+     * @param array<string, mixed>      $id
+     * @param array<string, mixed>|null $snapshot properties captured with an `(array)` cast before the
+     *                                            object's state was destroyed by resetAsLazyGhost()
      */
-    public function autorefresh(object $object, array $id, object $clone): void
+    public function autorefresh(object $object, array $id, ?array $snapshot = null): void
     {
         $strategy = $this->strategyFor($object::class);
         $om = $strategy->objectManagerFor($object::class);
@@ -205,9 +207,13 @@ class PersistenceManager implements IdentifierResolver
             }
         }
 
-        // the object no longer exists
-        Hydrator::hydrateFromOtherObject($object, $clone);
+        // the object no longer exists in the database: it was deleted or rolled back
         $om->detach($object);
+
+        if (null !== $snapshot) {
+            // the object's state was destroyed by resetAsLazyGhost(): restore its previous values
+            Hydrator::hydrateFromSnapshot($object, $snapshot);
+        }
     }
 
     /**
