@@ -19,7 +19,8 @@ use function Zenstruck\Foundry\Persistence\persist;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
- * @method static GlobalEntity globalEntity()
+ * @method static GlobalEntity   globalEntity()
+ * @method static GlobalDocument globalDocument()
  */
 final class GlobalStory extends Story
 {
@@ -31,7 +32,8 @@ final class GlobalStory extends Story
         }
 
         if (\getenv('MONGO_URL')) {
-            persist(GlobalDocument::class);
+            $globalDocument = persist(GlobalDocument::class);
+            $this->addState('globalDocument', $globalDocument);
         }
     }
 }

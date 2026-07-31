@@ -41,7 +41,9 @@ final class StoryRegistry
      */
     public function load(string $class): Story
     {
-        if (\array_key_exists($class, self::$globalInstances)) {
+        // Global stories hold objects tied to the persistence layer they were built with:
+        // when persistence is not available (ie: in a unit test), rebuild the story locally instead.
+        if (\array_key_exists($class, self::$globalInstances) && Configuration::instance()->isPersistenceAvailable()) {
             return self::$globalInstances[$class]; // @phpstan-ignore return.type
         }
 
