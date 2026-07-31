@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 use Doctrine\Persistence\Mapping\MappingException;
+use Zenstruck\Foundry\Persistence\InitializeTrackedGhostsBeforeFlushListener;
 use Zenstruck\Foundry\Persistence\PersistenceStrategy;
 
 /**
@@ -32,6 +33,19 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
         $em = $this->objectManagerFor($object::class);
 
         return $em->contains($object) && !$em->getUnitOfWork()->isScheduledForInsert($object);
+    }
+
+    final public function registerPreFlushGhostInitializer(string $class): void
+    {
+        $em = $this->objectManagerFor($class);
+
+        $config = $em->getConfiguration();
+        if (\method_exists($config, 'isNativeLazyObjectsEnabled') && $config->isNativeLazyObjectsEnabled()) {
+            // ORM >= 3.4 with native lazy objects skips uninitialized objects when computing changesets
+            return;
+        }
+
+        InitializeTrackedGhostsBeforeFlushListener::registerTo($em->getEventManager(), Events::preFlush);
     }
 
     final public function hasChanges(object $object): bool

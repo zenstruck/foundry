@@ -57,14 +57,12 @@ final class PersistedObjectsTracker
                 continue;
             }
 
+            // a flush could occur once the object is reset as an uninitialized lazy ghost:
+            // its object manager must not compute a changeset from it
+            Configuration::instance()->persistence()->registerPreFlushGhostInitializer($object::class);
+
             if (self::$trackedObjects->offsetExists($object) && self::$trackedObjects[$object]) {
-                if (DoctrineOrmVersionGuesser::isOrmV3()) {
-                    self::resetObjectAsLazyGhost($object, self::$trackedObjects[$object]);
-                } else {
-                    // refresh() would only swap a detached object for its managed instance,
-                    // leaving the tracked one stale: rehydrate it in place instead
-                    Configuration::instance()->persistence()->autorefresh($object, self::$trackedObjects[$object]);
-                }
+                self::resetObjectAsLazyGhost($object, self::$trackedObjects[$object]);
 
                 continue;
             }
@@ -81,6 +79,26 @@ final class PersistedObjectsTracker
     public static function countObjects(): int
     {
         return \count(self::$trackedObjects);
+    }
+
+    /**
+     * @return list<object>
+     */
+    public static function trackedObjects(): array
+    {
+        self::$trackedObjects ??= new \WeakMap();
+
+        // a snapshot is mandatory: initializing a ghost mutates the WeakMap being iterated
+        $objects = [];
+        foreach (self::$trackedObjects as $object => $id) {
+            if (!$id) {
+                continue;
+            }
+
+            $objects[] = $object;
+        }
+
+        return $objects;
     }
 
     private static function resetObjectsAsLazyGhosts(): void

@@ -460,6 +460,45 @@ abstract class AutoRefreshTestCase extends WebTestCase
     }
 
     #[Test]
+    public function saving_another_object_does_not_alter_ghost_objects(): void
+    {
+        $client = self::createClient();
+
+        $object = $this->factory()->create();
+        $objectId = $object->id;
+
+        // kernel.terminate resets tracked objects as lazy ghosts, but they are still managed
+        $client->request('GET', '/hello-world');
+        self::assertResponseIsSuccessful();
+        self::assertTrue((new \ReflectionClass($object))->isUninitializedLazyObject($object));
+        self::assertTrue($this->objectManager()->contains($object));
+
+        // saving another object triggers a flush while the ghost is uninitialized
+        $this->factory()->create();
+
+        $this->factory()::assert()->exists(['id' => $objectId, 'prop1' => 'default1']);
+        self::assertSame('default1', $object->getProp1());
+    }
+
+    #[Test]
+    public function saving_another_object_does_not_alter_ghost_objects_after_refresh_all(): void
+    {
+        $object = $this->factory()->create();
+        $objectId = $object->id;
+
+        refresh_all();
+
+        self::assertTrue((new \ReflectionClass($object))->isUninitializedLazyObject($object));
+        self::assertTrue($this->objectManager()->contains($object));
+
+        // saving another object triggers a flush while the ghost is uninitialized
+        $this->factory()->create();
+
+        $this->factory()::assert()->exists(['id' => $objectId, 'prop1' => 'default1']);
+        self::assertSame('default1', $object->getProp1());
+    }
+
+    #[Test]
     public function repository_method_returns_up_to_date_objects_with_readonly_props(): void
     {
         [$object1, $object2] = $this->objectWithReadonlyFactory()->many(2)->create([

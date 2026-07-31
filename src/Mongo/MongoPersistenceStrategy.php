@@ -12,8 +12,10 @@
 namespace Zenstruck\Foundry\Mongo;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Events;
 use Doctrine\ODM\MongoDB\Mapping\MappingException as MongoMappingException;
 use Doctrine\Persistence\Mapping\MappingException;
+use Zenstruck\Foundry\Persistence\InitializeTrackedGhostsBeforeFlushListener;
 use Zenstruck\Foundry\Persistence\PersistenceStrategy;
 
 /**
@@ -31,6 +33,19 @@ final class MongoPersistenceStrategy extends PersistenceStrategy
         $dm = $this->objectManagerFor($object::class);
 
         return $dm->contains($object) && !$dm->getUnitOfWork()->isScheduledForInsert($object);
+    }
+
+    public function registerPreFlushGhostInitializer(string $class): void
+    {
+        $dm = $this->objectManagerFor($class);
+
+        $config = $dm->getConfiguration();
+        if (\method_exists($config, 'isNativeLazyObjectEnabled') && $config->isNativeLazyObjectEnabled()) {
+            // ODM with native lazy objects skips uninitialized objects when computing changesets
+            return;
+        }
+
+        InitializeTrackedGhostsBeforeFlushListener::registerTo($dm->getEventManager(), Events::preFlush);
     }
 
     public function hasChanges(object $object): bool

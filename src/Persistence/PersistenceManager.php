@@ -463,6 +463,18 @@ class PersistenceManager implements IdentifierResolver
         }
     }
 
+    /**
+     * @param class-string $class
+     */
+    public function registerPreFlushGhostInitializer(string $class): void
+    {
+        try {
+            $this->strategyFor($class)->registerPreFlushGhostInitializer($class);
+        } catch (NoPersistenceStrategy) {
+            // ie: tracked objects in a kernel without their persistence strategy
+        }
+    }
+
     public function hasPersistenceFor(object $object): bool
     {
         try {

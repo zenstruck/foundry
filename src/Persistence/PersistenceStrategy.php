@@ -73,6 +73,16 @@ abstract class PersistenceStrategy
         return $this->objectManagerFor($class)->getClassMetadata($class);
     }
 
+    /**
+     * Guard the given class' object manager against computing changesets from
+     * uninitialized lazy ghosts, if it cannot handle them natively.
+     *
+     * @param class-string $class
+     */
+    public function registerPreFlushGhostInitializer(string $class): void
+    {
+    }
+
     abstract public function hasChanges(object $object): bool;
 
     abstract public function contains(object $object): bool;
