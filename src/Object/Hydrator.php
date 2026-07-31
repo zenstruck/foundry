@@ -215,7 +215,8 @@ final class Hydrator
     {
         if (\function_exists('deepclone_hydrate')) {
             // VarExporter's Hydrator is deprecated since symfony/var-exporter 8.1
-            deepclone_hydrate($object, $snapshot, \DEEPCLONE_HYDRATE_PRESERVE_REFS);
+            // the constant is resolved dynamically: it only exists along with the function
+            deepclone_hydrate($object, $snapshot, \constant('DEEPCLONE_HYDRATE_PRESERVE_REFS'));
         } else {
             VarExporterHydrator::hydrate($object, $snapshot);
         }
