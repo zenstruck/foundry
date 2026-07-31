@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\ResetDatabase;
 
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Tests\Fixture\Document\GlobalDocument;
@@ -34,6 +36,34 @@ abstract class GlobalStoryTestCase extends KernelTestCase
 
         if (FoundryTestKernel::hasMongo()) {
             repository(GlobalDocument::class)->assert()->count(2);
+        }
+    }
+
+    #[Test]
+    public function story_states_are_managed_by_the_current_object_manager(): void
+    {
+        if (FoundryTestKernel::hasORM()) {
+            $em = self::getContainer()->get(EntityManagerInterface::class);
+            \assert($em instanceof EntityManagerInterface);
+
+            self::assertTrue($em->contains(GlobalStory::globalEntity()));
+            self::assertTrue($em->contains(GlobalStory::getRandom('globalEntities')));
+
+            $arrayState = GlobalStory::get('globalEntitiesArray');
+            self::assertIsArray($arrayState);
+            self::assertTrue($em->contains($arrayState[0]));
+        }
+
+        if (FoundryTestKernel::hasMongo()) {
+            $dm = self::getContainer()->get(DocumentManager::class);
+            \assert($dm instanceof DocumentManager);
+
+            self::assertTrue($dm->contains(GlobalStory::globalDocument()));
+            self::assertTrue($dm->contains(GlobalStory::getRandom('globalDocuments')));
+
+            $arrayState = GlobalStory::get('globalDocumentsArray');
+            self::assertIsArray($arrayState);
+            self::assertTrue($dm->contains($arrayState[0]));
         }
     }
 

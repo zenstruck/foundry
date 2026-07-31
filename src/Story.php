@@ -57,7 +57,7 @@ abstract class Story
      */
     final public static function getPool(string $pool): array
     {
-        return static::load()->pools[$pool] ?? [];
+        return \array_map(self::normalizeState(...), static::load()->pools[$pool] ?? []);
     }
 
     /**
@@ -138,20 +138,7 @@ abstract class Story
             throw new \InvalidArgumentException(\sprintf('"%s" was not registered. Did you forget to call "%s::addState()"?', $name, static::class));
         }
 
-        if (!\is_object($this->state[$name])) {
-            return $this->state[$name];
-        }
-
-        try {
-            $isProxy = $this->state[$name] instanceof Proxy;
-
-            $unwrappedObject = ProxyGenerator::unwrap($this->state[$name]);
-            Configuration::instance()->persistence()->refresh($unwrappedObject, force: true);
-
-            return $isProxy ? ProxyGenerator::wrap($unwrappedObject) : $unwrappedObject;
-        } catch (PersistenceNotAvailable|NoPersistenceStrategy|RefreshObjectFailed) {
-            return $this->state[$name];
-        }
+        return self::normalizeState($this->state[$name]);
     }
 
     final protected function addToPool(string $pool, mixed $value): self
@@ -174,5 +161,36 @@ abstract class Story
     private static function normalizeFactory(mixed $value): mixed
     {
         return $value instanceof Factory ? $value->create() : $value;
+    }
+
+    /**
+     * Stories (especially global ones) can outlive the object manager their states were
+     * created with: swap detached objects for an instance managed by the current object
+     * manager, so tests never receive stale objects.
+     */
+    private static function normalizeState(mixed $value): mixed
+    {
+        if (!Configuration::instance()->isPersistenceAvailable()) {
+            return $value;
+        }
+
+        if (\is_array($value)) {
+            return \array_map(self::normalizeState(...), $value);
+        }
+
+        if (!\is_object($value)) {
+            return $value;
+        }
+
+        try {
+            $isProxy = $value instanceof Proxy;
+
+            $unwrappedObject = ProxyGenerator::unwrap($value, withAutoRefresh: false);
+            $unwrappedObject = Configuration::instance()->persistence()->reattach($unwrappedObject);
+
+            return $isProxy ? ProxyGenerator::wrap($unwrappedObject) : $unwrappedObject;
+        } catch (PersistenceNotAvailable|NoPersistenceStrategy|RefreshObjectFailed) {
+            return $value;
+        }
     }
 }

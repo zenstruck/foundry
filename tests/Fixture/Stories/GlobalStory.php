@@ -28,12 +28,14 @@ final class GlobalStory extends Story
     {
         if (\getenv('DATABASE_URL')) {
             $globalEntity = persist(GlobalEntity::class);
-            $this->addState('globalEntity', $globalEntity);
+            $this->addState('globalEntity', $globalEntity, 'globalEntities');
+            $this->addState('globalEntitiesArray', [$globalEntity]);
         }
 
         if (\getenv('MONGO_URL')) {
             $globalDocument = persist(GlobalDocument::class);
-            $this->addState('globalDocument', $globalDocument);
+            $this->addState('globalDocument', $globalDocument, 'globalDocuments');
+            $this->addState('globalDocumentsArray', [$globalDocument]);
         }
     }
 }
