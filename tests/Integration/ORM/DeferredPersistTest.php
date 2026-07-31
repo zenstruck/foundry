@@ -23,6 +23,7 @@ use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\CascadeCtorRequiredParent;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\CascadePersistChain;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\OrphanRemoval;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\SharedManagedParent;
 use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 use function Zenstruck\Foundry\Persistence\persistent_factory;
@@ -176,6 +177,32 @@ final class DeferredPersistTest extends KernelTestCase
             ->create(['bs' => $bFactory->many(1)]);
 
         self::assertTrue($hasAAtPrePersist);
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function refreshing_managed_attribute_does_not_fire_lifecycle_events_on_scheduled_objects(): void
+    {
+        $parentFactory = persistent_factory(SharedManagedParent\ParentEntity::class);
+        $childFactory = persistent_factory(SharedManagedParent\ChildEntity::class);
+        $rootFactory = persistent_factory(SharedManagedParent\RootEntity::class);
+
+        // a flushed, managed entity, shared by the two children created below
+        $parent = $parentFactory->create();
+
+        // both children are scheduled until the root create completes; normalizing the second
+        // child's "parent" attribute must not fire prePersist on the first (still scheduled) one
+        $root = $rootFactory->create([
+            'items' => $childFactory->with(['parent' => $parent])->many(2),
+        ]);
+
+        self::assertCount(2, $root->getItems());
+
+        foreach ($root->getItems() as $item) {
+            self::assertSame(1, $item->prePersistCount);
+        }
     }
 
     /** @test */

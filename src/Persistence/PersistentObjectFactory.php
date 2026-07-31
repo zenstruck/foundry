@@ -12,7 +12,6 @@
 namespace Zenstruck\Foundry\Persistence;
 
 use Doctrine\Persistence\ObjectRepository;
-use Symfony\Component\VarExporter\Exception\LogicException as VarExportLogicException;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\FoundryNotBooted;
 use Zenstruck\Foundry\Exception\PersistenceDisabled;
@@ -23,7 +22,6 @@ use Zenstruck\Foundry\Object\Hydrator;
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\Event\AfterPersist;
 use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
-use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
 use Zenstruck\Foundry\Persistence\Relationship\ManyToOneRelationship;
 use Zenstruck\Foundry\Persistence\Relationship\OneToManyRelationship;
 use Zenstruck\Foundry\Persistence\Relationship\OneToOneRelationship;
@@ -572,11 +570,10 @@ abstract class PersistentObjectFactory extends ObjectFactory
             return $object;
         }
 
-        try {
-            return $configuration->persistence()->refresh($object);
-        } catch (RefreshObjectFailed|VarExportLogicException) { // @phpstan-ignore catch.neverThrown (thrown by var exporter)
-            return $object;
-        }
+        // swap a detached object for its managed instance; a managed one is used as-is:
+        // refreshing it here would discard in-memory state (unsaved changes, wired inverse
+        // collections) and its dirty-check would fire lifecycle events on scheduled objects
+        return $persistenceManager->reattach($object);
     }
 
     /**

@@ -210,6 +210,28 @@ class PersistenceManager implements IdentifierResolver
     }
 
     /**
+     * Swap a detached object for its managed instance. A managed object is returned as-is.
+     *
+     * @template T of object
+     *
+     * @param T $object
+     *
+     * @return T
+     */
+    public function reattach(object $object): object
+    {
+        $strategy = $this->strategyFor($object::class);
+
+        if ($strategy->contains($object)) {
+            return $object;
+        }
+
+        $id = $strategy->getIdentifierValues($object);
+
+        return ($id ? $strategy->objectManagerFor($object::class)->find($object::class, $id) : null) ?? $object;
+    }
+
+    /**
      * @template T of object
      *
      * @param T $object
