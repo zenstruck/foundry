@@ -18,6 +18,7 @@ use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
+use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithOnlyPrivateProperties;
 use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Document\GenericDocument;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Document\GenericDocumentFactory;
@@ -37,6 +38,14 @@ final class AutoRefreshTest extends AutoRefreshTestCase
     protected static function factory(): PersistentObjectFactory
     {
         return GenericDocumentFactory::new();
+    }
+
+    /**
+     * @return PersistentObjectFactory<DocumentWithOnlyPrivateProperties>
+     */
+    protected static function factoryWithOnlyPrivateProperties(): PersistentObjectFactory
+    {
+        return persistent_factory(DocumentWithOnlyPrivateProperties::class);
     }
 
     protected function dbms(): string

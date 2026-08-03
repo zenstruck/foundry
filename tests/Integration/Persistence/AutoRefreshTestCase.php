@@ -30,8 +30,10 @@ use Zenstruck\Foundry\Persistence\PersistedObjectsTracker;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithOnlyPrivateProperties;
 use Zenstruck\Foundry\Tests\Fixture\Document\DocumentWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithReadonly\EntityWithReadonly;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EntityWithOnlyPrivateProperties;
 use Zenstruck\Foundry\Tests\Fixture\Model\Embeddable;
 use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
 use Zenstruck\Foundry\Tests\Fixture\TestKernel;
@@ -39,6 +41,7 @@ use Zenstruck\Foundry\Tests\Fixture\TestKernel;
 use function Zenstruck\Foundry\factory;
 use function Zenstruck\Foundry\Persistence\assert_not_persisted;
 use function Zenstruck\Foundry\Persistence\assert_persisted;
+use function Zenstruck\Foundry\Persistence\delete;
 use function Zenstruck\Foundry\Persistence\flush_after;
 use function Zenstruck\Foundry\Persistence\refresh;
 use function Zenstruck\Foundry\Persistence\refresh_all;
@@ -218,6 +221,26 @@ abstract class AutoRefreshTestCase extends WebTestCase
         if ($clearOM) {
             $this->objectManager()->clear();
         }
+
+        self::assertTrue((new \ReflectionClass($object))->isUninitializedLazyObject($object));
+        self::assertSame($prop1, $object->getProp1());
+        assert_not_persisted($object);
+    }
+
+    #[Test]
+    public function deleting_an_object_declaring_only_private_properties_does_not_create_a_refresh_error(): void
+    {
+        self::createClient();
+
+        $object = static::factoryWithOnlyPrivateProperties()->create();
+        $prop1 = $object->getProp1();
+        assert_persisted($object);
+
+        delete($object);
+
+        $objectTracker = Configuration::instance()->persistedObjectsTracker;
+        self::assertNotNull($objectTracker);
+        $objectTracker->refresh();
 
         self::assertTrue((new \ReflectionClass($object))->isUninitializedLazyObject($object));
         self::assertSame($prop1, $object->getProp1());
@@ -496,6 +519,14 @@ abstract class AutoRefreshTestCase extends WebTestCase
      * @return PersistentObjectFactory<GenericModel>
      */
     abstract protected static function factory(): PersistentObjectFactory;
+
+    /**
+     * An object declaring all of its properties itself, privately: no inherited scope and no public
+     * property, so casting it to an array yields only mangled keys resolving to its own scope.
+     *
+     * @return PersistentObjectFactory<DocumentWithOnlyPrivateProperties|EntityWithOnlyPrivateProperties>
+     */
+    abstract protected static function factoryWithOnlyPrivateProperties(): PersistentObjectFactory;
 
     abstract protected function dbms(): string;
 

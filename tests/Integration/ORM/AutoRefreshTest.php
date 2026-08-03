@@ -31,6 +31,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\DerivedIdentity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithCloneMethod;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithReadonly\EntityWithReadonly;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\ManyToOneWithCascade\OwningSide;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EntityWithOnlyPrivateProperties;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\AddressFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
@@ -232,6 +233,14 @@ final class AutoRefreshTest extends AutoRefreshTestCase
     protected static function factory(): PersistentObjectFactory
     {
         return GenericEntityFactory::new();
+    }
+
+    /**
+     * @return PersistentObjectFactory<EntityWithOnlyPrivateProperties>
+     */
+    protected static function factoryWithOnlyPrivateProperties(): PersistentObjectFactory
+    {
+        return persistent_factory(EntityWithOnlyPrivateProperties::class);
     }
 
     protected function dbms(): string
