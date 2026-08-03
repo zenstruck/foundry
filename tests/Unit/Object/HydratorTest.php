@@ -19,6 +19,7 @@ use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\ForceValue;
 use Zenstruck\Foundry\Object\Hydrator;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
+use Zenstruck\Foundry\Tests\Fixture\SnapshotChild;
 
 /**
  * @author Maarten de Boer <info@maartendeboer.net>
@@ -221,5 +222,102 @@ class HydratorTest extends TestCase
         Hydrator::forceSet($object, 'foo', new ForceValue('foo'));
 
         $this->assertSame('foo', $object->getFoo());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_hydrate_from_snapshot_with_public_property_only(): void
+    {
+        $object = new class {
+            public string $foo = 'original';
+        };
+
+        $snapshot = (array) $object;
+        $object->foo = 'overwritten';
+
+        Hydrator::hydrateFromSnapshot($object, $snapshot);
+
+        $this->assertSame('original', $object->foo);
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_hydrate_from_snapshot_with_own_private_property(): void
+    {
+        $object = new class {
+            private string $foo = 'original';
+
+            public function getFoo(): string
+            {
+                return $this->foo;
+            }
+
+            public function setFoo(string $foo): void
+            {
+                $this->foo = $foo;
+            }
+        };
+
+        $snapshot = (array) $object;
+        $object->setFoo('overwritten');
+
+        Hydrator::hydrateFromSnapshot($object, $snapshot);
+
+        $this->assertSame('original', $object->getFoo());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_hydrate_from_snapshot_with_own_protected_property(): void
+    {
+        $object = new class {
+            protected string $foo = 'original';
+
+            public function getFoo(): string
+            {
+                return $this->foo;
+            }
+
+            public function setFoo(string $foo): void
+            {
+                $this->foo = $foo;
+            }
+        };
+
+        $snapshot = (array) $object;
+        $object->setFoo('overwritten');
+
+        Hydrator::hydrateFromSnapshot($object, $snapshot);
+
+        $this->assertSame('original', $object->getFoo());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_hydrate_from_snapshot_with_inherited_properties(): void
+    {
+        $object = new SnapshotChild();
+
+        $snapshot = (array) $object;
+
+        Hydrator::forceSet($object, 'childPublic', 'overwritten');
+
+        Hydrator::hydrateFromSnapshot($object, $snapshot);
+
+        $this->assertSame('child-public', $object->childPublic);
+        $this->assertSame('child-private', $object->childPrivate());
+        $this->assertSame('parent-private', $object->parentPrivate());
+        $this->assertSame('parent-protected', $object->parentProtected());
+        // a private property shadowed by a child keeps one value per declaring scope
+        $this->assertSame('child-shadowed', $object->childShadowed());
+        $this->assertSame('parent-shadowed', $object->parentShadowed());
     }
 }
