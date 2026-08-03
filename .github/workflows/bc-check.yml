@@ -1,15 +1,13 @@
 name: "Backward Compatibility Check"
 
-# disabled until a solution is fined to work with foundry-behat subpackage
 on:
-  workflow_dispatch:
-#  pull_request:
-#    paths: &paths
-#      - .github/workflows/bc-check.yml
-#      - bin/tools/bc-check/**
-#      - src/**
-#  push:
-#    paths: *paths
+  pull_request:
+    paths: &paths
+      - .github/workflows/bc-check.yml
+      - bin/tools/bc-check/**
+      - src/**
+  push:
+    paths: *paths
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -23,6 +21,36 @@ jobs:
       - uses: "actions/checkout@v5"
         with:
           fetch-depth: 0
+
+      # roave/backward-compatibility-check crashes on the foundry-behat subpackage: it scans
+      # every file under the PSR-4 "src/" dir, ignores exclude-from-classmap
+      # (https://github.com/Roave/BackwardCompatibilityCheck/issues/983) and the subpackage
+      # layout ("src/Test/Behat/src/") is not resolvable through the main autoload mapping.
+      # Workaround: compare baseline and HEAD with that directory stripped on both sides,
+      # via synthetic commits built with git plumbing (the working tree is left untouched).
+      - name: Create Behat-stripped revisions for the BC check
+        run: |
+          export GIT_AUTHOR_NAME=github-actions GIT_AUTHOR_EMAIL=github-actions@github.com
+          export GIT_COMMITTER_NAME=github-actions GIT_COMMITTER_EMAIL=github-actions@github.com
+
+          strip_behat() {
+            git read-tree "$1"
+            git rm -rq --cached --ignore-unmatch src/Test/Behat
+            git commit-tree "$(git write-tree)" -p "$1" -m "Strip Behat subpackage for BC check"
+          }
+
+          FROM_REV=$(git describe --tags --abbrev=0)
+          FROM_SHA=$(strip_behat "$FROM_REV")
+          TO_SHA=$(strip_behat HEAD)
+          git read-tree HEAD
+
+          # branch refs so the stripped commits survive the tool's internal "git clone"
+          git update-ref refs/heads/bc-check-from "$FROM_SHA"
+          git update-ref refs/heads/bc-check-to "$TO_SHA"
+
+          echo "Comparing $FROM_REV ($FROM_SHA) -> HEAD ($TO_SHA)"
+          echo "FROM_SHA=$FROM_SHA" >> "$GITHUB_ENV"
+          echo "TO_SHA=$TO_SHA" >> "$GITHUB_ENV"
 
       - name: Install PHP with extensions.
         uses: shivammathur/setup-php@v2
@@ -38,4 +66,4 @@ jobs:
         run: composer bin bc-check require roave/backward-compatibility-check
 
       - name: Run roave/backward-compatibility-check.
-        run: bin/tools/bc-check/vendor/roave/backward-compatibility-check/bin/roave-backward-compatibility-check --install-development-dependencies --format=github-actions
+        run: bin/tools/bc-check/vendor/roave/backward-compatibility-check/bin/roave-backward-compatibility-check --from="$FROM_SHA" --to="$TO_SHA" --install-development-dependencies --format=github-actions
