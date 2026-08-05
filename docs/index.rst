@@ -3020,9 +3020,9 @@ application under test — like ``<foundry:lastId(type)>`` below. It comes in ha
 
 .. note::
 
-    ``<foundry:object(...)>`` and ``<foundry:lastObject(...)>`` only work inside table cells. Behat never
-    applies ``#[Transform]`` to the content of tables: the id placeholders described below are only
-    resolved in plain step arguments.
+    ``<foundry:object(...)>`` and ``<foundry:lastObject(...)>`` resolve to **objects**: they only work
+    inside the property tables of the built-in steps. The id placeholders described below resolve to
+    **scalar** values and also work in PyStrings and in the table cells of any step.
 
 .. note::
 
@@ -3126,8 +3126,9 @@ Accessing ids of created objects
     accessed until the next database reset occurs, and they are cleared after each feature.
     ``<foundry:lastId(factory)>`` only relies on the database content.
 
-To sum up — Behat resolves the id placeholders with ``#[Transform]``, which is applied to plain step
-arguments but never to table cells, hence the two families of placeholders:
+To sum up — the object placeholders resolve to objects, so they can only live in the property
+tables the built-in steps normalize, while the id placeholders resolve to scalar values with
+``#[Transform]``, applied to plain step arguments, PyStrings and tables alike:
 
 .. list-table::
     :header-rows: 1
@@ -3136,16 +3137,16 @@ arguments but never to table cells, hence the two families of placeholders:
       - Works in
       - Resolved from
     * - ``<foundry:object(type, name)>``
-      - Table cells only
+      - Property tables of the built-in steps
       - Object registry
     * - ``<foundry:lastObject(type)>``
-      - Table cells only
+      - Property tables of the built-in steps
       - Database (row with the highest id)
     * - ``<foundry:id(type, name)>``
-      - Plain step arguments only
+      - Any step argument (plain, PyString, table cell)
       - Object registry
     * - ``<foundry:lastId(type)>``
-      - Plain step arguments only
+      - Any step argument (plain, PyString, table cell)
       - Database (row with the highest id)
 
 Overriding built-in step definitions

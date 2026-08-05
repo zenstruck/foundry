@@ -11,11 +11,13 @@
 
 namespace Zenstruck\Foundry\Test\Behat;
 
+use Behat\Gherkin\Node\PyStringNode;
+use Behat\Gherkin\Node\TableNode;
 use Behat\Transformation\Transform;
 
 /**
  * Built-in transformations resolving <foundry:lastId(...)> and <foundry:id(...)>
- * placeholders in step arguments.
+ * placeholders in step arguments, including PyString and table arguments.
  *
  * The composing class only needs to implement FoundryContextInterface; the ObjectRegistry is
  * injected by the HasObjectRegistry trait (see FoundryPlaceholderContext).
@@ -37,5 +39,34 @@ trait PlaceholderTransforms
     public function transformIdForSpecificObject(string $before, string $factoryShortName, string $objectName, string $after): string
     {
         return $this->objectRegistry->resolveIdPlaceholders("{$before}<foundry:id({$factoryShortName}, {$objectName})>{$after}");
+    }
+
+    /**
+     * By-type transformation (no pattern): applied to every PyString argument of a step
+     * definition whose parameter is type-hinted PyStringNode.
+     */
+    #[Transform]
+    public function transformIdPlaceholdersInPyStrings(PyStringNode $pyString): PyStringNode
+    {
+        $strings = $pyString->getStrings();
+        $resolved = \array_map($this->objectRegistry->resolveIdPlaceholders(...), $strings);
+
+        return $resolved === $strings ? $pyString : new PyStringNode($resolved, $pyString->getLine());
+    }
+
+    /**
+     * By-type transformation (no pattern): applied to every table argument of a step
+     * definition whose parameter is type-hinted TableNode.
+     */
+    #[Transform]
+    public function transformIdPlaceholdersInTables(TableNode $table): TableNode
+    {
+        $rows = $table->getTable();
+        $resolved = \array_map(
+            fn(array $row) => \array_map($this->objectRegistry->resolveIdPlaceholders(...), $row),
+            $rows,
+        );
+
+        return $resolved === $rows ? $table : new TableNode($resolved);
     }
 }
