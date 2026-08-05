@@ -18,6 +18,7 @@ use Zenstruck\Foundry\Test\Behat\FoundryContext;
 use Zenstruck\Foundry\Test\Behat\FoundryCreationContext;
 use Zenstruck\Foundry\Test\Behat\FoundryPlaceholderContext;
 use Zenstruck\Foundry\Test\Behat\ObjectRegistry;
+use Zenstruck\Foundry\Test\Behat\TableParametersNormalizer;
 
 return static function(ContainerConfigurator $container): void {
     $container->services()
@@ -34,6 +35,12 @@ return static function(ContainerConfigurator $container): void {
         ])
         ->tag('kernel.event_listener', ['method' => 'storeAfterStateAddedToStory', 'event' => StateAddedToStory::class])
         ->public()
+
+        ->set('.zenstruck_foundry.behat.table_normalizer', TableParametersNormalizer::class)
+        ->args([
+            service('.zenstruck_foundry.behat.factory_resolver'),
+            service('.zenstruck_foundry.behat.object_registry'),
+        ])
 
         // the step traits inject their (internal) dependencies through #[Required] setters, so the
         // contexts only need to be autowired — no explicit arguments, no public FQCN aliases

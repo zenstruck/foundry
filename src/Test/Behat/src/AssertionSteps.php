@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Test\Behat;
 
+use Behat\Gherkin\Node\TableNode;
 use Behat\Step\Then;
 use Symfony\Component\Uid\AbstractUid;
 use Zenstruck\Assert;
@@ -38,6 +39,7 @@ trait AssertionSteps
 {
     use HasFactoryShortNameResolver;
     use HasObjectRegistry;
+    use HasTableParametersNormalizer;
 
     #[Then('/^(\d+) "([^"]*)" should exist$/')]
     #[Then('/^(\d+) (?!.*\S\s+named\s+\S)([^"]*) should exist$/')]
@@ -56,12 +58,12 @@ trait AssertionSteps
      * and optional trailing "properties".
      */
     #[Then('/^(?:the |an? )?(?|"(?P<factoryShortName>[^"]+)"|(?!\d)(?P<factoryShortName>\S+)) named (?|"(?P<objectName>[^"]+)"|(?P<objectName>\S+)) should (?:exist and )?have(?: properties)?:$/')]
-    public function assertObjectHasProperties(FoundryTableNode $table, string $factoryShortName, string $objectName): void
+    public function assertObjectHasProperties(TableNode $table, string $factoryShortName, string $objectName): void
     {
         $object = $this->objectRegistry->getByFactoryShortName($factoryShortName, $objectName);
         $this->refreshObject($object, "Object with name \"{$objectName}\" of type \"{$factoryShortName}\" no longer exists in the database.");
 
-        $this->assertProperties($object, self::singleRow($table));
+        $this->assertProperties($object, $this->singleRow($table, $factoryShortName));
     }
 
     #[Then('/^(?:the |an? )?(?|"(?P<factoryShortName>[^"]+)"|(?!\d)(?P<factoryShortName>\S+)) named (?|"(?P<objectName>[^"]+)"|(?P<objectName>\S+)) should exist$/')]
@@ -106,19 +108,19 @@ trait AssertionSteps
     }
 
     #[Then('/^an? (?|"(?P<factoryShortName>[^"]+)"|(?!\d)(?P<factoryShortName>\S+)) should exist with:$/')]
-    public function assertSomeObjectExistsWithProperties(FoundryTableNode $table, string $factoryShortName): void
+    public function assertSomeObjectExistsWithProperties(TableNode $table, string $factoryShortName): void
     {
         $this->repositoryAssertionFor($factoryShortName)->exists(
-            self::singleRow($table),
+            $this->singleRow($table, $factoryShortName),
             "No \"{$factoryShortName}\" matching the given properties exists in the database."
         );
     }
 
     #[Then('/^no (?|"(?P<factoryShortName>[^"]+)"|(?!\d)(?P<factoryShortName>\S+)) should exist with:$/')]
-    public function assertNoObjectExistsWithProperties(FoundryTableNode $table, string $factoryShortName): void
+    public function assertNoObjectExistsWithProperties(TableNode $table, string $factoryShortName): void
     {
         $this->repositoryAssertionFor($factoryShortName)->notExists(
-            self::singleRow($table),
+            $this->singleRow($table, $factoryShortName),
             "A \"{$factoryShortName}\" matching the given properties exists in the database although it should not."
         );
     }
@@ -139,12 +141,12 @@ trait AssertionSteps
     }
 
     #[Then('/^the (?|"(?P<factoryShortName>[^"]+)"|(?!\d)(?P<factoryShortName>\S+)) with id (?|"(?P<id>[^"]+)"|(?P<id>\S+)) should (?:exist and )?have(?: properties)?:$/')]
-    public function assertObjectWithIdHasProperties(FoundryTableNode $table, string $factoryShortName, string $id): void
+    public function assertObjectWithIdHasProperties(TableNode $table, string $factoryShortName, string $id): void
     {
         $object = $this->findByIdOrFail($factoryShortName, $id);
         $this->refreshObject($object, "\"{$factoryShortName}\" with id \"{$id}\" no longer exists in the database.");
 
-        $this->assertProperties($object, self::singleRow($table));
+        $this->assertProperties($object, $this->singleRow($table, $factoryShortName));
     }
 
     private function repositoryAssertionFor(string $factoryShortName): RepositoryAssertions
@@ -205,9 +207,9 @@ trait AssertionSteps
     /**
      * @return array<string, mixed>
      */
-    private static function singleRow(FoundryTableNode $table): array
+    private function singleRow(TableNode $table, string $factoryShortName): array
     {
-        $parametersList = $table->getColumnsHash();
+        $parametersList = $this->tableParametersNormalizer->normalize($table, $factoryShortName);
 
         if (1 !== \count($parametersList)) {
             throw new \InvalidArgumentException(\sprintf('Expected exactly one line of properties for assertion, got %d lines.', \count($parametersList)));

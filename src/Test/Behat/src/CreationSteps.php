@@ -28,6 +28,7 @@ trait CreationSteps
 {
     use HasFactoryShortNameResolver;
     use HasObjectRegistry;
+    use HasTableParametersNormalizer;
 
     #[Given('there is a(n) :factoryShortName')]
     #[Given('there is a(n) :factoryShortName named :objectName')]
@@ -41,7 +42,7 @@ trait CreationSteps
     public function createObjectWithProperties(TableNode $table, string $factoryShortName, ?string $objectName = null): void
     {
         $factory = $this->resolveFactory($factoryShortName, $objectName);
-        $parametersList = $table->getColumnsHash();
+        $parametersList = $this->tableParametersNormalizer->normalize($table, $factoryShortName);
 
         if (1 !== \count($parametersList)) {
             throw new \InvalidArgumentException(\sprintf('Expected exactly one line of properties to create one object, got %d lines. Use "there are %s with:" to create multiple objects.', \count($parametersList), $factoryShortName));
@@ -53,7 +54,7 @@ trait CreationSteps
     #[Given('there are :factoryShortName with:')]
     public function createObjectsWithProperties(TableNode $table, string $factoryShortName): void
     {
-        $parametersList = $table->getColumnsHash();
+        $parametersList = $this->tableParametersNormalizer->normalize($table, $factoryShortName);
 
         foreach ($parametersList as $parameters) {
             $objectName = $parameters['_ref'] ?? null;

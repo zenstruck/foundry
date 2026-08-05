@@ -14,12 +14,12 @@ namespace Zenstruck\Foundry\Test\Behat;
 use Behat\Behat\Context\Context;
 
 /**
- * Marker interface for contexts providing Foundry steps: table arguments of their step
- * definitions are normalized by Foundry (object references, dates, enums).
+ * Marker interface for contexts providing Foundry steps.
  *
  * Implement it together with the step traits (CreationSteps, AssertionSteps,
  * PlaceholderTransforms) to build a custom context, e.g. to replace the wording of
- * some built-in steps.
+ * some built-in steps. The built-in steps normalize their property tables themselves
+ * (object references, dates, enums) through the TableParametersNormalizer service.
  *
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  * @experimental

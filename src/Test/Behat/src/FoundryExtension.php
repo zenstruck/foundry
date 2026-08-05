@@ -12,7 +12,6 @@
 namespace Zenstruck\Foundry\Test\Behat;
 
 use Behat\Behat\EventDispatcher\ServiceContainer\EventDispatcherExtension;
-use Behat\Testwork\Call\ServiceContainer\CallExtension;
 use Behat\Testwork\ServiceContainer\Extension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
 use DAMA\DoctrineTestBundle\Behat\ServiceContainer\DoctrineExtension;
@@ -71,10 +70,6 @@ final class FoundryExtension implements Extension
         $container->register('.zenstruck_foundry.behat.listener.load_fixture', LoadFixturesListener::class)
             ->setArgument('$symfonyKernel', new Reference('fob_symfony.kernel'))
             ->addTag(EventDispatcherExtension::SUBSCRIBER_TAG);
-
-        $container->register(FoundryCallFilter::class)
-            ->setArgument('$symfonyKernel', new Reference('fob_symfony.kernel'))
-            ->addTag(CallExtension::CALL_FILTER_TAG);
 
         $databaseResetMode = DatabaseResetMode::from($config['database_reset_mode']);
 

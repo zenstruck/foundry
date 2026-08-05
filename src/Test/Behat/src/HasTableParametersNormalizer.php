@@ -1,0 +1,32 @@
+<?php
+
+/*
+ * This file is part of the zenstruck/foundry package.
+ *
+ * (c) Kevin Bond <kevinbond@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Zenstruck\Foundry\Test\Behat;
+
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Contracts\Service\Attribute\Required;
+
+/**
+ * @internal
+ * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ */
+trait HasTableParametersNormalizer
+{
+    private TableParametersNormalizer $tableParametersNormalizer;
+
+    #[Required]
+    public function setTableParametersNormalizer(
+        #[Autowire(service: '.zenstruck_foundry.behat.table_normalizer')]
+        TableParametersNormalizer $tableParametersNormalizer,
+    ): void {
+        $this->tableParametersNormalizer = $tableParametersNormalizer;
+    }
+}
