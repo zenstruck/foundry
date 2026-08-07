@@ -213,8 +213,6 @@ final class Hydrator
      */
     public static function hydrateFromSnapshot(object $object, array $snapshot): void
     {
-        $snapshot = self::normalizeMangledKeys($object, $snapshot);
-
         if (\function_exists('deepclone_hydrate')) {
             // VarExporter's Hydrator is deprecated since symfony/var-exporter 8.1
             // the constant is resolved dynamically: it only exists along with the function
@@ -222,48 +220,6 @@ final class Hydrator
         } else {
             VarExporterHydrator::hydrate($object, $snapshot);
         }
-    }
-
-    /**
-     * An `(array) $object` cast mangles non-public property names ("\0Class\0name" for a private
-     * one, "\0*\0name" for a protected one), but the hydrators expect the convention built by
-     * VarExporter\Hydrator: a plain name for anything writable in the object's own scope, and
-     * "\0Scope\0name" only for a private property declared by another class.
-     *
-     * Without this translation, a snapshot whose keys all resolve to the object's own scope takes
-     * the hydrator's un-grouped fast path and the mangled name is used verbatim, which fails with
-     * `Error: Cannot access property starting with "\0"`.
-     *
-     * @param array<string, mixed> $snapshot
-     *
-     * @return array<string, mixed>
-     */
-    private static function normalizeMangledKeys(object $object, array $snapshot): array
-    {
-        $vars = [];
-
-        foreach ($snapshot as $key => $value) {
-            $parts = \explode("\0", $key);
-
-            // a mangled key is "\0", the scope, "\0" and the property name, so it explodes into at
-            // least 3 parts. Anything shorter is left untouched: "\0" alone carries the state of
-            // SplObjectStorage/ArrayObject/ArrayIterator.
-            if (\count($parts) < 3 || '' !== $parts[0]) {
-                $vars[$key] = $value;
-
-                continue;
-            }
-
-            // the property name never contains a "\0" but an anonymous class name does, so the name
-            // is the last part and everything in between belongs to the scope
-            $name = \array_pop($parts);
-            \array_shift($parts);
-            $scope = \implode("\0", $parts);
-
-            $vars['*' === $scope || $scope === $object::class ? $name : "\0{$scope}\0{$name}"] = $value;
-        }
-
-        return $vars;
     }
 
     private static function accessibleProperty(object $object, string $name): \ReflectionProperty
