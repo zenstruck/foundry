@@ -42,7 +42,7 @@ jobs:
         with:
           composer-options: --prefer-dist
         env:
-          SYMFONY_REQUIRE: 8.0.*
+          SYMFONY_REQUIRE: 8.1.*
 
       - name: Install PHPStan
         run: composer bin phpstan install

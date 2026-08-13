@@ -27,7 +27,7 @@ jobs:
       fail-fast: false
       matrix:
         php: [ 8.4, 8.5 ]
-        symfony: [ 6.4.*, 7.4.*, 8.0.* ]
+        symfony: [ 6.4.*, 7.4.*, 8.1.* ]
         database: [ mysql|mongo ]
         phpunit: [ 13 ]
         use-phpunit-extension: [ 1 ]
@@ -279,7 +279,7 @@ jobs:
           dependency-versions: highest
           composer-options: --prefer-dist
         env:
-          SYMFONY_REQUIRE: 8.0.*
+          SYMFONY_REQUIRE: 8.1.*
 
       - name: Set up MySQL
         run: sudo /etc/init.d/mysql start
@@ -338,7 +338,7 @@ jobs:
         with:
           composer-options: --prefer-dist
         env:
-          SYMFONY_REQUIRE: 8.0.x
+          SYMFONY_REQUIRE: 8.1.x
 
       - name: Test with coverage
         run: ./phpunit --coverage-text --coverage-clover coverage.xml
