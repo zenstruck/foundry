@@ -3108,6 +3108,24 @@ Accessing ids of created objects
 
 .. warning::
 
+    Inside a **quoted** step argument, write multi-word names **without** quotes: a quote inside the
+    placeholder would close the step pattern's own ``"([^"]*)"`` group prematurely, and the step would
+    no longer match. Quoted names remain valid in PyStrings and table cells, which are not captured
+    by a quoted pattern:
+
+    .. code-block:: gherkin
+
+        # inline arguments: no quotes around multi-word names
+        When I am on "/events/<foundry:id(event date, opening)>"
+
+        # PyStrings and table cells: quoted names are fine
+        Then the response should equal:
+          """
+          <foundry:id("event date", "opening")>
+          """
+
+.. warning::
+
     ``<foundry:lastId(...)>`` is resolved from the database: the row with the **highest id** is considered the
     last one. This works whoever created the row — a Foundry ``Given`` step, a fixture, or the
     application under test — but it assumes ids follow the creation order (auto-increment columns,

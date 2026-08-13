@@ -42,12 +42,17 @@ trait PlaceholderTransforms
     }
 
     /**
-     * By-type transformation (no pattern): applied to every PyString argument of a step
-     * definition whose parameter is type-hinted PyStringNode.
+     * By-type transformation (no pattern): applied to every argument of a step definition
+     * whose parameter is type-hinted PyStringNode — matching is based on the parameter's
+     * TYPE, so it also runs with null when an optional multiline argument is omitted.
      */
     #[Transform]
-    public function transformIdPlaceholdersInPyStrings(PyStringNode $pyString): PyStringNode
+    public function transformIdPlaceholdersInPyStrings(?PyStringNode $pyString): ?PyStringNode
     {
+        if (null === $pyString) {
+            return null;
+        }
+
         $strings = $pyString->getStrings();
         $resolved = \array_map($this->objectRegistry->resolveIdPlaceholders(...), $strings);
 
@@ -55,12 +60,17 @@ trait PlaceholderTransforms
     }
 
     /**
-     * By-type transformation (no pattern): applied to every table argument of a step
-     * definition whose parameter is type-hinted TableNode.
+     * By-type transformation (no pattern): applied to every argument of a step definition
+     * whose parameter is type-hinted TableNode — matching is based on the parameter's
+     * TYPE, so it also runs with null when an optional multiline argument is omitted.
      */
     #[Transform]
-    public function transformIdPlaceholdersInTables(TableNode $table): TableNode
+    public function transformIdPlaceholdersInTables(?TableNode $table): ?TableNode
     {
+        if (null === $table) {
+            return null;
+        }
+
         $rows = $table->getTable();
         $resolved = \array_map(
             fn(array $row) => \array_map($this->objectRegistry->resolveIdPlaceholders(...), $row),

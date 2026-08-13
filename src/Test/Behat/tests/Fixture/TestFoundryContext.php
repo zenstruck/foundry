@@ -54,4 +54,31 @@ final class TestFoundryContext implements Context
             }
         }
     }
+
+    /**
+     * Mirrors the common real-world shape of an HTTP step (`iSendARequestTo($url, PyStringNode $body = null)`):
+     * the multiline argument is optional. Behat matches by-type transformations on the parameter's TYPE,
+     * so they also run — with null — when the step is called without the multiline argument.
+     */
+    #[Then('/^the value "(.*)" should not contain an unresolved placeholder:?$/')]
+    public function assertValueAndOptionalPyStringResolved(string $value, ?PyStringNode $body = null): void
+    {
+        Assert::that($value)->doesNotContain('<foundry:');
+
+        foreach ($body?->getStrings() ?? [] as $line) {
+            Assert::that($line)->doesNotContain('<foundry:');
+        }
+    }
+
+    #[Then('/^no cell of the optional table should contain an unresolved placeholder for "(.*)":?$/')]
+    public function assertValueAndOptionalTableResolved(string $value, ?TableNode $table = null): void
+    {
+        Assert::that($value)->doesNotContain('<foundry:');
+
+        foreach ($table?->getRows() ?? [] as $row) {
+            foreach ($row as $cell) {
+                Assert::that($cell)->doesNotContain('<foundry:');
+            }
+        }
+    }
 }

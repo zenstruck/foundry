@@ -22,6 +22,20 @@ Feature: Resolving id placeholders in PyString and table arguments
     And all cells of the following table should equal "<foundry:id("contact", "A")>":
       | <foundry:lastId(contact)> | <foundry:lastId("contact")> |
 
+  # A definition may declare its multiline argument optional (e.g. an HTTP step whose request
+  # body is not always given). By-type transformations match on the parameter's TYPE, so they
+  # also run when the step is called WITHOUT the multiline argument — they must pass null through.
+  Scenario: Optional multiline arguments may be omitted
+    Given there is a contact named A
+    Then the value "<foundry:id(contact, A)>" should not contain an unresolved placeholder
+    And no cell of the optional table should contain an unresolved placeholder for "<foundry:id(contact, A)>"
+    And the value "<foundry:id(contact, A)>" should not contain an unresolved placeholder:
+      """
+      <foundry:lastId(contact)>
+      """
+    And no cell of the optional table should contain an unresolved placeholder for "<foundry:id(contact, A)>":
+      | <foundry:lastId(contact)> |
+
   # The creation and assertion tables use different placeholders resolving to the same value:
   # if resolution silently stopped on either side, the literals would no longer match.
   Scenario: Id placeholders are resolved in the tables of the built-in steps
