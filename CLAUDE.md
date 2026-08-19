@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Git workflow
 
-**Never commit and never open pull requests on your own.** When explicitly asked, push the branch to a fork and open the PR against that fork — never directly against upstream `zenstruck/foundry`.
+**Never commit and never open pull requests on your own.** When explicitly asked, push the source branch to a fork, then open the PR against upstream `zenstruck/foundry`.
+
+PR descriptions must be succinct and explain the **why**, not the how.
 
 ## Commands
 
@@ -81,7 +83,8 @@ Foundry is a model-factory library for Symfony/Doctrine (ORM + MongoDB ODM). PHP
 
 - Code (and comments) always in English; specs/plans may be in French.
 - Mark classes not meant for end users with `@internal`.
-- As few comments as possible; only phpdoc that adds information beyond the type declarations.
+- Keep comments to a strict minimum: only when genuinely useful.
+- No phpdoc that paraphrases the type declarations; only useful `@param`/`@return`/`@var`/... annotations (generics, array shapes, information the types cannot express).
 - Prefer string interpolation over `sprintf()` when no static call is involved.
 - Minimize useless temporary variables.
 - Prefer `array_map()`/`array_filter()` and PHP 8.4+ `array_find()`/`array_find_key()`/`array_any()`/`array_all()` over `foreach`, unless it gets too complex.
