@@ -19,6 +19,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\FakerAdapter;
+use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
@@ -36,7 +37,8 @@ final class FakerSeedSetFromEnvVarKernelTest extends KernelTestCase
     #[Test]
     public function faker_seed_can_be_set_by_environment_variable(): void
     {
-        self::assertSame('quia', faker()->word());
+        // without Foundry's PHPUnit extension, no test id is available: the run's seed is used as-is
+        self::assertSame(FoundryExtension::isEnabled() ? 'rem' : 'quia', faker()->word());
         self::assertSame(4321, FakerAdapter::fakerSeed());
     }
 
@@ -44,7 +46,8 @@ final class FakerSeedSetFromEnvVarKernelTest extends KernelTestCase
     #[Depends('faker_seed_can_be_set_by_environment_variable')]
     public function faker_seed_is_already_set(): void
     {
-        self::assertSame('quia', faker()->word());
+        // the run's seed is unchanged, but each test derives its own faker sequence from it
+        self::assertSame(FoundryExtension::isEnabled() ? 'neque' : 'quia', faker()->word());
         self::assertSame(4321, FakerAdapter::fakerSeed());
     }
 

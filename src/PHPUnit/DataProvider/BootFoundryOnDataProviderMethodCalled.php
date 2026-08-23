@@ -15,6 +15,7 @@ use PHPUnit\Event;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\FakerAdapter;
 use Zenstruck\Foundry\InMemory\AsInMemoryTest;
 use Zenstruck\Foundry\PHPUnit\KernelTestCaseHelper;
 use Zenstruck\Foundry\Test\UnitTestConfig;
@@ -27,9 +28,11 @@ final class BootFoundryOnDataProviderMethodCalled implements Event\Test\DataProv
 {
     public function notify(Event\Test\DataProviderMethodCalled $event): void
     {
-        $this->bootFoundryForDataProvider($event->testMethod()->className());
-
         $testMethod = $event->testMethod();
+
+        FakerAdapter::setCurrentTestId("{$testMethod->className()}::{$testMethod->methodName()}::dataProvider");
+
+        $this->bootFoundryForDataProvider($testMethod->className());
 
         if (AsInMemoryTest::shouldEnableInMemory($testMethod->className(), $testMethod->methodName())) {
             Configuration::instance()->enableInMemory();

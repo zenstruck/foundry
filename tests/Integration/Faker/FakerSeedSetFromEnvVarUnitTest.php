@@ -18,6 +18,7 @@ use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\FakerAdapter;
+use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Test\Factories;
 
 use function Zenstruck\Foundry\faker;
@@ -35,7 +36,8 @@ final class FakerSeedSetFromEnvVarUnitTest extends TestCase
     public function faker_seed_is_set_from_env_var(): void
     {
         self::assertSame('1234', $_SERVER['FOUNDRY_FAKER_SEED'], 'Default seed should be 1234');
-        self::assertSame('architecto', faker()->word());
+        // without Foundry's PHPUnit extension, no test id is available: the run's seed is used as-is
+        self::assertSame(FoundryExtension::isEnabled() ? 'nemo' : 'architecto', faker()->word());
         self::assertSame(1234, FakerAdapter::fakerSeed());
     }
 
@@ -44,7 +46,8 @@ final class FakerSeedSetFromEnvVarUnitTest extends TestCase
     public function faker_seed_does_not_change(): void
     {
         self::assertSame('1234', $_SERVER['FOUNDRY_FAKER_SEED'], 'Default seed should be 1234');
-        self::assertSame('architecto', faker()->word());
+        // the run's seed is unchanged, but each test derives its own faker sequence from it
+        self::assertSame(FoundryExtension::isEnabled() ? 'quaerat' : 'architecto', faker()->word());
         self::assertSame(1234, FakerAdapter::fakerSeed());
     }
 }

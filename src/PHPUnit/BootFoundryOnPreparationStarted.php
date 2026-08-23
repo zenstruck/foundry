@@ -15,6 +15,7 @@ use PHPUnit\Event;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\FakerAdapter;
 use Zenstruck\Foundry\Test\UnitTestConfig;
 
 /**
@@ -32,6 +33,8 @@ final class BootFoundryOnPreparationStarted implements Event\Test\PreparationSta
         }
 
         /** @var Event\Code\TestMethod $test */
+        FakerAdapter::setCurrentTestId($test->id());
+
         $this->bootFoundry($test->className());
     }
 

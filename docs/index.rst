@@ -593,6 +593,15 @@ Reproducibility
 Foundry sets a different random seed for each PHPUnit run. This means that Faker will generate different data on each run.
 If you're using Foundry's `PHPUnit Extension`_, it will automatically display the seed used for each test run.
 
+Each test then derives its own Faker sequence from that run seed, so tests no longer generate the same data as one
+another, while a given test still replays identically when run in isolation - which is what makes reproducing a
+flaky test with ``--filter`` possible.
+
+.. versionadded::  2.12.1
+
+    Deriving a seed for each test was added in 2.12.1 and requires Foundry's `PHPUnit Extension`_. A given run seed
+    no longer generates the same data as in previous versions.
+
 You can also freeze the seed, by using the environment variable ``FOUNDRY_FAKER_SEED``:
 
 .. code-block:: terminal
@@ -611,9 +620,9 @@ You can also freeze the seed, by using the environment variable ``FOUNDRY_FAKER_
 
 .. note::
 
-    By default, Foundry generates a seed for Faker and automatically resets it before each test.
-    You can disable this with the configuration ``manage_seed: false``. You can still use ``FOUNDRY_FAKER_SEED``
-    to set an explicit seed.
+    By default, Foundry generates a seed for Faker and reseeds it before each test. If you'd rather manage the
+    seed yourself, set ``manage_seed: false``: Foundry will then leave Faker's seed untouched. You can still use
+    ``FOUNDRY_FAKER_SEED`` to set an explicit seed.
 
     .. code-block:: yaml
 
@@ -621,6 +630,16 @@ You can also freeze the seed, by using the environment variable ``FOUNDRY_FAKER_
         zenstruck_foundry:
             faker:
                 manage_seed: false
+
+    The bundle's configuration is not available in `Non-Kernel Tests`_. Mirror this setting there with
+    ``UnitTestConfig``::
+
+        // tests/bootstrap.php
+        Zenstruck\Foundry\Test\UnitTestConfig::configure(manageFakerSeed: false);
+
+    .. versionadded::  2.12.1
+
+        The ``manageFakerSeed`` argument of ``UnitTestConfig::configure()`` was added in 2.12.1.
 
 Hooks
 ~~~~~

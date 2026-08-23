@@ -44,8 +44,10 @@ final class FakerSeedDoNotConflictWithDataProviderTest extends KernelTestCase
     public function no_conflict_with_data_providers(WithUniqueColumn $withUniqueColumnFromDataProvider): void
     {
         self::assertSame(1234, FakerAdapter::fakerSeed());
-        self::assertSame('architecto', $withUniqueColumnFromDataProvider->getUniqueCol());
-        self::assertSame('eius', WithUniqueColumnFactory::createOne()->getUniqueCol());
+        self::assertNotSame(
+            $withUniqueColumnFromDataProvider->getUniqueCol(),
+            WithUniqueColumnFactory::createOne()->getUniqueCol(),
+        );
     }
 
     public static function provideObject(): iterable
@@ -64,8 +66,8 @@ final class FakerSeedDoNotConflictWithDataProviderTest extends KernelTestCase
 
     public static function provideObjectUsingFakreInDataProvider(): iterable
     {
-        yield [WithUniqueColumnFactory::createOne(['uniqueCol' => faker()->word()]), 'dolorum'];
-        yield [WithUniqueColumnFactory::createOne(['uniqueCol' => faker()->word()]), 'soluta'];
+        yield [WithUniqueColumnFactory::createOne(['uniqueCol' => faker()->word()]), 'sed'];
+        yield [WithUniqueColumnFactory::createOne(['uniqueCol' => faker()->word()]), 'et'];
 
         self::assertSame(1234, FakerAdapter::fakerSeed(), 'Faker seed should have been set even in data provider');
     }

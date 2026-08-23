@@ -20,6 +20,7 @@ use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\FakerAdapter;
+use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
@@ -54,14 +55,17 @@ final class FakerSeedShouldNotChangeIfSeedIsNotManagedByFoundryTest extends Kern
     #[WithEnvironmentVariable('FOUNDRY_FAKER_SEED', '4321')]
     public function faker_seed_can_still_be_forced_by_env_var(): void
     {
-        self::assertSame('quia', faker()->word());
+        // without Foundry's PHPUnit extension, no test id is available: the run's seed is used as-is
+        self::assertSame(FoundryExtension::isEnabled() ? 'mollitia' : 'quia', faker()->word());
         self::assertSame(4321, FakerAdapter::fakerSeed());
     }
 
     #[Test]
     public function faker_seed_can_still_be_forced_by_env_var_2(): void
     {
-        $this->faker_seed_can_still_be_forced_by_env_var();
+        // the seed forced earlier in the run is still in effect, but this test derives its own sequence from it
+        self::assertSame(FoundryExtension::isEnabled() ? 'optio' : 'quia', faker()->word());
+        self::assertSame(4321, FakerAdapter::fakerSeed());
     }
 
     protected static function bootKernel(array $options = []): KernelInterface

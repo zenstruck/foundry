@@ -29,14 +29,16 @@ final class UnitTestConfig
     /** @phpstan-var InstantiatorCallable|null */
     private static $instantiator;
     private static ?Faker\Generator $faker = null;
+    private static bool $manageFakerSeed = true;
 
     /**
      * @phpstan-param InstantiatorCallable|null $instantiator
      */
-    public static function configure(Instantiator|callable|null $instantiator = null, ?Faker\Generator $faker = null): void
+    public static function configure(Instantiator|callable|null $instantiator = null, ?Faker\Generator $faker = null, bool $manageFakerSeed = true): void
     {
         self::$instantiator = $instantiator;
         self::$faker = $faker;
+        self::$manageFakerSeed = $manageFakerSeed;
     }
 
     /**
@@ -49,7 +51,11 @@ final class UnitTestConfig
 
         return new Configuration(
             new FactoryRegistry([]),
-            new FakerAdapter($faker, forcedFakerSeedFromEnv: $_SERVER['FOUNDRY_FAKER_SEED'] ?? $_ENV['FOUNDRY_FAKER_SEED'] ?? (\getenv('FOUNDRY_FAKER_SEED') ?: null)),
+            new FakerAdapter(
+                $faker,
+                forcedFakerSeedFromEnv: $_SERVER['FOUNDRY_FAKER_SEED'] ?? $_ENV['FOUNDRY_FAKER_SEED'] ?? (\getenv('FOUNDRY_FAKER_SEED') ?: null),
+                manageFakerSeed: self::$manageFakerSeed,
+            ),
             self::$instantiator ?? Instantiator::withConstructor(),
             new StoryRegistry([]),
         );
