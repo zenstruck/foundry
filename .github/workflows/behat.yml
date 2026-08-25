@@ -2,9 +2,9 @@ name: Behat
 
 on:
   push:
-    # the Behat suite runs against the checkout's src/ (symlinked into the vendor dir by
-    # symlink-vendor.sh on post-install) and against the shared test fixtures: a change in
-    # the main package must also trigger this workflow
+    # the Behat suite runs against the checkout's zenstruck/foundry (installed from the
+    # monorepo as a composer path repository) and against the shared test fixtures:
+    # a change in the main package must also trigger this workflow
     paths: &paths
       - .github/workflows/behat.yml
       - src/**
@@ -49,6 +49,14 @@ jobs:
       - name: Pin Doctrine ORM 2 and its php80 polyfill for the lowest deps
         if: ${{ matrix.deps == 'lowest' }}
         run: composer require --dev "doctrine/orm:^2.16" symfony/polyfill-php80:^1.16 --no-update
+
+      # install zenstruck/foundry from the checkout instead of Packagist, so the suite runs
+      # the branch's code with its dependencies resolved transitively; composer refuses to
+      # install a path package inside its own source tree, hence the copy outside of it
+      - name: Install zenstruck/foundry from the checkout
+        run: |
+          rsync -a --exclude=.git --exclude=vendor ../../../ "$RUNNER_TEMP/foundry-checkout/"
+          composer config repositories.foundry "{\"type\": \"path\", \"url\": \"$RUNNER_TEMP/foundry-checkout\", \"options\": {\"versions\": {\"zenstruck/foundry\": \"2.99.0\"}}}"
 
       - name: Install dependencies
         uses: ramsey/composer-install@v2
@@ -113,6 +121,14 @@ jobs:
         if: ${{ matrix.deps == 'lowest' }}
         run: composer require --dev "doctrine/orm:^2.16" symfony/polyfill-php80:^1.16 --no-update
 
+      # install zenstruck/foundry from the checkout instead of Packagist, so the suite runs
+      # the branch's code with its dependencies resolved transitively; composer refuses to
+      # install a path package inside its own source tree, hence the copy outside of it
+      - name: Install zenstruck/foundry from the checkout
+        run: |
+          rsync -a --exclude=.git --exclude=vendor ../../../ "$RUNNER_TEMP/foundry-checkout/"
+          composer config repositories.foundry "{\"type\": \"path\", \"url\": \"$RUNNER_TEMP/foundry-checkout\", \"options\": {\"versions\": {\"zenstruck/foundry\": \"2.99.0\"}}}"
+
       - name: Install dependencies
         uses: ramsey/composer-install@v2
         with:
@@ -138,6 +154,14 @@ jobs:
           php-version: 8.5
           coverage: none
           tools: flex
+
+      # install zenstruck/foundry from the checkout instead of Packagist, so the suite runs
+      # the branch's code with its dependencies resolved transitively; composer refuses to
+      # install a path package inside its own source tree, hence the copy outside of it
+      - name: Install zenstruck/foundry from the checkout
+        run: |
+          rsync -a --exclude=.git --exclude=vendor ../../../ "$RUNNER_TEMP/foundry-checkout/"
+          composer config repositories.foundry "{\"type\": \"path\", \"url\": \"$RUNNER_TEMP/foundry-checkout\", \"options\": {\"versions\": {\"zenstruck/foundry\": \"2.99.0\"}}}"
 
       - name: Install dependencies
         uses: ramsey/composer-install@v2

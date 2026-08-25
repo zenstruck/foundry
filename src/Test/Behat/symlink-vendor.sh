@@ -12,6 +12,13 @@ if ! grep -q '"name": "zenstruck/foundry"' "${MONOREPO_ROOT}/composer.json" 2>/d
     exit 0
 fi
 
+# when zenstruck/foundry is installed from a path repository (as in CI), the vendor entry
+# already points to the checkout: symlinking would destroy the real sources
+if [ -L "${SCRIPT_DIR}/vendor/zenstruck/foundry" ]; then
+    echo "vendor/zenstruck/foundry is already a symlink to the checkout: nothing to do."
+    exit 0
+fi
+
 if [ ! -d "${VENDOR_SRC}" ]; then
     echo "Directory vendor/zenstruck/foundry/src does not exist yet."
     exit 1
