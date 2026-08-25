@@ -15,7 +15,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Component\VarExporter\Hydrator as VarExporterHydrator;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\ForceValue;
 
@@ -213,13 +212,9 @@ final class Hydrator
      */
     public static function hydrateFromSnapshot(object $object, array $snapshot): void
     {
-        if (\function_exists('deepclone_hydrate')) {
-            // VarExporter's Hydrator is deprecated since symfony/var-exporter 8.1
-            // the constant is resolved dynamically: it only exists along with the function
-            deepclone_hydrate($object, $snapshot, \constant('DEEPCLONE_HYDRATE_PRESERVE_REFS'));
-        } else {
-            VarExporterHydrator::hydrate($object, $snapshot);
-        }
+        // symfony/polyfill-deepclone >= 1.42 is required: it fixes the hydration
+        // of mangled keys pointing to the object's own scope (symfony/polyfill#643)
+        deepclone_hydrate($object, $snapshot, \DEEPCLONE_HYDRATE_PRESERVE_REFS);
     }
 
     private static function accessibleProperty(object $object, string $name): \ReflectionProperty
