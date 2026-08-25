@@ -394,6 +394,13 @@ The attributes used to instantiate the object can be added several ways. Attribu
 that returns an array. Using a *callable* ensures random data as the callable is run for each object separately during
 instantiation.
 
+.. note::
+
+    Throughout Foundry, "attributes" refers to this array of property values used to
+    instantiate an object, a term borrowed from the classic database fixture vocabulary.
+    It is unrelated to native PHP attributes: those, like ``#[WithStory]`` or
+    ``#[AsFoundryHook]``, are always referenced with their ``#[...]`` syntax.
+
 ::
 
     use App\Entity\Category;

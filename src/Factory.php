@@ -15,6 +15,9 @@ use Faker;
 use Zenstruck\Foundry\Exception\CannotCreateFactory;
 
 /**
+ * Throughout Foundry, "attributes" refers to the property values used to instantiate
+ * an object (the classic fixture meaning), not to native PHP `#[...]` attributes.
+ *
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @immutable
@@ -35,6 +38,8 @@ abstract class Factory
     }
 
     /**
+     * @param array|callable $attributes Property values for the object(s) to create
+     *
      * @phpstan-param Attributes $attributes
      * @phpstan-return static
      */
@@ -57,6 +62,8 @@ abstract class Factory
     }
 
     /**
+     * @param array|callable $attributes Property values for the object(s) to create
+     *
      * @phpstan-param Attributes $attributes
      *
      * @return T
@@ -67,6 +74,8 @@ abstract class Factory
     }
 
     /**
+     * @param array|callable $attributes Property values for the object(s) to create
+     *
      * @phpstan-param Attributes $attributes
      *
      * @return list<T>
@@ -78,6 +87,8 @@ abstract class Factory
     }
 
     /**
+     * @param array|callable $attributes Property values for the object(s) to create
+     *
      * @phpstan-param Attributes $attributes
      *
      * @return list<T>
@@ -99,6 +110,8 @@ abstract class Factory
     }
 
     /**
+     * @param array|callable $attributes Property values for the object(s) to create
+     *
      * @phpstan-param Attributes $attributes
      *
      * @return T
@@ -147,6 +160,8 @@ abstract class Factory
     }
 
     /**
+     * @param array|callable $attributes Property values to merge with the factory's current attributes
+     *
      * @phpstan-param Attributes $attributes
      *
      * @phpstan-return static
@@ -283,6 +298,8 @@ abstract class Factory
     }
 
     /**
+     * Default property values for every object this factory creates.
+     *
      * @phpstan-return Attributes
      */
     abstract protected function defaults(): array|callable;
