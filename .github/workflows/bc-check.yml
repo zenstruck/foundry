@@ -30,12 +30,19 @@ jobs:
       # via synthetic commits built with git plumbing (the working tree is left untouched).
       - name: Create Behat-stripped revisions for the BC check
         run: |
+          # propagate errexit into $(...) so a failing strip aborts the step immediately,
+          # instead of surfacing as an obscure roave crash later
+          shopt -s inherit_errexit
+
           export GIT_AUTHOR_NAME=github-actions GIT_AUTHOR_EMAIL=github-actions@github.com
           export GIT_COMMITTER_NAME=github-actions GIT_COMMITTER_EMAIL=github-actions@github.com
 
           strip_behat() {
             git read-tree "$1"
-            git rm -rq --cached --ignore-unmatch src/Test/Behat
+            # -f: when the branch modifies a file under src/Test/Behat, the index (baseline
+            # version) differs from both HEAD and the working tree, and the up-to-date safety
+            # check would refuse the removal; with --cached the working tree is never touched
+            git rm -rqf --cached --ignore-unmatch src/Test/Behat
             git commit-tree "$(git write-tree)" -p "$1" -m "Strip Behat subpackage for BC check"
           }
 
