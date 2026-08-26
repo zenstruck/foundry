@@ -1121,6 +1121,37 @@ the LazyValue can be `memoized <https://en.wikipedia.org/wiki/Memoization>`_ so 
     the ``lazy()`` and ``memoize()`` helper functions can also be used to create LazyValues,
     instead of ``LazyValue::new()`` and ``LazyValue::memoize()``.
 
+When the value comes from a factory, ``memoize()`` can be called on the factory itself, which reads
+better and avoids a common mistake::
+
+        protected function defaults(): array
+        {
+            $owner = UserFactory::new()->memoize();
+            // or, for several objects:
+            $reviewers = UserFactory::new()->many(2)->memoize();
+
+            return [
+                'project' => ProjectFactory::new(['users' => [$owner]]),
+                'owner'   => $owner,
+            ];
+        }
+
+.. versionadded::  2.13
+
+    ``Factory::memoize()`` and ``FactoryCollection::memoize()`` were added in Foundry 2.13.
+
+.. warning::
+
+    Passing a factory to ``memoize()`` instead of the object it creates is deprecated since Foundry
+    2.13: it memoizes the *factory*, so each use of the value creates a new object, which is rarely
+    what is wanted::
+
+        // deprecated: creates two different users
+        $owner = memoize(fn() => UserFactory::new());
+
+        // creates a single user, shared by every use of the value
+        $owner = UserFactory::new()->memoize();
+
 Factories as Services
 ~~~~~~~~~~~~~~~~~~~~~
 

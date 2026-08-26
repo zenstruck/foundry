@@ -11,9 +11,13 @@
 
 namespace Zenstruck\Foundry\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\LazyValue;
+use Zenstruck\Foundry\Test\Factories;
+use Zenstruck\Foundry\Tests\Fixture\Factories\SimpleObjectFactory;
+use Zenstruck\Foundry\Tests\Fixture\SimpleObject;
 
 use function Zenstruck\Foundry\lazy;
 use function Zenstruck\Foundry\memoize;
@@ -23,6 +27,8 @@ use function Zenstruck\Foundry\memoize;
  */
 final class LazyValueTest extends TestCase
 {
+    use Factories;
+
     /**
      * @test
      */
@@ -74,5 +80,50 @@ final class LazyValueTest extends TestCase
         ]);
 
         $this->assertSame([5, 'foo', 6, 'foo' => ['bar' => 7, 'baz' => 'foo'], [8, 'foo']], $value());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function factory_memoize_returns_the_same_object(): void
+    {
+        $value = SimpleObjectFactory::new()->memoize();
+
+        $object = $value();
+
+        $this->assertInstanceOf(SimpleObject::class, $object);
+        $this->assertSame($object, $value());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function factory_collection_memoize_returns_the_same_objects(): void
+    {
+        $value = SimpleObjectFactory::new()->many(2)->memoize();
+
+        $objects = $value();
+
+        $this->assertCount(2, $objects);
+        $this->assertContainsOnlyInstancesOf(SimpleObject::class, $objects);
+        $this->assertSame($objects, $value());
+    }
+
+    /**
+     * @test
+     *
+     * @group legacy
+     */
+    #[Test]
+    #[IgnoreDeprecations]
+    public function memoizing_a_factory_creates_a_new_object_on_each_use_and_is_deprecated(): void
+    {
+        $this->expectUserDeprecationMessageMatches('/Passing a factory to memoize\(\) is deprecated/');
+
+        $value = memoize(static fn() => SimpleObjectFactory::new());
+
+        $this->assertSame($value(), $value());
     }
 }

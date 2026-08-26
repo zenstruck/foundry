@@ -23,7 +23,7 @@ final class LazyValue
     /**
      * @param callable():mixed $factory
      */
-    private function __construct(callable $factory, private bool $memoize = false)
+    private function __construct(callable $factory, private bool $memoize = false, private bool $fromFactory = false)
     {
         $this->factory = $factory(...);
     }
@@ -41,6 +41,14 @@ final class LazyValue
 
         if ($value instanceof self) {
             $value = ($value)();
+        }
+
+        if ($this->fromFactory) {
+            // the factory is created here so that the object it produces is what gets memoized:
+            // memoizing the factory itself would create a new object on each use of the value
+            $value = $value->create();
+        } elseif ($this->memoize && ($value instanceof Factory || $value instanceof FactoryCollection)) {
+            trigger_deprecation('zenstruck/foundry', '2.13', 'Passing a factory to memoize() is deprecated: it memoizes the factory and not the object it creates, so a new object is created on each use. Use Factory::memoize() instead, or create the object in the callback.');
         }
 
         if (\is_array($value)) {
@@ -67,7 +75,17 @@ final class LazyValue
      */
     public static function memoize(callable $factory): self
     {
-        return new self($factory, true);
+        return new self($factory, memoize: true);
+    }
+
+    /**
+     * @internal
+     *
+     * @param callable():(Factory<mixed>|FactoryCollection<mixed, Factory<mixed>>) $factory
+     */
+    public static function memoizeFromFactory(callable $factory): self
+    {
+        return new self($factory, memoize: true, fromFactory: true);
     }
 
     /**

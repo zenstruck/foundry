@@ -106,6 +106,14 @@ abstract class Factory
     abstract public function create(array|callable $attributes = []): mixed;
 
     /**
+     * Creates the object once, and returns the same one every time the value is used.
+     */
+    final public function memoize(): LazyValue
+    {
+        return LazyValue::memoizeFromFactory(fn(): static => $this);
+    }
+
+    /**
      * @return FactoryCollection<T, static>
      */
     final public function many(int $count): FactoryCollection
