@@ -110,7 +110,7 @@ abstract class Factory
      */
     final public function memoize(): LazyValue
     {
-        return LazyValue::memoizeFromFactory(fn(): static => $this);
+        return LazyValue::memoizeFromFactory($this);
     }
 
     /**

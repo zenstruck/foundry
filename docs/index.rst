@@ -1146,7 +1146,7 @@ better and avoids a common mistake::
     2.13: it memoizes the *factory*, so each use of the value creates a new object, which is rarely
     what is wanted::
 
-        // deprecated: creates two different users
+        // deprecated, and an error in Foundry 3: creates two different users
         $owner = memoize(fn() => UserFactory::new());
 
         // creates a single user, shared by every use of the value

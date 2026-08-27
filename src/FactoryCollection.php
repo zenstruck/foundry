@@ -143,7 +143,7 @@ final class FactoryCollection implements \IteratorAggregate
      */
     public function memoize(): LazyValue
     {
-        return LazyValue::memoizeFromFactory(fn(): self => $this);
+        return LazyValue::memoizeFromFactory($this);
     }
 
     /**

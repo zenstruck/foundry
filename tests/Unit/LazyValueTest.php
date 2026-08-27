@@ -12,6 +12,7 @@
 namespace Zenstruck\Foundry\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\LazyValue;
@@ -115,9 +116,11 @@ final class LazyValueTest extends TestCase
      * @test
      *
      * @group legacy
+     * @requires PHPUnit >=11.0.0
      */
     #[Test]
     #[IgnoreDeprecations]
+    #[RequiresPhpunit('>=11.0.0')]
     public function memoizing_a_factory_creates_a_new_object_on_each_use_and_is_deprecated(): void
     {
         $this->expectUserDeprecationMessageMatches('/Passing a factory to memoize\(\) is deprecated/');
