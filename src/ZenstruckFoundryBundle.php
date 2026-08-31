@@ -154,7 +154,10 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                                         ->ifString()
                                         ->then(static fn(string $mode): ?ResetDatabaseMode => ResetDatabaseMode::tryFrom($mode))
                                     ->end()
-                                    ->values(ResetDatabaseMode::cases())
+                                    ->values([
+                                        ...ResetDatabaseMode::cases(),
+                                        ...array_column(ResetDatabaseMode::cases(), 'value'),
+                                    ])
                                 ->end()
                                 ->arrayNode('migrations')
                                     ->addDefaultsIfNotSet()
