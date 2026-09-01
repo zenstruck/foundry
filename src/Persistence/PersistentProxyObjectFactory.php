@@ -51,9 +51,9 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
      * @return T|Proxy<T>
      * @phpstan-return T&Proxy<T>
      */
-    final public static function createOne(array|callable $attributes = []): mixed
+    final protected static function doCreateOne(array|callable $attributes = []): mixed
     {
-        return proxy(parent::createOne($attributes)); // @phpstan-ignore function.unresolvableReturnType
+        return proxy(parent::doCreateOne($attributes)); // @phpstan-ignore function.unresolvableReturnType
     }
 
     /**

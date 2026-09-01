@@ -12,6 +12,8 @@
 namespace Zenstruck\Foundry\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Factory;
@@ -524,5 +526,68 @@ final class ObjectFactoryTest extends TestCase
     public function as_data_provider(): void
     {
         $this->markTestIncomplete();
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    #[Test]
+    #[IgnoreDeprecations]
+    public function create_helpers_called_on_an_instance_keep_the_state(): void
+    {
+        $factory = SimpleObjectFactory::new()->with(['prop1' => 'from-state']);
+
+        self::assertSame('from-state', $factory->createOne()->prop1);
+        self::assertSame(['from-state', 'from-state'], \array_column($factory->createMany(2), 'prop1'));
+        self::assertSame(['from-state', 'from-state'], \array_column($factory->createRange(2, 2), 'prop1'));
+        self::assertSame(['from-state'], \array_column($factory->createSequence([[]]), 'prop1'));
+    }
+
+    /**
+     * @test
+     * @group legacy
+     */
+    #[Test]
+    #[RequiresPhpunit('>=11.0.0')]
+    public function create_helpers_called_on_an_instance_are_deprecated(): void
+    {
+        $this->expectUserDeprecationMessageMatches('/Calling "createMany\(\)" on a factory instance is deprecated and will throw in Foundry 3\. Use "many\(\)->create\(\)" instead\./');
+
+        SimpleObjectFactory::new()->createMany(1);
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function create_helpers_still_ignore_nothing_when_called_statically(): void
+    {
+        self::assertCount(2, SimpleObjectFactory::createMany(2, ['prop1' => 'static']));
+        self::assertSame('static', SimpleObjectFactory::createOne(['prop1' => 'static'])->prop1);
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function calling_an_undefined_method_statically_throws(): void
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage(\sprintf('Call to undefined method %s::doesNotExist().', SimpleObjectFactory::class));
+
+        SimpleObjectFactory::doesNotExist(); // @phpstan-ignore staticMethod.notFound
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function calling_an_undefined_method_on_an_instance_throws(): void
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage(\sprintf('Call to undefined method %s::doesNotExist().', SimpleObjectFactory::class));
+
+        SimpleObjectFactory::new()->doesNotExist(); // @phpstan-ignore method.notFound
     }
 }

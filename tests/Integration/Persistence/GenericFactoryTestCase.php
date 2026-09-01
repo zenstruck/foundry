@@ -196,7 +196,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     #[Test]
     public function create_many(): void
     {
-        $models = static::factory()->createMany(3, static fn(int $i) => ['prop1' => "value{$i}"]);
+        $models = static::factory()->many(3)->create(static fn(int $i) => ['prop1' => "value{$i}"]);
 
         static::factory()::repository()->assert()->count(3);
 
