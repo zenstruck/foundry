@@ -49,7 +49,7 @@ function proxy_repository(string $class): ProxyRepositoryDecorator
  * @template T of object
  *
  * @param class-string<T>                                       $class
- * @param array<string,mixed>|callable(int):array<string,mixed> $attributes
+ * @param array<string,mixed>|callable(int):array<string,mixed> $attributes Property values for the object(s) to create
  *
  * @return PersistentObjectFactory<T>
  */
@@ -64,7 +64,7 @@ function persistent_factory(string $class, array|callable $attributes = []): Per
  * @template T of object
  *
  * @param class-string<T>                                       $class
- * @param array<string,mixed>|callable(int):array<string,mixed> $attributes
+ * @param array<string,mixed>|callable(int):array<string,mixed> $attributes Property values for the object(s) to create
  *
  * @return PersistentProxyObjectFactory<T>
  */
@@ -81,7 +81,7 @@ function proxy_factory(string $class, array|callable $attributes = []): Persiste
  * @template T of object
  *
  * @param class-string<T>                                       $class
- * @param array<string,mixed>|callable(int):array<string,mixed> $attributes
+ * @param array<string,mixed>|callable(int):array<string,mixed> $attributes Property values for the object(s) to create
  *
  * @return T
  */
