@@ -549,6 +549,7 @@ final class ObjectFactoryTest extends TestCase
      * @group legacy
      */
     #[Test]
+    #[IgnoreDeprecations]
     #[RequiresPhpunit('>=11.0.0')]
     public function create_helpers_called_on_an_instance_are_deprecated(): void
     {
