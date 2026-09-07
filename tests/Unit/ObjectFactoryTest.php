@@ -530,10 +530,13 @@ final class ObjectFactoryTest extends TestCase
 
     /**
      * @test
+     *
      * @group legacy
+     * @requires PHPUnit >=11.0.0
      */
     #[Test]
     #[IgnoreDeprecations]
+    #[RequiresPhpunit('>=11.0.0')]
     public function create_helpers_called_on_an_instance_keep_the_state(): void
     {
         $factory = SimpleObjectFactory::new()->with(['prop1' => 'from-state']);
@@ -546,7 +549,9 @@ final class ObjectFactoryTest extends TestCase
 
     /**
      * @test
+     *
      * @group legacy
+     * @requires PHPUnit >=11.0.0
      */
     #[Test]
     #[IgnoreDeprecations]
