@@ -139,6 +139,14 @@ final class FactoryCollection implements \IteratorAggregate
     }
 
     /**
+     * Creates the objects once, and returns the same ones every time the value is used.
+     */
+    public function memoize(): LazyValue
+    {
+        return LazyValue::memoizeFromFactory($this);
+    }
+
+    /**
      * @phpstan-param Attributes $attributes
      *
      * @return list<T>
