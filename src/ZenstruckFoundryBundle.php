@@ -156,7 +156,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                                     ->end()
                                     ->values([
                                         ...ResetDatabaseMode::cases(),
-                                        ...array_column(ResetDatabaseMode::cases(), 'value'),
+                                        ...\array_column(ResetDatabaseMode::cases(), 'value'),
                                     ])
                                 ->end()
                                 ->arrayNode('migrations')
