@@ -338,7 +338,7 @@ jobs:
         with:
           composer-options: --prefer-dist
         env:
-          SYMFONY_REQUIRE: 8.1.x
+          SYMFONY_REQUIRE: 8.1.*
 
       - name: Test with coverage
         run: ./phpunit --coverage-text --coverage-clover coverage.xml
