@@ -535,7 +535,7 @@ final class ObjectFactoryTest extends TestCase
      * @requires PHPUnit >=11.0.0
      */
     #[Test]
-    #[IgnoreDeprecations]
+    #[IgnoreDeprecations('on a factory instance is deprecated')]
     #[RequiresPhpunit('>=11.0.0')]
     public function create_helpers_called_on_an_instance_keep_the_state(): void
     {
@@ -554,7 +554,7 @@ final class ObjectFactoryTest extends TestCase
      * @requires PHPUnit >=11.0.0
      */
     #[Test]
-    #[IgnoreDeprecations]
+    #[IgnoreDeprecations('on a factory instance is deprecated')]
     #[RequiresPhpunit('>=11.0.0')]
     public function create_helpers_called_on_an_instance_are_deprecated(): void
     {

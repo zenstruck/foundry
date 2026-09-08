@@ -27,15 +27,20 @@ use Zenstruck\Foundry\Exception\CannotCreateFactory;
  * @phpstan-type Attributes = Parameters|callable(int):Parameters
  * @phpstan-type Sequence = iterable<Parameters>|callable(): iterable<Parameters>
  *
- * The create helpers are routed through __callStatic(), so they are declared here. Psalm reads
- * the "@method" tags but does not expand the aliases above inside them, it reads them as class
- * names, hence the plain signatures; PHPStan reads the "@phpstan-method" ones. The return types
- * Psalm uses come from FixCreateHelpersReturnType, not from the tags.
+ * The create helpers go through __callStatic(). One block per reader: PHPStorm and PHPStan get
+ * the real signatures, Psalm gets plain ones because it reads the aliases above as class names
+ * inside a "@method" tag, and inlining them makes it drop the tags entirely. Its return types
+ * come from FixCreateHelpersReturnType anyway.
  *
- * @method static T createOne(array|callable $attributes = [])
- * @method static list<T> createMany(int $number, array|callable $attributes = [])
- * @method static list<T> createRange(int $min, int $max, array|callable $attributes = [])
- * @method static list<T> createSequence(iterable|callable $sequence)
+ * @psalm-method static T createOne(array|callable $attributes = [])
+ * @psalm-method static list<T> createMany(int $number, array|callable $attributes = [])
+ * @psalm-method static list<T> createRange(int $min, int $max, array|callable $attributes = [])
+ * @psalm-method static list<T> createSequence(iterable|callable $sequence)
+ *
+ * @method static T createOne(Attributes $attributes = [])
+ * @method static ($number is positive-int ? non-empty-list<T> : list<T>) createMany(int $number, Attributes $attributes = [])
+ * @method static ($min is positive-int ? non-empty-list<T> : list<T>) createRange(int $min, int $max, Attributes $attributes = [])
+ * @method static list<T> createSequence(Sequence $sequence)
  *
  * @phpstan-method static T createOne(Attributes $attributes = [])
  * @phpstan-method static ($number is positive-int ? non-empty-list<T> : list<T>) createMany(int $number, Attributes $attributes = [])
@@ -85,7 +90,7 @@ abstract class Factory
      *
      * @return T
      */
-    protected static function doCreateOne(array|callable $attributes = []): mixed
+    private static function doCreateOne(array|callable $attributes = []): mixed
     {
         return static::new()->create($attributes);
     }
@@ -98,7 +103,7 @@ abstract class Factory
      * @return list<T>
      * @phpstan-return ($number is positive-int ? non-empty-list<T> : list<T>)
      */
-    final protected static function doCreateMany(int $number, array|callable $attributes = []): array
+    private static function doCreateMany(int $number, array|callable $attributes = []): array
     {
         return static::new()->many($number)->create($attributes);
     }
@@ -111,7 +116,7 @@ abstract class Factory
      * @return list<T>
      * @phpstan-return ($min is positive-int ? non-empty-list<T> : list<T>)
      */
-    final protected static function doCreateRange(int $min, int $max, array|callable $attributes = []): array
+    private static function doCreateRange(int $min, int $max, array|callable $attributes = []): array
     {
         return static::new()->range($min, $max)->create($attributes);
     }
@@ -121,7 +126,7 @@ abstract class Factory
      *
      * @return list<T>
      */
-    final protected static function doCreateSequence(iterable|callable $sequence): array
+    private static function doCreateSequence(iterable|callable $sequence): array
     {
         return static::new()->sequence($sequence)->create();
     }
