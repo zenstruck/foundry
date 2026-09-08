@@ -27,10 +27,20 @@ use Zenstruck\Foundry\Exception\CannotCreateFactory;
  * @phpstan-type Attributes = Parameters|callable(int):Parameters
  * @phpstan-type Sequence = iterable<Parameters>|callable(): iterable<Parameters>
  *
- * @method static T createOne(Attributes $attributes = [])
- * @method static ($number is positive-int ? non-empty-list<T> : list<T>) createMany(int $number, Attributes $attributes = [])
- * @method static ($min is positive-int ? non-empty-list<T> : list<T>) createRange(int $min, int $max, Attributes $attributes = [])
- * @method static list<T> createSequence(Sequence $sequence)
+ * The create helpers are routed through __callStatic(), so they are declared here. Psalm reads
+ * the "@method" tags but does not expand the aliases above inside them, it reads them as class
+ * names, hence the plain signatures; PHPStan reads the "@phpstan-method" ones. The return types
+ * Psalm uses come from FixCreateHelpersReturnType, not from the tags.
+ *
+ * @method static T createOne(array|callable $attributes = [])
+ * @method static list<T> createMany(int $number, array|callable $attributes = [])
+ * @method static list<T> createRange(int $min, int $max, array|callable $attributes = [])
+ * @method static list<T> createSequence(iterable|callable $sequence)
+ *
+ * @phpstan-method static T createOne(Attributes $attributes = [])
+ * @phpstan-method static ($number is positive-int ? non-empty-list<T> : list<T>) createMany(int $number, Attributes $attributes = [])
+ * @phpstan-method static ($min is positive-int ? non-empty-list<T> : list<T>) createRange(int $min, int $max, Attributes $attributes = [])
+ * @phpstan-method static list<T> createSequence(Sequence $sequence)
  */
 abstract class Factory
 {
