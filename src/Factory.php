@@ -26,9 +26,31 @@ use Zenstruck\Foundry\Exception\CannotCreateFactory;
  * @phpstan-type Parameters = array<string,mixed>
  * @phpstan-type Attributes = Parameters|callable(int):Parameters
  * @phpstan-type Sequence = iterable<Parameters>|callable(): iterable<Parameters>
+ *
+ * The create helpers go through __callStatic(). One block per reader: PHPStorm and PHPStan get
+ * the real signatures, Psalm gets plain ones because it reads the aliases above as class names
+ * inside a "@method" tag, and inlining them makes it drop the tags entirely. Its return types
+ * come from FixCreateHelpersReturnType anyway.
+ *
+ * @psalm-method static T createOne(array|callable $attributes = [])
+ * @psalm-method static list<T> createMany(int $number, array|callable $attributes = [])
+ * @psalm-method static list<T> createRange(int $min, int $max, array|callable $attributes = [])
+ * @psalm-method static list<T> createSequence(iterable|callable $sequence)
+ *
+ * @method static T createOne(Attributes $attributes = [])
+ * @method static ($number is positive-int ? non-empty-list<T> : list<T>) createMany(int $number, Attributes $attributes = [])
+ * @method static ($min is positive-int ? non-empty-list<T> : list<T>) createRange(int $min, int $max, Attributes $attributes = [])
+ * @method static list<T> createSequence(Sequence $sequence)
+ *
+ * @phpstan-method static T createOne(Attributes $attributes = [])
+ * @phpstan-method static ($number is positive-int ? non-empty-list<T> : list<T>) createMany(int $number, Attributes $attributes = [])
+ * @phpstan-method static ($min is positive-int ? non-empty-list<T> : list<T>) createRange(int $min, int $max, Attributes $attributes = [])
+ * @phpstan-method static list<T> createSequence(Sequence $sequence)
  */
 abstract class Factory
 {
+    private const CREATE_HELPERS = ['createOne', 'createMany', 'createRange', 'createSequence'];
+
     /** @phpstan-var Attributes[] */
     private array $attributes = [];
 
@@ -68,7 +90,7 @@ abstract class Factory
      *
      * @return T
      */
-    public static function createOne(array|callable $attributes = []): mixed
+    private static function doCreateOne(array|callable $attributes = []): mixed
     {
         return static::new()->create($attributes);
     }
@@ -81,7 +103,7 @@ abstract class Factory
      * @return list<T>
      * @phpstan-return ($number is positive-int ? non-empty-list<T> : list<T>)
      */
-    final public static function createMany(int $number, array|callable $attributes = []): array
+    private static function doCreateMany(int $number, array|callable $attributes = []): array
     {
         return static::new()->many($number)->create($attributes);
     }
@@ -94,7 +116,7 @@ abstract class Factory
      * @return list<T>
      * @phpstan-return ($min is positive-int ? non-empty-list<T> : list<T>)
      */
-    final public static function createRange(int $min, int $max, array|callable $attributes = []): array
+    private static function doCreateRange(int $min, int $max, array|callable $attributes = []): array
     {
         return static::new()->range($min, $max)->create($attributes);
     }
@@ -104,9 +126,56 @@ abstract class Factory
      *
      * @return list<T>
      */
-    final public static function createSequence(iterable|callable $sequence): array
+    private static function doCreateSequence(iterable|callable $sequence): array
     {
         return static::new()->sequence($sequence)->create();
+    }
+
+    /**
+     * @param array<mixed> $arguments
+     */
+    final public static function __callStatic(string $name, array $arguments): mixed
+    {
+        if (!\in_array($name, self::CREATE_HELPERS, true)) {
+            throw new \BadMethodCallException(\sprintf('Call to undefined method %s::%s().', static::class, $name));
+        }
+
+        return static::{'do'.\ucfirst($name)}(...$arguments);
+    }
+
+    /**
+     * The create helpers are static, so calling one on an instance used to silently discard
+     * everything set on that instance: `Factory::new()->someState()->createMany(2)` created
+     * two objects without the state. Routing them through __callStatic makes the instance
+     * call land here instead, where the state can be honored.
+     *
+     * @param array<mixed> $arguments
+     */
+    final public function __call(string $name, array $arguments): mixed
+    {
+        if (!\in_array($name, self::CREATE_HELPERS, true)) {
+            throw new \BadMethodCallException(\sprintf('Call to undefined method %s::%s().', static::class, $name));
+        }
+
+        trigger_deprecation('zenstruck/foundry', '2.13', 'Calling "%s()" on a factory instance is deprecated and will throw in Foundry 3. Use "%s" instead.', $name, self::instanceEquivalent($name));
+
+        return match ($name) {
+            'createOne' => $this->create(...$arguments),
+            'createMany' => $this->many($arguments[0])->create($arguments[1] ?? []),
+            'createRange' => $this->range($arguments[0], $arguments[1])->create($arguments[2] ?? []),
+            'createSequence' => $this->sequence($arguments[0])->create(),
+        };
+    }
+
+    private static function instanceEquivalent(string $name): string
+    {
+        return match ($name) {
+            'createOne' => 'create()',
+            'createMany' => 'many()->create()',
+            'createRange' => 'range()->create()',
+            'createSequence' => 'sequence()->create()',
+            default => throw new \LogicException(\sprintf('Unhandled create helper "%s".', $name)),
+        };
     }
 
     /**
