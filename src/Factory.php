@@ -37,10 +37,10 @@ use Zenstruck\Foundry\Exception\CannotCreateFactory;
  * @psalm-method static list<T> createRange(int $min, int $max, array|callable $attributes = [])
  * @psalm-method static list<T> createSequence(iterable|callable $sequence)
  *
- * @method static T createOne(Attributes $attributes = [])
+ * @method static T                                                       createOne(Attributes $attributes = [])
  * @method static ($number is positive-int ? non-empty-list<T> : list<T>) createMany(int $number, Attributes $attributes = [])
- * @method static ($min is positive-int ? non-empty-list<T> : list<T>) createRange(int $min, int $max, Attributes $attributes = [])
- * @method static list<T> createSequence(Sequence $sequence)
+ * @method static ($min is positive-int ? non-empty-list<T> : list<T>)    createRange(int $min, int $max, Attributes $attributes = [])
+ * @method static list<T>                                                 createSequence(Sequence $sequence)
  *
  * @phpstan-method static T createOne(Attributes $attributes = [])
  * @phpstan-method static ($number is positive-int ? non-empty-list<T> : list<T>) createMany(int $number, Attributes $attributes = [])
@@ -57,78 +57,6 @@ abstract class Factory
     // keep an empty constructor for BC
     public function __construct()
     {
-    }
-
-    /**
-     * @param array|callable $attributes Property values for the object(s) to create
-     *
-     * @phpstan-param Attributes $attributes
-     * @phpstan-return static
-     */
-    final public static function new(array|callable $attributes = []): static
-    {
-        if (Configuration::isBooted()) {
-            $factory = Configuration::instance()->factories->get(static::class);
-        }
-
-        try {
-            $factory ??= new static(); // @phpstan-ignore new.static, new.staticInAbstractClassStaticMethod
-        } catch (\ArgumentCountError $e) {
-            throw CannotCreateFactory::argumentCountError($e);
-        }
-
-        return $factory
-            ->initializeInternal()
-            ->initialize()
-            ->with($attributes);
-    }
-
-    /**
-     * @param array|callable $attributes Property values for the object(s) to create
-     *
-     * @phpstan-param Attributes $attributes
-     *
-     * @return T
-     */
-    private static function doCreateOne(array|callable $attributes = []): mixed
-    {
-        return static::new()->create($attributes);
-    }
-
-    /**
-     * @param array|callable $attributes Property values for the object(s) to create
-     *
-     * @phpstan-param Attributes $attributes
-     *
-     * @return list<T>
-     * @phpstan-return ($number is positive-int ? non-empty-list<T> : list<T>)
-     */
-    private static function doCreateMany(int $number, array|callable $attributes = []): array
-    {
-        return static::new()->many($number)->create($attributes);
-    }
-
-    /**
-     * @param array|callable $attributes Property values for the object(s) to create
-     *
-     * @phpstan-param Attributes $attributes
-     *
-     * @return list<T>
-     * @phpstan-return ($min is positive-int ? non-empty-list<T> : list<T>)
-     */
-    private static function doCreateRange(int $min, int $max, array|callable $attributes = []): array
-    {
-        return static::new()->range($min, $max)->create($attributes);
-    }
-
-    /**
-     * @phpstan-param Sequence $sequence
-     *
-     * @return list<T>
-     */
-    private static function doCreateSequence(iterable|callable $sequence): array
-    {
-        return static::new()->sequence($sequence)->create();
     }
 
     /**
@@ -167,15 +95,28 @@ abstract class Factory
         };
     }
 
-    private static function instanceEquivalent(string $name): string
+    /**
+     * @param array|callable $attributes Property values for the object(s) to create
+     *
+     * @phpstan-param Attributes $attributes
+     * @phpstan-return static
+     */
+    final public static function new(array|callable $attributes = []): static
     {
-        return match ($name) {
-            'createOne' => 'create()',
-            'createMany' => 'many()->create()',
-            'createRange' => 'range()->create()',
-            'createSequence' => 'sequence()->create()',
-            default => throw new \LogicException(\sprintf('Unhandled create helper "%s".', $name)),
-        };
+        if (Configuration::isBooted()) {
+            $factory = Configuration::instance()->factories->get(static::class);
+        }
+
+        try {
+            $factory ??= new static(); // @phpstan-ignore new.static, new.staticInAbstractClassStaticMethod
+        } catch (\ArgumentCountError $e) {
+            throw CannotCreateFactory::argumentCountError($e);
+        }
+
+        return $factory
+            ->initializeInternal()
+            ->initialize()
+            ->with($attributes);
     }
 
     /**
@@ -380,4 +321,63 @@ abstract class Factory
      * @phpstan-return Attributes
      */
     abstract protected function defaults(): array|callable;
+
+    /**
+     * @param array|callable $attributes Property values for the object(s) to create
+     *
+     * @phpstan-param Attributes $attributes
+     *
+     * @return T
+     */
+    private static function doCreateOne(array|callable $attributes = []): mixed
+    {
+        return static::new()->create($attributes);
+    }
+
+    /**
+     * @param array|callable $attributes Property values for the object(s) to create
+     *
+     * @phpstan-param Attributes $attributes
+     *
+     * @return list<T>
+     * @phpstan-return ($number is positive-int ? non-empty-list<T> : list<T>)
+     */
+    private static function doCreateMany(int $number, array|callable $attributes = []): array
+    {
+        return static::new()->many($number)->create($attributes);
+    }
+
+    /**
+     * @param array|callable $attributes Property values for the object(s) to create
+     *
+     * @phpstan-param Attributes $attributes
+     *
+     * @return list<T>
+     * @phpstan-return ($min is positive-int ? non-empty-list<T> : list<T>)
+     */
+    private static function doCreateRange(int $min, int $max, array|callable $attributes = []): array
+    {
+        return static::new()->range($min, $max)->create($attributes);
+    }
+
+    /**
+     * @phpstan-param Sequence $sequence
+     *
+     * @return list<T>
+     */
+    private static function doCreateSequence(iterable|callable $sequence): array
+    {
+        return static::new()->sequence($sequence)->create();
+    }
+
+    private static function instanceEquivalent(string $name): string
+    {
+        return match ($name) {
+            'createOne' => 'create()',
+            'createMany' => 'many()->create()',
+            'createRange' => 'range()->create()',
+            'createSequence' => 'sequence()->create()',
+            default => throw new \LogicException(\sprintf('Unhandled create helper "%s".', $name)),
+        };
+    }
 }

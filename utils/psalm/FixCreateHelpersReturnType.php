@@ -50,7 +50,7 @@ final class FixCreateHelpersReturnType implements AfterExpressionAnalysisInterfa
             return null;
         }
 
-        $method = \strtolower($expr->name->name);
+        $method = \mb_strtolower($expr->name->name);
 
         if (!\in_array($method, ['createone', 'createmany', 'createrange', 'createsequence'], true)) {
             return null;
