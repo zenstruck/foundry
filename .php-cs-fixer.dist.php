@@ -13,6 +13,7 @@ $csFixerConfig->setFinder(
     $csFixerConfig->getFinder()
         ->notName('WebTestCaseWithBothTraitsInWrongOrderTest.php')
         ->notName('GenericFactoryUsingBeforeHooksAndResetDatabaseTraitTest.php')
+        ->exclude('Fixture/Maker/expected')
         ->in(__DIR__.'/utils')
         ->in(__DIR__.'/config')
 );

@@ -66,6 +66,7 @@ parameters:
     excludePaths:
         - config/reference.php (?)
         - tests/Fixture/Maker/tmp (?)
+        - tests/Fixture/Maker/php-cs-fixer.config.php
 
         - tests/Fixture/Maker/expected/can_create_factory_with_auto_activated_not_persisted_option.php
         - tests/Fixture/Maker/expected/can_create_factory_interactively.php

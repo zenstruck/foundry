@@ -33,6 +33,15 @@ abstract class MakerTestCase extends KernelTestCase
         (new Filesystem())->remove(self::tempDir());
     }
 
+    /**
+     * @before
+     */
+    #[Before]
+    public static function disableMakerBundleCsFixer(): void
+    {
+        $_SERVER['MAKER_PHP_CS_FIXER_CONFIG_PATH'] = __DIR__.'/../../Fixture/Maker/php-cs-fixer.config.php';
+    }
+
     protected static function tempDir(): string
     {
         return __DIR__.'/../../Fixture/Maker/tmp';

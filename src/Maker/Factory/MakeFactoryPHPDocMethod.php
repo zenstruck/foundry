@@ -18,6 +18,8 @@ use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
  */
 final class MakeFactoryPHPDocMethod
 {
+    private int $returnTypePadding = 0;
+
     // @phpstan-ignore-next-line
     public function __construct(private string $objectName, private string $prototype, private bool $returnsCollection, private bool $isStatic = true, private ?\ReflectionClass $repository = null)
     {
@@ -53,6 +55,12 @@ final class MakeFactoryPHPDocMethod
             }
         }
 
+        // align the prototypes in the "@method" annotations
+        $returnTypePadding = \max(\array_map(static fn(self $method): int => \strlen($method->returnType()), $methods));
+        foreach ($methods as $method) {
+            $method->returnTypePadding = $returnTypePadding;
+        }
+
         return $methods;
     }
 
@@ -60,9 +68,15 @@ final class MakeFactoryPHPDocMethod
     {
         $annotation = $staticAnalysisTool ? "{$staticAnalysisTool}-method" : 'method';
         $static = $this->isStatic ? 'static' : '      ';
+        $returnType = $staticAnalysisTool ? $this->returnType($staticAnalysisTool) : \str_pad($this->returnType(), $this->returnTypePadding);
 
+        return " * @{$annotation} {$static} {$returnType} {$this->prototype}";
+    }
+
+    private function returnType(?string $staticAnalysisTool = null): string
+    {
         if ($this->repository) {
-            $returnType = match ((bool) $staticAnalysisTool) {
+            return match ((bool) $staticAnalysisTool) {
                 false => "{$this->repository->getShortName()}|ProxyRepositoryDecorator",
                 true => \sprintf(
                     "ProxyRepositoryDecorator<{$this->objectName}, %s>",
@@ -71,16 +85,14 @@ final class MakeFactoryPHPDocMethod
                         : "EntityRepository<{$this->objectName}>"
                 ),
             };
-        } else {
-            $returnType = match ([$this->returnsCollection, (bool) $staticAnalysisTool]) {
-                [true, true] => "list<{$this->objectName}&Proxy<{$this->objectName}>>",
-                [true, false] => "{$this->objectName}[]|Proxy[]",
-                [false, true] => "{$this->objectName}&Proxy<{$this->objectName}>",
-                [false, false] => "{$this->objectName}|Proxy",
-            };
         }
 
-        return " * @{$annotation} {$static} {$returnType} {$this->prototype}";
+        return match ([$this->returnsCollection, (bool) $staticAnalysisTool]) {
+            [true, true] => "list<{$this->objectName}&Proxy<{$this->objectName}>>",
+            [true, false] => "{$this->objectName}[]|Proxy[]",
+            [false, true] => "{$this->objectName}&Proxy<{$this->objectName}>",
+            [false, false] => "{$this->objectName}|Proxy",
+        };
     }
 
     public function sortValue(): string
