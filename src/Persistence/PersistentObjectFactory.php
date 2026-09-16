@@ -438,7 +438,10 @@ abstract class PersistentObjectFactory extends ObjectFactory
                     )
                 ;
 
-                if (($fieldType = (new \ReflectionClass(static::class()))->getProperty($field)->getType())?->allowsNull()) {
+                $fieldType = (new \ReflectionClass(static::class()))->getProperty($field)->getType();
+                $inverseFieldType = (new \ReflectionClass($value::class()))->getProperty($inverseField)->getType();
+
+                if ($fieldType?->allowsNull()) {
                     $this->inverseRelationshipCallbacks[] = static function(object $object) use ($value, $inverseField, $field) {
                         $inverseObject = $value->create([$inverseField => $object]);
 
@@ -447,7 +450,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
                     // we're using "force" here to avoid a potential type check in a setter
                     return force(null);
-                } elseif (($inverseFieldType = (new \ReflectionClass($value::class()))->getProperty($inverseField)->getType())?->allowsNull()) {
+                } elseif ($inverseFieldType?->allowsNull()) {
                     $inverseObject = ProxyGenerator::unwrap(
                         // we're using "force" here to avoid a potential type check in a setter
                         $value->create([$inverseField => force(null)]),

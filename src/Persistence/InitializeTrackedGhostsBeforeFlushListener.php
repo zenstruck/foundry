@@ -12,6 +12,7 @@
 namespace Zenstruck\Foundry\Persistence;
 
 use Doctrine\Common\EventManager;
+use Doctrine\Common\EventManagerInterface;
 use Doctrine\Persistence\Event\ManagerEventArgs;
 use Doctrine\Persistence\ObjectManager;
 use Zenstruck\Foundry\Configuration;
@@ -35,14 +36,14 @@ final class InitializeTrackedGhostsBeforeFlushListener
      * survive strategy re-instantiation across kernel resets, while the event manager
      * (owned by the connection) is longer-lived than the object manager itself.
      *
-     * @var \WeakMap<EventManager, true>
+     * @var \WeakMap<EventManager|EventManagerInterface, true>
      */
     private static \WeakMap $registeredEventManagers;
 
-    public static function registerTo(EventManager $eventManager, string $eventName): void
+    public static function registerTo(EventManager|EventManagerInterface $eventManager, string $eventName): void
     {
         if (!isset(self::$registeredEventManagers)) {
-            /** @var \WeakMap<EventManager, true> $registeredEventManagers */
+            /** @var \WeakMap<EventManager|EventManagerInterface, true> $registeredEventManagers */
             $registeredEventManagers = new \WeakMap();
             self::$registeredEventManagers = $registeredEventManagers;
         }
