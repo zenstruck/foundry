@@ -135,7 +135,7 @@ final class FactoryTest extends TestCase
     public function proxy_attributes_can_be_used_in_unit_test(): void
     {
         $object = ProxyContactFactory::createOne([
-            'category' => proxy(new Category('name')), // @phpstan-ignore function.unresolvableReturnType
+            'category' => proxy(new Category('name')),
             'address' => ProxyAddressFactory::new(),
         ]);
 
@@ -165,7 +165,7 @@ final class FactoryTest extends TestCase
     public function instantiating_with_proxy_attribute_normalizes_to_underlying_object(): void
     {
         $object = ProxyContactFactory::createOne([
-            'category' => proxy(new Category('name')), // @phpstan-ignore function.unresolvableReturnType
+            'category' => proxy(new Category('name')),
         ]);
 
         $this->assertInstanceOf(Category::class, $object->getCategory());

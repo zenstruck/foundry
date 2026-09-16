@@ -19,6 +19,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Persistence\ProxyGenerator;
 use Zenstruck\Foundry\Test\Factories;
 
@@ -56,8 +57,11 @@ final class ProxyGeneratorTest extends TestCase
     #[Test]
     public function it_can_generate_proxy_for_class_with_self_return_type(): void
     {
-        $proxyfiedObj = ProxyGenerator::wrap($obj = new ClassWithSelfReturnType()); // @phpstan-ignore staticMethod.unresolvableReturnType
-        self::assertSame($obj, $proxyfiedObj->returnsSelf()->_real());
+        $proxyfiedObj = ProxyGenerator::wrap($obj = new ClassWithSelfReturnType());
+        $returned = $proxyfiedObj->returnsSelf();
+
+        self::assertInstanceOf(Proxy::class, $returned);
+        self::assertSame($obj, $returned->_real());
     }
 
     /**
@@ -66,7 +70,7 @@ final class ProxyGeneratorTest extends TestCase
     #[Test]
     public function it_can_generate_proxy_for_class_with_method_with_nullable_return_type(): void
     {
-        $proxyfiedObj = ProxyGenerator::wrap(new ClassWithNullableReturnType()); // @phpstan-ignore staticMethod.unresolvableReturnType
+        $proxyfiedObj = ProxyGenerator::wrap(new ClassWithNullableReturnType());
         self::assertNull($proxyfiedObj->returnsNullable(null));
         self::assertSame(1, $proxyfiedObj->returnsNullable(1));
     }
@@ -77,7 +81,7 @@ final class ProxyGeneratorTest extends TestCase
     #[Test]
     public function it_can_generate_proxy_for_class_with_method_with_no_return_type(): void
     {
-        $proxyfiedObj = ProxyGenerator::wrap(new ClassWithoutReturnType()); // @phpstan-ignore staticMethod.unresolvableReturnType
+        $proxyfiedObj = ProxyGenerator::wrap(new ClassWithoutReturnType());
         self::assertSame(1, $proxyfiedObj->returnsSeomthing());
     }
 
@@ -87,7 +91,7 @@ final class ProxyGeneratorTest extends TestCase
     #[Test]
     public function it_can_generate_proxy_for_class_with_method_with_union_return_type(): void
     {
-        $proxyfiedObj = ProxyGenerator::wrap(new ClassWithUnionReturnType()); // @phpstan-ignore staticMethod.unresolvableReturnType
+        $proxyfiedObj = ProxyGenerator::wrap(new ClassWithUnionReturnType());
         self::assertSame(1, $proxyfiedObj->returnsUnionType());
     }
 
@@ -97,7 +101,7 @@ final class ProxyGeneratorTest extends TestCase
     #[Test]
     public function it_can_generate_proxy_for_class_with_method_with_intersection_return_type(): void
     {
-        $proxyfiedObj = ProxyGenerator::wrap(new ClassWithInterSectionReturnType()); // @phpstan-ignore staticMethod.unresolvableReturnType
+        $proxyfiedObj = ProxyGenerator::wrap(new ClassWithInterSectionReturnType());
         self::assertInstanceOf(One::class, $proxyfiedObj->returnsIntersectionType());
         self::assertInstanceOf(Two::class, $proxyfiedObj->returnsIntersectionType());
     }
@@ -108,7 +112,7 @@ final class ProxyGeneratorTest extends TestCase
     #[Test]
     public function it_can_generate_proxy_for_class_with_method_with_attribute_added_by_proxy_helper(): void
     {
-        $proxyfiedObj = ProxyGenerator::wrap(new ClassWithAttributeAddedByProxyHelper()); // @phpstan-ignore staticMethod.unresolvableReturnType
+        $proxyfiedObj = ProxyGenerator::wrap(new ClassWithAttributeAddedByProxyHelper());
         self::assertSame(1, $proxyfiedObj->jsonSerialize());
     }
 }

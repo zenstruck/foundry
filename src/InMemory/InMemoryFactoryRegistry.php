@@ -49,11 +49,10 @@ final class InMemoryFactoryRegistry implements FactoryRegistryInterface
             $factory = $factory->withoutPersisting();
         }
 
-        return $factory // @phpstan-ignore argument.templateType
-            ->afterInstantiate(
-                static function(object $object) use ($factory) {
-                    Configuration::instance()->inMemoryRepositoryRegistry?->get($factory::class())->_save($object);
-                }
-            );
+        return $factory->afterInstantiate( // @phpstan-ignore argument.templateType
+            static function(object $object) use ($factory) {
+                Configuration::instance()->inMemoryRepositoryRegistry?->get($factory::class())->_save($object);
+            }
+        );
     }
 }

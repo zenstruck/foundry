@@ -78,9 +78,7 @@ trait CommonResetDatabase
     /** @internal */
     private static function _boot(): KernelInterface
     {
-        if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.alreadyNarrowedType
-            throw new \RuntimeException(\sprintf('The "%s" trait can only be used on TestCases that extend "%s".', __TRAIT__, KernelTestCase::class));
-        }
+        self::_assertKernelTestCase(static::class);
 
         $kernel = static::bootKernel();
 
@@ -96,12 +94,18 @@ trait CommonResetDatabase
     /** @internal */
     private static function _shutdown(): void
     {
-        if (!\is_subclass_of(static::class, KernelTestCase::class)) { // @phpstan-ignore function.alreadyNarrowedType
-            throw new \RuntimeException(\sprintf('The "%s" trait can only be used on TestCases that extend "%s".', __TRAIT__, KernelTestCase::class));
-        }
+        self::_assertKernelTestCase(static::class);
 
         Configuration::shutdown();
         static::ensureKernelShutdown();
+    }
+
+    /** @internal */
+    private static function _assertKernelTestCase(string $class): void
+    {
+        if (!\is_subclass_of($class, KernelTestCase::class)) {
+            throw new \RuntimeException(\sprintf('The "%s" trait can only be used on TestCases that extend "%s".', ResetDatabase::class, KernelTestCase::class));
+        }
     }
 
     /** @internal */

@@ -39,7 +39,7 @@ final class DoctrineCascadeRelationshipMetadata implements \Stringable
     }
 
     /**
-     * @param array{class: class-string, field: string} $source
+     * @param array{class: class-string, field: string, ...} $source
      */
     public static function fromArray(array $source, bool $cascade = false, bool $orphanRemoval = false): self
     {

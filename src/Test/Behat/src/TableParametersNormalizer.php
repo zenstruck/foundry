@@ -120,7 +120,7 @@ final class TableParametersNormalizer
         if (\is_a($expectedTypeClass, \DateTimeInterface::class, allow_string: true)) {
             try {
                 return new $expectedTypeClass($value);
-            } catch (\Throwable $e) { // @phpstan-ignore catch.neverThrown
+            } catch (\Throwable $e) {
                 throw InvalidObjectParameter::invalidDate($propertyName, $value, $e);
             }
         }
