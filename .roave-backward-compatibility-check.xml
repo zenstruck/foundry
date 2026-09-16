@@ -11,5 +11,7 @@
         <ignored-regex>#\[BC\] CHANGED: Method getIdentifierValues\(\) of class Zenstruck\\Foundry\\Persistence\\PersistenceStrategy became final#</ignored-regex>
         <ignored-regex>#"Zenstruck\\Foundry\\Test\\(CommonResetDatabase|CommonFactories)" could not be found in the located source(.*)#</ignored-regex>
         <ignored-regex>#Method Zenstruck\\Foundry\\ORM\\AbstractORMPersistenceStrategy\#withoutDoctrineEvents\(\) was removed#</ignored-regex>
+        <ignored-regex>#Method Zenstruck\\Foundry\\Factory::create(One|Many|Range|Sequence)\(\) was removed#</ignored-regex>
+        <ignored-regex>#Method Zenstruck\\Foundry\\Persistence\\PersistentProxyObjectFactory::createOne\(\) was removed#</ignored-regex>
     </baseline>
 </roave-bc-check>

@@ -20,5 +20,8 @@ final class FoundryPlugin implements PluginEntryPointInterface
     {
         \class_exists(FixProxyFactoryMethodsReturnType::class, true);
         $registration->registerHooksFromClass(FixProxyFactoryMethodsReturnType::class);
+
+        \class_exists(FixCreateHelpersReturnType::class, true);
+        $registration->registerHooksFromClass(FixCreateHelpersReturnType::class);
     }
 }
