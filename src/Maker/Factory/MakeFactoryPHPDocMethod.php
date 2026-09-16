@@ -56,7 +56,7 @@ final class MakeFactoryPHPDocMethod
         }
 
         // align the prototypes in the "@method" annotations
-        $returnTypePadding = \max(\array_map(static fn(self $method): int => \strlen($method->returnType()), $methods));
+        $returnTypePadding = \max(\array_map(static fn(self $method): int => \mb_strlen($method->returnType()), $methods));
         foreach ($methods as $method) {
             $method->returnTypePadding = $returnTypePadding;
         }
@@ -71,6 +71,14 @@ final class MakeFactoryPHPDocMethod
         $returnType = $staticAnalysisTool ? $this->returnType($staticAnalysisTool) : \str_pad($this->returnType(), $this->returnTypePadding);
 
         return " * @{$annotation} {$static} {$returnType} {$this->prototype}";
+    }
+
+    public function sortValue(): string
+    {
+        return \sprintf(
+            "returnsCollection:%s, prototype:{$this->prototype}",
+            $this->returnsCollection ? '1' : '0',
+        );
     }
 
     private function returnType(?string $staticAnalysisTool = null): string
@@ -93,13 +101,5 @@ final class MakeFactoryPHPDocMethod
             [false, true] => "{$this->objectName}&Proxy<{$this->objectName}>",
             [false, false] => "{$this->objectName}|Proxy",
         };
-    }
-
-    public function sortValue(): string
-    {
-        return \sprintf(
-            "returnsCollection:%s, prototype:{$this->prototype}",
-            $this->returnsCollection ? '1' : '0',
-        );
     }
 }
