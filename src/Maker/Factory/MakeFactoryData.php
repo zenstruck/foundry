@@ -55,6 +55,13 @@ final class MakeFactoryData
             $object->getName(),
         ];
 
+        if (!$withPhpDoc) {
+            $this->methodsInPHPDoc = [];
+
+            return;
+        }
+
+        // the following classes are only referenced in the PHPDoc
         if ($this->persisted) {
             $this->uses[] = Proxy::class;
         }
@@ -67,7 +74,7 @@ final class MakeFactoryData
             }
         }
 
-        $this->methodsInPHPDoc = $withPhpDoc ? MakeFactoryPHPDocMethod::createAll($this) : [];
+        $this->methodsInPHPDoc = MakeFactoryPHPDocMethod::createAll($this);
     }
 
     // @phpstan-ignore-next-line
