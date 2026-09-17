@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## [v2.13.0](https://github.com/zenstruck/foundry/releases/tag/v2.13.0)
+
+September 17th, 2026 - [v2.12.1...v2.13.0](https://github.com/zenstruck/foundry/compare/v2.12.1...v2.13.0)
+
+* 12bfb66 minor: upgrade PHPStan to 2.2 (#1168) by @nikophil
+* d67f898 feat: honor factory state when a create helper is called on an instance (#1164) by @Amoifr, @claude
+* 5b0781d fix(maker): generate clean code without relying on php-cs-fixer (#1169) by @nikophil
+* 12e900b minor: fix SYMFONY_REQUIRE wildcard in the code coverage job (#1165) by @nikophil
+* eb2f4e0 docs: disambiguate factory "attributes" from native PHP attributes (#1159) by @Amoifr
+* 6541af3 feat: add Factory::memoize() and FactoryCollection::memoize() (#1161) by @Amoifr
+* cf8a783 minor: allow doctrine/doctrine-migrations-bundle ^4 in tests by @nikophil
+* 493688f Document valid string values for orm.reset.mode (#1163) by @derrabus
+* 65b9f60 ci: fix the BC check when a branch modifies src/Test/Behat (#1160) by @nikophil
+
 ## [v2.12.1](https://github.com/zenstruck/foundry/releases/tag/v2.12.1)
 
 August 26th, 2026 - [v2.12.0...v2.12.1](https://github.com/zenstruck/foundry/compare/v2.12.0...v2.12.1)
