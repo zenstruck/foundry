@@ -31,6 +31,7 @@ final class FactoryCollection implements \IteratorAggregate
 {
     private PersistMode $persistMode;
     private bool $isRootFactory = true;
+    private bool $collectResults = true;
 
     /**
      * @param TFactory $factory
@@ -138,7 +139,10 @@ final class FactoryCollection implements \IteratorAggregate
      */
     public static function sequence(Factory $factory, iterable $items): self
     {
-        return new self($factory, static fn() => $items);
+        $collection = new self($factory, static fn() => $items);
+        $collection->collectResults = false;
+
+        return $collection;
     }
 
     /**
@@ -224,7 +228,7 @@ final class FactoryCollection implements \IteratorAggregate
             if ($useDirectInsert) {
                 $allObjects = self::directInsertLoop($om, $connection, $this->items, $defaults, $attributes, $class, $attrMap, $batchSize);
             } else {
-                $allObjects = self::objectInsertLoop($om, $this->items, $defaults, $attributes, $class, $meta['instantiator'], $hooks, $hookFactory, $afterPersistHooks, $batchSize);
+                $allObjects = self::objectInsertLoop($om, $this->items, $defaults, $attributes, $class, $meta['instantiator'], $hooks, $hookFactory, $afterPersistHooks, $batchSize, $this->collectResults);
             }
 
             $connection->commit();
@@ -255,6 +259,7 @@ final class FactoryCollection implements \IteratorAggregate
         Factory $hookFactory,
         array $afterPersistHooks,
         int $batchSize,
+        bool $collectResults = true,
     ): array {
         $allObjects = [];
         $batch = [];
@@ -306,8 +311,11 @@ final class FactoryCollection implements \IteratorAggregate
                     self::runAfterPersistBulk($om, $batch, $afterPersistHooks, $hookFactory);
                 }
 
-                self::lightenBatch($om, $batch, $class);
-                \array_push($allObjects, ...$batch);
+                if ($collectResults) {
+                    self::lightenBatch($om, $batch, $class);
+                    \array_push($allObjects, ...$batch);
+                }
+
                 $batch = [];
                 $om->clear();
                 \gc_enable();
@@ -323,8 +331,10 @@ final class FactoryCollection implements \IteratorAggregate
                 self::runAfterPersistBulk($om, $batch, $afterPersistHooks, $hookFactory);
             }
 
-            self::lightenBatch($om, $batch, $class);
-            \array_push($allObjects, ...$batch);
+            if ($collectResults) {
+                self::lightenBatch($om, $batch, $class);
+                \array_push($allObjects, ...$batch);
+            }
         }
 
         return $allObjects;
