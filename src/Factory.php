@@ -95,6 +95,12 @@ abstract class Factory
         };
     }
 
+    /** @var array<class-string, static> */
+    private static array $bulkNewCache = [];
+
+    /** @internal */
+    public static bool $bulkBuffering = false;
+
     /**
      * @param array|callable $attributes Property values for the object(s) to create
      *
@@ -103,6 +109,14 @@ abstract class Factory
      */
     final public static function new(array|callable $attributes = []): static
     {
+        if (self::$bulkBuffering) {
+            $factory = self::$bulkNewCache[static::class] ?? null;
+
+            if (null !== $factory) {
+                return $factory->with($attributes);
+            }
+        }
+
         if (Configuration::isBooted()) {
             $factory = Configuration::instance()->factories->get(static::class);
         }
@@ -113,10 +127,24 @@ abstract class Factory
             throw CannotCreateFactory::argumentCountError($e);
         }
 
-        return $factory
+        $factory = $factory
             ->initializeInternal()
-            ->initialize()
-            ->with($attributes);
+            ->initialize();
+
+        if (self::$bulkBuffering) {
+            self::$bulkNewCache[static::class] = $factory;
+        }
+
+        return $factory->with($attributes);
+    }
+
+    /**
+     * @internal
+     */
+    public static function clearBulkCache(): void
+    {
+        self::$bulkNewCache = [];
+        self::$bulkBuffering = false;
     }
 
     /**
@@ -187,15 +215,29 @@ abstract class Factory
      */
     final public function with(array|callable $attributes = []): static
     {
+        if ([] === $attributes) {
+            return $this;
+        }
+
         $clone = clone $this;
         $clone->attributes[] = $attributes;
 
         return $clone;
     }
 
+    private static ?Faker\Generator $cachedFaker = null;
+
     final protected static function faker(): Faker\Generator
     {
-        return Configuration::instance()->faker();
+        return self::$cachedFaker ??= Configuration::instance()->faker();
+    }
+
+    /**
+     * @internal
+     */
+    public static function resetFakerCache(): void
+    {
+        self::$cachedFaker = null;
     }
 
     /**

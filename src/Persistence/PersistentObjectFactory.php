@@ -18,6 +18,7 @@ use Zenstruck\Foundry\Exception\PersistenceDisabled;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\FactoryCollection;
+use Zenstruck\Foundry\LazyValue;
 use Zenstruck\Foundry\Object\Hydrator;
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\Event\AfterPersist;
@@ -41,6 +42,32 @@ use function Zenstruck\Foundry\set;
 abstract class PersistentObjectFactory extends ObjectFactory
 {
     public const PRIORITY_SCHEDULE_FOR_INSERT = -10;
+
+    /** @var list<object>|null null = disabled, [] = collecting */
+    private static ?array $bulkCreateBuffer = null;
+
+    /**
+     * @internal
+     */
+    public static function enableBulkBuffering(): void
+    {
+        self::$bulkCreateBuffer = [];
+        Factory::$bulkBuffering = true;
+    }
+
+    /**
+     * @internal
+     *
+     * @return list<object>
+     */
+    public static function flushBulkBuffer(): array
+    {
+        $buffer = self::$bulkCreateBuffer ?? [];
+        self::$bulkCreateBuffer = null;
+        Factory::clearBulkCache();
+
+        return $buffer;
+    }
 
     private PersistMode $persist = PersistMode::PERSIST;
 
@@ -242,6 +269,15 @@ abstract class PersistentObjectFactory extends ObjectFactory
      */
     public function create(callable|array $attributes = []): object
     {
+        if (null !== self::$bulkCreateBuffer) {
+            $parameters = $this->normalizeAttributes($attributes);
+            self::bulkResolveParameters($parameters);
+            $object = ($this->instantiator())($parameters, static::class());
+            self::$bulkCreateBuffer[] = $object;
+
+            return $object;
+        }
+
         $configuration = Configuration::instance();
 
         if (!$configuration->isPersistenceAvailable()) {
@@ -577,6 +613,37 @@ abstract class PersistentObjectFactory extends ObjectFactory
         // refreshing it here would discard in-memory state (unsaved changes, wired inverse
         // collections) and its dirty-check would fire lifecycle events on scheduled objects
         return $persistenceManager->reattach($object);
+    }
+
+    /**
+     * @internal
+     */
+    protected function normalizeParameters(array $parameters): array
+    {
+        if (null !== self::$bulkCreateBuffer) {
+            self::bulkResolveParameters($parameters);
+
+            return $parameters;
+        }
+
+        return parent::normalizeParameters($parameters);
+    }
+
+    private static function bulkResolveParameters(array &$parameters): void
+    {
+        foreach ($parameters as &$value) {
+            if ($value instanceof LazyValue) {
+                $value = $value();
+            } elseif ($value instanceof self) {
+                $value = $value->create();
+            } elseif ($value instanceof Factory) {
+                $value = $value->create();
+            } elseif ($value instanceof FactoryCollection) {
+                $value = $value->create();
+            } elseif (\is_array($value)) {
+                self::bulkResolveParameters($value);
+            }
+        }
     }
 
     /**

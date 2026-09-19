@@ -152,6 +152,7 @@ final class Configuration
         PersistedObjectsTracker::reset();
         StoryRegistry::reset();
         FakerAdapter::reset();
+        Factory::resetFakerCache();
         self::$instance = null;
     }
 
