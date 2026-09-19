@@ -380,6 +380,16 @@ class PersistenceManager implements IdentifierResolver
     }
 
     /**
+     * @param class-string $class
+     */
+    public function objectManagerFor(string $class): ObjectManager
+    {
+        $class = ProxyGenerator::unwrap($class);
+
+        return $this->strategyFor($class)->objectManagerFor($class);
+    }
+
+    /**
      * @template T of object
      *
      * @param class-string<T> $class
