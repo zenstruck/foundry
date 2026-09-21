@@ -1463,18 +1463,18 @@ Objects related helpers
 Persistence related helpers
 ...........................
 
-- ``Zenstruck\Foundry\Persistent\repository(string $class): RepositoryDecorator``: Returns a ``RepositoryDecorator`` for the given class
-- ``Zenstruck\Foundry\Persistent\persistent_factory(string $class, array|callable $attributes = []): PersistentObjectFactory``: Creates an "anonymous" persistent factory, with default attributes
-- ``Zenstruck\Foundry\Persistent\persist(string $class, array|callable $attributes = []): object``: Directly creates an object (and persist it), based on the attributes provided
-- ``Zenstruck\Foundry\Persistent\save(object $object): object``: Saves to the database the given object
-- ``Zenstruck\Foundry\Persistent\refresh(object &$object): object``: Refresh the object from the database
-- ``Zenstruck\Foundry\Persistent\refresh_all(): void``: Refresh all persisted objects created by Foundry for which a reference exists (PHP 8.4 only)
-- ``Zenstruck\Foundry\Persistent\delete(object $object): object``: Removes an object from the database
-- ``Zenstruck\Foundry\Persistent\flush_after(callable $callback): mixed``: see `Delay Flush`_
-- ``Zenstruck\Foundry\Persistent\disable_persisting(): void``: Disable the persistence of the factories for the current test
-- ``Zenstruck\Foundry\Persistent\enable_persisting(): void``: Re-enable the persistence of the factories
-- ``Zenstruck\Foundry\Persistent\assert_persisted(object $object, string $message = '{entity} is not persisted.'): object``: see `Assertions`_
-- ``Zenstruck\Foundry\Persistent\assert_not_persisted(object $object, string $message = '{entity} is persisted.'): object``: see `Assertions`_
+- ``Zenstruck\Foundry\Persistence\repository(string $class): RepositoryDecorator``: Returns a ``RepositoryDecorator`` for the given class
+- ``Zenstruck\Foundry\Persistence\persistent_factory(string $class, array|callable $attributes = []): PersistentObjectFactory``: Creates an "anonymous" persistent factory, with default attributes
+- ``Zenstruck\Foundry\Persistence\persist(string $class, array|callable $attributes = []): object``: Directly creates an object (and persist it), based on the attributes provided
+- ``Zenstruck\Foundry\Persistence\save(object $object): object``: Saves to the database the given object
+- ``Zenstruck\Foundry\Persistence\refresh(object &$object): object``: Refresh the object from the database
+- ``Zenstruck\Foundry\Persistence\refresh_all(): void``: Refresh all persisted objects created by Foundry for which a reference exists (PHP 8.4 only)
+- ``Zenstruck\Foundry\Persistence\delete(object $object): object``: Removes an object from the database
+- ``Zenstruck\Foundry\Persistence\flush_after(callable $callback): mixed``: see `Delay Flush`_
+- ``Zenstruck\Foundry\Persistence\disable_persisting(): void``: Disable the persistence of the factories for the current test
+- ``Zenstruck\Foundry\Persistence\enable_persisting(): void``: Re-enable the persistence of the factories
+- ``Zenstruck\Foundry\Persistence\assert_persisted(object $object, string $message = '{entity} is not persisted.'): object``: see `Assertions`_
+- ``Zenstruck\Foundry\Persistence\assert_not_persisted(object $object, string $message = '{entity} is persisted.'): object``: see `Assertions`_
 
 Stories
 -------
