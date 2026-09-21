@@ -12,8 +12,6 @@ $csFixerConfig = require $file;
 $csFixerConfig->setRules(['php_unit_attributes' => true, ...$csFixerConfig->getRules()]);
 $csFixerConfig->setFinder(
     $csFixerConfig->getFinder()
-        ->notName('WebTestCaseWithBothTraitsInWrongOrderTest.php')
-        ->notName('GenericFactoryUsingBeforeHooksAndResetDatabaseTraitTest.php')
         ->exclude('Fixture/Maker/expected')
         ->in(__DIR__.'/utils')
         ->in(__DIR__.'/config')

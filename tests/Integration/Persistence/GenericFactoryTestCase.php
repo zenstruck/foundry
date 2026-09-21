@@ -153,9 +153,6 @@ abstract class GenericFactoryTestCase extends KernelTestCase
         static::factory()->repository()->assert()->empty();
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function repository_and_create_function(): void
     {

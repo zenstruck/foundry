@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the zenstruck/foundry package.
  *
@@ -13,24 +11,20 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\Mongo;
 
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\DocumentForDoctrineEventsFactory;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\DocumentWithListenedRelationFactory;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\MongoDoctrineEventsListener;
-use Zenstruck\Foundry\Tests\Integration\RequiresMongo;
 
 use function Zenstruck\Foundry\Persistence\flush_after;
 
+#[ResetDatabase]
+#[RequiresEnvironmentVariable('MONGO_URL')]
 final class WithoutDoctrineEventsTest extends KernelTestCase
 {
-    use Factories, RequiresMongo, ResetDatabase;
-
-    /**
-     * @test
-     */
     #[Test]
     public function mongo_events_are_called_by_default(): void
     {
@@ -39,9 +33,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         self::assertSame('test (from Mongo event)', $document->name);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_disable_all_mongo_events(): void
     {
@@ -52,9 +43,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         self::assertSame('test', $document->name);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_disable_specific_mongo_event_listener(): void
     {
@@ -65,9 +53,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         self::assertSame('test', $document->name);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function mongo_events_are_restored_after_creation(): void
     {
@@ -80,9 +65,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         self::assertSame('second (from Mongo event)', $document->name);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function without_doctrine_events_on_nested_factory_only_covers_the_root_flush(): void
     {
@@ -102,9 +84,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         self::assertSame(1, MongoDoctrineEventsListener::$postPersistCount);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_throws_when_used_inside_flush_after(): void
     {

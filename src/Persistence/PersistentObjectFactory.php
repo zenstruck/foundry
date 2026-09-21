@@ -687,7 +687,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
-     * @param callable|array<string, mixed> $attributes
+     * @phpstan-param Parameters|callable(int):Parameters $attributes
      *
      * @return T
      */

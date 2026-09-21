@@ -13,7 +13,6 @@ namespace Zenstruck\Foundry\Test\Behat;
 
 use Symfony\Component\Uid\AbstractUid;
 use Zenstruck\Foundry\Persistence\IdentifierResolver;
-use Zenstruck\Foundry\Persistence\ProxyGenerator;
 use Zenstruck\Foundry\Story\Event\StateAddedToStory;
 use Zenstruck\Foundry\Test\Behat\Exception\CompositeIdentifierNotSupported;
 use Zenstruck\Foundry\Test\Behat\Exception\ObjectAlreadyRegistered;
@@ -84,11 +83,6 @@ final class ObjectRegistry
 
     public function store(object $object, string $objectName): void
     {
-        // story states may carry a legacy Foundry proxy: index by the real class,
-        // like every read path (targetObjectClassFor()) does
-        $object = ProxyGenerator::unwrap($object, withAutoRefresh: false);
-        \assert(\is_object($object));
-
         if (isset(self::$namesInCurrentScenario[$object::class][$objectName])) {
             throw ObjectAlreadyRegistered::forClassAndName($object::class, $objectName);
         }
@@ -148,7 +142,7 @@ final class ObjectRegistry
     public function lastIdFor(string $factoryShortName): int|string
     {
         return $this->coerceIdToScalar(
-            $this->persistenceManager->getIdentifierValues(ProxyGenerator::unwrap($this->lastObjectFor($factoryShortName)))
+            $this->persistenceManager->getIdentifierValues(self::initialize($this->lastObjectFor($factoryShortName)))
         );
     }
 
@@ -168,10 +162,7 @@ final class ObjectRegistry
 
     public function idFor(string $factoryShortName, string $objectName): int|string
     {
-        // unwrap() also initializes uninitialized lazy ghosts (e.g. reset by the
-        // PersistedObjectsTracker), whose identifiers read as null through raw reflection
-        $object = ProxyGenerator::unwrap($this->getByFactoryShortName($factoryShortName, $objectName));
-        \assert(\is_object($object));
+        $object = self::initialize($this->getByFactoryShortName($factoryShortName, $objectName));
 
         return $this->coerceIdToScalar(
             $this->persistenceManager->getIdentifierValues($object)
@@ -202,6 +193,17 @@ final class ObjectRegistry
         }
 
         return $resolved;
+    }
+
+    /**
+     * Uninitialized lazy ghosts (e.g. reset by the PersistedObjectsTracker) read as null
+     * identifiers through raw reflection: initialize them before reading anything.
+     */
+    private static function initialize(object $object): object
+    {
+        return ($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)
+            ? $reflector->initializeLazyObject($object)
+            : $object;
     }
 
     public function isStored(object $object): bool

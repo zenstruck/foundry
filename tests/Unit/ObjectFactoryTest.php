@@ -447,7 +447,6 @@ final class ObjectFactoryTest extends TestCase
     }
 
     /**
-     * @test
      *
      * @group legacy
      * @requires PHPUnit >=11.0.0
@@ -466,7 +465,6 @@ final class ObjectFactoryTest extends TestCase
     }
 
     /**
-     * @test
      *
      * @group legacy
      * @requires PHPUnit >=11.0.0
@@ -481,9 +479,6 @@ final class ObjectFactoryTest extends TestCase
         SimpleObjectFactory::new()->createMany(1);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function create_helpers_still_ignore_nothing_when_called_statically(): void
     {
@@ -491,9 +486,6 @@ final class ObjectFactoryTest extends TestCase
         self::assertSame('static', SimpleObjectFactory::createOne(['prop1' => 'static'])->prop1);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function calling_an_undefined_method_statically_throws(): void
     {
@@ -503,9 +495,6 @@ final class ObjectFactoryTest extends TestCase
         SimpleObjectFactory::doesNotExist(); // @phpstan-ignore staticMethod.notFound
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function calling_an_undefined_method_on_an_instance_throws(): void
     {
