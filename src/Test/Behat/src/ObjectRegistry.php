@@ -195,17 +195,6 @@ final class ObjectRegistry
         return $resolved;
     }
 
-    /**
-     * Uninitialized lazy ghosts (e.g. reset by the PersistedObjectsTracker) read as null
-     * identifiers through raw reflection: initialize them before reading anything.
-     */
-    private static function initialize(object $object): object
-    {
-        return ($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)
-            ? $reflector->initializeLazyObject($object)
-            : $object;
-    }
-
     public function isStored(object $object): bool
     {
         return array_any(
@@ -220,6 +209,17 @@ final class ObjectRegistry
             self::$objects[$object::class] ?? [],
             static fn(object $o) => $o === $object
         ) ?? throw new \LogicException('Object is not stored in the registry.');
+    }
+
+    /**
+     * Uninitialized lazy ghosts (e.g. reset by the PersistedObjectsTracker) read as null
+     * identifiers through raw reflection: initialize them before reading anything.
+     */
+    private static function initialize(object $object): object
+    {
+        return ($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)
+            ? $reflector->initializeLazyObject($object)
+            : $object;
     }
 
     /**

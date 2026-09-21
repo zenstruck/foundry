@@ -446,11 +446,7 @@ final class ObjectFactoryTest extends TestCase
         $this->markTestIncomplete();
     }
 
-    /**
-     *
-     * @group legacy
-     * @requires PHPUnit >=11.0.0
-     */
+    #[\PHPUnit\Framework\Attributes\Group('legacy')]
     #[Test]
     #[IgnoreDeprecations]
     #[RequiresPhpunit('>=11.0.0')]
@@ -464,11 +460,7 @@ final class ObjectFactoryTest extends TestCase
         self::assertSame(['from-state'], \array_column($factory->createSequence([[]]), 'prop1'));
     }
 
-    /**
-     *
-     * @group legacy
-     * @requires PHPUnit >=11.0.0
-     */
+    #[\PHPUnit\Framework\Attributes\Group('legacy')]
     #[Test]
     #[IgnoreDeprecations]
     #[RequiresPhpunit('>=11.0.0')]

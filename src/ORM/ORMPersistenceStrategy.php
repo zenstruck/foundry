@@ -191,34 +191,43 @@ final class ORMPersistenceStrategy extends PersistenceStrategy
         };
     }
 
-    /**
-     * Doctrine accepts as "indexBy" either a field or the join column of a to-one association:
-     * the latter is resolved to the referenced field of the associated entity.
-     *
-     * @param class-string $class
-     *
-     * @return non-empty-list<string>
-     */
-    final protected function indexByPropertyPath(string $class, string $indexBy): array
+    public function bidirectionalRelationshipMetadata(string $parent, string $child, string $field): ?RelationshipMetadata
     {
-        $metadata = $this->objectManagerFor($class)->getClassMetadata($class);
+        $associationMapping = $this->getAssociationMapping($parent, $child, $field);
 
-        $association = $metadata->hasField($indexBy) ? null : array_find(
-            $metadata->getAssociationNames(),
-            static fn(string $association) => $metadata->isAssociationWithSingleJoinColumn($association)
-                && $metadata->getSingleAssociationJoinColumnName($association) === $indexBy
-        );
-
-        if (null === $association) {
-            return [$indexBy];
+        if (null === $associationMapping) {
+            return null;
         }
 
-        $targetClass = $metadata->getAssociationTargetClass($association);
+        if (!\is_a(
+            $child,
+            $associationMapping->targetEntity,
+            allow_string: true
+        )) { // is_a() handles inheritance as well
+            throw new \LogicException("Cannot find correct association named \"{$field}\" between classes [parent: \"{$parent}\", child: \"{$child}\"]");
+        }
 
-        return [
-            $association,
-            $this->objectManagerFor($targetClass)->getClassMetadata($targetClass)->getFieldForColumn($metadata->getSingleAssociationReferencedJoinColumnName($association)),
-        ];
+        $inverseField = $associationMapping->isOwningSide() ? $associationMapping->inversedBy : $associationMapping->mappedBy;
+
+        if (null === $inverseField) {
+            return null;
+        }
+
+        return match (true) {
+            $associationMapping instanceof OneToManyAssociationMapping => new OneToManyRelationship(
+                inverseField: $inverseField,
+                collectionIndexByPath: $associationMapping->isIndexed() ? $this->indexByPropertyPath($associationMapping->targetEntity, $associationMapping->indexBy()) : null
+            ),
+            $associationMapping instanceof OneToOneAssociationMapping => new OneToOneRelationship(
+                inverseField: $inverseField,
+                isOwning: $associationMapping->isOwningSide()
+            ),
+            $associationMapping instanceof ManyToOneAssociationMapping => new ManyToOneRelationship(
+                inverseField: $inverseField,
+                collectionIndexByPath: $this->inverseCollectionIndexByPath($associationMapping->targetEntity, $parent, $inverseField),
+            ),
+            default => null,
+        };
     }
 
     /**
@@ -310,47 +319,41 @@ final class ORMPersistenceStrategy extends PersistenceStrategy
         }
     }
 
-    public function bidirectionalRelationshipMetadata(string $parent, string $child, string $field): ?RelationshipMetadata
+    /**
+     * Doctrine accepts as "indexBy" either a field or the join column of a to-one association:
+     * the latter is resolved to the referenced field of the associated entity.
+     *
+     * @param class-string $class
+     *
+     * @return non-empty-list<string>
+     */
+    final protected function indexByPropertyPath(string $class, string $indexBy): array
     {
-        $associationMapping = $this->getAssociationMapping($parent, $child, $field);
+        $metadata = $this->objectManagerFor($class)->getClassMetadata($class);
 
-        if (null === $associationMapping) {
-            return null;
+        $association = $metadata->hasField($indexBy) ? null : array_find(
+            $metadata->getAssociationNames(),
+            static fn(string $association) => $metadata->isAssociationWithSingleJoinColumn($association)
+                && $metadata->getSingleAssociationJoinColumnName($association) === $indexBy
+        );
+
+        if (null === $association) {
+            return [$indexBy];
         }
 
-        if (!\is_a(
-            $child,
-            $associationMapping->targetEntity,
-            allow_string: true
-        )) { // is_a() handles inheritance as well
-            throw new \LogicException("Cannot find correct association named \"{$field}\" between classes [parent: \"{$parent}\", child: \"{$child}\"]");
-        }
+        $targetClass = $metadata->getAssociationTargetClass($association);
 
-        $inverseField = $associationMapping->isOwningSide() ? $associationMapping->inversedBy : $associationMapping->mappedBy;
-
-        if (null === $inverseField) {
-            return null;
-        }
-
-        return match (true) {
-            $associationMapping instanceof OneToManyAssociationMapping => new OneToManyRelationship(
-                inverseField: $inverseField,
-                collectionIndexByPath: $associationMapping->isIndexed() ? $this->indexByPropertyPath($associationMapping->targetEntity, $associationMapping->indexBy()) : null
-            ),
-            $associationMapping instanceof OneToOneAssociationMapping => new OneToOneRelationship(
-                inverseField: $inverseField,
-                isOwning: $associationMapping->isOwningSide()
-            ),
-            $associationMapping instanceof ManyToOneAssociationMapping => new ManyToOneRelationship(
-                inverseField: $inverseField,
-                collectionIndexByPath: $this->inverseCollectionIndexByPath($associationMapping->targetEntity, $parent, $inverseField),
-            ),
-            default => null,
-        };
+        return [
+            $association,
+            $this->objectManagerFor($targetClass)->getClassMetadata($targetClass)->getFieldForColumn($metadata->getSingleAssociationReferencedJoinColumnName($association)),
+        ];
     }
 
     /**
      * @param class-string $entityClass
+     * @param class-string $elementClass
+     *
+     * @return non-empty-list<string>|null
      */
     private function inverseCollectionIndexByPath(string $entityClass, string $elementClass, string $field): ?array
     {
@@ -361,6 +364,9 @@ final class ORMPersistenceStrategy extends PersistenceStrategy
             : null;
     }
 
+    /**
+     * @param class-string $entityClass
+     */
     private function getAssociationMapping(string $entityClass, string $targetEntity, string $field): ?AssociationMapping
     {
         try {

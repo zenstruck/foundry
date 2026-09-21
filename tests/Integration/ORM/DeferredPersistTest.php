@@ -16,8 +16,8 @@ use Doctrine\ORM\Events;
 use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\CascadeCtorRequiredParent;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\CascadePersistChain;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\OrphanRemoval;
@@ -122,7 +122,6 @@ final class DeferredPersistTest extends KernelTestCase
     }
 
     /**
-     *
      * @see https://github.com/zenstruck/foundry/pull/1134#issuecomment-5021148915
      */
     #[Test]
