@@ -20,8 +20,8 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Tester\CommandTester;
-use Zenstruck\Foundry\Story\FixtureStoryNotFound;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
+use Zenstruck\Foundry\Story\FixtureStoryNotFound;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GlobalEntity;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\Fixtures\FixtureStory;
@@ -73,10 +73,7 @@ final class LoadFixturesCommandTest extends KernelTestCase
         self::assertStringContainsString('loaded (name: fixture-story)', $commandTester->getDisplay());
     }
 
-    /**
-     *
-     * @group legacy
-     */
+    #[\PHPUnit\Framework\Attributes\Group('legacy')]
     #[Test]
     #[IgnoreDeprecations]
     public function it_can_still_load_a_story_when_the_name_argument_is_a_string(): void

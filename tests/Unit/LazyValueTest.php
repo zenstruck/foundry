@@ -91,11 +91,7 @@ final class LazyValueTest extends TestCase
         $this->assertSame($objects, $value());
     }
 
-    /**
-     *
-     * @group legacy
-     * @requires PHPUnit >=11.0.0
-     */
+    #[\PHPUnit\Framework\Attributes\Group('legacy')]
     #[Test]
     #[IgnoreDeprecations]
     #[RequiresPhpunit('>=11.0.0')]

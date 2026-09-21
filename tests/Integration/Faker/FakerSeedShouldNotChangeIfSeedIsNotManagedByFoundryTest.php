@@ -16,9 +16,9 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\FakerAdapter;
+use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 
 use function Zenstruck\Foundry\faker;
 

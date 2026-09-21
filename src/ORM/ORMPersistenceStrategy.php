@@ -157,6 +157,44 @@ final class ORMPersistenceStrategy extends PersistenceStrategy
         };
     }
 
+    public function bidirectionalRelationshipMetadata(string $parent, string $child, string $field): ?RelationshipMetadata
+    {
+        $associationMapping = $this->getAssociationMapping($parent, $child, $field);
+
+        if (null === $associationMapping) {
+            return null;
+        }
+
+        if (!\is_a(
+            $child,
+            $associationMapping->targetEntity,
+            allow_string: true
+        )) { // is_a() handles inheritance as well
+            throw new \LogicException("Cannot find correct association named \"{$field}\" between classes [parent: \"{$parent}\", child: \"{$child}\"]");
+        }
+
+        $inverseField = $associationMapping->isOwningSide() ? $associationMapping->inversedBy : $associationMapping->mappedBy;
+
+        if (null === $inverseField) {
+            return null;
+        }
+
+        return match (true) {
+            $associationMapping instanceof OneToManyAssociationMapping => new OneToManyRelationship(
+                inverseField: $inverseField,
+                collectionIndexedBy: $associationMapping->isIndexed() ? $associationMapping->indexBy() : null
+            ),
+            $associationMapping instanceof OneToOneAssociationMapping => new OneToOneRelationship(
+                inverseField: $inverseField,
+                isOwning: $associationMapping->isOwningSide()
+            ),
+            $associationMapping instanceof ManyToOneAssociationMapping => new ManyToOneRelationship(
+                inverseField: $inverseField,
+            ),
+            default => null,
+        };
+    }
+
     /**
      * @param list<class-string> $disabledClasses
      *
@@ -244,44 +282,6 @@ final class ORMPersistenceStrategy extends PersistenceStrategy
         if ([] !== $original) {
             $om->getClassMetadata($entityClass)->entityListeners = $original;
         }
-    }
-
-    public function bidirectionalRelationshipMetadata(string $parent, string $child, string $field): ?RelationshipMetadata
-    {
-        $associationMapping = $this->getAssociationMapping($parent, $child, $field);
-
-        if (null === $associationMapping) {
-            return null;
-        }
-
-        if (!\is_a(
-            $child,
-            $associationMapping->targetEntity,
-            allow_string: true
-        )) { // is_a() handles inheritance as well
-            throw new \LogicException("Cannot find correct association named \"{$field}\" between classes [parent: \"{$parent}\", child: \"{$child}\"]");
-        }
-
-        $inverseField = $associationMapping->isOwningSide() ? $associationMapping->inversedBy : $associationMapping->mappedBy;
-
-        if (null === $inverseField) {
-            return null;
-        }
-
-        return match (true) {
-            $associationMapping instanceof OneToManyAssociationMapping => new OneToManyRelationship(
-                inverseField: $inverseField,
-                collectionIndexedBy: $associationMapping->isIndexed() ? $associationMapping->indexBy() : null
-            ),
-            $associationMapping instanceof OneToOneAssociationMapping => new OneToOneRelationship(
-                inverseField: $inverseField,
-                isOwning: $associationMapping->isOwningSide()
-            ),
-            $associationMapping instanceof ManyToOneAssociationMapping => new ManyToOneRelationship(
-                inverseField: $inverseField,
-            ),
-            default => null,
-        };
     }
 
     /**

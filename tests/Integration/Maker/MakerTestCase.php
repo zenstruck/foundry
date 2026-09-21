@@ -29,9 +29,6 @@ abstract class MakerTestCase extends KernelTestCase
         (new Filesystem())->remove(self::tempDir());
     }
 
-    /**
-     * @before
-     */
     #[Before]
     public static function disableMakerBundleCsFixer(): void
     {
