@@ -19,7 +19,6 @@ use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Persistence\Exception\ObjectNoLongerExist;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Persistence\ProxyGenerator;
 use Zenstruck\Foundry\Persistence\RepositoryAssertions;
 
 use function Zenstruck\Foundry\get;
@@ -237,9 +236,6 @@ trait AssertionSteps
      */
     private function assertSameObject(mixed $actual, object $expected): void
     {
-        $expected = ProxyGenerator::unwrap($expected);
-        \assert(\is_object($expected));
-
         Assert::that($actual)->isInstanceOf($expected::class);
         \assert(\is_object($actual));
 
@@ -259,10 +255,11 @@ trait AssertionSteps
      */
     private function identifierCriteriaFor(object $object): ?array
     {
-        // also initializes uninitialized lazy ghosts: reading identifiers through raw
-        // reflection on a ghost (e.g. reset by the PersistedObjectsTracker) yields null
-        $object = ProxyGenerator::unwrap($object);
-        \assert(\is_object($object));
+        // reading identifiers through raw reflection on an uninitialized lazy ghost
+        // (e.g. reset by the PersistedObjectsTracker) yields null
+        if (($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)) {
+            $object = $reflector->initializeLazyObject($object);
+        }
 
         $persistence = $this->persistenceFor($object);
 

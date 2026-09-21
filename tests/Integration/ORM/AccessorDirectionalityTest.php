@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the zenstruck/foundry package.
  *
@@ -13,13 +11,12 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\AccessorDirectionality\CategoryEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\AccessorDirectionality\ItemEntity;
-use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 use function Zenstruck\Foundry\Persistence\persistent_factory;
 
@@ -31,11 +28,10 @@ use function Zenstruck\Foundry\Persistence\persistent_factory;
  *
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
+#[ResetDatabase]
+#[RequiresEnvironmentVariable('DATABASE_URL')]
 final class AccessorDirectionalityTest extends KernelTestCase
 {
-    use Factories, RequiresORM, ResetDatabase;
-
-    /** @test */
     #[Test]
     public function adder_is_used_when_creating_from_the_collection_side(): void
     {
@@ -53,7 +49,6 @@ final class AccessorDirectionalityTest extends KernelTestCase
         $itemFactory::assert()->count(2);
     }
 
-    /** @test */
     #[Test]
     public function adder_side_effects_are_not_triggered_when_creating_from_the_owning_side(): void
     {

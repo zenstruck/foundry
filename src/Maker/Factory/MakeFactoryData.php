@@ -11,14 +11,11 @@
 
 namespace Zenstruck\Foundry\Maker\Factory;
 
-use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
-use Doctrine\ORM\EntityRepository;
 use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 
 /**
  * @internal
@@ -35,7 +32,6 @@ final class MakeFactoryData
     public function __construct(
         private \ReflectionClass $object,
         private ClassNameDetails $factoryClassNameDetails,
-        private ?\ReflectionClass $repository,
         private bool $persisted,
         private bool $forceProperties,
         private bool $addHints,
@@ -44,14 +40,6 @@ final class MakeFactoryData
             $this->getFactoryClass(),
             $object->getName(),
         ];
-
-        if ($repository) {
-            $this->uses[] = $repository->getName();
-            $this->uses[] = RepositoryDecorator::class;
-            if (!\str_starts_with($repository->getName(), 'Doctrine')) {
-                $this->uses[] = \is_a($repository->getName(), DocumentRepository::class, allow_string: true) ? DocumentRepository::class : EntityRepository::class;
-            }
-        }
     }
 
     // @phpstan-ignore-next-line
@@ -87,11 +75,6 @@ final class MakeFactoryData
     public function getObjectFullyQualifiedClassName(): string
     {
         return $this->object->getName();
-    }
-
-    public function getRepositoryReflectionClass(): ?\ReflectionClass
-    {
-        return $this->repository;
     }
 
     public function isPersisted(): bool

@@ -197,9 +197,6 @@ class HydratorTest extends TestCase
         $this->assertSame('foo', $object->getFoo());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_hydrate_from_snapshot_with_public_property_only(): void
     {
@@ -215,9 +212,6 @@ class HydratorTest extends TestCase
         $this->assertSame('original', $object->foo);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_hydrate_from_snapshot_with_own_private_property(): void
     {
@@ -243,9 +237,6 @@ class HydratorTest extends TestCase
         $this->assertSame('original', $object->getFoo());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_hydrate_from_snapshot_with_own_protected_property(): void
     {
@@ -271,9 +262,6 @@ class HydratorTest extends TestCase
         $this->assertSame('original', $object->getFoo());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_hydrate_from_snapshot_with_inherited_properties(): void
     {

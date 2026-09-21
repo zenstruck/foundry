@@ -16,7 +16,6 @@ use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\LazyValue;
-use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixture\Factories\SimpleObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\SimpleObject;
 
@@ -28,8 +27,6 @@ use function Zenstruck\Foundry\memoize;
  */
 final class LazyValueTest extends TestCase
 {
-    use Factories;
-
     #[Test]
     public function lazy(): void
     {
@@ -71,9 +68,6 @@ final class LazyValueTest extends TestCase
         $this->assertSame([5, 'foo', 6, 'foo' => ['bar' => 7, 'baz' => 'foo'], [8, 'foo']], $value());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function factory_memoize_returns_the_same_object(): void
     {
@@ -85,9 +79,6 @@ final class LazyValueTest extends TestCase
         $this->assertSame($object, $value());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function factory_collection_memoize_returns_the_same_objects(): void
     {
@@ -101,7 +92,6 @@ final class LazyValueTest extends TestCase
     }
 
     /**
-     * @test
      *
      * @group legacy
      * @requires PHPUnit >=11.0.0

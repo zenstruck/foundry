@@ -34,7 +34,7 @@ final class <?php echo $class_name; ?> extends <?php echo $makeFactoryData->getF
      * @todo add your default values here
      */
 <?php endif ?>    #[\Override]
-    protected function defaults(): array<?php if ($makeFactoryData->shouldAddHints()): ?>|callable<?php endif ?>
+    protected function defaults(): array<?php if ($makeFactoryData->shouldAddHints()): ?>|callable<?php endif ?><?= "\n" ?>
     {
         return [
 <?php

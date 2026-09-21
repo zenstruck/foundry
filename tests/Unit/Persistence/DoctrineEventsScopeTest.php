@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the zenstruck/foundry package.
  *
@@ -37,9 +35,6 @@ final class DoctrineEventsScopeTest extends TestCase
         $this->attempts = 0;
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_is_open_until_closed(): void
     {
@@ -52,9 +47,6 @@ final class DoctrineEventsScopeTest extends TestCase
         self::assertFalse($scope->isOpen());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_does_nothing_when_no_factory_requests_disabling(): void
     {
@@ -68,9 +60,6 @@ final class DoctrineEventsScopeTest extends TestCase
         self::assertSame([], $this->restorations);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_disables_immediately_and_restores_only_on_close(): void
     {
@@ -86,9 +75,6 @@ final class DoctrineEventsScopeTest extends TestCase
         self::assertSame([0], $this->restorations);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_accumulates_classes_across_registrations(): void
     {
@@ -108,9 +94,6 @@ final class DoctrineEventsScopeTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_restores_in_reverse_order(): void
     {
@@ -123,9 +106,6 @@ final class DoctrineEventsScopeTest extends TestCase
         self::assertSame([1, 0], $this->restorations);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_deduplicates_identical_registrations(): void
     {
@@ -140,9 +120,6 @@ final class DoctrineEventsScopeTest extends TestCase
         self::assertSame([0], $this->restorations);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_ignores_class_order_when_deduplicating(): void
     {
@@ -154,9 +131,6 @@ final class DoctrineEventsScopeTest extends TestCase
         self::assertCount(1, $this->disableCalls);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function an_empty_list_means_all_and_absorbs_specific_classes(): void
     {
@@ -174,9 +148,6 @@ final class DoctrineEventsScopeTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_closes_only_once(): void
     {
@@ -189,9 +160,6 @@ final class DoctrineEventsScopeTest extends TestCase
         self::assertSame([0], $this->restorations);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function a_failed_registration_can_be_retried(): void
     {

@@ -74,7 +74,6 @@ final class LoadFixturesCommandTest extends KernelTestCase
     }
 
     /**
-     * @test
      *
      * @group legacy
      */
@@ -98,9 +97,6 @@ final class LoadFixturesCommandTest extends KernelTestCase
         GenericEntityFactory::assert()->count(1, ['prop1' => 'fixture-story-for-group']);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_load_multiple_groups(): void
     {
@@ -119,9 +115,6 @@ final class LoadFixturesCommandTest extends KernelTestCase
         self::assertStringContainsString('Story "'.FixtureStory::class.'" (name: fixture-story) already loaded. Skipping...', $display);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_load_a_mix_of_stories_and_groups(): void
     {
@@ -134,9 +127,6 @@ final class LoadFixturesCommandTest extends KernelTestCase
         self::assertStringContainsString('Loading stories group "multiple-fixtures-in-group"', $commandTester->getDisplay());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_does_not_load_anything_if_one_of_the_names_is_invalid(): void
     {
@@ -152,9 +142,6 @@ final class LoadFixturesCommandTest extends KernelTestCase
         }
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_throws_if_name_collision_between_two_stories_name(): void
     {

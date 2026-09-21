@@ -26,8 +26,6 @@ parameters:
         - identifier: missingType.iterableValue
           path: tests/
 
-        - identifier: phpunit.attributeRequiresPhpVersion
-          path: tests/
         # Hydrator and Factory are annotated @immutable
         - identifier: property.readOnlyByPhpDocDefaultValue
           paths:
