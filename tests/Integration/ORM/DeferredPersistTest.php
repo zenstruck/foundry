@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the zenstruck/foundry package.
  *
@@ -15,16 +13,15 @@ namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\CascadeCtorRequiredParent;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\CascadePersistChain;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\OrphanRemoval;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\SharedManagedParent;
-use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 use function Zenstruck\Foundry\Persistence\persistent_factory;
 
@@ -37,11 +34,10 @@ use function Zenstruck\Foundry\Persistence\persistent_factory;
  *
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
+#[ResetDatabase]
+#[RequiresEnvironmentVariable('DATABASE_URL')]
 final class DeferredPersistTest extends KernelTestCase
 {
-    use Factories, RequiresORM, ResetDatabase;
-
-    /** @test */
     #[Test]
     public function pre_persist_can_access_populated_one_to_many_collection(): void
     {
@@ -69,7 +65,6 @@ final class DeferredPersistTest extends KernelTestCase
         self::assertTrue($c->hasBAtPrePersist);
     }
 
-    /** @test */
     #[Test]
     public function pre_persist_sees_populated_collections_when_created_from_child_side(): void
     {
@@ -90,7 +85,6 @@ final class DeferredPersistTest extends KernelTestCase
         self::assertSame(1, $a->bsCountAtPrePersist);
     }
 
-    /** @test */
     #[Test]
     public function pre_persist_sees_populated_collection_with_unpersisted_parent_instance(): void
     {
@@ -102,7 +96,6 @@ final class DeferredPersistTest extends KernelTestCase
         self::assertSame(1, $a->bsCountAtPrePersist);
     }
 
-    /** @test */
     #[Test]
     public function pre_persist_sees_children_when_child_constructor_requires_parent_with_cascade(): void
     {
@@ -116,7 +109,6 @@ final class DeferredPersistTest extends KernelTestCase
         $childFactory::assert()->count(2);
     }
 
-    /** @test */
     #[Test]
     public function pre_persist_sees_child_when_created_from_child_side_with_cascade(): void
     {
@@ -130,7 +122,6 @@ final class DeferredPersistTest extends KernelTestCase
     }
 
     /**
-     * @test
      *
      * @see https://github.com/zenstruck/foundry/pull/1134#issuecomment-5021148915
      */
@@ -160,7 +151,6 @@ final class DeferredPersistTest extends KernelTestCase
         self::assertSame(['hasAAtPrePersist' => true, 'bsCountAtPrePersist' => 1], $stateAfterInsert);
     }
 
-    /** @test */
     #[Test]
     public function lifecycle_state_of_collection_items_is_visible_below_schedule_for_insert_priority(): void
     {
@@ -179,9 +169,6 @@ final class DeferredPersistTest extends KernelTestCase
         self::assertTrue($hasAAtPrePersist);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function refreshing_managed_attribute_does_not_fire_lifecycle_events_on_scheduled_objects(): void
     {
@@ -205,7 +192,6 @@ final class DeferredPersistTest extends KernelTestCase
         }
     }
 
-    /** @test */
     #[Test]
     public function orphan_removal_does_not_delete_children_on_subsequent_flushes(): void
     {
@@ -224,7 +210,6 @@ final class DeferredPersistTest extends KernelTestCase
         self::assertSame(2, $parent->childrenCount);
     }
 
-    /** @test */
     #[Test]
     public function only_one_flush_per_root_create(): void
     {
@@ -252,7 +237,6 @@ final class DeferredPersistTest extends KernelTestCase
         self::assertSame(1, $listener->flushes);
     }
 
-    /** @test */
     #[Test]
     public function a_failing_create_does_not_leak_scheduled_objects_into_the_next_one(): void
     {
@@ -274,7 +258,6 @@ final class DeferredPersistTest extends KernelTestCase
         $bFactory::assert()->count(0);
     }
 
-    /** @test */
     #[Test]
     public function a_failing_item_in_a_flush_once_batch_does_not_leak_scheduled_objects(): void
     {

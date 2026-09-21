@@ -12,6 +12,7 @@
 namespace Zenstruck\Foundry\Tests\Integration\Persistence;
 
 use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
+use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Attribute\ResetDatabase;

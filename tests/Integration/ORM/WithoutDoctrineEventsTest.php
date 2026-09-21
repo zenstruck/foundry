@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the zenstruck/foundry package.
  *
@@ -21,8 +19,7 @@ use PHPUnit\Framework\Attributes\RequiresPhpunitExtension;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\PHPUnit\FoundryExtension;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\AsEntityListenerListener;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\ChildEntityForDoctrineEventsFactory;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\ChildEntityWithoutAsEntityListenerFactory;
@@ -41,17 +38,13 @@ use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\ParentEntityForDoctrineEvents
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\ParentOfListenedEntitiesFactory;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EntityWithAsEntityListener;
 use Zenstruck\Foundry\Tests\Fixture\Entity\ListenedEntity;
-use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 use function Zenstruck\Foundry\Persistence\flush_after;
 
+#[ResetDatabase]
+#[RequiresEnvironmentVariable('DATABASE_URL')]
 final class WithoutDoctrineEventsTest extends KernelTestCase
 {
-    use Factories, RequiresORM, ResetDatabase;
-
-    /**
-     * @test
-     */
     #[Test]
     public function doctrine_events_are_called_by_default(): void
     {
@@ -60,9 +53,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         self::assertSame('test (from Doctrine event)', $entity->name);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_disable_all_doctrine_events(): void
     {
@@ -73,9 +63,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         self::assertSame('test', $entity->name);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_disable_specific_doctrine_event_listener(): void
     {
@@ -86,9 +73,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         self::assertSame('test', $entity->name);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function doctrine_events_are_restored_after_creation(): void
     {
@@ -104,9 +88,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
 
     // --- flush_after() ---
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_throws_when_used_inside_flush_after(): void
     {
@@ -122,9 +103,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
 
     // --- #[ORM\EntityListeners] ---
 
-    /**
-     * @test
-     */
     #[Test]
     public function orm_entity_listener_is_called_by_default(): void
     {
@@ -133,9 +111,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         self::assertSame('test (from ORM entity listener)', $entity->name);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_disable_all_orm_entity_listeners(): void
     {
@@ -146,9 +121,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         self::assertSame('test', $entity->name);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_disable_specific_orm_entity_listener(): void
     {
@@ -159,9 +131,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         self::assertSame('test', $entity->name);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function orm_entity_listener_is_restored_after_creation(): void
     {
@@ -176,9 +145,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
 
     // --- #[AsEntityListener] ---
 
-    /**
-     * @test
-     */
     #[Test]
     public function as_entity_listener_is_called_by_default(): void
     {
@@ -187,9 +153,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         self::assertSame('test (from AsEntityListener)', $entity->name);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_disable_all_as_entity_listeners(): void
     {
@@ -200,9 +163,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         self::assertSame('test', $entity->name);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_can_disable_specific_as_entity_listener(): void
     {
@@ -213,9 +173,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         self::assertSame('test', $entity->name);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function as_entity_listener_is_restored_after_creation(): void
     {
@@ -230,9 +187,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
 
     // --- Relations: ORM entity listeners on related entity (reproducer from PR #1131) ---
 
-    /**
-     * @test
-     */
     #[Test]
     public function without_doctrine_events_disables_orm_entity_listener_on_cascade_persisted_related_entity(): void
     {
@@ -244,9 +198,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         self::assertFalse(AsEntityListenerListener::$postPersistExecuted);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function same_factory_instance_can_create_twice_with_events_disabled(): void
     {
@@ -268,9 +219,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
 
     // --- Metadata loaded lazily during the disabling window ---
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_keeps_as_entity_listeners_of_classes_whose_metadata_loads_during_the_window(): void
     {
@@ -296,9 +244,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
 
     // --- Relations: ManyToOne (child → parent) ---
 
-    /**
-     * @test
-     */
     #[Test]
     public function events_are_called_by_default_on_child_and_parent(): void
     {
@@ -309,9 +254,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         self::assertStringEndsWith('(from Doctrine event)', $child->parent->name);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function without_doctrine_events_propagates_from_child_to_parent(): void
     {
@@ -326,9 +268,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
 
     // --- Relations: OneToMany (parent → children) ---
 
-    /**
-     * @test
-     */
     #[Test]
     public function events_are_called_by_default_on_parent_and_children(): void
     {
@@ -345,9 +284,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         }
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function without_doctrine_events_propagates_from_parent_to_children(): void
     {
@@ -367,9 +303,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
 
     // --- Relations: flush-time events (postPersist) on nested entities (#1129) ---
 
-    /**
-     * @test
-     */
     #[Test]
     public function without_doctrine_events_disables_post_persist_listener_on_nested_entity(): void
     {
@@ -391,9 +324,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         self::assertSame(1, ListenedEntityListener::$postPersistCount);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function without_doctrine_events_on_nested_factory_only_covers_the_root_flush(): void
     {
@@ -416,9 +346,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         self::assertSame(1, ListenedEntityListener::$postPersistCount);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function without_doctrine_events_merges_parent_and_nested_disabled_listeners(): void
     {
@@ -443,9 +370,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         self::assertSame(1, EntityWithListenedRelationListener::$postPersistCount);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function without_doctrine_events_propagates_through_multiple_nesting_levels(): void
     {
@@ -465,9 +389,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         self::assertSame(1, ListenedEntityListener::$postPersistCount);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function without_doctrine_events_covers_the_collective_flush_of_many(): void
     {
@@ -485,9 +406,6 @@ final class WithoutDoctrineEventsTest extends KernelTestCase
         self::assertSame(1, ListenedEntityListener::$postPersistCount);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function without_doctrine_events_on_nested_collection_factory_covers_the_root_flush(): void
     {

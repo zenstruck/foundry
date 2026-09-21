@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the zenstruck/foundry package.
  *
@@ -14,13 +12,12 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
-use Zenstruck\Foundry\Tests\Integration\RequiresORM;
 
 use function Zenstruck\Foundry\Persistence\persistent_factory;
 use function Zenstruck\Foundry\Persistence\refresh;
@@ -30,11 +27,10 @@ use function Zenstruck\Foundry\Persistence\refresh;
  * a change set on the real UOW overwrites the original-data snapshot, silently losing
  * any modification made before a refused refresh on the next flush.
  */
+#[ResetDatabase]
+#[RequiresEnvironmentVariable('DATABASE_URL')]
 final class RefreshDirtyCheckTest extends KernelTestCase
 {
-    use Factories, RequiresORM, ResetDatabase;
-
-    /** @test */
     #[Test]
     public function modifications_before_and_after_a_dirty_refresh_are_all_flushed(): void
     {

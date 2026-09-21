@@ -133,16 +133,11 @@ final class FactoryGenerator
             if ($metadata instanceof ODMClassMetadata && $metadata->isEmbeddedDocument) {
                 $persisted = false;
             }
-
-            if ($persisted) {
-                $repository = new \ReflectionClass($this->persistenceManager->repositoryFor($object->getName()));
-            }
         }
 
         return new MakeFactoryData(
             $object,
             $factory,
-            $repository ?? null,
             $persisted ?? false,
             $this->forceProperties,
             $makeFactoryQuery->shouldAddHints(),
