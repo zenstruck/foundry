@@ -163,6 +163,42 @@ class PersistenceManager implements IdentifierResolver
         return $result;
     }
 
+    /**
+     * Creates and flushes objects batch per batch, clearing the object managers in between,
+     * so that memory usage stays constant whatever the number of objects to create.
+     *
+     * @param iterable<callable():object> $creators consumed lazily: an object is created only when its turn comes
+     */
+    public function flushInBatches(int $batchSize, iterable $creators): void
+    {
+        if ($batchSize < 1) {
+            throw new \InvalidArgumentException('Batch size must be at least 1.');
+        }
+
+        if (!$this->flush) {
+            throw new \LogicException('flushInBatches() cannot be used inside flush_after().');
+        }
+
+        $this->flush = false;
+        $count = 0;
+
+        try {
+            foreach ($creators as $create) {
+                $create(); // the created object is deliberately not kept
+
+                if (0 === ++$count % $batchSize) {
+                    $this->flushBatch();
+                }
+            }
+
+            if (0 !== $count % $batchSize) {
+                $this->flushBatch();
+            }
+        } finally {
+            $this->flush = true;
+        }
+    }
+
     public function flush(ObjectManager $om): void
     {
         if ($this->flush) {
@@ -539,6 +575,28 @@ class PersistenceManager implements IdentifierResolver
         }
 
         return $this->strategyFor($entityClass)->disableDoctrineEvents($entityClass, $disabledClasses);
+    }
+
+    private function flushBatch(): void
+    {
+        $this->flush = true;
+
+        try {
+            $this->persistScheduled();
+            $this->flushAllStrategies();
+
+            if ($this->callPostPersistCallbacks()) {
+                $this->flushAllStrategies();
+            }
+
+            foreach ($this->strategies as $strategy) {
+                foreach ($strategy->objectManagers() as $om) {
+                    $om->clear();
+                }
+            }
+        } finally {
+            $this->flush = false;
+        }
     }
 
     private function flushAllStrategies(): void
