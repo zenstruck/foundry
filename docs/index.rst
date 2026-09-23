@@ -1766,6 +1766,13 @@ The database is only reset once, and a story belonging to several of the given g
 
     The ability to load several stories or groups at once was added in 2.12.
 
+With Doctrine ORM, the stories are loaded in a single transaction: if one of them fails, none of them is kept in the
+database.
+
+.. versionadded:: 2.14
+
+    Loading the stories in a transaction was added in 2.14.
+
 .. tip::
 
     It is possible to call a story inside another story, by using ``OtherStory::load();``. Because the stories are only

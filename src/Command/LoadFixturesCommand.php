@@ -12,6 +12,9 @@
 namespace Zenstruck\Foundry\Command;
 
 use DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver;
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -21,6 +24,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Zenstruck\Foundry\Persistence\ResetDatabase\BeforeFirstTestResetter;
+use Zenstruck\Foundry\Story;
 use Zenstruck\Foundry\Story\FixtureStoryResolver;
 
 /**
@@ -35,6 +39,7 @@ final class LoadFixturesCommand extends Command
         /** @var iterable<BeforeFirstTestResetter> */
         private iterable $databaseResetters,
         private KernelInterface $kernel,
+        private ?ManagerRegistry $registry = null,
     ) {
         parent::__construct();
     }
@@ -83,6 +88,39 @@ final class LoadFixturesCommand extends Command
             $resolvedStories[$fixtureNameOrGroup] = $this->fixtureStoryResolver->resolve($fixtureNameOrGroup);
         }
 
+        // All the stories are loaded, or none of them: a story failing halfway must not
+        // leave the ones loaded before it in the database.
+        $connections = $this->ormConnections();
+        foreach ($connections as $connection) {
+            $connection->beginTransaction();
+        }
+
+        try {
+            $this->loadStories($io, $resolvedStories);
+        } catch (\Throwable $e) {
+            foreach ($connections as $connection) {
+                if ($connection->isTransactionActive()) {
+                    $connection->rollBack();
+                }
+            }
+
+            throw $e;
+        }
+
+        foreach ($connections as $connection) {
+            $connection->commit();
+        }
+
+        $io->success('Stories successfully loaded!');
+
+        return self::SUCCESS;
+    }
+
+    /**
+     * @param array<string, array<string, class-string<Story>>> $resolvedStories
+     */
+    private function loadStories(SymfonyStyle $io, array $resolvedStories): void
+    {
         $loadedStoryClasses = [];
         foreach ($resolvedStories as $fixtureNameOrGroup => $stories) {
             $fixtureNameOrGroup = (string) $fixtureNameOrGroup;
@@ -108,10 +146,28 @@ final class LoadFixturesCommand extends Command
                 }
             }
         }
+    }
 
-        $io->success('Stories successfully loaded!');
+    /**
+     * The connections of the ORM entity managers, each one once.
+     *
+     * @return list<Connection>
+     */
+    private function ormConnections(): array
+    {
+        if (null === $this->registry) {
+            return [];
+        }
 
-        return self::SUCCESS;
+        $connections = [];
+        foreach ($this->registry->getManagers() as $manager) {
+            if ($manager instanceof EntityManagerInterface) {
+                $connection = $manager->getConnection();
+                $connections[\spl_object_id($connection)] = $connection;
+            }
+        }
+
+        return \array_values($connections);
     }
 
     private function resetDatabase(): void
