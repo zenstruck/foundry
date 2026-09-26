@@ -20,7 +20,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Zenstruck\Foundry\Persistence\PersistenceManager;
 use Zenstruck\Foundry\Persistence\ResetDatabase\BeforeFirstTestResetter;
+use Zenstruck\Foundry\Story;
 use Zenstruck\Foundry\Story\FixtureStoryResolver;
 
 /**
@@ -35,6 +37,7 @@ final class LoadFixturesCommand extends Command
         /** @var iterable<BeforeFirstTestResetter> */
         private iterable $databaseResetters,
         private KernelInterface $kernel,
+        private PersistenceManager $persistenceManager,
     ) {
         parent::__construct();
     }
@@ -83,6 +86,20 @@ final class LoadFixturesCommand extends Command
             $resolvedStories[$fixtureNameOrGroup] = $this->fixtureStoryResolver->resolve($fixtureNameOrGroup);
         }
 
+        // All the stories are loaded, or none of them: a story failing halfway must not
+        // leave the ones loaded before it in the database.
+        $this->persistenceManager->transactional(fn() => $this->loadStories($io, $resolvedStories));
+
+        $io->success('Stories successfully loaded!');
+
+        return self::SUCCESS;
+    }
+
+    /**
+     * @param array<string, array<string, class-string<Story>>> $resolvedStories
+     */
+    private function loadStories(SymfonyStyle $io, array $resolvedStories): void
+    {
         $loadedStoryClasses = [];
         foreach ($resolvedStories as $fixtureNameOrGroup => $stories) {
             $fixtureNameOrGroup = (string) $fixtureNameOrGroup;
@@ -108,10 +125,6 @@ final class LoadFixturesCommand extends Command
                 }
             }
         }
-
-        $io->success('Stories successfully loaded!');
-
-        return self::SUCCESS;
     }
 
     private function resetDatabase(): void

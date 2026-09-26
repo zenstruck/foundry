@@ -143,6 +143,22 @@ class PersistenceManager implements IdentifierResolver
      *
      * @return T
      */
+    public function transactional(callable $callback): mixed
+    {
+        foreach ($this->strategies as $strategy) {
+            $callback = static fn() => $strategy->transactional($callback);
+        }
+
+        return $callback();
+    }
+
+    /**
+     * @template T
+     *
+     * @param callable():T $callback
+     *
+     * @return T
+     */
     public function flushAfter(callable $callback): mixed
     {
         $this->flush = false;

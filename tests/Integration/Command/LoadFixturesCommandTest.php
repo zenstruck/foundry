@@ -172,6 +172,24 @@ final class LoadFixturesCommandTest extends KernelTestCase
      * @test
      */
     #[Test]
+    public function it_does_not_keep_any_story_if_one_of_them_fails(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('This story fails after persisting an entity.');
+
+        try {
+            $this->commandTester(['environment' => 'stories_as_fixtures_with_failure'])
+                ->execute(['name' => ['fixture-story', 'failing-fixture'], '--append' => true]);
+        } finally {
+            // "fixture-story" was loaded before the failure, and "failing-fixture" persisted an entity
+            GenericEntityFactory::assert()->count(0);
+        }
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
     public function it_throws_if_name_collision_between_two_stories_name(): void
     {
         $this->expectException(\LogicException::class);
