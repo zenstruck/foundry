@@ -12,9 +12,6 @@
 namespace Zenstruck\Foundry\Command;
 
 use DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver;
-use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -23,6 +20,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Zenstruck\Foundry\Persistence\PersistenceManager;
 use Zenstruck\Foundry\Persistence\ResetDatabase\BeforeFirstTestResetter;
 use Zenstruck\Foundry\Story;
 use Zenstruck\Foundry\Story\FixtureStoryResolver;
@@ -39,7 +37,7 @@ final class LoadFixturesCommand extends Command
         /** @var iterable<BeforeFirstTestResetter> */
         private iterable $databaseResetters,
         private KernelInterface $kernel,
-        private ?ManagerRegistry $registry = null,
+        private PersistenceManager $persistenceManager,
     ) {
         parent::__construct();
     }
@@ -90,26 +88,7 @@ final class LoadFixturesCommand extends Command
 
         // All the stories are loaded, or none of them: a story failing halfway must not
         // leave the ones loaded before it in the database.
-        $connections = $this->ormConnections();
-        foreach ($connections as $connection) {
-            $connection->beginTransaction();
-        }
-
-        try {
-            $this->loadStories($io, $resolvedStories);
-        } catch (\Throwable $e) {
-            foreach ($connections as $connection) {
-                if ($connection->isTransactionActive()) {
-                    $connection->rollBack();
-                }
-            }
-
-            throw $e;
-        }
-
-        foreach ($connections as $connection) {
-            $connection->commit();
-        }
+        $this->persistenceManager->transactional(fn() => $this->loadStories($io, $resolvedStories));
 
         $io->success('Stories successfully loaded!');
 
@@ -146,28 +125,6 @@ final class LoadFixturesCommand extends Command
                 }
             }
         }
-    }
-
-    /**
-     * The connections of the ORM entity managers, each one once.
-     *
-     * @return list<Connection>
-     */
-    private function ormConnections(): array
-    {
-        if (null === $this->registry) {
-            return [];
-        }
-
-        $connections = [];
-        foreach ($this->registry->getManagers() as $manager) {
-            if ($manager instanceof EntityManagerInterface) {
-                $connection = $manager->getConnection();
-                $connections[\spl_object_id($connection)] = $connection;
-            }
-        }
-
-        return \array_values($connections);
     }
 
     private function resetDatabase(): void

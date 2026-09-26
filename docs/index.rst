@@ -1766,8 +1766,8 @@ The database is only reset once, and a story belonging to several of the given g
 
     The ability to load several stories or groups at once was added in 2.12.
 
-With Doctrine ORM, the stories are loaded in a single transaction: if one of them fails, none of them is kept in the
-database.
+The stories are loaded in a transaction on each Doctrine ORM connection: if one of them fails, none of them is kept in
+the database. MongoDB is not covered, so the documents persisted before the failure are kept.
 
 .. versionadded:: 2.14
 
