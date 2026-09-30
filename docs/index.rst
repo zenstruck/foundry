@@ -1769,9 +1769,15 @@ The database is only reset once, and a story belonging to several of the given g
 The stories are loaded in a transaction on each Doctrine ORM connection: if one of them fails, none of them is kept in
 the database. MongoDB is not covered, so the documents persisted before the failure are kept.
 
+If the transaction is a problem, the ``--no-transaction`` option skips it:
+
+.. code-block:: terminal
+
+    $ php bin/console foundry:load-fixtures category post --no-transaction
+
 .. versionadded:: 2.14
 
-    Loading the stories in a transaction was added in 2.14.
+    Loading the stories in a transaction and the ``--no-transaction`` option were added in 2.14.
 
 .. tip::
 

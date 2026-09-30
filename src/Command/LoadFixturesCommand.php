@@ -47,6 +47,7 @@ final class LoadFixturesCommand extends Command
         $this
             ->addArgument('name', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, "Stories' names or stories groups' names to load.")
             ->addOption('append', 'a', InputOption::VALUE_NONE, 'Skip resetting database and append data to the existing database.')
+            ->addOption('no-transaction', null, InputOption::VALUE_NONE, 'Do not load the stories in a transaction.')
         ;
     }
 
@@ -86,9 +87,13 @@ final class LoadFixturesCommand extends Command
             $resolvedStories[$fixtureNameOrGroup] = $this->fixtureStoryResolver->resolve($fixtureNameOrGroup);
         }
 
-        // All the stories are loaded, or none of them: a story failing halfway must not
-        // leave the ones loaded before it in the database.
-        $this->persistenceManager->transactional(fn() => $this->loadStories($io, $resolvedStories));
+        if ($input->getOption('no-transaction')) {
+            $this->loadStories($io, $resolvedStories);
+        } else {
+            // All the stories are loaded, or none of them: a story failing halfway must not
+            // leave the ones loaded before it in the database.
+            $this->persistenceManager->transactional(fn() => $this->loadStories($io, $resolvedStories));
+        }
 
         $io->success('Stories successfully loaded!');
 
