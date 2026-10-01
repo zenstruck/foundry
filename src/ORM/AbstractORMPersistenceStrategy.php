@@ -36,30 +36,28 @@ abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
             $connections[\spl_object_id($connection)] = $connection;
         }
 
-        $success = false;
+        // the transactions begun here and not committed yet: a connection may already be in an outer
+        // transaction (eg: DAMA), so isTransactionActive() cannot tell which ones are still ours
+        $open = [];
 
         try {
-            foreach ($connections as $connection) {
+            foreach ($connections as $id => $connection) {
                 $connection->beginTransaction();
+                $open[$id] = $connection;
             }
 
             $result = $callback();
 
-            foreach ($connections as $connection) {
+            foreach ($connections as $id => $connection) {
                 $connection->commit();
+                unset($open[$id]);
             }
-
-            $success = true;
 
             return $result;
         } finally {
             // in "finally", so that an error while rolling back doesn't hide the original one
-            if (!$success) {
-                foreach ($connections as $connection) {
-                    if ($connection->isTransactionActive()) {
-                        $connection->rollBack();
-                    }
-                }
+            foreach ($open as $connection) {
+                $connection->rollBack();
             }
         }
     }

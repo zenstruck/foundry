@@ -58,12 +58,40 @@ final class OrmTransactionalTest extends TestCase
         $connection->method('rollBack')->willThrowException(new \LogicException('rollback failed'));
 
         try {
-            $this->strategy($connection)->transactional(static fn() => throw new \RuntimeException('story failed'));
+            $this->strategy($connection)->transactional(self::failingStory());
+            self::fail('The rollback error should have been thrown.');
         } catch (\LogicException $e) {
         }
 
         self::assertSame('rollback failed', $e->getMessage());
         self::assertSame('story failed', $e->getPrevious()?->getMessage());
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function it_only_rolls_back_the_transactions_it_still_has_open(): void
+    {
+        // both connections are already in an outer transaction (eg: DAMA), so they stay
+        // active once their own level is committed
+        $committed = $this->connection(commits: 1, rollBacks: 0);
+        $failing = $this->connection(commits: 1, rollBacks: 1);
+        $failing->method('commit')->willThrowException(new \RuntimeException('commit failed'));
+
+        $this->expectExceptionObject(new \RuntimeException('commit failed'));
+
+        $this->strategy($committed, $failing)->transactional(static fn() => 'result');
+    }
+
+    /**
+     * Typed as returning, so that static analysis does not consider the code after the call dead.
+     *
+     * @return callable():string
+     */
+    private static function failingStory(): callable
+    {
+        return static fn() => throw new \RuntimeException('story failed');
     }
 
     private function strategy(Connection ...$connections): OrmV3PersistenceStrategy
@@ -81,14 +109,13 @@ final class OrmTransactionalTest extends TestCase
         return new OrmV3PersistenceStrategy($registry);
     }
 
-    private function connection(int $commits, int $rollBacks = 0): Connection&MockObject
+    private function connection(int $commits, ?int $rollBacks = null): Connection&MockObject
     {
         $connection = $this->createMock(Connection::class);
         $connection->expects(self::once())->method('beginTransaction');
         $connection->expects(self::exactly($commits))->method('commit');
-        $connection->method('isTransactionActive')->willReturn(true);
 
-        if ($rollBacks > 0) {
+        if (null !== $rollBacks) {
             $connection->expects(self::exactly($rollBacks))->method('rollBack');
         }
 

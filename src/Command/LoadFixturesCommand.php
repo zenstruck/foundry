@@ -90,8 +90,6 @@ final class LoadFixturesCommand extends Command
         if ($input->getOption('no-transaction')) {
             $this->loadStories($io, $resolvedStories);
         } else {
-            // All the stories are loaded, or none of them: a story failing halfway must not
-            // leave the ones loaded before it in the database.
             $this->persistenceManager->transactional(fn() => $this->loadStories($io, $resolvedStories));
         }
 
