@@ -21,7 +21,7 @@ class Language
 {
     public function __construct(
         #[ORM\Id]
-        #[ORM\Column]
+        #[ORM\Column(length: 2)]
         public string $id,
     ) {
     }
