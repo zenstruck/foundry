@@ -28,6 +28,11 @@ use Zenstruck\Foundry\Persistence\PersistenceStrategy;
  */
 final class MongoPersistenceStrategy extends PersistenceStrategy
 {
+    public function transactional(callable $callback): mixed
+    {
+        return $callback();
+    }
+
     public function contains(object $object): bool
     {
         $dm = $this->objectManagerFor($object::class);

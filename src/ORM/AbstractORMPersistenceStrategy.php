@@ -28,6 +28,40 @@ use Zenstruck\Foundry\Persistence\PersistenceStrategy;
  */
 abstract class AbstractORMPersistenceStrategy extends PersistenceStrategy
 {
+    final public function transactional(callable $callback): mixed
+    {
+        $connections = [];
+        foreach ($this->objectManagers() as $om) {
+            $connection = $om->getConnection();
+            $connections[\spl_object_id($connection)] = $connection;
+        }
+
+        // the transactions begun here and not committed yet: a connection may already be in an outer
+        // transaction (eg: DAMA), so isTransactionActive() cannot tell which ones are still ours
+        $open = [];
+
+        try {
+            foreach ($connections as $id => $connection) {
+                $connection->beginTransaction();
+                $open[$id] = $connection;
+            }
+
+            $result = $callback();
+
+            foreach ($connections as $id => $connection) {
+                $connection->commit();
+                unset($open[$id]);
+            }
+
+            return $result;
+        } finally {
+            // in "finally", so that an error while rolling back doesn't hide the original one
+            foreach ($open as $connection) {
+                $connection->rollBack();
+            }
+        }
+    }
+
     final public function contains(object $object): bool
     {
         $em = $this->objectManagerFor($object::class);

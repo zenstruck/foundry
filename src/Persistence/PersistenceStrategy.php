@@ -119,4 +119,15 @@ abstract class PersistenceStrategy
      * @return callable():void
      */
     abstract public function disableDoctrineEvents(string $entityClass, array $disabledClasses): callable;
+
+    /**
+     * Runs the callback in a transaction, when the persistence layer supports it.
+     *
+     * @template T
+     *
+     * @param callable():T $callback
+     *
+     * @return T
+     */
+    abstract public function transactional(callable $callback): mixed;
 }

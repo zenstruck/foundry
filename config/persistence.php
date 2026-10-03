@@ -38,6 +38,7 @@ return static function(ContainerConfigurator $container): void {
             ->arg('$fixtureStoryResolver', service('.zenstruck_foundry.story.fixture_resolver'))
             ->arg('$databaseResetters', tagged_iterator('.foundry.persistence.database_resetter'))
             ->arg('$kernel', service('kernel'))
+            ->arg('$persistenceManager', service('.zenstruck_foundry.persistence_manager'))
             ->tag('console.command', [
                 'command' => 'foundry:load-fixtures|foundry:load-stories|foundry:load-story',
                 'description' => 'Load stories which are marked with #[AsFixture] attribute.',
