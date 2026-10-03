@@ -115,7 +115,7 @@ final class Hydrator
         }
     }
 
-    public static function add(object $object, string $property, mixed $value): void
+    public static function add(object $object, string $property, mixed $value, int|string|null $key = null): void
     {
         $inverseValue = self::get($object, $property);
 
@@ -134,7 +134,12 @@ final class Hydrator
             $inverseValue = \iterator_to_array($inverseValue);
         }
 
-        $inverseValue[] = $value;
+        if (null === $key) {
+            $inverseValue[] = $value;
+        } else {
+            $inverseValue[$key] = $value;
+        }
+
         self::forceSet($object, $property, $inverseValue, catchErrors: true);
     }
 
