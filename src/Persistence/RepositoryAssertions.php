@@ -25,7 +25,7 @@ final class RepositoryAssertions
     /**
      * @internal
      *
-     * @param RepositoryDecorator<object,ObjectRepository<object>> $repository
+     * @param RepositoryDecorator<object> $repository
      */
     public function __construct(private RepositoryDecorator $repository)
     {
