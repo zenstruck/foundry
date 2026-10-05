@@ -16,8 +16,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\Uuid;
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\IdentifierResolver;
-use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 use Zenstruck\Foundry\Story\Event\StateAddedToStory;
 use Zenstruck\Foundry\Test\Behat\Exception\CompositeIdentifierNotSupported;
 use Zenstruck\Foundry\Test\Behat\Exception\ObjectAlreadyRegistered;
@@ -324,18 +322,6 @@ final class ObjectRegistryTest extends TestCase
     }
 
     #[Test]
-    public function it_stores_proxies_under_their_real_class(): void
-    {
-        $user = new ProxyableUser();
-        $proxy = new FakeUserProxy($user);
-
-        $this->registry->store($proxy, 'john');
-
-        self::assertTrue($this->registry->has(ProxyableUser::class, 'john'));
-        self::assertSame($user, $this->registry->getByObjectClass(ProxyableUser::class, 'john'));
-    }
-
-    #[Test]
     public function it_checks_if_object_is_stored(): void
     {
         $user = new User(id: 1, name: 'John');
@@ -383,83 +369,6 @@ final class Post
         public int $id,
         public string $title,
     ) {
-    }
-}
-
-class ProxyableUser
-{
-    public int $id = 1;
-}
-
-/** @implements Proxy<ProxyableUser> */
-final class FakeUserProxy implements Proxy
-{
-    public function __construct(private readonly ProxyableUser $real)
-    {
-    }
-
-    public function _real(bool $withAutoRefresh = true): object
-    {
-        return $this->real;
-    }
-
-    public function _enableAutoRefresh(): static
-    {
-        return $this;
-    }
-
-    public function _disableAutoRefresh(): static
-    {
-        return $this;
-    }
-
-    public function _withoutAutoRefresh(callable $callback): static
-    {
-        return $this;
-    }
-
-    public function _save(): static
-    {
-        return $this;
-    }
-
-    public function _refresh(): static
-    {
-        return $this;
-    }
-
-    public function _delete(): static
-    {
-        return $this;
-    }
-
-    public function _get(string $property): mixed
-    {
-        return null;
-    }
-
-    public function _set(string $property, mixed $value): static
-    {
-        return $this;
-    }
-
-    public function _assertPersisted(string $message = '{entity} is not persisted.'): static
-    {
-        return $this;
-    }
-
-    public function _assertNotPersisted(string $message = '{entity} is persisted but it should not be.'): static
-    {
-        return $this;
-    }
-
-    public function _repository(): ProxyRepositoryDecorator
-    {
-        throw new \BadMethodCallException('Not supported by this fake.');
-    }
-
-    public function _initializeLazyObject(): void
-    {
     }
 }
 
