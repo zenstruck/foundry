@@ -33,6 +33,7 @@ use Zenstruck\Foundry\ORM\ResetDatabase\MigrateDatabaseResetter;
 use Zenstruck\Foundry\ORM\ResetDatabase\OrmResetter;
 use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
 use Zenstruck\Foundry\ORM\ResetDatabase\SchemaDatabaseResetter;
+use Zenstruck\Foundry\Persistence\PersistenceStrategy;
 use Zenstruck\Foundry\Test\Behat\DependencyInjection\BehatServicesCompilerPass;
 
 /**
@@ -215,6 +216,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
         $container->registerForAutoconfiguration(Factory::class)->addTag('foundry.factory');
 
         $container->registerForAutoconfiguration(Story::class)->addTag('foundry.story');
+        $container->registerForAutoconfiguration(PersistenceStrategy::class)->addTag('foundry.persistence_strategy');
 
         $configurator->import('../config/services.php');
 
