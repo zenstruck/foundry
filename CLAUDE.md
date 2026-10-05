@@ -56,8 +56,10 @@ The reset-database suite also honors `DATABASE_RESET_MODE` (`schema`|`migrate`) 
 composer update --working-dir=src/Test/Behat
 
 src/Test/Behat/vendor/bin/phpunit -c src/Test/Behat/phpunit.dist.xml            # unit tests
-src/Test/Behat/vendor/bin/behat -c src/Test/Behat/behat.yml                     # functional tests
-src/Test/Behat/vendor/bin/behat -c src/Test/Behat/behat.yml --profile=<name>    # profiles listed in behat.yml
+src/Test/Behat/vendor/bin/behat -c src/Test/Behat/behat.php                     # functional tests
+src/Test/Behat/vendor/bin/behat -c src/Test/Behat/behat.php --profile=<name>    # profiles listed in behat.php
+# `main-native-dama` additionally needs `--tags='~@skip-with-native-dama'`; the reference
+# invocations for every profile are the `vendor/bin/behat` lines of .github/workflows/behat.yml
 bin/tools/phpstan/vendor/phpstan/phpstan/phpstan analyse -c src/Test/Behat/phpstan.neon
 ```
 

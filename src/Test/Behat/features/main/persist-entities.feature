@@ -47,7 +47,7 @@ Feature: Test persisting entities
       | bar   |
 
   Scenario: Throws if last id is not found (!)
-    When I am on "/orm/update/<foundry:lastId(generic entity)>/bar"
+    When I resolve the last id for "generic entity"
     Then a "RuntimeException" exception should be thrown containing message "objects persisted"
 
   Scenario: Can access an ID from reference
@@ -61,7 +61,7 @@ Feature: Test persisting entities
       | bar   |
 
   Scenario: Throws if the reference is not found (!)
-    When I am on "/orm/update/<foundry:id(generic entity, the object)>/bar"
+    When I resolve the id of "generic entity" named "the object"
     Then an "ObjectNotFound" exception should be thrown containing message "Object \"generic entity the object\" was not found"
 
   Scenario: lastId for a type also sees unnamed entities

@@ -28,7 +28,7 @@
   },
   "require": {
     "php": "^8.1",
-    "behat/behat": "^3.22",
+    "behat/behat": "^3.22 || ^4.0",
     "friends-of-behat/symfony-extension": "^2.0",
     "symfony/config": "^6.4|^7.0",
     "symfony/dependency-injection": "^6.4|^7.0",
@@ -47,14 +47,14 @@
     "doctrine/common": "^3.2.2",
     "doctrine/doctrine-bundle": "^2.10|^3.0",
     "doctrine/orm": "^2.16|^3.0",
-    "friends-of-behat/mink-extension": "^2.0",
+    "friends-of-behat/mink-extension": "^2.7 || ^3.0@alpha",
     "phpunit/phpunit": "^12.5",
     "symfony/dotenv": "^6.4|^7.0",
     "symfony/flex": "^2.10",
     "symfony/framework-bundle": "^6.4|^7.0",
     "symfony/process": "^6.4|^7.0",
     "symfony/uid": "^6.4|^7.0",
-    "yceruto/behat-extension": "^1.0.2"
+    "yceruto/behat-extension": "^1.1"
   },
   "minimum-stability": "dev",
   "prefer-stable": true,

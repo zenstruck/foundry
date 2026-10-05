@@ -45,10 +45,14 @@ final class LoadFixturesListener implements EventSubscriberInterface
         $scenario = $event->getScenario();
         $feature = $event->getFeature();
 
-        $tags = $feature->getTags();
+        // the newer Gherkin modes keep the "@" prefix, the legacy one strips it
+        /** @param list<string> $tags @return list<string> */
+        $bare = static fn(array $tags): array => \array_values(\array_map(static fn(string $tag) => \ltrim($tag, '@'), $tags));
+
+        $tags = $bare($feature->getTags());
 
         if ($scenario instanceof TaggedNodeInterface) {
-            $tags = [...$tags, ...$scenario->getTags()];
+            $tags = [...$tags, ...$bare($scenario->getTags())];
         }
 
         if (!$tags) {
