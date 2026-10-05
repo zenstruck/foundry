@@ -1,12 +1,17 @@
 name: "Backward Compatibility Check"
 
 on:
+  # 3.0 is not tagged yet: on 3.x the check can only compare against a 2.x tag and
+  # report the removals the major release is made of. Re-enable it once 3.0 is out.
   pull_request:
+    branches-ignore: &branches_ignore
+      - 3.x
     paths: &paths
       - .github/workflows/bc-check.yml
       - bin/tools/bc-check/**
       - src/**
   push:
+    branches-ignore: *branches_ignore
     paths: *paths
 
 concurrency:
