@@ -12,7 +12,6 @@
 namespace Zenstruck\Foundry\Persistence;
 
 use Doctrine\Persistence\Mapping\ClassMetadata;
-use Doctrine\Persistence\ObjectRepository;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\Object\Hydrator;
@@ -361,24 +360,6 @@ class PersistenceManager implements IdentifierResolver
     }
 
     /**
-     * @template T of object
-     *
-     * @param class-string<T> $class
-     *
-     * @return ObjectRepository<T>
-     */
-    public function repositoryFor(string $class): ObjectRepository
-    {
-        $strategy = $this->strategyFor($class);
-
-        if (!$strategy instanceof DoctrinePersistenceStrategy) {
-            throw new \LogicException(\sprintf('"%s" does not expose a Doctrine repository for "%s".', $strategy::class, $class));
-        }
-
-        return $strategy->objectManagerFor($class)->getRepository($class);
-    }
-
-    /**
      * @param class-string $parent
      * @param class-string $child
      */
@@ -515,7 +496,11 @@ class PersistenceManager implements IdentifierResolver
                 $strategies = [];
             }
 
-            return 1 === \count($strategies) && $strategies[0] instanceof ORMPersistenceStrategy;
+            // non-Doctrine strategies write nothing DAMA would have to roll back, so they do not
+            // count: what matters is whether the only Doctrine backend in play is the ORM
+            $doctrine = \array_values(\array_filter($strategies, static fn(PersistenceStrategy $s) => $s instanceof DoctrinePersistenceStrategy));
+
+            return 1 === \count($doctrine) && $doctrine[0] instanceof ORMPersistenceStrategy;
         })();
     }
 
@@ -575,7 +560,7 @@ class PersistenceManager implements IdentifierResolver
      *
      * @throws NoPersistenceStrategy if no persistence strategy found
      */
-    private function strategyFor(string $class): PersistenceStrategy
+    public function strategyFor(string $class): PersistenceStrategy
     {
         foreach ($this->strategies as $strategy) {
             if ($strategy->supports($class)) {

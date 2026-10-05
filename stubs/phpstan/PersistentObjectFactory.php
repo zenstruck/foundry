@@ -66,7 +66,7 @@ assertType("list<{$factory}>", UserFactory::new()->many(2)->all());
 
 // methods using repository()
 $repository = UserFactory::repository();
-assertType("Zenstruck\Foundry\Persistence\RepositoryDecorator<UserForPersistentFactory, Doctrine\Persistence\ObjectRepository<UserForPersistentFactory>>", $repository);
+assertType("Zenstruck\Foundry\Persistence\RepositoryDecorator<UserForPersistentFactory>", $repository);
 assertType("UserForPersistentFactory|null", $repository->first());
 assertType('UserForPersistentFactory', $repository->firstOrFail());
 assertType("UserForPersistentFactory|null", $repository->last());
