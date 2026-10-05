@@ -77,7 +77,7 @@ Foundry is a model-factory library for Symfony/Doctrine (ORM + MongoDB ODM). PHP
 
 **Behat subpackage** — `src/Test/Behat/` is a standalone package (own composer.json, vendor, testsuite) subtree-split to `zenstruck/foundry-behat`. It is excluded from the main autoload/classmap and from PHPStan; its `symlink-vendor.sh` symlinks the parent `src/` into its vendor dir, so changes to the main package affect it. It is experimental (no BC promise).
 
-**Upgrade tooling** — `utils/rector/` ships Rector rules for user-facing migrations (v1→v2, 2.7, 2.9 deprecations; configs in `utils/rector/config/`; testsuite: `vendor/bin/phpunit -c phpunit-rector.xml.dist`); `utils/psalm/` is a Psalm plugin. Both are autoloaded from the main package.
+**Upgrade tooling** — `utils/psalm/` is a Psalm plugin, autoloaded from the main package. The Rector rules for user-facing migrations live on `2.x` only: they key on classes 3.0 removed (`PersistentProxyObjectFactory`), so they can neither run nor be tested here.
 
 **Tests layout** — `tests/Unit` (no kernel), `tests/Integration` (kernel + DB), `tests/WebTestCase` (runs first in the suite on purpose), `tests/Fixture` (entities/documents/factories shared by everything, including Behat and maker tests). `tests/Benchmark` is driven by phpbench (`phpbench.json`).
 
