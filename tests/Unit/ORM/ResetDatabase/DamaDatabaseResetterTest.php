@@ -39,9 +39,6 @@ final class DamaDatabaseResetterTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_re_enables_static_connections_when_the_reset_fails(): void
     {

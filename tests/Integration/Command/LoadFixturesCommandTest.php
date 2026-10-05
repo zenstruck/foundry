@@ -154,9 +154,6 @@ final class LoadFixturesCommandTest extends KernelTestCase
         }
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_keeps_the_stories_loaded_before_a_failure_without_transaction(): void
     {
@@ -171,9 +168,6 @@ final class LoadFixturesCommandTest extends KernelTestCase
         }
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_throws_if_name_collision_between_two_stories_name(): void
     {
