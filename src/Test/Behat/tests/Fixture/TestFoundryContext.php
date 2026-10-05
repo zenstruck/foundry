@@ -15,8 +15,10 @@ use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Step\Then;
+use Behat\Step\When;
 use Yceruto\BehatExtension\Context\ExceptionAssertionTrait;
 use Zenstruck\Assert;
+use Zenstruck\Foundry\Test\Behat\HasObjectRegistry;
 
 /**
  * Provides the exception assertion steps alongside the built-in FoundryContext.
@@ -24,6 +26,25 @@ use Zenstruck\Assert;
 final class TestFoundryContext implements Context
 {
     use ExceptionAssertionTrait;
+    use HasObjectRegistry;
+
+    /**
+     * Resolving the placeholder from a step argument would raise inside a transformation. Behat 4
+     * runs transformations through the CallCenter, so an exception caught there leaves the step to
+     * run with a null argument instead of failing -- it cannot be asserted. Calling the registry
+     * from a step keeps the exception in a DefinitionCall, where "(!)" can assert it.
+     */
+    #[When('/^I resolve the last id for "([^"]*)"$/')]
+    public function resolveLastId(string $factoryShortName): void
+    {
+        $this->objectRegistry->lastIdFor($factoryShortName);
+    }
+
+    #[When('/^I resolve the id of "([^"]*)" named "([^"]*)"$/')]
+    public function resolveId(string $factoryShortName, string $objectName): void
+    {
+        $this->objectRegistry->idFor($factoryShortName, $objectName);
+    }
 
     /**
      * The inline argument is resolved by the pattern-based transformation, the PyString by the
