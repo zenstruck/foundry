@@ -45,15 +45,17 @@ final class DamaDatabaseResetter implements OrmResetter
         // disable static connections for this operation
         StaticDriver::setKeepStaticConnections(false);
 
-        $this->decorated->resetBeforeFirstTest($kernel);
+        try {
+            $this->decorated->resetBeforeFirstTest($kernel);
 
-        if (PersistenceManager::isOrmOnly()) {
-            // add global stories so they are available after transaction rollback
-            Configuration::instance()->stories->loadGlobalStories();
+            if (PersistenceManager::isOrmOnly()) {
+                // add global stories so they are available after transaction rollback
+                Configuration::instance()->stories->loadGlobalStories();
+            }
+        } finally {
+            // re-enable static connections, even if the reset failed
+            StaticDriver::setKeepStaticConnections(true);
         }
-
-        // re-enable static connections
-        StaticDriver::setKeepStaticConnections(true);
 
         if (!$kernel instanceof RebootableInterface) {
             throw new \InvalidArgumentException('Kernel should be rebootable to work with DAMADoctrineTestBundle.');

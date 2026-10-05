@@ -1975,6 +1975,35 @@ bundle's configuration:
                             - odm_object_manager_1
                             - odm_object_manager_2
 
+.. _database-reset-failure:
+
+When the Database Reset Fails
+.............................
+
+When Foundry's `PHPUnit Extension`_ is enabled and the database cannot be reset before the first test (for instance,
+because the database server is unreachable or another session prevents the database from being dropped), the test
+suite is stopped with an error message and a non-zero exit code. Running the tests anyway would make them run against
+a database in an unknown state, and PHPUnit would only report the failure as a warning.
+
+To keep running the tests in this case, set the ``exit-on-reset-database-failure`` parameter to ``false``:
+
+.. configuration-block::
+
+    .. code-block:: xml
+
+        <!-- phpunit.xml -->
+        <phpunit>
+            <extensions>
+                <bootstrap class="Zenstruck\Foundry\PHPUnit\FoundryExtension">
+                    <parameter name="exit-on-reset-database-failure" value="false"/>
+                </bootstrap>
+            </extensions>
+        </phpunit>
+
+.. versionadded:: 2.14
+
+    Stopping the test suite when the database reset fails was added in Foundry 2.14.
+
 Resetting using migrations
 ..........................
 
@@ -2817,6 +2846,7 @@ This extension provides the following features:
 
 * :ref:`globally boot Foundry <enable-foundry-in-your-testcase>` (and remove the needs of `Factories` trait)
 * possibility to :ref:`automate the reset database mechanism <automatic-database-reset>`
+* :ref:`stop the test suite <database-reset-failure>` when the database cannot be reset
 * support for the `#[WithStory] Attribute`_
 * ability to use ``Factory::create()`` in `PHPUnit Data Providers`_ (along with PHPUnit ^11.4)
 

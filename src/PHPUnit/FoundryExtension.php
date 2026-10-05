@@ -33,6 +33,7 @@ if (\interface_exists(Runner\Extension\Extension::class)) {
     final class FoundryExtension implements Runner\Extension\Extension
     {
         public const PARAMETER_AUTO_RESET_DATABASE_CLASS = 'enabled-auto-reset';
+        public const PARAMETER_EXIT_ON_RESET_DATABASE_FAILURE = 'exit-on-reset-database-failure';
 
         private static bool $enabled = false;
 
@@ -49,9 +50,12 @@ if (\interface_exists(Runner\Extension\Extension::class)) {
             $autoResetEnabled = $parameters->has(self::PARAMETER_AUTO_RESET_DATABASE_CLASS)
                 && 'true' === $parameters->get(self::PARAMETER_AUTO_RESET_DATABASE_CLASS);
 
+            $exitOnResetDatabaseFailure = !$parameters->has(self::PARAMETER_EXIT_ON_RESET_DATABASE_FAILURE)
+                || 'false' !== $parameters->get(self::PARAMETER_EXIT_ON_RESET_DATABASE_FAILURE);
+
             // ⚠️ order matters within each event
             $subscribers = [
-                Event\TestSuite\Started::class => [new ResetDatabaseOnTestSuiteStarted($autoResetEnabled)],
+                Event\TestSuite\Started::class => [new ResetDatabaseOnTestSuiteStarted($autoResetEnabled, $exitOnResetDatabaseFailure)],
                 Event\Test\DataProviderMethodCalled::class => [new BootFoundryOnDataProviderMethodCalled()],
                 Event\Test\DataProviderMethodFinished::class => [new ShutdownFoundryOnDataProviderMethodFinished()],
                 Event\Test\PreparationStarted::class => [
