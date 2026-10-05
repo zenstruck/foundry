@@ -11,10 +11,6 @@
 
 namespace Zenstruck\Foundry\Persistence;
 
-use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\Persistence\Mapping\ClassMetadata;
-use Doctrine\Persistence\Mapping\MappingException;
-use Doctrine\Persistence\ObjectManager;
 use Zenstruck\Foundry\Persistence\Relationship\RelationshipMetadata;
 
 /**
@@ -24,33 +20,46 @@ use Zenstruck\Foundry\Persistence\Relationship\RelationshipMetadata;
  */
 abstract class PersistenceStrategy
 {
-    public function __construct(protected readonly ManagerRegistry $registry)
-    {
-    }
+    /**
+     * @param class-string $class
+     */
+    abstract public function supports(string $class): bool;
+
+    abstract public function persist(object $object): void;
 
     /**
      * @param class-string $class
      */
-    public function supports(string $class): bool
-    {
-        return (bool) $this->registry->getManagerForClass($class);
-    }
+    abstract public function flush(string $class): void;
+
+    abstract public function flushAll(): void;
+
+    abstract public function remove(object $object): void;
+
+    abstract public function refresh(object $object): void;
+
+    abstract public function detach(object $object): void;
 
     /**
-     * @param class-string $class
+     * @template T of object
+     *
+     * @param class-string<T>      $class
+     * @param array<string, mixed> $id
+     *
+     * @return T|null
      */
-    public function objectManagerFor(string $class): ObjectManager
-    {
-        return $this->registry->getManagerForClass($class) ?? throw new \LogicException(\sprintf('No manager found for "%s".', $class));
-    }
+    abstract public function find(string $class, array $id): ?object;
 
     /**
-     * @return ObjectManager[]
+     * @template T of object
+     *
+     * @param class-string<T>              $class
+     * @param array<string, mixed>         $criteria
+     * @param array<string, string>|null   $orderBy
+     *
+     * @return list<T>
      */
-    public function objectManagers(): array
-    {
-        return $this->registry->getManagers();
-    }
+    abstract public function findBy(string $class, array $criteria, ?array $orderBy = null, ?int $limit = null, ?int $offset = null): array;
 
     /**
      * @param class-string $parent
@@ -59,18 +68,6 @@ abstract class PersistenceStrategy
     public function bidirectionalRelationshipMetadata(string $parent, string $child, string $field): ?RelationshipMetadata
     {
         return null;
-    }
-
-    /**
-     * @template T of object
-     * @param  class-string<T>  $class
-     * @return ClassMetadata<T>
-     *
-     * @throws MappingException If $class is not managed by Doctrine
-     */
-    public function classMetadata(string $class): ClassMetadata
-    {
-        return $this->objectManagerFor($class)->getClassMetadata($class);
     }
 
     /**
