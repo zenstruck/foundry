@@ -210,15 +210,13 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
-     * @return RepositoryDecorator<T,ObjectRepository<T>>
+     * @return RepositoryDecorator<T>
      */
-    public static function repository(): ObjectRepository
+    public static function repository(): RepositoryDecorator
     {
-        if (!Configuration::instance()->isInMemoryEnabled()) {
-            Configuration::instance()->assertPersistenceEnabled();
-        }
+        Configuration::instance()->assertPersistenceEnabled();
 
-        return new RepositoryDecorator(static::class(), Configuration::instance()->isInMemoryEnabled()); // @phpstan-ignore return.type
+        return RepositoryDecorator::for(static::class());
     }
 
     final public static function assert(): RepositoryAssertions
@@ -364,7 +362,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
      */
     public function persistMode(): PersistMode
     {
-        return $this->isPersistenceEnabled() && !$this->isInMemoryEnabled() ? $this->persist : PersistMode::WITHOUT_PERSISTING;
+        return $this->isPersistenceEnabled() ? $this->persist : PersistMode::WITHOUT_PERSISTING;
     }
 
     final public function isPersisting(): bool
@@ -659,9 +657,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     {
         $configuration = Configuration::instance();
 
-        if ($configuration->inADataProvider()
-            && ($this->isPersisting() || $configuration->isInMemoryEnabled())
-        ) {
+        if ($configuration->inADataProvider() && $this->isPersisting()) {
             return $this->createLazyGhost($attributes);
         }
 
@@ -734,12 +730,4 @@ abstract class PersistentObjectFactory extends ObjectFactory
         }
     }
 
-    private function isInMemoryEnabled(): bool
-    {
-        try {
-            return Configuration::instance()->isInMemoryEnabled();
-        } catch (FoundryNotBooted) {
-            return false;
-        }
-    }
 }

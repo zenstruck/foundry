@@ -127,7 +127,12 @@ abstract class CustomPersistenceStrategy extends PersistenceStrategy
         return null;
     }
 
-    final public function bidirectionalRelationshipMetadata(string $parent, string $child, string $field): ?RelationshipMetadata
+    /**
+     * Not final: a backend layered over an existing mapping (the in-memory mode over Doctrine
+     * entities, say) replaces persistence without replacing the mapping, and relations must keep
+     * being wired.
+     */
+    public function bidirectionalRelationshipMetadata(string $parent, string $child, string $field): ?RelationshipMetadata
     {
         return null;
     }
