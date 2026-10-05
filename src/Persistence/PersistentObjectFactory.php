@@ -505,15 +505,11 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
                 $inverseObjects = ProxyGenerator::unwrap($inverseObjects, withAutoRefresh: false);
 
-                // if the collection is indexed by a field, index the array and keep a raw
-                // assignment: going through an adder would lose the keys
-                if ($inverseRelationshipMetadata->collectionIndexedBy) {
-                    $inverseObjects = \array_combine(
-                        \array_map(static fn($o) => get($o, $inverseRelationshipMetadata->collectionIndexedBy), $inverseObjects),
-                        \array_values($inverseObjects)
-                    );
-
-                    Hydrator::forceSet($object, $field, $inverseObjects);
+                // indexed collection: bypass adders, which would lose the keys
+                if ($indexByPath = $inverseRelationshipMetadata->collectionIndexByPath) {
+                    foreach ($inverseObjects as $inverseObject) {
+                        Hydrator::add($object, $field, $inverseObject, self::indexKey($inverseObject, $indexByPath));
+                    }
                 } else {
                     $this->hydrator()->addAll($object, $field, $inverseObjects);
                 }
@@ -524,6 +520,27 @@ abstract class PersistentObjectFactory extends ObjectFactory
         }
 
         return parent::normalizeCollection($field, $collection);
+    }
+
+    /**
+     * Null when the key is not known yet (ie: an auto-generated id not flushed yet).
+     *
+     * @param non-empty-list<string> $indexByPath
+     */
+    private static function indexKey(object $object, array $indexByPath): int|string|null
+    {
+        $key = \array_reduce(
+            $indexByPath,
+            static fn(mixed $value, string $property) => \is_object($value) ? get($value, $property) : null,
+            $object
+        );
+
+        return match (true) {
+            \is_int($key), \is_string($key) => $key,
+            $key instanceof \BackedEnum => $key->value,
+            $key instanceof \Stringable => (string) $key,
+            default => null,
+        };
     }
 
     /**
@@ -557,7 +574,12 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
         if ($inverseRelationship instanceof ManyToOneRelationship && !\in_array($field, $this->skipInverseWiringFields, true)) {
             $this->inverseRelationshipCallbacks[] = static function(object $newObject) use ($object, $inverseRelationship) {
-                Hydrator::add($object, $inverseRelationship->inverseField(), $newObject);
+                Hydrator::add(
+                    $object,
+                    $inverseRelationship->inverseField(),
+                    $newObject,
+                    $inverseRelationship->collectionIndexByPath ? self::indexKey($newObject, $inverseRelationship->collectionIndexByPath) : null
+                );
             };
         }
 

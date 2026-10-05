@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnorePhpunitWarnings;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
@@ -25,6 +26,7 @@ use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\ChangesEntityRelationshipCascadePersist;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\UsingRelationships;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithLifecycleCallback;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\IndexedByJoinColumn;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\IndexedOneToMany;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\InversedOneToOneWithManyToOne;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\InversedOneToOneWithNonNullableOwning;
@@ -174,6 +176,79 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
         $childFactory::assert()->count(1);
 
         self::assertNotNull($parent->getItems()->get('en')); // @phpstan-ignore argument.type
+    }
+
+    /** @test */
+    #[Test]
+    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[UsingRelationships(IndexedOneToMany\Child::class, ['parent'])]
+    #[RequiresPhpunit('>=11.4.0')]
+    #[IgnorePhpunitWarnings(self::DATA_PROVIDER_WARNING_REGEX)]
+    public function indexed_one_to_many_hydrated_from_many_to_one_side(): void
+    {
+        $parentFactory = persistent_factory(IndexedOneToMany\ParentEntity::class);
+        $childFactory = persistent_factory(IndexedOneToMany\Child::class);
+
+        $parent = $parentFactory->create();
+        $child = $childFactory->create(['language' => 'en', 'parent' => $parent]);
+
+        self::assertSame(['en' => $child], $parent->getItems()->toArray());
+    }
+
+    /** @test */
+    #[Test]
+    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[UsingRelationships(IndexedByJoinColumn\Product::class, ['translations'])]
+    #[RequiresPhpunit('>=11.4.0')]
+    #[IgnorePhpunitWarnings(self::DATA_PROVIDER_WARNING_REGEX)]
+    public function one_to_many_indexed_by_join_column(): void
+    {
+        $languageFactory = persistent_factory(IndexedByJoinColumn\Language::class);
+        $ca = $languageFactory->create(['id' => 'ca']);
+        $en = $languageFactory->create(['id' => 'en']);
+
+        $product = persistent_factory(IndexedByJoinColumn\Product::class)->create([
+            'translations' => persistent_factory(IndexedByJoinColumn\ProductTranslation::class)
+                ->sequence([['language' => $ca], ['language' => $en]]),
+        ]);
+
+        self::assertSame(['ca', 'en'], $product->getTranslations()->getKeys());
+        self::assertSame(['ca', 'en'], self::reloadIndexedByJoinColumnProduct($product)->getTranslations()->getKeys());
+    }
+
+    /** @test */
+    #[Test]
+    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[UsingRelationships(IndexedByJoinColumn\ProductTranslation::class, ['product'])]
+    #[RequiresPhpunit('>=11.4.0')]
+    #[IgnorePhpunitWarnings(self::DATA_PROVIDER_WARNING_REGEX)]
+    public function one_to_many_indexed_by_join_column_hydrated_from_many_to_one_side(): void
+    {
+        $language = persistent_factory(IndexedByJoinColumn\Language::class)->create(['id' => 'ca']);
+        $product = persistent_factory(IndexedByJoinColumn\Product::class)->create();
+
+        $translation = persistent_factory(IndexedByJoinColumn\ProductTranslation::class)->create([
+            'product' => $product,
+            'language' => $language,
+        ]);
+
+        self::assertSame(['ca' => $translation], $product->getTranslations()->toArray());
+        self::assertSame(['ca'], self::reloadIndexedByJoinColumnProduct($product)->getTranslations()->getKeys());
+    }
+
+    /**
+     * Ground truth: the keys Doctrine itself gives when loading the collection from the database.
+     */
+    private static function reloadIndexedByJoinColumnProduct(IndexedByJoinColumn\Product $product): IndexedByJoinColumn\Product
+    {
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        \assert($em instanceof EntityManagerInterface);
+        $em->clear();
+
+        $reloaded = $em->find(IndexedByJoinColumn\Product::class, $product->id);
+        \assert($reloaded instanceof IndexedByJoinColumn\Product);
+
+        return $reloaded;
     }
 
     /** @test */

@@ -22,6 +22,8 @@ final class ManyToOneRelationship implements RelationshipMetadata
 {
     public function __construct(
         private readonly string $inverseField,
+        /** @var non-empty-list<string>|null property path of the elements' index key */
+        public readonly ?array $collectionIndexByPath = null,
     ) {
     }
 

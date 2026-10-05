@@ -51,7 +51,7 @@ final class OrmV3PersistenceStrategy extends AbstractORMPersistenceStrategy
         return match (true) {
             $associationMapping instanceof OneToManyAssociationMapping => new OneToManyRelationship(
                 inverseField: $inverseField,
-                collectionIndexedBy: $associationMapping->isIndexed() ? $associationMapping->indexBy() : null
+                collectionIndexByPath: $associationMapping->isIndexed() ? $this->indexByPropertyPath($associationMapping->targetEntity, $associationMapping->indexBy()) : null
             ),
             $associationMapping instanceof OneToOneAssociationMapping => new OneToOneRelationship(
                 inverseField: $inverseField,
@@ -59,9 +59,25 @@ final class OrmV3PersistenceStrategy extends AbstractORMPersistenceStrategy
             ),
             $associationMapping instanceof ManyToOneAssociationMapping => new ManyToOneRelationship(
                 inverseField: $inverseField,
+                collectionIndexByPath: $this->inverseCollectionIndexByPath($associationMapping->targetEntity, $parent, $inverseField),
             ),
             default => null,
         };
+    }
+
+    /**
+     * @param class-string $entityClass
+     * @param class-string $elementClass
+     *
+     * @return non-empty-list<string>|null
+     */
+    private function inverseCollectionIndexByPath(string $entityClass, string $elementClass, string $field): ?array
+    {
+        $associationMapping = $this->objectManagerFor($entityClass)->getClassMetadata($entityClass)->getAssociationMapping($field);
+
+        return $associationMapping instanceof OneToManyAssociationMapping && $associationMapping->isIndexed()
+            ? $this->indexByPropertyPath($elementClass, $associationMapping->indexBy())
+            : null;
     }
 
     /**
