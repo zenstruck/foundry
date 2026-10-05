@@ -16,6 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 use Zenstruck\Foundry\PHPUnit\AttributeReader;
+use Zenstruck\Foundry\PHPUnit\FoundryExtension;
 use Zenstruck\Foundry\PHPUnit\KernelTestCaseHelper;
 
 /**
@@ -26,6 +27,7 @@ final class ResetDatabaseOnTestSuiteStarted implements Event\TestSuite\StartedSu
 {
     public function __construct(
         private readonly bool $autoResetEnabled = false,
+        private readonly bool $exitOnFailure = false,
     ) {
     }
 
@@ -49,9 +51,31 @@ final class ResetDatabaseOnTestSuiteStarted implements Event\TestSuite\StartedSu
             return;
         }
 
-        ResetDatabaseManager::resetBeforeFirstTest(
-            KernelTestCaseHelper::bootKernel($testClassName),
-        );
+        try {
+            ResetDatabaseManager::resetBeforeFirstTest(
+                KernelTestCaseHelper::bootKernel($testClassName),
+            );
+        } catch (\Throwable $e) {
+            if (!$this->exitOnFailure) {
+                throw $e;
+            }
+
+            // PHPUnit would only report a warning and keep running the tests against a database in an unknown state
+            $parameter = FoundryExtension::PARAMETER_EXIT_ON_RESET_DATABASE_FAILURE;
+
+            \fwrite(\STDERR, <<<MESSAGE
+
+
+                Foundry could not reset the database before the first test of "{$testClassName}": the test suite has been stopped.
+
+                {$e}
+
+                Set the "{$parameter}" parameter of the Foundry PHPUnit extension to "false" to run the tests anyway.
+
+                MESSAGE);
+
+            exit(2);
+        }
 
         KernelTestCaseHelper::ensureKernelShutdown($testClassName);
     }

@@ -65,6 +65,10 @@ parameters:
         - identifier: ekinoBannedCode.test
           path: src/Persistence/ResetDatabase/ResetDatabaseManager.php
 
+        # PHPUnit provides no way for an extension to stop the test run
+        - identifier: ekinoBannedCode.expression
+          path: src/PHPUnit/ResetDatabase/ResetDatabaseOnTestSuiteStarted.php
+
         # not relevant for files outside from Foundry's namespace
         - identifier: classConstant.internalClass
           path: config/
