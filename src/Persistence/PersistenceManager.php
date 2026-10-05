@@ -533,7 +533,7 @@ class PersistenceManager implements IdentifierResolver
             throw new \LogicException('withoutDoctrineEvents() cannot be used inside flush_after().');
         }
 
-        return $this->strategyFor($entityClass)->disableDoctrineEvents($entityClass, $disabledClasses);
+        return $this->strategyFor($entityClass)->disablePersistenceEvents($entityClass, $disabledClasses);
     }
 
     private function flushAllStrategies(): void
