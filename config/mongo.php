@@ -21,7 +21,7 @@ return static function(ContainerConfigurator $container): void {
             ->args([
                 service('doctrine_mongodb'),
             ])
-            ->tag('.foundry.persistence_strategy')
+            ->tag('foundry.persistence_strategy')
 
         ->set(MongoResetter::class, MongoSchemaResetter::class)
             ->args([

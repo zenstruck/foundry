@@ -176,7 +176,7 @@ final class ORMPersistenceStrategy extends DoctrinePersistenceStrategy
         );
     }
 
-    public function disableDoctrineEvents(string $entityClass, array $disabledClasses): callable
+    public function disablePersistenceEvents(string $entityClass, array $disabledClasses): callable
     {
         $om = $this->objectManagerFor($entityClass);
 
