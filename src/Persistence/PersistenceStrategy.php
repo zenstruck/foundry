@@ -83,6 +83,15 @@ abstract class PersistenceStrategy
     {
     }
 
+    /**
+     * Whether objects of this strategy can be reset as uninitialized lazy ghosts and refreshed on
+     * access. Defaults to true: every Doctrine strategy supports it.
+     */
+    public function supportsAutoRefresh(): bool
+    {
+        return true;
+    }
+
     abstract public function hasChanges(object $object): bool;
 
     abstract public function contains(object $object): bool;

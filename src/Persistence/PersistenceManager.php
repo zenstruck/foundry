@@ -462,6 +462,15 @@ class PersistenceManager implements IdentifierResolver
         }
     }
 
+    public function supportsAutoRefresh(object $object): bool
+    {
+        try {
+            return $this->strategyFor($object::class)->supportsAutoRefresh();
+        } catch (NoPersistenceStrategy) {
+            return false;
+        }
+    }
+
     public function resetDatabaseManager(): ResetDatabaseManager
     {
         return $this->resetDatabaseManager;
