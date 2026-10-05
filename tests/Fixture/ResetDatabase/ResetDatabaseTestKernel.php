@@ -34,6 +34,19 @@ final class ResetDatabaseTestKernel extends FoundryTestKernel
         }
     }
 
+    public static function migrationFile(): ?string
+    {
+        if (!$file = \getenv('MIGRATION_CONFIGURATION_FILE')) {
+            return null;
+        }
+
+        if (!\file_exists($file)) {
+            throw new \InvalidArgumentException("Migration configuration file \"{$file}\" does not exist.");
+        }
+
+        return $file;
+    }
+
     public static function usesSqlite(): bool
     {
         return \str_starts_with((string) \getenv('DATABASE_URL'), 'sqlite:');
@@ -55,14 +68,14 @@ final class ResetDatabaseTestKernel extends FoundryTestKernel
                         ? [
                             'mode' => ResetDatabaseMode::MIGRATE,
                             'migrations' => [
-                                'configurations' => ($configFile = \getenv('MIGRATION_CONFIGURATION_FILE')) ? [$configFile] : [],
+                                'configurations' => ($configFile = self::migrationFile()) ? [$configFile] : [],
                             ],
                         ]
                         : ['mode' => ResetDatabaseMode::SCHEMA],
             ],
         ]);
 
-        if (FoundryTestKernel::usesMigrations() && !\getenv('MIGRATION_CONFIGURATION_FILE')) {
+        if (FoundryTestKernel::usesMigrations() && !self::migrationFile()) {
             // if no configuration file was given in Foundry's config, let's use the main one as default.
             $c->loadFromExtension(
                 'doctrine_migrations',
