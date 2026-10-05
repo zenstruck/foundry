@@ -17,7 +17,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Zenstruck\Foundry\ORM\OrmV3PersistenceStrategy;
+use Zenstruck\Foundry\ORM\ORMPersistenceStrategy;
 
 final class OrmTransactionalTest extends TestCase
 {
@@ -94,7 +94,7 @@ final class OrmTransactionalTest extends TestCase
         return static fn() => throw new \RuntimeException('story failed');
     }
 
-    private function strategy(Connection ...$connections): OrmV3PersistenceStrategy
+    private function strategy(Connection ...$connections): ORMPersistenceStrategy
     {
         $managers = [];
         foreach ($connections as $connection) {
@@ -106,7 +106,7 @@ final class OrmTransactionalTest extends TestCase
         $registry = $this->createStub(ManagerRegistry::class);
         $registry->method('getManagers')->willReturn($managers);
 
-        return new OrmV3PersistenceStrategy($registry);
+        return new ORMPersistenceStrategy($registry);
     }
 
     private function connection(int $commits, ?int $rollBacks = null): Connection&MockObject
