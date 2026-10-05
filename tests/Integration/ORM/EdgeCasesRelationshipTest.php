@@ -236,21 +236,6 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
         self::assertSame(['ca'], self::reloadIndexedByJoinColumnProduct($product)->getTranslations()->getKeys());
     }
 
-    /**
-     * Ground truth: the keys Doctrine itself gives when loading the collection from the database.
-     */
-    private static function reloadIndexedByJoinColumnProduct(IndexedByJoinColumn\Product $product): IndexedByJoinColumn\Product
-    {
-        $em = self::getContainer()->get(EntityManagerInterface::class);
-        \assert($em instanceof EntityManagerInterface);
-        $em->clear();
-
-        $reloaded = $em->find(IndexedByJoinColumn\Product::class, $product->id);
-        \assert($reloaded instanceof IndexedByJoinColumn\Product);
-
-        return $reloaded;
-    }
-
     /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
@@ -462,5 +447,20 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
         $this->assertCount(2, $inversedSideEntity->getSecondaryRelations());
         MultipleMandatoryRelationshipToSameEntity\OwningSideEntityFactory::assert()->count(4);
         MultipleMandatoryRelationshipToSameEntity\InversedSideEntityFactory::assert()->count(1);
+    }
+
+    /**
+     * Ground truth: the keys Doctrine itself gives when loading the collection from the database.
+     */
+    private static function reloadIndexedByJoinColumnProduct(IndexedByJoinColumn\Product $product): IndexedByJoinColumn\Product
+    {
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        \assert($em instanceof EntityManagerInterface);
+        $em->clear();
+
+        $reloaded = $em->find(IndexedByJoinColumn\Product::class, $product->id);
+        \assert($reloaded instanceof IndexedByJoinColumn\Product);
+
+        return $reloaded;
     }
 }

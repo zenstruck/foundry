@@ -523,27 +523,6 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
-     * Null when the key is not known yet (ie: an auto-generated id not flushed yet).
-     *
-     * @param non-empty-list<string> $indexByPath
-     */
-    private static function indexKey(object $object, array $indexByPath): int|string|null
-    {
-        $key = \array_reduce(
-            $indexByPath,
-            static fn(mixed $value, string $property) => \is_object($value) ? get($value, $property) : null,
-            $object
-        );
-
-        return match (true) {
-            \is_int($key), \is_string($key) => $key,
-            $key instanceof \BackedEnum => $key->value,
-            $key instanceof \Stringable => (string) $key,
-            default => null,
-        };
-    }
-
-    /**
      * This method will try to find entities in database if they are detached.
      *
      * @internal
@@ -663,6 +642,27 @@ abstract class PersistentObjectFactory extends ObjectFactory
                 return false; // don't perform a flush after the hook
             }
         );
+    }
+
+    /**
+     * Null when the key is not known yet (ie: an auto-generated id not flushed yet).
+     *
+     * @param non-empty-list<string> $indexByPath
+     */
+    private static function indexKey(object $object, array $indexByPath): int|string|null
+    {
+        $key = \array_reduce(
+            $indexByPath,
+            static fn(mixed $value, string $property) => \is_object($value) ? get($value, $property) : null,
+            $object
+        );
+
+        return match (true) {
+            \is_int($key), \is_string($key) => $key,
+            $key instanceof \BackedEnum => $key->value,
+            $key instanceof \Stringable => (string) $key,
+            default => null,
+        };
     }
 
     /**
