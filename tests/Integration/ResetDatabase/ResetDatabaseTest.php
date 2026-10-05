@@ -49,8 +49,9 @@ final class ResetDatabaseTest extends KernelTestCase
 
         if (ResetDatabaseTestKernel::usesSqlite()) {
             // Don't know why sqlite always generate those requests with the derived entity ¯\_(ツ)_/¯
+            // (how many of them depends on the dbal version: don't assert on their count)
             self::assertSame(2, $exit, \sprintf('Schema is not valid: %s', $commandOutput = $output->fetch()));
-            self::assertStringContainsString('5 schema diff(s) detected', $commandOutput);
+            self::assertStringContainsString('schema diff(s) detected', $commandOutput);
             self::assertStringContainsString('CREATE TEMPORARY TABLE __temp__edge_case_derived_id_inverse_side', $commandOutput);
             self::assertStringContainsString('DROP TABLE edge_case_derived_id_inverse_side;', $commandOutput);
             self::assertStringContainsString('CREATE TABLE edge_case_derived_id_inverse_side', $commandOutput);
