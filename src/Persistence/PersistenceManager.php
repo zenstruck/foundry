@@ -230,6 +230,13 @@ class PersistenceManager implements IdentifierResolver
      */
     public function reattach(object $object): object
     {
+        if (($reflector = new \ReflectionClass($object))->isUninitializedLazyObject($object)) {
+            // an uninitialized ghost holds no identifier: initializing it lets the
+            // autorefresh initializer fetch the object from the current object manager
+            /** @var T $object */
+            $object = $reflector->initializeLazyObject($object);
+        }
+
         $strategy = $this->strategyFor($object::class);
 
         if ($strategy->contains($object)) {
