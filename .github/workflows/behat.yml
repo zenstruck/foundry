@@ -27,19 +27,14 @@ concurrency:
 
 jobs:
   behat:
-    name: Behat - P:${{ matrix.php }}, S:${{ matrix.symfony }}, B:${{ matrix.behat }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}
+    name: Behat - P:${{ matrix.php }}, S:${{ matrix.symfony }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        php: [ 8.3, 8.5 ]
-        symfony: [ 6.4.*, 7.4.* ]
+        php: [ 8.4, 8.5 ]
+        symfony: [ 8.1.* ]
         deps: [ highest, lowest ]
-        behat: [ '^3.22' ]
-        include:
-          # one Behat 4 permutation rather than a second full axis: it requires PHP >= 8.2, and
-          # mink-extension only has an alpha for it
-          - { php: 8.5, symfony: 7.4.*, deps: highest, behat: '^4.0' }
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -51,18 +46,13 @@ jobs:
           coverage: none
           tools: flex
 
-      - name: Pin Doctrine ORM 2 and its php80 polyfill for the lowest deps
-        if: ${{ matrix.deps == 'lowest' }}
-        run: composer require --dev "doctrine/orm:^2.16" symfony/polyfill-php80:^1.16 --no-update
-
       # install zenstruck/foundry from the checkout instead of Packagist, so the suite runs
       # the branch's code with its dependencies resolved transitively; composer refuses to
       # install a path package inside its own source tree, hence the copy outside of it
       - name: Install zenstruck/foundry from the checkout
         run: |
           rsync -a --exclude=.git --exclude=vendor ../../../ "$RUNNER_TEMP/foundry-checkout/"
-          composer config repositories.foundry "{\"type\": \"path\", \"url\": \"$RUNNER_TEMP/foundry-checkout\", \"options\": {\"versions\": {\"zenstruck/foundry\": \"2.99.0\"}}}"
-          composer require "behat/behat:${{ matrix.behat }}" --no-update --no-interaction
+          composer config repositories.foundry "{\"type\": \"path\", \"url\": \"$RUNNER_TEMP/foundry-checkout\", \"options\": {\"versions\": {\"zenstruck/foundry\": \"3.99.0\"}}}"
 
       - name: Install dependencies
         uses: ramsey/composer-install@v2
@@ -104,19 +94,14 @@ jobs:
         run: vendor/bin/behat --colors -vvv --profile=granular-contexts
 
   phpunit:
-    name: PHPUnit - P:${{ matrix.php }}, S:${{ matrix.symfony }}, B:${{ matrix.behat }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}
+    name: PHPUnit - P:${{ matrix.php }}, S:${{ matrix.symfony }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        php: [ 8.3, 8.5 ]
-        symfony: [ 6.4.*, 7.4.* ]
+        php: [ 8.4, 8.5 ]
+        symfony: [ 8.1.* ]
         deps: [ highest, lowest ]
-        behat: [ '^3.22' ]
-        include:
-          # one Behat 4 permutation rather than a second full axis: it requires PHP >= 8.2, and
-          # mink-extension only has an alpha for it
-          - { php: 8.5, symfony: 7.4.*, deps: highest, behat: '^4.0' }
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -128,18 +113,13 @@ jobs:
           coverage: none
           tools: flex
 
-      - name: Pin Doctrine ORM 2 and its php80 polyfill for the lowest deps
-        if: ${{ matrix.deps == 'lowest' }}
-        run: composer require --dev "doctrine/orm:^2.16" symfony/polyfill-php80:^1.16 --no-update
-
       # install zenstruck/foundry from the checkout instead of Packagist, so the suite runs
       # the branch's code with its dependencies resolved transitively; composer refuses to
       # install a path package inside its own source tree, hence the copy outside of it
       - name: Install zenstruck/foundry from the checkout
         run: |
           rsync -a --exclude=.git --exclude=vendor ../../../ "$RUNNER_TEMP/foundry-checkout/"
-          composer config repositories.foundry "{\"type\": \"path\", \"url\": \"$RUNNER_TEMP/foundry-checkout\", \"options\": {\"versions\": {\"zenstruck/foundry\": \"2.99.0\"}}}"
-          composer require "behat/behat:${{ matrix.behat }}" --no-update --no-interaction
+          composer config repositories.foundry "{\"type\": \"path\", \"url\": \"$RUNNER_TEMP/foundry-checkout\", \"options\": {\"versions\": {\"zenstruck/foundry\": \"3.99.0\"}}}"
 
       - name: Install dependencies
         uses: ramsey/composer-install@v2
@@ -173,8 +153,7 @@ jobs:
       - name: Install zenstruck/foundry from the checkout
         run: |
           rsync -a --exclude=.git --exclude=vendor ../../../ "$RUNNER_TEMP/foundry-checkout/"
-          composer config repositories.foundry "{\"type\": \"path\", \"url\": \"$RUNNER_TEMP/foundry-checkout\", \"options\": {\"versions\": {\"zenstruck/foundry\": \"2.99.0\"}}}"
-          composer require "behat/behat:^4.0" --no-update --no-interaction
+          composer config repositories.foundry "{\"type\": \"path\", \"url\": \"$RUNNER_TEMP/foundry-checkout\", \"options\": {\"versions\": {\"zenstruck/foundry\": \"3.99.0\"}}}"
 
       - name: Install dependencies
         uses: ramsey/composer-install@v2
@@ -182,7 +161,7 @@ jobs:
           working-directory: "src/Test/Behat"
           composer-options: --prefer-dist
         env:
-          SYMFONY_REQUIRE: 7.4.*
+          SYMFONY_REQUIRE: 8.1.*
 
       - name: Install PHPStan
         run: composer bin phpstan install
