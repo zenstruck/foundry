@@ -231,6 +231,36 @@ final class ORMPersistenceStrategy extends PersistenceStrategy
     }
 
     /**
+     * Doctrine accepts as "indexBy" either a field or the join column of a to-one association:
+     * the latter is resolved to the referenced field of the associated entity.
+     *
+     * @param class-string $class
+     *
+     * @return non-empty-list<string>
+     */
+    protected function indexByPropertyPath(string $class, string $indexBy): array
+    {
+        $metadata = $this->objectManagerFor($class)->getClassMetadata($class);
+
+        $association = $metadata->hasField($indexBy) ? null : array_find(
+            $metadata->getAssociationNames(),
+            static fn(string $association) => $metadata->isAssociationWithSingleJoinColumn($association)
+                && $metadata->getSingleAssociationJoinColumnName($association) === $indexBy
+        );
+
+        if (null === $association) {
+            return [$indexBy];
+        }
+
+        $targetClass = $metadata->getAssociationTargetClass($association);
+
+        return [
+            $association,
+            $this->objectManagerFor($targetClass)->getClassMetadata($targetClass)->getFieldForColumn($metadata->getSingleAssociationReferencedJoinColumnName($association)),
+        ];
+    }
+
+    /**
      * @param list<class-string> $disabledClasses
      *
      * @return array<string, list<object>>
@@ -317,36 +347,6 @@ final class ORMPersistenceStrategy extends PersistenceStrategy
         if ([] !== $original) {
             $om->getClassMetadata($entityClass)->entityListeners = $original;
         }
-    }
-
-    /**
-     * Doctrine accepts as "indexBy" either a field or the join column of a to-one association:
-     * the latter is resolved to the referenced field of the associated entity.
-     *
-     * @param class-string $class
-     *
-     * @return non-empty-list<string>
-     */
-    final protected function indexByPropertyPath(string $class, string $indexBy): array
-    {
-        $metadata = $this->objectManagerFor($class)->getClassMetadata($class);
-
-        $association = $metadata->hasField($indexBy) ? null : array_find(
-            $metadata->getAssociationNames(),
-            static fn(string $association) => $metadata->isAssociationWithSingleJoinColumn($association)
-                && $metadata->getSingleAssociationJoinColumnName($association) === $indexBy
-        );
-
-        if (null === $association) {
-            return [$indexBy];
-        }
-
-        $targetClass = $metadata->getAssociationTargetClass($association);
-
-        return [
-            $association,
-            $this->objectManagerFor($targetClass)->getClassMetadata($targetClass)->getFieldForColumn($metadata->getSingleAssociationReferencedJoinColumnName($association)),
-        ];
     }
 
     /**

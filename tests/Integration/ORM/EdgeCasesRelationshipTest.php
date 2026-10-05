@@ -180,7 +180,6 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
         self::assertSame(['en' => $child], $parent->getItems()->toArray());
     }
 
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(IndexedByJoinColumn\Product::class, ['translations'])]
@@ -200,7 +199,6 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
         self::assertSame(['ca', 'en'], self::reloadIndexedByJoinColumnProduct($product)->getTranslations()->getKeys());
     }
 
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(IndexedByJoinColumn\ProductTranslation::class, ['product'])]
@@ -219,7 +217,6 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
         self::assertSame(['ca'], self::reloadIndexedByJoinColumnProduct($product)->getTranslations()->getKeys());
     }
 
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(InversedOneToOneWithManyToOne\InverseSide::class, ['owningSide', 'item'])]

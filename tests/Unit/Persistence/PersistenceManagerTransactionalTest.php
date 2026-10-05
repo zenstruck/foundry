@@ -19,9 +19,6 @@ use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 
 final class PersistenceManagerTransactionalTest extends TestCase
 {
-    /**
-     * @test
-     */
     #[Test]
     public function it_runs_the_callback_once_inside_the_transaction_of_every_strategy(): void
     {

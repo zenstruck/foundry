@@ -21,9 +21,6 @@ use Zenstruck\Foundry\ORM\ORMPersistenceStrategy;
 
 final class OrmTransactionalTest extends TestCase
 {
-    /**
-     * @test
-     */
     #[Test]
     public function it_commits_each_connection_once(): void
     {
@@ -35,9 +32,6 @@ final class OrmTransactionalTest extends TestCase
         self::assertSame('result', $strategy->transactional(static fn() => 'result'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_rolls_back_when_the_callback_fails(): void
     {
@@ -48,9 +42,6 @@ final class OrmTransactionalTest extends TestCase
         $this->strategy($connection)->transactional(static fn() => throw new \RuntimeException('story failed'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_keeps_the_original_error_when_the_rollback_fails(): void
     {
@@ -67,9 +58,6 @@ final class OrmTransactionalTest extends TestCase
         self::assertSame('story failed', $e->getPrevious()?->getMessage());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_only_rolls_back_the_transactions_it_still_has_open(): void
     {
