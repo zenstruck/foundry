@@ -54,7 +54,7 @@ final class OverriddenStepsReplacementTest extends TestCase
     private static function runBehat(array $args): array
     {
         $behatDir = \dirname(__DIR__, 2);
-        $process = new Process([\PHP_BINARY, "{$behatDir}/vendor/bin/behat", '-c', "{$behatDir}/behat.yml", ...$args]);
+        $process = new Process([\PHP_BINARY, "{$behatDir}/vendor/bin/behat", '-c', "{$behatDir}/behat.php", ...$args]);
         $process->run();
 
         return [(int) $process->getExitCode(), $process->getOutput().$process->getErrorOutput()];
