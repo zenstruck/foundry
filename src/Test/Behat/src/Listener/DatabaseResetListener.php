@@ -216,14 +216,34 @@ final class DatabaseResetListener implements EventSubscriberInterface
             return true;
         }
 
-        return $event instanceof BeforeScenarioTested && $event->getFeature()->hasTag(self::NO_RESET_DB_TAG);
+        return $event instanceof BeforeScenarioTested && self::nodeHasTag($event->getFeature(), self::NO_RESET_DB_TAG);
     }
 
     private function hasTag(BeforeFeatureTested|BeforeScenarioTested $event, string $tag): bool
     {
         $node = $event instanceof BeforeFeatureTested ? $event->getFeature() : $event->getScenario();
 
-        return $node instanceof TaggedNodeInterface && $node->hasTag($tag);
+        return $node instanceof TaggedNodeInterface && self::nodeHasTag($node, $tag);
+    }
+
+    /**
+     * Gherkin's legacy compatibility mode strips the "@" from tag names, the newer modes keep it
+     * (GherkinCompatibilityMode::shouldRemoveTagPrefixChar()). The mode is the user's choice, so
+     * compare on the bare name rather than depending on it.
+     */
+    private static function nodeHasTag(TaggedNodeInterface $node, string $tag): bool
+    {
+        return \in_array($tag, self::bareTags($node->getTags()), true);
+    }
+
+    /**
+     * @param list<string> $tags
+     *
+     * @return list<string>
+     */
+    private static function bareTags(array $tags): array
+    {
+        return \array_map(static fn(string $tag) => \ltrim($tag, '@'), $tags);
     }
 
     /**
