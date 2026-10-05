@@ -14,9 +14,10 @@ namespace Zenstruck\Foundry\Persistence;
 use Zenstruck\Foundry\Persistence\Relationship\RelationshipMetadata;
 
 /**
- * @author Kevin Bond <kevinbond@gmail.com>
+ * Extension point for a persistence backend. Non-Doctrine backends should extend
+ * CustomPersistenceStrategy, which answers everything Foundry can default on their behalf.
  *
- * @internal
+ * @author Kevin Bond <kevinbond@gmail.com>
  */
 abstract class PersistenceStrategy
 {
@@ -117,14 +118,14 @@ abstract class PersistenceStrategy
     abstract public function isScheduledForInsert(object $object): bool;
 
     /**
-     * Removes the given Doctrine listeners immediately and returns a restorer closure.
+     * Removes the given lifecycle listeners immediately and returns a restorer closure.
      *
-     * @param class-string       $entityClass
+     * @param class-string       $class
      * @param list<class-string> $disabledClasses [] = disable all, [Foo::class] = disable specific
      *
      * @return callable():void
      */
-    abstract public function disableDoctrineEvents(string $entityClass, array $disabledClasses): callable;
+    abstract public function disablePersistenceEvents(string $class, array $disabledClasses): callable;
 
     /**
      * Runs the callback in a transaction, when the persistence layer supports it.

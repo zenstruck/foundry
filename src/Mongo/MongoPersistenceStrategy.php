@@ -115,7 +115,7 @@ final class MongoPersistenceStrategy extends DoctrinePersistenceStrategy
         return $this->classMetadata($object::class)->getIdentifierValues($object);
     }
 
-    public function disableDoctrineEvents(string $entityClass, array $disabledClasses): callable
+    public function disablePersistenceEvents(string $entityClass, array $disabledClasses): callable
     {
         $eventManager = $this->objectManagerFor($entityClass)->getEventManager();
         $removed = [];
