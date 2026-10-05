@@ -16,7 +16,7 @@ use Doctrine\ODM\MongoDB\Events;
 use Doctrine\ODM\MongoDB\Mapping\MappingException as MongoMappingException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Zenstruck\Foundry\Persistence\InitializeTrackedGhostsBeforeFlushListener;
-use Zenstruck\Foundry\Persistence\PersistenceStrategy;
+use Zenstruck\Foundry\Persistence\DoctrinePersistenceStrategy;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -26,7 +26,7 @@ use Zenstruck\Foundry\Persistence\PersistenceStrategy;
  * @method DocumentManager       objectManagerFor(string $class)
  * @method list<DocumentManager> objectManagers()
  */
-final class MongoPersistenceStrategy extends PersistenceStrategy
+final class MongoPersistenceStrategy extends DoctrinePersistenceStrategy
 {
     public function transactional(callable $callback): mixed
     {
