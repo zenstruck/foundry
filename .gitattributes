@@ -23,6 +23,3 @@
 /stubs                          export-ignore
 /symfony.lock                   export-ignore
 /tests                          export-ignore
-/utils/rector/tests             export-ignore
-/utils/rector/composer.json     export-ignore
-/utils/rector/phpunit.xml.dist  export-ignore
