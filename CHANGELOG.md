@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## [v2.14.0](https://github.com/zenstruck/foundry/releases/tag/v2.14.0)
+
+October 7th, 2026 - [v2.13.0...v2.14.0](https://github.com/zenstruck/foundry/compare/v2.13.0...v2.14.0)
+
+* c8ea565 Actually run the reset-database testsuite in migrate mode (#1186) by @nikophil
+* 7dd9a73 Support Behat 4 in the Behat sub-package (#1182) by @nikophil
+* b3ff36b fix: honor indexBy when wiring inverse collections (#1178) by @nikophil
+* 8e98898 fix: re-enable DAMA static connections and stop the run when the first database reset fails (#1180) by @Amoifr
+* 5c2f469 feat: load the stories of foundry:load-fixtures in a transaction (#1173) by @Amoifr
+* 5508c3a ci: ignore the Psalm AfterExpressionAnalysisInterface in the BC check (#1179) by @nikophil
+* 7d3b7aa Fix the namespace of the persistence helper functions in the docs (#1171) by @Amoifr
+
 ## [v2.13.0](https://github.com/zenstruck/foundry/releases/tag/v2.13.0)
 
 September 17th, 2026 - [v2.12.1...v2.13.0](https://github.com/zenstruck/foundry/compare/v2.12.1...v2.13.0)
