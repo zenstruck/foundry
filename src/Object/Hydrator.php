@@ -117,7 +117,10 @@ final class Hydrator
 
     public static function add(object $object, string $property, mixed $value, int|string|null $key = null): void
     {
-        $inverseValue = self::get($object, $property);
+        $reflectionProperty = self::accessibleProperty($object, $property);
+
+        // an inverse collection the constructor leaves uninitialized starts empty
+        $inverseValue = $reflectionProperty->isInitialized($object) ? $reflectionProperty->getValue($object) : [];
 
         $shouldAdd = match (true) {
             $inverseValue instanceof Collection => !$inverseValue->contains($value),
