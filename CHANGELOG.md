@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [v2.14.1](https://github.com/zenstruck/foundry/releases/tag/v2.14.1)
+
+October 8th, 2026 - [v2.14.0...v2.14.1](https://github.com/zenstruck/foundry/compare/v2.14.0...v2.14.1)
+
+* 73e96d0 fix: wire inverse collections left uninitialized by the constructor (#1187) by @nikophil
+
 ## [v2.14.0](https://github.com/zenstruck/foundry/releases/tag/v2.14.0)
 
 October 7th, 2026 - [v2.13.0...v2.14.0](https://github.com/zenstruck/foundry/compare/v2.13.0...v2.14.0)
