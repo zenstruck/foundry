@@ -1968,7 +1968,7 @@ bundle's configuration:
                         entity_managers:
                             - orm_object_manager_1
                             - orm_object_manager_2
-                        mode: schema # default value, enables resetting the schema with doctrine:schema commands
+                        mode: schema # resets the schema with doctrine:schema commands ("migrate" and "auto" are also available, see below)
                 mongo:
                     reset:
                         document_managers:
@@ -2034,6 +2034,33 @@ files.
                             configurations:
                                 - '%kernel.root_dir%/migrations/configuration.php'
                                 - 'migrations/configuration.yaml'
+
+Resetting using migrations when available
+.........................................
+
+With the ``auto`` *mode*, Foundry resets the database using your migrations if your app has any, and falls back to
+resetting the schema otherwise (for instance if DoctrineMigrationsBundle is not installed or no migrations were
+generated yet). This lets you start with the ``schema`` behavior and switch to migrations without changing the
+configuration. ``migrations.configurations`` cannot be used with this mode: use ``migrate`` instead.
+
+.. configuration-block::
+
+    .. code-block:: yaml
+
+        # config/packages/zenstruck_foundry.yaml
+        when@dev: # see Bundle Configuration section about sharing this in the test environment
+            zenstruck_foundry:
+                orm:
+                    reset:
+                        mode: auto
+
+.. versionadded:: 2.15
+
+    The ``auto`` reset mode was introduced in Foundry 2.15.
+
+.. deprecated:: 2.15
+
+    Not setting ``orm.reset.mode`` is deprecated: it defaults to ``schema`` but will default to ``auto`` in Foundry 3.
 
 Extending reset mechanism
 .........................
@@ -3511,8 +3538,9 @@ Full Default Bundle Configuration
                     # Default:
                     - default
 
-                # Reset mode to use with the reset database mechanism
-                mode:                 schema # One of "schema"; "migrate"
+                # Reset mode to use with the reset database mechanism ("auto" migrates if the app has migrations, otherwise resets the schema)
+                # Not setting it is deprecated: it falls back to "schema" but will default to "auto" in 3.0
+                mode:                 null # One of "schema"; "migrate"; "auto"
                 migrations:
 
                     # Migration configurations

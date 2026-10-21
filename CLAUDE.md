@@ -48,7 +48,7 @@ USE_FOUNDRY_PHPUNIT_EXTENSION="1"
 USE_PHP_84_LAZY_OBJECTS="1"                               # native lazy objects instead of generated proxies
 ```
 
-The reset-database suite also honors `DATABASE_RESET_MODE` (`schema`|`migrate`) and `MIGRATION_CONFIGURATION_FILE` (see README).
+The reset-database suite also honors `DATABASE_RESET_MODE` (`schema`|`migrate`|`auto`, the latter migrating only if doctrine-migrations-bundle is installed) and `MIGRATION_CONFIGURATION_FILE` (see README).
 
 ### Behat sub-package (src/Test/Behat/)
 
