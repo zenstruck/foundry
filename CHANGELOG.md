@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [v2.15.0](https://github.com/zenstruck/foundry/releases/tag/v2.15.0)
+
+October 26th, 2026 - [v2.14.1...v2.15.0](https://github.com/zenstruck/foundry/compare/v2.14.1...v2.15.0)
+
+* 8b46149 feat: `auto` ORM reset mode (#934) by @kbond
+* 0360bae test: don't rely on kernel shutdown leaving cycles uncollected (#1189) by @kbond
+
 ## [v2.14.1](https://github.com/zenstruck/foundry/releases/tag/v2.14.1)
 
 October 8th, 2026 - [v2.14.0...v2.14.1](https://github.com/zenstruck/foundry/compare/v2.14.0...v2.14.1)
