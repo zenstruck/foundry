@@ -25,7 +25,7 @@ return static function(ContainerConfigurator $container): void {
     $container->services()
         ->set('.zenstruck_foundry.persistence_manager', PersistenceManager::class)
             ->args([
-                tagged_iterator('.foundry.persistence_strategy'),
+                tagged_iterator('foundry.persistence_strategy'),
                 service('.zenstruck_foundry.persistence.reset_database_manager'),
             ])
         ->set('.zenstruck_foundry.persistence.reset_database_manager', ResetDatabaseManager::class)

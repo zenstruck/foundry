@@ -78,7 +78,7 @@ jobs:
 
       - name: Clear vendor files
         run: |
-          rm -rf vendor composer.lock
+          rm -rf vendor composer.lock var/cache
 
       - name: Checkout
         uses: actions/checkout@v4

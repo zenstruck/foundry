@@ -11,14 +11,16 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Zenstruck\Foundry\InMemory\InMemoryFactoryRegistry;
+use Zenstruck\Foundry\InMemory\InMemoryPersistenceStrategy;
 use Zenstruck\Foundry\InMemory\InMemoryRepositoryRegistry;
 
 return static function(ContainerConfigurator $container): void {
     $container->services()
-        ->set('.zenstruck_foundry.in_memory.factory_registry', InMemoryFactoryRegistry::class)
-        ->decorate('.zenstruck_foundry.factory_registry')
-        ->arg('$decorated', service('.inner'));
+        ->set('.zenstruck_foundry.in_memory.persistence_strategy', InMemoryPersistenceStrategy::class)
+        ->arg('$registry', service('.zenstruck_foundry.in_memory.repository_registry'))
+        ->arg('$decorated', tagged_iterator('foundry.persistence_strategy'))
+        // shadows the Doctrine strategies while the in-memory mode is on
+        ->tag('foundry.persistence_strategy', ['priority' => 100]);
 
     $container->services()
         ->set('.zenstruck_foundry.in_memory.repository_registry', InMemoryRepositoryRegistry::class)

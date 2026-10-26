@@ -57,13 +57,10 @@ final class AutoRefreshTest extends AutoRefreshTestCase
 
         self::ensureKernelShutdown();
 
-        // kernel shutdown cleared the EM, then one of the generic entities was removed from tracker
-        // all other entities are kept, because they have circular references
-        self::assertSame(7, PersistedObjectsTracker::countObjects());
-
+        // symfony/http-kernel >= 6.4.48/7.4.21 already collects cycles on shutdown
         \gc_collect_cycles();
 
-        // after gc collect, all entities created by ContactFactory are removed from tracker
+        // kernel shutdown cleared the EM: only the generic entity still referenced in current scope is kept
         self::assertSame(1, PersistedObjectsTracker::countObjects());
 
         // refreshing again won't clear the tracked object because a reference still exists in current scope

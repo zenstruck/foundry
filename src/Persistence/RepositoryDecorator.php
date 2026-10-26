@@ -11,41 +11,43 @@
 
 namespace Zenstruck\Foundry\Persistence;
 
-use Doctrine\ORM\EntityRepository;
-use Doctrine\Persistence\ObjectRepository;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Factory;
-use Zenstruck\Foundry\InMemory\InMemoryDoctrineObjectRepositoryAdapter;
 use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @template T of object
- * @template I of ObjectRepository
- * @implements I<T>
  * @implements \IteratorAggregate<array-key, T>
- * @mixin I
  *
  * @phpstan-import-type Parameters from Factory
  */
-class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Countable
+class RepositoryDecorator implements \IteratorAggregate, \Countable
 {
     /**
      * @internal
      *
      * @param class-string<T> $class
      */
-    public function __construct(private string $class, private bool $inMemory = false)
+    public function __construct(protected string $class)
     {
     }
 
     /**
-     * @param mixed[] $arguments
+     * @internal
+     *
+     * @template O of object
+     *
+     * @param class-string<O> $class
+     *
+     * @return self<O>
      */
-    public function __call(string $name, array $arguments): mixed
+    public static function for(string $class): self
     {
-        return $this->inner()->{$name}(...$arguments);
+        return Configuration::instance()->persistence()->strategyFor($class) instanceof DoctrinePersistenceStrategy
+            ? new DoctrineRepositoryDecorator($class)
+            : new self($class);
     }
 
     public function assert(): RepositoryAssertions
@@ -88,7 +90,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
     /**
      * @return T|null
      */
-    public function find($id): ?object
+    public function find(mixed $id): ?object
     {
         if (\is_array($id) && (empty($id) || !\array_is_list($id))) {
             /** @var T|null $object */
@@ -97,14 +99,17 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
             return $object;
         }
 
-        /** @var T|null $object */
-        $object = $this->inner()->find($id);
+        return $this->findByIdentifier($id);
+    }
 
-        if ($object) {
-            Configuration::instance()->persistedObjectsTracker?->add($object);
-        }
-
-        return $object;
+    /**
+     * Looking an object up by a bare identifier needs the backend to know its own identity fields.
+     *
+     * @return T|null
+     */
+    protected function findByIdentifier(mixed $id): ?object
+    {
+        throw new \BadMethodCallException(\sprintf('Looking "%s" up by a bare identifier is not supported by its backend. Pass criteria instead, eg. find([\'id\' => $id]).', $this->class));
     }
 
     /**
@@ -125,15 +130,16 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
 
     /**
      * @param array<string, string>|null $orderBy
-     * @param ?int                       $limit
-     * @param ?int                       $offset
+     * @phpstan-param Parameters $criteria
      * @phpstan-param array<string, 'asc'|'desc'|'ASC'|'DESC'>|null $orderBy
      *
      * @return list<T>
      */
-    public function findBy(array $criteria, ?array $orderBy = null, $limit = null, $offset = null): array
+    public function findBy(array $criteria, ?array $orderBy = null, ?int $limit = null, ?int $offset = null): array
     {
-        $objects = \array_values($this->inner()->findBy($this->normalize($criteria), $orderBy, $limit, $offset));
+        $objects = Configuration::instance()->persistence()
+            ->strategyFor($this->class)
+            ->findBy($this->class, $this->normalize($criteria), $orderBy, $limit, $offset);
 
         Configuration::instance()->persistedObjectsTracker?->add(...$objects);
 
@@ -141,6 +147,8 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
     }
 
     /**
+     * @phpstan-param Parameters $criteria
+     *
      * @return T|null
      */
     public function findOneBy(array $criteria): ?object
@@ -148,6 +156,9 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
         return $this->findBy($criteria, limit: 1)[0] ?? null;
     }
 
+    /**
+     * @return class-string<T>
+     */
     public function getClassName(): string
     {
         return $this->class;
@@ -158,14 +169,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
      */
     public function count(array $criteria = []): int
     {
-        $inner = $this->inner();
-
-        if ($inner instanceof EntityRepository) {
-            // use query to avoid loading all entities
-            return $inner->count($this->normalize($criteria));
-        }
-
-        return \count($this->inner()->findBy($criteria));
+        return \count($this->findBy($criteria));
     }
 
     public function truncate(): void
@@ -246,23 +250,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
 
     public function getIterator(): \Traversable
     {
-        if (\is_iterable($this->inner())) {
-            return yield from $this->inner();
-        }
-
         yield from $this->findAll();
-    }
-
-    /**
-     * @return ObjectRepository<T>
-     */
-    public function inner(): ObjectRepository
-    {
-        if ($this->inMemory) {
-            return new InMemoryDoctrineObjectRepositoryAdapter($this->class);
-        }
-
-        return Configuration::instance()->persistence()->repositoryFor($this->class);
     }
 
     /**
@@ -270,7 +258,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
      *
      * @return Parameters
      */
-    private function normalize(array $criteria): array
+    protected function normalize(array $criteria): array
     {
         $normalized = [];
 
@@ -281,13 +269,6 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
             }
 
             if (!\is_object($value) || null === $embeddableProps = Configuration::instance()->persistence()->embeddablePropertiesFor($value, $this->getClassName())) {
-                $normalized[$key] = $value;
-
-                continue;
-            }
-
-            if ($this->inMemory) {
-                // embeddables should not be expanded in memory
                 $normalized[$key] = $value;
 
                 continue;

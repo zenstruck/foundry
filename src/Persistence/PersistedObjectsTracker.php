@@ -51,14 +51,17 @@ final class PersistedObjectsTracker
     public function add(object ...$objects): void
     {
         foreach ($objects as $object) {
-            // ie: in-memory objects in a kernel without their persistence strategy
-            if (!Configuration::instance()->persistence()->hasPersistenceFor($object)) {
+            $persistence = Configuration::instance()->persistence();
+
+            // ie: in-memory objects in a kernel without their persistence strategy, embeddables, and
+            // backends that cannot lazy-ghost: none of them can be tracked
+            if (!$persistence->hasPersistenceFor($object) || !$persistence->supportsAutoRefresh($object)) {
                 continue;
             }
 
             // a flush could occur once the object is reset as an uninitialized lazy ghost:
             // its object manager must not compute a changeset from it
-            Configuration::instance()->persistence()->registerPreFlushGhostInitializer($object::class);
+            $persistence->registerPreFlushGhostInitializer($object::class);
 
             if (self::$trackedObjects->offsetExists($object) && self::$trackedObjects[$object]) {
                 self::resetObjectAsLazyGhost($object, self::$trackedObjects[$object]);
@@ -66,7 +69,7 @@ final class PersistedObjectsTracker
                 continue;
             }
 
-            self::$trackedObjects[$object] = Configuration::instance()->persistence()->getIdentifierValues($object);
+            self::$trackedObjects[$object] = $persistence->getIdentifierValues($object);
         }
     }
 
