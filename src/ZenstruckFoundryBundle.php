@@ -15,6 +15,7 @@ use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -29,6 +30,7 @@ use Zenstruck\Foundry\Mongo\MongoResetter;
 use Zenstruck\Foundry\Object\Event\Event;
 use Zenstruck\Foundry\Object\Event\HookListenerFilter;
 use Zenstruck\Foundry\Object\Instantiator;
+use Zenstruck\Foundry\ORM\ResetDatabase\AutoDatabaseResetter;
 use Zenstruck\Foundry\ORM\ResetDatabase\MigrateDatabaseResetter;
 use Zenstruck\Foundry\ORM\ResetDatabase\OrmResetter;
 use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
@@ -148,13 +150,14 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                                     ->scalarPrototype()->end()
                                 ->end()
                                 ->enumNode('mode')
-                                    ->info('Reset mode to use with ResetDatabase trait')
-                                    ->defaultValue(ResetDatabaseMode::SCHEMA)
+                                    ->info('Reset mode to use with ResetDatabase trait ("auto" migrates if the app has migrations, otherwise resets the schema)')
+                                    ->defaultNull()
                                     ->beforeNormalization()
                                         ->ifString()
-                                        ->then(static fn(string $mode): ?ResetDatabaseMode => ResetDatabaseMode::tryFrom($mode))
+                                        ->then(static fn(string $mode): ResetDatabaseMode|string => ResetDatabaseMode::tryFrom($mode) ?? $mode)
                                     ->end()
                                     ->values([
+                                        null,
                                         ...ResetDatabaseMode::cases(),
                                         ...\array_column(ResetDatabaseMode::cases(), 'value'),
                                     ])
@@ -181,6 +184,10 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
                                         ->end()
                                     ->end()
                                 ->end()
+                            ->end()
+                            ->validate()
+                                ->ifTrue(static fn(array $reset): bool => ResetDatabaseMode::AUTO === $reset['mode'] && $reset['migrations']['configurations'])
+                                ->thenInvalid('"migrations.configurations" cannot be used with the "auto" reset mode, use "migrate" instead.')
                             ->end()
                         ->end()
                     ->end()
@@ -463,15 +470,32 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
             ->replaceArgument('$managers', $ormConfig['reset']['entity_managers'])
             ->replaceArgument('$connections', $ormConfig['reset']['connections']);
 
-        /** @var ResetDatabaseMode $resetMode */
+        /** @var ResetDatabaseMode|null $resetMode */
         $resetMode = $ormConfig['reset']['mode'];
+
+        if (null === $resetMode) {
+            trigger_deprecation('zenstruck/foundry', '2.15', 'Not setting a value for "zenstruck_foundry.orm.reset.mode" is deprecated. Its default value will change from "schema" to "auto" in 3.0.');
+
+            $resetMode = ResetDatabaseMode::SCHEMA;
+        }
+
+        if (ResetDatabaseMode::SCHEMA === $resetMode && $ormConfig['reset']['migrations']['configurations']) {
+            trigger_deprecation('zenstruck/foundry', '2.15', 'Setting "zenstruck_foundry.orm.reset.migrations.configurations" with the "schema" reset mode is deprecated and will throw in 3.0. These configurations are only used by the "migrate" reset mode.');
+        }
+
         $container->getDefinition(OrmResetter::class)
             ->setClass(
                 match ($resetMode) {
                     ResetDatabaseMode::SCHEMA => SchemaDatabaseResetter::class,
                     ResetDatabaseMode::MIGRATE => MigrateDatabaseResetter::class,
+                    ResetDatabaseMode::AUTO => AutoDatabaseResetter::class,
                 }
             );
+
+        if (ResetDatabaseMode::AUTO === $resetMode) {
+            $container->getDefinition(OrmResetter::class)
+                ->replaceArgument('$dependencyFactory', new Reference('doctrine.migrations.dependency_factory', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+        }
 
         if (ResetDatabaseMode::MIGRATE === $resetMode) {
             $container->getDefinition(OrmResetter::class)

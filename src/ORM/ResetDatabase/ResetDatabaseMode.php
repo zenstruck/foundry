@@ -20,4 +20,5 @@ enum ResetDatabaseMode: string
 {
     case SCHEMA = 'schema';
     case MIGRATE = 'migrate';
+    case AUTO = 'auto';
 }
