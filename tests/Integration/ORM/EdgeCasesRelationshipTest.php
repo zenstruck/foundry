@@ -184,7 +184,6 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(UninitializedOneToMany\Child::class, ['parent'])]
-    #[RequiresPhpunit('>=11.4.0')]
     #[IgnorePhpunitWarnings(self::DATA_PROVIDER_WARNING_REGEX)]
     public function inverse_collection_not_initialized_in_constructor(): void
     {
@@ -195,7 +194,6 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
         self::assertSame([$child], $child->parent->items->toArray());
     }
 
-    /** @test */
     #[Test]
     #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(IndexedByJoinColumn\Product::class, ['translations'])]
