@@ -15,6 +15,7 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Doctrine\ORM\Mapping\FieldMapping;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -49,6 +50,7 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
         'TEXT' => 'self::faker()->text({length}),',
         'TIME_MUTABLE' => 'self::faker()->datetime(),',
         'TIME_IMMUTABLE' => '\DateTimeImmutable::createFromMutable(self::faker()->datetime()),',
+        'ULID' => 'Ulid::fromString(self::faker()->uuid()),',
         'UUID' => 'Uuid::fromString(self::faker()->uuid()),',
     ];
 
@@ -86,6 +88,10 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
 
             $value = "null, // TODO add {$type} type manually";
             $length = $this->extractFieldMappingData($property, 'length', '');
+
+            if ('ULID' === $type) {
+                $makeFactoryData->addUse(Ulid::class);
+            }
 
             if ('UUID' === $type) {
                 $makeFactoryData->addUse(Uuid::class);

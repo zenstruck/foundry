@@ -2,6 +2,7 @@
 
 namespace App\Factory;
 
+use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithUidColumn;
@@ -36,6 +37,7 @@ final class WithUidColumnFactory extends PersistentObjectFactory
     {
         return [
             'guid' => self::faker()->uuid(),
+            'ulid' => Ulid::fromString(self::faker()->uuid()),
             'uuid' => Uuid::fromString(self::faker()->uuid()),
         ];
     }
