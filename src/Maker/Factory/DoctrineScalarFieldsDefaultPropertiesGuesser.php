@@ -52,7 +52,7 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
         'UUID' => 'Uuid::fromString(self::faker()->uuid()),',
     ];
 
-    private const ARRAY_TYPES = ['ARRAY', 'COLLECTION', 'HASH', 'JSON', 'JSONB', 'SIMPLE_ARRAY'];
+    private const ARRAY_TYPES = ['ARRAY', 'COLLECTION', 'HASH', 'JSON', 'JSON_ARRAY', 'JSONB', 'SIMPLE_ARRAY'];
 
     public function __invoke(SymfonyStyle $io, MakeFactoryData $makeFactoryData, MakeFactoryQuery $makeFactoryQuery): void
     {
