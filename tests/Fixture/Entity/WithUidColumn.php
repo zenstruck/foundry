@@ -13,6 +13,7 @@ namespace Zenstruck\Foundry\Tests\Fixture\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
 use Zenstruck\Foundry\Tests\Fixture\Model\Base;
 
@@ -25,10 +26,14 @@ class WithUidColumn extends Base
     #[ORM\Column(type: 'uuid')]
     private Uuid $uuid;
 
-    public function __construct(string $guid, Uuid $uuid)
+    #[ORM\Column(type: 'ulid')]
+    private Ulid $ulid;
+
+    public function __construct(string $guid, Uuid $uuid, Ulid $ulid)
     {
         $this->guid = $guid;
         $this->uuid = $uuid;
+        $this->ulid = $ulid;
     }
 
     public function getGuid(): string
@@ -51,6 +56,18 @@ class WithUidColumn extends Base
     public function setUuid(Uuid $uuid): static
     {
         $this->uuid = $uuid;
+
+        return $this;
+    }
+
+    public function getUlid(): Ulid
+    {
+        return $this->ulid;
+    }
+
+    public function setUlid(Ulid $ulid): static
+    {
+        $this->ulid = $ulid;
 
         return $this;
     }
