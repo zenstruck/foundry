@@ -22,10 +22,12 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Zenstruck\Foundry\Maker\Factory\FactoryGenerator;
 use Zenstruck\Foundry\Tests\Fixture\Document\GenericDocument;
 use Zenstruck\Foundry\Tests\Fixture\Document\WithEmbeddableDocument;
+use Zenstruck\Foundry\Tests\Fixture\Document\WithEnumArraysDocument;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithEmbeddableEntity;
+use Zenstruck\Foundry\Tests\Fixture\Entity\WithEnumArraysEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithUidColumn;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
 use Zenstruck\Foundry\Tests\Fixture\ObjectWithEnum;
@@ -486,6 +488,35 @@ final class MakeFactoryTest extends MakerTestCase
         $tester->execute(['class' => ObjectWithEnum::class, '--no-persistence' => true]);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/ObjectWithEnumFactory.php'));
+    }
+
+    /**
+     * @test
+     * @dataProvider objectsWithEnumArraysProvider
+     */
+    #[Test]
+    #[DataProvider('objectsWithEnumArraysProvider')]
+    public function can_create_factory_with_enum_arrays(string $objectClass, string $objectFactoryName): void
+    {
+        $tester = $this->makeFactoryCommandTester();
+
+        $tester->execute(['class' => $objectClass]);
+
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile("src/Factory/{$objectFactoryName}.php"));
+    }
+
+    /**
+     * @return iterable<string, array{0: string, 1: string}>
+     */
+    public static function objectsWithEnumArraysProvider(): iterable
+    {
+        if (\getenv('DATABASE_URL')) {
+            yield 'orm' => [WithEnumArraysEntity::class, 'WithEnumArraysEntityFactory'];
+        }
+
+        if (\getenv('MONGO_URL')) {
+            yield 'odm' => [WithEnumArraysDocument::class, 'WithEnumArraysDocumentFactory'];
+        }
     }
 
     /**
