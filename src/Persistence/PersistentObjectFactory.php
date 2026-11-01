@@ -643,6 +643,9 @@ abstract class PersistentObjectFactory extends ObjectFactory
         );
     }
 
+    /**
+     * @param \ReflectionClass<object> $class
+     */
     private function getInheritedProperty(\ReflectionClass $class, string $propertyName): \ReflectionProperty
     {
         $originalClassName = $class->getName();

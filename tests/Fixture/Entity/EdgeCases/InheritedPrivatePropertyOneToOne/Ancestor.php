@@ -25,12 +25,12 @@ class Ancestor
     #[ORM\JoinColumn(nullable: true)]
     private ?Other $inverse = null;
 
-    public function setInverse(?Other $inverse)
+    public function setInverse(?Other $inverse): void
     {
         $this->inverse = $inverse;
     }
 
-    public function setOwning(?Other $owning)
+    public function setOwning(?Other $owning): void
     {
         $this->owning = $owning;
     }
