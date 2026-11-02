@@ -52,6 +52,8 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
         'UUID' => 'Uuid::fromString(self::faker()->uuid()),',
     ];
 
+    private const ARRAY_TYPES = ['ARRAY', 'COLLECTION', 'HASH', 'JSON', 'JSON_ARRAY', 'JSONB', 'SIMPLE_ARRAY'];
+
     public function __invoke(SymfonyStyle $io, MakeFactoryData $makeFactoryData, MakeFactoryQuery $makeFactoryQuery): void
     {
         /** @var ODMClassMetadata|ORMClassMetadata $metadata */
@@ -79,7 +81,11 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
 
             $type = \mb_strtoupper($this->extractFieldMappingData($property, 'type'));
             if ($this->extractFieldMappingData($property, 'enumType')) {
-                $makeFactoryData->addEnumDefaultProperty($fieldName, $this->extractFieldMappingData($property, 'enumType'));
+                $makeFactoryData->addEnumDefaultProperty(
+                    $fieldName,
+                    $this->extractFieldMappingData($property, 'enumType'),
+                    isList: \in_array($type, self::ARRAY_TYPES, true),
+                );
 
                 continue;
             }
