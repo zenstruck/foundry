@@ -75,7 +75,7 @@ jobs:
           # disable lazy objects in PHP 8.4
           - {php: 8.4, symfony: 7.4.*, phpunit: 13, database: mysql|mongo, use-phpunit-extension: 1, use-php-84-lazy-objects: 0}
     env:
-      DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || contains(matrix.database, 'sqlite') && 'sqlite:///%kernel.project_dir%/var/data.db' || '' }}
+      DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@127.0.0.1:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || contains(matrix.database, 'sqlite') && 'sqlite:///%kernel.project_dir%/var/data.db' || '' }}
       MONGO_URL: ${{ contains(matrix.database, 'mongo') && 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb' || '' }}
       USE_DAMA_DOCTRINE_TEST_BUNDLE: ${{ contains(matrix.database, 'sql') && matrix.no-dama != 1 && 1 || 0 }}
       USE_FOUNDRY_PHPUNIT_EXTENSION: ${{ matrix.use-phpunit-extension || 0 }}
@@ -83,6 +83,17 @@ jobs:
       PHPUNIT_VERSION: ${{ matrix.phpunit }}
       WITH_LOWEST_DEPENDENCIES: ${{ matrix.deps == 'lowest' && 1 || 0 }}
     services:
+      mysql:
+        image: ${{ contains(matrix.database, 'mysql') && 'mysql:8.0' || '' }}
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -proot"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
       postgres:
         image: ${{ contains(matrix.database, 'pgsql') && 'postgres:15' || '' }}
         env:
@@ -123,10 +134,6 @@ jobs:
           composer-options: --prefer-dist
         env:
           SYMFONY_REQUIRE: ${{ matrix.symfony }}
-      - name: Set up MySQL
-        if: contains(matrix.database, 'mysql')
-        run: sudo /etc/init.d/mysql start
-
       - name: Test
         run: ./phpunit
         shell: bash
@@ -153,7 +160,7 @@ jobs:
           - { database: pgsql, migration-configuration-file: 'migration-configuration-transactional', use-dama: 0, reset-database-mode: migrate, use-phpunit-extension: 1 }
           - { database: pgsql, use-dama: 0, reset-database-mode: auto, use-phpunit-extension: 1 }
     env:
-      DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || 'sqlite:///%kernel.project_dir%/var/data.db' }}
+      DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@127.0.0.1:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || 'sqlite:///%kernel.project_dir%/var/data.db' }}
       MONGO_URL: ${{ contains(matrix.database, 'mongo') && 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb' || '' }}
       USE_DAMA_DOCTRINE_TEST_BUNDLE: ${{ matrix.use-dama == 1 && 1 || 0 }}
       DATABASE_RESET_MODE: ${{ matrix.reset-database-mode }}
@@ -162,6 +169,17 @@ jobs:
       WITH_LOWEST_DEPENDENCIES: ${{ matrix.deps == 'lowest' && 1 || 0 }}
       USE_FOUNDRY_PHPUNIT_EXTENSION: ${{ matrix.use-phpunit-extension }}
     services:
+      mysql:
+        image: ${{ contains(matrix.database, 'mysql') && 'mysql:8.0' || '' }}
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -proot"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
       postgres:
         image: ${{ contains(matrix.database, 'pgsql') && 'postgres:15' || '' }}
         env:
@@ -197,10 +215,6 @@ jobs:
           composer-options: --prefer-dist
         env:
           SYMFONY_REQUIRE: 7.4.*
-
-      - name: Set up MySQL
-        if: contains(matrix.database, 'mysql')
-        run: sudo /etc/init.d/mysql start
 
       - name: Test
         run: |
@@ -256,9 +270,20 @@ jobs:
     name: Test with paratest
     runs-on: ubuntu-latest
     env:
-      DATABASE_URL: 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42'
+      DATABASE_URL: 'mysql://root:root@127.0.0.1:3306/foundry?serverVersion=5.7.42'
       MONGO_URL: 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb'
     services:
+      mysql:
+        image: 'mysql:8.0'
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -proot"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
       mongo:
         image: 'mongo:4'
         ports:
@@ -281,9 +306,6 @@ jobs:
           composer-options: --prefer-dist
         env:
           SYMFONY_REQUIRE: 8.1.*
-
-      - name: Set up MySQL
-        run: sudo /etc/init.d/mysql start
 
       - name: Install paratest
         run: composer require brianium/paratest --dev
