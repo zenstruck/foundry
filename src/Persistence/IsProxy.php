@@ -28,7 +28,8 @@ use Zenstruck\Foundry\Persistence\Exception\ObjectNoLongerExist;
  */
 trait IsProxy // @phpstan-ignore trait.unused
 {
-    private static array $_autoRefresh = [];
+    /** @var \WeakMap<object, bool>|null */
+    private static ?\WeakMap $_autoRefresh = null;
 
     public function _enableAutoRefresh(): static
     {
@@ -161,16 +162,17 @@ trait IsProxy // @phpstan-ignore trait.unused
     {
         $real = $this->initializeLazyObject();
 
-        static::$_autoRefresh[\spl_object_id($real)] ??= true;
+        static::$_autoRefresh ??= new \WeakMap();
 
-        return static::$_autoRefresh[\spl_object_id($real)];
+        return static::$_autoRefresh[$real] ??= true;
     }
 
     private function _setAutoRefresh(bool $autoRefresh): void
     {
         $real = $this->initializeLazyObject();
 
-        static::$_autoRefresh[\spl_object_id($real)] = $autoRefresh;
+        static::$_autoRefresh ??= new \WeakMap();
+        static::$_autoRefresh[$real] = $autoRefresh;
     }
 
     // used in ProxyGenerator
