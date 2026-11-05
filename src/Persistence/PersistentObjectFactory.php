@@ -435,11 +435,10 @@ abstract class PersistentObjectFactory extends ObjectFactory
                     ->reuse(...$this->reusedObjects(), ...$value->reusedObjects())
                     ->withPersistMode(
                         $this->isPersisting() ? PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT : PersistMode::WITHOUT_PERSISTING
-                    )
-                ;
+                    );
 
-                $fieldType = (new \ReflectionClass(static::class()))->getProperty($field)->getType();
-                $inverseFieldType = (new \ReflectionClass($value::class()))->getProperty($inverseField)->getType();
+                $fieldType = $this->getInheritedProperty(new \ReflectionClass(static::class()), $field)->getType();
+                $inverseFieldType = $this->getInheritedProperty(new \ReflectionClass($value::class()), $inverseField)->getType();
 
                 if ($fieldType?->allowsNull()) {
                     $this->inverseRelationshipCallbacks[] = static function(object $object) use ($value, $inverseField, $field) {
@@ -642,6 +641,22 @@ abstract class PersistentObjectFactory extends ObjectFactory
                 return false; // don't perform a flush after the hook
             }
         );
+    }
+
+    /**
+     * @param \ReflectionClass<object> $class
+     */
+    private function getInheritedProperty(\ReflectionClass $class, string $propertyName): \ReflectionProperty
+    {
+        $originalClassName = $class->getName();
+
+        do {
+            if ($class->hasProperty($propertyName)) {
+                return $class->getProperty($propertyName);
+            }
+        } while ($class = $class->getParentClass());
+
+        throw new \ReflectionException(\sprintf('Property %s::%s does not exist', $originalClassName, $propertyName));
     }
 
     /**
