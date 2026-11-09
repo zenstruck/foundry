@@ -19,6 +19,7 @@ use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Object\Hydrator;
+use Zenstruck\Foundry\Object\PropertyLocator;
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\Event\AfterPersist;
 use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
@@ -437,8 +438,8 @@ abstract class PersistentObjectFactory extends ObjectFactory
                         $this->isPersisting() ? PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT : PersistMode::WITHOUT_PERSISTING
                     );
 
-                $fieldType = $this->getInheritedProperty(new \ReflectionClass(static::class()), $field)->getType();
-                $inverseFieldType = $this->getInheritedProperty(new \ReflectionClass($value::class()), $inverseField)->getType();
+                $fieldType = PropertyLocator::find(static::class(), $field)?->getType();
+                $inverseFieldType = PropertyLocator::find($value::class(), $inverseField)?->getType();
 
                 if ($fieldType?->allowsNull()) {
                     $this->inverseRelationshipCallbacks[] = static function(object $object) use ($value, $inverseField, $field) {
@@ -641,22 +642,6 @@ abstract class PersistentObjectFactory extends ObjectFactory
                 return false; // don't perform a flush after the hook
             }
         );
-    }
-
-    /**
-     * @param \ReflectionClass<object> $class
-     */
-    private function getInheritedProperty(\ReflectionClass $class, string $propertyName): \ReflectionProperty
-    {
-        $originalClassName = $class->getName();
-
-        do {
-            if ($class->hasProperty($propertyName)) {
-                return $class->getProperty($propertyName);
-            }
-        } while ($class = $class->getParentClass());
-
-        throw new \ReflectionException(\sprintf('Property %s::%s does not exist', $originalClassName, $propertyName));
     }
 
     /**
