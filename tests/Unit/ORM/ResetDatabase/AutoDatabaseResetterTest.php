@@ -12,7 +12,9 @@
 namespace Zenstruck\Foundry\Tests\Unit\ORM\ResetDatabase;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
 use Doctrine\Migrations\Configuration\Migration\ConfigurationArray;
 use Doctrine\Migrations\DependencyFactory;
@@ -91,7 +93,10 @@ final class AutoDatabaseResetterTest extends TestCase
     {
         return DependencyFactory::fromConnection(
             new ConfigurationArray(['migrations_paths' => ['Zenstruck\Foundry\Tests\Unit\ORM\ResetDatabase\Migrations' => $this->migrationsDirectory]]),
-            new ExistingConnection(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true])),
+            new ExistingConnection(DriverManager::getConnection(
+                ['driver' => 'pdo_sqlite', 'memory' => true],
+                (new Configuration())->setSchemaManagerFactory(new DefaultSchemaManagerFactory()),
+            )),
         );
     }
 
