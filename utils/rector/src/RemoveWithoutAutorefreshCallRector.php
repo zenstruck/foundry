@@ -37,7 +37,7 @@ final class RemoveWithoutAutorefreshCallRector extends AbstractRector
             || !$method->var instanceof Node\Expr\Variable
             || !$this->isName($method->name, '_withoutAutoRefresh')
             || !isset($method->args[0])
-            || $method->args[0] instanceof Node\VariadicPlaceholder
+            || !$method->args[0] instanceof Node\Arg
         ) {
             return null;
         }

@@ -44,7 +44,7 @@ final class RemoveFunctionCallRector extends AbstractRector implements Configura
             }
 
             if ($assign->expr instanceof Node\Expr\FuncCall && !$assign->expr->isFirstClassCallable() && $this->isName($assign->expr, $removeFunctionCall->functionName)) {
-                if (!isset($assign->expr->args[0]) || $assign->expr->args[0] instanceof Node\VariadicPlaceholder) {
+                if (!isset($assign->expr->args[0]) || !$assign->expr->args[0] instanceof Node\Arg) {
                     return null;
                 }
 
