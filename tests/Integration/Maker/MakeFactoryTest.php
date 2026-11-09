@@ -28,6 +28,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithEmbeddableEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithEnumArraysEntity;
+use Zenstruck\Foundry\Tests\Fixture\Entity\WithNestedEmbeddableEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithUidColumn;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
 use Zenstruck\Foundry\Tests\Fixture\ObjectWithEnum;
@@ -461,6 +462,25 @@ final class MakeFactoryTest extends MakerTestCase
 
         $this->assertFileExists(self::tempFile('src/Factory/EmbeddableFactory.php'));
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile("src/Factory/{$objectFactoryName}.php"));
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_create_factory_with_nested_embeddable(): void
+    {
+        if (!\getenv('DATABASE_URL')) {
+            self::markTestSkipped('doctrine/orm not enabled.');
+        }
+
+        $tester = $this->makeFactoryCommandTester();
+
+        $tester->execute(['class' => WithNestedEmbeddableEntity::class, '--all-fields' => true]);
+
+        $this->assertFileExists(self::tempFile('src/Factory/NestedEmbeddableFactory.php'));
+        $this->assertFileExists(self::tempFile('src/Factory/EmbeddableFactory.php'));
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/WithNestedEmbeddableEntityFactory.php'));
     }
 
     /**

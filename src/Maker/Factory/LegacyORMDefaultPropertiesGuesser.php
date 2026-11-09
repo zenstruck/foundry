@@ -73,6 +73,11 @@ final class LegacyORMDefaultPropertiesGuesser extends AbstractDoctrineDefaultPro
     private function guessDefaultValueForEmbedded(SymfonyStyle $io, MakeFactoryData $makeFactoryData, MakeFactoryQuery $makeFactoryQuery, ORMClassMetadata $metadata): void
     {
         foreach ($metadata->embeddedClasses as $fieldName => $item) {
+            if (\str_contains($fieldName, '.')) {
+                // embeddable nested in another embeddable: the factory of the parent embeddable handles it
+                continue;
+            }
+
             $isNullable = $makeFactoryData->getObject()->getProperty($fieldName)->getType()?->allowsNull() ?? true;
 
             if (!$makeFactoryQuery->isAllFields() && $isNullable) {
