@@ -21,6 +21,13 @@ final class StoryRegistry
     /** @var array<string,Story> */
     private static array $globalInstances = [];
 
+    /**
+     * Stories shared by several tests (a class, or the data sets of a test method), innermost scope last.
+     *
+     * @var list<array{scope: string, instances: array<string,Story>}>
+     */
+    private static array $sharedInstances = [];
+
     /** @var array<string,Story> */
     private static array $instances = [];
 
@@ -47,6 +54,12 @@ final class StoryRegistry
             return self::$globalInstances[$class]; // @phpstan-ignore return.type
         }
 
+        foreach (self::$sharedInstances as ['instances' => $instances]) {
+            if (\array_key_exists($class, $instances)) {
+                return $instances[$class]; // @phpstan-ignore return.type
+            }
+        }
+
         if (\array_key_exists($class, self::$instances)) {
             return self::$instances[$class]; // @phpstan-ignore return.type
         }
@@ -67,6 +80,37 @@ final class StoryRegistry
 
         self::$globalInstances = self::$instances;
         self::$instances = [];
+    }
+
+    /**
+     * Loads stories once for all the tests of a scope: they are kept until releaseSharedStories() is called for it.
+     *
+     * @param list<class-string<Story>> $stories
+     */
+    public function loadSharedStories(string $scope, array $stories): void
+    {
+        foreach ($stories as $story) {
+            $this->load($story);
+        }
+
+        self::$sharedInstances[] = ['scope' => $scope, 'instances' => self::$instances];
+        self::$instances = [];
+    }
+
+    /**
+     * @return bool whether the innermost shared stories were the ones of this scope
+     */
+    public static function releaseSharedStories(string $scope): bool
+    {
+        $innermost = \array_key_last(self::$sharedInstances);
+
+        if (null === $innermost || $scope !== self::$sharedInstances[$innermost]['scope']) {
+            return false;
+        }
+
+        \array_pop(self::$sharedInstances);
+
+        return true;
     }
 
     public static function reset(): void
