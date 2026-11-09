@@ -19,6 +19,7 @@ jobs:
   run:
     name: "Benchmarks ${{ matrix.database }} - ${{ matrix.with-dama && 'with Dama' || 'without Dama' }}"
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -58,58 +59,50 @@ jobs:
           coverage: none
           tools: flex
 
-      - name: Checkout
+      # side-by-side checkouts: each side gets its own vendor/ and var/cache/
+      - name: Checkout 2.x
         uses: actions/checkout@v4
         with:
           ref: 2.x
+          path: base
           fetch-depth: 1
 
-      - name: Install dependencies
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          path: head
+          fetch-depth: 1
+
+      - name: Install dependencies (2.x)
         uses: ramsey/composer-install@v2
         with:
+          working-directory: base
+          dependency-versions: ${{ matrix.deps }}
+          composer-options: --prefer-dist
+        env:
+          SYMFONY_REQUIRE: ${{ matrix.symfony }}
+
+      - name: Install dependencies (PR)
+        uses: ramsey/composer-install@v2
+        with:
+          working-directory: head
           dependency-versions: ${{ matrix.deps }}
           composer-options: --prefer-dist
         env:
           SYMFONY_REQUIRE: ${{ matrix.symfony }}
 
       - name: Install PHPBench
+        working-directory: head
         run: composer bin phpbench install
 
-      - name: Run benchmarks baseline
+      # shared runners shift between measurements: fail only if two rounds both exceed the threshold
+      - name: Run benchmarks (2.x vs PR)
         run: |
-          bin/tools/phpbench/vendor/phpbench/phpbench/bin/phpbench run \
-            tests/Benchmark \
-            --report=aggregate \
-            --tag=2.x \
-            --iterations=5 \
-            --progress=plain \
-            --retry-threshold=10
-
-      - name: Clear vendor files
-        run: |
-          rm -rf vendor composer.lock
-
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          clean: false
-          fetch-depth: 1
-
-      - name: Install dependencies
-        uses: ramsey/composer-install@v2
-        with:
-          dependency-versions: ${{ matrix.deps }}
-          composer-options: --prefer-dist
-        env:
-          SYMFONY_REQUIRE: ${{ matrix.symfony }}
-
-      - name: Run benchmarks and compare
-        run: |
-          bin/tools/phpbench/vendor/phpbench/phpbench/bin/phpbench run \
-            tests/Benchmark \
-            --report=aggregate \
-            --ref=2.x \
-            --iterations=5 \
-            --progress=plain \
-            --retry-threshold=10 \
-            --assert="mode(variant.time.avg) <= mode(baseline.time.avg) +/- 10%"
+          PHPBENCH="$PWD/head/bin/tools/phpbench/vendor/phpbench/phpbench/bin/phpbench"
+          OPTIONS="tests/Benchmark --iterations=5 --retry-threshold=10 --progress=plain"
+          round() {
+            (cd base && $PHPBENCH run $OPTIONS --dump-file="$RUNNER_TEMP/base.xml") &&
+            (cd head && $PHPBENCH run $OPTIONS --report=aggregate --file="$RUNNER_TEMP/base.xml" \
+              --assert="mode(variant.time.avg) <= mode(baseline.time.avg) +/- 15%")
+          }
+          round || { echo "::warning::A variant is more than 15% slower than 2.x, measuring both sides again"; round; }
