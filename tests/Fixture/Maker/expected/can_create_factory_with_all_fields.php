@@ -36,14 +36,14 @@ final class GenericEntityFactory extends PersistentObjectFactory
     protected function defaults(): array|callable
     {
         return [
-            'bool' => self::faker()->boolean(),
-            'date' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
-            'dateMutable' => self::faker()->dateTime(),
-            'float' => self::faker()->randomFloat(),
-            'intEnum' => self::faker()->randomElement(IntBackedEnum::cases()),
+            'bool' => self::faker()->optional()->boolean(),
+            'date' => self::faker()->optional()->passthrough(\DateTimeImmutable::createFromMutable(self::faker()->dateTime())),
+            'dateMutable' => self::faker()->optional()->dateTime(),
+            'float' => self::faker()->optional()->randomFloat(),
+            'intEnum' => self::faker()->optional()->randomElement(IntBackedEnum::cases()),
             'prop1' => self::faker()->text(),
             'propInteger' => self::faker()->randomNumber(),
-            'stringEnum' => self::faker()->randomElement(StringBackedEnum::cases()),
+            'stringEnum' => self::faker()->optional()->randomElement(StringBackedEnum::cases()),
         ];
     }
 

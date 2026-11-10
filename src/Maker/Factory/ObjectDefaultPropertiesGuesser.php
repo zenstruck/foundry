@@ -36,11 +36,12 @@ class ObjectDefaultPropertiesGuesser extends AbstractDefaultPropertyGuesser
             }
 
             $type = $this->getPropertyType($property) ?? '';
+            $nullable = $makeFactoryData->acceptsNull($property->getName());
 
             $value = \sprintf('null, // TODO add %svalue manually', $type ? "{$type} " : '');
 
             if (\PHP_VERSION_ID >= 80100 && \enum_exists($type)) {
-                $makeFactoryData->addEnumDefaultProperty($property->getName(), $type);
+                $makeFactoryData->addEnumDefaultProperty($property->getName(), $type, nullable: $nullable);
 
                 continue;
             }
@@ -55,7 +56,7 @@ class ObjectDefaultPropertiesGuesser extends AbstractDefaultPropertyGuesser
                 $value = self::DEFAULTS_FOR_NOT_PERSISTED[$type];
             }
 
-            $makeFactoryData->addDefaultProperty($property->getName(), $value);
+            $makeFactoryData->addDefaultProperty($property->getName(), $value, $nullable);
         }
     }
 
