@@ -30,6 +30,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\WithEmbeddableEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithEnumArraysEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithNestedEmbeddableEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithUidColumn;
+use Zenstruck\Foundry\Tests\Fixture\Maker\Entity\WithJsonbColumn;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
 use Zenstruck\Foundry\Tests\Fixture\ObjectWithEnum;
 use Zenstruck\Foundry\Tests\Fixture\ObjectWithNonWriteable;
@@ -108,6 +109,23 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertStringContainsString('Note: pass --test if you want to generate factories in your tests/ directory', $output);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/WithUidColumnFactory.php'));
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_create_factory_with_jsonb(): void
+    {
+        if (!\getenv('DATABASE_URL')) {
+            self::markTestSkipped('doctrine/orm not enabled.');
+        }
+
+        $tester = $this->makeFactoryCommandTester(['environment' => 'maker_jsonb']);
+
+        $tester->execute(['class' => WithJsonbColumn::class]);
+
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/WithJsonbColumnFactory.php'));
     }
 
     /**
