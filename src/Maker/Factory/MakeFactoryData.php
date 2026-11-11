@@ -177,10 +177,10 @@ final class MakeFactoryData
             'enable_adder_remover_extraction' => false,
         ]);
 
-        return \array_all(
+        return array_all(
             [
                 PropertyLocator::find($this->object->getName(), $propertyName)?->getType(),
-                \array_find(
+                array_find(
                     $this->object->getConstructor()?->getParameters() ?? [],
                     static fn(\ReflectionParameter $parameter): bool => $parameter->getName() === $propertyName,
                 )?->getType(),
@@ -266,7 +266,7 @@ final class MakeFactoryData
     private static function optional(string $defaultValue): string
     {
         if (\str_starts_with($defaultValue, 'self::faker()->')) {
-            return \substr_replace($defaultValue, '->optional()', \strlen('self::faker()'), 0);
+            return \substr_replace($defaultValue, '->optional()', \mb_strlen('self::faker()'), 0);
         }
 
         // the faker call is wrapped in another call: it cannot be made optional by itself
