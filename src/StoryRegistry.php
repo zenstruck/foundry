@@ -54,9 +54,12 @@ final class StoryRegistry
             return self::$globalInstances[$class]; // @phpstan-ignore return.type
         }
 
-        foreach (self::$sharedInstances as ['instances' => $instances]) {
-            if (\array_key_exists($class, $instances)) {
-                return $instances[$class]; // @phpstan-ignore return.type
+        // shared stories live in the database: an in-memory test builds its own
+        if (!Configuration::instance()->isInMemoryEnabled()) {
+            foreach (self::$sharedInstances as ['instances' => $instances]) {
+                if (\array_key_exists($class, $instances)) {
+                    return $instances[$class]; // @phpstan-ignore return.type
+                }
             }
         }
 
@@ -95,6 +98,11 @@ final class StoryRegistry
 
         self::$sharedInstances[] = ['scope' => $scope, 'instances' => self::$instances];
         self::$instances = [];
+    }
+
+    public static function hasSharedStories(string $scope): bool
+    {
+        return \in_array($scope, \array_column(self::$sharedInstances, 'scope'), true);
     }
 
     /**
