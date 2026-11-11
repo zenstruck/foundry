@@ -14,16 +14,20 @@ namespace Zenstruck\Foundry\Tests\Fixture\Stories;
 use Zenstruck\Foundry\Story;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 
+use function Zenstruck\Foundry\faker;
+
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
  */
 final class BuildCountingStory extends Story
 {
     public static int $builds = 0;
+    public static int $firstFakerNumber = 0;
 
     public function build(): void
     {
         ++self::$builds;
+        self::$firstFakerNumber = faker()->randomNumber();
 
         $this->addState('foo', GenericEntityFactory::createOne(['prop1' => 'foo']));
     }

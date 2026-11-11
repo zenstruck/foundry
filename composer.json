@@ -99,12 +99,9 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "repositories": {
-        "dama-local": {
-            "type": "path",
-            "url": "/home/niko/works/github.com/dmaicher/doctrine-test-bundle",
-            "options": {
-                "symlink": true
-            }
+        "dama-savepoint-levels": {
+            "type": "vcs",
+            "url": "https://github.com/nikophil/doctrine-test-bundle"
         }
     }
 }

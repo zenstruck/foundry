@@ -29,7 +29,7 @@ final class ReleaseSharedStoriesOnTestSuiteFinished implements Event\TestSuite\F
 
         // a test might have rolled back the whole static transaction
         if (StaticDriver::getSavepointLevel() > 0) {
-            StaticDriver::releaseSavepoint();
+            StaticDriver::rollBackAndReleaseSavepoint();
         }
     }
 }

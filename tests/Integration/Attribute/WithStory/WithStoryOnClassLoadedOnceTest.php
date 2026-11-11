@@ -20,6 +20,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
 use Zenstruck\Foundry\Attribute\WithStory;
+use Zenstruck\Foundry\FakerAdapter;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\BuildCountingStory;
@@ -27,6 +28,7 @@ use Zenstruck\Foundry\Tests\Fixture\Stories\DataProviderBuildCountingStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\EntityStory;
 use Zenstruck\Foundry\Tests\Fixture\Stories\OtherBuildCountingStory;
 
+use function Zenstruck\Foundry\faker;
 use function Zenstruck\Foundry\Persistence\save;
 
 /**
@@ -41,6 +43,11 @@ use function Zenstruck\Foundry\Persistence\save;
 #[RequiresMethod(StaticDriver::class, 'createSavepoint')]
 final class WithStoryOnClassLoadedOnceTest extends KernelTestCase
 {
+    public static function setUpBeforeClass(): void
+    {
+        BuildCountingStory::$builds = OtherBuildCountingStory::$builds = DataProviderBuildCountingStory::$builds = 0;
+    }
+
     #[Test]
     public function stories_are_built_once_for_the_class(): void
     {
@@ -121,6 +128,15 @@ final class WithStoryOnClassLoadedOnceTest extends KernelTestCase
         self::assertSame(1, BuildCountingStory::$builds);
         GenericEntityFactory::assert()->count(2);
         self::assertSame('foo', BuildCountingStory::get('foo')->getProp1());
+    }
+
+    #[Test]
+    public function stories_are_built_with_the_faker_seed_of_their_scope(): void
+    {
+        FakerAdapter::reset();
+        FakerAdapter::setCurrentTestId(self::class);
+
+        self::assertSame(faker()->randomNumber(), BuildCountingStory::$firstFakerNumber);
     }
 
     /**

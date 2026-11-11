@@ -16,14 +16,14 @@ use PHPUnit\Metadata\Version\ConstraintRequirement;
 use PHPUnit\Runner;
 use PHPUnit\TextUI;
 use Zenstruck\Foundry\Configuration;
-use Zenstruck\Foundry\PHPUnit\SharedStory\LoadSharedStoriesOnTestSuiteStarted;
-use Zenstruck\Foundry\PHPUnit\SharedStory\ReleaseSharedStoriesOnTestSuiteFinished;
 use Zenstruck\Foundry\PHPUnit\DataProvider\BootFoundryOnDataProviderMethodCalled;
 use Zenstruck\Foundry\PHPUnit\DataProvider\DataProviderSubscriberInterface;
 use Zenstruck\Foundry\PHPUnit\DataProvider\ShutdownFoundryOnDataProviderMethodFinished;
 use Zenstruck\Foundry\PHPUnit\DataProvider\TriggerDataProviderPersistenceOnTestPrepared;
 use Zenstruck\Foundry\PHPUnit\ResetDatabase\ResetDatabaseOnPreparationStarted;
 use Zenstruck\Foundry\PHPUnit\ResetDatabase\ResetDatabaseOnTestSuiteStarted;
+use Zenstruck\Foundry\PHPUnit\SharedStory\LoadSharedStoriesOnPreparationStarted;
+use Zenstruck\Foundry\PHPUnit\SharedStory\ReleaseSharedStoriesOnTestSuiteFinished;
 
 /**
  * @internal
@@ -54,14 +54,12 @@ final class FoundryExtension implements Runner\Extension\Extension
 
         // ⚠️ order matters within each event
         $subscribers = [
-            Event\TestSuite\Started::class => [
-                new ResetDatabaseOnTestSuiteStarted($autoResetEnabled, $exitOnResetDatabaseFailure),
-                new LoadSharedStoriesOnTestSuiteStarted(),
-            ],
+            Event\TestSuite\Started::class => [new ResetDatabaseOnTestSuiteStarted($autoResetEnabled, $exitOnResetDatabaseFailure)],
             Event\TestSuite\Finished::class => [new ReleaseSharedStoriesOnTestSuiteFinished()],
             Event\Test\DataProviderMethodCalled::class => [new BootFoundryOnDataProviderMethodCalled()],
             Event\Test\DataProviderMethodFinished::class => [new ShutdownFoundryOnDataProviderMethodFinished()],
             Event\Test\PreparationStarted::class => [
+                new LoadSharedStoriesOnPreparationStarted(),
                 new BootFoundryOnPreparationStarted(),
                 new ResetDatabaseOnPreparationStarted($autoResetEnabled),
                 new EnableInMemoryOnPreparationStarted(),
