@@ -13,6 +13,7 @@ namespace Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\MappingException;
+use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -27,6 +28,8 @@ use Zenstruck\Foundry\Persistence\PersistenceManager;
  * Hack into PHPUnit data provider mechanism to change the cascade persist behavior of Doctrine relationship:
  * - each test declares which relationship it uses, thanks to UsingRelationships attribute
  * - the data provider provides all possible combinations of relationships to change the cascade persist behavior
+ * - a #[Before] hook consumes the provided data, not the test method: #[DataProvider] needs "false"
+ *   as second argument ($validateArgumentCount), otherwise PHPUnit warns about unused arguments
  * - the listener {@see ChangeCascadePersistOnLoadClassMetadataListener} is used to change the cascade persist behavior
  *   before each test, thanks to "onLoadMetadata" doctrine event.
  *
@@ -60,18 +63,24 @@ trait ChangesEntityRelationshipCascadePersist
             return;
         }
 
-        $usingRelationshipsAttributes = $testMethod->getAttributes(DataProvider::class);
-        if (1 !== \count($usingRelationshipsAttributes) || 'provideCascadeRelationshipsCombinations' !== $usingRelationshipsAttributes[0]->newInstance()->methodName()) {
-            throw new \LogicException(\sprintf('When using attribute "%s", you must use "provideCascadeRelationshipsCombinations" as unique a data provider.', UsingRelationships::class));
+        $dataProviderAttributes = $testMethod->getAttributes(DataProvider::class);
+        if (1 !== \count($dataProviderAttributes) || 'provideCascadeRelationshipsCombinations' !== $dataProviderAttributes[0]->newInstance()->methodName()) {
+            throw new \LogicException(\sprintf('When using attribute "%s", "provideCascadeRelationshipsCombinations" must be the only data provider.', UsingRelationships::class));
         }
 
         /** @var ChangeCascadePersistOnLoadClassMetadataListener $changeCascadePersistListener */
         $changeCascadePersistListener = self::getContainer()->get(ChangeCascadePersistOnLoadClassMetadataListener::class);
         $changeCascadePersistListener->withMetadata(\array_values($this->providedData())); // @phpstan-ignore method.internal
 
-        /** @var CacheItemPoolInterface $doctrineMetadataCache */
-        $doctrineMetadataCache = self::getContainer()->get('doctrine.orm.default_metadata_cache');
-        $doctrineMetadataCache->clear();
+        self::clearDoctrineMetadataCache();
+    }
+
+    // DAMA's metadata cache is static: without this, the next tests would inherit the changed mapping.
+    // Priority 1 makes it run before tearDown() shuts the kernel down.
+    #[After(1)]
+    public function restoreCascadePersistMetadata(): void
+    {
+        self::clearDoctrineMetadataCache();
     }
 
     /**
@@ -79,14 +88,6 @@ trait ChangesEntityRelationshipCascadePersist
      */
     public static function provideCascadeRelationshipsCombinations(): iterable
     {
-        // paratest does not still provide option --do-not-fail-on-phpunit-warning
-        // so we need to skip all relationships permutations for paratest
-        if (isset($_ENV['PARATEST'])) {
-            yield []; // @phpstan-ignore generator.valueType
-
-            return;
-        }
-
         if (!\getenv('DATABASE_URL') || !self::$methodName) {
             // data providers are resolved before #[RequiresEnvironmentVariable] is checked
             yield []; // @phpstan-ignore generator.valueType
@@ -104,7 +105,7 @@ trait ChangesEntityRelationshipCascadePersist
         foreach ($attributes as $attribute) {
             /** @var UsingRelationships $attributeInstance */
             $attributeInstance = $attribute->newInstance();
-            $relationshipsToChange[$attributeInstance->class] = $attributeInstance->relationShips;
+            $relationshipsToChange[$attributeInstance->class] = $attributeInstance->relationships;
         }
 
         /** @var PersistenceManager $persistenceManager */
@@ -125,17 +126,17 @@ trait ChangesEntityRelationshipCascadePersist
                     throw new \LogicException(\sprintf("Wrong parameters for attribute \"%s\". Association \"{$class}::\${$field}\" does not exist.", UsingRelationships::class));
                 }
 
-                $relationshipFields[] = ['class' => $association['sourceEntity'], 'field' => $association['fieldName'], 'isOneToMany' => ClassMetadata::ONE_TO_MANY === $association['type']];
+                $relationshipFields["{$association['sourceEntity']}::{$association['fieldName']}"] = ['class' => $association['sourceEntity'], 'field' => $association['fieldName'], 'isOneToMany' => ClassMetadata::ONE_TO_MANY === $association['type']];
                 if ($association['inversedBy'] ?? $association['mappedBy'] ?? null) {
                     /** @var ClassMetadata<object> $metadataTargetEntity */
                     $metadataTargetEntity = $persistenceManager->metadataFor($association['targetEntity']); // @phpstan-ignore argument.templateType
                     $associationTargetEntity = $metadataTargetEntity->getAssociationMapping($association['inversedBy'] ?? $association['mappedBy']);
-                    $relationshipFields[] = ['class' => $associationTargetEntity['sourceEntity'], 'field' => $associationTargetEntity['fieldName'], 'isOneToMany' => ClassMetadata::ONE_TO_MANY === $associationTargetEntity['type']];
+                    $relationshipFields["{$associationTargetEntity['sourceEntity']}::{$associationTargetEntity['fieldName']}"] = ['class' => $associationTargetEntity['sourceEntity'], 'field' => $associationTargetEntity['fieldName'], 'isOneToMany' => ClassMetadata::ONE_TO_MANY === $associationTargetEntity['type']];
                 }
             }
         }
 
-        yield from DoctrineCascadeRelationshipMetadata::allCombinations($relationshipFields);
+        yield from DoctrineCascadeRelationshipMetadata::allCombinations(\array_values($relationshipFields));
 
         Configuration::shutdown();
         static::ensureKernelShutdown();
@@ -144,5 +145,12 @@ trait ChangesEntityRelationshipCascadePersist
     public static function setCurrentProvidedMethodName(string $methodName): void
     {
         self::$methodName = $methodName;
+    }
+
+    private static function clearDoctrineMetadataCache(): void
+    {
+        /** @var CacheItemPoolInterface $doctrineMetadataCache */
+        $doctrineMetadataCache = self::getContainer()->get('doctrine.orm.default_metadata_cache');
+        $doctrineMetadataCache->clear();
     }
 }

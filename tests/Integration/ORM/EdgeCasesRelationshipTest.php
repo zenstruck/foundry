@@ -14,7 +14,6 @@ namespace Zenstruck\Foundry\Tests\Integration\ORM;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\IgnorePhpunitWarnings;
 use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -51,14 +50,9 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
 {
     use ChangesEntityRelationshipCascadePersist;
 
-    // Because we're handling the provided data manually in a #[Before] method,
-    // PHPUnit triggers a warning, which we ignore with #[IgnorePhpunitWarnings]
-    public const DATA_PROVIDER_WARNING_REGEX = 'Data set "(.)*" provided by Zenstruck(.)*::provideCascadeRelationshipsCombinations has more arguments \(\d\) than the test method accepts \(0\)';
-
     #[Test]
-    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[DataProvider('provideCascadeRelationshipsCombinations', false)]
     #[UsingRelationships(RichDomainMandatoryRelationship\OwningSide::class, ['main'])]
-    #[IgnorePhpunitWarnings(self::DATA_PROVIDER_WARNING_REGEX)]
     public function inversed_relationship_mandatory(): void
     {
         $owningSideEntityFactory = persistent_factory(RichDomainMandatoryRelationship\OwningSide::class);
@@ -74,9 +68,8 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
     }
 
     #[Test]
-    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[DataProvider('provideCascadeRelationshipsCombinations', false)]
     #[UsingRelationships(InversedOneToOneWithNonNullableOwning\OwningSide::class, ['inverseSide'])]
-    #[IgnorePhpunitWarnings(self::DATA_PROVIDER_WARNING_REGEX)]
     public function inverse_one_to_one_with_non_nullable_inverse_side(): void
     {
         $owningSideFactory = persistent_factory(InversedOneToOneWithNonNullableOwning\OwningSide::class);
@@ -91,9 +84,8 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
     }
 
     #[Test]
-    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[DataProvider('provideCascadeRelationshipsCombinations', false)]
     #[UsingRelationships(InversedOneToOneWithSetter\OwningSide::class, ['inverseSide'])]
-    #[IgnorePhpunitWarnings(self::DATA_PROVIDER_WARNING_REGEX)]
     public function inverse_one_to_one_with_both_nullable(): void
     {
         $owningSideFactory = persistent_factory(InversedOneToOneWithSetter\OwningSide::class);
@@ -108,10 +100,9 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
     }
 
     #[Test]
-    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[DataProvider('provideCascadeRelationshipsCombinations', false)]
     #[UsingRelationships(InversedOneToOneWithOneToMany\OwningSide::class, ['inverseSide'])]
     #[UsingRelationships(InversedOneToOneWithOneToMany\Item::class, ['owningSide'])]
-    #[IgnorePhpunitWarnings(self::DATA_PROVIDER_WARNING_REGEX)]
     public function inverse_one_to_one_with_one_to_many(): void
     {
         $inverseSideFactory = persistent_factory(InversedOneToOneWithOneToMany\InverseSide::class);
@@ -147,9 +138,8 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
     }
 
     #[Test]
-    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[DataProvider('provideCascadeRelationshipsCombinations', false)]
     #[UsingRelationships(IndexedOneToMany\ParentEntity::class, ['items'])]
-    #[IgnorePhpunitWarnings(self::DATA_PROVIDER_WARNING_REGEX)]
     public function indexed_one_to_many(): void
     {
         $parentFactory = persistent_factory(IndexedOneToMany\ParentEntity::class);
@@ -168,9 +158,8 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
     }
 
     #[Test]
-    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[DataProvider('provideCascadeRelationshipsCombinations', false)]
     #[UsingRelationships(IndexedOneToMany\Child::class, ['parent'])]
-    #[IgnorePhpunitWarnings(self::DATA_PROVIDER_WARNING_REGEX)]
     public function indexed_one_to_many_hydrated_from_many_to_one_side(): void
     {
         $parentFactory = persistent_factory(IndexedOneToMany\ParentEntity::class);
@@ -183,9 +172,8 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
     }
 
     #[Test]
-    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[DataProvider('provideCascadeRelationshipsCombinations', false)]
     #[UsingRelationships(UninitializedOneToMany\Child::class, ['parent'])]
-    #[IgnorePhpunitWarnings(self::DATA_PROVIDER_WARNING_REGEX)]
     public function inverse_collection_not_initialized_in_constructor(): void
     {
         $child = persistent_factory(UninitializedOneToMany\Child::class)->create([
@@ -196,9 +184,8 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
     }
 
     #[Test]
-    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[DataProvider('provideCascadeRelationshipsCombinations', false)]
     #[UsingRelationships(IndexedByJoinColumn\Product::class, ['translations'])]
-    #[IgnorePhpunitWarnings(self::DATA_PROVIDER_WARNING_REGEX)]
     public function one_to_many_indexed_by_join_column(): void
     {
         $languageFactory = persistent_factory(IndexedByJoinColumn\Language::class);
@@ -215,9 +202,8 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
     }
 
     #[Test]
-    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[DataProvider('provideCascadeRelationshipsCombinations', false)]
     #[UsingRelationships(IndexedByJoinColumn\ProductTranslation::class, ['product'])]
-    #[IgnorePhpunitWarnings(self::DATA_PROVIDER_WARNING_REGEX)]
     public function one_to_many_indexed_by_join_column_hydrated_from_many_to_one_side(): void
     {
         $language = persistent_factory(IndexedByJoinColumn\Language::class)->create(['id' => 'ca']);
@@ -233,9 +219,8 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
     }
 
     #[Test]
-    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[DataProvider('provideCascadeRelationshipsCombinations', false)]
     #[UsingRelationships(InversedOneToOneWithManyToOne\InverseSide::class, ['owningSide', 'item'])]
-    #[IgnorePhpunitWarnings(self::DATA_PROVIDER_WARNING_REGEX)]
     public function inversed_one_to_one_can_be_used_after_other_relationship(): void
     {
         $inverseSideFactory = persistent_factory(InversedOneToOneWithManyToOne\InverseSide::class);
@@ -260,9 +245,8 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
     }
 
     #[Test]
-    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[DataProvider('provideCascadeRelationshipsCombinations', false)]
     #[UsingRelationships(InversedOneToOneWithoutAutoGeneratedId\OwningSide::class, ['inverseSide'])]
-    #[IgnorePhpunitWarnings(self::DATA_PROVIDER_WARNING_REGEX)]
     public function inverse_one_to_one_with_custom_id(): void
     {
         $owningSideFactory = persistent_factory(InversedOneToOneWithoutAutoGeneratedId\OwningSide::class);
@@ -277,9 +261,8 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
     }
 
     #[Test]
-    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[DataProvider('provideCascadeRelationshipsCombinations', false)]
     #[UsingRelationships(OneToManyWithUnionType\OwningSideEntity::class, ['item'])]
-    #[IgnorePhpunitWarnings(self::DATA_PROVIDER_WARNING_REGEX)]
     public function after_instantiate_flushing_using_current_object_in_relationship_one_to_one(): void
     {
         $owningSideFactory = persistent_factory(OneToManyWithUnionType\OwningSideEntity::class);
@@ -331,9 +314,8 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
     }
 
     #[Test]
-    #[DataProvider('provideCascadeRelationshipsCombinations')]
+    #[DataProvider('provideCascadeRelationshipsCombinations', false)]
     #[UsingRelationships(InversedOneToOneWithNonNullableOwning\OwningSide::class, ['inverseSide'])]
-    #[IgnorePhpunitWarnings(self::DATA_PROVIDER_WARNING_REGEX)]
     public function after_instantiate_flushing_using_current_object_in_relationship_inverse_one_to_one(): void
     {
         $owningSideFactory = persistent_factory(InversedOneToOneWithNonNullableOwning\OwningSide::class);
