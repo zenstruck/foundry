@@ -30,6 +30,7 @@ return static function(ContainerConfigurator $container): void {
         ->args([
             tagged_iterator('foundry.story'),
             abstract_arg('global_stories'),
+            true,
         ])
 
         ->set('.zenstruck_foundry.instantiator', Instantiator::class)
