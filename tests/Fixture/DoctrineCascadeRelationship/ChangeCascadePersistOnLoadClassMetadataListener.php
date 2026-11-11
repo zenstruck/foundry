@@ -43,11 +43,20 @@ final class ChangeCascadePersistOnLoadClassMetadataListener
 
         foreach ($this->metadata as $metadatum) {
             if ($classMetadata->getName() === $metadatum->class) {
-                $classMetadata->getAssociationMapping($metadatum->field)['cascade'] = $metadatum->cascade ? ['persist'] : [];
+                // getAssociationMapping() returns a copy with ORM 2
+                $mapping = &$classMetadata->associationMappings[$metadatum->field];
+                $mapping['cascade'] = $metadatum->cascade ? ['persist'] : [];
+
+                if (\is_array($mapping)) {
+                    // ORM 2 reads this flag, computed once when the mapping is validated
+                    $mapping['isCascadePersist'] = $metadatum->cascade;
+                }
 
                 if ($metadatum->orphanRemoval) {
-                    $classMetadata->getAssociationMapping($metadatum->field)['orphanRemoval'] = true;
+                    $mapping['orphanRemoval'] = true;
                 }
+
+                unset($mapping);
             }
         }
     }
