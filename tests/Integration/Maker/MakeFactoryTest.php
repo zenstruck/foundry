@@ -34,6 +34,7 @@ use Zenstruck\Foundry\Tests\Fixture\Maker\Entity\WithJsonbColumn;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
 use Zenstruck\Foundry\Tests\Fixture\ObjectWithEnum;
 use Zenstruck\Foundry\Tests\Fixture\ObjectWithNonWriteable;
+use Zenstruck\Foundry\Tests\Fixture\ObjectWithNullableProperties;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -513,6 +514,19 @@ final class MakeFactoryTest extends MakerTestCase
         if (\getenv('MONGO_URL')) {
             yield 'odm' => [WithEmbeddableDocument::class, 'WithEmbeddableDocumentFactory'];
         }
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_create_factory_with_optional_defaults_for_nullable_properties(): void
+    {
+        $tester = $this->makeFactoryCommandTester();
+
+        $tester->execute(['class' => ObjectWithNullableProperties::class, '--no-persistence' => true, '--all-fields' => true]);
+
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/ObjectWithNullablePropertiesFactory.php'));
     }
 
     /**

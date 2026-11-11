@@ -261,6 +261,8 @@ component will be used to call the ``setTitle()`` method or directly set the pub
 
     Using ``make:factory --all-fields`` will generate default values for all fields of the entity,
     not only non-nullable fields.
+    Nullable fields get an `optional <https://fakerphp.org/#modifiers>`_ default value
+    (e.g. ``self::faker()->optional()->text()``), so that they are randomly ``null``.
 
 .. note::
 

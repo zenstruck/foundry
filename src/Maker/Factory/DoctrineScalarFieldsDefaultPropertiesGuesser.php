@@ -77,10 +77,14 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
                 continue;
             }
 
+            $nullable = $this->extractFieldMappingData($property, 'nullable', false);
+
             // ignore identifiers and nullable fields
-            if ((!$makeFactoryQuery->isAllFields() && $this->extractFieldMappingData($property, 'nullable', false)) || \in_array($fieldName, $ids, true)) {
+            if ((!$makeFactoryQuery->isAllFields() && $nullable) || \in_array($fieldName, $ids, true)) {
                 continue;
             }
+
+            $nullable = $nullable && $makeFactoryData->acceptsNull($fieldName);
 
             $type = \mb_strtoupper($this->extractFieldMappingData($property, 'type'));
             if ($this->extractFieldMappingData($property, 'enumType')) {
@@ -88,6 +92,7 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
                     $fieldName,
                     $this->extractFieldMappingData($property, 'enumType'),
                     isList: \in_array($type, self::ARRAY_TYPES, true),
+                    nullable: $nullable,
                 );
 
                 continue;
@@ -108,7 +113,7 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
                 $value = self::DEFAULTS[$type];
             }
 
-            $makeFactoryData->addDefaultProperty($fieldName, \str_replace('{length}', (string) $length, $value));
+            $makeFactoryData->addDefaultProperty($fieldName, \str_replace('{length}', (string) $length, $value), $nullable);
         }
     }
 
