@@ -13,16 +13,10 @@ namespace Zenstruck\Foundry\Tests\Integration;
 
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixture\Stories\UnregisteredServiceStory;
 
 final class ServiceStoryTest extends KernelTestCase
 {
-    use Factories;
-
-    /**
-     * @test
-     */
     #[Test]
     public function story_with_dependencies_which_is_not_a_service_throws_a_helpful_exception(): void
     {

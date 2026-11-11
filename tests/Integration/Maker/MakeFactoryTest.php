@@ -97,9 +97,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/WithJsonbColumnFactory.php'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_factory_interactively(): void
     {
@@ -410,9 +407,6 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/ObjectWithNullablePropertiesFactory.php'));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function can_create_factory_with_default_enum(): void
     {

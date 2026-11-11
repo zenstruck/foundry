@@ -46,27 +46,18 @@ final class AutoDatabaseResetterTest extends TestCase
         (new Filesystem())->remove($this->migrationsDirectory);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_resets_the_schema_without_the_migrations_bundle(): void
     {
         self::assertInstanceOf(SchemaDatabaseResetter::class, $this->innerResetter(null));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_resets_the_schema_when_there_are_no_migrations(): void
     {
         self::assertInstanceOf(SchemaDatabaseResetter::class, $this->innerResetter($this->dependencyFactory()));
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function it_migrates_when_there_are_migrations(): void
     {

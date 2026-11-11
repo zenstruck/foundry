@@ -420,9 +420,6 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
         MultipleMandatoryRelationshipToSameEntity\InversedSideEntityFactory::assert()->count(1);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function inherited_one_to_one_private_property_are_correctly_found(): void
     {

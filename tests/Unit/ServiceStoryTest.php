@@ -13,16 +13,10 @@ namespace Zenstruck\Foundry\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Tests\Fixture\Stories\ServiceStory;
 
 final class ServiceStoryTest extends TestCase
 {
-    use Factories;
-
-    /**
-     * @test
-     */
     #[Test]
     public function story_with_dependencies_cannot_be_used_without_the_bundle(): void
     {

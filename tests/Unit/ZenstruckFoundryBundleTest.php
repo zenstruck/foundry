@@ -201,9 +201,6 @@ final class ZenstruckFoundryBundleTest extends TestCase
         self::assertSame(ContainerInterface::NULL_ON_INVALID_REFERENCE, $dependencyFactory->getInvalidBehavior());
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function auto_reset_mode_cannot_be_used_with_migration_configurations(): void
     {
@@ -216,9 +213,6 @@ final class ZenstruckFoundryBundleTest extends TestCase
         ]]]]);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function invalid_reset_mode_is_rejected(): void
     {
@@ -227,9 +221,6 @@ final class ZenstruckFoundryBundleTest extends TestCase
         self::buildConfiguration([['orm' => ['reset' => ['mode' => 'invalid']]]]);
     }
 
-    /**
-     * @test
-     */
     #[Test]
     public function configuration_default_values(): void
     {
