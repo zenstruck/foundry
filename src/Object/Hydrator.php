@@ -117,7 +117,10 @@ final class Hydrator
 
     public static function add(object $object, string $property, mixed $value, int|string|null $key = null): void
     {
-        $inverseValue = self::get($object, $property);
+        $reflectionProperty = self::accessibleProperty($object, $property);
+
+        // an inverse collection the constructor leaves uninitialized starts empty
+        $inverseValue = $reflectionProperty->isInitialized($object) ? $reflectionProperty->getValue($object) : [];
 
         $shouldAdd = match (true) {
             $inverseValue instanceof Collection => !$inverseValue->contains($value),
@@ -224,29 +227,11 @@ final class Hydrator
 
     private static function accessibleProperty(object $object, string $name): \ReflectionProperty
     {
-        $class = new \ReflectionClass($object);
-
-        if (!$property = self::reflectionProperty($class, $name)) {
-            throw new \InvalidArgumentException(\sprintf('Class "%s" does not have property "%s".', $class->getName(), $name));
+        if (!$property = PropertyLocator::find($object, $name)) {
+            throw new \InvalidArgumentException(\sprintf('Class "%s" does not have property "%s".', $object::class, $name));
         }
 
         return $property;
-    }
-
-    /**
-     * @param \ReflectionClass<object> $class
-     */
-    private static function reflectionProperty(\ReflectionClass $class, string $name): ?\ReflectionProperty
-    {
-        try {
-            return $class->getProperty($name);
-        } catch (\ReflectionException) {
-            if ($class = $class->getParentClass()) {
-                return self::reflectionProperty($class, $name);
-            }
-        }
-
-        return null;
     }
 
     private function shouldForceProperty(int|string $property): bool
@@ -261,7 +246,7 @@ final class Hydrator
 
     private static function isDoctrineCollection(object $object, string $property): bool
     {
-        $type = self::reflectionProperty(new \ReflectionClass($object), $property)?->getType();
+        $type = PropertyLocator::find($object, $property)?->getType();
 
         if (null === $type) {
             return false;

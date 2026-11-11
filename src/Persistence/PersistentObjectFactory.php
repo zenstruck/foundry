@@ -19,6 +19,7 @@ use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Object\Hydrator;
+use Zenstruck\Foundry\Object\PropertyLocator;
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\Event\AfterPersist;
 use Zenstruck\Foundry\Persistence\Exception\NotEnoughObjects;
@@ -429,11 +430,10 @@ abstract class PersistentObjectFactory extends ObjectFactory
                     ->reuse(...$this->reusedObjects(), ...$value->reusedObjects())
                     ->withPersistMode(
                         $this->isPersisting() ? PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT : PersistMode::WITHOUT_PERSISTING
-                    )
-                ;
+                    );
 
-                $fieldType = (new \ReflectionClass(static::class()))->getProperty($field)->getType();
-                $inverseFieldType = (new \ReflectionClass($value::class()))->getProperty($inverseField)->getType();
+                $fieldType = PropertyLocator::find(static::class(), $field)?->getType();
+                $inverseFieldType = PropertyLocator::find($value::class(), $inverseField)?->getType();
 
                 if ($fieldType?->allowsNull()) {
                     $this->inverseRelationshipCallbacks[] = static function(object $object) use ($value, $inverseField, $field) {

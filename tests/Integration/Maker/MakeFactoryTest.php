@@ -20,14 +20,19 @@ use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 use Symfony\Component\Console\Tester\CommandTester;
 use Zenstruck\Foundry\Tests\Fixture\Document\GenericDocument;
 use Zenstruck\Foundry\Tests\Fixture\Document\WithEmbeddableDocument;
+use Zenstruck\Foundry\Tests\Fixture\Document\WithEnumArraysDocument;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithEmbeddableEntity;
+use Zenstruck\Foundry\Tests\Fixture\Entity\WithEnumArraysEntity;
+use Zenstruck\Foundry\Tests\Fixture\Entity\WithNestedEmbeddableEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithUidColumn;
+use Zenstruck\Foundry\Tests\Fixture\Maker\Entity\WithJsonbColumn;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
 use Zenstruck\Foundry\Tests\Fixture\ObjectWithEnum;
 use Zenstruck\Foundry\Tests\Fixture\ObjectWithNonWriteable;
+use Zenstruck\Foundry\Tests\Fixture\ObjectWithNullableProperties;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -76,6 +81,20 @@ final class MakeFactoryTest extends MakerTestCase
         $this->assertStringContainsString('Note: pass --test if you want to generate factories in your tests/ directory', $output);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/WithUidColumnFactory.php'));
+    }
+
+    #[Test]
+    public function can_create_factory_with_jsonb(): void
+    {
+        if (!\getenv('DATABASE_URL')) {
+            self::markTestSkipped('doctrine/orm not enabled.');
+        }
+
+        $tester = $this->makeFactoryCommandTester(['environment' => 'maker_jsonb']);
+
+        $tester->execute(['class' => WithJsonbColumn::class]);
+
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/WithJsonbColumnFactory.php'));
     }
 
     #[Test]
@@ -351,6 +370,22 @@ final class MakeFactoryTest extends MakerTestCase
     }
 
     #[Test]
+    public function can_create_factory_with_nested_embeddable(): void
+    {
+        if (!\getenv('DATABASE_URL')) {
+            self::markTestSkipped('doctrine/orm not enabled.');
+        }
+
+        $tester = $this->makeFactoryCommandTester();
+
+        $tester->execute(['class' => WithNestedEmbeddableEntity::class, '--all-fields' => true]);
+
+        $this->assertFileExists(self::tempFile('src/Factory/NestedEmbeddableFactory.php'));
+        $this->assertFileExists(self::tempFile('src/Factory/EmbeddableFactory.php'));
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/WithNestedEmbeddableEntityFactory.php'));
+    }
+
+    #[Test]
     #[RequiresEnvironmentVariable('MONGO_URL')]
     public function can_create_factory_with_embeddable_odm(): void
     {
@@ -363,6 +398,16 @@ final class MakeFactoryTest extends MakerTestCase
     }
 
     #[Test]
+    public function can_create_factory_with_optional_defaults_for_nullable_properties(): void
+    {
+        $tester = $this->makeFactoryCommandTester();
+
+        $tester->execute(['class' => ObjectWithNullableProperties::class, '--no-persistence' => true, '--all-fields' => true]);
+
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/ObjectWithNullablePropertiesFactory.php'));
+    }
+
+    #[Test]
     public function can_create_factory_with_default_enum(): void
     {
         $tester = $this->makeFactoryCommandTester();
@@ -370,6 +415,28 @@ final class MakeFactoryTest extends MakerTestCase
         $tester->execute(['class' => ObjectWithEnum::class, '--no-persistence' => true]);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/ObjectWithEnumFactory.php'));
+    }
+
+    #[Test]
+    #[RequiresEnvironmentVariable('DATABASE_URL')]
+    public function can_create_factory_with_enum_arrays_orm(): void
+    {
+        $tester = $this->makeFactoryCommandTester();
+
+        $tester->execute(['class' => WithEnumArraysEntity::class]);
+
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/WithEnumArraysEntityFactory.php'));
+    }
+
+    #[Test]
+    #[RequiresEnvironmentVariable('MONGO_URL')]
+    public function can_create_factory_with_enum_arrays_odm(): void
+    {
+        $tester = $this->makeFactoryCommandTester();
+
+        $tester->execute(['class' => WithEnumArraysDocument::class]);
+
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/WithEnumArraysDocumentFactory.php'));
     }
 
     #[Test]

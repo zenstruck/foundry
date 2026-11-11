@@ -1,5 +1,45 @@
 # CHANGELOG
 
+## [v2.16.0](https://github.com/zenstruck/foundry/releases/tag/v2.16.0)
+
+November 9th, 2026 - [v2.15.0...v2.16.0](https://github.com/zenstruck/foundry/compare/v2.15.0...v2.16.0)
+
+* a4a3903 ci: make the benchmark comparison resilient to runner noise (#1201) by @nikophil
+* 1c9af86 refactor: share the parent-walking property lookup (#1202) by @nikophil
+* e141c8b feat(maker): generate a default value for `ulid` fields (#1194) by @seb-jean
+* 45d6d0a fix: support inherited private property (#1195) by @Exalyon
+* 66c5306 fix(maker): support entities with nested embeddables (#1199) by @Lars-
+* 9279d09 test: configure the DBAL schema manager factory in AutoDatabaseResetterTest (#1200) by @nikophil
+* 0db83e5 chore: Replace deprecated rector rule with own rule (#1198) by @Gared, @nikophil
+* a00d6d5 ci: run MySQL as a service container (#1196) by @nikophil
+* cbf809e fix(maker): generate `randomElements()` for array-of-enum fields (#1192) by @seb-jean
+* 4fba8f5 test: fix flaky FakerSeedIsNotResetDuringRunKernelTest (#1193) by @nikophil
+
+## [v2.15.0](https://github.com/zenstruck/foundry/releases/tag/v2.15.0)
+
+October 26th, 2026 - [v2.14.1...v2.15.0](https://github.com/zenstruck/foundry/compare/v2.14.1...v2.15.0)
+
+* 8b46149 feat: `auto` ORM reset mode (#934) by @kbond
+* 0360bae test: don't rely on kernel shutdown leaving cycles uncollected (#1189) by @kbond
+
+## [v2.14.1](https://github.com/zenstruck/foundry/releases/tag/v2.14.1)
+
+October 8th, 2026 - [v2.14.0...v2.14.1](https://github.com/zenstruck/foundry/compare/v2.14.0...v2.14.1)
+
+* 73e96d0 fix: wire inverse collections left uninitialized by the constructor (#1187) by @nikophil
+
+## [v2.14.0](https://github.com/zenstruck/foundry/releases/tag/v2.14.0)
+
+October 7th, 2026 - [v2.13.0...v2.14.0](https://github.com/zenstruck/foundry/compare/v2.13.0...v2.14.0)
+
+* c8ea565 Actually run the reset-database testsuite in migrate mode (#1186) by @nikophil
+* 7dd9a73 Support Behat 4 in the Behat sub-package (#1182) by @nikophil
+* b3ff36b fix: honor indexBy when wiring inverse collections (#1178) by @nikophil
+* 8e98898 fix: re-enable DAMA static connections and stop the run when the first database reset fails (#1180) by @Amoifr
+* 5c2f469 feat: load the stories of foundry:load-fixtures in a transaction (#1173) by @Amoifr
+* 5508c3a ci: ignore the Psalm AfterExpressionAnalysisInterface in the BC check (#1179) by @nikophil
+* 7d3b7aa Fix the namespace of the persistence helper functions in the docs (#1171) by @Amoifr
+
 ## [v2.13.0](https://github.com/zenstruck/foundry/releases/tag/v2.13.0)
 
 September 17th, 2026 - [v2.12.1...v2.13.0](https://github.com/zenstruck/foundry/compare/v2.12.1...v2.13.0)

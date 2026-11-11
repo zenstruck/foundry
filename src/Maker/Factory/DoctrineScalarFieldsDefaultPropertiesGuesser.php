@@ -15,6 +15,7 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Doctrine\ORM\Mapping\FieldMapping;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -42,6 +43,7 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
         'INTEGER' => 'self::faker()->randomNumber(),',
         'INT' => 'self::faker()->randomNumber(),',
         'JSON' => '[],',
+        'JSONB' => '[],',
         'JSON_ARRAY' => '[],',
         'SIMPLE_ARRAY' => '[],',
         'SMALLINT' => 'self::faker()->numberBetween(1, 32767),',
@@ -49,8 +51,11 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
         'TEXT' => 'self::faker()->text({length}),',
         'TIME_MUTABLE' => 'self::faker()->datetime(),',
         'TIME_IMMUTABLE' => '\DateTimeImmutable::createFromMutable(self::faker()->datetime()),',
+        'ULID' => 'Ulid::fromString(self::faker()->uuid()),',
         'UUID' => 'Uuid::fromString(self::faker()->uuid()),',
     ];
+
+    private const ARRAY_TYPES = ['ARRAY', 'COLLECTION', 'HASH', 'JSON', 'JSON_ARRAY', 'JSONB', 'SIMPLE_ARRAY'];
 
     public function __invoke(SymfonyStyle $io, MakeFactoryData $makeFactoryData, MakeFactoryQuery $makeFactoryQuery): void
     {
@@ -72,20 +77,33 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
                 continue;
             }
 
+            $nullable = $this->extractFieldMappingData($property, 'nullable', false);
+
             // ignore identifiers and nullable fields
-            if ((!$makeFactoryQuery->isAllFields() && $this->extractFieldMappingData($property, 'nullable', false)) || \in_array($fieldName, $ids, true)) {
+            if ((!$makeFactoryQuery->isAllFields() && $nullable) || \in_array($fieldName, $ids, true)) {
                 continue;
             }
 
+            $nullable = $nullable && $makeFactoryData->acceptsNull($fieldName);
+
             $type = \mb_strtoupper($this->extractFieldMappingData($property, 'type'));
             if ($this->extractFieldMappingData($property, 'enumType')) {
-                $makeFactoryData->addEnumDefaultProperty($fieldName, $this->extractFieldMappingData($property, 'enumType'));
+                $makeFactoryData->addEnumDefaultProperty(
+                    $fieldName,
+                    $this->extractFieldMappingData($property, 'enumType'),
+                    isList: \in_array($type, self::ARRAY_TYPES, true),
+                    nullable: $nullable,
+                );
 
                 continue;
             }
 
             $value = "null, // TODO add {$type} type manually";
             $length = $this->extractFieldMappingData($property, 'length', '');
+
+            if ('ULID' === $type) {
+                $makeFactoryData->addUse(Ulid::class);
+            }
 
             if ('UUID' === $type) {
                 $makeFactoryData->addUse(Uuid::class);
@@ -95,7 +113,7 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
                 $value = self::DEFAULTS[$type];
             }
 
-            $makeFactoryData->addDefaultProperty($fieldName, \str_replace('{length}', (string) $length, $value));
+            $makeFactoryData->addDefaultProperty($fieldName, \str_replace('{length}', (string) $length, $value), $nullable);
         }
     }
 

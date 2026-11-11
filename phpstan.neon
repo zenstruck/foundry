@@ -71,6 +71,7 @@ parameters:
         - tests/Fixture/Maker/expected/can_create_factory_interactively.php
         - tests/Fixture/Maker/expected/can_create_factory_with_embeddable_odm.php
         - tests/Fixture/Maker/expected/can_create_factory_with_embeddable_orm.php
+        - tests/Fixture/Maker/expected/can_create_factory_with_nested_embeddable.php
 
         # dual ORM/ODM FieldMapping type in this file requires exclusion
         - ./src/Maker/Factory/DoctrineScalarFieldsDefaultPropertiesGuesser.php

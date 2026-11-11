@@ -19,6 +19,7 @@ jobs:
   run:
     name: "Benchmarks ${{ matrix.database }} - ${{ matrix.with-dama && 'with Dama' || 'without Dama' }}"
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -27,21 +28,28 @@ jobs:
         database: [ mysql|mongo ]
         with-dama: [ 0 ]
     env:
-      DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@localhost:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || contains(matrix.database, 'sqlite') && 'sqlite:///%kernel.project_dir%/var/data.db' || '' }}
+      DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@127.0.0.1:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || contains(matrix.database, 'sqlite') && 'sqlite:///%kernel.project_dir%/var/data.db' || '' }}
       MONGO_URL: ${{ contains(matrix.database, 'mongo') && 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb' || '' }}
       USE_DAMA_DOCTRINE_TEST_BUNDLE: ${{ matrix.with-dama }}
 
     services:
+      mysql:
+        image: ${{ contains(matrix.database, 'mysql') && 'mysql:8.0' || '' }}
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -proot"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
       mongo:
         image: ${{ contains(matrix.database, 'mongo') && 'mongo:4' || '' }}
         ports:
           - 27017:27017
 
     steps:
-      - name: Set up MySQL
-        if: contains(matrix.database, 'mysql')
-        run: sudo /etc/init.d/mysql start
-
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -49,58 +57,50 @@ jobs:
           coverage: none
           tools: flex
 
-      - name: Checkout
+      # side-by-side checkouts: each side gets its own vendor/ and var/cache/
+      - name: Checkout 3.x
         uses: actions/checkout@v4
         with:
           ref: 3.x
+          path: base
           fetch-depth: 1
 
-      - name: Install dependencies
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          path: head
+          fetch-depth: 1
+
+      - name: Install dependencies (3.x)
         uses: ramsey/composer-install@v2
         with:
+          working-directory: base
+          dependency-versions: ${{ matrix.deps }}
+          composer-options: --prefer-dist
+        env:
+          SYMFONY_REQUIRE: ${{ matrix.symfony }}
+
+      - name: Install dependencies (PR)
+        uses: ramsey/composer-install@v2
+        with:
+          working-directory: head
           dependency-versions: ${{ matrix.deps }}
           composer-options: --prefer-dist
         env:
           SYMFONY_REQUIRE: ${{ matrix.symfony }}
 
       - name: Install PHPBench
+        working-directory: head
         run: composer bin phpbench install
 
-      - name: Run benchmarks baseline
+      # shared runners shift between measurements: fail only if two rounds both exceed the threshold
+      - name: Run benchmarks (3.x vs PR)
         run: |
-          bin/tools/phpbench/vendor/phpbench/phpbench/bin/phpbench run \
-            tests/Benchmark \
-            --report=aggregate \
-            --tag=3.x \
-            --iterations=5 \
-            --progress=plain \
-            --retry-threshold=10
-
-      - name: Clear vendor files
-        run: |
-          rm -rf vendor composer.lock
-
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          clean: false
-          fetch-depth: 1
-
-      - name: Install dependencies
-        uses: ramsey/composer-install@v2
-        with:
-          dependency-versions: ${{ matrix.deps }}
-          composer-options: --prefer-dist
-        env:
-          SYMFONY_REQUIRE: ${{ matrix.symfony }}
-
-      - name: Run benchmarks and compare
-        run: |
-          bin/tools/phpbench/vendor/phpbench/phpbench/bin/phpbench run \
-            tests/Benchmark \
-            --report=aggregate \
-            --ref=3.x \
-            --iterations=5 \
-            --progress=plain \
-            --retry-threshold=10 \
-            --assert="mode(variant.time.avg) <= mode(baseline.time.avg) +/- 10%"
+          PHPBENCH="$PWD/head/bin/tools/phpbench/vendor/phpbench/phpbench/bin/phpbench"
+          OPTIONS="tests/Benchmark --iterations=5 --retry-threshold=10 --progress=plain"
+          round() {
+            (cd base && $PHPBENCH run $OPTIONS --dump-file="$RUNNER_TEMP/base.xml") &&
+            (cd head && $PHPBENCH run $OPTIONS --report=aggregate --file="$RUNNER_TEMP/base.xml" \
+              --assert="mode(variant.time.avg) <= mode(baseline.time.avg) +/- 15%")
+          }
+          round || { echo "::warning::A variant is more than 15% slower than 3.x, measuring both sides again"; round; }

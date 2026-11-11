@@ -11,22 +11,27 @@
 
 namespace Zenstruck\Foundry\Tests\Unit;
 
+use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Loader\DefinitionFileLoader;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\Reference;
 use Zenstruck\Foundry\Object\Instantiator;
-use Zenstruck\Foundry\ORM\ResetDatabase\ResetDatabaseMode;
+use Zenstruck\Foundry\ORM\ResetDatabase\AutoDatabaseResetter;
+use Zenstruck\Foundry\ORM\ResetDatabase\OrmResetter;
 use Zenstruck\Foundry\Tests\Fixture\ExtendedGenerator;
 use Zenstruck\Foundry\ZenstruckFoundryBundle;
 
@@ -179,6 +184,44 @@ final class ZenstruckFoundryBundleTest extends TestCase
     }
 
     #[Test]
+    public function auto_reset_mode_uses_the_migrations_dependency_factory_if_available(): void
+    {
+        $this->container->setParameter('kernel.bundles', ['DoctrineBundle' => DoctrineBundle::class]);
+
+        $config = self::buildConfiguration([['orm' => ['reset' => ['mode' => 'auto']]]]);
+
+        $this->bundle->loadExtension($config, $this->configurator, $this->container);
+
+        $definition = $this->container->getDefinition(OrmResetter::class);
+        $dependencyFactory = $definition->getArgument('$dependencyFactory');
+
+        self::assertSame(AutoDatabaseResetter::class, $definition->getClass());
+        self::assertInstanceOf(Reference::class, $dependencyFactory);
+        self::assertSame('doctrine.migrations.dependency_factory', (string) $dependencyFactory);
+        self::assertSame(ContainerInterface::NULL_ON_INVALID_REFERENCE, $dependencyFactory->getInvalidBehavior());
+    }
+
+    #[Test]
+    public function auto_reset_mode_cannot_be_used_with_migration_configurations(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('"migrations.configurations" cannot be used with the "auto" reset mode');
+
+        self::buildConfiguration([['orm' => ['reset' => [
+            'mode' => 'auto',
+            'migrations' => ['configurations' => [__FILE__]],
+        ]]]]);
+    }
+
+    #[Test]
+    public function invalid_reset_mode_is_rejected(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+
+        self::buildConfiguration([['orm' => ['reset' => ['mode' => 'invalid']]]]);
+    }
+
+    #[Test]
     public function configuration_default_values(): void
     {
         self::assertSame([
@@ -200,7 +243,7 @@ final class ZenstruckFoundryBundleTest extends TestCase
                 'reset' => [
                     'connections' => ['default'],
                     'entity_managers' => ['default'],
-                    'mode' => ResetDatabaseMode::SCHEMA,
+                    'mode' => null,
                     'migrations' => [
                         'configurations' => [],
                     ],
