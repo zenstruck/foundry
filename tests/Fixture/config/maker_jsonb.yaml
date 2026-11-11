@@ -1,0 +1,11 @@
+# The "jsonb" type only exists since doctrine/dbal 4.3: the entity using it is only mapped
+# for the maker test, which never creates the schema.
+doctrine:
+    orm:
+        mappings:
+            MakerEntity:
+                is_bundle: false
+                type: attribute
+                dir: '%kernel.project_dir%/tests/Fixture/Maker/Entity'
+                prefix: 'Zenstruck\Foundry\Tests\Fixture\Maker\Entity'
+                alias: MakerEntity

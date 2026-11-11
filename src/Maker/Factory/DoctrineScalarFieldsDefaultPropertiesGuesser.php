@@ -43,6 +43,7 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
         'INTEGER' => 'self::faker()->randomNumber(),',
         'INT' => 'self::faker()->randomNumber(),',
         'JSON' => '[],',
+        'JSONB' => '[],',
         'JSON_ARRAY' => '[],',
         'SIMPLE_ARRAY' => '[],',
         'SMALLINT' => 'self::faker()->numberBetween(1, 32767),',
