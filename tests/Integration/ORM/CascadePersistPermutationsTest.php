@@ -58,6 +58,18 @@ final class CascadePersistPermutationsTest extends KernelTestCase
     }
 
     /**
+     * paratest serializes the events of the tests that do not pass.
+     *
+     * @test
+     */
+    #[Test]
+    #[UsingRelationships(Contact::class, ['category'])]
+    public function its_events_can_be_serialized(): void
+    {
+        self::assertNotEmpty(\serialize($this->valueObjectForEvents())); // @phpstan-ignore method.internal
+    }
+
+    /**
      * Must stay after the tests above: it checks the last permutation does not leak.
      *
      * @test

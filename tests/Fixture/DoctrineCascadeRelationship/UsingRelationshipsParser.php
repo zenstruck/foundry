@@ -64,8 +64,12 @@ final class UsingRelationshipsParser implements Parser
         ]);
     }
 
+    /**
+     * The events of a test carry this collection, and paratest serializes them:
+     * the closure of the data provider must stay out of it.
+     */
     public function forClassAndMethod(string $className, string $methodName): MetadataCollection
     {
-        return $this->forClass($className)->mergeWith($this->forMethod($className, $methodName));
+        return $this->decorated->forClassAndMethod($className, $methodName);
     }
 }
