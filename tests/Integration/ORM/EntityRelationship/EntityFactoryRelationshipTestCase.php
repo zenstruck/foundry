@@ -59,11 +59,33 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         $this->assertNotNull($contact->getCategory()?->id);
     }
 
+    /**
+     * @param FactoryCollection<Contact, PersistentObjectFactory<Contact>>|list<Factory<Contact>>|list<Contact> $contacts
+     */
     #[Test]
     #[UsingRelationships(Category::class, ['contacts'])]
-    public function one_to_many_with_factory_collection(): void
+    #[DataProvider('provideOneToManyCases')]
+    public function one_to_many(FactoryCollection|array $contacts): void
     {
-        $this->one_to_many(static::contactFactory()->many(2));
+        $category = static::categoryFactory()->create([
+            'contacts' => $contacts,
+        ]);
+
+        static::contactFactory()::assert()->count(2);
+        static::categoryFactory()::assert()->count(1);
+
+        $this->assertNotNull($category->id);
+        $this->assertCount(2, $category->getContacts());
+
+        foreach ($category->getContacts() as $contact) {
+            $this->assertSame($category->id, $contact->getCategory()?->id);
+        }
+    }
+
+    public static function provideOneToManyCases(): iterable
+    {
+        yield 'factory collection' => [static::contactFactory()->many(2)];
+        yield 'array of factories' => [[static::contactFactory(), static::contactFactory()]];
     }
 
     #[Test]
@@ -78,13 +100,7 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         CategoryFactory::assert()->count(1);
     }
 
-    #[Test]
-    #[UsingRelationships(Category::class, ['contacts'])]
-    public function one_to_many_with_array_of_factories(): void
-    {
-        $this->one_to_many([static::contactFactory(), static::contactFactory()]);
-    }
-
+    // not a data set of one_to_many(): create() cannot be called in a data provider crossed with #[UsingRelationships]
     #[Test]
     #[UsingRelationships(Category::class, ['contacts'])]
     public function one_to_many_with_array_of_managed_objects(): void
@@ -112,18 +128,31 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
         }
     }
 
+    /**
+     * @param FactoryCollection<Contact, PersistentObjectFactory<Contact>>|list<Factory<Contact>> $contacts
+     */
     #[Test]
     #[UsingRelationships(Tag::class, ['contacts'])]
-    public function many_to_many_owning(): void
+    #[DataProvider('provideManyToManyOwningCases')]
+    public function many_to_many_owning(FactoryCollection|array $contacts): void
     {
-        $this->many_to_many(static::contactFactory()->many(3));
+        $tag = static::tagFactory()->create([
+            'contacts' => $contacts,
+        ]);
+
+        static::contactFactory()::assert()->count(3);
+        static::tagFactory()::repository()->assert()->count(1);
+        $this->assertNotNull($tag->id);
+
+        foreach ($tag->getContacts() as $contact) {
+            $this->assertSame($tag->id, $contact->getTags()[0]?->id);
+        }
     }
 
-    #[Test]
-    #[UsingRelationships(Tag::class, ['contacts'])]
-    public function many_to_many_owning_as_array(): void
+    public static function provideManyToManyOwningCases(): iterable
     {
-        $this->many_to_many([static::contactFactory(), static::contactFactory(), static::contactFactory()]);
+        yield 'factory collection' => [static::contactFactory()->many(3)];
+        yield 'array of factories' => [[static::contactFactory(), static::contactFactory(), static::contactFactory()]];
     }
 
     #[Test]
@@ -688,6 +717,7 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
      * @param PersistentObjectFactory<Contact> $factory
      */
     #[Test]
+    #[UsingRelationships(Contact::class, ['category'])]
     #[DataProvider('provideCanUseFactoryInDataProviderWithRelationshipCases')]
     public function can_create_many_with_factory_from_data_provider_with_relationship(PersistentObjectFactory $factory): void
     {
@@ -718,6 +748,7 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
     }
 
     #[Test]
+    #[UsingRelationships(Category::class, ['contacts'])]
     #[DataProvider('provideIsCreatesFactoryInDataProviderWithOneToManyCases')]
     public function is_creates_factory_in_data_provider_with_one_to_many(CategoryFactory $categoryFactory): void
     {
@@ -765,43 +796,5 @@ abstract class EntityFactoryRelationshipTestCase extends KernelTestCase
 
         self::assertSame($category, $contact1->getCategory());
         self::assertSame($category, $contact2->getCategory());
-    }
-
-    /**
-     * @param FactoryCollection<Contact, PersistentObjectFactory<Contact>>|list<Factory<Contact>>|list<Contact> $contacts
-     */
-    private function one_to_many(FactoryCollection|array $contacts): void
-    {
-        $category = static::categoryFactory()->create([
-            'contacts' => $contacts,
-        ]);
-
-        static::contactFactory()::assert()->count(2);
-        static::categoryFactory()::assert()->count(1);
-
-        $this->assertNotNull($category->id);
-        $this->assertCount(2, $category->getContacts());
-
-        foreach ($category->getContacts() as $contact) {
-            $this->assertSame($category->id, $contact->getCategory()?->id);
-        }
-    }
-
-    /**
-     * @param FactoryCollection<Contact, PersistentObjectFactory<Contact>>|list<Factory<Contact>>|list<Contact> $contacts
-     */
-    private function many_to_many(FactoryCollection|array $contacts): void
-    {
-        $tag = static::tagFactory()->create([
-            'contacts' => $contacts,
-        ]);
-
-        static::contactFactory()::assert()->count(3);
-        static::tagFactory()::repository()->assert()->count(1);
-        $this->assertNotNull($tag->id);
-
-        foreach ($tag->getContacts() as $contact) {
-            $this->assertSame($tag->id, $contact->getTags()[0]?->id);
-        }
     }
 }
