@@ -27,7 +27,7 @@ final class WithUniqueColumnFactory extends PersistentObjectFactory
     protected function defaults(): array
     {
         return [
-            'uniqueCol' => self::faker()->word(),
+            'uniqueCol' => self::faker()->uuid(),
         ];
     }
 }

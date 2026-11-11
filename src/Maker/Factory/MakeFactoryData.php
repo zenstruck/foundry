@@ -14,6 +14,8 @@ namespace Zenstruck\Foundry\Maker\Factory;
 use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\PropertyWriteInfo;
+use Zenstruck\Foundry\Object\PropertyLocator;
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
@@ -106,9 +108,36 @@ final class MakeFactoryData
         return $uses;
     }
 
-    public function addDefaultProperty(string $propertyName, string $defaultValue): void
+    public function addDefaultProperty(string $propertyName, string $defaultValue, bool $nullable = false): void
     {
-        $this->defaultProperties[$propertyName] = $defaultValue;
+        $this->defaultProperties[$propertyName] = $nullable ? self::optional($defaultValue) : $defaultValue;
+    }
+
+    /**
+     * Whether null can be given to the property, whatever the way Foundry sets it (constructor, setter or property).
+     */
+    public function acceptsNull(string $propertyName): bool
+    {
+        // same lookup as the PropertyAccessor hydrating the objects does for a null value
+        $writeInfo = self::propertyInfo()->getWriteInfo($this->object->getName(), $propertyName, [
+            'enable_getter_setter_extraction' => true,
+            'enable_constructor_extraction' => false,
+            'enable_adder_remover_extraction' => false,
+        ]);
+
+        return array_all(
+            [
+                PropertyLocator::find($this->object->getName(), $propertyName)?->getType(),
+                array_find(
+                    $this->object->getConstructor()?->getParameters() ?? [],
+                    static fn(\ReflectionParameter $parameter): bool => $parameter->getName() === $propertyName,
+                )?->getType(),
+                PropertyWriteInfo::TYPE_METHOD === $writeInfo?->getType()
+                    ? $this->object->getMethod($writeInfo->getName())->getParameters()[0]->getType()
+                    : null,
+            ],
+            static fn(?\ReflectionType $type): bool => $type?->allowsNull() ?? true,
+        );
     }
 
     /**
@@ -138,7 +167,7 @@ final class MakeFactoryData
         return $defaultProperties;
     }
 
-    public function addEnumDefaultProperty(string $propertyName, string $enumClass): void
+    public function addEnumDefaultProperty(string $propertyName, string $enumClass, bool $isList = false, bool $nullable = false): void
     {
         if (!\enum_exists($enumClass)) {
             throw new \InvalidArgumentException("Enum of class \"{$enumClass}\" does not exist.");
@@ -149,13 +178,30 @@ final class MakeFactoryData
         $enumShortClassName = Str::getShortClassName($enumClass);
         $this->addDefaultProperty(
             $propertyName,
-            "self::faker()->randomElement({$enumShortClassName}::cases()),",
+            $isList
+                ? "self::faker()->randomElements({$enumShortClassName}::cases(), null),"
+                : "self::faker()->randomElement({$enumShortClassName}::cases()),",
+            $nullable,
         );
     }
 
     public function shouldAddHints(): bool
     {
         return $this->addHints;
+    }
+
+    private static function optional(string $defaultValue): string
+    {
+        if (\str_starts_with($defaultValue, 'self::faker()->')) {
+            return \substr_replace($defaultValue, '->optional()', \mb_strlen('self::faker()'), 0);
+        }
+
+        // the faker call is wrapped in another call: it cannot be made optional by itself
+        if (\str_contains($defaultValue, 'self::faker()')) {
+            return 'self::faker()->optional()->passthrough('.\rtrim($defaultValue, ',').'),';
+        }
+
+        return $defaultValue;
     }
 
     private static function propertyInfo(): ReflectionExtractor

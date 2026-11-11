@@ -28,7 +28,7 @@ final class StoryRegistry
      * @param Story[]                                   $stories
      * @param list<class-string<Story>|callable():void> $globalStories
      */
-    public function __construct(private iterable $stories, private array $globalStories = [])
+    public function __construct(private iterable $stories, private array $globalStories = [], private bool $bundleEnabled = false)
     {
     }
 
@@ -92,6 +92,10 @@ final class StoryRegistry
         try {
             return new $class();
         } catch (\ArgumentCountError $e) {
+            if ($this->bundleEnabled) {
+                throw new \RuntimeException(\sprintf('Story "%s" has dependencies, so it must be a service tagged with "foundry.story". Register it as a service with autoconfiguration enabled, or add the tag yourself.', $class), 0, $e);
+            }
+
             throw new \RuntimeException('Stories with dependencies (Story services) cannot be used without the foundry bundle.', 0, $e);
         }
     }

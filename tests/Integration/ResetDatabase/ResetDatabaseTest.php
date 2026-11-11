@@ -11,6 +11,7 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\ResetDatabase;
 
+use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -60,6 +61,22 @@ final class ResetDatabaseTest extends KernelTestCase
         } else {
             self::assertSame(0, $exit, \sprintf('Schema is not valid: %s', $output->fetch()));
         }
+    }
+
+    #[Test]
+    public function it_resets_with_the_expected_mode(): void
+    {
+        if (!FoundryTestKernel::hasORM()) {
+            self::markTestSkipped('ORM needed.');
+        }
+
+        /** @var Connection $connection */
+        $connection = self::getContainer()->get('doctrine.dbal.default_connection');
+
+        self::assertSame(
+            FoundryTestKernel::usesMigrations(),
+            $connection->createSchemaManager()->tablesExist(['doctrine_migration_versions']),
+        );
     }
 
     #[Test]

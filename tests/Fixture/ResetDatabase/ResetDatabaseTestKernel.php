@@ -62,14 +62,7 @@ final class ResetDatabaseTestKernel extends FoundryTestKernel
                 GlobalInvokableService::class,
             ],
             'orm' => [
-                'reset' => FoundryTestKernel::usesMigrations()
-                        ? [
-                            'mode' => ResetDatabaseMode::MIGRATE,
-                            'migrations' => [
-                                'configurations' => ($configFile = self::migrationFile()) ? [$configFile] : [],
-                            ],
-                        ]
-                        : ['mode' => ResetDatabaseMode::SCHEMA],
+                'reset' => self::resetConfiguration(),
             ],
         ]);
 
@@ -94,5 +87,26 @@ final class ResetDatabaseTestKernel extends FoundryTestKernel
         if (self::hasMongo()) {
             $c->register(MongoResetterDecorator::class)->setAutowired(true)->setAutoconfigured(true);
         }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function resetConfiguration(): array
+    {
+        if (self::usesAutoResetMode()) {
+            return ['mode' => ResetDatabaseMode::AUTO];
+        }
+
+        if (!FoundryTestKernel::usesMigrations()) {
+            return ['mode' => ResetDatabaseMode::SCHEMA];
+        }
+
+        return [
+            'mode' => ResetDatabaseMode::MIGRATE,
+            'migrations' => [
+                'configurations' => ($configFile = self::migrationFile()) ? [$configFile] : [],
+            ],
+        ];
     }
 }

@@ -25,6 +25,7 @@ use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\UsingRelationshi
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithLifecycleCallback;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\IndexedByJoinColumn;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\IndexedOneToMany;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\InheritedPrivatePropertyOneToOne;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\InversedOneToOneWithManyToOne;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\InversedOneToOneWithNonNullableOwning;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\InversedOneToOneWithOneToMany;
@@ -417,6 +418,28 @@ final class EdgeCasesRelationshipTest extends KernelTestCase
         $this->assertCount(2, $inversedSideEntity->getSecondaryRelations());
         MultipleMandatoryRelationshipToSameEntity\OwningSideEntityFactory::assert()->count(4);
         MultipleMandatoryRelationshipToSameEntity\InversedSideEntityFactory::assert()->count(1);
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function inherited_one_to_one_private_property_are_correctly_found(): void
+    {
+        $childEntityFactory = persistent_factory(InheritedPrivatePropertyOneToOne\Child::class);
+        $otherEntityFactory = persistent_factory(InheritedPrivatePropertyOneToOne\Other::class);
+
+        $entity = $childEntityFactory->create([
+            'owning' => $otherEntityFactory::new(),
+        ]);
+
+        $this->assertInstanceOf(InheritedPrivatePropertyOneToOne\Child::class, $entity);
+
+        $entity = $otherEntityFactory->create([
+            'owning' => $childEntityFactory::new(),
+        ]);
+
+        $this->assertInstanceOf(InheritedPrivatePropertyOneToOne\Other::class, $entity);
     }
 
     /**

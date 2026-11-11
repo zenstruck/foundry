@@ -1,5 +1,27 @@
 # CHANGELOG
 
+## [v2.16.0](https://github.com/zenstruck/foundry/releases/tag/v2.16.0)
+
+November 9th, 2026 - [v2.15.0...v2.16.0](https://github.com/zenstruck/foundry/compare/v2.15.0...v2.16.0)
+
+* a4a3903 ci: make the benchmark comparison resilient to runner noise (#1201) by @nikophil
+* 1c9af86 refactor: share the parent-walking property lookup (#1202) by @nikophil
+* e141c8b feat(maker): generate a default value for `ulid` fields (#1194) by @seb-jean
+* 45d6d0a fix: support inherited private property (#1195) by @Exalyon
+* 66c5306 fix(maker): support entities with nested embeddables (#1199) by @Lars-
+* 9279d09 test: configure the DBAL schema manager factory in AutoDatabaseResetterTest (#1200) by @nikophil
+* 0db83e5 chore: Replace deprecated rector rule with own rule (#1198) by @Gared, @nikophil
+* a00d6d5 ci: run MySQL as a service container (#1196) by @nikophil
+* cbf809e fix(maker): generate `randomElements()` for array-of-enum fields (#1192) by @seb-jean
+* 4fba8f5 test: fix flaky FakerSeedIsNotResetDuringRunKernelTest (#1193) by @nikophil
+
+## [v2.15.0](https://github.com/zenstruck/foundry/releases/tag/v2.15.0)
+
+October 26th, 2026 - [v2.14.1...v2.15.0](https://github.com/zenstruck/foundry/compare/v2.14.1...v2.15.0)
+
+* 8b46149 feat: `auto` ORM reset mode (#934) by @kbond
+* 0360bae test: don't rely on kernel shutdown leaving cycles uncollected (#1189) by @kbond
+
 ## [v2.14.1](https://github.com/zenstruck/foundry/releases/tag/v2.14.1)
 
 October 8th, 2026 - [v2.14.0...v2.14.1](https://github.com/zenstruck/foundry/compare/v2.14.0...v2.14.1)

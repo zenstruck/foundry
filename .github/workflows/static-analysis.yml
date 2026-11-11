@@ -19,7 +19,8 @@ on:
     - cron: '0 0 1,16 * *'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  # a run on a release branch gets its own group: merging several PRs in a row must not cancel the previous runs
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || (contains(fromJSON('["2.x", "3.x"]'), github.ref_name) && github.run_id) || github.ref }}
   cancel-in-progress: true
 
 jobs:

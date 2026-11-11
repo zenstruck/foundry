@@ -13,6 +13,7 @@ namespace Zenstruck\Foundry\Tests\Fixture;
 
 use DAMA\DoctrineTestBundle\DAMADoctrineTestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -64,7 +65,16 @@ abstract class FoundryTestKernel extends Kernel
 
     public static function usesMigrations(): bool
     {
+        if (self::usesAutoResetMode()) {
+            return \class_exists(DoctrineMigrationsBundle::class);
+        }
+
         return 'migrate' === \getenv('DATABASE_RESET_MODE');
+    }
+
+    public static function usesAutoResetMode(): bool
+    {
+        return 'auto' === \getenv('DATABASE_RESET_MODE');
     }
 
     public static function usesDamaDoctrineTestBundle(): bool
