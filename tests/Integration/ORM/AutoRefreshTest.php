@@ -12,7 +12,6 @@
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
@@ -74,7 +73,6 @@ final class AutoRefreshTest extends AutoRefreshTestCase
 
     #[Test]
     #[UsingRelationships(Contact::class, ['category', 'address'])]
-    #[DataProvider('provideCascadeRelationshipsCombinations', false)]
     public function it_can_refresh_objects_with_relationships(): void
     {
         $contact = ContactFactory::createOne([

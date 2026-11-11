@@ -11,7 +11,6 @@
 
 namespace Zenstruck\Foundry\Tests\Integration\ResetDatabase;
 
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -33,7 +32,6 @@ final class OrmEdgeCaseTest extends KernelTestCase
     use ChangesEntityRelationshipCascadePersist;
 
     #[Test]
-    #[DataProvider('provideCascadeRelationshipsCombinations', false)]
     #[UsingRelationships(RelationshipWithGlobalEntity\RelationshipWithGlobalEntity::class, ['globalEntity'])]
     public function it_can_use_flush_after_and_entity_from_global_state(): void
     {

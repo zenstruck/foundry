@@ -18,7 +18,6 @@ use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\ChangesEntityRelationshipCascadePersist;
-use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\DoctrineCascadeRelationshipMetadata;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\UsingRelationships;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
@@ -29,19 +28,28 @@ final class CascadePersistPermutationsTest extends KernelTestCase
     use ChangesEntityRelationshipCascadePersist;
 
     #[Test]
-    #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(Contact::class, ['category'])]
-    public function it_applies_the_provided_cascade(DoctrineCascadeRelationshipMetadata ...$metadata): void
+    public function it_applies_the_cascade_of_the_permutation(): void
     {
-        foreach ($metadata as $metadatum) {
-            $mapping = self::associationMapping($metadatum->class, $metadatum->field);
-
-            self::assertSame($metadatum->cascade, $mapping->isCascadePersist());
-            self::assertSame($metadatum->orphanRemoval, $mapping->orphanRemoval);
-        }
+        $this->assertCascadeIsApplied();
     }
 
-    // must stay after the test above: it checks the last permutation does not leak
+    #[Test]
+    #[UsingRelationships(Contact::class, ['category'])]
+    #[DataProvider('provideNames')]
+    public function it_crosses_the_permutations_with_a_data_provider(string $name): void
+    {
+        self::assertContains($name, ['foo', 'bar']);
+        $this->assertCascadeIsApplied();
+    }
+
+    public static function provideNames(): iterable
+    {
+        yield 'foo' => ['foo'];
+        yield 'bar' => ['bar'];
+    }
+
+    // must stay after the tests above: it checks the last permutation does not leak
     #[Test]
     public function it_restores_the_mapping_of_the_fixtures(): void
     {
@@ -49,6 +57,19 @@ final class CascadePersistPermutationsTest extends KernelTestCase
 
         self::assertFalse($mapping->isCascadePersist());
         self::assertFalse($mapping->orphanRemoval);
+    }
+
+    private function assertCascadeIsApplied(): void
+    {
+        $combination = $this->cascadePersistCombination();
+        self::assertNotEmpty($combination);
+
+        foreach ($combination as $metadatum) {
+            $mapping = self::associationMapping($metadatum->class, $metadatum->field);
+
+            self::assertSame($metadatum->cascade, $mapping->isCascadePersist());
+            self::assertSame($metadatum->orphanRemoval, $mapping->orphanRemoval);
+        }
     }
 
     /**

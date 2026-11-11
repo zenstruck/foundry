@@ -16,7 +16,6 @@ use Doctrine\ORM\Mapping\MappingException;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\BeforeClass;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Configuration;
@@ -27,9 +26,8 @@ use Zenstruck\Foundry\Persistence\PersistenceManager;
  *
  * Hack into PHPUnit data provider mechanism to change the cascade persist behavior of Doctrine relationship:
  * - each test declares which relationship it uses, thanks to UsingRelationships attribute
- * - the data provider provides all possible combinations of relationships to change the cascade persist behavior
- * - a #[Before] hook consumes the provided data, not the test method: #[DataProvider] needs "false"
- *   as second argument ($validateArgumentCount), otherwise PHPUnit warns about unused arguments
+ * - {@see UsingRelationshipsParser} turns this attribute into a data provider, which provides all possible combinations
+ *   of cascade persist for these relationships, crossed with the data sets of the test's own data providers
  * - the listener {@see ChangeCascadePersistOnLoadClassMetadataListener} is used to change the cascade persist behavior
  *   before each test, thanks to "onLoadMetadata" doctrine event.
  *
@@ -39,7 +37,8 @@ use Zenstruck\Foundry\Persistence\PersistenceManager;
  */
 trait ChangesEntityRelationshipCascadePersist
 {
-    private static string $methodName = '';
+    /** @var array<class-string, array<string, array<array-key, list<DoctrineCascadeRelationshipMetadata>>>> */
+    private static array $combinations = [];
 
     #[BeforeClass]
     public static function _requiresORM(): void
@@ -56,21 +55,13 @@ trait ChangesEntityRelationshipCascadePersist
             throw new \LogicException('Cannot use trait "ChangesEntityRelationshipCascadePersist" without KernelTestCase.');
         }
 
-        $testMethod = new \ReflectionMethod(static::class, $this->name()); // @phpstan-ignore method.internal
-        $usingRelationshipsAttributes = $testMethod->getAttributes(UsingRelationships::class);
-
-        if (!$usingRelationshipsAttributes) {
+        if (!$combination = $this->cascadePersistCombination()) {
             return;
-        }
-
-        $dataProviderAttributes = $testMethod->getAttributes(DataProvider::class);
-        if (1 !== \count($dataProviderAttributes) || 'provideCascadeRelationshipsCombinations' !== $dataProviderAttributes[0]->newInstance()->methodName()) {
-            throw new \LogicException(\sprintf('When using attribute "%s", "provideCascadeRelationshipsCombinations" must be the only data provider.', UsingRelationships::class));
         }
 
         /** @var ChangeCascadePersistOnLoadClassMetadataListener $changeCascadePersistListener */
         $changeCascadePersistListener = self::getContainer()->get(ChangeCascadePersistOnLoadClassMetadataListener::class);
-        $changeCascadePersistListener->withMetadata(\array_values($this->providedData())); // @phpstan-ignore method.internal
+        $changeCascadePersistListener->withMetadata($combination);
 
         self::clearDoctrineMetadataCache();
     }
@@ -84,22 +75,23 @@ trait ChangesEntityRelationshipCascadePersist
     }
 
     /**
-     * @return iterable<list<DoctrineCascadeRelationshipMetadata>>
+     * Called by {@see UsingRelationshipsParser} for each test using #[UsingRelationships].
+     *
+     * @param  array<array-key, array<mixed>>    $dataSets data sets of the test's own data providers
+     * @return iterable<array-key, array<mixed>>
      */
-    public static function provideCascadeRelationshipsCombinations(): iterable
+    public static function cascadeRelationshipsCombinations(string $methodName, array $dataSets): iterable
     {
-        if (!\getenv('DATABASE_URL') || !self::$methodName) {
+        $dataSets = $dataSets ?: ['' => []];
+
+        if (!\getenv('DATABASE_URL')) {
             // data providers are resolved before #[RequiresEnvironmentVariable] is checked
-            yield []; // @phpstan-ignore generator.valueType
+            yield from $dataSets;
 
             return;
         }
 
-        /**
-         * self::$methodName is set in a PHPUnit extension, it's the only way to get the current method name.
-         * @see PhpUnitTestExtension
-         */
-        $attributes = (new \ReflectionMethod(static::class, self::$methodName))->getAttributes(UsingRelationships::class);
+        $attributes = (new \ReflectionMethod(static::class, $methodName))->getAttributes(UsingRelationships::class);
 
         $relationshipsToChange = [];
         foreach ($attributes as $attribute) {
@@ -136,15 +128,26 @@ trait ChangesEntityRelationshipCascadePersist
             }
         }
 
-        yield from DoctrineCascadeRelationshipMetadata::allCombinations(\array_values($relationshipFields));
+        foreach (DoctrineCascadeRelationshipMetadata::allCombinations(\array_values($relationshipFields)) as $combinationName => $combination) {
+            foreach ($dataSets as $dataSetName => $arguments) {
+                $name = '' === $dataSetName ? $combinationName : "{$combinationName} / {$dataSetName}";
+                self::$combinations[static::class][$methodName][$name] = $combination;
+
+                // PHPUnit only shows the name of a data set that has arguments
+                yield $name => $arguments ?: $combination;
+            }
+        }
 
         Configuration::shutdown();
         static::ensureKernelShutdown();
     }
 
-    public static function setCurrentProvidedMethodName(string $methodName): void
+    /**
+     * @return list<DoctrineCascadeRelationshipMetadata>
+     */
+    private function cascadePersistCombination(): array
     {
-        self::$methodName = $methodName;
+        return self::$combinations[static::class][$this->name()][$this->dataName()] ?? []; // @phpstan-ignore method.internal, method.internal
     }
 
     private static function clearDoctrineMetadataCache(): void
