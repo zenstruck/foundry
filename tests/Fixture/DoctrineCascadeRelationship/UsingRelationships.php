@@ -20,7 +20,8 @@ final class UsingRelationships
     public function __construct(
         /** @var class-string */
         public readonly string $class,
-        public readonly array $relationShips,
+        /** @var list<string> */
+        public readonly array $relationships,
     ) {
     }
 }
