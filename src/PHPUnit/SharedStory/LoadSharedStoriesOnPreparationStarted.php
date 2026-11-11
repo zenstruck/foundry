@@ -96,27 +96,23 @@ final class LoadSharedStoriesOnPreparationStarted implements Event\Test\Preparat
     {
         $class = new \ReflectionClass($test->className());
         $method = $class->getMethod($test->methodName());
-        $withStoryAttributes = [];
 
-        if (!$class->getAttributes(AsInMemoryTest::class) && !self::skipsDatabaseRollback($class, $class->getMethods())) {
-            $withStoryAttributes[$class->name] = AttributeReader::collectAttributesFromClassAndParents(WithStory::class, $class);
-        }
-
-        if (
-            $test->testData()->hasDataFromDataProvider()
-            && !AsInMemoryTest::shouldEnableInMemory($class->name, $method->name)
-            && !self::skipsDatabaseRollback($class, [$method])
-        ) {
-            $withStoryAttributes["{$class->name}::{$method->name}"] = $method->getAttributes(WithStory::class);
-        }
-
-        return \array_filter(
-            \array_map(
-                static fn(array $attributes) => \array_map(static fn(\ReflectionAttribute $attribute) => $attribute->newInstance()->story, $attributes),
-                $withStoryAttributes,
-            ),
-            static fn(array $stories, string $scope) => $stories && !StoryRegistry::hasSharedStories($scope),
+        $withStoryAttributes = \array_filter(
+            [
+                $class->name => AttributeReader::collectAttributesFromClassAndParents(WithStory::class, $class),
+                "{$class->name}::{$method->name}" => $test->testData()->hasDataFromDataProvider() ? $method->getAttributes(WithStory::class) : [],
+            ],
+            static fn(array $attributes, string $scope) => $attributes && !StoryRegistry::hasSharedStories($scope),
             \ARRAY_FILTER_USE_BOTH,
+        );
+
+        if (!$withStoryAttributes || AsInMemoryTest::shouldEnableInMemory($class->name, $method->name) || self::skipsDatabaseRollback($class)) {
+            return [];
+        }
+
+        return \array_map(
+            static fn(array $attributes) => \array_map(static fn(\ReflectionAttribute $attribute) => $attribute->newInstance()->story, $attributes),
+            $withStoryAttributes,
         );
     }
 
@@ -124,12 +120,11 @@ final class LoadSharedStoriesOnPreparationStarted implements Event\Test\Preparat
      * A test skipping DAMA's rollback uses other connections: they do not see the rows of the shared stories,
      * and might wait for the locks held on them.
      *
-     * @param \ReflectionClass<object>  $class
-     * @param list<\ReflectionMethod> $methods
+     * @param \ReflectionClass<object> $class
      */
-    private static function skipsDatabaseRollback(\ReflectionClass $class, array $methods): bool
+    private static function skipsDatabaseRollback(\ReflectionClass $class): bool
     {
         return AttributeReader::classOrParentsHasAttribute($class->name, SkipDatabaseRollback::class)
-            || \array_any($methods, static fn(\ReflectionMethod $method) => (bool) $method->getAttributes(SkipDatabaseRollback::class));
+            || \array_any($class->getMethods(), static fn(\ReflectionMethod $method) => (bool) $method->getAttributes(SkipDatabaseRollback::class));
     }
 }
