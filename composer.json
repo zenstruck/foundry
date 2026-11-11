@@ -27,7 +27,7 @@
     },
     "require-dev": {
         "bamarni/composer-bin-plugin": "^1.8",
-        "dama/doctrine-test-bundle": "^8.0",
+        "dama/doctrine-test-bundle": "dev-savepoint-levels as 8.99.0",
         "doctrine/collections": "^2.0",
         "doctrine/common": "^3.2.2",
         "doctrine/doctrine-bundle": "^3.0",
@@ -97,5 +97,11 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "repositories": {
+        "dama-savepoint-levels": {
+            "type": "vcs",
+            "url": "https://github.com/nikophil/doctrine-test-bundle"
+        }
+    }
 }
