@@ -11,46 +11,56 @@
 
 namespace Zenstruck\Foundry\Persistence;
 
-use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\Persistence\Mapping\ClassMetadata;
-use Doctrine\Persistence\Mapping\MappingException;
-use Doctrine\Persistence\ObjectManager;
 use Zenstruck\Foundry\Persistence\Relationship\RelationshipMetadata;
 
 /**
- * @author Kevin Bond <kevinbond@gmail.com>
+ * Extension point for a persistence backend. Non-Doctrine backends should extend
+ * CustomPersistenceStrategy, which answers everything Foundry can default on their behalf.
  *
- * @internal
+ * @author Kevin Bond <kevinbond@gmail.com>
  */
 abstract class PersistenceStrategy
 {
-    public function __construct(protected readonly ManagerRegistry $registry)
-    {
-    }
+    /**
+     * @param class-string $class
+     */
+    abstract public function supports(string $class): bool;
+
+    abstract public function persist(object $object): void;
 
     /**
      * @param class-string $class
      */
-    public function supports(string $class): bool
-    {
-        return (bool) $this->registry->getManagerForClass($class);
-    }
+    abstract public function flush(string $class): void;
+
+    abstract public function flushAll(): void;
+
+    abstract public function remove(object $object): void;
+
+    abstract public function refresh(object $object): void;
+
+    abstract public function detach(object $object): void;
 
     /**
-     * @param class-string $class
+     * @template T of object
+     *
+     * @param class-string<T>      $class
+     * @param array<string, mixed> $id
+     *
+     * @return T|null
      */
-    public function objectManagerFor(string $class): ObjectManager
-    {
-        return $this->registry->getManagerForClass($class) ?? throw new \LogicException(\sprintf('No manager found for "%s".', $class));
-    }
+    abstract public function find(string $class, array $id): ?object;
 
     /**
-     * @return ObjectManager[]
+     * @template T of object
+     *
+     * @param class-string<T>              $class
+     * @param array<string, mixed>         $criteria
+     * @param array<string, string>|null   $orderBy
+     *
+     * @return list<T>
      */
-    public function objectManagers(): array
-    {
-        return $this->registry->getManagers();
-    }
+    abstract public function findBy(string $class, array $criteria, ?array $orderBy = null, ?int $limit = null, ?int $offset = null): array;
 
     /**
      * @param class-string $parent
@@ -62,18 +72,6 @@ abstract class PersistenceStrategy
     }
 
     /**
-     * @template T of object
-     * @param  class-string<T>  $class
-     * @return ClassMetadata<T>
-     *
-     * @throws MappingException If $class is not managed by Doctrine
-     */
-    public function classMetadata(string $class): ClassMetadata
-    {
-        return $this->objectManagerFor($class)->getClassMetadata($class);
-    }
-
-    /**
      * Guard the given class' object manager against computing changesets from
      * uninitialized lazy ghosts, if it cannot handle them natively.
      *
@@ -81,6 +79,15 @@ abstract class PersistenceStrategy
      */
     public function registerPreFlushGhostInitializer(string $class): void
     {
+    }
+
+    /**
+     * Whether objects of this strategy can be reset as uninitialized lazy ghosts and refreshed on
+     * access. Defaults to true: every Doctrine strategy supports it.
+     */
+    public function supportsAutoRefresh(): bool
+    {
+        return true;
     }
 
     abstract public function hasChanges(object $object): bool;
@@ -111,14 +118,14 @@ abstract class PersistenceStrategy
     abstract public function isScheduledForInsert(object $object): bool;
 
     /**
-     * Removes the given Doctrine listeners immediately and returns a restorer closure.
+     * Removes the given lifecycle listeners immediately and returns a restorer closure.
      *
-     * @param class-string       $entityClass
+     * @param class-string       $class
      * @param list<class-string> $disabledClasses [] = disable all, [Foo::class] = disable specific
      *
      * @return callable():void
      */
-    abstract public function disableDoctrineEvents(string $entityClass, array $disabledClasses): callable;
+    abstract public function disablePersistenceEvents(string $class, array $disabledClasses): callable;
 
     /**
      * Runs the callback in a transaction, when the persistence layer supports it.
