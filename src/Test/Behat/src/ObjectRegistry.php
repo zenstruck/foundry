@@ -261,6 +261,10 @@ final class ObjectRegistry
             return $id->toRfc4122();
         }
 
+        if ($id instanceof \Stringable) {
+            return (string) $id;
+        }
+
         if (!\is_int($id) && !\is_string($id)) {
             throw new \InvalidArgumentException(\sprintf('Wrong type for the id: expected int, string or Uid, got "%s".', \get_debug_type($id)));
         }
