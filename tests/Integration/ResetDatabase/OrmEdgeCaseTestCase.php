@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Tests\Integration\ResetDatabase;
 
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\IgnorePhpunitWarnings;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -24,7 +22,6 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\RelationshipWithGlobalEntit
 use Zenstruck\Foundry\Tests\Fixture\Entity\GlobalEntity;
 use Zenstruck\Foundry\Tests\Fixture\ResetDatabase\ResetDatabaseTestKernel;
 use Zenstruck\Foundry\Tests\Fixture\Stories\GlobalStory;
-use Zenstruck\Foundry\Tests\Integration\ORM\EdgeCasesRelationshipTest;
 
 use function Zenstruck\Foundry\Persistence\flush_after;
 use function Zenstruck\Foundry\Persistence\persistent_factory;
@@ -34,10 +31,8 @@ abstract class OrmEdgeCaseTestCase extends KernelTestCase
     use ChangesEntityRelationshipCascadePersist;
 
     #[Test]
-    #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(RelationshipWithGlobalEntity\RelationshipWithGlobalEntity::class, ['globalEntity'])]
     #[RequiresPhpunit('>=11.4.0')]
-    #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
     public function it_can_use_flush_after_and_entity_from_global_state(): void
     {
         $relationshipWithGlobalEntityFactory = persistent_factory(RelationshipWithGlobalEntity\RelationshipWithGlobalEntity::class);

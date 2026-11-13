@@ -19,6 +19,7 @@ namespace Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship;
 final class DoctrineCascadeRelationshipMetadata implements \Stringable
 {
     private function __construct(
+        /** @var class-string */
         public readonly string $class,
         public readonly string $field,
         public readonly bool $cascade,
