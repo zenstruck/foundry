@@ -33,7 +33,6 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Tag;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\CategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ContactFactory;
-use Zenstruck\Foundry\Tests\Integration\ORM\EdgeCasesRelationshipTest;
 
 use function Zenstruck\Foundry\lazy;
 use function Zenstruck\Foundry\Persistence\flush_after;

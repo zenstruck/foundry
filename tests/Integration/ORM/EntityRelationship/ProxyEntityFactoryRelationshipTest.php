@@ -29,7 +29,6 @@ use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\ProxyAddressFactory
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Category\ProxyCategoryFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Contact\ProxyContactFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Tag\ProxyTagFactory;
-use Zenstruck\Foundry\Tests\Integration\ORM\EdgeCasesRelationshipTest;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
