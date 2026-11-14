@@ -36,6 +36,13 @@ jobs:
         php: [ 8.4, 8.5 ]
         symfony: [ 8.1.* ]
         deps: [ highest, lowest ]
+        include:
+          # upcoming PHP and Symfony versions
+          - { php: 8.6, symfony: 8.1.*, deps: highest }
+          - { php: 8.5, symfony: 8.2.*, deps: highest }
+    env:
+      # some dependencies do not allow the upcoming PHP version yet
+      COMPOSER_IGNORE_PLATFORM_REQ: ${{ matrix.php == 8.6 && 'php+' || '' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -103,6 +110,13 @@ jobs:
         php: [ 8.4, 8.5 ]
         symfony: [ 8.1.* ]
         deps: [ highest, lowest ]
+        include:
+          # upcoming PHP and Symfony versions
+          - { php: 8.6, symfony: 8.1.*, deps: highest }
+          - { php: 8.5, symfony: 8.2.*, deps: highest }
+    env:
+      # some dependencies do not allow the upcoming PHP version yet
+      COMPOSER_IGNORE_PLATFORM_REQ: ${{ matrix.php == 8.6 && 'php+' || '' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
