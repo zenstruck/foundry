@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the zenstruck/foundry package.
  *
@@ -14,8 +12,9 @@ declare(strict_types=1);
 namespace Zenstruck\Foundry\Tests\Integration\ORM;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\AssociationMapping;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\RequiresPhpunit;
+use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\ChangesEntityRelationshipCascadePersist;
@@ -23,17 +22,11 @@ use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\UsingRelationshi
 use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 
-/**
- * The permutations need PHPUnit 13.1, {@see \Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\PhpUnitTestExtension}.
- *
- * @requires PHPUnit >=13.1.0
- */
-#[RequiresPhpunit('>=13.1.0')]
+#[RequiresEnvironmentVariable('DATABASE_URL')]
 final class CascadePersistPermutationsTest extends KernelTestCase
 {
     use ChangesEntityRelationshipCascadePersist;
 
-    /** @test */
     #[Test]
     #[UsingRelationships(Contact::class, ['category'])]
     public function it_applies_the_cascade_of_the_permutation(): void
@@ -41,7 +34,6 @@ final class CascadePersistPermutationsTest extends KernelTestCase
         $this->assertCascadeIsApplied();
     }
 
-    /** @test */
     #[Test]
     #[UsingRelationships(Contact::class, ['category'])]
     #[DataProvider('provideNames')]
@@ -57,11 +49,7 @@ final class CascadePersistPermutationsTest extends KernelTestCase
         yield 'bar' => ['bar'];
     }
 
-    /**
-     * paratest serializes the events of the tests that do not pass.
-     *
-     * @test
-     */
+    // paratest serializes the events of the tests that do not pass
     #[Test]
     #[UsingRelationships(Contact::class, ['category'])]
     public function its_events_can_be_serialized(): void
@@ -69,15 +57,14 @@ final class CascadePersistPermutationsTest extends KernelTestCase
         self::assertNotEmpty(\serialize($this->valueObjectForEvents())); // @phpstan-ignore method.internal
     }
 
-    /**
-     * Must stay after the tests above: it checks the last permutation does not leak.
-     *
-     * @test
-     */
+    // must stay after the tests above: it checks the last permutation does not leak
     #[Test]
     public function it_restores_the_mapping_of_the_fixtures(): void
     {
-        self::assertSame(['cascadePersist' => false, 'orphanRemoval' => false], self::cascadeOf(Category::class, 'contacts'));
+        $mapping = self::associationMapping(Category::class, 'contacts');
+
+        self::assertFalse($mapping->isCascadePersist());
+        self::assertFalse($mapping->orphanRemoval);
     }
 
     private function assertCascadeIsApplied(): void
@@ -86,26 +73,21 @@ final class CascadePersistPermutationsTest extends KernelTestCase
         self::assertNotEmpty($combination);
 
         foreach ($combination as $metadatum) {
-            self::assertSame(
-                ['cascadePersist' => $metadatum->cascade, 'orphanRemoval' => $metadatum->orphanRemoval],
-                self::cascadeOf($metadatum->class, $metadatum->field),
-            );
+            $mapping = self::associationMapping($metadatum->class, $metadatum->field);
+
+            self::assertSame($metadatum->cascade, $mapping->isCascadePersist());
+            self::assertSame($metadatum->orphanRemoval, $mapping->orphanRemoval);
         }
     }
 
     /**
      * @param class-string $class
-     *
-     * @return array{cascadePersist: bool, orphanRemoval: bool}
      */
-    private static function cascadeOf(string $class, string $field): array
+    private static function associationMapping(string $class, string $field): AssociationMapping
     {
         /** @var EntityManagerInterface $entityManager */
         $entityManager = self::getContainer()->get(EntityManagerInterface::class);
 
-        // array access reads both the array of ORM 2 and the AssociationMapping of ORM 3
-        $mapping = $entityManager->getClassMetadata($class)->getAssociationMapping($field);
-
-        return ['cascadePersist' => $mapping['isCascadePersist'], 'orphanRemoval' => (bool) $mapping['orphanRemoval']];
+        return $entityManager->getClassMetadata($class)->getAssociationMapping($field);
     }
 }
