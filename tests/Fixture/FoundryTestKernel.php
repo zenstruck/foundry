@@ -127,14 +127,12 @@ abstract class FoundryTestKernel extends Kernel
                             'type' => 'attribute',
                             'dir' => "{$this->baseFixturePath()}/Entity",
                             'prefix' => 'Zenstruck\Foundry\Tests\Fixture\Entity',
-                            'alias' => 'Entity',
                         ],
                         'Model' => [
                             'is_bundle' => false,
                             'type' => 'attribute',
                             'dir' => "{$this->baseFixturePath()}/Model",
                             'prefix' => 'Zenstruck\Foundry\Tests\Fixture\Model',
-                            'alias' => 'Model',
                         ],
 
                         // postgres acts weirdly with multiple schemas
@@ -146,7 +144,6 @@ abstract class FoundryTestKernel extends Kernel
                                     'type' => 'attribute',
                                     'dir' => "{$this->baseFixturePath()}/EntityInAnotherSchema",
                                     'prefix' => 'Zenstruck\Foundry\Tests\Fixture\EntityInAnotherSchema',
-                                    'alias' => 'Migrate',
                                 ],
                             ]
                             : []
