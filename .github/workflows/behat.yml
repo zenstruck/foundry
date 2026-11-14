@@ -41,8 +41,11 @@ jobs:
           # one Behat 4 permutation rather than a second full axis: it requires PHP >= 8.2, and
           # mink-extension only has an alpha for it
           - { php: 8.5, symfony: 7.4.*, deps: highest, behat: '^4.0' }
-          # upcoming PHP version
+          # Symfony 8 requires Behat 4
+          - { php: 8.5, symfony: 8.1.*, deps: highest, behat: '^4.0' }
+          # upcoming PHP and Symfony versions
           - { php: 8.6, symfony: 7.4.*, deps: highest, behat: '^4.0' }
+          - { php: 8.5, symfony: 8.2.*, deps: highest, behat: '^4.0' }
     env:
       # some dependencies do not allow the upcoming PHP version yet
       COMPOSER_IGNORE_PLATFORM_REQ: ${{ matrix.php == 8.6 && 'php+' || '' }}
@@ -123,8 +126,11 @@ jobs:
           # one Behat 4 permutation rather than a second full axis: it requires PHP >= 8.2, and
           # mink-extension only has an alpha for it
           - { php: 8.5, symfony: 7.4.*, deps: highest, behat: '^4.0' }
-          # upcoming PHP version
+          # Symfony 8 requires Behat 4
+          - { php: 8.5, symfony: 8.1.*, deps: highest, behat: '^4.0' }
+          # upcoming PHP and Symfony versions
           - { php: 8.6, symfony: 7.4.*, deps: highest, behat: '^4.0' }
+          - { php: 8.5, symfony: 8.2.*, deps: highest, behat: '^4.0' }
     env:
       # some dependencies do not allow the upcoming PHP version yet
       COMPOSER_IGNORE_PLATFORM_REQ: ${{ matrix.php == 8.6 && 'php+' || '' }}
