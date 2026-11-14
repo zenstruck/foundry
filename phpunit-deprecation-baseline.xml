@@ -35,4 +35,22 @@ See https://github.com/zenstruck/foundry/blob/2.x/UPGRADE-2.7.md to upgrade.]]><
             <issue><![CDATA[Support for MySQL < 8 is deprecated and will be removed in DBAL 5 (AbstractMySQLDriver.php:80 called by AbstractDriverMiddleware.php:32, https://github.com/doctrine/dbal/pull/6343, package doctrine/dbal)]]></issue>
         </line>
     </file>
+    <file path="vendor/mongodb/mongodb/src/Operation/Find.php">
+        <line number="182" hash="d5df2d44366714892e4a408d15738d5a2a3be2dd">
+            <issue><![CDATA[Function is_integer() is deprecated since 8.6, use is_int() instead]]></issue>
+        </line>
+        <line number="230" hash="ece32fade9ab9790b6849e75c40fe799dbf597f6">
+            <issue><![CDATA[Function is_integer() is deprecated since 8.6, use is_int() instead]]></issue>
+        </line>
+    </file>
+    <file path="vendor/mongodb/mongodb/src/Operation/FindOneAndUpdate.php">
+        <line number="121" hash="ad78f99a01773040d1e377056f671d9d3366f406">
+            <issue><![CDATA[Function is_integer() is deprecated since 8.6, use is_int() instead]]></issue>
+        </line>
+    </file>
+    <file path="vendor/doctrine/mongodb-odm-bundle/src/Repository/ContainerRepositoryFactory.php">
+        <line number="84" hash="ccdab9437d26aa48040135a4ffb8b758e73a87de">
+            <issue><![CDATA[Function spl_object_hash() is deprecated since 8.6, consider using spl_object_id() instead]]></issue>
+        </line>
+    </file>
 </files>
