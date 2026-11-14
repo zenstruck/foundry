@@ -16,9 +16,7 @@ namespace Zenstruck\Foundry\Tests\Integration\ORM\EntityRelationship;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\Proxy as DoctrineProxy;
 use PHPUnit\Framework\AssertionFailedError;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
-use PHPUnit\Framework\Attributes\IgnorePhpunitWarnings;
 use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
@@ -44,9 +42,7 @@ final class ProxyEntityFactoryRelationshipTest extends EntityFactoryRelationship
 {
     /** @test */
     #[Test]
-    #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(Contact::class, ['category'])]
-    #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
     #[RequiresPhp('<8.4.0')]
     public function doctrine_proxies_are_converted_to_foundry_proxies(): void
     {
@@ -69,9 +65,7 @@ final class ProxyEntityFactoryRelationshipTest extends EntityFactoryRelationship
 
     /** @test */
     #[Test]
-    #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(Contact::class, ['category'])]
-    #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
     public function it_can_add_proxy_to_many_to_one(): void
     {
         $contact = static::contactFactory()->create();
@@ -85,9 +79,7 @@ final class ProxyEntityFactoryRelationshipTest extends EntityFactoryRelationship
 
     /** @test */
     #[Test]
-    #[DataProvider('provideCascadeRelationshipsCombinations')]
     #[UsingRelationships(Contact::class, ['tags'])]
-    #[IgnorePhpunitWarnings(EdgeCasesRelationshipTest::DATA_PROVIDER_WARNING_REGEX)]
     public function it_can_add_proxy_to_one_to_many(): void
     {
         $contact = static::contactFactory()->create();

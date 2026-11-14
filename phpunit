@@ -65,7 +65,12 @@ case ${PHPUNIT_VERSION} in
     ;;
 
   "11"|"12"|"13")
-    PHPUNIT_EXEC="${PHPUNIT_EXEC} -c phpunit.xml.dist --extension Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\PhpUnitTestExtension"
+    PHPUNIT_EXEC="${PHPUNIT_EXEC} -c phpunit.xml.dist"
+
+    # the cascade persist permutations need PHPUnit 13.1: below, the tests run once with the mapping of the fixtures
+    if [ "${PHPUNIT_VERSION}" = "13" ]; then
+      PHPUNIT_EXEC="${PHPUNIT_EXEC} --extension Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\PhpUnitTestExtension"
+    fi
 
     if [ "${USE_DAMA_DOCTRINE_TEST_BUNDLE:-0}" = "1" ]; then
       PHPUNIT_EXEC="${PHPUNIT_EXEC} --extension "${DAMA_EXTENSION}""
