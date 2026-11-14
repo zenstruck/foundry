@@ -125,6 +125,6 @@ final class LoadSharedStoriesOnPreparationStarted implements Event\Test\Preparat
     private static function skipsDatabaseRollback(\ReflectionClass $class): bool
     {
         return AttributeReader::classOrParentsHasAttribute($class->name, SkipDatabaseRollback::class)
-            || \array_any($class->getMethods(), static fn(\ReflectionMethod $method) => (bool) $method->getAttributes(SkipDatabaseRollback::class));
+            || array_any($class->getMethods(), static fn(\ReflectionMethod $method) => (bool) $method->getAttributes(SkipDatabaseRollback::class));
     }
 }
