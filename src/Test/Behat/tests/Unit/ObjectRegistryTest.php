@@ -154,6 +154,22 @@ final class ObjectRegistryTest extends TestCase
     }
 
     #[Test]
+    public function it_resolves_stringable_id_value(): void
+    {
+        $id = new CustomId(Uuid::v7()->toRfc4122());
+
+        $persistenceManager = $this->createStub(IdentifierResolver::class);
+        $persistenceManager->method('getIdentifierValues')->willReturn(['id' => $id]);
+
+        $registry = new ObjectRegistry($this->resolver, $persistenceManager);
+        $registry->reset();
+
+        $registry->store(new User(id: 1, name: 'John'), 'john');
+
+        self::assertSame((string) $id, $registry->idFor('user', 'john'));
+    }
+
+    #[Test]
     public function it_stores_object_from_state_added_event(): void
     {
         ObjectRegistry::startCapturingStoryStates();
@@ -351,6 +367,20 @@ final class ObjectRegistryTest extends TestCase
         $this->expectExceptionMessage('Object is not stored in the registry.');
 
         $this->registry->getNameFor($user);
+    }
+}
+
+final readonly class CustomId implements \Stringable
+{
+    public function __construct(
+        private string $value
+    ) {
+    }
+
+    #[\Override]
+    public function __toString(): string
+    {
+        return $this->value;
     }
 }
 
