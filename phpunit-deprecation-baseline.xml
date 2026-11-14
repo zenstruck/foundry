@@ -33,6 +33,7 @@ See https://github.com/zenstruck/foundry/blob/2.x/UPGRADE-2.7.md to upgrade.]]><
             <issue><![CDATA[Support for MySQL < 8 is deprecated and will be removed in DBAL 5 (AbstractMySQLDriver.php:70 called by AbstractDriverMiddleware.php:32, https://github.com/doctrine/dbal/pull/6343, package doctrine/dbal)]]></issue>
             <issue><![CDATA[Support for MySQL < 8 is deprecated and will be removed in DBAL 5 (AbstractMySQLDriver.php:75 called by AbstractDriverMiddleware.php:32, https://github.com/doctrine/dbal/pull/6343, package doctrine/dbal)]]></issue>
             <issue><![CDATA[Support for MySQL < 8 is deprecated and will be removed in DBAL 5 (AbstractMySQLDriver.php:80 called by AbstractDriverMiddleware.php:32, https://github.com/doctrine/dbal/pull/6343, package doctrine/dbal)]]></issue>
+            <issue><![CDATA[Support for MySQL < 8.4 is deprecated and will be removed in DBAL 5 (AbstractMySQLDriver.php:80 called by AbstractDriverMiddleware.php:32, https://github.com/doctrine/dbal/pull/7581, package doctrine/dbal)]]></issue>
         </line>
     </file>
     <file path="vendor/mongodb/mongodb/src/Operation/Find.php">
