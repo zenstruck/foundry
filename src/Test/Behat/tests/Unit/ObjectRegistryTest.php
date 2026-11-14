@@ -155,7 +155,7 @@ final class ObjectRegistryTest extends TestCase
         self::assertSame($uuid->toRfc4122(), $registry->idFor('user', 'john'));
     }
 
-
+    #[Test]
     public function it_resolves_stringable_id_value(): void
     {
         $id = new CustomId(Uuid::v7()->toRfc4122());
