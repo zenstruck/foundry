@@ -1709,7 +1709,23 @@ You can use the ``#[WithStory]`` attribute to load stories in your tests:
         }
     }
 
-If used on the class, the story will be loaded before each test method.
+If used on the class, the story is available in each test method.
+
+.. versionadded:: 3.0
+
+    Stories declared on a class are built once for all its tests with DAMADoctrineTestBundle 8.8+.
+
+With `DAMADoctrineTestBundle`_ 8.8 or greater and its PHPUnit extension enabled, the stories declared on a class are
+built once, before its first test, and every test is rolled back to the state right after they were built. The same
+goes for the stories declared on a test method with a data provider: they are built once for all its data sets.
+
+Otherwise, or when the test class or one of its tests uses ``#[SkipDatabaseRollback]`` or ``#[AsInMemoryTest]``, or
+when both Doctrine ORM and ODM are used, the stories are built before each test.
+
+.. note::
+
+    As a story declared on a class is not built again for each test anymore, what its ``build()`` method does outside
+    of the database only happens once per class.
 
 .. _as-fixture-attribute:
 
