@@ -53,6 +53,17 @@
         "symfony/yaml": "^8.0",
         "webmozart/assert": "^1.11"
     },
+    "conflict": {
+        "dama/doctrine-test-bundle": "<8.0",
+        "doctrine/doctrine-bundle": "<3.0",
+        "doctrine/mongodb-odm": "<2.16",
+        "doctrine/mongodb-odm-bundle": "<5.6",
+        "doctrine/orm": "<3.0",
+        "doctrine/persistence": "<3.3.1",
+        "phpunit/phpunit": "<11.0",
+        "symfony/framework-bundle": "<8.0",
+        "symfony/maker-bundle": "<1.55"
+    },
     "autoload": {
         "psr-4": {
             "Zenstruck\\Foundry\\": "src/",

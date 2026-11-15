@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
 use PHPUnit\Framework\Attributes\RequiresMethod;
+use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Attribute\ResetDatabase;
@@ -39,6 +40,7 @@ use function Zenstruck\Foundry\Persistence\save;
 #[ResetDatabase]
 #[RequiresEnvironmentVariable('DATABASE_URL')]
 #[RequiresEnvironmentVariable('MONGO_URL', '')]
+#[RequiresPhpunit('>=12.0.0')] // PHPUnit 11 ignores #[RequiresEnvironmentVariable]
 #[RequiresEnvironmentVariable('USE_DAMA_DOCTRINE_TEST_BUNDLE', '1')]
 #[RequiresMethod(StaticDriver::class, 'createSavepoint')]
 final class WithStoryOnClassLoadedOnceTest extends KernelTestCase

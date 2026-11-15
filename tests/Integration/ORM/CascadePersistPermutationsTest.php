@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\AssociationMapping;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresEnvironmentVariable;
+use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship\ChangesEntityRelationshipCascadePersist;
@@ -23,6 +24,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 
 #[RequiresEnvironmentVariable('DATABASE_URL')]
+#[RequiresPhpunit('>=13.1.0')] // see PhpUnitTestExtension
 final class CascadePersistPermutationsTest extends KernelTestCase
 {
     use ChangesEntityRelationshipCascadePersist;

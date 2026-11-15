@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   tests:
-    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.no-dama == 1 && ' (no dama)' || '' }}${{ matrix.disable-php-84-lazy-objects == 1 && ' (no lazy objects)' || '' }}
+    name: P:${{ matrix.php }}, S:${{ matrix.symfony }}, D:${{ matrix.database }}${{ matrix.deps == 'lowest' && ' (lowest)' || '' }}${{ matrix.no-dama == 1 && ' (no dama)' || '' }}${{ matrix.disable-php-84-lazy-objects == 1 && ' (no lazy objects)' || '' }}${{ matrix.phpunit && format(' (PHPUnit {0})', matrix.phpunit) || '' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -52,6 +52,10 @@ jobs:
 
           # Disable dama
           - {php: 8.5, symfony: 8.1.*, database: mysql, no-dama: 1}
+
+          # older PHPUnit versions, with every database: PHPUnit 11 ignores #[RequiresEnvironmentVariable]
+          - {php: 8.4, symfony: 8.1.*, database: mysql|mongo, phpunit: 11}
+          - {php: 8.5, symfony: 8.1.*, database: mysql|mongo, phpunit: 12}
 
           # disable lazy objects in PHP 8.4
           - { php: 8.4, symfony: 8.1.*, database: mysql|mongo, disable-php-84-lazy-objects: 1 }
@@ -106,6 +110,10 @@ jobs:
           php-version: ${{ matrix.php }}
           coverage: none
           tools: flex
+
+      - name: Use PHPUnit ${{ matrix.phpunit }}
+        if: matrix.phpunit
+        run: composer require --dev --no-update "phpunit/phpunit:^${{ matrix.phpunit }}"
 
       - name: Install dependencies
         uses: ramsey/composer-install@v2
