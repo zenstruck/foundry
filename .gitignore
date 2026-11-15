@@ -15,6 +15,5 @@
 /.env.local
 /docker-compose.override.yaml
 /tests/Fixture/Maker/tmp/
-/.phpbench
 /config/reference.php
 /src/Test/Behat/config/reference.php

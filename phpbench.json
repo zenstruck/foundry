@@ -1,8 +1,0 @@
-{
-    "$schema": "./bin/tools/phpbench/vendor/phpbench/phpbench/phpbench.schema.json",
-    "runner.bootstrap": "./vendor/autoload.php",
-    "runner.php_env": {
-        "KERNEL_CLASS": "Zenstruck\\Foundry\\Tests\\Fixture\\TestKernel",
-        "APP_ENV": "dev"
-    }
-}

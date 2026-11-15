@@ -5,6 +5,7 @@ on:
     paths: &paths
       - .github/workflows/static-analysis.yml
       - bin/tools/phpstan
+      - bin/tools/tally/**
       - bin/tools/psalm
       - config/**
       - stubs/**
@@ -48,8 +49,8 @@ jobs:
       - name: Install PHPStan
         run: composer bin phpstan install
 
-      - name: Install PHPBench
-        run: composer bin phpbench install
+      - name: Install Tally
+        run: composer bin tally install
 
       - name: Run PHPStan
         run: bin/tools/phpstan/vendor/phpstan/phpstan/phpstan analyse

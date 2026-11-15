@@ -19,7 +19,7 @@ parameters:
         non_ignorable: false
 
     bootstrapFiles:
-        - bin/tools/phpbench/vendor/autoload.php
+        - bin/tools/tally/vendor/autoload.php
 
     ignoreErrors:
         # prevent PHPStan to force to type data providers
