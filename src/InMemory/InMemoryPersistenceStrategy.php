@@ -82,6 +82,24 @@ final class InMemoryPersistenceStrategy extends CustomPersistenceStrategy
     }
 
     /**
+     * Nothing goes through Doctrine in memory, so no Doctrine event fires anyway.
+     */
+    public function disablePersistenceEvents(string $class, array $disabledClasses): callable
+    {
+        return static function(): void {};
+    }
+
+    public function remove(object $object): void
+    {
+        throw new \LogicException(\sprintf('Objects of "%s" cannot be deleted in in-memory tests.', $object::class));
+    }
+
+    public function truncate(string $class): void
+    {
+        throw new \LogicException(\sprintf('Objects of "%s" cannot be truncated in in-memory tests.', $class));
+    }
+
+    /**
      * In-memory replaces persistence, not mapping: relations between Doctrine entities must keep
      * being wired, so the question goes to the strategy that owns the mapping.
      */
