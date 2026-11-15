@@ -20,6 +20,7 @@ use Zenstruck\Foundry\FakerAdapter;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Persistence\CustomPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
+use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 use Zenstruck\Foundry\StoryRegistry;
@@ -46,6 +47,22 @@ final class CustomPersistenceStrategyTest extends TestCase
 
         self::assertSame(['id'], $manager->getIdentifierFields(Thing::class));
         self::assertSame($seven, RepositoryDecorator::for(Thing::class)->find(7));
+    }
+
+    #[Test]
+    public function a_factory_persists_its_object_once(): void
+    {
+        Configuration::boot(new Configuration(
+            new FactoryRegistry([]),
+            new FakerAdapter(Faker\Factory::create()),
+            Instantiator::withConstructor(),
+            new StoryRegistry([]),
+            persistence: new PersistenceManager([$strategy = new InMemoryArrayStrategy()], new ResetDatabaseManager([], [])),
+        ));
+
+        ThingFactory::createOne();
+
+        self::assertSame(1, $strategy->persistCalls);
     }
 
     #[Test]
@@ -138,10 +155,28 @@ final class Thing
 }
 
 /**
+ * @extends PersistentObjectFactory<Thing>
+ */
+final class ThingFactory extends PersistentObjectFactory
+{
+    public static function class(): string
+    {
+        return Thing::class;
+    }
+
+    protected function defaults(): array
+    {
+        return ['id' => 1, 'name' => 'one'];
+    }
+}
+
+/**
  * The smallest possible backend: four methods, no Doctrine.
  */
 final class InMemoryArrayStrategy extends CustomPersistenceStrategy
 {
+    public int $persistCalls = 0;
+
     /** @var list<object> */
     private array $objects = [];
 
@@ -152,6 +187,7 @@ final class InMemoryArrayStrategy extends CustomPersistenceStrategy
 
     public function persist(object $object): void
     {
+        ++$this->persistCalls;
         $this->objects[] = $object;
     }
 

@@ -678,7 +678,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
             throw new \LogicException('Persistence cannot be used in unit tests.');
         }
 
-        $configuration->persistence()->save($object);
+        $configuration->persistence()->flushPersisted($object);
 
         return $object;
     }

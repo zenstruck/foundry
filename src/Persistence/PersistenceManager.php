@@ -75,14 +75,28 @@ class PersistenceManager implements IdentifierResolver
     public function save(object $object): object
     {
         $this->persistScheduled();
+        $this->strategyFor($object::class)->persist($object);
+
+        return $this->flushPersisted($object);
+    }
+
+    /**
+     * Flushes an object a factory has already persisted along with its graph.
+     *
+     * @template T of object
+     *
+     * @param T $object
+     *
+     * @return T
+     */
+    public function flushPersisted(object $object): object
+    {
+        $this->persistScheduled();
 
         $strategy = $this->strategyFor($object::class);
-        $strategy->persist($object);
         $this->flush($strategy, $object::class);
 
-        $shouldFlush = $this->callPostPersistCallbacks();
-
-        if ($shouldFlush) {
+        if ($this->callPostPersistCallbacks()) {
             $this->flush($strategy, $object::class);
         }
 
