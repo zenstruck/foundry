@@ -81,7 +81,8 @@ final class TestKernel extends FoundryTestKernel
         $c->register(ServiceStory::class)->setAutowired(true)->setAutoconfigured(true);
         $c->register(InMemoryAddressRepository::class)->setAutowired(true)->setAutoconfigured(true);
         $c->register(InMemoryContactRepository::class)->setAutowired(true)->setAutoconfigured(true);
-        $c->register(WidgetPersistenceStrategy::class)->setAutoconfigured(true)->setPublic(true);
+        // after the Doctrine strategies: the benchmarks boot this kernel and must not pay its supports()
+        $c->register(WidgetPersistenceStrategy::class)->addTag('foundry.persistence_strategy', ['priority' => -10])->setPublic(true);
 
         $c->register(FoundryEventListener::class)->setAutowired(true)->setAutoconfigured(true);
 

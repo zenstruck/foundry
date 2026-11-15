@@ -41,13 +41,18 @@ class PersistenceManager implements IdentifierResolver
     /** @var array<int, object> objects awaiting an object manager persist, in creation order */
     private array $pendingForInsert = [];
 
+    /** @var list<PersistenceStrategy> */
+    private array $strategies;
+
     /**
      * @param iterable<PersistenceStrategy> $strategies
      */
     public function __construct(
-        private iterable $strategies,
+        iterable $strategies,
         private ResetDatabaseManager $resetDatabaseManager,
     ) {
+        // a tagged iterator would pull every strategy from the container again on each strategyFor()
+        $this->strategies = \iterator_to_array($strategies, false);
     }
 
     public function isEnabled(): bool
@@ -501,7 +506,7 @@ class PersistenceManager implements IdentifierResolver
 
         return $isOrmOnly ??= (static function(): bool {
             try {
-                $strategies = \iterator_to_array(Configuration::instance()->persistence()->strategies);
+                $strategies = Configuration::instance()->persistence()->strategies;
             } catch (PersistenceNotAvailable) {
                 $strategies = [];
             }

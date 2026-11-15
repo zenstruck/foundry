@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\InMemory;
 
-use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Persistence\CustomPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\PersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Relationship\RelationshipMetadata;
@@ -41,7 +40,7 @@ final class InMemoryPersistenceStrategy extends CustomPersistenceStrategy
 
     public function supports(string $class): bool
     {
-        return Configuration::instance()->isInMemoryEnabled();
+        return $this->registry->isEnabled();
     }
 
     public function persist(object $object): void

@@ -232,8 +232,10 @@ abstract class ObjectFactory extends Factory
             return $this;
         }
 
+        $configuration = Configuration::instance();
+
         // in-memory storage is not persistence: every object goes to its repository, persistent or not
-        $factory = Configuration::instance()->isInMemoryEnabled()
+        $factory = $configuration->inMemoryRepositoryRegistry?->isEnabled()
             ? $this->afterInstantiate(
                 static function(object $object, array $parameters, self $usedFactory): void {
                     Configuration::instance()->inMemoryRepositoryRegistry?->get($usedFactory::class())->_save($object);
@@ -241,7 +243,7 @@ abstract class ObjectFactory extends Factory
             )
             : $this;
 
-        if (!Configuration::instance()->hasEventDispatcher()) {
+        if (!$configuration->hasEventDispatcher()) {
             return $factory;
         }
 
