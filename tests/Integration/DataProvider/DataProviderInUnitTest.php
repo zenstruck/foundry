@@ -18,6 +18,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object1Factory;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Object2Factory;
+use Zenstruck\Foundry\Tests\Fixture\Model\GenericModel;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
 use Zenstruck\Foundry\Tests\Fixture\Object2;
 
@@ -68,7 +69,7 @@ final class DataProviderInUnitTest extends TestCase
 
     #[Test]
     #[DataProvider('createObjectUsingFakerInDataProvider')]
-    public function assert_it_can_create_use_faker_in_data_provider(mixed $providedData, string $expected): void
+    public function assert_it_can_create_use_faker_in_data_provider(Object1|GenericModel $providedData, string $expected): void
     {
         self::assertSame($expected, $providedData->getProp1());
     }

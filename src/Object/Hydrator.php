@@ -137,6 +137,8 @@ final class Hydrator
             $inverseValue = \iterator_to_array($inverseValue);
         }
 
+        \assert(\is_array($inverseValue) || $inverseValue instanceof Collection);
+
         if (null === $key) {
             $inverseValue[] = $value;
         } else {

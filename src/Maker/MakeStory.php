@@ -69,17 +69,20 @@ final class MakeStory extends AbstractMaker
         }
 
         $argument = $command->getDefinition()->getArgument('name');
-        $value = $io->ask($argument->getDescription(), null, static fn(?string $value = null): string => Validator::notBlank($value)); // @phpstan-ignore staticMethod.internalClass
+        $value = $io->ask($argument->getDescription(), null, static fn(?string $value = null): string => Validator::notBlank($value)); // @phpstan-ignore staticMethod.internalClass, argument.type
         $input->setArgument($argument->getName(), $value);
     }
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
+        /** @var string $class */
         $class = $input->getArgument('name');
-        $namespace = ($this->namespaceGuesser)($generator, $class, $input->getOption('namespace') ?? $this->defaultNamespace, $input->getOption('test'));
+        /** @var ?string $namespaceOption */
+        $namespaceOption = $input->getOption('namespace');
+        $namespace = ($this->namespaceGuesser)($generator, $class, $namespaceOption ?? $this->defaultNamespace, (bool) $input->getOption('test'));
 
         $storyClassNameDetails = $generator->createClassNameDetails(
-            $input->getArgument('name'),
+            $class,
             $namespace,
             'Story'
         );

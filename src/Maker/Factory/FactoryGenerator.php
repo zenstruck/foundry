@@ -81,6 +81,7 @@ final class FactoryGenerator
                         return $newFactoryClass;
                     },
                 );
+                /** @var class-string $factoryClass */
                 $factoryClass = $io->askQuestion($question);
 
                 $this->factoryClassMap->addFactoryForClass($factoryClass, $class);

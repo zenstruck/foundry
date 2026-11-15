@@ -13,10 +13,13 @@ namespace Zenstruck\Foundry\Tests\Fixture\Stories;
 
 use Symfony\Component\Routing\RouterInterface;
 use Zenstruck\Foundry\Story;
+use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ *
+ * @method static GenericEntity foo()
  */
 final class ServiceStory extends Story
 {

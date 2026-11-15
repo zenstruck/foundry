@@ -562,6 +562,7 @@ abstract class GenericFactoryTestCase extends KernelTestCase
         $object = static::factory()
             ->instantiateWith(Instantiator::withConstructor()->allowExtra('extra'))
             ->afterPersist(static function(GenericModel $object, array $attributes) {
+                \assert(\is_string($attributes['extra']));
                 $object->setProp1($attributes['extra']);
                 $object->setPropInteger($object->getPropInteger() + 1);
             })
@@ -609,12 +610,16 @@ abstract class GenericFactoryTestCase extends KernelTestCase
     {
         $object = $this->factory()
             ->beforeInstantiate(static function(array $attributes) {
-                $attributes['prop1'] = ($attributes['prop1'] ?? '').'3';
+                $prop1 = $attributes['prop1'] ?? '';
+                \assert(\is_string($prop1));
+                $attributes['prop1'] = "{$prop1}3";
 
                 return $attributes;
             })
             ->beforeInstantiate(static function(array $attributes) {
-                $attributes['prop1'] = ($attributes['prop1'] ?? '').'2';
+                $prop1 = $attributes['prop1'] ?? '';
+                \assert(\is_string($prop1));
+                $attributes['prop1'] = "{$prop1}2";
 
                 return $attributes;
             }, priority: 1)
