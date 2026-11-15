@@ -53,7 +53,7 @@ final class PersistentFactoryBench
     public static function factoriesAndCounts(): iterable
     {
         foreach (self::factories() as $name => [$factory]) {
-            foreach ([1, 10, 50] as $count) {
+            foreach ([10, 50] as $count) {
                 yield "{$name}-{$count}" => [$factory, $count];
             }
         }
