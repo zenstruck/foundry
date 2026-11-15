@@ -455,6 +455,17 @@ abstract class AutoRefreshTestCase extends WebTestCase
     }
 
     #[Test]
+    public function counting_keeps_unflushed_changes(): void
+    {
+        $object = $this->factory()->create();
+        $object->setProp1('unflushed');
+
+        $this->factory()::assert()->count(1);
+
+        self::assertSame('unflushed', $object->getProp1());
+    }
+
+    #[Test]
     public function can_flush_when_persisted_objects_are_ghost_objects(): void
     {
         $this->factory()->create();

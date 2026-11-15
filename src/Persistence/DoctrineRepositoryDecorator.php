@@ -45,12 +45,16 @@ class DoctrineRepositoryDecorator extends RepositoryDecorator implements ObjectR
     {
         $inner = $this->inner();
 
-        if ($inner instanceof EntityRepository) {
-            // use query to avoid loading all entities
-            return $inner->count($this->normalize($criteria));
-        }
+        // the Doctrine repository directly: parent::count() goes through findBy(), whose objects
+        // the auto-refresh tracker would turn back into ghosts, discarding unflushed changes
+        return $inner instanceof EntityRepository
+            ? $inner->count($this->normalize($criteria))
+            : \count($inner->findBy($criteria));
+    }
 
-        return parent::count($criteria);
+    public function getIterator(): \Traversable
+    {
+        yield from \is_iterable($inner = $this->inner()) ? $inner : $this->findAll();
     }
 
     /**
