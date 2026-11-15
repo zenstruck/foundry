@@ -436,11 +436,8 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
         /** @var array<string, string> $bundles */
         $bundles = $container->getParameter('kernel.bundles');
 
-        if (isset($bundles['DoctrineBundle']) || isset($bundles['DoctrineMongoDBBundle'])) {
-            $configurator->import('../config/persistence.php');
-        } else {
-            return;
-        }
+        // in-memory or a custom strategy persist without Doctrine
+        $configurator->import('../config/persistence.php');
 
         if (isset($bundles['DoctrineBundle'])) {
             $this->configureOrm($configurator, $container, $config['orm']);

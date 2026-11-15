@@ -27,6 +27,7 @@ use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\ChildEntityWithoutAsEntityLis
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\DoctrineEventsSubscriber;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\DocumentForDoctrineEventsFactory;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\DocumentWithListenedRelationFactory;
+use Zenstruck\Foundry\Tests\Fixture\CustomPersistence\WidgetPersistenceStrategy;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\EntityForDoctrineEventsFactory;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\EntityWithAsEntityListenerFactory;
 use Zenstruck\Foundry\Tests\Fixture\DoctrineEvents\EntityWithDeepListenedRelationFactory;
@@ -80,6 +81,7 @@ final class TestKernel extends FoundryTestKernel
         $c->register(ServiceStory::class)->setAutowired(true)->setAutoconfigured(true);
         $c->register(InMemoryAddressRepository::class)->setAutowired(true)->setAutoconfigured(true);
         $c->register(InMemoryContactRepository::class)->setAutowired(true)->setAutoconfigured(true);
+        $c->register(WidgetPersistenceStrategy::class)->setAutoconfigured(true)->setPublic(true);
 
         $c->register(FoundryEventListener::class)->setAutowired(true)->setAutoconfigured(true);
 
