@@ -14,7 +14,7 @@ namespace Zenstruck\Foundry\DependencyInjection;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
-use Symfony\Component\DependencyInjection\Reference;
+use Zenstruck\Foundry\Story;
 
 final class AsFixtureStoryCompilerPass implements CompilerPassInterface
 {
@@ -24,7 +24,7 @@ final class AsFixtureStoryCompilerPass implements CompilerPassInterface
             return;
         }
 
-        /** @var array<string, Reference> $fixtureStories */
+        /** @var array<string, class-string<Story>> $fixtureStories */
         $fixtureStories = [];
         $groupedFixtureStories = [];
         foreach ($container->findTaggedServiceIds('foundry.story.fixture') as $id => $tags) {
