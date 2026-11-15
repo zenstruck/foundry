@@ -100,7 +100,11 @@ final class MakeFactory extends AbstractMaker
         if ($input->getOption('no-persistence')) {
             $question = new Question('Not persisted fully qualified class name to create a factory for');
             $question->setValidator(
-                static function(string $class) {
+                static function(mixed $class) {
+                    if (!\is_string($class)) {
+                        throw new RuntimeCommandException('A class name is required.');
+                    }
+
                     if (!\class_exists($class)) {
                         throw new RuntimeCommandException("Given class \"{$class}\" does not exist.");
                     }
