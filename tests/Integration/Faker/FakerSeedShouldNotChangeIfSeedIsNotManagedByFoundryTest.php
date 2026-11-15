@@ -12,6 +12,7 @@
 namespace Zenstruck\Foundry\Tests\Integration\Faker;
 
 use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\WithEnvironmentVariable;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -48,6 +49,7 @@ final class FakerSeedShouldNotChangeIfSeedIsNotManagedByFoundryTest extends Kern
 
     #[Test]
     #[WithEnvironmentVariable('FOUNDRY_FAKER_SEED', '4321')]
+    #[RequiresPhpunit('>=12.1.0')]
     public function faker_seed_can_still_be_forced_by_env_var(): void
     {
         // without Foundry's PHPUnit extension, no test id is available: the run's seed is used as-is
@@ -56,6 +58,7 @@ final class FakerSeedShouldNotChangeIfSeedIsNotManagedByFoundryTest extends Kern
     }
 
     #[Test]
+    #[RequiresPhpunit('>=12.1.0')] // relies on the seed forced by the previous test
     public function faker_seed_can_still_be_forced_by_env_var_2(): void
     {
         // the seed forced earlier in the run is still in effect, but this test derives its own sequence from it

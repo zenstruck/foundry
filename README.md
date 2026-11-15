@@ -71,7 +71,6 @@ DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db"
 
 MONGO_URL="" # disables Mongo
 USE_DAMA_DOCTRINE_TEST_BUNDLE="1" # enables dama/doctrine-test-bundle
-PHPUNIT_VERSION="11" # possible values: 9, 10, 11, 11.4
 
 # test reset database with migrations,
 # only relevant for "reset-database" testsuite
@@ -112,12 +111,6 @@ USE_DAMA_DOCTRINE_TEST_BUNDLE="1"
 
 # using both ODM and ORM makes the "reset db" mechanism slower
 MONGO_URL=""
-
-# Use the last version of PHPUnit
-PHPUNIT_VERSION="12"
-
-# Enable all features of Foundry
-USE_FOUNDRY_PHPUNIT_EXTENSION="1"
 ```
 
 "maker" tests are also quite slow, so you can skip them with using the following command:

@@ -27,6 +27,11 @@ final class PhpUnitTestExtension implements Runner\Extension\Extension
         Runner\Extension\Facade $facade,
         Runner\Extension\ParameterCollection $parameters,
     ): void {
+        // Metadata::dataProviderClosure() appeared in PHPUnit 13.1: below, the tests run once with the mapping of the fixtures
+        if (\version_compare(Runner\Version::id(), '13.1', '<')) {
+            return;
+        }
+
         // ULTRA HACKY: this swaps PHPUnit's internal metadata parser by reflection. None of it is covered
         // by PHPUnit's BC promise: it can break on ANY PHPUnit upgrade, even a patch release.
         //
