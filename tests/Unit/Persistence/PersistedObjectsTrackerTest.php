@@ -34,7 +34,7 @@ final class PersistedObjectsTrackerTest extends TestCase
     {
         $tracker = $this->bootWith(supportsAutoRefresh: true);
 
-        $tracker->add(new \stdClass());
+        $tracker->add($object = new \stdClass());
 
         self::assertSame(1, PersistedObjectsTracker::countObjects());
     }
@@ -44,7 +44,7 @@ final class PersistedObjectsTrackerTest extends TestCase
     {
         $tracker = $this->bootWith(supportsAutoRefresh: false);
 
-        $tracker->add(new \stdClass());
+        $tracker->add($object = new \stdClass());
 
         self::assertSame(0, PersistedObjectsTracker::countObjects());
     }
