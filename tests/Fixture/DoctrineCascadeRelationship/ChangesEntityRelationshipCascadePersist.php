@@ -13,8 +13,8 @@ namespace Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\InverseSideMapping;
-use Doctrine\ORM\Mapping\OwningSideMapping;
 use Doctrine\ORM\Mapping\MappingException;
+use Doctrine\ORM\Mapping\OwningSideMapping;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\BeforeClass;
