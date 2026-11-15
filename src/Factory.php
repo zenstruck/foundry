@@ -300,7 +300,7 @@ abstract class Factory
      *
      * @param FactoryCollection<mixed, Factory<mixed>> $collection
      *
-     * @return self<mixed>[]
+     * @return list<mixed>
      */
     protected function normalizeCollection(string $field, FactoryCollection $collection): array
     {

@@ -23,8 +23,7 @@ final class ForceValue
     }
 
     /**
-     * @param  array<mixed> $what
-     * @return array<mixed>
+     * @return ($what is array ? array<mixed> : mixed)
      */
     public static function unwrap(mixed $what): mixed
     {
