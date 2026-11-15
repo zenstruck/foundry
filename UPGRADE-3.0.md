@@ -49,16 +49,11 @@ Foundry 3.0 requires PHP 8.4 or greater and Symfony 8.0 or greater.
 
 It conflicts with the following versions of the packages it integrates with:
 
-| Package                       | Minimum version |
-| ----------------------------- | --------------- |
-| `doctrine/orm`                | 3.0             |
-| `doctrine/doctrine-bundle`    | 3.0             |
-| `doctrine/persistence`        | 3.3.1           |
-| `doctrine/mongodb-odm`        | 2.16            |
-| `doctrine/mongodb-odm-bundle` | 5.6             |
-| `dama/doctrine-test-bundle`   | 8.0             |
-| `phpunit/phpunit`             | 11.0            |
-| `symfony/maker-bundle`        | 1.55            |
+| Package                     | Minimum version |
+| --------------------------- | --------------- |
+| `doctrine/orm`              | 3.0             |
+| `dama/doctrine-test-bundle` | 8.0             |
+| `phpunit/phpunit`           | 11.0            |
 
 Foundry handles the objects created in data providers only from PHPUnit 11.4.
 
