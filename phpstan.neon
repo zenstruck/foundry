@@ -72,10 +72,6 @@ parameters:
         - identifier: function.internal
           path: tests/bootstrap-reset-database.php
 
-        # association mappings are arrays on ORM 2 and ArrayAccess objects on ORM 3: their offsets are mixed
-        - identifiers: [argument.type, encapsedStringPart.nonString]
-          path: tests/Fixture/DoctrineCascadeRelationship/ChangesEntityRelationshipCascadePersist.php
-
         # the cascade persist permutations decorate PHPUnit's internal metadata parser on purpose
         - message: '#internal (class|interface) PHPUnit\\Metadata\\Parser\\#'
           paths:

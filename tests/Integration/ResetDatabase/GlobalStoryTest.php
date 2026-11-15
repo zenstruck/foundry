@@ -47,10 +47,12 @@ final class GlobalStoryTest extends KernelTestCase
             \assert($em instanceof EntityManagerInterface);
 
             self::assertTrue($em->contains(GlobalStory::globalEntity()));
-            self::assertTrue($em->contains(GlobalStory::getRandom('globalEntities')));
+            self::assertInstanceOf(GlobalEntity::class, $randomEntity = GlobalStory::getRandom('globalEntities'));
+            self::assertTrue($em->contains($randomEntity));
 
             $arrayState = GlobalStory::get('globalEntitiesArray');
             self::assertIsArray($arrayState);
+            self::assertInstanceOf(GlobalEntity::class, $arrayState[0]);
             self::assertTrue($em->contains($arrayState[0]));
         }
 
@@ -59,10 +61,12 @@ final class GlobalStoryTest extends KernelTestCase
             \assert($dm instanceof DocumentManager);
 
             self::assertTrue($dm->contains(GlobalStory::globalDocument()));
-            self::assertTrue($dm->contains(GlobalStory::getRandom('globalDocuments')));
+            self::assertInstanceOf(GlobalDocument::class, $randomDocument = GlobalStory::getRandom('globalDocuments'));
+            self::assertTrue($dm->contains($randomDocument));
 
             $arrayState = GlobalStory::get('globalDocumentsArray');
             self::assertIsArray($arrayState);
+            self::assertInstanceOf(GlobalDocument::class, $arrayState[0]);
             self::assertTrue($dm->contains($arrayState[0]));
         }
     }

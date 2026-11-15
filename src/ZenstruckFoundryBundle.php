@@ -40,16 +40,14 @@ use Zenstruck\Foundry\Test\Behat\DependencyInjection\BehatServicesCompilerPass;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
- * @phpstan-type FakerConfig array{locale: ?string, seed: scalar|null, manage_seed: bool, service: ?string}
+ * @phpstan-type FakerConfig array{locale: ?string, manage_seed: bool, service: ?string}
  * @phpstan-type InstantiatorConfig array{use_constructor: bool, allow_extra_attributes: bool, always_force_properties: bool, service: ?string}
  * @phpstan-type OrmConfig array{
- *     auto_persist: bool,
  *     reset: array{connections: list<string>, entity_managers: list<string>, mode: ?ResetDatabaseMode, migrations: array{configurations: list<string>}},
  * }
- * @phpstan-type MongoConfig array{auto_persist: bool, reset: array{document_managers: list<string>}}
+ * @phpstan-type MongoConfig array{reset: array{document_managers: list<string>}}
  * @phpstan-type Config array{
- *     auto_refresh_proxies: ?bool,
- *     enable_auto_refresh_with_lazy_objects: ?bool,
+ *     enable_auto_refresh_with_lazy_objects: bool,
  *     faker: FakerConfig,
  *     instantiator: InstantiatorConfig,
  *     global_state: list<string>,
