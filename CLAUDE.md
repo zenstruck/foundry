@@ -15,8 +15,8 @@ docker compose up --detach   # DBs required by the test suite (mysql:3307, pgsql
 composer update              # install deps
 
 # provision static analysis tools (bin/tools) — not run automatically on install
-# (phpbench is required too: phpstan.neon bootstraps bin/tools/phpbench/vendor/autoload.php)
-composer bin phpstan install && composer bin phpbench install
+# (tally is required too: phpstan.neon bootstraps bin/tools/tally/vendor/autoload.php)
+composer bin phpstan install && composer bin tally install
 
 ./phpunit --exclude-group=maker      # main testsuite (wrapper script, NOT vendor/bin/phpunit directly);
                                      # always exclude slow "maker" tests unless working on the maker commands
@@ -25,6 +25,9 @@ composer bin phpstan install && composer bin phpbench install
 
 # static analysis
 bin/tools/phpstan/vendor/phpstan/phpstan/phpstan analyse
+
+# benchmarks (Linux only), see "Benchmarks" below
+(set -a; source .env; [ -f .env.local ] && source .env.local; vendor/bin/tally run --jobs=1)
 
 # docs linter
 docker run --rm -e DOCS_DIR='/docs' -v ${PWD}/docs:/docs oskarstark/doctor-rst --short
@@ -79,7 +82,17 @@ Foundry is a model-factory library for Symfony/Doctrine (ORM + MongoDB ODM). PHP
 
 **Upgrade tooling** — `utils/psalm/` is a Psalm plugin, autoloaded from the main package. The Rector rules for user-facing migrations live on `2.x` only: they key on classes 3.0 removed (`PersistentProxyObjectFactory`), so they can neither run nor be tested here.
 
-**Tests layout** — `tests/Unit` (no kernel), `tests/Integration` (kernel + DB), `tests/WebTestCase` (runs first in the suite on purpose), `tests/Fixture` (entities/documents/factories shared by everything, including Behat and maker tests). `tests/Benchmark` is driven by phpbench (`phpbench.json`).
+**Tests layout** — `tests/Unit` (no kernel), `tests/Integration` (kernel + DB), `tests/WebTestCase` (runs first in the suite on purpose), `tests/Fixture` (entities/documents/factories shared by everything, including Behat and maker tests). `tests/Benchmark` is driven by Tally (`tally.php`).
+
+### Benchmarks
+
+`tests/Benchmark` runs under [phpstan/tally](https://github.com/phpstan/tally), which counts instructions, cycles and memory under Valgrind instead of measuring time.
+No expected numbers are committed: the CI runs the PR's benchmarks on `3.x`, accepts those numbers as expected, then runs them on the PR (see `.github/workflows/benchmarks.yml`).
+So a benchmark must run against the `3.x` fixtures too, and the benchmark classes must not carry `#[Expected]`/`#[ExpectedFor]` attributes.
+Always pass `--jobs=1`: the cases share one database.
+Tally passes only the env vars listed in `tally.php` to the cases, and reads neither `.env` nor `.env.local`, hence the subshell above.
+
+Database round trips, which Tally does not see (only the PHP process is counted), are asserted by `tests/Integration/{ORM,Mongo}/RoundTripsTest.php`.
 
 ## Code style
 

@@ -1,15 +1,15 @@
-name: Benchmarks with PHPBench
+name: Benchmarks with Tally
 
 on:
   workflow_dispatch:
   pull_request:
     paths:
       - .github/workflows/benchmarks.yml
-      - bin/tools/phpbench
+      - bin/tools/tally/**
       - src/**
       - tests/Benchmark/**
       - composer.json
-      - phpbench.json
+      - tally.php
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -17,35 +17,19 @@ concurrency:
 
 jobs:
   run:
-    name: "Benchmarks ${{ matrix.database }} - ${{ matrix.with-dama && 'with Dama' || 'without Dama' }}"
+    name: Benchmarks (3.x vs PR)
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      fail-fast: false
-      matrix:
-        php: [ 8.5 ]
-        symfony: [ 8.1.* ]
-        database: [ mysql|mongo ]
-        with-dama: [ 0 ]
+    timeout-minutes: 30
     env:
-      DATABASE_URL: ${{ contains(matrix.database, 'mysql') && 'mysql://root:root@127.0.0.1:3306/foundry?serverVersion=5.7.42' || contains(matrix.database, 'pgsql') && 'postgresql://root:root@localhost:5432/foundry?serverVersion=15' || contains(matrix.database, 'sqlite') && 'sqlite:///%kernel.project_dir%/var/data.db' || '' }}
-      MONGO_URL: ${{ contains(matrix.database, 'mongo') && 'mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb' || '' }}
-      USE_DAMA_DOCTRINE_TEST_BUNDLE: ${{ matrix.with-dama }}
+      SYMFONY_REQUIRE: 8.1.*
+      # with sqlite, the SQL engine runs in the PHP process and its instructions are counted
+      DATABASE_URL: sqlite:///%kernel.project_dir%/var/data.db
+      MONGO_URL: mongodb://127.0.0.1:27017/dbName?compressors=disabled&amp;gssapiServiceName=mongodb
+      USE_DAMA_DOCTRINE_TEST_BUNDLE: 0
 
     services:
-      mysql:
-        image: ${{ contains(matrix.database, 'mysql') && 'mysql:8.0' || '' }}
-        env:
-          MYSQL_ROOT_PASSWORD: root
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd "mysqladmin ping -proot"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
       mongo:
-        image: ${{ contains(matrix.database, 'mongo') && 'mongo:4' || '' }}
+        image: mongo:4
         ports:
           - 27017:27017
 
@@ -53,11 +37,13 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
+          php-version: 8.5
+          extensions: posix
           coverage: none
           tools: flex
 
-      # side-by-side checkouts: each side gets its own vendor/ and var/cache/
+      # side-by-side checkouts with paths of the same length: each side gets its own vendor/ and var/cache/,
+      # and the memory layout of both sides is the same
       - name: Checkout 3.x
         uses: actions/checkout@v4
         with:
@@ -75,32 +61,31 @@ jobs:
         uses: ramsey/composer-install@v2
         with:
           working-directory: base
-          dependency-versions: ${{ matrix.deps }}
           composer-options: --prefer-dist
-        env:
-          SYMFONY_REQUIRE: ${{ matrix.symfony }}
 
       - name: Install dependencies (PR)
         uses: ramsey/composer-install@v2
         with:
           working-directory: head
-          dependency-versions: ${{ matrix.deps }}
           composer-options: --prefer-dist
-        env:
-          SYMFONY_REQUIRE: ${{ matrix.symfony }}
 
-      - name: Install PHPBench
+      - name: Install Tally
         working-directory: head
-        run: composer bin phpbench install
+        run: composer bin tally install
 
-      # shared runners shift between measurements: fail only if two rounds both exceed the threshold
-      - name: Run benchmarks (3.x vs PR)
+      # no expected numbers are committed: the numbers of 3.x, measured with the PR's benchmarks, become the expected ones.
+      # A benchmark that does not exist on 3.x yet would also be "new" and pass.
+      - name: Run benchmarks on 3.x
         run: |
-          PHPBENCH="$PWD/head/bin/tools/phpbench/vendor/phpbench/phpbench/bin/phpbench"
-          OPTIONS="tests/Benchmark --iterations=5 --retry-threshold=10 --progress=plain"
-          round() {
-            (cd base && $PHPBENCH run $OPTIONS --dump-file="$RUNNER_TEMP/base.xml") &&
-            (cd head && $PHPBENCH run $OPTIONS --report=aggregate --file="$RUNNER_TEMP/base.xml" \
-              --assert="mode(variant.time.avg) <= mode(baseline.time.avg) +/- 15%")
-          }
-          round || { echo "::warning::A variant is more than 15% slower than 3.x, measuring both sides again"; round; }
+          rm -rf base/tests/Benchmark
+          cp -r head/tests/Benchmark base/tests/Benchmark
+          cp head/tally.php base/tally.php
+          cd base
+          GITHUB_ACTIONS=false "$GITHUB_WORKSPACE/head/bin/tools/tally/vendor/phpstan/tally/bin/tally" run --jobs=1 --output="$RUNNER_TEMP/tally-3.x"
+
+      - name: Run benchmarks on the PR
+        working-directory: head
+        run: |
+          TALLY="$GITHUB_WORKSPACE/head/bin/tools/tally/vendor/phpstan/tally/bin/tally"
+          $TALLY accept "$RUNNER_TEMP/tally-3.x"
+          GITHUB_WORKSPACE="$PWD" $TALLY run --jobs=1 --output="$RUNNER_TEMP/tally-pr"
