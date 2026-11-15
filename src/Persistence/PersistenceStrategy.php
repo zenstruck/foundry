@@ -102,6 +102,15 @@ abstract class PersistenceStrategy
     abstract public function getIdentifierValues(object $object): array;
 
     /**
+     * The fields holding this class' identity, eg. ['id'].
+     *
+     * @param class-string $class
+     *
+     * @return list<string>
+     */
+    abstract public function identifierFields(string $class): array;
+
+    /**
      * @return list<string>
      */
     abstract public function managedNamespaces(): array;

@@ -482,7 +482,7 @@ class PersistenceManager implements IdentifierResolver
      */
     public function getIdentifierFields(string $class): array
     {
-        return \array_values($this->metadataFor($class)->getIdentifier());
+        return $this->strategyFor($class)->identifierFields($class);
     }
 
     public static function isOrmOnly(): bool

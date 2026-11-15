@@ -26,15 +26,6 @@ use Zenstruck\Foundry\Persistence\Relationship\RelationshipMetadata;
 abstract class CustomPersistenceStrategy extends PersistenceStrategy
 {
     /**
-     * The fields holding this class' identity, eg. ['id'].
-     *
-     * @param class-string $class
-     *
-     * @return list<string>
-     */
-    abstract protected function identifierFields(string $class): array;
-
-    /**
      * Like Doctrine, an identity missing a single field is no identity at all.
      */
     final public function getIdentifierValues(object $object): array

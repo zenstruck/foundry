@@ -11,14 +11,43 @@
 
 namespace Zenstruck\Foundry\Tests\Unit\Persistence;
 
+use Faker;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Zenstruck\Foundry\Configuration;
+use Zenstruck\Foundry\FactoryRegistry;
+use Zenstruck\Foundry\FakerAdapter;
+use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Persistence\CustomPersistenceStrategy;
 use Zenstruck\Foundry\Persistence\PersistenceManager;
+use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
+use Zenstruck\Foundry\StoryRegistry;
 
 final class CustomPersistenceStrategyTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        Configuration::shutdown();
+    }
+
+    #[Test]
+    public function it_finds_by_a_bare_identifier_through_the_declared_fields(): void
+    {
+        $manager = new PersistenceManager([$strategy = new InMemoryArrayStrategy()], new ResetDatabaseManager([], []));
+        Configuration::boot(new Configuration(
+            new FactoryRegistry([]),
+            new FakerAdapter(Faker\Factory::create()),
+            Instantiator::withConstructor(),
+            new StoryRegistry([]),
+            persistence: $manager,
+        ));
+        $strategy->persist($seven = new Thing(7, 'seven'));
+
+        self::assertSame(['id'], $manager->getIdentifierFields(Thing::class));
+        self::assertSame($seven, RepositoryDecorator::for(Thing::class)->find(7));
+    }
+
     #[Test]
     public function it_derives_identifier_values_from_the_declared_fields(): void
     {
@@ -129,7 +158,7 @@ final class InMemoryArrayStrategy extends CustomPersistenceStrategy
         return \array_slice($matching, $offset ?? 0, $limit);
     }
 
-    protected function identifierFields(string $class): array
+    public function identifierFields(string $class): array
     {
         return ['id'];
     }
@@ -167,7 +196,7 @@ final class BufferingStrategy extends CustomPersistenceStrategy
         return [];
     }
 
-    protected function identifierFields(string $class): array
+    public function identifierFields(string $class): array
     {
         return ['id'];
     }

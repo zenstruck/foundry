@@ -76,7 +76,7 @@ final class InMemoryPersistenceStrategy extends CustomPersistenceStrategy
     /**
      * Objects held in memory have no identity, so find() by id is not supported -- findBy() is.
      */
-    protected function identifierFields(string $class): array
+    public function identifierFields(string $class): array
     {
         return [];
     }

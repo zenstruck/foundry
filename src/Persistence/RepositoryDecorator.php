@@ -103,13 +103,17 @@ class RepositoryDecorator implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Looking an object up by a bare identifier needs the backend to know its own identity fields.
-     *
      * @return T|null
      */
     protected function findByIdentifier(mixed $id): ?object
     {
-        throw new \BadMethodCallException(\sprintf('Looking "%s" up by a bare identifier is not supported by its backend. Pass criteria instead, eg. find([\'id\' => $id]).', $this->class));
+        $fields = Configuration::instance()->persistence()->strategyFor($this->class)->identifierFields($this->class);
+
+        if (1 !== \count($fields)) {
+            throw new \BadMethodCallException(\sprintf('Looking "%s" up by a bare identifier needs exactly one identity field (%d found). Pass criteria instead, eg. find([\'id\' => $id]).', $this->class, \count($fields)));
+        }
+
+        return $this->findOneBy([$fields[0] => $id]);
     }
 
     /**

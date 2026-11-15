@@ -99,6 +99,11 @@ abstract class DoctrinePersistenceStrategy extends PersistenceStrategy implement
         return $this->objectManagerFor($class)->getClassMetadata($class);
     }
 
+    public function identifierFields(string $class): array
+    {
+        return \array_values($this->classMetadata($class)->getIdentifier());
+    }
+
     public function allMetadata(): iterable
     {
         foreach ($this->objectManagers() as $objectManager) {
