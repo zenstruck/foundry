@@ -1,6 +1,5 @@
 <?php
 
-use Doctrine\Persistence\ObjectRepository;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Object\Instantiator;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
@@ -88,7 +87,7 @@ $var = UserFactory::new()->many(2)->all();
 
 // methods using repository()
 $repository = UserFactory::repository();
-/** @psalm-check-type-exact $var = RepositoryDecorator<UserForPersistentFactory, ObjectRepository<UserForPersistentFactory>> */
+/** @psalm-check-type-exact $var = RepositoryDecorator<UserForPersistentFactory> */
 $var = $repository;
 /** @psalm-check-type-exact $var = UserForPersistentFactory|null */
 $var = $repository->first();
