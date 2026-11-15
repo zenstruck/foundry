@@ -11,17 +11,16 @@
 
 namespace Zenstruck\Foundry\Persistence;
 
+use Zenstruck\Foundry\Object\PropertyLocator;
 use Zenstruck\Foundry\Persistence\Relationship\RelationshipMetadata;
-
-use function Zenstruck\Foundry\get;
 
 /**
  * Base class for a non-Doctrine backend. Four methods are left to implement -- supports(),
  * persist(), findBy() and identifierFields() -- and everything Foundry can answer on the backend's
  * behalf is answered here.
  *
- * A backend writing straight away leaves flush() alone. One that would rather send a single batch
- * buffers in persist() and sends it in flush(): Foundry decides when flush() happens, so flush_after()
+ * A backend writing straight away leaves flushAll() alone. One that would rather send a single batch
+ * buffers in persist() and sends it in flushAll(): Foundry decides when it happens, so flush_after()
  * keeps its promise either way.
  */
 abstract class CustomPersistenceStrategy extends PersistenceStrategy
@@ -35,20 +34,35 @@ abstract class CustomPersistenceStrategy extends PersistenceStrategy
      */
     abstract protected function identifierFields(string $class): array;
 
+    /**
+     * Like Doctrine, an identity missing a single field is no identity at all.
+     */
     final public function getIdentifierValues(object $object): array
     {
-        $fields = $this->identifierFields($object::class);
+        $values = [];
 
-        return \array_combine($fields, \array_map(static fn(string $field) => get($object, $field), $fields));
+        foreach ($this->identifierFields($object::class) as $field) {
+            $property = PropertyLocator::find($object, $field);
+
+            if (!$property?->isInitialized($object) || null === $value = $property->getValue($object)) {
+                return [];
+            }
+
+            $values[$field] = $value;
+        }
+
+        return $values;
     }
 
     final public function find(string $class, array $id): ?object
     {
-        return $this->findBy($class, $id, limit: 1)[0] ?? null;
+        // positional: the backend's findBy() may name its parameters differently
+        return $this->findBy($class, $id, null, 1)[0] ?? null;
     }
 
     public function flush(string $class): void
     {
+        $this->flushAll();
     }
 
     public function flushAll(): void

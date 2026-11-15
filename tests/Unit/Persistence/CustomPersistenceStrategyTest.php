@@ -14,6 +14,8 @@ namespace Zenstruck\Foundry\Tests\Unit\Persistence;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Zenstruck\Foundry\Persistence\CustomPersistenceStrategy;
+use Zenstruck\Foundry\Persistence\PersistenceManager;
+use Zenstruck\Foundry\Persistence\ResetDatabase\ResetDatabaseManager;
 
 final class CustomPersistenceStrategyTest extends TestCase
 {
@@ -23,6 +25,32 @@ final class CustomPersistenceStrategyTest extends TestCase
         $strategy = new InMemoryArrayStrategy();
 
         self::assertSame(['id' => 7], $strategy->getIdentifierValues(new Thing(7, 'seven')));
+    }
+
+    #[Test]
+    public function it_has_no_identifier_values_until_every_identity_field_is_set(): void
+    {
+        $strategy = new InMemoryArrayStrategy();
+
+        self::assertSame([], $strategy->getIdentifierValues(new Thing(null, 'new')));
+        self::assertSame([], $strategy->getIdentifierValues((new \ReflectionClass(Thing::class))->newInstanceWithoutConstructor()));
+    }
+
+    #[Test]
+    public function a_backend_buffering_until_flush_all_writes_on_every_flush(): void
+    {
+        $manager = new PersistenceManager([$strategy = new BufferingStrategy()], new ResetDatabaseManager([], []));
+
+        $manager->save(new Thing(1, 'one'));
+        self::assertCount(1, $strategy->written);
+
+        $manager->flushAfter(static function() use ($manager, $strategy) {
+            $manager->save(new Thing(2, 'two'));
+            $manager->save(new Thing(3, 'three'));
+
+            self::assertCount(1, $strategy->written);
+        });
+        self::assertCount(3, $strategy->written);
     }
 
     #[Test]
@@ -67,7 +95,7 @@ final class CustomPersistenceStrategyTest extends TestCase
 
 final class Thing
 {
-    public function __construct(public int $id, public string $name)
+    public function __construct(public ?int $id, public string $name)
     {
     }
 }
@@ -99,6 +127,44 @@ final class InMemoryArrayStrategy extends CustomPersistenceStrategy
         ));
 
         return \array_slice($matching, $offset ?? 0, $limit);
+    }
+
+    protected function identifierFields(string $class): array
+    {
+        return ['id'];
+    }
+}
+
+/**
+ * Sends one batch per flush, and overrides nothing but flushAll() to do so.
+ */
+final class BufferingStrategy extends CustomPersistenceStrategy
+{
+    /** @var list<object> */
+    public array $written = [];
+
+    /** @var list<object> */
+    private array $buffer = [];
+
+    public function supports(string $class): bool
+    {
+        return Thing::class === $class;
+    }
+
+    public function persist(object $object): void
+    {
+        $this->buffer[] = $object;
+    }
+
+    public function flushAll(): void
+    {
+        $this->written = [...$this->written, ...$this->buffer];
+        $this->buffer = [];
+    }
+
+    public function findBy(string $class, array $criteria, ?array $orderBy = null, ?int $limit = null, ?int $offset = null): array
+    {
+        return [];
     }
 
     protected function identifierFields(string $class): array
