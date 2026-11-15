@@ -21,8 +21,8 @@ use Zenstruck\Foundry\FakerAdapter;
 if (\method_exists(Before::class, '__construct')) { // @phpstan-ignore function.alreadyNarrowedType
     trait ResetFakerTestTrait
     {
-        private static ?string $savedServerSeed = null;
-        private static ?string $savedEnvSeed = null;
+        private static mixed $savedServerSeed = null;
+        private static mixed $savedEnvSeed = null;
         private static ?string $savedGetEnvSeed = null;
 
         private static ?int $currentSeed = null;
@@ -53,7 +53,7 @@ if (\method_exists(Before::class, '__construct')) { // @phpstan-ignore function.
             }
 
             $savedValue = self::$savedServerSeed ?? self::$savedEnvSeed ?? self::$savedGetEnvSeed;
-            FakerAdapter::resetFakerSeed($savedValue ? (int) $savedValue : null);
+            FakerAdapter::resetFakerSeed(\is_numeric($savedValue) ? (int) $savedValue : null);
         }
     }
 } else {

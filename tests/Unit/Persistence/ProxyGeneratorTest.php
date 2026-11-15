@@ -42,7 +42,9 @@ final class ProxyGeneratorTest extends TestCase
     public function it_can_generate_proxy_for_class_with_unserialize_magic_method(object $obj): void
     {
         $proxyfiedObj = ProxyGenerator::wrap($obj);
-        self::assertEquals(\unserialize(\serialize($proxyfiedObj))->_real(), $proxyfiedObj->_real());
+        $unserializedObj = \unserialize(\serialize($proxyfiedObj));
+        self::assertInstanceOf(Proxy::class, $unserializedObj);
+        self::assertEquals($unserializedObj->_real(), $proxyfiedObj->_real());
     }
 
     public static function classWithUnserializeMagicMethodProvider(): iterable

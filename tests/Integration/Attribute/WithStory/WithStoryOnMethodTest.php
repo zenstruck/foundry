@@ -44,7 +44,7 @@ final class WithStoryOnMethodTest extends KernelTestCase
         GenericEntityFactory::assert()->count(2);
 
         // ensure state is accessible
-        $this->assertSame('foo', EntityStory::get('foo')->getProp1());
+        $this->assertSame('foo', EntityStory::foo()->getProp1());
     }
 
     #[Test]
@@ -59,6 +59,6 @@ final class WithStoryOnMethodTest extends KernelTestCase
     #[WithStory(ServiceStory::class)]
     public function can_use_service_story(): void
     {
-        $this->assertSame('localhost', ServiceStory::get('foo')->getProp1());
+        $this->assertSame('localhost', ServiceStory::foo()->getProp1());
     }
 }

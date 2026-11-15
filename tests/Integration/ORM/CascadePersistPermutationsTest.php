@@ -106,6 +106,6 @@ final class CascadePersistPermutationsTest extends KernelTestCase
         // array access reads both the array of ORM 2 and the AssociationMapping of ORM 3
         $mapping = $entityManager->getClassMetadata($class)->getAssociationMapping($field);
 
-        return ['cascadePersist' => $mapping['isCascadePersist'], 'orphanRemoval' => (bool) $mapping['orphanRemoval']];
+        return ['cascadePersist' => (bool) $mapping['isCascadePersist'], 'orphanRemoval' => (bool) $mapping['orphanRemoval']];
     }
 }

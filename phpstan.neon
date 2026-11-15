@@ -2,7 +2,7 @@ includes:
     - phar://phpstan.phar/conf/bleedingEdge.neon
 
 parameters:
-    level: 8
+    level: 9
 
     treatPhpDocTypesAsCertain: false
     inferPrivatePropertyTypeFromConstructor: true
@@ -51,6 +51,16 @@ parameters:
             - src/ObjectFactory.php
             - src/Persistence/PersistentObjectFactory.php
 
+        # PHPStan cannot infer T from the bound of TFactory (TFactory of Factory<T>)
+        - message: '#should return Zenstruck\\Foundry\\FactoryCollection<T, TFactory of Zenstruck\\Foundry\\Factory<T>> but returns Zenstruck\\Foundry\\FactoryCollection<mixed, TFactory#'
+          identifier: return.type
+          path: src/FactoryCollection.php
+
+        # magic create helpers forward user arguments as is: native types check them
+        - message: '#^Parameter \#\d+ \$\w+ of (static )?method Zenstruck\\Foundry\\(Factory|FactoryCollection)<.+>::(doCreate\w+|create|many|range|sequence)\(\) expects .+, mixed given\.$#'
+          identifier: argument.type
+          path: src/Factory.php
+
         # generics annotation are not so helpful in maker code
         - identifier: missingType.generics
           path: src/Maker/Factory/
@@ -74,6 +84,10 @@ parameters:
           path: config/
         - identifier: function.internal
           path: tests/bootstrap-reset-database.php
+
+        # association mappings are arrays on ORM 2 and ArrayAccess objects on ORM 3: their offsets are mixed
+        - identifiers: [argument.type, encapsedStringPart.nonString]
+          path: tests/Fixture/DoctrineCascadeRelationship/ChangesEntityRelationshipCascadePersist.php
 
         # the cascade persist permutations decorate PHPUnit's internal metadata parser on purpose
         - message: '#internal (class|interface) PHPUnit\\Metadata\\Parser\\#'

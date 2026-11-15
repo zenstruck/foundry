@@ -43,7 +43,7 @@ final class WithStoryOnClassTest extends KernelTestCase
         GenericEntityFactory::assert()->count(2);
 
         // ensure state is accessible
-        $this->assertSame('foo', EntityStory::get('foo')->getProp1());
+        $this->assertSame('foo', EntityStory::foo()->getProp1());
     }
 
     #[Test]

@@ -105,6 +105,9 @@ final class AutoDatabaseResetterTest extends TestCase
         $resetter = new AutoDatabaseResetter($this->createStub(Registry::class), ['default'], ['default'], $dependencyFactory);
 
         // the resolved resetter is private: resolving it through a reset would require a booted kernel and a database
-        return (new \ReflectionMethod($resetter, 'inner'))->invoke($resetter);
+        $inner = (new \ReflectionMethod($resetter, 'inner'))->invoke($resetter);
+        self::assertInstanceOf(OrmResetter::class, $inner);
+
+        return $inner;
     }
 }

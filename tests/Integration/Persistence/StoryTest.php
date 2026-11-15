@@ -81,8 +81,8 @@ final class StoryTest extends KernelTestCase
     #[DataProvider('storiesProvider')]
     public function can_access_story_state(string $story, string $factory): void
     {
-        $this->assertSame('foo', $story::get('foo')->getProp1());
-        $this->assertSame('bar', $story::get('bar')->getProp1());
+        $this->assertSame('foo', $story::foo()->getProp1());
+        $this->assertSame('bar', $story::bar()->getProp1());
         $this->assertSame(12, $story::get('int'));
         $this->assertSame(12.12, $story::get('float'));
         $this->assertSame('dummyString', $story::get('string'));
@@ -188,7 +188,9 @@ final class StoryTest extends KernelTestCase
         $ids = [];
 
         while (50 !== \count($ids) && 3 !== \count(\array_unique($ids))) {
-            $ids[] = $story::getRandom($story)->id;
+            $object = $story::getRandom($story);
+            \assert($object instanceof GenericModel);
+            $ids[] = $object->id;
         }
 
         $this->assertCount(3, \array_unique($ids));

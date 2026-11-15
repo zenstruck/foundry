@@ -48,12 +48,13 @@ final class UnitTestConfig
     {
         $faker = self::$faker ?? Faker\Factory::create();
         $faker->unique(true);
+        $seedFromEnv = $_SERVER['FOUNDRY_FAKER_SEED'] ?? $_ENV['FOUNDRY_FAKER_SEED'] ?? \getenv('FOUNDRY_FAKER_SEED');
 
         return new Configuration(
             new FactoryRegistry([]),
             new FakerAdapter(
                 $faker,
-                forcedFakerSeedFromEnv: $_SERVER['FOUNDRY_FAKER_SEED'] ?? $_ENV['FOUNDRY_FAKER_SEED'] ?? (\getenv('FOUNDRY_FAKER_SEED') ?: null),
+                forcedFakerSeedFromEnv: \is_numeric($seedFromEnv) ? (int) $seedFromEnv : null,
                 manageFakerSeed: self::$manageFakerSeed,
             ),
             self::$instantiator ?? Instantiator::withConstructor(),
