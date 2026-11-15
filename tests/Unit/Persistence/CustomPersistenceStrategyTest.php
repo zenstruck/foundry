@@ -49,6 +49,14 @@ final class CustomPersistenceStrategyTest extends TestCase
     }
 
     #[Test]
+    public function it_exposes_no_doctrine_metadata(): void
+    {
+        $manager = new PersistenceManager([new InMemoryArrayStrategy()], new ResetDatabaseManager([], []));
+
+        self::assertNull($manager->metadataFor(Thing::class));
+    }
+
+    #[Test]
     public function it_derives_identifier_values_from_the_declared_fields(): void
     {
         $strategy = new InMemoryArrayStrategy();

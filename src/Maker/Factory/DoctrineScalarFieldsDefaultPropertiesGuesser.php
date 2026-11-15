@@ -119,7 +119,7 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
 
     public function supports(MakeFactoryData $makeFactoryData): bool
     {
-        return $makeFactoryData->isPersisted();
+        return $makeFactoryData->isPersisted() && null !== $this->getClassMetadata($makeFactoryData);
     }
 
     private function extractFieldMappingData(FieldMapping|array $fieldMapping, string $field, mixed $default = null): mixed

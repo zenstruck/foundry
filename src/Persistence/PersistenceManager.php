@@ -377,17 +377,13 @@ class PersistenceManager implements IdentifierResolver
      * @template T of object
      *
      * @param  class-string<T>  $class
-     * @return ClassMetadata<T>
+     * @return ClassMetadata<T>|null null for a backend without Doctrine metadata
      */
-    public function metadataFor(string $class): ClassMetadata
+    public function metadataFor(string $class): ?ClassMetadata
     {
         $strategy = $this->strategyFor($class);
 
-        if (!$strategy instanceof ProvidesMetadata) {
-            throw new \LogicException(\sprintf('"%s" exposes no metadata for "%s".', $strategy::class, $class));
-        }
-
-        return $strategy->classMetadata($class);
+        return $strategy instanceof ProvidesMetadata ? $strategy->classMetadata($class) : null;
     }
 
     /**
