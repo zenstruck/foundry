@@ -152,10 +152,12 @@ final class LoadFixturesCommand extends Command
         if (\count($this->fixtureStoryResolver->availableGroupNames()) > 0) {
             $storyNames[] = '(choose a group of stories...)';
         }
+        /** @var string $name */
         $name = $io->choice('Choose a story to load:', $storyNames);
 
         if (!$this->fixtureStoryResolver->hasFixture($name)) {
             $groupsNames = $this->fixtureStoryResolver->availableGroupNames();
+            /** @var string $name */
             $name = $io->choice('Choose a group of stories:', $groupsNames);
         }
 

@@ -92,7 +92,6 @@ final class NoPersistenceObjectsAutoCompleter
     {
         $composerConfig = $this->getComposerConfiguration();
 
-        /** @var array<string, string> $definedNamespaces */
         $definedNamespaces = $composerConfig['autoload']['psr-4'] ?? [];
 
         return \array_combine(
@@ -108,7 +107,7 @@ final class NoPersistenceObjectsAutoCompleter
     }
 
     /**
-     * @return array<string, string>
+     * @return list<string>
      */
     private function excludedFiles(): array
     {
@@ -121,7 +120,7 @@ final class NoPersistenceObjectsAutoCompleter
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array{autoload?: array{'psr-4'?: array<string, string>, files?: list<string>}}
      */
     private function getComposerConfiguration(): array
     {
@@ -130,6 +129,9 @@ final class NoPersistenceObjectsAutoCompleter
             return [];
         }
 
-        return \json_decode((string) \file_get_contents($composerConfigFilePath), true, 512, \JSON_THROW_ON_ERROR);
+        /** @var array{autoload?: array{'psr-4'?: array<string, string>, files?: list<string>}} $composerConfig */
+        $composerConfig = \json_decode((string) \file_get_contents($composerConfigFilePath), true, 512, \JSON_THROW_ON_ERROR);
+
+        return $composerConfig;
     }
 }

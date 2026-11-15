@@ -110,8 +110,9 @@ final class FoundryEventListener
         $event->object->name = "{$this->name($event->object->name, $event)} global";
     }
 
-    private function name(string $name, Event $event): string // @phpstan-ignore missingType.generics
+    private function name(mixed $name, Event $event): string // @phpstan-ignore missingType.generics
     {
+        \assert(\is_string($name));
         $eventName = (new \ReflectionClass($event))->getShortName();
 
         return "{$name}\n{$eventName}";

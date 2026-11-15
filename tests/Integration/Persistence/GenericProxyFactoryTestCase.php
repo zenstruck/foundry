@@ -297,6 +297,7 @@ abstract class GenericProxyFactoryTestCase extends GenericFactoryTestCase
                 return $attributes;
             })
             ->afterPersist(static function(GenericModel $object, array $attributes) {
+                \assert(\is_string($attributes['extra']));
                 $object->setProp1($attributes['extra']);
             })
             ->create();

@@ -145,6 +145,7 @@ final class Instantiator
         foreach ($factory->getParameters() as $parameter) {
             if (\array_key_exists($parameter->name, $parameters)) {
                 if ($parameter->isVariadic()) {
+                    \assert(\is_array($parameters[$parameter->name]));
                     $arguments = \array_merge($arguments, $parameters[$parameter->name]);
                 } else {
                     $arguments[] = $parameters[$parameter->name];

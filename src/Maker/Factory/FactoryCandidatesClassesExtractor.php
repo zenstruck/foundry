@@ -67,7 +67,7 @@ final class FactoryCandidatesClassesExtractor
     {
         // - Doctrine ORM embedded objects does NOT have metadata classes, so we have to find all embedded classes inside entities
         // - Doctrine ODM embedded objects HAVE metadata classes, so they are already returned by factoryCandidatesClasses()
-        return match (true) {
+        return match (true) { // @phpstan-ignore return.type (Doctrine types embedded class mappings loosely)
             $metadata instanceof ORMClassMetadata => \array_column($metadata->embeddedClasses, 'class'),
             default => [],
         };

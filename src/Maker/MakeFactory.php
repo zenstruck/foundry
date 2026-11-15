@@ -130,14 +130,17 @@ final class MakeFactory extends AbstractMaker
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
+        /** @var string $class */
         $class = $input->getArgument('class');
+        /** @var ?string $namespace */
+        $namespace = $input->getOption('namespace');
         $generateAllFactories = self::GENERATE_ALL_FACTORIES === $class;
         $classes = $generateAllFactories ? $this->factoryCandidatesClassesExtractor->factoryCandidatesClasses() : [$class];
 
         foreach ($classes as $class) {
             $this->factoryGenerator->generateFactory(
                 $io,
-                MakeFactoryQuery::fromInput($input, $class, $generateAllFactories, $generator, $input->getOption('namespace') ?? $this->defaultNamespace, $this->addHints), );
+                MakeFactoryQuery::fromInput($input, $class, $generateAllFactories, $generator, $namespace ?? $this->defaultNamespace, $this->addHints), );
         }
 
         $generator->writeChanges();

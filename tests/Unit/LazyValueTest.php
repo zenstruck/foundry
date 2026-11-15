@@ -107,6 +107,7 @@ final class LazyValueTest extends TestCase
 
         $objects = $value();
 
+        $this->assertIsArray($objects);
         $this->assertCount(2, $objects);
         $this->assertContainsOnlyInstancesOf(SimpleObject::class, $objects);
         $this->assertSame($objects, $value());

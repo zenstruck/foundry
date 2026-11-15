@@ -49,7 +49,7 @@ final class DoctrineCascadeRelationshipMetadata implements \Stringable
 
     /**
      * @param  list<array{class: class-string, field: string, isOneToMany: bool}> $relationshipFields
-     * @return \Generator<list<static>>
+     * @return \Generator<string, list<static>>
      */
     public static function allCombinations(array $relationshipFields): iterable
     {
