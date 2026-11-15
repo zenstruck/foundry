@@ -100,7 +100,11 @@ final class MakeFactory extends AbstractMaker
         if ($input->getOption('no-persistence')) {
             $question = new Question('Not persisted fully qualified class name to create a factory for');
             $question->setValidator(
-                static function(string $class) {
+                static function(mixed $class) {
+                    if (!\is_string($class)) {
+                        throw new RuntimeCommandException('A class name is required.');
+                    }
+
                     if (!\class_exists($class)) {
                         throw new RuntimeCommandException("Given class \"{$class}\" does not exist.");
                     }
@@ -121,14 +125,17 @@ final class MakeFactory extends AbstractMaker
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
+        /** @var string $class */
         $class = $input->getArgument('class');
+        /** @var ?string $namespace */
+        $namespace = $input->getOption('namespace');
         $generateAllFactories = self::GENERATE_ALL_FACTORIES === $class;
         $classes = $generateAllFactories ? $this->factoryCandidatesClassesExtractor->factoryCandidatesClasses() : [$class];
 
         foreach ($classes as $class) {
             $this->factoryGenerator->generateFactory(
                 $io,
-                MakeFactoryQuery::fromInput($input, $class, $generateAllFactories, $generator, $input->getOption('namespace') ?? $this->defaultNamespace, $this->addHints), );
+                MakeFactoryQuery::fromInput($input, $class, $generateAllFactories, $generator, $namespace ?? $this->defaultNamespace, $this->addHints), );
         }
 
         $generator->writeChanges();

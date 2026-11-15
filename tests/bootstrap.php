@@ -24,7 +24,9 @@ if (!isset($_ENV['PARATEST'])) {
     (new Dotenv())->usePutenv()->loadEnv(__DIR__.'/../.env', testEnvs: []);
 }
 
-$databaseUrl = u($_ENV['DATABASE_URL'] ?? '');
+/** @var string $databaseUrl */
+$databaseUrl = $_ENV['DATABASE_URL'] ?? '';
+$databaseUrl = u($databaseUrl);
 if ($databaseUrl->startsWith('sqlite:')
     && $fs->exists(
         $sqliteFile = $databaseUrl->after('sqlite://')->trimStart('/')->replace('%kernel.project_dir%', \dirname(__DIR__))->toString()
@@ -33,7 +35,9 @@ if ($databaseUrl->startsWith('sqlite:')
     $fs->remove($sqliteFile);
 }
 
-$command = \implode(' ', $_SERVER['argv']);
+/** @var list<string> $argv */
+$argv = $_SERVER['argv'];
+$command = \implode(' ', $argv);
 
 if (\str_contains($command, '--testsuite reset-database')) {
     require __DIR__.'/bootstrap-reset-database.php';

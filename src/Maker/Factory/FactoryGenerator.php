@@ -72,7 +72,11 @@ final class FactoryGenerator
                 );
 
                 $question->setValidator(
-                    function(string $newClassName) use ($factoryClass) {
+                    function(mixed $newClassName) use ($factoryClass) {
+                        if (!\is_string($newClassName)) {
+                            throw new RuntimeCommandException('A class name is required.');
+                        }
+
                         $newFactoryClass = \sprintf('%s\\%s', Str::getNamespace($factoryClass), $newClassName);
                         if ($this->factoryClassMap->factoryClassExists($newFactoryClass)) {
                             throw new RuntimeCommandException("Class \"{$newFactoryClass}\" also already exists!");
@@ -81,6 +85,7 @@ final class FactoryGenerator
                         return $newFactoryClass;
                     },
                 );
+                /** @var class-string $factoryClass */
                 $factoryClass = $io->askQuestion($question);
 
                 $this->factoryClassMap->addFactoryForClass($factoryClass, $class);

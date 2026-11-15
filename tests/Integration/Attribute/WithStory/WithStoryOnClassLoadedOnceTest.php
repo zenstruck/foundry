@@ -96,7 +96,7 @@ final class WithStoryOnClassLoadedOnceTest extends KernelTestCase
         self::assertSame(1, OtherBuildCountingStory::$builds);
         GenericEntityFactory::assert()->count(2);
 
-        self::assertSame('foo', BuildCountingStory::get('foo')->getProp1());
+        self::assertSame('foo', BuildCountingStory::foo()->getProp1());
     }
 
     #[Test]
@@ -127,7 +127,7 @@ final class WithStoryOnClassLoadedOnceTest extends KernelTestCase
     {
         self::assertSame(1, BuildCountingStory::$builds);
         GenericEntityFactory::assert()->count(2);
-        self::assertSame('foo', BuildCountingStory::get('foo')->getProp1());
+        self::assertSame('foo', BuildCountingStory::foo()->getProp1());
     }
 
     #[Test]

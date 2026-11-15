@@ -487,6 +487,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
             $collection = $collection->map(static fn(Factory $f) => $f instanceof self ? $f->skipInverseWiringFor($inverseField) : $f);
 
             $this->inverseRelationshipCallbacks[] = function(object $object) use ($collection, $inverseRelationshipMetadata, $field, $inverseField) {
+                /** @var list<object> $inverseObjects */
                 $inverseObjects = $collection
                     ->reuse(...$this->reusedObjects())
                     ->withPersistMode($this->isPersisting() ? PersistMode::NO_PERSIST_BUT_SCHEDULE_FOR_INSERT : PersistMode::WITHOUT_PERSISTING)

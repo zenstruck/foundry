@@ -39,6 +39,24 @@ use Zenstruck\Foundry\Test\Behat\DependencyInjection\BehatServicesCompilerPass;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @phpstan-type FakerConfig array{locale: ?string, manage_seed: bool, service: ?string}
+ * @phpstan-type InstantiatorConfig array{use_constructor: bool, allow_extra_attributes: bool, always_force_properties: bool, service: ?string}
+ * @phpstan-type OrmConfig array{
+ *     reset: array{connections: list<string>, entity_managers: list<string>, mode: ?ResetDatabaseMode, migrations: array{configurations: list<string>}},
+ * }
+ * @phpstan-type MongoConfig array{reset: array{document_managers: list<string>}}
+ * @phpstan-type Config array{
+ *     enable_auto_refresh_with_lazy_objects: bool,
+ *     faker: FakerConfig,
+ *     instantiator: InstantiatorConfig,
+ *     global_state: list<string>,
+ *     persistence: array{flush_once: bool},
+ *     orm: OrmConfig,
+ *     mongo: MongoConfig,
+ *     make_factory: array{default_namespace: string, add_hints: bool},
+ *     make_story: array{default_namespace: string},
+ * }
  */
 final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPassInterface
 {
@@ -217,7 +235,10 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
         ;
     }
 
-    public function loadExtension(array $config, ContainerConfigurator $configurator, ContainerBuilder $container): void // @phpstan-ignore missingType.iterableValue
+    /**
+     * @param Config $config
+     */
+    public function loadExtension(array $config, ContainerConfigurator $configurator, ContainerBuilder $container): void
     {
         $container->registerForAutoconfiguration(Factory::class)->addTag('foundry.factory');
 
@@ -315,7 +336,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
     }
 
     /**
-     * @param mixed[] $config
+     * @param InstantiatorConfig $config
      */
     private function configureInstantiator(array $config, ContainerBuilder $container): void
     {
@@ -345,7 +366,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
     }
 
     /**
-     * @param mixed[] $config
+     * @param FakerConfig $config
      */
     private function configureFaker(array $config, ContainerBuilder $container): void
     {
@@ -365,7 +386,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
     }
 
     /**
-     * @param array<string, mixed> $config
+     * @param Config $config
      */
     private function configureMakers(ContainerConfigurator $configurator, ContainerBuilder $container, array $config): void
     {
@@ -402,11 +423,11 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
         }
 
         $container->getDefinition('.zenstruck_foundry.maker.factory.generator')
-            ->setArgument('$forceProperties', $config['instantiator']['always_force_properties'] ?? false);
+            ->setArgument('$forceProperties', $config['instantiator']['always_force_properties']);
     }
 
     /**
-     * @param array<string, mixed> $config
+     * @param Config $config
      */
     private function configurePersistence(ContainerBuilder $container, ContainerConfigurator $configurator, array $config): void
     {
@@ -429,7 +450,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
     }
 
     /**
-     * @param array<string, mixed> $ormConfig
+     * @param OrmConfig $ormConfig
      */
     private function configureOrm(ContainerConfigurator $configurator, ContainerBuilder $container, array $ormConfig): void
     {
@@ -439,7 +460,6 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
             ->replaceArgument('$managers', $ormConfig['reset']['entity_managers'])
             ->replaceArgument('$connections', $ormConfig['reset']['connections']);
 
-        /** @var ResetDatabaseMode|null $resetMode */
         $resetMode = $ormConfig['reset']['mode'];
 
         if (null === $resetMode) {
@@ -473,7 +493,7 @@ final class ZenstruckFoundryBundle extends AbstractBundle implements CompilerPas
     }
 
     /**
-     * @param array<string, mixed> $mongoConfig
+     * @param MongoConfig $mongoConfig
      */
     private function configureMongo(ContainerConfigurator $configurator, ContainerBuilder $container, array $mongoConfig): void
     {

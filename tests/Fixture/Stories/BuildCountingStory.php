@@ -12,12 +12,15 @@
 namespace Zenstruck\Foundry\Tests\Fixture\Stories;
 
 use Zenstruck\Foundry\Story;
+use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\GenericEntityFactory;
 
 use function Zenstruck\Foundry\faker;
 
 /**
  * @author Nicolas PHILIPPE <nikophil@gmail.com>
+ *
+ * @method static GenericEntity foo()
  */
 final class BuildCountingStory extends Story
 {

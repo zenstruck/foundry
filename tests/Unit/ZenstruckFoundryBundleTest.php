@@ -37,6 +37,8 @@ use Zenstruck\Foundry\ZenstruckFoundryBundle;
 
 /**
  * @author Silas Joisten <silasjoisten@proton.me>
+ *
+ * @phpstan-import-type Config from ZenstruckFoundryBundle
  */
 final class ZenstruckFoundryBundleTest extends TestCase
 {
@@ -264,6 +266,11 @@ final class ZenstruckFoundryBundleTest extends TestCase
         ], self::buildConfiguration());
     }
 
+    /**
+     * @param list<array<string, mixed>> $config
+     *
+     * @return Config
+     */
     private static function buildConfiguration(array $config = []): array
     {
         $treeBuilder = new TreeBuilder('zenstruck_foundry');
@@ -272,6 +279,9 @@ final class ZenstruckFoundryBundleTest extends TestCase
 
         (new ZenstruckFoundryBundle())->configure($configurator);
 
-        return (new Processor())->process($treeBuilder->buildTree(), $config);
+        /** @var Config $processedConfig */
+        $processedConfig = (new Processor())->process($treeBuilder->buildTree(), $config);
+
+        return $processedConfig;
     }
 }

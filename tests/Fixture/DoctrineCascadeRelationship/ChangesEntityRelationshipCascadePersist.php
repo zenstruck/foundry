@@ -12,6 +12,8 @@
 namespace Zenstruck\Foundry\Tests\Fixture\DoctrineCascadeRelationship;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\InverseSideMapping;
+use Doctrine\ORM\Mapping\OwningSideMapping;
 use Doctrine\ORM\Mapping\MappingException;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\Before;
@@ -118,12 +120,17 @@ trait ChangesEntityRelationshipCascadePersist
                     throw new \LogicException(\sprintf("Wrong parameters for attribute \"%s\". Association \"{$class}::\${$field}\" does not exist.", UsingRelationships::class));
                 }
 
-                $relationshipFields["{$association['sourceEntity']}::{$association['fieldName']}"] = ['class' => $association['sourceEntity'], 'field' => $association['fieldName'], 'isOneToMany' => ClassMetadata::ONE_TO_MANY === $association['type']];
-                if ($association['inversedBy'] ?? $association['mappedBy'] ?? null) {
+                $relationshipFields["{$association->sourceEntity}::{$association->fieldName}"] = ['class' => $association->sourceEntity, 'field' => $association->fieldName, 'isOneToMany' => ClassMetadata::ONE_TO_MANY === $association->type()];
+                $inverseField = match (true) {
+                    $association instanceof OwningSideMapping => $association->inversedBy,
+                    $association instanceof InverseSideMapping => $association->mappedBy,
+                    default => null,
+                };
+                if ($inverseField) {
                     /** @var ClassMetadata<object> $metadataTargetEntity */
-                    $metadataTargetEntity = $persistenceManager->metadataFor($association['targetEntity']); // @phpstan-ignore argument.templateType
-                    $associationTargetEntity = $metadataTargetEntity->getAssociationMapping($association['inversedBy'] ?? $association['mappedBy']);
-                    $relationshipFields["{$associationTargetEntity['sourceEntity']}::{$associationTargetEntity['fieldName']}"] = ['class' => $associationTargetEntity['sourceEntity'], 'field' => $associationTargetEntity['fieldName'], 'isOneToMany' => ClassMetadata::ONE_TO_MANY === $associationTargetEntity['type']];
+                    $metadataTargetEntity = $persistenceManager->metadataFor($association->targetEntity); // @phpstan-ignore argument.templateType
+                    $associationTargetEntity = $metadataTargetEntity->getAssociationMapping($inverseField);
+                    $relationshipFields["{$associationTargetEntity->sourceEntity}::{$associationTargetEntity->fieldName}"] = ['class' => $associationTargetEntity->sourceEntity, 'field' => $associationTargetEntity->fieldName, 'isOneToMany' => ClassMetadata::ONE_TO_MANY === $associationTargetEntity->type()];
                 }
             }
         }
