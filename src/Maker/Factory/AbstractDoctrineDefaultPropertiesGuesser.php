@@ -24,7 +24,7 @@ abstract class AbstractDoctrineDefaultPropertiesGuesser extends AbstractDefaultP
         parent::__construct($factoryClassMap, $factoryGenerator);
     }
 
-    protected function getClassMetadata(MakeFactoryData $makeFactoryData): ClassMetadata
+    protected function getClassMetadata(MakeFactoryData $makeFactoryData): ?ClassMetadata
     {
         $class = $makeFactoryData->getObjectFullyQualifiedClassName();
 

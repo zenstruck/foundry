@@ -45,8 +45,6 @@ final class Configuration
     /** @var \Closure():self|self|null */
     private static \Closure|self|null $instance = null;
 
-    private bool $inMemory = false;
-
     /**
      * @phpstan-param InstantiatorCallable $instantiator
      */
@@ -153,7 +151,7 @@ final class Configuration
             throw CannotEnableInMemory::noInMemoryRepositoryRegistry();
         }
 
-        $this->inMemory = true;
+        $this->inMemoryRepositoryRegistry->enable();
     }
 
     /**
@@ -161,7 +159,7 @@ final class Configuration
      */
     public function isInMemoryEnabled(): bool
     {
-        return $this->inMemory;
+        return $this->inMemoryRepositoryRegistry?->isEnabled() ?? false;
     }
 
     public static function autoRefreshWithLazyObjectsIsEnabled(): bool

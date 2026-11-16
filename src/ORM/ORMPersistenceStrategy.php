@@ -20,7 +20,7 @@ use Doctrine\ORM\Mapping\OneToManyAssociationMapping;
 use Doctrine\ORM\Mapping\OneToOneAssociationMapping;
 use Doctrine\Persistence\Mapping\MappingException;
 use Zenstruck\Foundry\Persistence\InitializeTrackedGhostsBeforeFlushListener;
-use Zenstruck\Foundry\Persistence\PersistenceStrategy;
+use Zenstruck\Foundry\Persistence\DoctrinePersistenceStrategy;
 use Zenstruck\Foundry\Persistence\Relationship\ManyToOneRelationship;
 use Zenstruck\Foundry\Persistence\Relationship\OneToManyRelationship;
 use Zenstruck\Foundry\Persistence\Relationship\OneToOneRelationship;
@@ -34,7 +34,7 @@ use Zenstruck\Foundry\Persistence\Relationship\RelationshipMetadata;
  * @method EntityManagerInterface       objectManagerFor(string $class)
  * @method list<EntityManagerInterface> objectManagers()
  */
-final class ORMPersistenceStrategy extends PersistenceStrategy
+final class ORMPersistenceStrategy extends DoctrinePersistenceStrategy
 {
     public function transactional(callable $callback): mixed
     {
@@ -176,7 +176,7 @@ final class ORMPersistenceStrategy extends PersistenceStrategy
         );
     }
 
-    public function disableDoctrineEvents(string $entityClass, array $disabledClasses): callable
+    public function disablePersistenceEvents(string $entityClass, array $disabledClasses): callable
     {
         $om = $this->objectManagerFor($entityClass);
 

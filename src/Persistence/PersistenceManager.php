@@ -12,8 +12,6 @@
 namespace Zenstruck\Foundry\Persistence;
 
 use Doctrine\Persistence\Mapping\ClassMetadata;
-use Doctrine\Persistence\ObjectManager;
-use Doctrine\Persistence\ObjectRepository;
 use Zenstruck\Foundry\Configuration;
 use Zenstruck\Foundry\Exception\PersistenceNotAvailable;
 use Zenstruck\Foundry\Object\Hydrator;
@@ -43,13 +41,18 @@ class PersistenceManager implements IdentifierResolver
     /** @var array<int, object> objects awaiting an object manager persist, in creation order */
     private array $pendingForInsert = [];
 
+    /** @var list<PersistenceStrategy> */
+    private array $strategies;
+
     /**
      * @param iterable<PersistenceStrategy> $strategies
      */
     public function __construct(
-        private iterable $strategies,
+        iterable $strategies,
         private ResetDatabaseManager $resetDatabaseManager,
     ) {
+        // a tagged iterator would pull every strategy from the container again on each strategyFor()
+        $this->strategies = \iterator_to_array($strategies, false);
     }
 
     public function isEnabled(): bool
@@ -77,15 +80,29 @@ class PersistenceManager implements IdentifierResolver
     public function save(object $object): object
     {
         $this->persistScheduled();
+        $this->strategyFor($object::class)->persist($object);
 
-        $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
-        $om->persist($object);
-        $this->flush($om);
+        return $this->flushPersisted($object);
+    }
 
-        $shouldFlush = $this->callPostPersistCallbacks();
+    /**
+     * Flushes an object a factory has already persisted along with its graph.
+     *
+     * @template T of object
+     *
+     * @param T $object
+     *
+     * @return T
+     */
+    public function flushPersisted(object $object): object
+    {
+        $this->persistScheduled();
 
-        if ($shouldFlush) {
-            $this->flush($om);
+        $strategy = $this->strategyFor($object::class);
+        $this->flush($strategy, $object::class);
+
+        if ($this->callPostPersistCallbacks()) {
+            $this->flush($strategy, $object::class);
         }
 
         return $object;
@@ -118,7 +135,7 @@ class PersistenceManager implements IdentifierResolver
         // a "pre persist" listener may schedule new objects: keep draining until empty
         while ($this->pendingForInsert) {
             $object = \array_shift($this->pendingForInsert);
-            $this->strategyFor($object::class)->objectManagerFor($object::class)->persist($object);
+            $this->strategyFor($object::class)->persist($object);
         }
     }
 
@@ -170,10 +187,13 @@ class PersistenceManager implements IdentifierResolver
         return $result;
     }
 
-    public function flush(ObjectManager $om): void
+    /**
+     * @param class-string $class
+     */
+    private function flush(PersistenceStrategy $strategy, string $class): void
     {
         if ($this->flush) {
-            $om->flush();
+            $strategy->flush($class);
         }
     }
 
@@ -188,11 +208,10 @@ class PersistenceManager implements IdentifierResolver
     public function autorefresh(object $object, array $id, ?array $snapshot = null): void
     {
         $strategy = $this->strategyFor($object::class);
-        $om = $strategy->objectManagerFor($object::class);
 
         if ($id) {
             try {
-                $om->refresh($object);
+                $strategy->refresh($object);
 
                 if ($this->getIdentifierValues($object)) {
                     // no identifier values means the object no longer exists
@@ -202,8 +221,8 @@ class PersistenceManager implements IdentifierResolver
             }
 
             // let's detach the object, in order to prevent Doctrine cache
-            $om->detach($object);
-            if ($refreshedObject = $om->find($object::class, $id)) {
+            $strategy->detach($object);
+            if ($refreshedObject = $strategy->find($object::class, $id)) {
                 Hydrator::hydrateFromOtherObject($object, $refreshedObject);
 
                 return;
@@ -211,7 +230,7 @@ class PersistenceManager implements IdentifierResolver
         }
 
         // the object no longer exists in the database: it was deleted or rolled back
-        $om->detach($object);
+        $strategy->detach($object);
 
         if (null !== $snapshot) {
             // the object's state was destroyed by resetAsLazyGhost(): restore its previous values
@@ -245,7 +264,7 @@ class PersistenceManager implements IdentifierResolver
 
         $id = $strategy->getIdentifierValues($object);
 
-        return ($id ? $strategy->objectManagerFor($object::class)->find($object::class, $id) : null) ?? $object;
+        return ($id ? $strategy->find($object::class, $id) : null) ?? $object;
     }
 
     /**
@@ -282,11 +301,9 @@ class PersistenceManager implements IdentifierResolver
             throw new ObjectHasUnsavedChanges($object::class);
         }
 
-        $om = $strategy->objectManagerFor($object::class);
-
         if ($strategy->contains($object)) {
             try {
-                $om->refresh($object);
+                $strategy->refresh($object);
             } catch (\LogicException|\Error) {
                 // prevent entities/documents with readonly properties to create an error
                 // LogicException is for ORM / Error is for ODM
@@ -324,10 +341,9 @@ class PersistenceManager implements IdentifierResolver
             return false;
         }
 
-        $om = $persistenceStrategy->objectManagerFor($object::class);
         $id = $persistenceStrategy->getIdentifierValues($object);
 
-        return $id && null !== $om->find($object::class, $id);
+        return $id && null !== $persistenceStrategy->find($object::class, $id);
     }
 
     /**
@@ -347,9 +363,9 @@ class PersistenceManager implements IdentifierResolver
         // Doctrine cannot remove a detached object
         $object = $this->reattach($object);
 
-        $om = $this->strategyFor($object::class)->objectManagerFor($object::class);
-        $om->remove($object);
-        $this->flush($om);
+        $strategy = $this->strategyFor($object::class);
+        $strategy->remove($object);
+        $this->flush($strategy, $object::class);
 
         return $object;
     }
@@ -360,18 +376,6 @@ class PersistenceManager implements IdentifierResolver
     public function truncate(string $class): void
     {
         $this->strategyFor($class)->truncate($class);
-    }
-
-    /**
-     * @template T of object
-     *
-     * @param class-string<T> $class
-     *
-     * @return ObjectRepository<T>
-     */
-    public function repositoryFor(string $class): ObjectRepository
-    {
-        return $this->strategyFor($class)->objectManagerFor($class)->getRepository($class);
     }
 
     /**
@@ -392,11 +396,13 @@ class PersistenceManager implements IdentifierResolver
      * @template T of object
      *
      * @param  class-string<T>  $class
-     * @return ClassMetadata<T>
+     * @return ClassMetadata<T>|null null for a backend without Doctrine metadata
      */
-    public function metadataFor(string $class): ClassMetadata
+    public function metadataFor(string $class): ?ClassMetadata
     {
-        return $this->strategyFor($class)->classMetadata($class);
+        $strategy = $this->strategyFor($class);
+
+        return $strategy instanceof ProvidesMetadata ? $strategy->classMetadata($class) : null;
     }
 
     /**
@@ -405,8 +411,8 @@ class PersistenceManager implements IdentifierResolver
     public function allMetadata(): iterable
     {
         foreach ($this->strategies as $strategy) {
-            foreach ($strategy->objectManagers() as $objectManager) {
-                yield from $objectManager->getMetadataFactory()->getAllMetadata();
+            if ($strategy instanceof ProvidesMetadata) {
+                yield from $strategy->allMetadata();
             }
         }
     }
@@ -462,6 +468,15 @@ class PersistenceManager implements IdentifierResolver
         }
     }
 
+    public function supportsAutoRefresh(object $object): bool
+    {
+        try {
+            return $this->strategyFor($object::class)->supportsAutoRefresh();
+        } catch (NoPersistenceStrategy) {
+            return false;
+        }
+    }
+
     public function resetDatabaseManager(): ResetDatabaseManager
     {
         return $this->resetDatabaseManager;
@@ -482,7 +497,7 @@ class PersistenceManager implements IdentifierResolver
      */
     public function getIdentifierFields(string $class): array
     {
-        return \array_values($this->metadataFor($class)->getIdentifier());
+        return $this->strategyFor($class)->identifierFields($class);
     }
 
     public static function isOrmOnly(): bool
@@ -491,12 +506,16 @@ class PersistenceManager implements IdentifierResolver
 
         return $isOrmOnly ??= (static function(): bool {
             try {
-                $strategies = \iterator_to_array(Configuration::instance()->persistence()->strategies);
+                $strategies = Configuration::instance()->persistence()->strategies;
             } catch (PersistenceNotAvailable) {
                 $strategies = [];
             }
 
-            return 1 === \count($strategies) && $strategies[0] instanceof ORMPersistenceStrategy;
+            // non-Doctrine strategies write nothing DAMA would have to roll back, so they do not
+            // count: what matters is whether the only Doctrine backend in play is the ORM
+            $doctrine = \array_values(\array_filter($strategies, static fn(PersistenceStrategy $s) => $s instanceof DoctrinePersistenceStrategy));
+
+            return 1 === \count($doctrine) && $doctrine[0] instanceof ORMPersistenceStrategy;
         })();
     }
 
@@ -514,15 +533,17 @@ class PersistenceManager implements IdentifierResolver
             throw new \LogicException('withoutDoctrineEvents() cannot be used inside flush_after().');
         }
 
-        return $this->strategyFor($entityClass)->disableDoctrineEvents($entityClass, $disabledClasses);
+        return $this->strategyFor($entityClass)->disablePersistenceEvents($entityClass, $disabledClasses);
     }
 
     private function flushAllStrategies(): void
     {
+        if (!$this->flush) {
+            return;
+        }
+
         foreach ($this->strategies as $strategy) {
-            foreach ($strategy->objectManagers() as $om) {
-                $this->flush($om);
-            }
+            $strategy->flushAll();
         }
     }
 
@@ -554,7 +575,7 @@ class PersistenceManager implements IdentifierResolver
      *
      * @throws NoPersistenceStrategy if no persistence strategy found
      */
-    private function strategyFor(string $class): PersistenceStrategy
+    public function strategyFor(string $class): PersistenceStrategy
     {
         foreach ($this->strategies as $strategy) {
             if ($strategy->supports($class)) {

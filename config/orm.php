@@ -23,7 +23,7 @@ return static function(ContainerConfigurator $container): void {
             ->args([
                 service('doctrine'),
             ])
-            ->tag('.foundry.persistence_strategy')
+            ->tag('foundry.persistence_strategy')
 
         ->set('.zenstruck_foundry.persistence.database_resetter.orm.abstract', BaseOrmResetter::class)
             ->arg('$registry', service('doctrine'))

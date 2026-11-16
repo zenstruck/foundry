@@ -22,11 +22,11 @@ use Zenstruck\Foundry\Persistence\Exception\RefreshObjectFailed;
  *
  * @param class-string<T> $class
  *
- * @return RepositoryDecorator<T,ObjectRepository<T>>
+ * @return RepositoryDecorator<T>
  */
 function repository(string $class): RepositoryDecorator
 {
-    return new RepositoryDecorator($class, Configuration::instance()->isInMemoryEnabled()); // @phpstan-ignore return.type
+    return RepositoryDecorator::for($class);
 }
 
 /**

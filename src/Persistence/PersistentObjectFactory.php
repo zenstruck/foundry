@@ -211,15 +211,15 @@ abstract class PersistentObjectFactory extends ObjectFactory
     }
 
     /**
-     * @return RepositoryDecorator<T,ObjectRepository<T>>
+     * @return RepositoryDecorator<T>
      */
-    public static function repository(): ObjectRepository
+    public static function repository(): RepositoryDecorator
     {
         if (!Configuration::instance()->isInMemoryEnabled()) {
             Configuration::instance()->assertPersistenceEnabled();
         }
 
-        return new RepositoryDecorator(static::class(), Configuration::instance()->isInMemoryEnabled()); // @phpstan-ignore return.type
+        return RepositoryDecorator::for(static::class());
     }
 
     final public static function assert(): RepositoryAssertions
@@ -682,7 +682,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
             throw new \LogicException('Persistence cannot be used in unit tests.');
         }
 
-        $configuration->persistence()->save($object);
+        $configuration->persistence()->flushPersisted($object);
 
         return $object;
     }
@@ -743,4 +743,5 @@ abstract class PersistentObjectFactory extends ObjectFactory
             return false;
         }
     }
+
 }

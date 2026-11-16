@@ -24,10 +24,26 @@ final class InMemoryRepositoryRegistry
      */
     private array $genericInMemoryRepositories = [];
 
+    private bool $enabled = false;
+
     public function __construct(
         /** @var ServiceLocator<InMemoryRepository<object>> */
         private readonly ServiceLocator $inMemoryRepositories,
     ) {
+    }
+
+    public function enable(): void
+    {
+        $this->enabled = true;
+    }
+
+    /**
+     * Read on every strategy lookup: the in-memory strategy shadows all the others, and getting
+     * the flag through Configuration::instance() would cost a container lookup each time.
+     */
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
     }
 
     /**

@@ -228,11 +228,26 @@ abstract class ObjectFactory extends Factory
      */
     protected function initializeInternal(): static
     {
-        if (!Configuration::isBooted() || !Configuration::instance()->hasEventDispatcher()) {
+        if (!Configuration::isBooted()) {
             return $this;
         }
 
-        return $this->beforeInstantiate(
+        $configuration = Configuration::instance();
+
+        // in-memory storage is not persistence: every object goes to its repository, persistent or not
+        $factory = $configuration->inMemoryRepositoryRegistry?->isEnabled()
+            ? $this->afterInstantiate(
+                static function(object $object, array $parameters, self $usedFactory): void {
+                    Configuration::instance()->inMemoryRepositoryRegistry?->get($usedFactory::class())->_save($object);
+                }
+            )
+            : $this;
+
+        if (!$configuration->hasEventDispatcher()) {
+            return $factory;
+        }
+
+        return $factory->beforeInstantiate(
             static function(array $parameters, string $objectClass, self $usedFactory): array {
                 Configuration::instance()->eventDispatcher()->dispatch(
                     $hook = new BeforeInstantiate($parameters, $objectClass, $usedFactory)
