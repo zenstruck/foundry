@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## [v2.17.0](https://github.com/zenstruck/foundry/releases/tag/v2.17.0)
+
+November 18th, 2026 - [v2.16.0...v2.17.0](https://github.com/zenstruck/foundry/compare/v2.16.0...v2.17.0)
+
+* c2182a7 fix: keep unmapped properties when auto-refreshing (#1219) by @nikophil
+* 3d2f1c9 chore(phpstan): bump to level 9 (#1215) by @nikophil
+* 30148e5 test: fix and simplify the cascade persist permutations (#1210) by @nikophil
+* 2e750c5 Test against PHP 8.6 and Symfony 8.2, allow Symfony 8 in foundry-behat (#1211) by @nikophil
+* 2538302 feat(behat): Cast to string id witch impl \Stringable (#1212) by @Norbytus
+* bf3b1f9 ci: don't cancel superseded runs on 2.x and 3.x (#1206) by @nikophil
+* 7bfdedb feat(maker): generate optional default values for nullable fields (#1203) by @seb-jean
+* e752723 feat(maker): generate a default value for `jsonb` fields (#1204) by @seb-jean
+* fe46bf5 fix: improve the error when a story with dependencies is not a service (#1205) by @Lars-
+
 ## [v2.16.0](https://github.com/zenstruck/foundry/releases/tag/v2.16.0)
 
 November 9th, 2026 - [v2.15.0...v2.16.0](https://github.com/zenstruck/foundry/compare/v2.15.0...v2.16.0)
