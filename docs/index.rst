@@ -259,6 +259,13 @@ component will be used to call the ``setTitle()`` method or directly set the pub
 
 .. tip::
 
+    ``make:factory`` guesses the default values from the type of the fields, but also from the name of the
+    most common ones: for instance ``self::faker()->safeEmail()`` is generated for a string field named ``email``,
+    ``self::faker()->firstName()`` for ``firstName`` or ``self::faker()->latitude()`` for a float field named
+    ``latitude``, as long as the column is long enough to store these values.
+
+.. tip::
+
     Using ``make:factory --all-fields`` will generate default values for all fields of the entity,
     not only non-nullable fields.
     Nullable fields get an `optional <https://fakerphp.org/#modifiers>`_ default value

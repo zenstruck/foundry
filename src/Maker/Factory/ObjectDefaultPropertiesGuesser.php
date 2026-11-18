@@ -52,9 +52,9 @@ class ObjectDefaultPropertiesGuesser extends AbstractDefaultPropertyGuesser
                 continue;
             }
 
-            if (\array_key_exists($type, self::DEFAULTS_FOR_NOT_PERSISTED)) {
-                $value = self::DEFAULTS_FOR_NOT_PERSISTED[$type];
-            }
+            $value = FakerFormatterGuesser::guess($property->getName(), $type)
+                ?? self::DEFAULTS_FOR_NOT_PERSISTED[$type]
+                ?? $value;
 
             $makeFactoryData->addDefaultProperty($property->getName(), $value, $nullable);
         }

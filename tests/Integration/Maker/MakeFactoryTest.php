@@ -28,11 +28,13 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithEmbeddableEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithEnumArraysEntity;
+use Zenstruck\Foundry\Tests\Fixture\Entity\WithGuessableFieldNames;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithNestedEmbeddableEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithUidColumn;
 use Zenstruck\Foundry\Tests\Fixture\Maker\Entity\WithJsonbColumn;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
 use Zenstruck\Foundry\Tests\Fixture\ObjectWithEnum;
+use Zenstruck\Foundry\Tests\Fixture\ObjectWithGuessablePropertyNames;
 use Zenstruck\Foundry\Tests\Fixture\ObjectWithNonWriteable;
 use Zenstruck\Foundry\Tests\Fixture\ObjectWithNullableProperties;
 
@@ -527,6 +529,36 @@ final class MakeFactoryTest extends MakerTestCase
         $tester->execute(['class' => ObjectWithNullableProperties::class, '--no-persistence' => true, '--all-fields' => true]);
 
         $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/ObjectWithNullablePropertiesFactory.php'));
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_create_factory_with_defaults_guessed_from_field_names(): void
+    {
+        if (!\getenv('DATABASE_URL')) {
+            self::markTestSkipped('doctrine/orm not enabled.');
+        }
+
+        $tester = $this->makeFactoryCommandTester();
+
+        $tester->execute(['class' => WithGuessableFieldNames::class, '--all-fields' => true]);
+
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/WithGuessableFieldNamesFactory.php'));
+    }
+
+    /**
+     * @test
+     */
+    #[Test]
+    public function can_create_factory_for_not_persisted_class_with_defaults_guessed_from_property_names(): void
+    {
+        $tester = $this->makeFactoryCommandTester();
+
+        $tester->execute(['class' => ObjectWithGuessablePropertyNames::class, '--no-persistence' => true]);
+
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile('src/Factory/ObjectWithGuessablePropertyNamesFactory.php'));
     }
 
     /**
