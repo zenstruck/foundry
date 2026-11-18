@@ -109,9 +109,9 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
                 $makeFactoryData->addUse(Uuid::class);
             }
 
-            if (\array_key_exists($type, self::DEFAULTS)) {
-                $value = self::DEFAULTS[$type];
-            }
+            $value = FakerFormatterGuesser::guess($fieldName, $type, \is_int($length) ? $length : null)
+                ?? self::DEFAULTS[$type]
+                ?? $value;
 
             $makeFactoryData->addDefaultProperty($fieldName, \str_replace('{length}', (string) $length, $value), $nullable);
         }
