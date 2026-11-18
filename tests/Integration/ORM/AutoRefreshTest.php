@@ -28,6 +28,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\DerivedIdentity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithCloneMethod;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithReadonly\EntityWithReadonly;
+use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\EntityWithUnmappedProperty;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EdgeCases\ManyToOneWithCascade\OwningSide;
 use Zenstruck\Foundry\Tests\Fixture\Entity\EntityWithOnlyPrivateProperties;
 use Zenstruck\Foundry\Tests\Fixture\Factories\Entity\Address\AddressFactory;
@@ -169,6 +170,22 @@ final class AutoRefreshTest extends AutoRefreshTestCase
 
         self::assertSame('foo', $entity->prop);
         self::assertSame($entityId, $entity->id);
+    }
+
+    #[Test]
+    public function it_keeps_unmapped_property_value_after_refresh(): void
+    {
+        $entity = persistent_factory(EntityWithUnmappedProperty::class)->create();
+        $entity->unmapped = 'changed';
+
+        $this->objectManager()->getConnection()->executeQuery('UPDATE entity_with_unmapped_property SET prop = \'foo\' WHERE id = ?', [$entity->id]);
+
+        self::ensureKernelShutdown();
+
+        self::assertTrue((new \ReflectionClass($entity))->isUninitializedLazyObject($entity));
+
+        self::assertSame('foo', $entity->prop);
+        self::assertSame('changed', $entity->unmapped);
     }
 
     #[Test]

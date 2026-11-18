@@ -217,6 +217,11 @@ class PersistenceManager implements IdentifierResolver
                     $this->refresh($refreshedObject, canThrow: false);
                 }
 
+                if (null !== $snapshot) {
+                    // Doctrine does not hydrate unmapped properties: keep their previous values, as refresh() does
+                    Hydrator::hydrateFromSnapshot($object, $snapshot);
+                }
+
                 Hydrator::hydrateFromOtherObject($object, $refreshedObject);
 
                 return;

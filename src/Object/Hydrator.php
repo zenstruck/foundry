@@ -210,6 +210,10 @@ final class Hydrator
         }
 
         foreach ($properties as $property) {
+            if (!self::accessibleProperty($other, $property)->isInitialized($other)) {
+                continue;
+            }
+
             self::forceSet($object, $property, self::get($other, $property), catchErrors: true);
         }
     }
