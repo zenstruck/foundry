@@ -23,6 +23,7 @@ use Zenstruck\Foundry\Maker\Factory\FactoryGenerator;
 use Zenstruck\Foundry\Tests\Fixture\Document\GenericDocument;
 use Zenstruck\Foundry\Tests\Fixture\Document\WithEmbeddableDocument;
 use Zenstruck\Foundry\Tests\Fixture\Document\WithEnumArraysDocument;
+use Zenstruck\Foundry\Tests\Fixture\Document\WithUniqueFieldsDocument;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Category;
 use Zenstruck\Foundry\Tests\Fixture\Entity\Contact;
 use Zenstruck\Foundry\Tests\Fixture\Entity\GenericEntity;
@@ -30,6 +31,7 @@ use Zenstruck\Foundry\Tests\Fixture\Entity\WithEmbeddableEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithEnumArraysEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithNestedEmbeddableEntity;
 use Zenstruck\Foundry\Tests\Fixture\Entity\WithUidColumn;
+use Zenstruck\Foundry\Tests\Fixture\Entity\WithUniqueFieldsEntity;
 use Zenstruck\Foundry\Tests\Fixture\Maker\Entity\WithJsonbColumn;
 use Zenstruck\Foundry\Tests\Fixture\Object1;
 use Zenstruck\Foundry\Tests\Fixture\ObjectWithEnum;
@@ -568,6 +570,35 @@ final class MakeFactoryTest extends MakerTestCase
 
         if (\getenv('MONGO_URL')) {
             yield 'odm' => [WithEnumArraysDocument::class, 'WithEnumArraysDocumentFactory'];
+        }
+    }
+
+    /**
+     * @test
+     * @dataProvider objectsWithUniqueFieldsProvider
+     */
+    #[Test]
+    #[DataProvider('objectsWithUniqueFieldsProvider')]
+    public function can_create_factory_with_unique_fields(string $objectClass, string $objectFactoryName): void
+    {
+        $tester = $this->makeFactoryCommandTester();
+
+        $tester->execute(['class' => $objectClass, '--all-fields' => true]);
+
+        $this->assertFileFromMakerSameAsExpectedFile(self::tempFile("src/Factory/{$objectFactoryName}.php"));
+    }
+
+    /**
+     * @return iterable<string, array{0: string, 1: string}>
+     */
+    public static function objectsWithUniqueFieldsProvider(): iterable
+    {
+        if (\getenv('DATABASE_URL')) {
+            yield 'orm' => [WithUniqueFieldsEntity::class, 'WithUniqueFieldsEntityFactory'];
+        }
+
+        if (\getenv('MONGO_URL')) {
+            yield 'odm' => [WithUniqueFieldsDocument::class, 'WithUniqueFieldsDocumentFactory'];
         }
     }
 

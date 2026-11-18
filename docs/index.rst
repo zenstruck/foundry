@@ -264,6 +264,12 @@ component will be used to call the ``setTitle()`` method or directly set the pub
     Nullable fields get an `optional <https://fakerphp.org/#modifiers>`_ default value
     (e.g. ``self::faker()->optional()->text()``), so that they are randomly ``null``.
 
+.. tip::
+
+    ``make:factory`` generates a `unique <https://fakerphp.org/#modifiers>`_ default value
+    (e.g. ``self::faker()->unique()->text()``) for the fields with a unique constraint
+    in their Doctrine mapping.
+
 .. note::
 
     ``defaults()`` is called every time a factory is instantiated (even if you don't end up

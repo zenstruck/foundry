@@ -84,7 +84,10 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
                 continue;
             }
 
-            $nullable = $nullable && $makeFactoryData->acceptsNull($fieldName);
+            $unique = $this->isUnique($metadata, $property);
+
+            // unlike relational databases, MongoDB only allows a single null value in a unique index
+            $nullable = $nullable && $makeFactoryData->acceptsNull($fieldName) && !($unique && $metadata instanceof ODMClassMetadata);
 
             $type = \mb_strtoupper($this->extractFieldMappingData($property, 'type'));
             if ($this->extractFieldMappingData($property, 'enumType')) {
@@ -93,6 +96,7 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
                     $this->extractFieldMappingData($property, 'enumType'),
                     isList: \in_array($type, self::ARRAY_TYPES, true),
                     nullable: $nullable,
+                    unique: $unique,
                 );
 
                 continue;
@@ -113,13 +117,33 @@ final class DoctrineScalarFieldsDefaultPropertiesGuesser extends AbstractDoctrin
                 $value = self::DEFAULTS[$type];
             }
 
-            $makeFactoryData->addDefaultProperty($fieldName, \str_replace('{length}', (string) $length, $value), $nullable);
+            $makeFactoryData->addDefaultProperty($fieldName, \str_replace('{length}', (string) $length, $value), $nullable, $unique);
         }
     }
 
     public function supports(MakeFactoryData $makeFactoryData): bool
     {
         return $makeFactoryData->isPersisted();
+    }
+
+    /**
+     * Unique constraints on several fields are ignored: none of their fields is unique by itself.
+     */
+    private function isUnique(ODMClassMetadata|ORMClassMetadata $metadata, FieldMapping|array $fieldMapping): bool
+    {
+        if ($metadata instanceof ODMClassMetadata) {
+            return array_any(
+                $metadata->getIndexes(),
+                static fn(array $index): bool => ($index['options']['unique'] ?? false) && [$fieldMapping['name']] === \array_keys($index['keys']),
+            );
+        }
+
+        return $this->extractFieldMappingData($fieldMapping, 'unique', false)
+            || array_any(
+                $metadata->table['uniqueConstraints'] ?? [],
+                fn(array $constraint): bool => [$this->extractFieldMappingData($fieldMapping, 'fieldName')] === ($constraint['fields'] ?? null)
+                    || [$this->extractFieldMappingData($fieldMapping, 'columnName')] === ($constraint['columns'] ?? null),
+            );
     }
 
     // handles both ORM 3 & 4
