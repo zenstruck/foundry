@@ -160,8 +160,12 @@ final class MakeFactoryData
         return $uses;
     }
 
-    public function addDefaultProperty(string $propertyName, string $defaultValue, bool $nullable = false): void
+    public function addDefaultProperty(string $propertyName, string $defaultValue, bool $nullable = false, bool $unique = false): void
     {
+        if ($unique) {
+            $defaultValue = \str_replace('self::faker()->', 'self::faker()->unique()->', $defaultValue);
+        }
+
         $this->defaultProperties[$propertyName] = $nullable ? self::optional($defaultValue) : $defaultValue;
     }
 
@@ -231,7 +235,7 @@ final class MakeFactoryData
         return $methodsInPHPDoc;
     }
 
-    public function addEnumDefaultProperty(string $propertyName, string $enumClass, bool $isList = false, bool $nullable = false): void
+    public function addEnumDefaultProperty(string $propertyName, string $enumClass, bool $isList = false, bool $nullable = false, bool $unique = false): void
     {
         if (\PHP_VERSION_ID < 80100) {
             throw new \LogicException('Cannot add enum for php version inferior than 8.1');
@@ -250,6 +254,7 @@ final class MakeFactoryData
                 ? "self::faker()->randomElements({$enumShortClassName}::cases(), null),"
                 : "self::faker()->randomElement({$enumShortClassName}::cases()),",
             $nullable,
+            $unique,
         );
     }
 
@@ -265,11 +270,12 @@ final class MakeFactoryData
 
     private static function optional(string $defaultValue): string
     {
-        if (\str_starts_with($defaultValue, 'self::faker()->')) {
+        if (\str_starts_with($defaultValue, 'self::faker()->') && !\str_starts_with($defaultValue, 'self::faker()->unique()->')) {
             return \substr_replace($defaultValue, '->optional()', \mb_strlen('self::faker()'), 0);
         }
 
-        // the faker call is wrapped in another call: it cannot be made optional by itself
+        // the faker call is wrapped in another call or is unique: it cannot be made optional by itself
+        // ("optional()->unique()" is randomly null, the faker method cannot be chained to it)
         if (\str_contains($defaultValue, 'self::faker()')) {
             return 'self::faker()->optional()->passthrough('.\rtrim($defaultValue, ',').'),';
         }
