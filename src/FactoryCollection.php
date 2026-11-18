@@ -111,7 +111,11 @@ final class FactoryCollection implements \IteratorAggregate
      */
     public static function many(Factory $factory, int $count): self
     {
-        return new self($factory, static fn() => \array_fill(0, $count, []));
+        return new self($factory, static function() use ($count) {
+            for ($i = 0; $i < $count; ++$i) {
+                yield [];
+            }
+        });
     }
 
     /**
@@ -125,7 +129,11 @@ final class FactoryCollection implements \IteratorAggregate
             throw new \InvalidArgumentException('Min must be less than max.');
         }
 
-        return new self($factory, static fn() => \array_fill(0, \mt_rand($min, $max), []));
+        return new self($factory, static function() use ($min, $max) {
+            for ($i = \mt_rand($min, $max); $i > 0; --$i) {
+                yield [];
+            }
+        });
     }
 
     /**
@@ -169,37 +177,63 @@ final class FactoryCollection implements \IteratorAggregate
     }
 
     /**
+     * Creates the objects batch per batch: each batch is flushed, then the object managers
+     * are cleared. Nothing is returned, as holding a reference on every created object is
+     * precisely what makes creating a large amount of them impossible.
+     *
+     * Beware: clearing an object manager detaches every object it managed, not only the
+     * ones created here.
+     *
+     * @phpstan-param Attributes $attributes
+     */
+    public function bulkCreate(array|callable $attributes = [], int $batchSize = 100): void
+    {
+        if (!$this->factory instanceof PersistentObjectFactory || PersistMode::PERSIST !== $this->persistMode) {
+            throw new \LogicException('bulkCreate() can only be used with a factory which persists its objects.');
+        }
+
+        Configuration::instance()->persistence()->flushInBatches(
+            $batchSize,
+            (function() use ($attributes): \Generator {
+                foreach ($this->factories() as $factory) {
+                    yield static fn() => $factory->create($attributes);
+                }
+            })(),
+        );
+    }
+
+    /**
      * @return list<TFactory>
      */
     public function all(): array
     {
-        $factories = [];
+        return \iterator_to_array($this->factories(), preserve_keys: false);
+    }
 
+    /**
+     * Same as all(), but never holds more than one factory at a time.
+     *
+     * @return \Generator<int, TFactory>
+     */
+    private function factories(): \Generator
+    {
         $i = 1;
+
         foreach (($this->items)() as $attributesOrFactory) {
-            if ($attributesOrFactory instanceof Factory) {
-                $factories[] = $attributesOrFactory;
+            $factory = $attributesOrFactory instanceof Factory
+                ? $attributesOrFactory
+                : $this->factory->with($attributesOrFactory)->with(['__index' => $i++]);
 
-                continue;
-            }
-
-            $factories[] = $this->factory->with($attributesOrFactory)->with(['__index' => $i++]);
-        }
-
-        return \array_map( // @phpstan-ignore return.type (PHPStan does not understand we have an array of factories)
-            function(Factory $f) {
-                if ($f instanceof PersistentObjectFactory) {
-                    if (!$this->isRootFactory) {
-                        $f = $f->notRootFactory();
-                    }
-
-                    return $f->withPersistMode($this->persistMode);
+            if ($factory instanceof PersistentObjectFactory) {
+                if (!$this->isRootFactory) {
+                    $factory = $factory->notRootFactory();
                 }
 
-                return $f;
-            },
-            $factories
-        );
+                $factory = $factory->withPersistMode($this->persistMode);
+            }
+
+            yield $factory; // @phpstan-ignore generator.valueType (PHPStan does not understand we have a factory of the right type)
+        }
     }
 
     /**
