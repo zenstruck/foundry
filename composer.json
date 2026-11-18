@@ -102,6 +102,9 @@
         },
         "symfony": {
             "allow-contrib": false
+        },
+        "ai-mate": {
+            "skills": ["skills"]
         }
     },
     "minimum-stability": "dev",
